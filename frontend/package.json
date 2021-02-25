@@ -1,0 +1,66 @@
+{
+  "name": "seng302-template-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --port 9500",
+    "build": "vue-cli-service build --mode staging",
+    "build-prod": "vue-cli-service build --mode prod",
+    "kill-all": "fuser -k 9500/tcp 9499/tcp",
+    "lint": "vue-cli-service lint",
+    "test": "jest --coverage",
+    "sonarqube": "node sonarqube-analysis.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "core-js": "^3.8.3",
+    "serve": "^11.3.2",
+    "vue": "^2.6.12",
+    "vuejs-logger": "^1.5.5"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.11",
+    "@vue/cli-plugin-eslint": "~4.5.11",
+    "@vue/cli-service": "~4.5.11",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.19.0",
+    "eslint-plugin-vue": "^7.5.0",
+    "vue-template-compiler": "^2.6.12",
+    "jest": "^26.6.3",
+    "vue-jest": "^3.0.7",
+    "jest-sonar-reporter": "^2.0.0",
+    "sonarqube-scanner": "^2.8.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testResultsProcessor": "jest-sonar-reporter"
+  },
+  "jestSonar": {
+    "reportPath": "coverage",
+    "reportFile": "test-reporter.xml",
+    "indent": 4
+  }
+}
