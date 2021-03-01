@@ -32,10 +32,6 @@ Running on: http://localhost:9500/ by default
 
 Running on: http://localhost:9499/ by default
 
-## Todo (S1)
-
-- Add team name into `build.gradle` and `package.json`
-
 ## Todo (S2)
 
 - Update team name into `build.gradle` and `package.json`
