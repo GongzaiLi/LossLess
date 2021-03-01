@@ -35,8 +35,6 @@ Running on: http://localhost:9499/ by default
 ## Todo (S1)
 
 - Add team name into `build.gradle` and `package.json`
-- Update this README title ✓
-- Update this README contributors
 
 ## Todo (S2)
 
@@ -49,6 +47,11 @@ Running on: http://localhost:9499/ by default
 ## Contributors
 
 - SENG302 teaching team
+- Eric Song
+- Caleb Sim
+- Gongzai Li
+- Nitish Singh
+- Phil Taylor
 
 ## References
 
