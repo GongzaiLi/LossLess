@@ -1,4 +1,4 @@
-# Seng302 Example Project
+# Seng302 Team 20 Project
 
 Basic project template using `gradle`, `npm`, `Spring Boot`, `Vue.js` and `Gitlab CI`.
 
@@ -35,7 +35,7 @@ Running on: http://localhost:9499/ by default
 ## Todo (S1)
 
 - Add team name into `build.gradle` and `package.json`
-- Update this README title
+- Update this README title ✓
 - Update this README contributors
 
 ## Todo (S2)
