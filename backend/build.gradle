@@ -34,7 +34,7 @@ plugins {
     id 'org.sonarqube' version '3.0'
 }
 
-group = 'Team 1100'
+group = 'Team 8'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
