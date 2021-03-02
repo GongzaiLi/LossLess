@@ -1,4 +1,4 @@
-# Seng302 Example Project
+# Seng302 Team 8 Wasteless Project
 
 Basic project template using `gradle`, `npm`, `Spring Boot`, `Vue.js` and `Gitlab CI`.
 
@@ -35,8 +35,8 @@ Running on: http://localhost:9499/ by default
 ## Todo (S1)
 
 - Add team name into `build.gradle` and `package.json`
-- Update this README title
-- Update this README contributors
+- Update this README title (DONE)
+- Update this README contributors (DONE)
 
 ## Todo (S2)
 
@@ -49,6 +49,10 @@ Running on: http://localhost:9499/ by default
 ## Contributors
 
 - SENG302 teaching team
+- Arish Myckel Abalos
+- Marcus Brorens
+- Oliver Cranshaw
+- James Harris
 
 ## References
 
