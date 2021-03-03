@@ -1,17 +1,39 @@
 <template>
-  <div class="login">
+  <div>
     <h2>Login to Wasteless</h2>
-    <p>Username</p>
-    <input
+    <p>Email</p>
+    <input v-model="email"
+        size="30"
         autofocus
         autocomplete="off"
     />
     <p>Password</p>
-    <input
+    <input v-model="password"
+        size="30"
         autofocus
         autocomplete="off"
-    />
-    <button style="margin-top:10px">Login</button>
+    /> <br>
+    <button v-on:click="login"
+      style="margin-top:10px">Login</button>
   </div>
 
 </template>
+
+<script>
+module.exports = {
+  data: function() {
+    return {
+      email: "",
+      password: "",
+    }
+  },
+  methods: {
+    login: function() {
+      console.log({
+        email: this.email, 
+        password: this.password
+      });
+    }
+  }
+}
+</script>
