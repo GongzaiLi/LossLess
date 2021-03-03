@@ -12,6 +12,8 @@
         autocomplete="off"
     />
     <button style="margin-top:10px">Login</button>
+    <button style="margin-top:10px">Register</button>
+
   </div>
 
 </template>

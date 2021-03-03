@@ -6,6 +6,11 @@
 
 <script>
 import Login from "./components/Login";
+import Register from "./components/views/Register";
+import Students from "./components/Students";
+
+
+
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
@@ -16,6 +21,8 @@ const app = {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
     Login,
+    Register,
+    Students
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
