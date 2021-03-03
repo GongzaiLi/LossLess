@@ -27,6 +27,7 @@ const app = {
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
+  fullname: ''
     return {};
   },
 };

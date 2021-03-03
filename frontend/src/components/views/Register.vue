@@ -2,18 +2,18 @@
   <div class="register">
 
     <h2> Sign Up to Wasteless </h2>
+
     <p> Full Name * </p>
 
-    <input
-        autofocus
-        autocomplete="off"
-        size=30;
-    />
+    <input v-model="fullName" placeholder="Full Name" autocomplete="off" size=30 />  //create variable for fields
+
+    <p> it is {{ fullName }} </p>
 
     <p> Nickname </p>
 
 
     <input
+        placeholder="Nick Name"
         autofocus
         autocomplete="off"
         size=30;
@@ -22,6 +22,7 @@
 
     <p> Bio </p>
     <textarea
+        placeholder="Enter your Bio"
         autofocus
         autocomplete="off"
         style="width:240px;height:80px;resize:none;font-family:Arial"
@@ -29,6 +30,7 @@
 
     <p> Email * </p>
     <input
+        placeholder="Email"
         autofocus
         autocomplete="off"
         size=30;
@@ -38,6 +40,7 @@
 
     <p> Date of Birth * </p>
     <input
+        placeholder="Date of Birth"
         autofocus
         autocomplete="off"
         size=30;
@@ -45,6 +48,7 @@
 
     <p> Phone </p>
     <input
+        placeholder="Phone"
         autofocus
         autocomplete="off"
         size=30;
@@ -52,9 +56,10 @@
 
     <p> Home Address * </p>
      <textarea
-             autofocus
-             autocomplete="off"
-             style="width:240px;height:80px;resize:none;font-family:Arial"
+     placeholder="Home Address"
+        autofocus
+        autocomplete="off"
+        style="width:240px;height:80px;resize:none;font-family:Arial"
       />
      <p>
         <button style="margin-top:10px">Register</button>
