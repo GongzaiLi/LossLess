@@ -13,9 +13,19 @@
         autofocus
         autocomplete="off"
     /> <br>
-    <button v-on:click="login"
-      style="margin-top:10px">Login</button>
-    <p>Don't have an account? <a href="\register">Register here</a></p>
+
+    <span style="padding-right:10px" align="left">
+
+        <button @click="login" style="margin-top:10px">Login</button>
+      </span>
+
+
+    <p> Don't have an account?
+        <span>
+            <button @click="goToRegisterPage" style="margin-top:10px">Register</button>
+        </span>
+    </p>
+
   </div>
 
 </template>
@@ -31,9 +41,12 @@ module.exports = {
   methods: {
     login: function() {
       console.log({
-        email: this.email, 
+        email: this.email,
         password: this.password
       });
+    },
+    goToRegisterPage: function() {
+      console.log("Redirecting to Register Page");
     }
   }
 }
