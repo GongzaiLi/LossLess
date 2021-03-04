@@ -101,6 +101,9 @@ methods: {
     const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.dateOfBirth,
     this.homeAddress];
     this.errors = [];
+    if (!this.email.includes("@")) {
+      this.errors.push("Email address is invalid, please make sure it contains an @ sign");
+    }
     if (requiredFields.every(function(e) { return e;})) {
       console.log({
         firstName: this.firstName,
@@ -115,9 +118,6 @@ methods: {
         password: this.password
       })
     } else {
-      if (!this.email.includes("@")) {
-        this.errors.push("Email address is invalid, please make sure it contains an @ sign");
-      }
       this.errors.push("One or more mandatory fields are empty!");
     }
 
