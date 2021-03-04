@@ -64,6 +64,7 @@ export default {
         .catch((error) => {
           if (this.makeLoginSucceed) {
             // Go to profile page
+            this.loginFailed = false;
             return;
           }
 
