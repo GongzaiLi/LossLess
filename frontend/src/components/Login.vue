@@ -3,15 +3,16 @@
     <h2>Login to Wasteless</h2>
     <p>Email</p>
     <input v-model="email"
-        size="30"
-        autofocus
-        autocomplete="off"
+           size="30"
+           autofocus
+           autocomplete="off"
     />
     <p>Password</p>
     <input v-model="password"
-        size="30"
-        autofocus
-        autocomplete="off"
+           type="password"
+           size="30"
+           autofocus
+           autocomplete="off"
     /> <br>
 
     <span style="padding-right:10px" align="left">
@@ -21,7 +22,7 @@
 
 
     <p> Don't have an account?
-        <span>
+      <span>
             <button @click="goToRegisterPage" style="margin-top:10px">Register</button>
         </span>
     </p>
@@ -32,20 +33,20 @@
 
 <script>
 module.exports = {
-  data: function() {
+  data: function () {
     return {
       email: "",
       password: "",
     }
   },
   methods: {
-    login: function() {
+    login: function () {
       console.log({
         email: this.email,
         password: this.password
       });
     },
-    goToRegisterPage: function() {
+    goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
     }
   }
