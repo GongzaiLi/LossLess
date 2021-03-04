@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <Register />
+    <Login />
   </div>
 </template>
 
 <script>
 import Login from "./components/Login";
-import Register from "./components/views/Register";
+import Register from "./components/Register";
 import Students from "./components/Students";
 
 
@@ -27,7 +27,6 @@ const app = {
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
   data: () => {
-  fullname: ''
     return {};
   },
 };
