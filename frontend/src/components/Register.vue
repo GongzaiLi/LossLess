@@ -4,16 +4,16 @@
     <h2> Sign Up to Wasteless </h2>
 
     <p> First Name * </p>
-    <input v-model="firstName" placeholder="First Name" autocomplete="off" size=30 />
+    <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
     <span> //Test: {{ firstName }} </span>
 
     <p> Middle Name * </p>
-    <input v-model="middleName" placeholder="Middle Name" autocomplete="off" size=30 />
+    <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
      <span> //Test: {{ middleName }} </span>
 
 
     <p> Last Name * </p>
-    <input v-model="lastName" placeholder="Last Name" autocomplete="off" size=30 />
+    <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
     <span> //Test: {{ lastName }} </span>
 
     <p> Nickname </p>
@@ -23,13 +23,13 @@
     <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
 
     <p> Email * </p>
-    <input v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
+    <input type="email" required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
 
      <p> Password * </p>
-      <input v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
+      <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
 
     <p> Date of Birth * </p>
-    <input v-model="dateOfBirth"
+    <input type="date" v-model="dateOfBirth" required
         placeholder="Date of Birth"
         autofocus
         autocomplete="off"
@@ -37,7 +37,7 @@
     />
 
     <p> Phone </p>
-    <input v-model="phoneNumber"
+    <input type="number" v-model="phoneNumber"
         placeholder="Phone"
         autofocus
         autocomplete="off"
@@ -45,21 +45,28 @@
     />
 
     <p> Home Address * </p>
-     <textarea v-model="homeAddress"
+     <textarea v-model="homeAddress" required
      placeholder="Home Address"
         autofocus
         autocomplete="off"
         style="width:240px;height:80px;resize:none;font-family:Arial"
       />
-     <p>
-        <button @click="register" style="margin-top:10px">Register</button>
+
+      <div v-if="errors.length">
+          <p style="color:red" v-for="error in errors" v-bind:key="error">{{ error }}  </p>
+      </div>
+
+
+    <p>
+        <button v-on:click="register" style="margin-top:10px">Register</button>
     </p>
 
     <p> Already have an account?
     <span>
-       <button @click="goToLoginPage" style="margin-top:10px">Login</button>
+       <button v-on:click="goToLoginPage" style="margin-top:10px">Login</button>
     </span>
     </p>
+
 
 
   </div>
@@ -71,6 +78,7 @@ module.exports = {
 
 data: function() {
     return {
+      errors: [],
       "firstName": "",
         "lastName": "",
         "middleName": "",
@@ -85,6 +93,14 @@ data: function() {
   },
 methods: {
     register() {
+    const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.dateOfBirth,
+    this.homeAddress];
+    if (requiredFields.every(function(e) { return e;})) {
+      console.log(true);
+      return true;
+    }
+      this.errors = [];
+      this.errors.push("One or more mandatory fields are empty!");
     console.log({
                   firstName: this.firstName,
                   lastName: this.lastName,
