@@ -24,7 +24,7 @@
       <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
 
       <p> Email * </p>
-      <input type="email" required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
+      <input required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
 
        <p> Password * </p>
         <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
@@ -115,6 +115,9 @@ methods: {
         password: this.password
       })
     } else {
+      if (!this.email.includes("@")) {
+        this.errors.push("Email address is invalid, please make sure it contains an @ sign");
+      }
       this.errors.push("One or more mandatory fields are empty!");
     }
 
