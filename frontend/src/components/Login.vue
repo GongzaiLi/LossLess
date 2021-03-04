@@ -52,9 +52,7 @@ module.exports = {
   methods: {
     login: function () {
 
-      if (this.email && this.password) {
-        return true;
-      }
+
       this.errors = [];
 
       if (!this.email) {
