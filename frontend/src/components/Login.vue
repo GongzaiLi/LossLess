@@ -47,9 +47,6 @@ module.exports = {
     },
     goToRegisterPage: function() {
     console.log("Redirecting to Register Page");
-    },
-    forgotPassword: function() {
-    console.log("Redirecting to Password recovery page")
     }
   }
 }
