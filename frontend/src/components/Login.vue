@@ -54,21 +54,45 @@ export default {
     }
   },
   methods: {
-    login: function() {
-      this.errors = [];
+    /**
+     * Makes a POST request to the API to send a login request.
+     * Sends the values entered into the email and password fields.
+     * Login errors (eg. incorrect password) are displayed
+     */
+    login: function () {
+      this.errors = this.validateLoginFields();
+      if (this.errors.length == 0) {
+        this.makeLoginRequest();
+      }
+    },
+    /**
+     * Checks if both email and password fields are not empty, and
+     * the email format is valid. Returns a list of error messages.
+     * The list will be empty if there are not errors.
+     */
+    validateLoginFields() {
+      let errors = [];
 
       if (!this.email) {
-        this.errors.push("Please Fill In The Email Field");
+        errors.push("Please fill in the Email field");
+      } else if (!this.email.includes("@")) {
+        errors.push("The given email is not valid");
       }
       if (!this.password) {
-        this.errors.push("Please Fill In The Password Field");
+        errors.push("Please fill in the Password field");
       }
-
+      return errors;
+    },
+    /**
+     * Makes a POST request to the API to send a login request.
+     * Sends the values entered into the email and password fields.
+     * Login errors (eg. incorrect password) are displayed
+     */
+    makeLoginRequest: function () {
       let loginData = {
         email: this.email,
         password: this.password
       };
-
       console.log(loginData);
       api
         .login(loginData)
