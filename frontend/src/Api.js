@@ -38,16 +38,14 @@ const instance = axios.create({
 });  
   
 export default {  
+  login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
+
+  /* STUFF FROM PROJECT TEMPLATE EXAMPLE
   // (C)reate  
   createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),  
   // (R)ead  
-  getAll: () => instance.get('students', {  
-    transformResponse: [function (data) {  
-      return data? JSON.parse(data)._embedded.students : data;  
-    }]  
-  }),  
   // (U)pdate  
   updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}), 
   // (D)elete  
-  removeForId: (id) => instance.delete('students/'+id)  
+  removeForId: (id) => instance.delete('students/'+id)  */
 }
