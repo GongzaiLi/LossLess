@@ -1,4 +1,4 @@
-package User;
+package org.seng302.example.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,21 +32,28 @@ public class User {
     @Column(name = "nick_name") // map camelcase name (java) to snake case (SQL)
     private String nickname;
 
+    @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
+    private String bio;
+
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
     private String email;
 
     @Column(name = "date_of_birth") // map camelcase name (java) to snake case (SQL)
     private String dateOfBirth;
 
+    @Column(name = "phone_number") // map camelcase name (java) to snake case (SQL)
+    private String phoneNumber;
+
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private String homeAddress;
 
-    @Column(name = "password")
+    @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     private String password;
 
+    @Column(name = "created") // map camelcase name (java) to snake case (SQL)
+    private String created;
 
-    public User() {
-    }
+    //Omitted fields. Role: added in u4, business administered: added in u6
 
     /**
      * Convenience constructor (it's discouraged to expose the JPA id field)
