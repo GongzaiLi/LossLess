@@ -52,7 +52,7 @@
         style="width:240px;height:80px;resize:none;font-family:Arial"
       />
      <p>
-        <button style="margin-top:10px">Register</button>
+        <button @click="register" style="margin-top:10px">Register</button>
     </p>
 
     <p> Already have an account?
@@ -84,8 +84,7 @@ data: function() {
     }
   },
 methods: {
-    goToLoginPage() {
-    console.log( "Login Pressed. Redirecting to Login Page...."),
+    register() {
     console.log({
                   firstName: this.firstName,
                   lastName: this.lastName,
@@ -100,6 +99,10 @@ methods: {
                   })
 
     //return this.$router.go(-1);
+    },
+    goToLoginPage() {
+        console.log( "Login Pressed. Redirecting to Login Page....")
+
     }
 }
 }
