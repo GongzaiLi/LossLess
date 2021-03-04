@@ -55,6 +55,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     // ability to expose RESTFul services (with controllers)
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // ability to validate requests
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     // security starter package
     //implementation 'org.springframework.boot:spring-boot-starter-security'
     //implementation 'org.springframework.security:spring-security-test'

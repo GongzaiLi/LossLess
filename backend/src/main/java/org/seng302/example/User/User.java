@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,8 +22,10 @@ public class User {
     private Long id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
+    @NotBlank(message = "firstName is mandatory")
     private String firstName;
 
+    @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
     private String lastName;
 
@@ -35,15 +38,18 @@ public class User {
     @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
     private String bio;
 
+    @NotBlank(message = "email is mandatory")
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
     private String email;
 
+    @NotBlank(message = "dateOfBirth is mandatory")
     @Column(name = "date_of_birth") // map camelcase name (java) to snake case (SQL)
     private String dateOfBirth;
 
     @Column(name = "phone_number") // map camelcase name (java) to snake case (SQL)
     private String phoneNumber;
 
+    @NotBlank(message = "homeAddress is mandatory")
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private String homeAddress;
 
