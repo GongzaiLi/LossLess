@@ -1,5 +1,5 @@
 <template>
-  <div id="loginPage">
+  <div>
     <h2>Login to Wasteless</h2>
     <p>Email</p>
     <input type="email" v-model="email" required
