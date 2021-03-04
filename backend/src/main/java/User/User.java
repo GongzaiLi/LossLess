@@ -1,4 +1,4 @@
-package org.seng302.example;
+package User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +40,9 @@ public class User {
 
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private String homeAddress;
+
+    @Column(name = "password")
+    private String password;
 
 
     public User() {
