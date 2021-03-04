@@ -19,13 +19,6 @@
         <button @click="login" style="margin-top:10px">Login</button>
       </span>
 
-          <span style="padding-right:10px" align="right">
-
-
-        <button @click="forgotPassword" style="margin-top:10px">Forgot Password</button>
-        </span>
-
-
 
     <p> Don't have an account?
         <span>
