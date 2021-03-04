@@ -53,12 +53,12 @@
       />
 
       <div v-if="errors.length">
-          <p style="color:red" v-for="error in errors" v-bind:key="error">{{ error }}  </p>
+          <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
       </div>
 
 
     <p>
-        <button v-on:click="register" style="margin-top:10px">Register</button>
+        <button v-on:click="register" style="margin-top:10px" id="register-btn">Register</button>
     </p>
 
     <p> Already have an account?
@@ -99,8 +99,8 @@ methods: {
       console.log(true);
       return true;
     }
-      this.errors = [];
-      this.errors.push("One or more mandatory fields are empty!");
+    this.errors = [];
+    this.errors.push("One or more mandatory fields are empty!");
     console.log({
                   firstName: this.firstName,
                   lastName: this.lastName,
