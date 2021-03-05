@@ -2,7 +2,6 @@
   <div id="userBox">
     <h2>{{ userDetail.nickname }}'s Profile Page</h2>
     <div>
-      <p id="imgBox">image in here</p>
       <p>Member since: {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
     </div>
 
@@ -57,11 +56,6 @@ export default {
 </script>
 
 <style scoped>
-#imgBox {
-  border-style: double;
-  width: 200px;
-  height: 200px;
-}
 
 #userBox {
   border: 2px solid #a1a1a1;
