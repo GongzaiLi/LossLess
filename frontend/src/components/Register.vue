@@ -102,6 +102,7 @@ methods: {
     },
     goToLoginPage() {
         console.log( "Login Pressed. Redirecting to Login Page....")
+        this.$router.push({ path: '/' })
 
     }
 }

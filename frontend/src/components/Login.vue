@@ -47,6 +47,7 @@ module.exports = {
     },
     goToRegisterPage: function() {
       console.log("Redirecting to Register Page");
+      this.$router.push({ path: '/register' })
     }
   }
 }
