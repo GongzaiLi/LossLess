@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Register />
+    <UserProfile /> <!--can change page -->
   </div>
 </template>
 
@@ -8,6 +8,7 @@
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Students from "./components/Students";
+import UserProfile from "./components/UserProfile";
 
 
 
@@ -22,6 +23,7 @@ const app = {
     // https://vuejs.org/v2/guide/components-registration.html
     Login,
     Register,
+    UserProfile,
     Students
   },
   // app initial state
