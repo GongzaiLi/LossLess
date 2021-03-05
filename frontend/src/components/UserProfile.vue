@@ -1,3 +1,8 @@
+<!--
+Individual User profile Page
+Author: Gongzai Li
+Date: 5/3/2021
+-->
 <template>
   <div id="userBox">
     <h2>{{ userDetail.nickname }}'s Profile Page</h2>

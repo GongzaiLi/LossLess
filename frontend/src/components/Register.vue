@@ -1,3 +1,10 @@
+<!--
+Page for users to input their information for registration
+Author: Nitish Singh
+Date: 3/3/2021
+-->
+
+
 <template>
   <div class="register">
 
@@ -97,6 +104,11 @@ data: function() {
     }
   },
 methods: {
+
+    /* Author: Caleb Sim
+    Register function first has list of all mandatory fields, checks email contains @
+    Checks if any required field is empty if so print message else print to console Api format
+    */
     register() {
     const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.dateOfBirth,
     this.homeAddress];
@@ -118,7 +130,7 @@ methods: {
         password: this.password
       })
     } else {
-      this.errors.push("One or more mandatory fields are empty!");
+      this.errors.push("Highlighted fields are Mandatory, please fill them in");
     }
 
     //return this.$router.go(-1);

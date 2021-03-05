@@ -1,3 +1,8 @@
+<!--
+Login page for existing users
+Author: Eric Song, Caleb Sim
+Date: 3/3/2021
+-->
 <template>
   <div>
     <h2>Login to Wasteless</h2>
@@ -23,7 +28,7 @@
       </ul>
     </div>
 
-    <span style="padding-right:10px" align="left">
+    <span style="padding-right:10px">
 
         <button @click="login" style="margin-top:10px">Login</button>
       </span>
@@ -61,7 +66,7 @@ export default {
      */
     login: function () {
       this.errors = this.validateLoginFields();
-      if (this.errors.length == 0) {
+      if (this.errors.length === 0) {
         this.makeLoginRequest();
       }
     },
