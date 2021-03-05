@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <UserProfile /> <!--can change page -->
+    <Register /> <!--can change page -->
   </div>
 </template>
 
