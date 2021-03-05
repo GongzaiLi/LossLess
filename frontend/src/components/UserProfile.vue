@@ -1,22 +1,24 @@
 <template>
   <div>
-    <h2>Profile Page</h2>
-    <h3>Some image in here</h3>
-    <p>Member since: {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
+    <h2>{{ userDetail.nickname }}'s Profile Page</h2>
     <div>
-      <ul>
+      <p id="imgBox">image in here</p>
+      <p>Member since: {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
+    </div>
+
+    <div id="userBox">
+      <ol>
         <li>Name: {{ userDetail.firstName + " " + userDetail.middleName + userDetail.lastName }}</li>
-        <li>Nick Name: {{ userDetail.nickname }}</li>
         <li>Date Of Birth: {{ userDetail.dateOfBirth }}</li>
         <li>Email: {{ userDetail.email }}</li>
         <li>Phone Number: {{ userDetail.phoneNumber }}</li>
         <li>Home Address: {{ userDetail.homeAddress }}</li>
         <li>Describe: {{ userDetail.bio }}</li>
-      </ul>
+      </ol>
     </div>
 
 
-    <button @click="loginOut" style="margin-top:10px">Login out</button>
+    <button id="buttonLog" @click="logOut" style="margin-top:10px">Log out</button>
 
 
   </div>
@@ -37,7 +39,7 @@ export default {
         firstName: "",
         lastName: "",
         middleName: " ",
-        nickname: "",
+        nickname: "Someone",
         bio: "",
         email: "",
         dateOfBirth: "",
@@ -49,7 +51,7 @@ export default {
     }
   },
   methods: {
-    loginOut: function () {
+    logOut: function () {
 
     }
   }
@@ -57,5 +59,25 @@ export default {
 </script>
 
 <style scoped>
+#imgBox {
+  border-style: double;
+
+  width: 200px;
+  height: 200px;
+
+
+}
+
+#userBox ol {
+  list-style-type: none;
+}
+
+#userBox {
+  border: 2px solid #a1a1a1;
+  padding: 10px 40px;
+  background: floralwhite;
+  width: 300px;
+  border-radius: 25px;
+}
 
 </style>
