@@ -2,7 +2,7 @@
   <div id="userBox">
     <h2>{{ userDetail.nickname }}'s Profile Page</h2>
     <div>
-      <p id="member-since">Member since: {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
+      <p id="member-since">{{ memberSince }}</p>
     </div>
     <hr>
     <div>
@@ -26,12 +26,6 @@
 export default {
   data: function () {
     return {
-      dateR: {
-        year: 0,
-        month: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        day: 0
-      },
-      registrationTime: 0,
       userDetail: {
         firstName: "Firstname",
         lastName: "Lastname",
@@ -42,7 +36,7 @@ export default {
         dateOfBirth: "1999-04-27",
         phoneNumber: "+64 3 555 0129",
         homeAddress: "4 Rountree Street, Upper Riccarton",
-
+        created: "2020-07-14T14:32:00Z",
       }
 
     }
@@ -50,6 +44,26 @@ export default {
   methods: {
     logOut: function () {
 
+    }
+  },
+  computed: {
+    memberSince: function() {
+      let registeredDate = new Date(this.userDetail.created);
+      let registeredMonths = Math.round((Date.now() - registeredDate) / (1000 * 60 * 60 * 24 * 30));
+      let registeredYears = Math.round(registeredMonths / 12);
+
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
+      if (registeredYears > 0) {
+        message += registeredYears + ((registeredYears > 1) ? " Years" : " Year");
+        if (registeredMonths > 0) {
+          message += " and ";
+        }
+      }
+      if (registeredMonths > 0) {
+        message += registeredMonths + ((registeredMonths > 1) ? " Months" : " Month");
+      }
+      return message + ") ";
     }
   }
 }
