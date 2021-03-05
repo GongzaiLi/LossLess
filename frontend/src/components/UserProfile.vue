@@ -1,20 +1,18 @@
 <template>
-  <div>
+  <div id="userBox">
     <h2>{{ userDetail.nickname }}'s Profile Page</h2>
     <div>
       <p id="imgBox">image in here</p>
       <p>Member since: {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
     </div>
 
-    <div id="userBox">
-      <ol>
-        <li>Name: {{ userDetail.firstName + " " + userDetail.middleName + userDetail.lastName }}</li>
-        <li>Date Of Birth: {{ userDetail.dateOfBirth }}</li>
-        <li>Email: {{ userDetail.email }}</li>
-        <li>Phone Number: {{ userDetail.phoneNumber }}</li>
-        <li>Home Address: {{ userDetail.homeAddress }}</li>
-        <li>Describe: {{ userDetail.bio }}</li>
-      </ol>
+    <div>
+      <p>Name: {{ userDetail.firstName + " " + userDetail.middleName + userDetail.lastName }}</p>
+      <p>Date Of Birth: {{ userDetail.dateOfBirth }}</p>
+      <p>Email: {{ userDetail.email }}</p>
+      <p>Phone Number: {{ userDetail.phoneNumber }}</p>
+      <p>Home Address: {{ userDetail.homeAddress }}</p>
+      <p>Describe: {{ userDetail.bio }}</p>
     </div>
 
 
@@ -61,15 +59,8 @@ export default {
 <style scoped>
 #imgBox {
   border-style: double;
-
   width: 200px;
   height: 200px;
-
-
-}
-
-#userBox ol {
-  list-style-type: none;
 }
 
 #userBox {
@@ -77,7 +68,7 @@ export default {
   padding: 10px 40px;
   background: floralwhite;
   width: 300px;
-  border-radius: 25px;
+  border-radius: 10px;
 }
 
 </style>
