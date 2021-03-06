@@ -1,3 +1,10 @@
+<!--
+Page for users to input their information for registration
+Author: Nitish Singh
+Date: 3/3/2021
+-->
+
+
 <template>
   <div class="register">
 
@@ -113,6 +120,11 @@ methods: {
       password: this.password
     };
   },
+
+    /* Author: Caleb Sim
+    Register function first has list of all mandatory fields, checks email contains @
+    Checks if any required field is empty if so print message else print to console Api format
+    */
     register() {
     const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.dateOfBirth,
     this.homeAddress];
@@ -129,8 +141,8 @@ methods: {
       this.makeRegisterRequest();
     }
 
-    //return this.$router.go(-1);
     },
+    
   makeRegisterRequest() {
     let registerData = this.getRegisterData();
     console.log(registerData);
@@ -155,6 +167,7 @@ methods: {
   },
     goToLoginPage() {
         console.log( "Login Pressed. Redirecting to Login Page....")
+        this.$router.push({ path: '/' })
 
     }
 }

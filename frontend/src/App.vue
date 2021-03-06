@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Register /> <!--can change page -->
+    <router-view />
   </div>
 </template>
 
