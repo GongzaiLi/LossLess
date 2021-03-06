@@ -28,24 +28,35 @@
 /**
  * Declare all available services here
  */
-import axios from 'axios'  
-  
+import axios from 'axios'
+
+
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
-const instance = axios.create({  
-  baseURL: SERVER_URL,
-  timeout: 1000  
-});  
-  
-export default {  
-  login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
+const instance = axios.create({
+    baseURL: SERVER_URL,
+    timeout: 1000
+});
 
-  /* STUFF FROM PROJECT TEMPLATE EXAMPLE
-  // (C)reate  
-  createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),  
-  // (R)ead  
-  // (U)pdate  
-  updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}), 
-  // (D)elete  
-  removeForId: (id) => instance.delete('students/'+id)  */
+export default {
+    login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
+
+    readUserInf: (id) => {
+        return instance.get('user/' + id, {
+            transformResponse: [function (data) {
+                return data;
+            }],
+        });
+    },
+
+    /* STUFF FROM PROJECT TEMPLATE EXAMPLE
+    // (C)reate
+    createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),
+    // (R)ead
+    readForID: (id) => instance.get('')
+    // (U)pdate
+    updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}),
+    // (D)elete
+    removeForId: (id) => instance.delete('students/'+id)  */
+
 }

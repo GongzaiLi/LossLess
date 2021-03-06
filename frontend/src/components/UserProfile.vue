@@ -1,13 +1,14 @@
 <!--
 Individual User profile Page
-Author: Gongzai Li
+Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
 <template>
   <div id="userBox">
     <h2>{{ userDetail.nickname }}'s Profile Page</h2>
     <div>
-      <p id="member-since">Member since: {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
+      <p id="member-since">Member since:
+        {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
     </div>
     <hr>
     <div>
@@ -23,11 +24,15 @@ Date: 5/3/2021
 
     <button id="buttonLog" @click="logOut" style="margin-top:10px">Log out</button>
 
+
   </div>
 
 </template>
 
 <script>
+import api from "../Api";
+import usersInfo from './usersDate.json';
+
 export default {
   data: function () {
     return {
@@ -38,24 +43,54 @@ export default {
       },
       registrationTime: 0,
       userDetail: {
-        firstName: "Firstname",
-        lastName: "Lastname",
-        middleName: "Middlename",
-        nickname: "Someone",
-        bio: "Likes long walks on the beach",
-        email: "johnsmith99@gmail.com",
-        dateOfBirth: "1999-04-27",
-        phoneNumber: "+64 3 555 0129",
-        homeAddress: "4 Rountree Street, Upper Riccarton",
-
-      }
+        firstName: "",
+        lastName: "",
+        middleName: "",
+        nickname: "",
+        bio: "",
+        email: "",
+        dateOfBirth: "",
+        phoneNumber: "",
+        homeAddress: ""
+      },
+      userData: {}
 
     }
   },
+
+  mounted() {
+    this.getUserInfo();
+  },
+
   methods: {
     logOut: function () {
+    },
+    getUserInfo: function () {
 
+      api
+          .readUserInf(1) // fake id
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            //this.userData = response.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to Load User Date"
+          })
+      this.userData = usersInfo.users[0]; // fake the Api data from the response data
+
+      this.userDetail.firstName = this.userData.firstName;
+      this.userDetail.lastName = this.userData.lastName;
+      this.userDetail.middleName = this.userData.middleName;
+      this.userDetail.nickname = this.userData.nickname;
+      this.userDetail.bio = this.userData.bio;
+      this.userDetail.email = this.userData.email;
+      this.userDetail.dateOfBirth = this.userData.dateOfBirth;
+      this.userDetail.phoneNumber = this.userData.phoneNumber;
+      this.userDetail.homeAddress = this.userData.homeAddress;
     }
+
+
   }
 }
 </script>
