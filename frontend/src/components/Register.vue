@@ -5,24 +5,21 @@ Date: 3/3/2021
 -->
 
 
-<template>
-  <div class="register">
+<template >
+  <div class="register" >
 
     <h2> Sign Up to Wasteless </h2>
 
     <form action="" :class="errors.length > 0 ? 'errors' : false">
       <p> First Name * </p>
       <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
-      <span> //Test: {{ firstName }} </span>
 
       <p> Middle Name * </p>
       <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
-       <span> //Test: {{ middleName }} </span>
 
 
       <p> Last Name * </p>
       <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
-      <span> //Test: {{ lastName }} </span>
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
@@ -113,9 +110,6 @@ methods: {
     const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.dateOfBirth,
     this.homeAddress];
     this.errors = [];
-    if (!this.email.includes("@")) {
-      this.errors.push("Email address is invalid, please make sure it contains an @ sign");
-    }
     if (requiredFields.every(function(e) { return e;})) {
       console.log({
         firstName: this.firstName,
@@ -131,6 +125,9 @@ methods: {
       })
     } else {
       this.errors.push("Highlighted fields are Mandatory, please fill them in");
+    }
+    if (this.email && !this.email.includes("@")) {
+      this.errors.push("Email address is invalid, please make sure it contains an @ sign");
     }
 
     //return this.$router.go(-1);
