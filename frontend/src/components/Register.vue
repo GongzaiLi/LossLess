@@ -53,13 +53,17 @@ Date: 3/3/2021
       />
 
       <p> Home Address * </p>
-       <textarea v-model="homeAddress" required
-       placeholder="Home Address"
-          autofocus
-          autocomplete="off"
-          style="width:240px;height:80px;resize:none;font-family:Arial"
-        />
+      <textarea v-model="homeAddress" required
+                placeholder="Home Address"
+                autofocus
+                autocomplete="off"
+                style="width:240px;height:80px;resize:none;font-family:Arial"
+      />
+      <p>Search: {{ addressSearch(homeAddress)}}</p>
     </form>
+
+
+
 
     <div v-if="errors.length">
         <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
@@ -137,8 +141,22 @@ methods: {
     },
     goToLoginPage() {
         console.log( "Login Pressed. Redirecting to Login Page....")
-        this.$router.push({ path: '/' })
+        this.$router.push({ path: '/login' })
 
+    },
+
+  //currently just gets json data from json function and prints it to the console. Is constantly updated while typing
+    async addressSearch(input) {
+      let returnQuery = await(this.getJson(input));
+      console.log(returnQuery);
+
+    },
+
+  //gets JSON from photon.komoot.io api with inputed string and returns an array of the results from the search
+  async getJson(input){
+    const url = 'https://photon.komoot.io/api/?q='+input;
+    let returned = await (await fetch(url)).json();
+    return returned['features'];
     }
 }
 }
