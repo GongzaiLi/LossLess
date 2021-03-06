@@ -15,14 +15,14 @@ Date: 3/3/2021
       <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
       <span> //Test: {{ firstName }} </span>
 
+      <p> Last Name * </p>
+      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
+      <span> //Test: {{ lastName }} </span>
+
       <p> Middle Name * </p>
       <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
        <span> //Test: {{ middleName }} </span>
 
-
-      <p> Last Name * </p>
-      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
-      <span> //Test: {{ lastName }} </span>
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
@@ -35,7 +35,7 @@ Date: 3/3/2021
 
        <p> Password * </p>
         <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
-
+      //Add confirm password field
       <p> Date of Birth * </p>
       <input type="date" v-model="dateOfBirth" required
           placeholder="Date of Birth"
@@ -86,7 +86,9 @@ form.errors :invalid {
 </style>
 
 <script>
-module.exports = {
+import api from "@/Api";
+
+export default {
 
 data: function() {
     return {
@@ -104,6 +106,20 @@ data: function() {
     }
   },
 methods: {
+  getRegisterData() {
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      middleName: this.middleName,
+      nickname: this.nickname,
+      bio: this.bio,
+      email: this.email,
+      dateOfBirth: this.dateOfBirth,
+      phoneNumber: this.phoneNumber,
+      homeAddress: this.homeAddress,
+      password: this.password
+    };
+  },
 
     /* Author: Caleb Sim
     Register function first has list of all mandatory fields, checks email contains @
@@ -116,25 +132,39 @@ methods: {
     if (!this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
     }
-    if (requiredFields.every(function(e) { return e;})) {
-      console.log({
-        firstName: this.firstName,
-        lastName: this.lastName,
-        middleName: this.middleName,
-        nickname: this.nickname,
-        bio: this.bio,
-        email: this.email,
-        dateOfBirth: this.dateOfBirth,
-        phoneNumber: this.phoneNumber,
-        homeAddress: this.homeAddress,
-        password: this.password
-      })
-    } else {
-      this.errors.push("Highlighted fields are Mandatory, please fill them in");
+    if (!requiredFields.every(function(e) { return e;})) {
+      this.errors.push("One or more mandatory fields are empty!");
     }
 
-    //return this.$router.go(-1);
+    if(this.errors.length == 0) {
+      console.log("All register correct, Making register request.")
+      this.makeRegisterRequest();
+    }
+
     },
+    
+  makeRegisterRequest() {
+    let registerData = this.getRegisterData();
+    console.log(registerData);
+
+    api
+        .login(registerData)
+        .then(() => {
+          this.$log.debug("Registered");
+          // Go to Login or profile page
+        })
+        .catch((error) => {
+
+          this.$log.debug(error);
+          if ((error.response && error.response.status === 400)) {
+            this.errors.push("Registration failed.");
+          } else {
+            this.errors.push(error.message);
+          }
+        });
+
+
+  },
     goToLoginPage() {
         console.log( "Login Pressed. Redirecting to Login Page....")
         this.$router.push({ path: '/' })
