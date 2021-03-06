@@ -49,7 +49,7 @@ Date: 3/3/2021
 import api from "../Api";
 
 export default {
-  data: function() {
+  data: function () {
     return {
       makeLoginSucceed: true,
       loginFailed: false,
@@ -100,30 +100,39 @@ export default {
       };
       console.log(loginData);
       api
-        .login(loginData)
-        .then(() => {
-          this.$log.debug("Logged in");
-          // Go to profile page
-        })
-        .catch((error) => {
-          if (this.makeLoginSucceed) {
+          .login(loginData)
+          .then(() => {
+            this.$log.debug("Logged in");
             // Go to profile page
-            this.loginFailed = false;
-            return;
-          }
+            this.goToUserProfilePage();
+          })
+          .catch((error) => {
+            if (this.makeLoginSucceed) {
+              // Go to profile page
+              this.loginFailed = false;
+              this.goToUserProfilePage();
+              return;
+            }
 
-          this.loginFailed = true;
-          this.$log.debug(error);
-          if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
-            this.errors.push("The given username or password is incorrect.");
-          } else {
-            this.errors.push(error.message);
-          }
-        });
+            this.loginFailed = true;
+            this.$log.debug(error);
+            if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
+              this.errors.push("The given username or password is incorrect.");
+            } else {
+              this.errors.push(error.message);
+            }
+          });
     },
     goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
-      this.$router.push({ path: '/register' })
+      this.$router.push({path: '/register'})
+    },
+    /**
+     *
+     */
+    goToUserProfilePage: function () {
+      console.log("Login page go into User profile page");
+      this.$router.push({path: '/userProfile'})
     }
   }
 }
