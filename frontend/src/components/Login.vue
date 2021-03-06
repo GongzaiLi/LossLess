@@ -109,9 +109,8 @@ export default {
           .catch((error) => {
             if (this.makeLoginSucceed) {
               // Go to profile page
-              this.goToUserProfilePage();
-
               this.loginFailed = false;
+              this.goToUserProfilePage();
               return;
             }
 
