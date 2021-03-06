@@ -8,14 +8,14 @@
       <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
       <span> //Test: {{ firstName }} </span>
 
+      <p> Last Name * </p>
+      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
+      <span> //Test: {{ lastName }} </span>
+
       <p> Middle Name * </p>
       <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
        <span> //Test: {{ middleName }} </span>
 
-
-      <p> Last Name * </p>
-      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
-      <span> //Test: {{ lastName }} </span>
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
