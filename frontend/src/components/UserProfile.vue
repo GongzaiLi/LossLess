@@ -68,7 +68,7 @@ export default {
     getUserInfo: function () {
 
       api
-          .readUserInf(1) // fake id
+          .readUserInf()
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             //this.userData = response.data;
