@@ -139,6 +139,7 @@ methods: {
     if(this.errors.length == 0) {
       console.log("All register correct, Making register request.")
       this.makeRegisterRequest();
+      this.goToLoginPage()
     }
 
     },
@@ -168,7 +169,6 @@ methods: {
     goToLoginPage() {
         console.log( "Login Pressed. Redirecting to Login Page....")
         this.$router.push({ path: '/' })
-
     }
 }
 }
