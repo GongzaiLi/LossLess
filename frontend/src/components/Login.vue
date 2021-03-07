@@ -39,8 +39,13 @@ Date: 3/3/2021
         </span>
     </p>
 
+
     <br><br><br>
-    <span>Make logins successful</span> <input type="checkbox" v-model="makeLoginSucceed" checked>
+    <span>Demo Mode</span>
+
+    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+    //Test {{isActive}}
+
   </div>
 
 </template>
@@ -55,10 +60,15 @@ export default {
       loginFailed: false,
       errors: [],
       email: null,
-      password: ""
+      password: "",
+      isActive: false
+
     }
   },
   methods: {
+    toggle: function() {
+      this.isActive = !this.isActive;
+    },
     /**
      * Makes a POST request to the API to send a login request.
      * Sends the values entered into the email and password fields.
@@ -66,6 +76,9 @@ export default {
      */
     login: function () {
       this.errors = this.validateLoginFields();
+      if (this.isActive) {
+        this.errors.length = 0;
+      }
       if (this.errors.length === 0) {
         this.makeLoginRequest();
       }
