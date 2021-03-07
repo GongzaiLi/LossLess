@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view />
+    <UserSearch />
   </div>
 </template>
 
@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Students from "./components/Students";
 import UserProfile from "./components/UserProfile";
+import UserSearch from "@/components/UserSearch";
 
 
 
@@ -19,6 +20,7 @@ import UserProfile from "./components/UserProfile";
 const app = {
   name: "app",
   components: {
+    UserSearch,
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
     Login,
