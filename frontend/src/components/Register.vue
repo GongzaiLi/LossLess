@@ -30,8 +30,11 @@ Date: 3/3/2021
       <p> Email * </p>
       <input required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
 
-       <p> Password * </p>
-        <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
+      <p> Password * </p>
+      <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
+
+      <p> Confirm Password * </p>
+      <input type="password" required v-model="confirmPassword" placeholder="Confirm Password" autofocus autocomplete="off" size=30;/>
 
       <p> Date of Birth * </p>
       <input type="date" v-model="dateOfBirth" required
@@ -97,7 +100,8 @@ data: function() {
         "dateOfBirth": "",
         "phoneNumber": "",
         "homeAddress": "",
-        "password": ""
+        "password": "",
+        "confirmPassword": ""
     }
   },
 methods: {
@@ -107,7 +111,7 @@ methods: {
     Checks if any required field is empty if so print message else print to console Api format
     */
     register() {
-    const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.dateOfBirth,
+    const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
     this.homeAddress];
     this.errors = [];
     if (requiredFields.every(function(e) { return e;})) {
@@ -128,6 +132,9 @@ methods: {
     }
     if (this.email && !this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
+    }
+    if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
+      this.errors.push("Passwords do not Match")
     }
 
     //return this.$router.go(-1);
