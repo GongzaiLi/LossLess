@@ -12,6 +12,7 @@ Date: 7/3/2021
 
     <br><br><br>
     <table style="width: 100%" >
+      <caption>Search Results</caption>
       <tr>
         <th>Firstname</th>
         <th>Lastname</th>
@@ -56,6 +57,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
+  text-align: left;
+
+}
 
 </style>
