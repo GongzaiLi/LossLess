@@ -12,23 +12,24 @@ Date: 3/3/2021
 
     <form action="" :class="errors.length > 0 ? 'errors' : false">
       <p> First Name * </p>
-      <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
+      <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30/>
       <span> //Test: {{ firstName }} </span>
 
       <p> Middle Name * </p>
-      <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
+      <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30/>
       <span> //Test: {{ middleName }} </span>
 
 
       <p> Last Name * </p>
-      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
+      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30/>
       <span> //Test: {{ lastName }} </span>
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
 
       <p> Bio </p>
-      <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
+      <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off"
+                style="width:240px;height:80px;resize:none;font-family:Arial"/>
 
       <p> Email * </p>
       <input required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
@@ -53,37 +54,37 @@ Date: 3/3/2021
       />
 
       <p> Home Address * </p>
-      <p>{{addressSearch(homeAddress)}}</p>
-      <input v-model="homeAddress"
-             placeholder="HomeAddress"
-             autofocus
-             autocomplete="off"
-             size=30;
-      />
 
-      <!--<input list="browsers" v-model="homeAddress" required
+
+
+      <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
              placeholder="Home Address"
              autofocus
-             autocomplete="on"
+             autocomplete="off"
              style="width:240px;height:80px;resize:none;font-family:Arial"
-
       />
 
       <datalist id="browsers">
-        <option v-for="index in this.addressArray" v-bind:key="index"  value="index">{{index}}</option>
+        <option v-for="address in addressFind" v-bind:key="address" selected>{{ address }}</option>
+
       </datalist>
-      -->
 
+      <!--
+      <input type="search" v-model="homeAddress" onkeypress="" required
+             placeholder="Home Address"
+             autofocus
+             autocomplete="off"
+             style="width:240px;height:80px;resize:none;font-family:Arial"/>
+      <div v-show="addressFind.length" v-for="address in addressFind" v-bind:key="address">{{address}}</div>
 
+      <p>{{ addressFind }}</p> -->
 
 
     </form>
 
 
-
-
     <div v-if="errors.length">
-      <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
+      <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </p>
     </div>
 
 
@@ -110,7 +111,7 @@ form.errors :invalid {
 
 module.exports = {
 
-  data: function() {
+  data: function () {
     return {
       errors: [],
       "firstName": "",
@@ -123,7 +124,7 @@ module.exports = {
       "phoneNumber": "",
       "homeAddress": "",
       "password": "",
-      addressArray: [],
+      addressFind: [],
     }
   },
   methods: {
@@ -139,7 +140,9 @@ module.exports = {
       if (!this.email.includes("@")) {
         this.errors.push("Email address is invalid, please make sure it contains an @ sign");
       }
-      if (requiredFields.every(function(e) { return e;})) {
+      if (requiredFields.every(function (e) {
+        return e;
+      })) {
         console.log({
           firstName: this.firstName,
           lastName: this.lastName,
@@ -160,50 +163,42 @@ module.exports = {
     },
 
     goToLoginPage() {
-      console.log( "Login Pressed. Redirecting to Login Page....")
-      this.$router.push({ path: '/login' })
+      console.log("Login Pressed. Redirecting to Login Page....")
+      this.$router.push({path: '/login'})
 
     },
 
-    //currently just gets json data from json function and prints it to the console. Is constantly updated while typing
-    async addressSearch(input) {
-      let returnQuery = await(this.getJson(input));
-      //console.log(returnQuery);
-      this.addressArray=[]
-      let returnString =''
+    //gets JSON from photon.komoot.io api with inputed string and returns an array of the results from the search
+    async getJson(input) {
+      const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
+      let returned = await (await fetch(url)).json();
+      return returned['features'];
+    }
 
-      for (let addresses of returnQuery) {
+  },
+
+  watch: {
+    //currently just gets json data from json function and prints it to the console. Is constantly updated while typing
+    async homeAddress(input) {
+      let returnQuery = await this.getJson(input);
+      this.addressFind = [];
+
+      let returnString = '';
+      for (const addresses of returnQuery) {
         let houseNumber = addresses['properties']['housenumber'];
         let street = addresses['properties']['street'];
         let district = addresses['properties']['district'];
         let county = addresses['properties']['county'];
 
-
-        returnString = houseNumber + ' ' + street + ' ' + district + ' ' + county;
+        returnString = houseNumber + ' ' + street + ' ' + district + ' ' + district + ' ' + county;
         returnString = returnString.replaceAll("undefined", "");
-        // console.log(returnString);
-        if (returnString.trim().length > 1) {
-          this.addressArray.push(returnString);
+
+        if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
+          this.addressFind.push(returnString);
         }
-
-
-        //console.log(this.addressArray);
       }
-      console.log(this.addressArray);
-      return this.addressArray;
-
-
-    },
-
-    //gets JSON from photon.komoot.io api with inputed string and returns an array of the results from the search
-    async getJson(input){
-      const url = 'https://photon.komoot.io/api/?q='+input;
-      let returned = await (await fetch(url)).json();
-      return returned['features'];
+      //console.log(this.addressFind);
     }
-
-
-
   }
 }
 </script>
