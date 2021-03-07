@@ -61,6 +61,7 @@ Date: 3/3/2021
         />
     </form>
 
+
     <div v-if="errors.length">
         <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
     </div>
@@ -75,7 +76,15 @@ Date: 3/3/2021
        <button v-on:click="goToLoginPage" style="margin-top:10px">Login</button>
     </span>
     </p>
+    <br><br><br>
+    <span>Demo Mode</span>
+
+    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+    //Test {{isActive}}
+
   </div>
+
+
 
 </template>
 
@@ -102,10 +111,14 @@ data: function() {
         "dateOfBirth": "",
         "phoneNumber": "",
         "homeAddress": "",
-        "password": ""
+        "password": "",
+      isActive: false
     }
   },
 methods: {
+  toggle: function() {
+    this.isActive = !this.isActive;
+  },
   getRegisterData() {
     return {
       firstName: this.firstName,
@@ -136,13 +149,17 @@ methods: {
       this.errors.push("One or more mandatory fields are empty!");
     }
 
+    if (this.isActive) {
+      this.errors.length = 0;
+    }
+
     if(this.errors.length == 0) {
       console.log("All register correct, Making register request.")
       this.makeRegisterRequest();
     }
 
     },
-    
+
   makeRegisterRequest() {
     let registerData = this.getRegisterData();
     console.log(registerData);
