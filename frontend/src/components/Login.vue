@@ -138,14 +138,14 @@ export default {
     },
     goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
-      this.$router.push({path: '/register'})
+      this.$router.push({path: '/register'});
     },
     /**
      *
      */
     goToUserProfilePage: function () {
       console.log("Login page go into User profile page");
-      this.$router.push({path: '/userProfile'})
+      this.$router.push({path: '/userProfile'});
     }
   }
 }

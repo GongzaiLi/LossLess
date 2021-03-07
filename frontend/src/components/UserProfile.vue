@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     logOut: function () {
-
+      this.$router.push({path: '/login'})
     }
   }
 }
