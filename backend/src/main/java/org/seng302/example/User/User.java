@@ -19,7 +19,7 @@ public class User {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    private Long id;
+    private Integer id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
@@ -53,6 +53,7 @@ public class User {
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private String homeAddress;
 
+    @NotBlank(message = "password is mandatory")
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     private String password;
 
@@ -67,12 +68,13 @@ public class User {
      * @param firstName student first name
      * @param lastName  student last name
      */
-    public User(String firstName, String lastName, String email, String dateOfBirth, String homeAddress) {
+    public User(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.dateOfBirth = dateOfBirth;
         this.homeAddress = homeAddress;
+        this.password = password;
     }
 }
 
