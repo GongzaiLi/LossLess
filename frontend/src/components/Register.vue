@@ -14,12 +14,11 @@ Date: 3/3/2021
       <p> First Name * </p>
       <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
 
-      <p> Middle Name * </p>
-      <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
-
-
       <p> Last Name * </p>
       <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
+
+      <p> Middle Name </p>
+      <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
@@ -111,7 +110,7 @@ methods: {
     Checks if any required field is empty if so print message else print to console Api format
     */
     register() {
-    const requiredFields = [this.firstName, this.lastName, this.middleName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
+    const requiredFields = [this.firstName, this.lastName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
     this.homeAddress];
     this.errors = [];
     if (requiredFields.every(function(e) { return e;})) {
