@@ -41,13 +41,7 @@ const instance = axios.create({
 export default {
     login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
 
-    readUserInf: () => {
-        return instance.get('user/{id}', {
-            transformResponse: [function (data) {
-                return data;
-            }],
-        });
-    },
+    getUser: (id) => instance.get('user/' + id),
 
     /* STUFF FROM PROJECT TEMPLATE EXAMPLE
     // (C)reate

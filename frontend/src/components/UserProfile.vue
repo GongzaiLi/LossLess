@@ -57,38 +57,29 @@ export default {
   },
 
   mounted() {
-    this.getUserInfo();
+    this.getUserInfo(1);
   },
 
   methods: {
-    logOut: function () {
-    },
-    getUserInfo: function () {
-
+    /**
+     * this is a get api which can take Specific user to display on the page
+     * The function id means user's id, if the serve find -
+     * -the user's id will response the data and keep the data into this.userData
+     */
+    getUserInfo: function (id) {
       api
-          .readUserInf()
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            //this.userData = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to Load User Date"
-          })
-
+        .getUser(id) //
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          //this.userData = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to Load User Date"
+        })
       // fake the Api data from the response data
-      this.userData.firstName = usersInfo.users[0].firstName;
-      this.userData.lastName = usersInfo.users[0].lastName;
-      this.userData.middleName = usersInfo.users[0].middleName;
-      this.userData.nickname = usersInfo.users[0].nickname;
-      this.userData.bio = usersInfo.users[0].bio;
-      this.userData.email = usersInfo.users[0].email;
-      this.userData.dateOfBirth = usersInfo.users[0].dateOfBirth;
-      this.userData.phoneNumber = usersInfo.users[0].phoneNumber;
-      this.userData.homeAddress = usersInfo.users[0].homeAddress;
+      this.userData = usersInfo.users[0];
     }
-
-
   }
 }
 </script>
