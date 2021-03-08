@@ -203,7 +203,7 @@ module.exports = {
         }
       }
 
-      this.addressFind = this.addressFind.sort(); //sort the the addressFind list
+      this.addressFind.sort(); //sort the the addressFind list
       //console.log(this.addressFind);
     }
   }
