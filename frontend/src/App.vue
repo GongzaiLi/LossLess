@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <UserProfile/> <!-- router-view -->
+    <router-view/>
   </div>
 </template>
 
