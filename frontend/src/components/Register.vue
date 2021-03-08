@@ -60,6 +60,7 @@ Date: 3/3/2021
         />
     </form>
 
+
     <div v-if="errors.length">
         <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
     </div>
@@ -74,7 +75,15 @@ Date: 3/3/2021
        <button v-on:click="goToLoginPage" style="margin-top:10px">Login</button>
     </span>
     </p>
+    <br><br><br>
+    <span>Demo Mode</span>
+
+    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+    //Test {{isActive}}
+
   </div>
+
+
 
 </template>
 
@@ -85,7 +94,9 @@ form.errors :invalid {
 </style>
 
 <script>
-module.exports = {
+import api from "@/Api";
+
+export default {
 
 data: function() {
     return {
@@ -104,6 +115,23 @@ data: function() {
     }
   },
 methods: {
+  toggle: function() {
+    this.isActive = !this.isActive;
+  },
+  getRegisterData() {
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      middleName: this.middleName,
+      nickname: this.nickname,
+      bio: this.bio,
+      email: this.email,
+      dateOfBirth: this.dateOfBirth,
+      phoneNumber: this.phoneNumber,
+      homeAddress: this.homeAddress,
+      password: this.password
+    };
+  },
 
     /* Author: Caleb Sim
     Register function first has list of all mandatory fields, checks email contains @
@@ -113,21 +141,21 @@ methods: {
     const requiredFields = [this.firstName, this.lastName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
     this.homeAddress];
     this.errors = [];
-    if (requiredFields.every(function(e) { return e;})) {
-      console.log({
-        firstName: this.firstName,
-        lastName: this.lastName,
-        middleName: this.middleName,
-        nickname: this.nickname,
-        bio: this.bio,
-        email: this.email,
-        dateOfBirth: this.dateOfBirth,
-        phoneNumber: this.phoneNumber,
-        homeAddress: this.homeAddress,
-        password: this.password
-      })
-    } else {
-      this.errors.push("Highlighted fields are Mandatory, please fill them in");
+    if (!this.email.includes("@")) {
+      this.errors.push("Email address is invalid, please make sure it contains an @ sign");
+    }
+    if (!requiredFields.every(function(e) { return e;})) {
+      this.errors.push("One or more mandatory fields are empty!");
+    }
+
+    if (this.isActive) {
+      this.errors.length = 0;
+    }
+
+    if(this.errors.length == 0) {
+      console.log("All register correct, Making register request.")
+      this.makeRegisterRequest();
+      this.goToLoginPage()
     }
     if (this.email && !this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
@@ -136,12 +164,33 @@ methods: {
       this.errors.push("Passwords do not Match")
     }
 
-    //return this.$router.go(-1);
     },
+
+  makeRegisterRequest() {
+    let registerData = this.getRegisterData();
+    console.log(registerData);
+
+    api
+        .login(registerData)
+        .then(() => {
+          this.$log.debug("Registered");
+          // Go to Login or profile page
+        })
+        .catch((error) => {
+
+          this.$log.debug(error);
+          if ((error.response && error.response.status === 400)) {
+            this.errors.push("Registration failed.");
+          } else {
+            this.errors.push(error.message);
+          }
+        });
+
+
+  },
     goToLoginPage() {
         console.log( "Login Pressed. Redirecting to Login Page....")
         this.$router.push({ path: '/' })
-
     }
 }
 }

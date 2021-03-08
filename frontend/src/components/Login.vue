@@ -39,8 +39,13 @@ Date: 3/3/2021
         </span>
     </p>
 
+
     <br><br><br>
-    <span>Make logins successful</span> <input type="checkbox" v-model="makeLoginSucceed" checked>
+    <span>Demo Mode</span>
+
+    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+    //Test {{isActive}}
+
   </div>
 
 </template>
@@ -49,16 +54,21 @@ Date: 3/3/2021
 import api from "../Api";
 
 export default {
-  data: function() {
+  data: function () {
     return {
       makeLoginSucceed: true,
       loginFailed: false,
       errors: [],
       email: null,
-      password: ""
+      password: "",
+      isActive: false
+
     }
   },
   methods: {
+    toggle: function() {
+      this.isActive = !this.isActive;
+    },
     /**
      * Makes a POST request to the API to send a login request.
      * Sends the values entered into the email and password fields.
@@ -66,6 +76,9 @@ export default {
      */
     login: function () {
       this.errors = this.validateLoginFields();
+      if (this.isActive) {
+        this.errors.length = 0;
+      }
       if (this.errors.length === 0) {
         this.makeLoginRequest();
       }
@@ -100,30 +113,39 @@ export default {
       };
       console.log(loginData);
       api
-        .login(loginData)
-        .then(() => {
-          this.$log.debug("Logged in");
-          // Go to profile page
-        })
-        .catch((error) => {
-          if (this.makeLoginSucceed) {
+          .login(loginData)
+          .then(() => {
+            this.$log.debug("Logged in");
             // Go to profile page
-            this.loginFailed = false;
-            return;
-          }
+            this.goToUserProfilePage();
+          })
+          .catch((error) => {
+            if (this.makeLoginSucceed) {
+              // Go to profile page
+              this.loginFailed = false;
+              this.goToUserProfilePage();
+              return;
+            }
 
-          this.loginFailed = true;
-          this.$log.debug(error);
-          if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
-            this.errors.push("The given username or password is incorrect.");
-          } else {
-            this.errors.push(error.message);
-          }
-        });
+            this.loginFailed = true;
+            this.$log.debug(error);
+            if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
+              this.errors.push("The given username or password is incorrect.");
+            } else {
+              this.errors.push(error.message);
+            }
+          });
     },
     goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
-      this.$router.push({ path: '/register' })
+      this.$router.push({path: '/register'});
+    },
+    /**
+     *
+     */
+    goToUserProfilePage: function () {
+      console.log("Login page go into User profile page");
+      this.$router.push({path: '/userProfile'});
     }
   }
 }
