@@ -34,23 +34,23 @@ import axios from 'axios'
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const instance = axios.create({
-    baseURL: SERVER_URL,
-    timeout: 1000
+  baseURL: SERVER_URL,
+  timeout: 1000
 });
 
 export default {
-    login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
+  login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
 
-    getUser: (id) => instance.get('user/' + id),
+  getUser: (id) => instance.get('user/' + id),
 
-    /* STUFF FROM PROJECT TEMPLATE EXAMPLE
-    // (C)reate
-    createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),
-    // (R)ead
-    readForID: (id) => instance.get('')
-    // (U)pdate
-    updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}),
-    // (D)elete
-    removeForId: (id) => instance.delete('students/'+id)  */
+  /* STUFF FROM PROJECT TEMPLATE EXAMPLE
+  // (C)reate
+  createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),
+  // (R)ead
+  readForID: (id) => instance.get('')
+  // (U)pdate
+  updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}),
+  // (D)elete
+  removeForId: (id) => instance.delete('students/'+id)  */
 
 }
