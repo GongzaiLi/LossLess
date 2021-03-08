@@ -18,7 +18,7 @@ Date: 3/3/2021
       <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
 
       <p> Middle Name </p>
-      <input v-model="middleName" required placeholder="Middle Name" autocomplete="off" size=30 />
+      <input v-model="middleName" placeholder="Middle Name" autocomplete="off" size=30 />
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
@@ -141,28 +141,27 @@ methods: {
     const requiredFields = [this.firstName, this.lastName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
     this.homeAddress];
     this.errors = [];
-    if (!this.email.includes("@")) {
-      this.errors.push("Email address is invalid, please make sure it contains an @ sign");
-    }
+
     if (!requiredFields.every(function(e) { return e;})) {
       this.errors.push("One or more mandatory fields are empty!");
     }
 
-    if (this.isActive) {
-      this.errors.length = 0;
-    }
-
-    if(this.errors.length == 0) {
-      console.log("All register correct, Making register request.")
-      this.makeRegisterRequest();
-      this.goToLoginPage()
-    }
     if (this.email && !this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
     }
     if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
       this.errors.push("Passwords do not Match")
     }
+
+      if (this.isActive) {
+        this.errors.length = 0;
+      }
+
+      if(this.errors.length == 0) {
+        console.log("All register correct, Making register request.")
+        this.makeRegisterRequest();
+        this.goToLoginPage()
+      }
 
     },
 

@@ -44,7 +44,6 @@ Date: 3/3/2021
     <span>Demo Mode</span>
 
     <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
-    //Test {{isActive}}
 
   </div>
 
