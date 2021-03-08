@@ -79,6 +79,9 @@ export default {
         })
       // fake the Api data from the response data
       this.userData = usersInfo.users[0];
+    },
+    logOut: function () {
+      this.$router.push({path: '/login'})
     }
   }
 }

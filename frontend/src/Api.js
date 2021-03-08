@@ -40,6 +40,7 @@ const instance = axios.create({
 
 export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
+  register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
 
   getUser: (id) => instance.get('user/' + id),
 
