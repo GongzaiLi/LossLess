@@ -61,11 +61,12 @@ Date: 3/3/2021
              placeholder="Home Address"
              autofocus
              autocomplete="off"
-             style="width:240px;height:80px;resize:none;font-family:Arial"
+             size=50;
+             style="font-family:Arial"
       />
 
       <datalist id="browsers">
-        <option v-for="address in addressFind" v-bind:key="address" selected>{{ address }}</option>
+        <option v-for="address in addressFind" v-bind:key="address" select>{{ address }}</option>
 
       </datalist>
 
@@ -172,9 +173,8 @@ module.exports = {
     async getJson(input) {
       const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
       let returned = await (await fetch(url)).json();
-      return returned['features'];
+      return returned.features;
     }
-
   },
 
   watch: {
@@ -185,18 +185,24 @@ module.exports = {
 
       let returnString = '';
       for (const addresses of returnQuery) {
-        let houseNumber = addresses['properties']['housenumber'];
-        let street = addresses['properties']['street'];
-        let district = addresses['properties']['district'];
-        let county = addresses['properties']['county'];
+        console.log(addresses);
+        let name = addresses.properties.name || "";
+        let houseNumber = addresses.properties.housenumber || "";
+        let street = addresses.properties.street || "";
+        let district = addresses.properties.district || "";
+        let county = addresses.properties.county || "";
+        let country = addresses.properties.country || "";
 
-        returnString = houseNumber + ' ' + street + ' ' + district + ' ' + district + ' ' + county;
-        returnString = returnString.replaceAll("undefined", "");
+        returnString = houseNumber + ' ' + street + ' ' + district + ' ' + county + ' ' + country;
+        if (houseNumber.length === 0) { // Only display name if there's no houes number
+          returnString = name + ' ' + returnString;
+        }
 
-        if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
+        if (returnString.trim().length > 1 && !this.addressFind.includes(returnString) ){
           this.addressFind.push(returnString);
         }
       }
+
       //console.log(this.addressFind);
     }
   }
