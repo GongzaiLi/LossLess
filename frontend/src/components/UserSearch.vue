@@ -7,11 +7,11 @@ Date: 7/3/2021
   <div>
     <h2>Search For a User</h2>
 
-    <input type="search" v-model="searchQuery" size="30" autofocus />
-    <button> Search </button>
+    <input type="search" v-model="searchQuery" size="30" autofocus/>
+    <button @click="searchUser(searchQuery)"> Search</button>
 
     <br><br><br>
-    <table style="width: 100%" >
+    <table style="width: 100%">
       <caption>Search Results</caption>
       <tr>
         <th>Firstname</th>
@@ -48,10 +48,38 @@ Date: 7/3/2021
 </template>
 
 <script>
+import api from "../Api";
+
 export default {
   data: function () {
     return {
-      searchQuery: ""
+      searchQuery: "",
+      userData: {
+        firstName: "",
+        lastName: "",
+        city: "",
+        country: "",
+        email: ""
+      }
+    }
+  },
+  methods: {
+
+    /**
+     * the function is search a user id the using api to find the user's detail
+     * @param id user is id or name other details
+     */
+    searchUser: function (searchParameter) {
+      api
+        .getUser(searchParameter)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.userData = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load user data";
+        })
     }
   }
 }
