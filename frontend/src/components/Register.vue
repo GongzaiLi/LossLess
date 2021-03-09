@@ -54,17 +54,31 @@ Date: 3/3/2021
       />
 
       <p> Home Address * </p>
-
-
-
       <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
-             placeholder="Home Address"
+             placeholder="Search Address"
              autofocus
              autocomplete="off"
-             size=50;
+             size=30;
              style="font-family:Arial"
       />
+     <button v-on:click="clearAddress" style="margin-top:10px" >Clear</button>
+      <p>
+        <p>
+      FIX 1: Big Box with line breaks for better view.
+    </p>
+      <p>
+      <textarea cols="33" type="search" list="browsers" rows="4" v-model="homeAddress " onkeypress="" required
+                placeholder="Manually Type Home Address"
+                autofocus
+                autocomplete="off"
+                style="font-family:Arial"
+      />
+      </p>
+
       <br> <br> <br>
+      <p>
+        FIX 2: Have Address lines instead of labels for each type of address field to avoid showing incorrect data.
+      </p>
 
       <p> House
       <span>
@@ -228,6 +242,9 @@ module.exports = {
 
       //return this.$router.go(-1);
     },
+    /* Author: Nitish Singh
+    Redirects to login page when login button is pressed.
+    */
 
     goToLoginPage() {
       console.log("Login Pressed. Redirecting to Login Page....")
@@ -241,13 +258,26 @@ module.exports = {
       let returned = await (await fetch(url)).json();
       return returned.features;
     },
-    autofillFields(name, street, district, county, country) {
-      this.house = name;
+
+    /* Author: Nitish Singh
+    For FIX 1: Autofills the address into separate fields for better view, especially on mobile.
+    */
+    autofillAddress(numberOrName, street, district, county, country) {
+
+      this.house = numberOrName;
       this.street = street;
       this.district = district;
       this.county = county;
       this.country = country;
 
+    },
+    /* Author: Nitish Singh
+    Clears the address input box so user can start over.
+    */
+    clearAddress() {
+      console.log("clear");
+      this.homeAddress = "";
+      this.autofillAddress("", "", "", "", "");
     }
   },
 
@@ -259,7 +289,6 @@ module.exports = {
 
       let returnString = '';
       for (const addresses of returnQuery) {
-        console.log(addresses.properties.state);
         let name = addresses.properties.name || "";
         let houseNumber = addresses.properties.housenumber || "";
         let street = addresses.properties.street || "";
@@ -267,17 +296,21 @@ module.exports = {
         let county = addresses.properties.county || "";
         let country = addresses.properties.country || "";
 
-        returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
-        if (houseNumber.length === 0) { // Only display name if there's no house number
-          returnString = name + ' ' + returnString;
-        }
 
-        if (returnString.trim().length > 1 && !this.addressFind.includes(returnString) ){
-          this.addressFind.push(returnString);
-          this.autofillFields(houseNumber+ " (" + name+")" , street, district, county, country);
 
-        }
+          returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
+          if (houseNumber.length === 0) { // Only display name if there's no house number
+            returnString = name + ' ' + returnString;
+            this.autofillAddress(name, street, district, county, country);
+          }
+
+          if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
+            this.addressFind.push(returnString);
+          }
+        this.autofillAddress(houseNumber, name, street, district, county, country);
+
       }
+
 
       //console.log(this.addressFind);
     }
