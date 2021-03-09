@@ -27,10 +27,11 @@ Date: 3/3/2021
       <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
 
       <p> Email * </p>
-      <input required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
+      <input required v-model="email" placeholder="Email" v-bind:style="[this.email && !this.email.includes('@') ? {'outline': '2px solid red'} : {}]" autocomplete="off" size=30;/>
+
 
       <p> Password * </p>
-      <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
+      <input type="password" style="outline: red" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
 
       <p> Confirm Password * </p>
       <input type="password" required v-model="confirmPassword" placeholder="Confirm Password" autofocus autocomplete="off" size=30;/>
@@ -62,7 +63,7 @@ Date: 3/3/2021
 
 
     <div v-if="errors.length">
-        <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
+        <p style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
     </div>
 
 
@@ -157,7 +158,7 @@ methods: {
         this.errors.length = 0;
       }
 
-      if(this.errors.length == 0) {
+      if(this.errors.length === 0) {
         console.log("All register correct, Making register request.")
         this.makeRegisterRequest();
         this.goToLoginPage()
