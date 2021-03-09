@@ -27,7 +27,7 @@ Date: 3/3/2021
       <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
 
       <p> Email * </p>
-      <input required v-model="email" placeholder="Email" v-bind:style="[this.email && !this.email.includes('@') ? {'outline': '2px solid red'} : {}]" autocomplete="off" size=30;/>
+      <input required v-model="email" placeholder="Email" v-bind:style="[this.emailInvalid ? {'outline': '2px solid red'} : {}]" autocomplete="off" size=30;/>
 
 
       <p> Password * </p>
@@ -101,6 +101,7 @@ export default {
 
 data: function() {
     return {
+      emailInvalid: false,
       errors: [],
       "firstName": "",
         "lastName": "",
@@ -119,6 +120,7 @@ methods: {
   toggle: function() {
     this.isActive = !this.isActive;
   },
+
   getRegisterData() {
     return {
       firstName: this.firstName,
@@ -149,6 +151,13 @@ methods: {
 
     if (this.email && !this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
+      this.emailInvalid = true;
+      console.log('trueeeeeeeeeee');
+    } else if (this.email && this.email.includes("@")) {
+      this.emailInvalid = false;
+      console.log('falseeeee');
+    } else {
+      this.emailInvalid = true;
     }
     if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
       this.errors.push("Passwords do not Match")
