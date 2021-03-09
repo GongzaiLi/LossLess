@@ -55,39 +55,28 @@ Date: 3/3/2021
 
       <p> Home Address * </p>
 
+      <div class="address-input"> 
+        <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
+              placeholder="Home Address"
+              autofocus
+              autocomplete="off"
+              size=50;
+              style="font-family:Arial"
+        />
 
-
-      <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
-             placeholder="Home Address"
-             autofocus
-             autocomplete="off"
-             size=50;
-             style="font-family:Arial"
-      />
-
-      <datalist id="browsers">
-        <option v-for="address in addressFind" v-bind:key="address" select>{{ address }}</option>
-
-      </datalist>
-
-      <!--
-      <input type="search" v-model="homeAddress" onkeypress="" required
-             placeholder="Home Address"
-             autofocus
-             autocomplete="off"
-             style="width:240px;height:80px;resize:none;font-family:Arial"/>
-      <div v-show="addressFind.length" v-for="address in addressFind" v-bind:key="address">{{address}}</div>
-
-      <p>{{ addressFind }}</p> -->
-
+        <div class="address-options-list">
+          <div class="address-option" 
+              v-for="address in addressFind"
+              v-bind:key="address"
+              >{{ address }}</div>
+        </div>
+      </div>
 
     </form>
-
 
     <div v-if="errors.length">
       <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </p>
     </div>
-
 
     <p>
       <button v-on:click="register" style="margin-top:10px" id="register-btn">Register</button>
@@ -105,6 +94,29 @@ Date: 3/3/2021
 <style>
 form.errors :invalid {
   outline: 2px solid red;
+}
+
+.address-input {
+  position: relative;
+  display: inline-block;
+}
+
+.address-option {
+  border-top: 2px solid gray;
+}
+
+.address-option:hover {
+  background-color: lightgray;
+}
+
+.address-options-list {
+  border-left: 2px solid gray;
+  border-right: 2px solid gray;
+  border-bottom: 2px solid gray;
+  background-color: #FCFCFC;
+  position: absolute;
+  z-index: 9999;
+  top: 100%;
 }
 </style>
 
