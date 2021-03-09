@@ -57,18 +57,23 @@ Date: 3/3/2021
 
       <div class="address-input"> 
         <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
-              placeholder="Home Address"
-              autofocus
-              autocomplete="off"
-              size=50;
-              style="font-family:Arial"
+          @input="onAddressChange"
+          placeholder="Home Address"
+          autofocus
+          autocomplete="off"
+          size=50;
+          style="font-family:Arial"
         />
 
-        <div class="address-options-list">
+        <div class="address-options-list"
+          v-if="addressFind.length > 0">
           <div class="address-option" 
-              v-for="address in addressFind"
-              v-bind:key="address"
-              >{{ address }}</div>
+            v-for="address in addressFind"
+            v-bind:key="address"
+            @click="selectAddressOption(address)"
+            >{{ address }}</div>
+          <div class="address-option address-close" 
+            @click="addressFind=[]">&#10060; Close Suggestions</div>
         </div>
       </div>
 
@@ -109,14 +114,21 @@ form.errors :invalid {
   background-color: lightgray;
 }
 
+.address-close {
+  text-align: center;
+}
+
 .address-options-list {
   border-left: 2px solid gray;
   border-right: 2px solid gray;
   border-bottom: 2px solid gray;
   background-color: #FCFCFC;
+  width: 100%;
   position: absolute;
   z-index: 9999;
   top: 100%;
+  height: 20ex;
+  overflow-y: scroll;
 }
 </style>
 
@@ -186,13 +198,29 @@ module.exports = {
       const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
       let returned = await (await fetch(url)).json();
       return returned.features;
-    }
-  },
+    },
 
-  watch: {
-    //currently just gets json data from json function and prints it to the console. Is constantly updated while typing
-    async homeAddress(input) {
-      let returnQuery = await this.getJson(input);
+    /**
+    * Author: Eric Song
+    * Sets the address input field to the selected address 
+    * and clsoes the autocomplete drop down
+    */
+    selectAddressOption (address) {
+      this.homeAddress = address;
+      this.addressFind = [];
+    },
+
+    /**
+    * Authors: Phil Taylor, Gongzai Li, Eric Song
+    * Queries the Photon Komoot API with the home address and puts the 
+    * results into addressFind.
+    * This method is called whenever the address input is changed 
+    * by the user's typing (as it is bound to @input). 
+    * This is not and should not be called when an autocomplete option is 
+    * clicked, otherwise the suggestions will pop up again when it is clicked. 
+    */
+    async onAddressChange() {
+      let returnQuery = await this.getJson(this.homeAddress);
       this.addressFind = [];
 
       let returnString = '';
@@ -214,10 +242,16 @@ module.exports = {
           this.addressFind.push(returnString);
         }
       }
-
+      
       this.addressFind.sort(); //sort the the addressFind list
       //console.log(this.addressFind);
     }
-  }
+  },
+
+  computed: {
+    showAutocomplete() {
+      return this.addressFind.length > 0 && !this.autoCompleteClosed;
+    }
+  },
 }
 </script>
