@@ -64,6 +64,72 @@ Date: 3/3/2021
              size=50;
              style="font-family:Arial"
       />
+      <br> <br> <br>
+
+      <p> House
+      <span>
+        <input type="search" list="browsers" v-model="house" onkeypress="" required
+                    placeholder="house"
+                    autofocus
+                    autocomplete="off"
+                    size=30;
+                    style="font-family:Arial"
+      />
+      </span>
+        </p>
+      <p>
+        <span>
+       Street
+        <input type="search" list="browsers" v-model="street" onkeypress="" required
+               placeholder="Street"
+               autofocus
+               autocomplete="off"
+               size=30;
+               style="font-family:Arial"
+        />
+      </span>
+      </p>
+
+      <p>
+         <span>
+       District
+        <input type="search" list="browsers" v-model="district" onkeypress="" required
+               placeholder="District"
+               autofocus
+               autocomplete="off"
+               size=30;
+               style="font-family:Arial"
+        />
+      </span>
+
+      </p>
+      <p>
+         <span>
+       County
+        <input type="search" list="browsers" v-model="county" onkeypress="" required
+               placeholder="County"
+               autofocus
+               autocomplete="off"
+               size=30;
+               style="font-family:Arial"
+        />
+      </span>
+      </p>
+
+      <p>
+         <span>
+       Country
+        <input type="search" list="browsers" v-model="country" onkeypress="" required
+               placeholder="Country"
+               autofocus
+               autocomplete="off"
+               size=30;
+               style="font-family:Arial"
+        />
+      </span>
+      </p>
+
+
 
       <datalist id="browsers">
         <option v-for="address in addressFind" v-bind:key="address" select>{{ address }}</option>
@@ -174,6 +240,14 @@ module.exports = {
       const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
       let returned = await (await fetch(url)).json();
       return returned.features;
+    },
+    autofillFields(name, street, district, county, country) {
+      this.house = name;
+      this.street = street;
+      this.district = district;
+      this.county = county;
+      this.country = country;
+
     }
   },
 
@@ -185,7 +259,7 @@ module.exports = {
 
       let returnString = '';
       for (const addresses of returnQuery) {
-        console.log(addresses);
+        console.log(addresses.properties.state);
         let name = addresses.properties.name || "";
         let houseNumber = addresses.properties.housenumber || "";
         let street = addresses.properties.street || "";
@@ -193,13 +267,15 @@ module.exports = {
         let county = addresses.properties.county || "";
         let country = addresses.properties.country || "";
 
-        returnString = houseNumber + ' ' + street + ' ' + district + ' ' + county + ' ' + country;
-        if (houseNumber.length === 0) { // Only display name if there's no houes number
+        returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
+        if (houseNumber.length === 0) { // Only display name if there's no house number
           returnString = name + ' ' + returnString;
         }
 
         if (returnString.trim().length > 1 && !this.addressFind.includes(returnString) ){
           this.addressFind.push(returnString);
+          this.autofillFields(houseNumber+ " (" + name+")" , street, district, county, country);
+
         }
       }
 
