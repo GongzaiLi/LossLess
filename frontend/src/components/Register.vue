@@ -149,16 +149,15 @@ methods: {
       this.errors.push("One or more mandatory fields are empty!");
     }
 
+    /*
+    first branch: if field not empty but doesnt include @, push error message turn box red
+    else branch: if not (empty and includes @) turn box back to regular (false) else field is empty so turn red
+     */
     if (this.email && !this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
-      this.emailInvalid = true;
-      console.log('trueeeeeeeeeee');
-    } else if (this.email && this.email.includes("@")) {
-      this.emailInvalid = false;
-      console.log('falseeeee');
-    } else {
-      this.emailInvalid = true;
-    }
+      this.emailInvalid = true; //turns the email box read; in input definition this variable is checked
+    } else this.emailInvalid = !(this.email && this.email.includes("@"));
+
     if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
       this.errors.push("Passwords do not Match")
     }
