@@ -6,7 +6,7 @@ Date: 3/3/2021
 
 
 <template>
-  <div class="register">
+  <div class="register" style="margin: 20px ">
 
     <h2> Sign Up to Wasteless </h2>
 
@@ -190,19 +190,6 @@ module.exports = {
     },
 
     /* Author: Nitish Singh
-    For FIX 1: Autofills the address into separate fields for better view, especially on mobile.
-    */
-    autofillAddress(numberOrName, street, district, county, country) {
-
-      this.house = numberOrName;
-      this.street = street;
-      this.district = district;
-      this.county = county;
-      this.country = country;
-
-    },
-
-    /* Author: Nitish Singh
     Clears the address input box so user can start over.
     */
     clearAddress() {
@@ -231,13 +218,13 @@ module.exports = {
           returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
           if (houseNumber.length === 0) { // Only display name if there's no house number
             returnString = name + ' ' + returnString;
-            this.autofillAddress(name, street, district, county, country);
+            //this.autofillAddress(name, street, district, county, country);
           }
 
           if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
             this.addressFind.push(returnString);
           }
-        this.autofillAddress(returnString);
+        //this.autofillAddress(returnString);
 
       }
 
