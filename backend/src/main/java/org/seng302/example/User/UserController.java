@@ -80,4 +80,21 @@ public class UserController {
         });
         return errors;
     }
+
+    @GetMapping("/users/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId){
+        User possibleUser = userRepository.findFirstById(userId);
+        System.out.println(possibleUser);
+        if(possibleUser == null){
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(406).body("ID does not exist");
+        }
+
+        // Not too sure what to do with Response 401 because it's possibly about security but do we need
+        // to have U4 for that or is it possible to do without it
+
+        logger.info("Account: {} retrieved successfully", possibleUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(possibleUser);
+    }
 }

@@ -9,4 +9,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findFirstByEmail(String email);
+
+    User findFirstById(Integer id);
 }
