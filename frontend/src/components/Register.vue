@@ -6,7 +6,7 @@ Date: 3/3/2021
 
 
 <template>
-  <div class="register">
+  <div class="register" style="margin: 20px ">
 
     <h2> Sign Up to Wasteless </h2>
 
@@ -54,31 +54,32 @@ Date: 3/3/2021
       />
 
       <p> Home Address * </p>
-
-
-
       <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
-             placeholder="Home Address"
+             placeholder="Search Address"
              autofocus
              autocomplete="off"
-             size=50;
+             size=30;
              style="font-family:Arial"
       />
+     <button v-on:click="clearAddress" style="margin-top:10px" >Clear</button>
+      <p>
+      <textarea cols="33" type="search" list="browsers" rows="4" v-model="homeAddress " onkeypress="" required
+                placeholder="Manually Type Home Address"
+                autofocus
+                autocomplete="off"
+                style="font-family:Arial"
+      />
+      </p>
+
+      <br> <br> <br>
+
+
 
       <datalist id="browsers">
         <option v-for="address in addressFind" v-bind:key="address" select>{{ address }}</option>
 
       </datalist>
 
-      <!--
-      <input type="search" v-model="homeAddress" onkeypress="" required
-             placeholder="Home Address"
-             autofocus
-             autocomplete="off"
-             style="width:240px;height:80px;resize:none;font-family:Arial"/>
-      <div v-show="addressFind.length" v-for="address in addressFind" v-bind:key="address">{{address}}</div>
-
-      <p>{{ addressFind }}</p> -->
 
 
     </form>
@@ -160,9 +161,11 @@ module.exports = {
         this.errors.push("Highlighted fields are Mandatory, please fill them in");
       }
 
-      //return this.$router.go(-1);
     },
 
+    /* Author: Nitish Singh
+    Redirects to login page when login button is pressed.
+    */
     goToLoginPage() {
       console.log("Login Pressed. Redirecting to Login Page....")
       this.$router.push({path: '/login'})
@@ -174,6 +177,14 @@ module.exports = {
       const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
       let returned = await (await fetch(url)).json();
       return returned.features;
+    },
+
+    /* Author: Nitish Singh
+    Clears the address input box so user can start over.
+    */
+    clearAddress() {
+      console.log("clear");
+      this.homeAddress = "";
     }
   },
 
@@ -185,7 +196,6 @@ module.exports = {
 
       let returnString = '';
       for (const addresses of returnQuery) {
-        console.log(addresses);
         let name = addresses.properties.name || "";
         let houseNumber = addresses.properties.housenumber || "";
         let street = addresses.properties.street || "";
@@ -193,18 +203,20 @@ module.exports = {
         let county = addresses.properties.county || "";
         let country = addresses.properties.country || "";
 
-        returnString = houseNumber + ' ' + street + ' ' + district + ' ' + county + ' ' + country;
-        if (houseNumber.length === 0) { // Only display name if there's no houes number
-          returnString = name + ' ' + returnString;
-        }
 
-        if (returnString.trim().length > 1 && !this.addressFind.includes(returnString) ){
-          this.addressFind.push(returnString);
-        }
+
+          returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
+          if (houseNumber.length === 0) { // Only display name if there's no house number
+            returnString = name + ' ' + returnString;
+          }
+
+          if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
+            this.addressFind.push(returnString);
+          }
+
       }
 
-      this.addressFind.sort(); //sort the the addressFind list
-      //console.log(this.addressFind);
+
     }
   }
 }
