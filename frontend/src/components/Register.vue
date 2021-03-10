@@ -63,10 +63,6 @@ Date: 3/3/2021
       />
      <button v-on:click="clearAddress" style="margin-top:10px" >Clear</button>
       <p>
-        <p>
-      FIX 1: Big Box with line breaks for better view.
-    </p>
-      <p>
       <textarea cols="33" type="search" list="browsers" rows="4" v-model="homeAddress " onkeypress="" required
                 placeholder="Manually Type Home Address"
                 autofocus
@@ -76,72 +72,6 @@ Date: 3/3/2021
       </p>
 
       <br> <br> <br>
-      <p>
-        FIX 2: Have Address lines instead of labels for each type of address field to avoid showing incorrect data.
-      </p>
-
-      <p> House
-      <span>
-        <input type="search" list="browsers" v-model="house" onkeypress="" required
-                    placeholder="house"
-                    autofocus
-                    autocomplete="off"
-                    size=30;
-                    style="font-family:Arial"
-      />
-      </span>
-        </p>
-      <p>
-        <span>
-       Street
-        <input type="search" list="browsers" v-model="street" onkeypress="" required
-               placeholder="Street"
-               autofocus
-               autocomplete="off"
-               size=30;
-               style="font-family:Arial"
-        />
-      </span>
-      </p>
-
-      <p>
-         <span>
-       District
-        <input type="search" list="browsers" v-model="district" onkeypress="" required
-               placeholder="District"
-               autofocus
-               autocomplete="off"
-               size=30;
-               style="font-family:Arial"
-        />
-      </span>
-
-      </p>
-      <p>
-         <span>
-       County
-        <input type="search" list="browsers" v-model="county" onkeypress="" required
-               placeholder="County"
-               autofocus
-               autocomplete="off"
-               size=30;
-               style="font-family:Arial"
-        />
-      </span>
-      </p>
-
-      <p>
-         <span>
-       Country
-        <input type="search" list="browsers" v-model="country" onkeypress="" required
-               placeholder="Country"
-               autofocus
-               autocomplete="off"
-               size=30;
-               style="font-family:Arial"
-        />
-      </span>
-      </p>
 
 
 
@@ -242,10 +172,10 @@ module.exports = {
 
       //return this.$router.go(-1);
     },
+
     /* Author: Nitish Singh
     Redirects to login page when login button is pressed.
     */
-
     goToLoginPage() {
       console.log("Login Pressed. Redirecting to Login Page....")
       this.$router.push({path: '/login'})
@@ -271,13 +201,13 @@ module.exports = {
       this.country = country;
 
     },
+
     /* Author: Nitish Singh
     Clears the address input box so user can start over.
     */
     clearAddress() {
       console.log("clear");
       this.homeAddress = "";
-      this.autofillAddress("", "", "", "", "");
     }
   },
 
@@ -307,7 +237,7 @@ module.exports = {
           if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
             this.addressFind.push(returnString);
           }
-        this.autofillAddress(houseNumber, name, street, district, county, country);
+        this.autofillAddress(returnString);
 
       }
 
