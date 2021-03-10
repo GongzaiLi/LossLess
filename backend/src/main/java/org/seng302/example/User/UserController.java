@@ -81,12 +81,12 @@ public class UserController {
         return errors;
     }
 
-    @GetMapping(value="{/id}")
+    @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public ResponseEntity<Object> getUser(@PathVariable("id") @RequestParam(required = true) Integer userId){
+    public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId){
         User possibleUser = userRepository.findFirstById(userId);
-
+        System.out.println(possibleUser);
         if(possibleUser == null){
             logger.warn("Not acceptable error");
             return ResponseEntity.status(406).build();

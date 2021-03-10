@@ -76,5 +76,9 @@ public class User {
         this.homeAddress = homeAddress;
         this.password = password;
     }
+
+    public String getEmail(){
+        return this.email;
+    }
 }
 
