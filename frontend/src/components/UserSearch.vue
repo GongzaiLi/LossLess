@@ -9,49 +9,43 @@ Date: 7/3/2021
 
     <input type="search" v-model="searchQuery" size="30" autofocus />
     <button> Search </button>
+    <button @click="populateTable"> Change Data </button>
+
 
     <br><br><br>
-    <table style="width: 100%" >
-      <caption>Search Results</caption>
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>City</th>
-        <th>Country</th>
-        <th>Email</th>
-
-      </tr>
-      <tr>
-        <td>Jill</td>
-        <td>Smith</td>
-        <td>Christchurch</td>
-        <td>New Zealand</td>
-        <td>jill@gmail.com</td>
-      </tr>
-      <tr>
-        <td>Eve</td>
-        <td>Jackson</td>
-        <td>Dunedin</td>
-        <td>New Zealand</td>
-        <td>Eve@gmail.com</td>
-      </tr>
-      <tr>
-        <td>Bob</td>
-        <td>Jones</td>
-        <td>Sydney</td>
-        <td>Australia</td>
-        <td>Bob@outlook.com</td>
-      </tr>
-    </table>
-
+    <div>
+      <b-table striped hover :items="items2"></b-table>
+    </div>
   </div>
 </template>
 
+
 <script>
+const data = require('./users.json');
+const users = data.users;
+const notUsers = [ { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},]
+console.log(users);
+
 export default {
   data: function () {
     return {
-      searchQuery: ""
+      searchQuery: "",
+      items2: [ { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},],
+      items: [
+        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
+        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
+        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
+        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
+      ]
+    }
+  },
+  methods: {
+    populateTable() {
+      if (this.items2.length > 1) {
+        this.items2 = notUsers;
+      } else {
+        this.items2 = users;
+      }
     }
   }
 }
