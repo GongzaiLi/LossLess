@@ -44,7 +44,6 @@ Date: 3/3/2021
     <span>Demo Mode</span>
 
     <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
-    //Test {{isActive}}
 
   </div>
 
@@ -138,14 +137,14 @@ export default {
     },
     goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
-      this.$router.push({path: '/register'})
+      this.$router.push({path: '/register'});
     },
     /**
      *
      */
     goToUserProfilePage: function () {
       console.log("Login page go into User profile page");
-      this.$router.push({path: '/userProfile'})
+      this.$router.push({path: '/userProfile'});
     }
   }
 }

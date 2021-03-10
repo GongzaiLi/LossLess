@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <UserSearch />
+    <router-view/>
   </div>
 </template>
 
@@ -9,8 +9,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Students from "./components/Students";
 import UserProfile from "./components/UserProfile";
-import UserSearch from "@/components/UserSearch";
-
+import UserSearch from "./components/UserSearch";
 
 
 // Vue app instance

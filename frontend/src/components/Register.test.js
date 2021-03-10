@@ -26,5 +26,5 @@ test('all-fields-empty', async () => {
     expect(wrapper.find('#error-txt').exists()).toBe(false)
     const regBtn = wrapper.find('#register-btn');
     await regBtn.trigger('click');
-    expect(wrapper.find('#error-txt').text()).toBe("One or more mandatory fields are empty!");
+    expect(wrapper.find('#error-txt').text()).toBe("Highlighted fields are Mandatory, please fill them in");
 });
