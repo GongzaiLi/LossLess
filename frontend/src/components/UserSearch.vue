@@ -38,7 +38,7 @@ export default {
      */
     populateTable() {
       axios
-      .get("https://virtserver.swaggerhub.com/matthewminish/seng302-2021-api-spec/1.0.2/users/search?searchQuery=" + this.searchQuery)
+      .get("https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=" + this.searchQuery)
       .then(res => (this.items = res.data, console.log(res)))
       .catch(err => console.log(err));
     }
