@@ -25,6 +25,7 @@ public class Logins {
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     private String password;
 
+    @NotBlank(message = "salt is mandatory")
     @Column(name = "salt") // map camelcase name (java) to snake case (SQL)
     private String salt;
 
