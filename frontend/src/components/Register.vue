@@ -5,85 +5,89 @@ Date: 3/3/2021
 -->
 
 
-<template >
-  <div class="register" >
+<template>
+  <div class="register">
 
     <h2> Sign Up to Wasteless </h2>
 
     <form action="" :class="errors.length > 0 ? 'errors' : false">
       <p> First Name * </p>
-      <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30 />
+      <input v-model="firstName" required placeholder="First Name" autocomplete="off" size=30/>
 
       <p> Last Name * </p>
-      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30 />
+      <input v-model="lastName" required placeholder="Last Name" autocomplete="off" size=30/>
 
       <p> Middle Name </p>
-      <input v-model="middleName" placeholder="Middle Name" autocomplete="off" size=30 />
+      <input v-model="middleName" placeholder="Middle Name" autocomplete="off" size=30/>
 
       <p> Nickname </p>
       <input v-model="nickname" placeholder="Nick Name" autofocus autocomplete="off" size=30;/>
 
       <p> Bio </p>
-      <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
+      <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off"
+                style="width:240px;height:80px;resize:none;font-family:Arial"/>
 
       <p> Email * </p>
-      <input required v-model="email" placeholder="Email" v-bind:style="[this.emailInvalid ? {'outline': '2px solid red'} : {}]" autocomplete="off" size=30;/>
+      <input required v-model="email" placeholder="Email"
+             v-bind:style="[this.emailInvalid ? {'outline': '2px solid red'} : {}]" autocomplete="off" size=30;/>
 
 
       <p> Password * </p>
-      <input type="password" style="outline: red" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
+      <input type="password" style="outline: red" required v-model="password" placeholder="Password" autofocus
+             autocomplete="off" size=30;/>
 
       <p> Confirm Password * </p>
-      <input type="password" required v-model="confirmPassword" placeholder="Confirm Password" autofocus autocomplete="off" size=30;/>
+      <input type="password" required v-model="confirmPassword" placeholder="Confirm Password" autofocus
+             autocomplete="off" size=30;/>
 
       <p> Date of Birth * </p>
       <input type="date" v-model="dateOfBirth" required
-          placeholder="Date of Birth"
-          autofocus
-          autocomplete="off"
-          size=30;
+             placeholder="Date of Birth"
+             autofocus
+             autocomplete="off"
+             size=30;
       />
 
       <p> Phone </p>
       <input type="number" v-model="phoneNumber"
-          placeholder="Phone"
-          autofocus
-          autocomplete="off"
-          size=30;
+             placeholder="Phone"
+             autofocus
+             autocomplete="off"
+             size=30;
       />
 
       <p> Home Address * </p>
-       <textarea v-model="homeAddress" required
-       placeholder="Home Address"
-          autofocus
-          autocomplete="off"
-          style="width:240px;height:80px;resize:none;font-family:Arial"
-        />
+      <textarea v-model="homeAddress" required
+                placeholder="Home Address"
+                autofocus
+                autocomplete="off"
+                style="width:240px;height:80px;resize:none;font-family:Arial"
+      />
     </form>
 
 
     <div v-if="errors.length">
-        <p style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
+      <p style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </p>
     </div>
 
 
     <p>
-        <button v-on:click="register" style="margin-top:10px" id="register-btn">Register</button>
+      <button v-on:click="register" style="margin-top:10px" id="register-btn">Register</button>
     </p>
 
     <p> Already have an account?
-    <span>
+      <span>
        <button v-on:click="goToLoginPage" style="margin-top:10px">Login</button>
     </span>
     </p>
     <br><br><br>
     <span>Demo Mode</span>
 
-    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
-    //Test {{isActive}}
+    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{ isActive ? 'ON' : 'OFF' }}
+    </button>
+    //Test {{ isActive }}
 
   </div>
-
 
 
 </template>
@@ -99,75 +103,77 @@ import api from "@/Api";
 
 export default {
 
-data: function() {
+  data: function () {
     return {
       emailInvalid: false,
       errors: [],
       isActive: false,
       "firstName": "",
-        "lastName": "",
-        "middleName": "",
-        "nickname": "",
-        "bio": "",
-        "email": "",
-        "dateOfBirth": "",
-        "phoneNumber": "",
-        "homeAddress": "",
-        "password": "",
-        "confirmPassword": ""
+      "lastName": "",
+      "middleName": "",
+      "nickname": "",
+      "bio": "",
+      "email": "",
+      "dateOfBirth": "",
+      "phoneNumber": "",
+      "homeAddress": "",
+      "password": "",
+      "confirmPassword": ""
     }
   },
-methods: {
-  toggle: function() {
-    this.isActive = !this.isActive;
-  },
+  methods: {
+    toggle: function () {
+      this.isActive = !this.isActive;
+    },
 
-  getRegisterData() {
-    return {
-      firstName: this.firstName,
-      lastName: this.lastName,
-      middleName: this.middleName,
-      nickname: this.nickname,
-      bio: this.bio,
-      email: this.email,
-      dateOfBirth: this.dateOfBirth,
-      phoneNumber: this.phoneNumber,
-      homeAddress: this.homeAddress,
-      password: this.password
-    };
-  },
+    getRegisterData() {
+      return {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        middleName: this.middleName,
+        nickname: this.nickname,
+        bio: this.bio,
+        email: this.email,
+        dateOfBirth: this.dateOfBirth,
+        phoneNumber: this.phoneNumber,
+        homeAddress: this.homeAddress,
+        password: this.password
+      };
+    },
 
     /* Author: Caleb Sim
     Register function first has list of all mandatory fields, checks email contains @
     Checks if any required field is empty if so print message else print to console Api format
     */
     register() {
-    const requiredFields = [this.firstName, this.lastName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
-    this.homeAddress];
-    this.errors = [];
+      const requiredFields = [this.firstName, this.lastName, this.email, this.password, this.confirmPassword, this.dateOfBirth,
+        this.homeAddress];
+      this.errors = [];
 
-    if (!requiredFields.every(function(e) { return e;})) {
-      this.errors.push("One or more mandatory fields are empty!");
-    }
+      if (!requiredFields.every(function (e) {
+        return e;
+      })) {
+        this.errors.push("One or more mandatory fields are empty!");
+      }
 
-    /*
-    first branch: if field not empty but doesnt include @, push error message turn box red
-    else branch: if not (empty and includes @) turn box back to regular (false) else field is empty so turn red
-     */
-    if (this.email && !this.email.includes("@")) {
-      this.errors.push("Email address is invalid, please make sure it contains an @ sign");
-      this.emailInvalid = true; //turns the email box read; in input definition this variable is checked
-    } else this.emailInvalid = !(this.email && this.email.includes("@"));
+      /*
+      first branch: if field not empty but doesnt include @, push error message turn box red
+      else branch: if not (empty and includes @) turn box back to regular (false) else field is empty so turn red
+       */
+      if (this.email && !this.email.includes("@")) {
+        this.errors.push("Email address is invalid, please make sure it contains an @ sign");
+        this.emailInvalid = true; //turns the email box read; in input definition this variable is checked
+      } else this.emailInvalid = !(this.email && this.email.includes("@"));
 
-    if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
-      this.errors.push("Passwords do not Match")
-    }
+      if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
+        this.errors.push("Passwords do not Match")
+      }
 
       if (this.isActive) {
         this.errors.length = 0;
       }
 
-      if(this.errors.length === 0) {
+      if (this.errors.length === 0) {
         console.log("All register correct, Making register request.")
         this.makeRegisterRequest();
         this.goToLoginPage()
@@ -175,11 +181,11 @@ methods: {
 
     },
 
-  makeRegisterRequest() {
-    let registerData = this.getRegisterData();
-    console.log(registerData);
+    makeRegisterRequest() {
+      let registerData = this.getRegisterData();
+      console.log(registerData);
 
-    api
+      api
         .login(registerData)
         .then(() => {
           this.$log.debug("Registered");
@@ -196,11 +202,11 @@ methods: {
         });
 
 
-  },
+    },
     goToLoginPage() {
-        console.log( "Login Pressed. Redirecting to Login Page....")
-        this.$router.push({ path: '/' })
+      console.log("Login Pressed. Redirecting to Login Page....")
+      this.$router.push({path: '/'})
     }
-}
+  }
 }
 </script>
