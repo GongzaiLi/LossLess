@@ -101,6 +101,7 @@ export default {
 data: function() {
     return {
       errors: [],
+      isActive: false,
       "firstName": "",
         "lastName": "",
         "middleName": "",
