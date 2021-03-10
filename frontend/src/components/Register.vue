@@ -80,15 +80,6 @@ Date: 3/3/2021
 
       </datalist>
 
-      <!--
-      <input type="search" v-model="homeAddress" onkeypress="" required
-             placeholder="Home Address"
-             autofocus
-             autocomplete="off"
-             style="width:240px;height:80px;resize:none;font-family:Arial"/>
-      <div v-show="addressFind.length" v-for="address in addressFind" v-bind:key="address">{{address}}</div>
-
-      <p>{{ addressFind }}</p> -->
 
 
     </form>
@@ -170,7 +161,6 @@ module.exports = {
         this.errors.push("Highlighted fields are Mandatory, please fill them in");
       }
 
-      //return this.$router.go(-1);
     },
 
     /* Author: Nitish Singh
@@ -218,18 +208,15 @@ module.exports = {
           returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
           if (houseNumber.length === 0) { // Only display name if there's no house number
             returnString = name + ' ' + returnString;
-            //this.autofillAddress(name, street, district, county, country);
           }
 
           if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
             this.addressFind.push(returnString);
           }
-        //this.autofillAddress(returnString);
 
       }
 
 
-      //console.log(this.addressFind);
     }
   }
 }
