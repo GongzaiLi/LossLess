@@ -27,10 +27,11 @@ Date: 3/3/2021
       <textarea v-model="bio" placeholder="Enter your Bio" autofocus autocomplete="off" style="width:240px;height:80px;resize:none;font-family:Arial" />
 
       <p> Email * </p>
-      <input required v-model="email" placeholder="Email" autofocus autocomplete="off" size=30;/>
+      <input required v-model="email" placeholder="Email" v-bind:style="[this.emailInvalid ? {'outline': '2px solid red'} : {}]" autocomplete="off" size=30;/>
+
 
       <p> Password * </p>
-      <input type="password" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
+      <input type="password" style="outline: red" required v-model="password" placeholder="Password" autofocus autocomplete="off" size=30;/>
 
       <p> Confirm Password * </p>
       <input type="password" required v-model="confirmPassword" placeholder="Confirm Password" autofocus autocomplete="off" size=30;/>
@@ -62,7 +63,7 @@ Date: 3/3/2021
 
 
     <div v-if="errors.length">
-        <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
+        <p style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }}  </p>
     </div>
 
 
@@ -100,6 +101,7 @@ export default {
 
 data: function() {
     return {
+      emailInvalid: false,
       errors: [],
       isActive: false,
       "firstName": "",
@@ -119,6 +121,7 @@ methods: {
   toggle: function() {
     this.isActive = !this.isActive;
   },
+
   getRegisterData() {
     return {
       firstName: this.firstName,
@@ -147,9 +150,15 @@ methods: {
       this.errors.push("One or more mandatory fields are empty!");
     }
 
+    /*
+    first branch: if field not empty but doesnt include @, push error message turn box red
+    else branch: if not (empty and includes @) turn box back to regular (false) else field is empty so turn red
+     */
     if (this.email && !this.email.includes("@")) {
       this.errors.push("Email address is invalid, please make sure it contains an @ sign");
-    }
+      this.emailInvalid = true; //turns the email box read; in input definition this variable is checked
+    } else this.emailInvalid = !(this.email && this.email.includes("@"));
+
     if (this.password && this.confirmPassword && this.password !== this.confirmPassword) {
       this.errors.push("Passwords do not Match")
     }
@@ -158,7 +167,7 @@ methods: {
         this.errors.length = 0;
       }
 
-      if(this.errors.length == 0) {
+      if(this.errors.length === 0) {
         console.log("All register correct, Making register request.")
         this.makeRegisterRequest();
         this.goToLoginPage()
