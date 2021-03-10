@@ -9,43 +9,38 @@ Date: 7/3/2021
 
     <input type="search" v-model="searchQuery" size="30" autofocus />
     <button> Search </button>
-    <button @click="populateTable"> Change Data </button>
+    <button @click="populateTable"> Populate Table </button>
 
 
     <br><br><br>
     <div>
-      <b-table striped hover :items="items2"></b-table>
+      <b-table striped hover :items="items" style="width: fit-content"></b-table>
     </div>
   </div>
 </template>
 
 
 <script>
-const data = require('./users.json');
-const users = data.users;
-const notUsers = [ { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},]
-console.log(users);
+import axios from 'axios';
 
 export default {
   data: function () {
     return {
       searchQuery: "",
-      items2: [ { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},],
-      items: [
-        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
-        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
-        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
-        { id: 1, firstName: 40, lastName: 'Dickerson', city: 'Macdonald', country: ' ', email: ''},
-      ]
+      items: [],
     }
   },
   methods: {
+    /**
+     * Author: Nitish Singh
+     * Sends a get request to the API and populates the tables
+     * with data received from the API.
+     */
     populateTable() {
-      if (this.items2.length > 1) {
-        this.items2 = notUsers;
-      } else {
-        this.items2 = users;
-      }
+      axios
+      .get("https://virtserver.swaggerhub.com/matthewminish/seng302-2021-api-spec/1.0.2/users/search?searchQuery=" + this.searchQuery)
+      .then(res => (this.items = res.data, console.log(res)))
+      .catch(err => console.log(err));
     }
   }
 }
