@@ -49,6 +49,10 @@ public class UserController {
             return ResponseEntity.status(409).build();
         }
 
+        if (!user.checkDateOfBirthValid()) {
+            return ResponseEntity.status(400).body("Date out of expected range");
+        }
+
         //Save user object in h2 database
         user = userRepository.save(user);
 
