@@ -21,16 +21,40 @@ Date: 7/3/2021
 
 
 <script>
-import axios from 'axios';
+import api from "../Api";
 
 export default {
   data: function () {
     return {
       searchQuery: "",
-      items: [],
+      userData: {
+        firstName: "",
+        lastName: "",
+        city: "",
+        country: "",
+        email: ""
+      }
     }
   },
   methods: {
+
+    /**
+     * the function is search a user id the using api to find the user's detail
+     * @param id user is id or name other details
+     */
+    searchUser: function (searchParameter) {
+      api
+        .getUser(searchParameter)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.userData = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load user data";
+        })
+      items: [],
+    },
     /**
      * Author: Nitish Singh
      * Sends a get request to the API and populates the tables
