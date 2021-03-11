@@ -63,7 +63,7 @@ Date: 3/3/2021
       />
      <button v-on:click="clearAddress" style="margin-top:10px" >Clear</button>
       <p>
-      <textarea cols="33" type="search" list="browsers" rows="4" v-model="homeAddress " onkeypress="" required
+      <textarea cols="33" rows="4" v-model="homeAddress " onkeypress="" required
                 placeholder="Manually Type Home Address"
                 autofocus
                 autocomplete="off"
@@ -76,7 +76,7 @@ Date: 3/3/2021
 
 
       <datalist id="browsers">
-        <option v-for="address in addressFind" v-bind:key="address" select>{{ address }}</option>
+        <option v-for="address in addressFind" v-bind:key="address" >{{ address }}</option>
 
       </datalist>
 
@@ -185,6 +185,39 @@ module.exports = {
     clearAddress() {
       console.log("clear");
       this.homeAddress = "";
+    },
+
+    /**
+     * Authors: Eric Song, Caleb Sim
+     * Given the address properties of an object returned by Photon Komoot, attempts to convert
+     * it into an address string. Returns null if the address is not valid.
+     * Rules for a valid address are:
+     * - Address must have a country field
+     * - Address must have either a county, district, or city field
+     * - Address must have either a housenumber and street, or a name field
+     */
+    getStringFromPhotonAddress (address) {
+      let addressString = "";
+      let addressValid = false;
+
+      if (address.country) {
+        addressString = address.country;
+        if (address.county || address.district || address.city) {
+          addressString = (address.county || address.district || address.city) + ', ' + addressString;
+          if (address.housenumber && address.street) {
+            addressString = address.housenumber + ' ' + address.street + ', ' + addressString;
+            addressValid = true;
+          } else if (address.name) {
+            addressString = address.name + ', ' + addressString;
+            addressValid = true;
+          }
+        }
+      }
+      if (addressValid) {
+        return addressString;
+      } else {
+        return null;
+      }
     }
   },
 
@@ -194,29 +227,14 @@ module.exports = {
       let returnQuery = await this.getJson(input);
       this.addressFind = [];
 
-      let returnString = '';
-      for (const addresses of returnQuery) {
-        let name = addresses.properties.name || "";
-        let houseNumber = addresses.properties.housenumber || "";
-        let street = addresses.properties.street || "";
-        let district = addresses.properties.district || "";
-        let county = addresses.properties.county || "";
-        let country = addresses.properties.country || "";
+      for (const result of returnQuery) {
+        const addressString = this.getStringFromPhotonAddress(result.properties);
 
-
-
-          returnString = houseNumber + ' ' + street + ' , ' + district + ' , ' + county + ' , ' + country;
-          if (houseNumber.length === 0) { // Only display name if there's no house number
-            returnString = name + ' ' + returnString;
-          }
-
-          if (returnString.trim().length > 1 && !this.addressFind.includes(returnString)) {
-            this.addressFind.push(returnString);
-          }
-
+        if (addressString != null && !this.addressFind.includes(addressString)) {
+          this.addressFind.push(addressString);
+        }
       }
-
-
+      console.log(returnQuery);
     }
   }
 }
