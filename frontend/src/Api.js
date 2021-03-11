@@ -41,7 +41,10 @@ export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
   register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
 
-  getUser: (searchParameter) => instance.get('users/' + searchParameter, {withCredentials: true}),
+  getUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),
+
+  //getUser: (searchParameter) => instance.get('users/' + searchParameter, {withCredentials: true}),
+
   /* STUFF FROM PROJECT TEMPLATE EXAMPLE
   // (C)reate  
   createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),  
