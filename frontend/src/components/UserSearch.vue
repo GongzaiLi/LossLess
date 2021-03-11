@@ -6,6 +6,8 @@ Date: 7/3/2021
 <template>
   <div>
     <h2>Search For a User</h2>
+
+    <!--
     <form>
       <div>
         <input type="search" v-model="searchQuery" s ize="30" autofocus/>
@@ -13,10 +15,30 @@ Date: 7/3/2021
       </div>
       <br><br><br>
     </form>
+    -->
 
     <div>
-      <b-table sticky-header striped hover :fields="fields" :items="items" style="width: fit-content"></b-table>
-      <b-pagination></b-pagination>>
+      <b-row>
+        <b-col md="8">
+          <b-form-input v-model="searchQuery" type="search" placeholder="Search"></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row id="window">
+        <b-col >
+          <b-table striped hover
+                   :headers="headers"
+                   :fields="fields"
+                   :items="items"
+                   :filter="searchQuery"
+                   :per-page="perPage"
+                   :current-page="currentPage"
+                   style="width: fit-content">
+          </b-table>
+          <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
+        </b-col>
+      </b-row>
+
+
     </div>
 
   </div>
@@ -26,16 +48,40 @@ Date: 7/3/2021
 <script>
 import api from "../Api";
 
+
 export default {
   data: function () {
     return {
       searchQuery: "",
-
+      perPage: 10,
+      currentPage: 1,
       items: [],
-      fields: [
-
+      headers: [
         {
-          key: ['id', 'firstName'],
+          sortable: true,
+          value: 'id'
+        },
+        {value: 'id'},
+        {value: 'firstName'},
+        {value: 'lastName'},
+        {value: 'middleName'},
+        {value: 'nickname'},
+        {value: 'bio'},
+        {value: 'email'},
+        {value: 'dateOfBirth'},
+        {value: 'phoneNumber'},
+        {value: 'homeAddress'},
+        {value: 'created'},
+        {value: 'role'},
+        {value: 'role'}
+      ],
+      fields: [
+        {
+          key: 'id',
+          sortable: true
+        },
+        {
+          key: 'firstName',
           sortable: true
         },
 
@@ -108,18 +154,32 @@ export default {
     }
   },
   computed: {
-
+    rows() {
+      return this.items.length;
+    }
+  },
+  mounted() {
+    this.displayResults();
   }
 }
 </script>
 
 <style>
-table, th, td {
-  border: 2px solid black;
-  border-collapse: collapse;
-  padding: 5px;
-  text-align: left;
+/*table, th, td {*/
+/*  border: 1px solid black;*/
+/*  padding: 5px;*/
+/*  text-align: left;*/
 
+/*}*/
+
+/*table {*/
+/*  border-collapse: collapse;*/
+/*}*/
+
+/*th {*/
+/*  height: 50px;*/
+/*}*/
+#window {
+  float: left;
 }
-
 </style>
