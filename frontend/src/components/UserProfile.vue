@@ -1,5 +1,6 @@
 <!--
-Individual User profile Page
+Individual User profile Page. Currently displays all user data
+to all logged in users, regardless of permissions.
 Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
@@ -22,8 +23,7 @@ Date: 5/3/2021
 
     <hr>
 
-    <button id="buttonLog" @click="logOut" style="margin-top:10px">Log out</button>
-
+    <button id="logout-button" @click="logOut" style="margin-top:10px">Log out</button>
 
   </div>
 
@@ -57,7 +57,8 @@ export default {
   },
 
   mounted() {
-    this.getUserInfo(1);
+    const userId = this.$route.params.id;
+    this.getUserInfo( userId );
   },
 
   methods: {
@@ -71,17 +72,33 @@ export default {
         .getUser(id) //
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
-          //this.userData = response.data;
+          this.userData = response.data;
         })
         .catch((error) => {
           this.$log.debug(error);
           this.error = "Failed to Load User Date"
         })
-      // fake the Api data from the response data
-      this.userData = usersInfo.users[0];
+      // fake the Api data from the response data.
+      // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
+      this.userData = usersInfo.users[id];
     },
     logOut: function () {
       this.$router.push({path: '/login'})
+    }
+  },
+
+  watch: {
+    /**
+     * When the user navigates from /user/foo to /user/bar, this component is re-used. This watches for those routing
+     * changes, and will update the user profile with the data of the user specified by the new route.
+     * See https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes for more info
+     */
+    /* The orgument _from is not needed, so this is to stop eslint complaining:*/
+    /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
+    $route(to, _from) {
+      console.log(to);
+      const userId = to.params.id;
+      this.getUserInfo( userId );
     }
   }
 }

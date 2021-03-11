@@ -113,16 +113,16 @@ export default {
       console.log(loginData);
       api
           .login(loginData)
-          .then(() => {
+          .then((response) => {
             this.$log.debug("Logged in");
             // Go to profile page
-            this.goToUserProfilePage();
+            this.goToUserProfilePage(response.userId);
           })
           .catch((error) => {
+            // THIS if BLOCK IS FOR TESTING PURPOSES ONLY, DELETE ONCE WE HAVE A BACKEND
             if (this.makeLoginSucceed) {
-              // Go to profile page
               this.loginFailed = false;
-              this.goToUserProfilePage();
+              this.goToUserProfilePage(0);
               return;
             }
 
@@ -135,16 +135,21 @@ export default {
             }
           });
     },
+    /**
+     * Redirects to the registration page/component. To be used when
+     * the user has no account and wants to sign up.
+     */
     goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
       this.$router.push({path: '/register'});
     },
     /**
-     *
+     * Redirects to the profile page of the user with the specified userId.
+     * This will switch components immediately to the UserProfile component
+     * so no loading spinner needs to be implemented here.
      */
-    goToUserProfilePage: function () {
-      console.log("Login page go into User profile page");
-      this.$router.push({path: '/userProfile'});
+    goToUserProfilePage: function (userId) {
+      this.$router.push({path: `/user/${userId}`});
     }
   }
 }
