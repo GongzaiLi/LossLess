@@ -197,9 +197,10 @@ module.exports = {
 
     //gets JSON from photon.komoot.io api with inputted string and returns an array of the results from the search
     async getJson(input) {
-      const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
-      let returned = await (await fetch(url)).json();
-      return returned.features;
+        const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
+        let returned = await (await fetch(url)).json();
+        return returned.features;
+
     },
 
     /**
@@ -255,7 +256,9 @@ module.exports = {
      */
     async onAddressChange() {
       const addressQueryString = this.homeAddress.replace(/\s/gm," ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
-      let returnQuery = await this.getJson(addressQueryString);
+      if (this.homeAddress.length > 3) {
+        let returnQuery = await this.getJson(addressQueryString);
+
       this.addressFind = [];
 
       for (const result of returnQuery) {
@@ -264,6 +267,7 @@ module.exports = {
         if (addressString != null && !this.addressFind.includes(addressString)) {
           this.addressFind.push(addressString);
         }
+      }
       }
     }
   },
