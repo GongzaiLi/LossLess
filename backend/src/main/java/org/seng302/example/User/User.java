@@ -6,6 +6,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -42,9 +46,10 @@ public class User {
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
     private String email;
 
-    @NotBlank(message = "dateOfBirth is mandatory")
+    @NotNull(message = "dateOfBirth is mandatory")
     @Column(name = "date_of_birth") // map camelcase name (java) to snake case (SQL)
-    private String dateOfBirth;
+    //Date format validated by spring. See spring.mvc.format.date=yyyy-MM-dd in application.properties
+    private LocalDate dateOfBirth;
 
     @Column(name = "phone_number") // map camelcase name (java) to snake case (SQL)
     private String phoneNumber;
@@ -71,7 +76,7 @@ public class User {
      * @param firstName student first name
      * @param lastName  student last name
      */
-    public User(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
+    public User(String firstName, String lastName, String email, LocalDate dateOfBirth, String homeAddress, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -79,5 +84,19 @@ public class User {
         this.homeAddress = homeAddress;
         this.password = password;
     }
+
+    /**
+     * Check this objects date is within the expected maximum and minimum date ranges
+     */
+    public boolean checkDateOfBirthValid() {
+        //Todo minimum age to allow
+        LocalDate today = LocalDate.now();
+
+        LocalDate minimumDOB = today.minusYears(0);
+        LocalDate maximumDOB = today.minusYears(120);
+
+        return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));
+    }
+
 }
 
