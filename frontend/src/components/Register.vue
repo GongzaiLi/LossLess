@@ -54,41 +54,43 @@ Date: 3/3/2021
       />
 
       <p> Home Address * </p>
-      <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
-             placeholder="Search Address"
-             autofocus
-             autocomplete="off"
-             size=30;
-             style="font-family:Arial"
-      />
-     <button v-on:click="clearAddress" style="margin-top:10px" >Clear</button>
-      <p>
-      <textarea cols="33" rows="4" v-model="homeAddress " onkeypress="" required
+
+      <div class="address-input">
+        <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
+          @input="onAddressChange"
+          placeholder="Search Addresses"
+          autofocus
+          autocomplete="off"
+          size=30;
+          style="font-family:Arial"
+        />
+
+        <div class="address-options-list"
+          v-if="addressFind.length > 0">
+          <div class="address-option"
+            v-for="address in addressFind"
+            v-bind:key="address"
+            @click="selectAddressOption(address)"
+            >{{ address }}</div>
+          <div class="address-option address-close"
+            @click="addressFind=[]">&#10060; Close Suggestions</div>
+        </div>
+
+        <br>
+
+        <textarea cols="33" rows="4" v-model="homeAddress " onkeypress="" required
                 placeholder="Manually Type Home Address"
                 autofocus
                 autocomplete="off"
                 style="font-family:Arial"
-      />
-      </p>
-
-      <br> <br> <br>
-
-
-
-      <datalist id="browsers">
-        <option v-for="address in addressFind" v-bind:key="address" >{{ address }}</option>
-
-      </datalist>
-
-
+        />
+      </div>
 
     </form>
-
 
     <div v-if="errors.length">
       <p style="color:red" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </p>
     </div>
-
 
     <p>
       <button v-on:click="register" style="margin-top:10px" id="register-btn">Register</button>
@@ -106,6 +108,36 @@ Date: 3/3/2021
 <style>
 form.errors :invalid {
   outline: 2px solid red;
+}
+
+.address-input {
+  position: relative;
+  display: inline-block;
+}
+
+.address-option {
+  border-top: 2px solid gray;
+}
+
+.address-option:hover {
+  background-color: lightgray;
+}
+
+.address-close {
+  text-align: center;
+}
+
+.address-options-list {
+  border-left: 2px solid gray;
+  border-right: 2px solid gray;
+  border-bottom: 2px solid gray;
+  background-color: #FCFCFC;
+  width: 100%;
+  position: absolute;
+  z-index: 9999;
+  top: 100%;
+  height: 20ex;
+  overflow-y: scroll;
 }
 </style>
 
@@ -221,10 +253,27 @@ module.exports = {
     }
   },
 
-  watch: {
-    //currently just gets json data from json function and prints it to the console. Is constantly updated while typing
-    async homeAddress(input) {
-      let returnQuery = await this.getJson(input);
+    /**
+    * Author: Eric Song
+    * Sets the address input field to the selected address
+    * and clsoes the autocomplete drop down
+    */
+    selectAddressOption (address) {
+      this.homeAddress = address;
+      this.addressFind = [];
+    },
+
+    /**
+    * Authors: Phil Taylor, Gongzai Li, Eric Song
+    * Queries the Photon Komoot API with the home address and puts the
+    * results into addressFind.
+    * This method is called whenever the address input is changed
+    * by the user's typing (as it is bound to @input).
+    * This is not and should not be called when an autocomplete option is
+    * clicked, otherwise the suggestions will pop up again when it is clicked.
+    */
+    async onAddressChange() {
+      let returnQuery = await this.getJson(this.homeAddress);
       this.addressFind = [];
 
       for (const result of returnQuery) {
@@ -234,7 +283,6 @@ module.exports = {
           this.addressFind.push(addressString);
         }
       }
-      console.log(returnQuery);
     }
   }
 }
