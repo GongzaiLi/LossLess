@@ -7,45 +7,18 @@ Date: 7/3/2021
   <div>
     <h2>Search For a User</h2>
 
-    <input type="search" v-model="searchQuery" size="30" autofocus/>
-    <button @click="searchUser(searchQuery)"> Search</button>
+    <input type="search" v-model="searchQuery" size="30" autofocus />
+    <button> Search </button>
+    <button @click="populateTable"> Populate Table </button>
+
 
     <br><br><br>
-    <table style="width: 100%">
-      <caption>Search Results</caption>
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>City</th>
-        <th>Country</th>
-        <th>Email</th>
-
-      </tr>
-      <tr>
-        <td>Jill</td>
-        <td>Smith</td>
-        <td>Christchurch</td>
-        <td>New Zealand</td>
-        <td>jill@gmail.com</td>
-      </tr>
-      <tr>
-        <td>Eve</td>
-        <td>Jackson</td>
-        <td>Dunedin</td>
-        <td>New Zealand</td>
-        <td>Eve@gmail.com</td>
-      </tr>
-      <tr>
-        <td>Bob</td>
-        <td>Jones</td>
-        <td>Sydney</td>
-        <td>Australia</td>
-        <td>Bob@outlook.com</td>
-      </tr>
-    </table>
-
+    <div>
+      <b-table striped hover :items="items" style="width: fit-content"></b-table>
+    </div>
   </div>
 </template>
+
 
 <script>
 import api from "../Api";
@@ -80,6 +53,18 @@ export default {
           this.$log.debug(error);
           this.error = "Failed to load user data";
         })
+      items: [],
+    },
+    /**
+     * Author: Nitish Singh
+     * Sends a get request to the API and populates the tables
+     * with data received from the API.
+     */
+    populateTable() {
+      axios
+      .get("https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=" + this.searchQuery)
+      .then(res => (this.items = res.data, console.log(res)))
+      .catch(err => console.log(err));
     }
   }
 }
