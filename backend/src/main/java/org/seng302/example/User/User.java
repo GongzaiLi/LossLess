@@ -57,6 +57,9 @@ public class User {
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     private String password;
 
+    @Column(name = "salt") // map camelcase name (java) to snake case (SQL)
+    private String salt;
+
     @Column(name = "created") // map camelcase name (java) to snake case (SQL)
     private String created;
 

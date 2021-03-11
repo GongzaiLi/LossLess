@@ -1,4 +1,4 @@
-package org.seng302.example.Logins;
+package org.seng302.example.User;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
