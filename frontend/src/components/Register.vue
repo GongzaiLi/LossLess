@@ -56,12 +56,12 @@ Date: 3/3/2021
       <p> Home Address * </p>
 
       <div class="address-input">
-        <input type="search" list="browsers" v-model="homeAddress" onkeypress="" required
+        <textarea type="search" v-model="homeAddress" onkeypress=""
           @input="onAddressChange"
-          placeholder="Search Addresses"
+          placeholder="Enter Address"
           autofocus
           autocomplete="off"
-          size=30;
+          cols=30;
           style="font-family:Arial"
         />
 
@@ -75,15 +75,6 @@ Date: 3/3/2021
           <div class="address-option address-close"
             @click="addressFind=[]">&#10060; Close Suggestions</div>
         </div>
-
-        <br>
-
-        <textarea cols="33" rows="4" v-model="homeAddress " onkeypress="" required
-                placeholder="Manually Type Home Address"
-                autofocus
-                autocomplete="off"
-                style="font-family:Arial"
-        />
       </div>
 
     </form>
@@ -135,8 +126,7 @@ form.errors :invalid {
   width: 100%;
   position: absolute;
   z-index: 9999;
-  top: 100%;
-  height: 20ex;
+  max-height: 20ex;
   overflow-y: scroll;
 }
 </style>
@@ -158,6 +148,7 @@ module.exports = {
       "phoneNumber": "",
       "homeAddress": "",
       "password": "",
+      addressSearchQuery: "",
       addressFind: [],
     }
   },
@@ -204,19 +195,11 @@ module.exports = {
 
     },
 
-    //gets JSON from photon.komoot.io api with inputed string and returns an array of the results from the search
+    //gets JSON from photon.komoot.io api with inputted string and returns an array of the results from the search
     async getJson(input) {
       const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
       let returned = await (await fetch(url)).json();
       return returned.features;
-    },
-
-    /* Author: Nitish Singh
-    Clears the address input box so user can start over.
-    */
-    clearAddress() {
-      console.log("clear");
-      this.homeAddress = "";
     },
 
     /**
@@ -226,7 +209,7 @@ module.exports = {
      * Rules for a valid address are:
      * - Address must have a country field
      * - Address must have either a county, district, or city field
-     * - Address must have either a housenumber and street, or a name field
+     * - Address must have either a house number and street, or a name field
      */
     getStringFromPhotonAddress (address) {
       let addressString = "";
@@ -250,30 +233,29 @@ module.exports = {
       } else {
         return null;
       }
-    }
-  },
-
+    },
     /**
-    * Author: Eric Song
-    * Sets the address input field to the selected address
-    * and clsoes the autocomplete drop down
-    */
+     * Author: Eric Song
+     * Sets the address input field to the selected address
+     * and closes the autocomplete drop down
+     */
     selectAddressOption (address) {
       this.homeAddress = address;
       this.addressFind = [];
     },
 
     /**
-    * Authors: Phil Taylor, Gongzai Li, Eric Song
-    * Queries the Photon Komoot API with the home address and puts the
-    * results into addressFind.
-    * This method is called whenever the address input is changed
-    * by the user's typing (as it is bound to @input).
-    * This is not and should not be called when an autocomplete option is
-    * clicked, otherwise the suggestions will pop up again when it is clicked.
-    */
+     * Authors: Phil Taylor, Gongzai Li, Eric Song
+     * Queries the Photon Komoot API with the home address and puts the
+     * results into addressFind.
+     * This method is called whenever the address input is changed
+     * by the user's typing (as it is bound to @input).
+     * This is not and should not be called when an autocomplete option is
+     * clicked, otherwise the suggestions will pop up again when it is clicked.
+     */
     async onAddressChange() {
-      let returnQuery = await this.getJson(this.homeAddress);
+      const addressQueryString = this.homeAddress.replace(/\s/gm," ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
+      let returnQuery = await this.getJson(addressQueryString);
       this.addressFind = [];
 
       for (const result of returnQuery) {
@@ -284,6 +266,6 @@ module.exports = {
         }
       }
     }
-  }
+  },
 }
 </script>
