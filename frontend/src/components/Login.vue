@@ -29,12 +29,9 @@ Date: 3/3/2021
       <br><br>
     </b-form>
 
-    <b-form-group
-        label-cols="auto"
-        label="Don't have an account?"
-        label-for="input-horizontal">
-      <b-button @click="goToRegisterPage" variant="outline-primary" >Register</b-button>
-    </b-form-group>
+    <p> Don't have an account?
+      <router-link to="/register" >Register Here</router-link>
+    </p>
 
 
     <br><br>
@@ -117,14 +114,6 @@ export default {
               this.errors.push(error.message);
             }
           });
-    },
-    /**
-     * Redirects to the registration page/component. To be used when
-     * the user has no account and wants to sign up.
-     */
-    goToRegisterPage: function () {
-      console.log("Redirecting to Register Page");
-      this.$router.push({path: '/register'});
     },
     /**
      * Redirects to the profile page of the user with the specified userId.
