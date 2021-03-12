@@ -10,8 +10,12 @@ Date: 5/3/2021
     <div>
       <p id="member-since">Member since:
         {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
-      <h1 v-if="userIsAdmin">Admin:{{userData.globalApplicationAdmin}}</h1>
+      <p  v-if="userIsAdmin">
+        <label v-if="userData.globalApplicationAdmin">Admin:</label>
+        <label v-else>User:</label>
 
+      <button v-bind:class="{ 'admin': userData.globalApplicationAdmin, 'user': !userData.globalApplicationAdmin}" @click="toggleAdmin">{{userData.globalApplicationAdmin ? 'Remove Admin' : 'Make Admin'}} </button>
+      </p>
     </div>
     <hr>
     <div>
@@ -84,7 +88,6 @@ export default {
     const userId = this.$route.params.id;
     this.displayAdmin();
     this.getUserInfo( userId );
-    //this.displayAdmin();
 
 
 
@@ -119,6 +122,9 @@ export default {
       if (getCookie('globalApplicationAdmin')==='1'){
         this.userIsAdmin='True';
       }
+    },
+    toggleAdmin: function() {
+      this.userData.globalApplicationAdmin = !this.userData.globalApplicationAdmin;
     },
 
   },
