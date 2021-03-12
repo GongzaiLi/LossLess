@@ -128,5 +128,17 @@ public class UserControllerTest {
     }
 
 
+    @Test
+    public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27/10/2000\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/1")
+                .content(user)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+    }
 }
 

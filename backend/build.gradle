@@ -58,8 +58,8 @@ dependencies {
     // ability to validate requests
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     // security starter package
-    //implementation 'org.springframework.boot:spring-boot-starter-security'
-    //implementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-test'
     // connector to mariadb (mysql) database
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
     // ability to use in-memory database (for testing only)
