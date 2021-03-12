@@ -11,4 +11,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findFirstByEmail(String email);
 
     User findFirstById(Integer id);
+
+    List<User> findAllByFirstNameContainsOrLastNameContainsOrMiddleNameOrNicknameContains(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nickNameQuery);
+
+    List<User> findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nickNameQuery);
+
+    List<User> findAllByFirstNameContainsAndFirstNameNot(String firstNameQuery, String firstNameNot);
+
 }

@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -21,8 +23,6 @@ public class UserController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
     private UserRepository userRepository;
     private Encryption encryption;
-
-    //Todo validation of email, birthday, etc formats
 
     @Autowired
     public UserController(UserRepository userRepository) {
@@ -72,6 +72,22 @@ public class UserController {
         //return ResponseEntity.created(location).build();
     }
 
+
+    @GetMapping("/users/search")
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
+
+        //Todo full matches
+        //List<User> fullMatches =  userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+
+        List<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
+
+        //Todo partial matches
+
+        //List<User> partialMatchingUsers = userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameOrNicknameContains(searchQuery, searchQuery, searchQuery, searchQuery);
+        return ResponseEntity.status(200).body(firstNamePartialMatches);
+    }
+
+
     /**
      * Returns a json object of bad field found in the request
      *
@@ -92,7 +108,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
         User possibleUser = userRepository.findFirstById(userId);
         System.out.println(possibleUser);
@@ -105,30 +121,30 @@ public class UserController {
         // to have U4 for that or is it possible to do without it
 
         logger.info("Account: {} retrieved successfully", possibleUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(possibleUser);
+        return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> verifyLogin(@RequestBody User user) {
+    public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
-        User savedUser = userRepository.findFirstByEmail(user.getEmail());
+        User savedUser = userRepository.findFirstByEmail(login.getEmail());
         if (savedUser == null) {
-            logger.warn("Attempted to login to account that does not exist, dropping request: {}", user.getEmail());
+            logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
             return ResponseEntity.status(400).build();
         } else {
 
-            String enteredPassword = user.getPassword();
+            String enteredPassword = login.getPassword();
             String savedPasswordHash = savedUser.getPassword();
             String savedSalt = savedUser.getSalt();
 
             boolean correctPassword = encryption.verifyUserPassword(enteredPassword, savedPasswordHash, savedSalt);
 
             if (!correctPassword) {
-                logger.warn("Attempted to login to account with incorrect password, dropping request: {}", user);
+                logger.warn("Attempted to login to account with incorrect password, dropping request: {}", login.getEmail());
                 return ResponseEntity.status(400).build();
             } else {
-                logger.info("Account {}, logged into successfully", user.getEmail());
+                logger.info("Account {}, logged into successfully", login.getEmail());
                 return ResponseEntity.status(HttpStatus.OK).build();
                 //   AuthenticatedResponse:
                 //      description: >
