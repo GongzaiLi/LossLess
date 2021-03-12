@@ -17,13 +17,17 @@ Date: 7/3/2021
       </b-col>
     </b-row>
     <b-row>
-      <b-col v-show="items.length">
+      <b-col v-show="items.length"><!--responsive-->
         <b-table striped hover
+                 table-class="text-nowrap"
+                 responsive="sm"
+                 no-border-collapse
+                 bordered
                  :fields="fields"
                  :items="items"
                  :per-page="perPage"
                  :current-page="currentPage"
-                 style="width: fit-content">
+                 style="table-layout: fixed; table-layout: fixed">
         </b-table>
         <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
       </b-col>
@@ -80,7 +84,7 @@ export default {
             if (searchParameter.trim().length) {
               this.items = response.data;  //Add functionality to return results based on query
             } else {
-              this.items = [];
+              this.items = Array(10).fill({});
             }
 
           })
