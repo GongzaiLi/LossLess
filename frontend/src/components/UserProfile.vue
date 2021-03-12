@@ -10,15 +10,19 @@ Date: 5/3/2021
     <div>
       <p id="member-since">Member since:
         {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
+      <h1 v-if="userIsAdmin">Admin:{{userData.globalApplicationAdmin}}</h1>
+
     </div>
     <hr>
     <div>
+
       <p><b>Name:</b> {{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</p>
       <p><b>Date Of Birth:</b> {{ userData.dateOfBirth }}</p>
       <p><b>Email:</b> {{ userData.email }}</p>
       <p><b>Phone Number:</b> {{ userData.phoneNumber }}</p>
       <p><b>Home Address:</b> {{ userData.homeAddress }}</p>
       <p><b>Bio:</b> {{ userData.bio }}</p>
+
     </div>
 
     <hr>
@@ -32,6 +36,24 @@ Date: 5/3/2021
 <script>
 import api from "../Api";
 import usersInfo from './usersDate.json';
+
+function getCookie(cName) {
+    let name = cName + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let cookieArray = decodedCookie.split(';');
+    for(let i = 0; i <cookieArray.length; i++) {
+      let c = cookieArray[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+
+
+}
 
 export default {
   data: function () {
@@ -51,14 +73,21 @@ export default {
         email: "",
         dateOfBirth: "",
         phoneNumber: "",
-        homeAddress: ""
-      }
+        homeAddress: "",
+        globalApplicationAdmin: ""
+      },
+      userIsAdmin: ""
     }
   },
 
   mounted() {
     const userId = this.$route.params.id;
+    this.displayAdmin();
     this.getUserInfo( userId );
+    //this.displayAdmin();
+
+
+
   },
 
   methods: {
@@ -84,8 +113,17 @@ export default {
     },
     logOut: function () {
       this.$router.push({path: '/login'})
-    }
+    },
+    displayAdmin: function() {
+      console.log(this.userIsAdmin);
+      if (getCookie('globalApplicationAdmin')==='1'){
+        this.userIsAdmin='True';
+      }
+    },
+
   },
+
+
 
   watch: {
     /**

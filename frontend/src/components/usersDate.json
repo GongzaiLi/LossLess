@@ -2,7 +2,7 @@
   "users": [
     {
       "id": 0,
-      "firstName": "Firstname",
+      "firstName": "A",
       "lastName": "Lastname",
       "middleName": "Middlename",
       "nickname": "Someone",
@@ -10,7 +10,49 @@
       "email": "johnsmith99@gmail.com",
       "dateOfBirth": "1999-04-27",
       "phoneNumber": "+64 3 555 0129",
-      "homeAddress": "4 Rountree Street, Upper Riccarton"
+      "homeAddress": "4 Rountree Street, Upper Riccarton",
+      "globalApplicationAdmin": "True"
+    },
+    {
+      "id": 1,
+      "firstName": "B",
+      "lastName": "Lastname",
+      "middleName": "Middlename",
+      "nickname": "Someone",
+      "bio": "Likes long walks on the beach",
+      "email": "johnsmith99@gmail.com",
+      "dateOfBirth": "1999-04-27",
+      "phoneNumber": "+64 3 555 0129",
+      "homeAddress": "4 Rountree Street, Upper Riccarton",
+      "globalApplicationAdmin": ""
+    }
+  ,
+    {
+      "id": 2,
+      "firstName": "C",
+      "lastName": "Lastname",
+      "middleName": "Middlename",
+      "nickname": "Someone",
+      "bio": "Likes long walks on the beach",
+      "email": "johnsmith99@gmail.com",
+      "dateOfBirth": "1999-04-27",
+      "phoneNumber": "+64 3 555 0129",
+      "homeAddress": "4 Rountree Street, Upper Riccarton",
+      "globalApplicationAdmin": ""
+    }
+  ,
+    {
+      "id": 3,
+      "firstName": "D",
+      "lastName": "Lastname",
+      "middleName": "Middlename",
+      "nickname": "Someone",
+      "bio": "Likes long walks on the beach",
+      "email": "johnsmith99@gmail.com",
+      "dateOfBirth": "1999-04-27",
+      "phoneNumber": "+64 3 555 0129",
+      "homeAddress": "4 Rountree Street, Upper Riccarton",
+      "globalApplicationAdmin": ""
     }
   ]
 }

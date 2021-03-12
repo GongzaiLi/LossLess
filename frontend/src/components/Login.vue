@@ -44,6 +44,9 @@ Date: 3/3/2021
     <span>Demo Mode</span>
 
     <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+    <span>Sign in as Admin</span>
+
+    <button v-bind:class="{ 'admin': isAdmin, 'user': !isAdmin}" @click="toggleAdmin">{{isAdmin ? 'ON' : 'OFF'}} </button>
 
   </div>
 
@@ -60,13 +63,17 @@ export default {
       errors: [],
       email: null,
       password: "",
-      isActive: false
+      isActive: false,
+      isAdmin: false
 
     }
   },
   methods: {
     toggle: function() {
       this.isActive = !this.isActive;
+    },
+    toggleAdmin: function() {
+      this.isAdmin = !this.isAdmin;
     },
     /**
      * Makes a POST request to the API to send a login request.
@@ -122,6 +129,14 @@ export default {
             // THIS if BLOCK IS FOR TESTING PURPOSES ONLY, DELETE ONCE WE HAVE A BACKEND
             if (this.makeLoginSucceed) {
               this.loginFailed = false;
+              document.cookie = "user=0";
+              if (this.isAdmin){
+                document.cookie = "globalApplicationAdmin=1";
+              }
+              else{
+                document.cookie = "globalApplicationAdmin=0";
+              }
+
               this.goToUserProfilePage(0);
               return;
             }
