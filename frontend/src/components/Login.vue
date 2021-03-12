@@ -62,6 +62,7 @@ export default {
     }
   },
   computed: {
+    //if in demo mode or not change style of the button
     demoVariant() {
       return this.isActive ? 'outline-success' : 'outline-danger';
     }
