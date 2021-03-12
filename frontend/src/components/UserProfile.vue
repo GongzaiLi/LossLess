@@ -88,7 +88,6 @@ export default {
     const userId = this.$route.params.id;
     this.displayAdmin();
     this.getUserInfo( userId );
-    //this.displayAdmin();
 
 
 
