@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -125,25 +126,25 @@ public class UserController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> verifyLogin(@RequestBody User user) {
+    public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
-        User savedUser = userRepository.findFirstByEmail(user.getEmail());
+        User savedUser = userRepository.findFirstByEmail(login.getEmail());
         if (savedUser == null) {
-            logger.warn("Attempted to login to account that does not exist, dropping request: {}", user.getEmail());
+            logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
             return ResponseEntity.status(400).build();
         } else {
 
-            String enteredPassword = user.getPassword();
+            String enteredPassword = login.getPassword();
             String savedPasswordHash = savedUser.getPassword();
             String savedSalt = savedUser.getSalt();
 
             boolean correctPassword = encryption.verifyUserPassword(enteredPassword, savedPasswordHash, savedSalt);
 
             if (!correctPassword) {
-                logger.warn("Attempted to login to account with incorrect password, dropping request: {}", user);
+                logger.warn("Attempted to login to account with incorrect password, dropping request: {}", login.getEmail());
                 return ResponseEntity.status(400).build();
             } else {
-                logger.info("Account {}, logged into successfully", user.getEmail());
+                logger.info("Account {}, logged into successfully", login.getEmail());
                 return ResponseEntity.status(HttpStatus.OK).build();
                 //   AuthenticatedResponse:
                 //      description: >
