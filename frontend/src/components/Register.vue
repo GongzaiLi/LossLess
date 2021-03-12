@@ -133,6 +133,7 @@ form.errors :invalid {
 
 <script>
 
+
 module.exports = {
 
   data: function () {
@@ -197,9 +198,10 @@ module.exports = {
 
     //gets JSON from photon.komoot.io api with inputted string and returns an array of the results from the search
     async getJson(input) {
-        const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
-        let returned = await (await fetch(url)).json();
-        return returned.features;
+      const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
+      let returned = await (await fetch(url)).json();
+      return returned.features;
+
 
     },
 
@@ -212,7 +214,9 @@ module.exports = {
      * - Address must have either a county, district, or city field
      * - Address must have either a house number and street, or a name field
      */
-    getStringFromPhotonAddress (address) {
+    getStringFromPhotonAddress(address) {
+
+
       let addressString = "";
       let addressValid = false;
 
@@ -229,6 +233,8 @@ module.exports = {
           }
         }
       }
+
+
       if (addressValid) {
         return addressString;
       } else {
@@ -240,9 +246,18 @@ module.exports = {
      * Sets the address input field to the selected address
      * and closes the autocomplete drop down
      */
-    selectAddressOption (address) {
+    selectAddressOption(address) {
       this.homeAddress = address;
       this.addressFind = [];
+    },
+
+    /**
+     * Author: Nitish Singh
+     * Returns a promise to be awaited to add
+     * a delay of "ms" milliseconds when called.
+     */
+    timeout(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     },
 
     /**
@@ -255,21 +270,31 @@ module.exports = {
      * clicked, otherwise the suggestions will pop up again when it is clicked.
      */
     async onAddressChange() {
-      const addressQueryString = this.homeAddress.replace(/\s/gm," ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
-      if (this.homeAddress.length > 3) {
+      const addressQueryString = this.homeAddress.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
+      await this.timeout(500);
+
+      // if (this.homeAddress.trim().length == 0) {
+      //   this.addressFind = [];
+      // }
+      if (this.homeAddress.trim().length > 3) {
         let returnQuery = await this.getJson(addressQueryString);
 
-      this.addressFind = [];
 
-      for (const result of returnQuery) {
-        const addressString = this.getStringFromPhotonAddress(result.properties);
+        this.addressFind = [];
 
-        if (addressString != null && !this.addressFind.includes(addressString)) {
-          this.addressFind.push(addressString);
+
+        for (const result of returnQuery) {
+          const addressString = this.getStringFromPhotonAddress(result.properties);
+
+          if (addressString != null && !this.addressFind.includes(addressString)) {
+            this.addressFind.push(addressString);
+          }
         }
-      }
+      // } else {
+      //   this.addressFind = [];
       }
     }
+
   },
 }
 </script>
