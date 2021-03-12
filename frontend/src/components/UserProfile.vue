@@ -42,15 +42,17 @@ import api from "../Api";
 import usersInfo from './usersDate.json';
 
 function getCookie(cName) {
+  /*Gets the inputted cookie from the cookie document string
+  -Splits the string by ; character and turns it into an array then searches the array for inputted cookie name*/
     let name = cName + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let cookieArray = decodedCookie.split(';');
     for(let i = 0; i <cookieArray.length; i++) {
       let c = cookieArray[i];
-      while (c.charAt(0) == ' ') {
+      while (c.charAt(0) === ' ') {
         c = c.substring(1);
       }
-      if (c.indexOf(name) == 0) {
+      if (c.indexOf(name) === 0) {
         return c.substring(name.length, c.length);
       }
     }
@@ -69,6 +71,7 @@ export default {
       },
       registrationTime: 0,
       userData: {
+        id: "",
         firstName: "",
         lastName: "",
         middleName: "",
@@ -118,7 +121,7 @@ export default {
       this.$router.push({path: '/login'})
     },
     displayAdmin: function() {
-      console.log(this.userIsAdmin);
+      //Changes userIsAdmin variable to true if user is logged in as admin (has GAA cookie)
       if (getCookie('globalApplicationAdmin')==='1'){
         this.userIsAdmin='True';
       }
@@ -137,7 +140,7 @@ export default {
      * changes, and will update the user profile with the data of the user specified by the new route.
      * See https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes for more info
      */
-    /* The orgument _from is not needed, so this is to stop eslint complaining:*/
+    /* The argument _from is not needed, so this is to stop eslint complaining:*/
     /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
     $route(to, _from) {
       console.log(to);
