@@ -1,53 +1,38 @@
 <!--
 Page that stores table and search bar to search for other users
-Author: Caleb Sim
+Author: Caleb Sim, Gongzai Li
 Date: 7/3/2021
 -->
 <template>
   <div>
     <h2>Search For a User</h2>
-
-    <!--
-    <form>
-      <div>
-        <input type="search" v-model="searchQuery" s ize="30" autofocus/>
-        <button @click="displayResults"> Search </button>
-      </div>
-      <br><br><br>
-    </form>
-    -->
-
-    <div>
-      <b-row>
-        <b-col md="8">
-          <b-form-input v-model="searchQuery" type="search" placeholder="Search"></b-form-input>
-        </b-col>
-      </b-row>
-      <b-row id="window">
-        <b-col >
-          <b-table striped hover
-                   :headers="headers"
-                   :fields="fields"
-                   :items="items"
-                   :filter="searchQuery"
-                   :per-page="perPage"
-                   :current-page="currentPage"
-                   style="width: fit-content">
-          </b-table>
-          <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
-        </b-col>
-      </b-row>
-
-
-    </div>
-
+    <b-row style="height: 50px">
+      <b-col>
+        <form class="form-inline">
+          <div class="form-group">
+            <b-form-input v-model="searchQuery" type="search" placeholder="Search"></b-form-input>
+            <b-button @click="displayResults(searchQuery)" style="margin-left:15px;"> Search</b-button>
+          </div>
+        </form>
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col v-show="items.length">
+        <b-table striped hover
+                 :fields="fields"
+                 :items="items"
+                 :per-page="perPage"
+                 :current-page="currentPage"
+                 style="width: fit-content">
+        </b-table>
+        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
-
 <script>
 import api from "../Api";
-
 
 export default {
   data: function () {
@@ -56,49 +41,14 @@ export default {
       perPage: 10,
       currentPage: 1,
       items: [],
-      headers: [
-        {
-          sortable: true,
-          value: 'id'
-        },
-        {value: 'id'},
-        {value: 'firstName'},
-        {value: 'lastName'},
-        {value: 'middleName'},
-        {value: 'nickname'},
-        {value: 'bio'},
-        {value: 'email'},
-        {value: 'dateOfBirth'},
-        {value: 'phoneNumber'},
-        {value: 'homeAddress'},
-        {value: 'created'},
-        {value: 'role'},
-        {value: 'role'}
-      ],
       fields: [
         {
-          key: 'id',
-          sortable: true
-        },
-        {
           key: 'firstName',
+          //label: 'F name',
           sortable: true
         },
-
         {
           key: 'lastName',
-          sortable: true
-        },
-        {
-          key: 'middleName',
-          sortable: true
-        },
-        {
-          key: 'nickname',
-          sortable: true
-        },
-        {
-          key: 'bio',
           sortable: true
         },
         {
@@ -106,80 +56,51 @@ export default {
           sortable: true
         },
         {
-          key: 'dateOfBirth',
-          sortable: true
-        },
-        {
-          key: 'phoneNumber',
-          sortable: true
-        },
-        {
           key: 'homeAddress',
-          sortable: true
-        },
-        {
-          key: 'created',
           sortable: true
         },
         {
           key: 'role',
           sortable: true
-        },
-        {
-          key: 'businessesAdministered',
-          sortable: true
-        },
+        }
       ]
-
     }
   },
-  methods: {
 
+  methods: {
     /**
      * the function is search a user id the using api to find the user's detail
      * @param id user is id or name other details
      */
     displayResults: function (searchParameter) {
-      api
-        .getUser(searchParameter)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.items = response.data;  //Add functionality to return results based on query
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to load user data";
-        })
-      console.log(this.items);
-    }
+        api
+          .getUser(searchParameter)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            if (searchParameter.trim().length) {
+              this.items = response.data;  //Add functionality to return results based on query
+            } else {
+              this.items = [];
+            }
+
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load user data";
+          })
+      }
   },
   computed: {
+    /**
+     * The rows function just computed how many pages in the search table.
+     * @returns {number}
+     */
     rows() {
       return this.items.length;
     }
-  },
-  mounted() {
-    this.displayResults();
   }
 }
 </script>
 
 <style>
-/*table, th, td {*/
-/*  border: 1px solid black;*/
-/*  padding: 5px;*/
-/*  text-align: left;*/
-
-/*}*/
-
-/*table {*/
-/*  border-collapse: collapse;*/
-/*}*/
-
-/*th {*/
-/*  height: 50px;*/
-/*}*/
-#window {
-  float: left;
-}
 </style>
