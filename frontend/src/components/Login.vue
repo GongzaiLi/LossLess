@@ -6,44 +6,45 @@ Date: 3/3/2021
 <template>
   <div>
     <h2>Login to Wasteless</h2>
-    <p>Email</p>
+    <b-form @submit="login" >
+      <b-form-group
+        label="Email"
+        >
+        <b-form-input type="email" v-model="email" required
+               autofocus
+               autocomplete="off"
+        ></b-form-input>
+      </b-form-group>
 
-    <input type="email" v-model="email" required
-           size="30"
-           autofocus
-           autocomplete="off"
-    />
-    <p>Password</p>
+      <b-form-group
+          label="Password"
+      >
+        <b-form-input v-model="password" type="password" required
+             autofocus
+             autocomplete="off"
+        ></b-form-input>
+      </b-form-group>
 
-    <input v-model="password" type="password" required
-           size="30"
-           autofocus
-           autocomplete="off"
-    /> <br>
+      <b-button type="submit" variant="outline-primary" style="margin-top:10px">Login</b-button>
+      <br><br>
+    </b-form>
 
-
-    <div v-if="errors.length">
-      <ul>
-        <li v-for="error in errors" v-bind:key="error" style="color:red">{{ error }}</li>
-      </ul>
-    </div>
-
-    <span style="padding-right:10px">
-
-        <button @click="login" style="margin-top:10px">Login</button>
-      </span>
-
-    <p> Don't have an account?
-      <span>
-            <button @click="goToRegisterPage" style="margin-top:10px">Register</button>
-        </span>
-    </p>
+    <b-form-group
+        label-cols="auto"
+        label="Don't have an account?"
+        label-for="input-horizontal">
+      <b-button @click="goToRegisterPage" variant="outline-primary" >Register</b-button>
+    </b-form-group>
 
 
-    <br><br><br>
-    <span>Demo Mode</span>
+    <br><br>
 
-    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+    <b-form-group
+      label-cols="auto"
+      label="Demo Mode"
+      label-for="input-horizontal">
+      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isActive ? 'ON' : 'OFF'}} </b-button>
+    </b-form-group>
 
   </div>
 
@@ -60,8 +61,12 @@ export default {
       errors: [],
       email: null,
       password: "",
-      isActive: false
-
+      isActive: false,
+    }
+  },
+  computed: {
+    demoVariant() {
+      return this.isActive ? 'outline-success' : 'outline-danger';
     }
   },
   methods: {
@@ -73,33 +78,11 @@ export default {
      * Sends the values entered into the email and password fields.
      * Login errors (eg. incorrect password) are displayed
      */
-    login: function () {
-      this.errors = this.validateLoginFields();
-      if (this.isActive) {
-        this.errors.length = 0;
-      }
-      if (this.errors.length === 0) {
-        this.makeLoginRequest();
-      }
+    login(event) {
+      event.preventDefault()
+      this.makeLoginRequest();
     },
-    /**
-     * Checks if both email and password fields are not empty, and
-     * the email format is valid. Returns a list of error messages.
-     * The list will be empty if there are not errors.
-     */
-    validateLoginFields() {
-      let errors = [];
 
-      if (!this.email) {
-        errors.push("Please fill in the Email field");
-      } else if (!this.email.includes("@")) {
-        errors.push("The given email is not valid");
-      }
-      if (!this.password) {
-        errors.push("Please fill in the Password field");
-      }
-      return errors;
-    },
     /**
      * Makes a POST request to the API to send a login request.
      * Sends the values entered into the email and password fields.
