@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -21,8 +22,6 @@ public class UserController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
     private UserRepository userRepository;
     private Encryption encryption;
-
-    //Todo validation of email, birthday, etc formats
 
     @Autowired
     public UserController(UserRepository userRepository) {
@@ -72,6 +71,22 @@ public class UserController {
         //return ResponseEntity.created(location).build();
     }
 
+
+    @GetMapping("/users/search")
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
+
+        //Todo full matches
+        //List<User> fullMatches =  userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+
+        List<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
+
+        //Todo partial matches
+
+        //List<User> partialMatchingUsers = userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameOrNicknameContains(searchQuery, searchQuery, searchQuery, searchQuery);
+        return ResponseEntity.status(200).body(firstNamePartialMatches);
+    }
+
+
     /**
      * Returns a json object of bad field found in the request
      *
@@ -92,7 +107,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
         User possibleUser = userRepository.findFirstById(userId);
         System.out.println(possibleUser);
@@ -105,7 +120,7 @@ public class UserController {
         // to have U4 for that or is it possible to do without it
 
         logger.info("Account: {} retrieved successfully", possibleUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(possibleUser);
+        return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
     }
 
     @PostMapping("/login")
