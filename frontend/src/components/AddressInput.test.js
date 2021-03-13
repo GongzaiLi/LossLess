@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import Register from './Register'; // name of your Vue component
+import AddressInput from './AddressInput'; // name of your Vue component
 
 let wrapper;
 
 beforeEach(() => {
-    wrapper = shallowMount(Register, {
+    wrapper = shallowMount(AddressInput, {
         propsData: {},
         mocks: {},
         stubs: {},
@@ -16,7 +16,7 @@ afterEach(() => {
     wrapper.destroy();
 });
 
-describe('Register', () => {
+describe('AddressInput', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
