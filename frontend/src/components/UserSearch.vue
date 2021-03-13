@@ -17,7 +17,7 @@ Date: 7/3/2021
       </b-col>
     </b-row>
     <b-row>
-      <b-col v-show="items.length"><!--responsive-->
+      <b-col><!--responsive-->
         <b-table striped hover
                  table-class="text-nowrap"
                  responsive="sm"
@@ -44,7 +44,7 @@ export default {
       searchQuery: "",
       perPage: 10,
       currentPage: 1,
-      items: [],
+      items: Array(10).fill({}),
       fields: [
         {
           key: 'firstName',
