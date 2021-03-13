@@ -25,7 +25,7 @@ Date: 3/3/2021
         ></b-form-input>
       </b-form-group>
 
-      <b-button type="submit" variant="outline-primary" style="margin-top:10px">Login</b-button>
+      <b-button type="submit" variant="outline-primary" v-on:click="demoLogin" style="margin-top:10px">Login</b-button>
       <br><br>
     </b-form>
 
@@ -53,7 +53,6 @@ import api from "../Api";
 export default {
   data: function () {
     return {
-      makeLoginSucceed: true,
       loginFailed: false,
       errors: [],
       email: null,
@@ -68,19 +67,26 @@ export default {
     }
   },
   methods: {
+    // toggle the demo mode variable when button clicked
     toggle: function() {
       this.isActive = !this.isActive;
     },
     /**
-     * Makes a POST request to the API to send a login request.
-     * Sends the values entered into the email and password fields.
-     * Login errors (eg. incorrect password) are displayed
+     * only called if form page passes submit criteria
+     * when user clicks login stop page deleting everything and refreshing
+     * then make login request
      */
     login(event) {
       event.preventDefault()
       this.makeLoginRequest();
     },
 
+    //called on submit to check if in demo mode if so go straight to user page 0
+    demoLogin : function() {
+      if (this.isActive) {
+        this.goToUserProfilePage(0);
+      }
+    },
     /**
      * Makes a POST request to the API to send a login request.
      * Sends the values entered into the email and password fields.
@@ -100,16 +106,9 @@ export default {
             this.goToUserProfilePage(response.userId);
           })
           .catch((error) => {
-            // THIS if BLOCK IS FOR TESTING PURPOSES ONLY, DELETE ONCE WE HAVE A BACKEND
-            if (this.makeLoginSucceed) {
-              this.loginFailed = false;
-              this.goToUserProfilePage(0);
-              return;
-            }
-
             this.loginFailed = true;
             this.$log.debug(error);
-            if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
+            if (error.response && error.response.status === 400) {
               this.errors.push("The given username or password is incorrect.");
             } else {
               this.errors.push(error.message);
