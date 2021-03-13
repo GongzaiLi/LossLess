@@ -1,5 +1,6 @@
 <template>
   <b-container id="app">
+    <Navbar/>
     <router-view/>
   </b-container>
 </template>
@@ -7,7 +8,7 @@
 <script>
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Students from "./components/Students";
+import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 
 
@@ -23,7 +24,7 @@ const app = {
     Login,
     Register,
     UserProfile,
-    Students
+    Navbar
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
