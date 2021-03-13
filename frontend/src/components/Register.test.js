@@ -22,13 +22,6 @@ describe('Register', () => {
     });
 });
 
-test('all-fields-empty', async () => {
-    expect(wrapper.find('#error-txt').exists()).toBe(false)
-    const regBtn = wrapper.find('#register-btn');
-    await regBtn.trigger('click');
-    expect(wrapper.find('#error-txt').text()).toBe("Email address is invalid, please make sure it contains an @ sign");
-});
-
 test('empty-address-object', async () => {
     const address = {};
     expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe(null);

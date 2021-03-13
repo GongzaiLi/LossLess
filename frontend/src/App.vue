@@ -1,7 +1,7 @@
 <template>
-  <div id="app">
-    <router-view />
-  </div>
+  <b-container id="app">
+    <router-view/>
+  </b-container>
 </template>
 
 <script>
@@ -9,7 +9,6 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Students from "./components/Students";
 import UserProfile from "./components/UserProfile";
-
 
 
 // Vue app instance

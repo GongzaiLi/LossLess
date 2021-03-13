@@ -39,8 +39,12 @@ Date: 3/3/2021
         </span>
     </p>
 
+
     <br><br><br>
-    <span>Make logins successful</span> <input type="checkbox" v-model="makeLoginSucceed" checked>
+    <span>Demo Mode</span>
+
+    <button v-bind:class="{ 'green': isActive, 'blue': !isActive}" @click="toggle">{{isActive ? 'ON' : 'OFF'}} </button>
+
   </div>
 
 </template>
@@ -49,16 +53,21 @@ Date: 3/3/2021
 import api from "../Api";
 
 export default {
-  data: function() {
+  data: function () {
     return {
       makeLoginSucceed: true,
       loginFailed: false,
       errors: [],
       email: null,
-      password: ""
+      password: "",
+      isActive: false
+
     }
   },
   methods: {
+    toggle: function() {
+      this.isActive = !this.isActive;
+    },
     /**
      * Makes a POST request to the API to send a login request.
      * Sends the values entered into the email and password fields.
@@ -66,6 +75,9 @@ export default {
      */
     login: function () {
       this.errors = this.validateLoginFields();
+      if (this.isActive) {
+        this.errors.length = 0;
+      }
       if (this.errors.length === 0) {
         this.makeLoginRequest();
       }
@@ -100,30 +112,44 @@ export default {
       };
       console.log(loginData);
       api
-        .login(loginData)
-        .then(() => {
-          this.$log.debug("Logged in");
-          // Go to profile page
-        })
-        .catch((error) => {
-          if (this.makeLoginSucceed) {
+          .login(loginData)
+          .then((response) => {
+            this.$log.debug("Logged in");
             // Go to profile page
-            this.loginFailed = false;
-            return;
-          }
+            this.goToUserProfilePage(response.userId);
+          })
+          .catch((error) => {
+            // THIS if BLOCK IS FOR TESTING PURPOSES ONLY, DELETE ONCE WE HAVE A BACKEND
+            if (this.makeLoginSucceed) {
+              this.loginFailed = false;
+              this.goToUserProfilePage(0);
+              return;
+            }
 
-          this.loginFailed = true;
-          this.$log.debug(error);
-          if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
-            this.errors.push("The given username or password is incorrect.");
-          } else {
-            this.errors.push(error.message);
-          }
-        });
+            this.loginFailed = true;
+            this.$log.debug(error);
+            if ((error.response && error.response.status === 400) || !this.makeLoginSucceed) {
+              this.errors.push("The given username or password is incorrect.");
+            } else {
+              this.errors.push(error.message);
+            }
+          });
     },
+    /**
+     * Redirects to the registration page/component. To be used when
+     * the user has no account and wants to sign up.
+     */
     goToRegisterPage: function () {
       console.log("Redirecting to Register Page");
-      this.$router.push({ path: '/register' })
+      this.$router.push({path: '/register'});
+    },
+    /**
+     * Redirects to the profile page of the user with the specified userId.
+     * This will switch components immediately to the UserProfile component
+     * so no loading spinner needs to be implemented here.
+     */
+    goToUserProfilePage: function (userId) {
+      this.$router.push({path: `/user/${userId}`});
     }
   }
 }
