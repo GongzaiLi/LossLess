@@ -41,17 +41,6 @@ const instance = axios.create({
 export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
   register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
-
-  getUser: (id) => instance.get('user/' + id),
-
-  /* STUFF FROM PROJECT TEMPLATE EXAMPLE
-  // (C)reate
-  createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),
-  // (R)ead
-  readForID: (id) => instance.get('')
-  // (U)pdate
-  updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}),
-  // (D)elete
-  removeForId: (id) => instance.delete('students/'+id)  */
-
+  getUser: (id) => instance.get('users/' + id),
+  makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true})
 }

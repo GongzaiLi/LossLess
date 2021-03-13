@@ -10,7 +10,7 @@ Date: 5/3/2021
     <div>
       <p id="member-since">Member since:
         {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
-      <p  v-if="userIsAdmin">
+      <p  v-if="loggedInAsAdmin">
         <label v-if="userData.globalApplicationAdmin">Admin:</label>
         <label v-else>User:</label>
 
@@ -83,7 +83,8 @@ export default {
         homeAddress: "",
         globalApplicationAdmin: ""
       },
-      userIsAdmin: ""
+      loggedInAsAdmin: false,
+      demoMode: true
     }
   },
 
@@ -91,9 +92,6 @@ export default {
     const userId = this.$route.params.id;
     this.displayAdmin();
     this.getUserInfo( userId );
-
-
-
   },
 
   methods: {
@@ -104,14 +102,14 @@ export default {
      */
     getUserInfo: function (id) {
       api
-        .getUser(id) //
+        .getUser(id)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
         })
         .catch((error) => {
           this.$log.debug(error);
-          this.error = "Failed to Load User Date"
+          this.error = "Failed to Load User Data"
         })
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
@@ -123,16 +121,44 @@ export default {
     displayAdmin: function() {
       //Changes userIsAdmin variable to true if user is logged in as admin (has GAA cookie)
       if (getCookie('globalApplicationAdmin')==='1'){
-        this.userIsAdmin='True';
+        this.loggedInAsAdmin = true;
       }
     },
+    /**
+     * Revoke or give the current user the 'globalApplicationAdmin' role,
+     * depending on whether the current user already has that role.
+     */
     toggleAdmin: function() {
-      this.userData.globalApplicationAdmin = !this.userData.globalApplicationAdmin;
+      if (!this.userData.globalApplicationAdmin) {
+        this.giveAdmin();
+      }
     },
+    /**
+     *  Attempts to grant the displayed user the 'globalApplicationAdmin' role
+     *  by sending a request to the API. Will show an error alert if unsuccessful.
+     */
+    giveAdmin: function() {
+      api
+        .makeUserAdmin(this.userData.id)
+        .then(() => {
+          this.$log.debug(`Made user ${this.userData.id} admin`);
+          this.userData.globalApplicationAdmin = true;
+        })
+        .catch((error) => {
 
+          if (this.demoMode) {
+            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+            this.$log.debug(`Made user ${this.userData.id} admin`);
+            this.userData.globalApplicationAdmin = true;
+            return;
+            //////////////////////////
+          }
+
+          this.$log.debug(error);
+          alert(error);
+        });
+    }
   },
-
-
 
   watch: {
     /**
