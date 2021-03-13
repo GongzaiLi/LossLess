@@ -129,7 +129,9 @@ export default {
      * depending on whether the current user already has that role.
      */
     toggleAdmin: function() {
-      if (!this.userData.globalApplicationAdmin) {
+      if (this.userData.globalApplicationAdmin) {
+        this.revokeAdmin();
+      } else {
         this.giveAdmin();
       }
     },
@@ -145,11 +147,32 @@ export default {
           this.userData.globalApplicationAdmin = true;
         })
         .catch((error) => {
-
           if (this.demoMode) {
             // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-            this.$log.debug(`Made user ${this.userData.id} admin`);
             this.userData.globalApplicationAdmin = true;
+            return;
+            //////////////////////////
+          }
+
+          this.$log.debug(error);
+          alert(error);
+        });
+    },
+    /**
+     *  Attempts to revoke the 'globalApplicationAdmin' role from the displayed user
+     *  by sending a request to the API. Will show an error alert if unsuccessful.
+     */
+    revokeAdmin: function() {
+      api
+        .revokeUserAdmin(this.userData.id)
+        .then(() => {
+          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
+          this.userData.globalApplicationAdmin = false;
+        })
+        .catch((error) => {
+          if (this.demoMode) {
+            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+            this.userData.globalApplicationAdmin = false;
             return;
             //////////////////////////
           }

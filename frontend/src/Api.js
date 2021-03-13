@@ -42,5 +42,6 @@ export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
   register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
   getUser: (id) => instance.get('users/' + id),
-  makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true})
+  makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
+  revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true})
 }
