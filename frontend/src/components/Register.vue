@@ -80,38 +80,36 @@ Date: 3/3/2021
       </b-form-group>
 
       <b-form-group
-          label="Phone Number"
+        label="Phone Number"
       >
         <b-form-input v-model="phoneNumber"
-                      placeholder="Phone Number"
-                      autofocus
-                      autocomplete="off"
-                      size=30;
+         placeholder="Phone Number"
+         autofocus
+         autocomplete="off"
+         size=30;
         />
         <div class="invalid-feedback">Please enter a phone # like 123-456-7890. This field is required.</div>
       </b-form-group>
-
-      <b-button type="submit" style="margin-top:10px" id="register-btn">Register</b-button>
-      </b-form>
-
+      <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
+    </b-form>
     <br>
     <div v-if="errors.length">
       <h5 style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </h5>
     </div>
-    <br>
     <h6>
-      Already have an account? <router-link to="/login">Login here.</router-link>
+      Already have an account? <router-link to="/login">Login here</router-link>
     </h6>
-    <br><br><br>
-    <span>Demo Mode</span>
 
-    <button v-bind:class="{ 'green': isDemoMode, 'blue': !isDemoMode}" @click="toggle">{{ isDemoMode ? 'ON' : 'OFF' }}
-    </button>
-
+    <b-form-group
+        class="fixed-bottom"
+        label-cols="auto"
+        label="Demo Mode"
+        label-for="input-horizontal">
+      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isDemoMode ? 'ON' : 'OFF'}} </b-button>
+    </b-form-group>
   </div>
 
 </template>
-
 
 <script>
 import api from "@/Api";
@@ -186,7 +184,7 @@ export default {
         .login(registerData)
         .then(() => {
           this.$log.debug("Registered");
-          this.$router.push({path: '/login'});
+          this.$router.push({path: '/login', query: { justRegistered: true }});
         })
         .catch((error) => {
           this.errors = [];
@@ -198,9 +196,15 @@ export default {
           }
         });
       if (this.isDemoMode) {
-        this.$router.push({path: '/login'});
+        this.$router.push({path: '/login', query: { justRegistered: true }});
       }
     },
   },
+  computed: {
+    //if in demo mode or not change style of the button
+    demoVariant() {
+      return this.isDemoMode ? 'outline-success' : 'outline-danger';
+    }
+  }
 }
 </script>
