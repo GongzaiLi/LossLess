@@ -5,27 +5,65 @@ Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
 <template>
-  <div id="userBox">
-    <h2>{{ userData.nickname }}'s Profile Page</h2>
-    <div>
-      <p id="member-since">Member since:
-        {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
-    </div>
-    <hr>
-    <div>
-      <p><b>Name:</b> {{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</p>
-      <p><b>Date Of Birth:</b> {{ userData.dateOfBirth }}</p>
-      <p><b>Email:</b> {{ userData.email }}</p>
-      <p><b>Phone Number:</b> {{ userData.phoneNumber }}</p>
-      <p><b>Home Address:</b> {{ userData.homeAddress }}</p>
-      <p><b>Bio:</b> {{ userData.bio }}</p>
-    </div>
+  <b-card border-variant="secondary" header-border-variant="secondary" style="max-width: 45rem" no-body>
+    <template #header>
+      <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
+      <p class="mb-1">Member since:
+        {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}
+      </p>
+    </template>
 
-    <hr>
+    <b-list-group border-variant="secondary">
+      <b-list-group-item>
+        <b-card-text style="text-align: justify">
+          {{ userData.bio }}
+        </b-card-text>
+      </b-list-group-item>
+    </b-list-group>
 
-    <button id="logout-button" @click="logOut" style="margin-top:10px">Log out</button>
+    <b-card-body>
+      <b-container>
+        <h6>
+          <b-row>
+            <b-col cols="4"><b>Name:</b></b-col>
+            <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
+          </b-row>
+        </h6>
+        <h6>
+          <b-row v-show="userData.nickname.length">
+            <b-col cols="4"><b>Nickname:</b></b-col>
+            <b-col>{{ userData.nickname}}</b-col>
+          </b-row>
+        </h6>
+        <h6>
+          <b-row>
+            <b-col cols="4"><b>Date Of Birth:</b></b-col>
+            <b-col>{{ userData.dateOfBirth }}</b-col>
+          </b-row>
+        </h6>
+        <h6>
+          <b-row>
+            <b-col cols="4"><b>Email:</b></b-col>
+            <b-col>{{ userData.email }}</b-col>
+          </b-row>
+        </h6>
+        <h6>
+          <b-row>
+            <b-col cols="4"><b>Phone Number:</b></b-col>
+            <b-col>{{ userData.phoneNumber }}</b-col>
+          </b-row>
+        </h6>
+        <h6>
+          <b-row>
+            <b-col cols="4"><b>Home Address:</b></b-col>
+            <b-col> {{ userData.homeAddress }}</b-col>
+          </b-row>
+        </h6>
+      </b-container>
+    </b-card-body>
 
-  </div>
+
+  </b-card>
 
 </template>
 
@@ -58,7 +96,7 @@ export default {
 
   mounted() {
     const userId = this.$route.params.id;
-    this.getUserInfo( userId );
+    this.getUserInfo(userId);
   },
 
   methods: {
@@ -93,29 +131,13 @@ export default {
      * changes, and will update the user profile with the data of the user specified by the new route.
      * See https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes for more info
      */
-    /* The orgument _from is not needed, so this is to stop eslint complaining:*/
+    /* The argument _from is not needed, so this is to stop eslint complaining:*/
     /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
     $route(to, _from) {
       console.log(to);
       const userId = to.params.id;
-      this.getUserInfo( userId );
+      this.getUserInfo(userId);
     }
   }
 }
 </script>
-
-<style scoped>
-
-#userBox {
-  border: 2px solid #a1a1a1;
-  padding: 10px 40px;
-  background: floralwhite;
-  width: 400px;
-  border-radius: 10px;
-}
-
-#member-since {
-  margin-top: -10px;
-}
-
-</style>
