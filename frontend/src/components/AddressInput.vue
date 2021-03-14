@@ -12,7 +12,7 @@
       v-if="showAutocompleteDropdown && addressResults.length > 0"
     >
 
-      <b-list-group-item class="address-option"
+      <b-list-group-item button
          v-for="address in addressResults"
          v-bind:key="address"
          @click="selectAddressOption(address)"
@@ -38,27 +38,15 @@
   position: relative;
 }
 
-.address-option {
-  border-top: 2px solid gray;
-}
-
-.address-option:hover {
-  background-color: lightgray;
-}
-
 .address-close {
   text-align: center;
 }
 
 .address-options-list {
-  border-left: 2px solid gray;
-  border-right: 2px solid gray;
-  border-bottom: 2px solid gray;
-  background-color: #FCFCFC;
   width: 100%;
   position: absolute;
   z-index: 9999;
-  max-height: 20em;
+  max-height: 16em;
   overflow-y: scroll;
 }
 
