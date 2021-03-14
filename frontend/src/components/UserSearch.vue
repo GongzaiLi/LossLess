@@ -28,7 +28,7 @@ Date: 7/3/2021
                  :per-page="perPage"
                  :items="items"
                  :current-page="currentPage"
-                 style="table-layout: fixed; table-layout: fixed">
+                 style="table-layout: fixed">
         </b-table>
       </b-col>
     </b-row>
@@ -87,7 +87,7 @@ export default {
           this.$log.debug("Data loaded: ", response.data);
           if (searchParameter.trim().length) {
             this.items = this.getUserInfoIntoTable(response.data);  //Add functionality to return results based on query
-            this.totalResults = this.items.length;
+            this.totalResults = response.data.length;
             this.resultsReturned = true;
           } else {
             this.items = Array(this.perPage).fill({
@@ -175,11 +175,11 @@ export default {
      * Computes the upper range of items displaying on the table.
      * @returns {number}
      */
+
     itemsRangeMax() {
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
 
       if (this.currentPage === numPages) {
-        //this.currentPageItems = (this.totalResults % this.perPage);
         return this.perPage  * (this.currentPage - 1) + (this.totalResults % this.perPage) ;
       } else {
         return this.perPage  * (this.currentPage - 1) + (this.getCurrentPageItems) ;
