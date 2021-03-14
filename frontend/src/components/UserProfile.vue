@@ -11,10 +11,10 @@ Date: 5/3/2021
       <p id="member-since">Member since:
         {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
       <p  v-if="loggedInAsAdmin">
-        <label v-if="userData.globalApplicationAdmin">Admin:</label>
-        <label v-else>User:</label>
+        <label v-if="userData.role==='user'">User:</label>
+        <label v-else>Admin:</label>
 
-      <button v-bind:class="{ 'admin': userData.globalApplicationAdmin, 'user': !userData.globalApplicationAdmin}" @click="toggleAdmin">{{userData.globalApplicationAdmin ? 'Remove Admin' : 'Make Admin'}} </button>
+      <button  @click="toggleAdmin">{{adminButtonToggle ? 'Remove Admin' : 'Make Admin'}} </button>
       </p>
     </div>
     <hr>
@@ -80,9 +80,9 @@ export default {
         email: "",
         dateOfBirth: "",
         phoneNumber: "",
-        homeAddress: "",
-        globalApplicationAdmin: ""
+        homeAddress: ""
       },
+      adminButtonToggle: false,
       loggedInAsAdmin: false,
       demoMode: true
     }
@@ -114,6 +114,9 @@ export default {
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
       this.userData = usersInfo.users[id];
+      if (this.userData.role==='defaultGlobalApplicationAdmin' || this.userData.role==='globalApplicationAdmin') {
+        this.adminButtonToggle = true;
+      }
     },
     logOut: function () {
       this.$router.push({path: '/login'})
@@ -129,9 +132,11 @@ export default {
      * depending on whether the current user already has that role.
      */
     toggleAdmin: function() {
-      if (this.userData.globalApplicationAdmin) {
+      if (this.userData.role==='defaultGlobalApplicationAdmin' || this.userData.role==='globalApplicationAdmin') {
+        this.adminButtonToggle=false;
         this.revokeAdmin();
       } else {
+        this.adminButtonToggle=true;
         this.giveAdmin();
       }
     },
@@ -144,12 +149,12 @@ export default {
         .makeUserAdmin(this.userData.id)
         .then(() => {
           this.$log.debug(`Made user ${this.userData.id} admin`);
-          this.userData.globalApplicationAdmin = true;
+          this.userData.role = 'globalApplicationAdmin';
         })
         .catch((error) => {
           if (this.demoMode) {
             // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-            this.userData.globalApplicationAdmin = true;
+            this.userData.role = 'globalApplicationAdmin';
             return;
             //////////////////////////
           }
@@ -167,12 +172,12 @@ export default {
         .revokeUserAdmin(this.userData.id)
         .then(() => {
           this.$log.debug(`Revoked admin for user ${this.userData.id}`);
-          this.userData.globalApplicationAdmin = false;
+          this.userData.role = 'user';
         })
         .catch((error) => {
           if (this.demoMode) {
             // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-            this.userData.globalApplicationAdmin = false;
+            this.userData.role = 'user';
             return;
             //////////////////////////
           }
