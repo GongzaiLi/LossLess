@@ -10,7 +10,8 @@
       "email": "johnsmith99@gmail.com",
       "dateOfBirth": "1999-04-27",
       "phoneNumber": "+64 3 555 0129",
-      "homeAddress": "4 Rountree Street, Upper Riccarton"
+      "homeAddress": "4 Rountree Street, Upper Riccarton",
+      "created": "2020-11-07T11:35:27Z"
     }
   ]
 }
