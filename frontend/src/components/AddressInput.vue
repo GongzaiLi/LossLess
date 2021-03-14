@@ -20,7 +20,7 @@
         {{ address }}
       </b-list-group-item>
 
-      <b-list-group-item
+      <b-list-group-item button
         class="address-option address-close"
         @click="showAutocompleteDropdown = false"
       >
