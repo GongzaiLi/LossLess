@@ -26,24 +26,26 @@ Date: 3/3/2021
                  autocomplete="off"
             ></b-form-input>
           </b-form-group>
-
-          <b-button type="submit" variant="outline-primary" v-on:click="demoLogin" style="margin-top:10px">Login</b-button>
-          <br><br>
+          <b-form-group
+          >
+          <b-button block type="submit" variant="primary" v-on:click="demoLogin" style="margin-top:0.7em">Login</b-button>
+          </b-form-group>
         </b-form>
 
-        <p> Don't have an account?
+        <h6> Don't have an account?
           <router-link to="/register" >Register Here</router-link>
-        </p>
+        </h6>
         <br><br>
-
-        <b-form-group
-          label-cols="auto"
-          label="Demo Mode"
-          label-for="input-horizontal">
-          <b-button v-bind:variant="demoVariant" @click="toggle" >{{isActive ? 'ON' : 'OFF'}} </b-button>
-        </b-form-group>
       </b-col>
     </b-row>
+
+    <b-form-group
+        class="fixed-bottom"
+        label-cols="auto"
+        label="Demo Mode"
+        label-for="input-horizontal">
+      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isActive ? 'ON' : 'OFF'}} </b-button>
+    </b-form-group>
 
   </b-container>
 

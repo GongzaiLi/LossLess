@@ -47,7 +47,7 @@ Date: 3/3/2021
       <b-form-group
         label="Email *"
       >
-        <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
+        <b-form-input required type="email" :state="validity" v-model="email" placeholder="Email"></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -94,22 +94,23 @@ Date: 3/3/2021
           autocomplete="off"
         ></b-form-textarea>
       </b-form-group>
-      <b-button type="submit" style="margin-top:10px" id="register-btn">Register</b-button>
+      <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
     </b-form>
     <br>
     <div v-if="errors.length">
       <h5 style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </h5>
     </div>
-    <br>
     <h6>
-      Already have an account? <router-link to="/login">Login here.</router-link>
+      Already have an account? <router-link to="/login">Login here</router-link>
     </h6>
-    <br><br><br>
-    <span>Demo Mode</span>
 
-    <button v-bind:class="{ 'green': isDemoMode, 'blue': !isDemoMode}" @click="toggle">{{ isDemoMode ? 'ON' : 'OFF' }}
-    </button>
-
+    <b-form-group
+        class="fixed-bottom"
+        label-cols="auto"
+        label="Demo Mode"
+        label-for="input-horizontal">
+      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isDemoMode ? 'ON' : 'OFF'}} </b-button>
+    </b-form-group>
   </div>
 
 
@@ -200,6 +201,12 @@ export default {
         this.$router.push({path: '/login'});
       }
     },
+  },
+  computed: {
+    //if in demo mode or not change style of the button
+    demoVariant() {
+      return this.isDemoMode ? 'outline-success' : 'outline-danger';
+    }
   }
 }
 </script>
