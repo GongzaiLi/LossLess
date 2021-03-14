@@ -11,10 +11,9 @@ Date: 5/3/2021
       <p id="member-since">Member since:
         {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
       <p  v-if="loggedInAsAdmin">
-        <label v-if="userData.role==='user'">User:</label>
-        <label v-else>Admin:</label>
+        <label >{{userRoleDisplayString}}</label>
 
-      <button  @click="toggleAdmin">{{adminButtonToggle ? 'Remove Admin' : 'Make Admin'}} </button>
+      <button v-if="userData.role!=='defaultGlobalApplicationAdmin'" @click="toggleAdmin">{{adminButtonText}}</button>
       </p>
     </div>
     <hr>
@@ -82,7 +81,6 @@ export default {
         phoneNumber: "",
         homeAddress: ""
       },
-      adminButtonToggle: false,
       loggedInAsAdmin: false,
       demoMode: true
     }
@@ -114,9 +112,6 @@ export default {
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
       this.userData = usersInfo.users[id];
-      if (this.userData.role==='defaultGlobalApplicationAdmin' || this.userData.role==='globalApplicationAdmin') {
-        this.adminButtonToggle = true;
-      }
     },
     logOut: function () {
       this.$router.push({path: '/login'})
@@ -133,10 +128,8 @@ export default {
      */
     toggleAdmin: function() {
       if (this.userData.role==='defaultGlobalApplicationAdmin' || this.userData.role==='globalApplicationAdmin') {
-        this.adminButtonToggle=false;
         this.revokeAdmin();
       } else {
-        this.adminButtonToggle=true;
         this.giveAdmin();
       }
     },
@@ -185,6 +178,34 @@ export default {
           this.$log.debug(error);
           alert(error);
         });
+    }
+  },
+  computed: {
+    /**
+     * User friendly display string for the user role. Converts the user role
+     * string given by the api (eg. 'user', 'globalApplicationAdmin') to
+     * a more user-friendly string to be displayed (eg. 'User', 'Site Admin')
+     */
+    userRoleDisplayString: function() {
+      switch(this.userData.role) {
+        case 'globalApplicationAdmin':
+          return "Site Admin";
+        case 'defaultGlobalApplicationAdmin':
+          return "Default Site Admin";
+        default:
+          return "User";
+      }
+    },
+    /**
+     * Toggles the button text to add/remove admin privileges on a profile based on the user's role
+     */
+    adminButtonText: function() {
+      switch(this.userData.role) {
+        case 'globalApplicationAdmin':
+          return "Remove Admin";
+        default:  // Button won't even appear if they are default global admin so this is fine
+          return "Make Admin";
+      }
     }
   },
 
