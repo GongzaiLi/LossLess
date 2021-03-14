@@ -31,8 +31,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import BootstrapVue from 'bootstrap-vue';
-import IconsPlugin from 'bootstrap-vue';
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
@@ -52,8 +51,8 @@ const options = {
 };
 
 Vue.use(VueLogger, options);
-Vue.use(BootstrapVue);
-Vue.use(IconsPlugin);
+Vue.use(BootstrapVue)
+Vue.use(BootstrapVueIcons)
 
 /* eslint-disable no-new */
 new Vue({

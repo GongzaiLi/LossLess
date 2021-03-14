@@ -25,36 +25,42 @@ Date: 5/3/2021
       <b-container>
         <h6>
           <b-row>
-            <b-col cols="4"><b>Name:</b></b-col>
+            <b-col cols="0"><b-icon-person-fill></b-icon-person-fill></b-col>
+            <b-col cols="4"><b>Full Name:</b></b-col>
             <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
           </b-row>
         </h6>
         <h6>
           <b-row v-show="userData.nickname.length">
+            <b-col cols="0"><b-icon-emoji-smile-fill></b-icon-emoji-smile-fill></b-col>
             <b-col cols="4"><b>Nickname:</b></b-col>
             <b-col>{{ userData.nickname}}</b-col>
           </b-row>
         </h6>
         <h6>
           <b-row>
+            <b-col cols="0"><b-icon-calendar-event-fill></b-icon-calendar-event-fill></b-col>
             <b-col cols="4"><b>Date Of Birth:</b></b-col>
             <b-col>{{ userData.dateOfBirth }}</b-col>
           </b-row>
         </h6>
         <h6>
           <b-row>
+            <b-col cols="0"><b-icon-envelope-fill></b-icon-envelope-fill></b-col>
             <b-col cols="4"><b>Email:</b></b-col>
             <b-col>{{ userData.email }}</b-col>
           </b-row>
         </h6>
         <h6>
           <b-row>
+            <b-col cols="0"><b-icon-telephone-fill></b-icon-telephone-fill></b-col>
             <b-col cols="4"><b>Phone Number:</b></b-col>
             <b-col>{{ userData.phoneNumber }}</b-col>
           </b-row>
         </h6>
         <h6>
           <b-row>
+            <b-col cols="0"><b-icon-house-fill></b-icon-house-fill></b-col>
             <b-col cols="4"><b>Home Address:</b></b-col>
             <b-col> {{ userData.homeAddress }}</b-col>
           </b-row>
@@ -66,6 +72,12 @@ Date: 5/3/2021
   </b-card>
 
 </template>
+
+<style scoped>
+h6 {
+  line-height: 1.4;
+}
+</style>
 
 <script>
 import api from "../Api";
