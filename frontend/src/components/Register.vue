@@ -47,7 +47,7 @@ Date: 3/3/2021
       <b-form-group
         label="Email *"
       >
-        <b-form-input required type="email" :state="validity" v-model="email" placeholder="Email"></b-form-input>
+        <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
       </b-form-group>
 
       <b-form-group
