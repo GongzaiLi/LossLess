@@ -27,9 +27,9 @@ Date: 7/3/2021
                  :items="items"
                  :per-page="perPage"
                  :current-page="currentPage"
-                 style="table-layout: fixed; table-layout: fixed">
+                 style="table-layout: fixed">
         </b-table>
-        <p> Displaying {{getCurrentPageItems}} ({{itemsRangeMin}} - {{itemsRangeMax}}) results of total {{totalResults}} results. </p>
+        <p> Displaying {{itemsRangeMin}} - {{itemsRangeMax}} of total {{totalResults}} results. </p>
         <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
       </b-col>
     </b-row>
@@ -76,7 +76,7 @@ export default {
   methods: {
     /**
      * the function is search a user id the using api to find the user's detail
-     * @param id user is id or name other details
+     * @param searchParameter id user is id or name other details
      */
     displayResults: function (searchParameter) {
         api
@@ -124,7 +124,7 @@ export default {
 
       if (this.currentPage === numPages) {
         return this.totalResults % this.perPage;
-      } else if(this.totalResults == 0) {
+      } else if(this.totalResults === 0) {
         return 0;
       } else {
         return this.perPage;
@@ -134,10 +134,15 @@ export default {
     /**
      * Author: Nitish Singh
      * Computes the lower range of items displaying on the table.
+     * Ranges (indexes) starts from 1, so plus 1
      * @returns {number}
      */
     itemsRangeMin() {
-      return this.perPage  * (this.currentPage - 1);
+      let minRange = this.perPage  * (this.currentPage - 1);
+      if (this.totalResults > 0){
+        minRange++;
+      }
+      return minRange;
     },
     /**
      * Author: Nitish Singh
