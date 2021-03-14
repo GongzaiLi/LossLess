@@ -4,46 +4,48 @@ Author: Eric Song, Caleb Sim
 Date: 3/3/2021
 -->
 <template>
-  <div>
-    <h2>Login to Wasteless</h2>
-    <b-form @submit="login" >
-      <b-form-group
-        label="Email"
-        >
-        <b-form-input type="email" v-model="email" required
-               autofocus
-               autocomplete="off"
-        ></b-form-input>
-      </b-form-group>
+  <b-container>
+    <b-row class="justify-content-md-center">
+      <b-col class="col-md-5">
+        <h2>Login to Wasteless</h2>
+        <b-form @submit="login" >
+          <b-form-group
+            label="Email"
+            >
+            <b-form-input type="email" v-model="email" required
+                   autofocus
+                   autocomplete="off"
+            ></b-form-input>
+          </b-form-group>
 
-      <b-form-group
-          label="Password"
-      >
-        <b-form-input v-model="password" type="password" required
-             autofocus
-             autocomplete="off"
-        ></b-form-input>
-      </b-form-group>
+          <b-form-group
+              label="Password"
+          >
+            <b-form-input v-model="password" type="password" required
+                 autofocus
+                 autocomplete="off"
+            ></b-form-input>
+          </b-form-group>
 
-      <b-button type="submit" variant="outline-primary" v-on:click="demoLogin" style="margin-top:10px">Login</b-button>
-      <br><br>
-    </b-form>
+          <b-button type="submit" variant="outline-primary" v-on:click="demoLogin" style="margin-top:10px">Login</b-button>
+          <br><br>
+        </b-form>
 
-    <p> Don't have an account?
-      <router-link to="/register" >Register Here</router-link>
-    </p>
+        <p> Don't have an account?
+          <router-link to="/register" >Register Here</router-link>
+        </p>
+        <br><br>
 
+        <b-form-group
+          label-cols="auto"
+          label="Demo Mode"
+          label-for="input-horizontal">
+          <b-button v-bind:variant="demoVariant" @click="toggle" >{{isActive ? 'ON' : 'OFF'}} </b-button>
+        </b-form-group>
+      </b-col>
+    </b-row>
 
-    <br><br>
-
-    <b-form-group
-      label-cols="auto"
-      label="Demo Mode"
-      label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isActive ? 'ON' : 'OFF'}} </b-button>
-    </b-form-group>
-
-  </div>
+  </b-container>
 
 </template>
 
