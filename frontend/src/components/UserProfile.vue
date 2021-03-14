@@ -9,7 +9,7 @@ Date: 5/3/2021
     <template #header>
       <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
       <p class="mb-1">Member since:
-        {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}
+        {{ memberSince }}
       </p>
     </template>
 
@@ -68,18 +68,9 @@ Date: 5/3/2021
 </template>
 
 <script>
-import api from "../Api";
-import usersInfo from './usersDate.json';
-
 export default {
   data: function () {
     return {
-      dateR: {
-        year: 0,
-        month: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        day: 0
-      },
-      registrationTime: 0,
       userData: {
         firstName: "",
         lastName: "",
@@ -89,42 +80,15 @@ export default {
         email: "",
         dateOfBirth: "",
         phoneNumber: "",
-        homeAddress: ""
+        homeAddress: "",
       }
     }
   },
-
-  mounted() {
-    const userId = this.$route.params.id;
-    this.getUserInfo(userId);
-  },
-
   methods: {
-    /**
-     * this is a get api which can take Specific user to display on the page
-     * The function id means user's id, if the serve find -
-     * -the user's id will response the data and keep the data into this.userData
-     */
-    getUserInfo: function (id) {
-      api
-        .getUser(id) //
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.userData = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to Load User Date"
-        })
-      // fake the Api data from the response data.
-      // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
-      this.userData = usersInfo.users[id];
-    },
     logOut: function () {
       this.$router.push({path: '/login'})
     }
   },
-
   watch: {
     /**
      * When the user navigates from /user/foo to /user/bar, this component is re-used. This watches for those routing
@@ -137,6 +101,45 @@ export default {
       console.log(to);
       const userId = to.params.id;
       this.getUserInfo(userId);
+    },
+    /**
+     * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
+     * The months elapsed is not the total number of months elapsed, but the number months elapsed in
+     * addition to the years also elapsed. For example, 1 year and 2 months instead of 1 year, 14 months.
+     * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
+     * Returns data in the format {months: months_elapsed, years: years_elapsed}
+     */
+    getMonthsAndYearsBetween (start, end) {
+      const timeElapsed = end - start;
+      const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+      const yearsElapsed = Math.floor(daysElapsed / 365);
+      console.log(daysElapsed / 365);
+      const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
+      return {
+        months: monthsElapsed,
+        years: yearsElapsed
+      }
+    },
+  },
+  computed: {
+    memberSince: function() {
+      let registeredDate = new Date(this.userDetail.created);
+      const timeElapsed = this.getMonthsAndYearsBetween(registeredDate, Date.now());
+      const registeredYears = timeElapsed.years;
+      const registeredMonths = timeElapsed.months;
+
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
+      if (registeredYears > 0) {
+        message += registeredYears + ((registeredYears > 1) ? " Year" : " Years");
+        if (registeredMonths > 0) {
+          message += " and ";
+        }
+      }
+      if (registeredMonths > 0 || registeredYears === 0) {
+        message += registeredMonths + ((registeredMonths === 1) ? " Month" : " Months");
+      }
+      return message + ") ";
     }
   }
 }
