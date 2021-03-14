@@ -29,7 +29,7 @@ Date: 7/3/2021
                  :current-page="currentPage"
                  style="table-layout: fixed; table-layout: fixed">
         </b-table>
-        <p> Displaying {{currentPageItems}} ({{itemsRangeMin}} - {{itemsRangeMax}}) results of total {{totalResults}} results. </p>
+        <p> Displaying {{getCurrentPageItems}} ({{itemsRangeMin}} - {{itemsRangeMax}}) results of total {{totalResults}} results. </p>
         <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
       </b-col>
     </b-row>
@@ -44,7 +44,6 @@ export default {
     return {
       searchQuery: "",
       totalResults: 0,
-      currentPageItems: 0,
       perPage: 10,
       currentPage: 1,
       items: Array(10).fill({}),
@@ -88,13 +87,13 @@ export default {
               this.items = response.data;
 
               this.totalResults = this.items.length;
-              this.currentPageItems = this.perPage;
+              this.resultsReturned = true;
 
 
             } else {
               this.items = Array(10).fill({});
               this.totalResults = 0;
-              this.currentPageItems = 0;
+
             }
 
 
@@ -114,6 +113,24 @@ export default {
     rows() {
       return this.items.length;
     },
+
+    /**
+     * Author: Nitish Singh
+     * Computes current number of items displaying on the table.
+     * @returns {number}
+     */
+    getCurrentPageItems() {
+      let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
+
+      if (this.currentPage === numPages) {
+        return this.totalResults % this.perPage;
+      } else if(this.totalResults == 0) {
+        return 0;
+      } else {
+        return this.perPage;
+      }
+    },
+
     /**
      * Author: Nitish Singh
      * Computes the lower range of items displaying on the table.
@@ -131,9 +148,10 @@ export default {
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
 
       if (this.currentPage === numPages) {
-        return this.perPage  * (this.currentPage - 1) + (this.totalResults % 10) ;
+        //this.currentPageItems = (this.totalResults % this.perPage);
+        return this.perPage  * (this.currentPage - 1) + (this.totalResults % this.perPage) ;
       } else {
-        return this.perPage  * (this.currentPage - 1) + (this.currentPageItems) ;
+        return this.perPage  * (this.currentPage - 1) + (this.getCurrentPageItems) ;
       }
     }
   }
