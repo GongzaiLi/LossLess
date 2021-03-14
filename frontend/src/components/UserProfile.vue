@@ -30,6 +30,12 @@ Date: 5/3/2021
           </b-row>
         </h6>
         <h6>
+          <b-row v-show="userData.nickname.length">
+            <b-col cols="4"><b>Nickname:</b></b-col>
+            <b-col>{{ userData.nickname}}</b-col>
+          </b-row>
+        </h6>
+        <h6>
           <b-row>
             <b-col cols="4"><b>Date Of Birth:</b></b-col>
             <b-col>{{ userData.dateOfBirth }}</b-col>
