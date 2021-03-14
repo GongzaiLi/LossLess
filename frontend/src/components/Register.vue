@@ -186,7 +186,7 @@ export default {
         .login(registerData)
         .then(() => {
           this.$log.debug("Registered");
-          this.$router.push({path: '/login'});
+          this.$router.push({path: '/login', query: { justRegistered: true }});
         })
         .catch((error) => {
           this.errors = [];
@@ -198,7 +198,7 @@ export default {
           }
         });
       if (this.isDemoMode) {
-        this.$router.push({path: '/login'});
+        this.$router.push({path: '/login', query: { justRegistered: true }});
       }
     },
   },

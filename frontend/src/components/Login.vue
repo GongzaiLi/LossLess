@@ -5,6 +5,8 @@ Date: 3/3/2021
 -->
 <template>
   <b-container>
+    <b-alert show variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered">
+      You have been successfully registered! Please log in with your email and password.</b-alert>
     <b-row class="justify-content-md-center">
       <b-col class="col-md-5">
         <h2>Login to Wasteless</h2>
