@@ -17,21 +17,22 @@ Date: 7/3/2021
       </b-col>
     </b-row>
     <b-row>
-      <b-col><!--responsive-->
+      <b-col><!--responsive sticky-header="500px"-->
         <b-table striped hover
                  table-class="text-nowrap"
                  responsive="sm"
                  no-border-collapse
+                 sticky-header="500px"
                  bordered
                  :fields="fields"
                  :items="items"
                  :per-page="perPage"
                  :current-page="currentPage"
-                 style="table-layout: fixed; table-layout: fixed">
+                 style="table-layout: fixed">
         </b-table>
-        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
       </b-col>
     </b-row>
+    <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
   </div>
 </template>
 
@@ -44,15 +45,17 @@ export default {
       searchQuery: "",
       perPage: 10,
       currentPage: 1,
-      items: Array(10).fill({}),
+      items: this.items = Array(this.perPage).fill({
+        name: '-',
+      }),
       fields: [
         {
-          key: 'firstName',
+          key: 'name',
           //label: 'F name',
           sortable: true
         },
         {
-          key: 'lastName',
+          key: 'nickname',
           sortable: true
         },
         {
@@ -61,10 +64,6 @@ export default {
         },
         {
           key: 'homeAddress',
-          sortable: true
-        },
-        {
-          key: 'role',
           sortable: true
         }
       ]
@@ -77,23 +76,53 @@ export default {
      * @param id user is id or name other details
      */
     displayResults: function (searchParameter) {
-        api
-          .getUser(searchParameter)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            if (searchParameter.trim().length) {
-              this.items = response.data;  //Add functionality to return results based on query
-            } else {
-              this.items = Array(10).fill({});
-            }
+      api
+        .getUser(searchParameter)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          if (searchParameter.trim().length) {
+            this.items = this.getUserInfoIntoTable(response.data);  //Add functionality to return results based on query
+          } else {
+            this.items = Array(this.perPage).fill({
+              name: '-',
+            });
+          }
 
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.error = "Failed to load user data";
-          })
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.error = "Failed to load user data";
+        })
+    },
+
+    /**
+     * The getUserInfoIntoTable function to read the data from the APi response.Date then put a array (item)
+     * The Array hold the an object {name: 'name', nickname: 'nickName', email: 'Email', homeAddress: 'address'}.
+     * @returns [{name: 'name', nickname: 'nickName', email: 'Email', homeAddress: 'address'}, .......]
+     */
+    getUserInfoIntoTable: function (data) {
+      let items = [];
+      let tableHeader = {
+        name: '',
+        nickname: '',
+        email: '',
+        homeAddress: ''
+      };
+      for (const user of data) {
+        tableHeader = user;
+        tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+        items.push(tableHeader);
       }
+      for (let i = 0; i < items.length % this.perPage; i++) {
+        tableHeader = {
+          name: '-',
+        }
+        items.push(tableHeader);
+      }
+      return items;
+    }
   },
+
   computed: {
     /**
      * The rows function just computed how many pages in the search table.
@@ -105,6 +134,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>
