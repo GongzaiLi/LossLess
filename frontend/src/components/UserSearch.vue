@@ -29,6 +29,7 @@ Date: 7/3/2021
                  :current-page="currentPage"
                  style="table-layout: fixed; table-layout: fixed">
         </b-table>
+        <p> Displaying {{currentPageItems}} ({{itemsRangeMin}} - {{itemsRangeMax}}) results of total {{totalResults}} results. </p>
         <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
       </b-col>
     </b-row>
@@ -42,6 +43,8 @@ export default {
   data: function () {
     return {
       searchQuery: "",
+      totalResults: 0,
+      currentPageItems: 0,
       perPage: 10,
       currentPage: 1,
       items: Array(10).fill({}),
@@ -82,10 +85,18 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             if (searchParameter.trim().length) {
-              this.items = response.data;  //Add functionality to return results based on query
+              this.items = response.data;
+
+              this.totalResults = this.items.length;
+              this.currentPageItems = this.perPage;
+
+
             } else {
               this.items = Array(10).fill({});
+              this.totalResults = 0;
+              this.currentPageItems = 0;
             }
+
 
           })
           .catch((error) => {
@@ -94,6 +105,7 @@ export default {
           })
       }
   },
+
   computed: {
     /**
      * The rows function just computed how many pages in the search table.
@@ -101,6 +113,28 @@ export default {
      */
     rows() {
       return this.items.length;
+    },
+    /**
+     * Author: Nitish Singh
+     * Computes the lower range of items displaying on the table.
+     * @returns {number}
+     */
+    itemsRangeMin() {
+      return this.perPage  * (this.currentPage - 1);
+    },
+    /**
+     * Author: Nitish Singh
+     * Computes the upper range of items displaying on the table.
+     * @returns {number}
+     */
+    itemsRangeMax() {
+      let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
+
+      if (this.currentPage === numPages) {
+        return this.perPage  * (this.currentPage - 1) + (this.totalResults % 10) ;
+      } else {
+        return this.perPage  * (this.currentPage - 1) + (this.currentPageItems) ;
+      }
     }
   }
 }
