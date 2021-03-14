@@ -28,10 +28,11 @@ Date: 7/3/2021
                  :per-page="perPage"
                  :items="items"
                  :current-page="currentPage"
-                 style="table-layout: fixed">
+                 style="table-layout: fixed; table-layout: fixed">
         </b-table>
       </b-col>
     </b-row>
+    <p> Displaying {{itemsRangeMin}} - {{itemsRangeMax}} of total {{totalResults}} results. </p>
     <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
   </div>
 </template>
@@ -43,6 +44,7 @@ export default {
   data: function () {
     return {
       searchQuery: "",
+      totalResults: 0,
       perPage: 10,
       currentPage: 1,
       items: [],
@@ -76,7 +78,7 @@ export default {
   methods: {
     /**
      * the function is search a user id the using api to find the user's detail
-     * @param id user is id or name other details
+     * @param searchParameter id user is id or name other details
      */
     displayResults: function (searchParameter) {
       api
@@ -85,10 +87,13 @@ export default {
           this.$log.debug("Data loaded: ", response.data);
           if (searchParameter.trim().length) {
             this.items = this.getUserInfoIntoTable(response.data);  //Add functionality to return results based on query
+            this.totalResults = this.items.length;
+            this.resultsReturned = true;
           } else {
             this.items = Array(this.perPage).fill({
               name: '-',
             });
+            this.totalResults = 0;
           }
 
         })
@@ -133,6 +138,52 @@ export default {
      */
     rows() {
       return this.items.length;
+    },
+
+    /**
+     * Author: Nitish Singh
+     * Computes current number of items displaying on the table.
+     * @returns {number}
+     */
+    getCurrentPageItems() {
+      let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
+
+      if (this.currentPage === numPages) {
+        return this.totalResults % this.perPage;
+      } else if(this.totalResults === 0) {
+        return 0;
+      } else {
+        return this.perPage;
+      }
+    },
+
+    /**
+     * Author: Nitish Singh
+     * Computes the lower range of items displaying on the table.
+     * Ranges (indexes) starts from 1, so plus 1
+     * @returns {number}
+     */
+    itemsRangeMin() {
+      let minRange = this.perPage  * (this.currentPage - 1);
+      if (this.totalResults > 0){
+        minRange++;
+      }
+      return minRange;
+    },
+    /**
+     * Author: Nitish Singh
+     * Computes the upper range of items displaying on the table.
+     * @returns {number}
+     */
+    itemsRangeMax() {
+      let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
+
+      if (this.currentPage === numPages) {
+        //this.currentPageItems = (this.totalResults % this.perPage);
+        return this.perPage  * (this.currentPage - 1) + (this.totalResults % this.perPage) ;
+      } else {
+        return this.perPage  * (this.currentPage - 1) + (this.getCurrentPageItems) ;
+      }
     }
   }
 }
