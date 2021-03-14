@@ -46,7 +46,7 @@ export default {
       perPage: 10,
       currentPage: 1,
       items: this.items = Array(this.perPage).fill({
-        name: '-',
+        name: '-', // - is a placeholder for empty entries
       }),
       fields: [
         {
