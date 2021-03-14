@@ -25,8 +25,8 @@ Date: 7/3/2021
                  sticky-header="500px"
                  bordered
                  :fields="fields"
-                 :items="items"
                  :per-page="perPage"
+                 :items="items"
                  :current-page="currentPage"
                  style="table-layout: fixed">
         </b-table>
@@ -45,9 +45,7 @@ export default {
       searchQuery: "",
       perPage: 10,
       currentPage: 1,
-      items: this.items = Array(this.perPage).fill({
-        name: '-', // - is a placeholder for empty entries
-      }),
+      items: [],
       fields: [
         {
           key: 'name',
@@ -68,6 +66,11 @@ export default {
         }
       ]
     }
+  },
+  mounted() {
+    this.items = Array(this.perPage).fill({
+      name: '-',
+    })// - is a placeholder for empty entries
   },
 
   methods: {
