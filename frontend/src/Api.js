@@ -28,9 +28,8 @@
 /**
  * Declare all available services here
  */
-import axios from 'axios'
-
-
+import axios from 'axios'  
+  
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const instance = axios.create({
@@ -42,7 +41,11 @@ export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
   register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
 
-  getUser: (id) => instance.get('user/' + id),
+  getUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),
+
+  //getUser: (searchParameter) => instance.get('users/' + searchParameter, {withCredentials: true}),
+
+  //getUser: (id) => instance.get('user/' + id),
 
   /* STUFF FROM PROJECT TEMPLATE EXAMPLE
   // (C)reate
@@ -53,5 +56,4 @@ export default {
   updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}),
   // (D)elete
   removeForId: (id) => instance.delete('students/'+id)  */
-
 }
