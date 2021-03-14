@@ -8,6 +8,9 @@
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto">
+        <b-navbar-brand>
+          <router-link to="/UserSearch">User Search</router-link>
+        </b-navbar-brand>
         <b-nav-item-dropdown right>
           <template #button-content>
             <em>User</em>
