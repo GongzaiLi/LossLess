@@ -28,7 +28,6 @@
       </b-list-group-item>
 
     </b-list-group>
-    <h1>{{blah}}</h1>
   </div>
 </template>
 
@@ -65,7 +64,7 @@ export default {
       address: "",
       addressResults: [],
       showAutocompleteDropdown: false,
-      blah: "",
+      awaitingSearch: false,
     }
   },
 
@@ -137,9 +136,8 @@ export default {
     },
 
     /**
-     * Authors: Phil Taylor, Gongzai Li, Eric Song
-     * Queries the Photon Komoot API with the home address and puts the
-     * results into addressFind.
+     * Author: Nitish Singh
+     * Send a query to Photon API after a debounced delay i.e. 500 ms.
      * This method is called whenever the address input is changed
      * by the user's typing (as it is bound to @input).
      * This is not and should not be called when an autocomplete option is
@@ -149,9 +147,28 @@ export default {
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
       this.$emit('input', this.address);
+      console.log("DSFDSFDSF");
+      if (!this.awaitingSearch) {
+        setTimeout(() => {
+          this.queryAddressAutocomplete();
+          this.awaitingSearch = false;
+        }, 500);
+      }
+      this.awaitingSearch = true;
+    },
 
+    /**
+     * Authors: Phil Taylor, Gongzai Li, Eric Song
+     * Queries the Photon Komoot API with the home address and puts the
+     * results into addressFind.
+     */
+    async queryAddressAutocomplete() {
+      if (this.address.trim().length <= 3) {
+        this.addressResults = [];
+        return;
+      }
       this.showAutocompleteDropdown = true;
-
+      console.log(this.address);
       const addressQueryString = this.address.replace(/\s/gm," ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
       this.addressResults = [];
