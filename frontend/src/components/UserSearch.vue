@@ -32,7 +32,7 @@ Date: 7/3/2021
         </b-table>
       </b-col>
     </b-row>
-    <p> Displaying {{itemsRangeMin}} - {{itemsRangeMax}} of total {{totalResults}} results. </p>
+    <p> Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalResults }} results. </p>
     <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
   </div>
 </template>
@@ -70,9 +70,7 @@ export default {
     }
   },
   mounted() {
-    this.items = Array(this.perPage).fill({
-      name: '-',
-    })// - is a placeholder for empty entries
+    this.items = Array(this.perPage).fill({name: '-'});// - is a placeholder for empty entries
   },
 
   methods: {
@@ -90,9 +88,7 @@ export default {
             this.totalResults = response.data.length;
             this.resultsReturned = true;
           } else {
-            this.items = Array(this.perPage).fill({
-              name: '-',
-            });
+            this.items = this.getUserInfoIntoTable([]); // if the searchParameter is empty then the response.date will be []
             this.totalResults = 0;
           }
 
@@ -121,11 +117,13 @@ export default {
         tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
         items.push(tableHeader);
       }
-      for (let i = 0; i < items.length % this.perPage; i++) {
-        tableHeader = {
-          name: '-',
+      if (items.length) {
+        while (items.length % this.perPage !== 0) {
+          tableHeader = {name: '-'};
+          items.push(tableHeader);
         }
-        items.push(tableHeader);
+      } else {
+        items = Array(this.perPage).fill({name: '-'});
       }
       return items;
     }
@@ -150,7 +148,7 @@ export default {
 
       if (this.currentPage === numPages) {
         return this.totalResults % this.perPage;
-      } else if(this.totalResults === 0) {
+      } else if (this.totalResults === 0) {
         return 0;
       } else {
         return this.perPage;
@@ -164,8 +162,8 @@ export default {
      * @returns {number}
      */
     itemsRangeMin() {
-      let minRange = this.perPage  * (this.currentPage - 1);
-      if (this.totalResults > 0){
+      let minRange = this.perPage * (this.currentPage - 1);
+      if (this.totalResults > 0) {
         minRange++;
       }
       return minRange;
@@ -180,9 +178,9 @@ export default {
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
 
       if (this.currentPage === numPages) {
-        return this.perPage  * (this.currentPage - 1) + (this.totalResults % this.perPage) ;
+        return this.perPage * (this.currentPage - 1) + (this.totalResults % this.perPage);
       } else {
-        return this.perPage  * (this.currentPage - 1) + (this.getCurrentPageItems) ;
+        return this.perPage * (this.currentPage - 1) + (this.getCurrentPageItems);
       }
     }
   }
