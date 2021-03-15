@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
+import UserSearch from "./components/UserSearch";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -23,7 +24,8 @@ const app = {
     Login,
     Register,
     UserProfile,
-    Navbar
+    Navbar,
+    UserSearch
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
@@ -31,6 +33,8 @@ const app = {
     return {};
   },
 };
+
+
 
 // make the 'app' available
 export default app;

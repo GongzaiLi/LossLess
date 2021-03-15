@@ -116,7 +116,7 @@ export default {
           .getUser(id) //
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
-            this.userData = response.data;
+            //this.userData = response.data;
           })
           .catch((error) => {
             this.$log.debug(error);
