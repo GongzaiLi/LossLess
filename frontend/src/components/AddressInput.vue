@@ -5,6 +5,7 @@
       @input="onAddressChange"
       placeholder="Enter Address"
       v-bind:value="value"
+      required
     />
 
     <b-list-group

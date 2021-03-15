@@ -198,7 +198,7 @@ export default {
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
       let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
       if (registeredYears > 0) {
-        message += registeredYears + ((registeredYears > 1) ? " Year" : " Years");
+        message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
         if (registeredMonths > 0) {
           message += " and ";
         }
