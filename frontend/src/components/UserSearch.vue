@@ -7,35 +7,59 @@ Date: 7/3/2021
   <div>
     <h2>Search For a User</h2>
     <b-row style="height: 50px">
-      <b-col>
-        <form class="form-inline">
-          <div class="form-group">
-            <b-form-input v-model="searchQuery" type="search" placeholder="Search"></b-form-input>
-            <b-button @click="displayResults(searchQuery)" style="margin-left:15px;"> Search</b-button>
-          </div>
-        </form>
+      <b-col cols="7">
+        <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search" placeholder="Search"></b-form-input>
+      </b-col>
+      <b-col cols="0">
+        <b-button @click="displayResults(searchQuery)"> Search</b-button>
       </b-col>
     </b-row>
     <b-row>
       <b-col><!--responsive sticky-header="500px"-->
+          <h3 v-if="items.length === 0" class="no-results-overlay" >No results to display</h3>
         <b-table striped hover
-                 table-class="text-nowrap"
-                 responsive="sm"
-                 no-border-collapse
-                 sticky-header="500px"
-                 bordered
-                 :fields="fields"
-                 :per-page="perPage"
-                 :items="items"
-                 :current-page="currentPage"
-                 style="table-layout: fixed">
+         table-class="text-nowrap"
+         responsive="sm"
+         no-border-collapse
+         bordered
+         @row-clicked="rowClickHandler"
+         :fields="fields"
+         :per-page="perPage"
+         :items="items"
+         :current-page="currentPage"
+         class="user-search-table">
         </b-table>
       </b-col>
     </b-row>
-    <p> Displaying {{itemsRangeMin}} - {{itemsRangeMax}} of total {{totalResults}} results. </p>
-    <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
+    <b-row>
+      <b-col>
+        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
+      </b-col>
+      <b-col style="text-align: right; margin-top: 6px">
+        Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalResults }} results.
+      </b-col>
+    </b-row>
   </div>
 </template>
+
+<style>
+.user-search-table {
+  min-height: 36em;
+  table-layout: fixed;
+  border-top: 1px solid #dee2e6;
+  border-left: 3px solid #dee2e6;
+  border-right: 3px solid #dee2e6;
+  border-bottom: 3px solid #dee2e6;
+}
+.no-results-overlay {
+  position:absolute;
+  width:100%;
+  margin-top:9em;
+  height:100%;
+  z-index:999;
+  text-align: center;
+}
+</style>
 
 <script>
 import api from "../Api";
@@ -69,13 +93,13 @@ export default {
       ]
     }
   },
-  mounted() {
-    this.items = Array(this.perPage).fill({
-      name: '-',
-    })// - is a placeholder for empty entries
-  },
-
   methods: {
+    /**
+     * When called changes page to the profile page based on the id of the user clicked
+     */
+    rowClickHandler: function(record){
+      this.$router.push({path: `/user/${record.id}`});
+    },
     /**
      * the function is search a user id the using api to find the user's detail
      * @param searchParameter id user is id or name other details
@@ -90,12 +114,9 @@ export default {
             this.totalResults = response.data.length;
             this.resultsReturned = true;
           } else {
-            this.items = Array(this.perPage).fill({
-              name: '-',
-            });
+            this.items = this.getUserInfoIntoTable([]); // if the searchParameter is empty then the response.date will be []
             this.totalResults = 0;
           }
-
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -121,12 +142,6 @@ export default {
         tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
         items.push(tableHeader);
       }
-      for (let i = 0; i < items.length % this.perPage; i++) {
-        tableHeader = {
-          name: '-',
-        }
-        items.push(tableHeader);
-      }
       return items;
     }
   },
@@ -150,7 +165,7 @@ export default {
 
       if (this.currentPage === numPages) {
         return this.totalResults % this.perPage;
-      } else if(this.totalResults === 0) {
+      } else if (this.totalResults === 0) {
         return 0;
       } else {
         return this.perPage;
@@ -164,8 +179,8 @@ export default {
      * @returns {number}
      */
     itemsRangeMin() {
-      let minRange = this.perPage  * (this.currentPage - 1);
-      if (this.totalResults > 0){
+      let minRange = this.perPage * (this.currentPage - 1);
+      if (this.totalResults > 0) {
         minRange++;
       }
       return minRange;
@@ -176,13 +191,19 @@ export default {
      * @returns {number}
      */
 
-    itemsRangeMax() {
+    itemsRangeMax() {// 1000 t 1000 p
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
 
       if (this.currentPage === numPages) {
-        return this.perPage  * (this.currentPage - 1) + (this.totalResults % this.perPage) ;
-      } else {
-        return this.perPage  * (this.currentPage - 1) + (this.getCurrentPageItems) ;
+        if (this.totalResults !== this.perPage) {
+          return this.perPage * (this.currentPage - 1) + (this.totalResults % this.perPage);
+        }
+        else {
+          return this.totalResults;
+        }
+      }
+      else {
+        return this.perPage * (this.currentPage - 1) + (this.getCurrentPageItems);
       }
     }
   }
