@@ -1,5 +1,6 @@
 package org.seng302.example.User;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.seng302.example.MainApplicationRunner;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 @RestController
@@ -54,6 +57,8 @@ public class UserController {
             return ResponseEntity.status(400).body("Date out of expected range");
         }
 
+        user.setCreated(LocalDate.now());
+
         //Create the users salt
         String salt = encryption.getNextSalt().toString();
         user.setSalt(salt);
@@ -64,26 +69,31 @@ public class UserController {
 
         logger.info("saved new user {}", user);
 
+        //Todo send back authenticated responses
         return ResponseEntity.status(HttpStatus.CREATED).build();
 
-        //If response with url to where this new user is stored is required, then use
-        //URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-        //        .buildAndExpand(savedStudent.getId()).toUri();
-        //return ResponseEntity.created(location).build();
     }
 
 
     @GetMapping("/users/search")
+    @JsonView(UserViews.SearchUserView.class)
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
 
         //Todo full matches
-        //List<User> fullMatches =  userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+        Set<User> fullMatches =  userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
 
-        List<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
 
         //Todo partial matches
+        Set<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
+        Set<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
 
-        //List<User> partialMatchingUsers = userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameOrNicknameContains(searchQuery, searchQuery, searchQuery, searchQuery);
+
+        //Todo combine matches
+        firstNamePartialMatches.addAll(lastNamePartialMatches);
+
+        //Todo remove all important data
+
+
         return ResponseEntity.status(200).body(firstNamePartialMatches);
     }
 
@@ -109,6 +119,7 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @JsonView(UserViews.GetUserView.class)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
         User possibleUser = userRepository.findFirstById(userId);
         System.out.println(possibleUser);

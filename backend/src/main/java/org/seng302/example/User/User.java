@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -27,35 +29,44 @@ public class User {
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private String firstName;
 
     @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private String lastName;
 
     @Column(name = "middle_name") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private String middleName;
 
     @Column(name = "nick_name") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private String nickname;
 
     @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private String bio;
 
     @NotBlank(message = "email is mandatory")
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class})
     private String email;
 
     @NotNull(message = "dateOfBirth is mandatory")
     @Column(name = "date_of_birth") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class})
     //Date format validated by spring. See spring.mvc.format.date=yyyy-MM-dd in application.properties
     private LocalDate dateOfBirth;
 
     @Column(name = "phone_number") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class})
     private String phoneNumber;
 
     @NotBlank(message = "homeAddress is mandatory")
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private String homeAddress;
 
     @NotBlank(message = "password is mandatory")
@@ -66,7 +77,8 @@ public class User {
     private String salt;
 
     @Column(name = "created") // map camelcase name (java) to snake case (SQL)
-    private String created;
+    @JsonView({UserViews.GetUserView.class})
+    private LocalDate created;
 
     //Omitted fields. Role: added in u4, business administered: added in u6
 
