@@ -5,7 +5,7 @@ Date: 3/3/2021
 -->
 <template>
   <b-container>
-    <b-alert show variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered">
+    <b-alert variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered">
       You have been successfully registered! Please log in with your email and password.</b-alert>
     <b-row class="justify-content-md-center">
       <b-col class="col-md-5">
@@ -30,7 +30,7 @@ Date: 3/3/2021
           </b-form-group>
           <b-form-group
           >
-          <b-button block type="submit" variant="primary" v-on:click="demoLogin" style="margin-top:0.7em">Login</b-button>
+          <b-button block type="submit" variant="primary" style="margin-top:0.7em">Login</b-button>
           </b-form-group>
         </b-form>
 
@@ -87,12 +87,6 @@ export default {
       this.makeLoginRequest();
     },
 
-    //called on submit to check if in demo mode if so go straight to user page 0
-    demoLogin : function() {
-      if (this.isActive) {
-        this.goToUserProfilePage(0);
-      }
-    },
     /**
      * Makes a POST request to the API to send a login request.
      * Sends the values entered into the email and password fields.
@@ -108,6 +102,8 @@ export default {
           .login(loginData)
           .then((response) => {
             this.$log.debug("Logged in");
+            //set global variable of logged in user
+            this.$currentUser.set(response.userId);
             // Go to profile page
             this.goToUserProfilePage(response.userId);
           })
@@ -120,6 +116,11 @@ export default {
               this.errors.push(error.message);
             }
           });
+      //if in demo mode set current user to default user 0 and go to user page
+      if (this.isActive) {
+        this.$currentUser = 0;
+        this.goToUserProfilePage(this.$currentUser);
+      }
     },
     /**
      * Redirects to the profile page of the user with the specified userId.

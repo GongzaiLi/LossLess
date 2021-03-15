@@ -8,7 +8,7 @@
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item to="/user/0">My Profile</b-nav-item>
+        <b-nav-item v-on:click="my_profile">My Profile</b-nav-item>
         <b-nav-item to="/userSearch">User Search</b-nav-item>
         <b-nav-item-dropdown right>
           <template #button-content>
@@ -32,6 +32,9 @@
 export default {
   name: "Navbar.vue",
   methods: {
+    my_profile: function () {
+      this.$router.push({path: `/user/${this.$currentUser}`});
+    },
     /**
      * Logs out the current user and redirects to the login page.
      * Currently does nothing with managing cookies, this needs to be implemented later.

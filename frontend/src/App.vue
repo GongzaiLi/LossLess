@@ -35,6 +35,8 @@ const app = {
   },
 };
 
+
+
 // make the 'app' available
 export default app;
 </script>
