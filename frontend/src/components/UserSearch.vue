@@ -117,7 +117,6 @@ export default {
             this.items = this.getUserInfoIntoTable([]); // if the searchParameter is empty then the response.date will be []
             this.totalResults = 0;
           }
-
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -192,12 +191,18 @@ export default {
      * @returns {number}
      */
 
-    itemsRangeMax() {
+    itemsRangeMax() {// 1000 t 1000 p
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
 
       if (this.currentPage === numPages) {
-        return this.perPage * (this.currentPage - 1) + (this.totalResults % this.perPage);
-      } else {
+        if (this.totalResults !== this.perPage) {
+          return this.perPage * (this.currentPage - 1) + (this.totalResults % this.perPage);
+        }
+        else {
+          return this.totalResults;
+        }
+      }
+      else {
         return this.perPage * (this.currentPage - 1) + (this.getCurrentPageItems);
       }
     }
