@@ -16,12 +16,13 @@ Date: 7/3/2021
     </b-row>
     <b-row>
       <b-col><!--responsive sticky-header="500px"-->
-          <h3 v-if="items.length == 0" class="no-results-overlay" >No results to display</h3>
+          <h3 v-if="items.length === 0" class="no-results-overlay" >No results to display</h3>
         <b-table striped hover
          table-class="text-nowrap"
          responsive="sm"
          no-border-collapse
          bordered
+         @row-clicked="rowClickHandler"
          :fields="fields"
          :per-page="perPage"
          :items="items"
@@ -93,6 +94,12 @@ export default {
     }
   },
   methods: {
+    /**
+     * When called changes page to the profile page based on the id of the user clicked
+     */
+    rowClickHandler: function(record){
+      this.$router.push({path: `/user/${record.id}`});
+    },
     /**
      * the function is search a user id the using api to find the user's detail
      * @param searchParameter id user is id or name other details
