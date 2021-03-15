@@ -5,72 +5,90 @@ Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
 <template>
-  <b-card border-variant="secondary" header-border-variant="secondary" style="max-width: 45rem" no-body>
-    <template #header>
-      <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
-      <p class="mb-1">Member since:
-        {{ memberSince }}
-      </p>
-    </template>
+  <div>
+    <b-card border-variant="secondary" header-border-variant="secondary"
+      style="max-width: 45rem" no-body
+      v-if="userFound"
+    >
+      <template #header>
+        <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
+        <p class="mb-1">Member since:
+          {{ memberSince }}
+        </p>
+      </template>
 
-    <b-list-group border-variant="secondary">
-      <b-list-group-item>
-        <b-card-text style="text-align: justify">
-          {{ userData.bio }}
-        </b-card-text>
-      </b-list-group-item>
-    </b-list-group>
+      <b-list-group border-variant="secondary">
+        <b-list-group-item>
+          <b-card-text style="text-align: justify">
+            {{ userData.bio }}
+          </b-card-text>
+        </b-list-group-item>
+      </b-list-group>
 
-    <b-card-body>
-      <b-container>
-        <h6>
-          <b-row>
-            <b-col cols="0"><b-icon-person-fill></b-icon-person-fill></b-col>
-            <b-col cols="4"><b>Full Name:</b></b-col>
-            <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
-          </b-row>
-        </h6>
-        <h6>
-          <b-row v-show="userData.nickname.length">
-            <b-col cols="0"><b-icon-emoji-smile-fill></b-icon-emoji-smile-fill></b-col>
-            <b-col cols="4"><b>Nickname:</b></b-col>
-            <b-col>{{ userData.nickname}}</b-col>
-          </b-row>
-        </h6>
-        <h6>
-          <b-row>
-            <b-col cols="0"><b-icon-calendar-event-fill></b-icon-calendar-event-fill></b-col>
-            <b-col cols="4"><b>Date Of Birth:</b></b-col>
-            <b-col>{{ userData.dateOfBirth }}</b-col>
-          </b-row>
-        </h6>
-        <h6>
-          <b-row>
-            <b-col cols="0"><b-icon-envelope-fill></b-icon-envelope-fill></b-col>
-            <b-col cols="4"><b>Email:</b></b-col>
-            <b-col>{{ userData.email }}</b-col>
-          </b-row>
-        </h6>
-        <h6>
-          <b-row>
-            <b-col cols="0"><b-icon-telephone-fill></b-icon-telephone-fill></b-col>
-            <b-col cols="4"><b>Phone Number:</b></b-col>
-            <b-col>{{ userData.phoneNumber }}</b-col>
-          </b-row>
-        </h6>
-        <h6>
-          <b-row>
-            <b-col cols="0"><b-icon-house-fill></b-icon-house-fill></b-col>
-            <b-col cols="4"><b>Home Address:</b></b-col>
-            <b-col> {{ userData.homeAddress }}</b-col>
-          </b-row>
-        </h6>
-      </b-container>
-    </b-card-body>
+      <b-card-body>
+        <b-container>
+          <h6>
+            <b-row>
+              <b-col cols="0"><b-icon-person-fill></b-icon-person-fill></b-col>
+              <b-col cols="4"><b>Full Name:</b></b-col>
+              <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row v-show="userData.nickname.length">
+              <b-col cols="0"><b-icon-emoji-smile-fill></b-icon-emoji-smile-fill></b-col>
+              <b-col cols="4"><b>Nickname:</b></b-col>
+              <b-col>{{ userData.nickname }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0"><b-icon-calendar-event-fill></b-icon-calendar-event-fill></b-col>
+              <b-col cols="4"><b>Date Of Birth:</b></b-col>
+              <b-col>{{ userData.dateOfBirth }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0"><b-icon-envelope-fill></b-icon-envelope-fill></b-col>
+              <b-col cols="4"><b>Email:</b></b-col>
+              <b-col>{{ userData.email }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0"><b-icon-telephone-fill></b-icon-telephone-fill></b-col>
+              <b-col cols="4"><b>Phone Number:</b></b-col>
+              <b-col>{{ userData.phoneNumber }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0"><b-icon-house-fill></b-icon-house-fill></b-col>
+              <b-col cols="4"><b>Home Address:</b></b-col>
+              <b-col> {{ userData.homeAddress }}</b-col>
+            </b-row>
+          </h6>
+        </b-container>
+      </b-card-body>
+    </b-card>
 
-
-  </b-card>
-
+    <b-card border-variant="secondary" header-border-variant="secondary"
+            style="max-width: 45rem" no-body
+            v-if="!userFound"
+    >
+      <template #header>
+        <h4 class="mb-1">User not found</h4>
+      </template>
+      <b-card-body>
+        <h6>
+          The user you are looking for does not exist. The account may have been deleted, or you may have typed an
+          invalid URL into the address bar.<br><br>
+          Try <router-link to="/userSearch">searching for a user here.</router-link>
+        </h6>
+      </b-card-body>
+    </b-card>
+  </div>
 </template>
 
 <style scoped>
@@ -96,7 +114,8 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
-      }
+      },
+      userFound: true,
     }
   },
 
@@ -116,15 +135,22 @@ export default {
           .getUser(id) //
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
-            //this.userData = response.data;
+            this.userData = response.data;
+            this.userFound = true;
           })
           .catch((error) => {
             this.$log.debug(error);
-            this.error = "Failed to Load User Date"
+            // Uncomment the below line once we have a backend
+            // this.userFound = false;
           })
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
-      this.userData = usersInfo.users[id];
+      if (id >= usersInfo.users.length) {
+        this.userFound = false;
+      } else {
+        this.userData = usersInfo.users[id];
+        this.userFound = true;
+      }
     },
     logOut: function () {
       this.$router.push({path: '/login'})

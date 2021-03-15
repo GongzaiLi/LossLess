@@ -106,7 +106,7 @@ export default {
      */
     displayResults: function (searchParameter) {
       api
-        .getUser(searchParameter)
+        .searchUser(searchParameter)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           if (searchParameter.trim().length) {
