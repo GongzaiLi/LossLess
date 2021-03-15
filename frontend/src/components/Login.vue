@@ -10,7 +10,7 @@ Date: 3/3/2021
     <b-row class="justify-content-md-center">
       <b-col class="col-md-5">
         <h2>Login to Wasteless</h2>
-        <b-form @submit="login" >
+        <b-form @submit="login" :novalidate="isActive">
           <b-form-group
             label="Email"
             >
