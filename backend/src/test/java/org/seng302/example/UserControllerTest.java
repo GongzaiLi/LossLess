@@ -1,19 +1,24 @@
 package org.seng302.example;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.seng302.example.User.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = UserController.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
 public class UserControllerTest {
 
     @Autowired
@@ -27,8 +32,8 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -36,8 +41,8 @@ public class UserControllerTest {
         String user = "{\"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27-10-2000\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -46,8 +51,8 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -55,8 +60,8 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -64,8 +69,8 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -73,8 +78,8 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -82,31 +87,29 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
-//    @Test
-//    public void whenPostRequestToUsersAndUserInvalidDueToAlreadyUsedEmail_thenCorrectResponse() throws Exception {
-//        String firstUser = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"Test@example.com\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
-//        mockMvc.perform(MockMvcRequestBuilders.post("/users")
-//                .content(firstUser)
-//                .contentType(MediaType.APPLICATION_JSON));
-//
-//        String secondUser = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"Test@example.com\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
-//        mockMvc.perform(MockMvcRequestBuilders.post("/users")
-//                .content(secondUser)
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(MockMvcResultMatchers.status().isConflict());
-//    }
+    @Test
+    public void whenPostRequestToUsersAndUserInvalidDueToAlreadyUsedEmail_thenCorrectResponse() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthTooOld_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"1800-20-10\", \"homeAddress\": \"236a Blenheim Road\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -114,8 +117,8 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2200-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -123,22 +126,34 @@ public class UserControllerTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"10/27/1000\", \"homeAddress\": \"236a Blenheim Road\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
 
     @Test
     public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27/10/2000\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON));
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1")
-                .content(user)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+        mockMvc.perform(get("/users/1"))
+                .andExpect(status().isOk());
+    }
+
+
+
+    private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
+        String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": \"%s\", \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
+
+        try {
+            mockMvc.perform(
+                    MockMvcRequestBuilders.post("/users")
+                            .content(user)
+                            .contentType(APPLICATION_JSON))
+                    .andExpect(status().isCreated());
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Request", e);
+        }
     }
 }
 

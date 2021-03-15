@@ -25,6 +25,7 @@ public class User {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class})
     private Integer id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)

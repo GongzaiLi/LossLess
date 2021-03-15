@@ -44,18 +44,14 @@ import java.util.stream.Stream;
 public class MainApplicationRunner implements ApplicationRunner {
 
   private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
-  private StudentRepository repository;
 
   /**
    * This constructor is implicitly called by Spring (purpose of the @Autowired
    * annotation). Injected constructors can be supplied with instances of other
    * classes (i.e. dependency injection)
-   * 
-   * @param repository the student repository to persist a few names as examples
    */
   @Autowired
-  public MainApplicationRunner(StudentRepository repository) {
-    this.repository = repository;
+  public MainApplicationRunner() {
   }
 
   /**
@@ -64,20 +60,7 @@ public class MainApplicationRunner implements ApplicationRunner {
    */
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    logger.info("Startup application with {}", args);
-
-    Stream.of("Marina Filipovic", "Matthew Minish", "Moffat Mathews", "Fabian Gilson", "Miguel Morales",
-        "Neville Churcher").forEach(name -> {
-          String[] splitName = name.split(" ");
-          Student student = new Student(splitName[0], splitName[1]);
-
-          // this "save" method will persist given JPA entity (returned instance may have
-          // been changed)
-          student = repository.save(student);
-          logger.info("saved new student {}", student);
-        });
-
-    repository.findAll().forEach(logger::info);
+      logger.info("Startup application with {}", args);
   }
 
 }

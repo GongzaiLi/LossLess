@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,11 +50,11 @@ public class UserController {
         User possibleUser = userRepository.findFirstByEmail(user.getEmail());
         if (possibleUser != null) {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
-            return ResponseEntity.status(409).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         if (!user.checkDateOfBirthValid()) {
-            return ResponseEntity.status(400).body("Date out of expected range");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
         }
 
         user.setCreated(LocalDate.now());
@@ -75,26 +75,36 @@ public class UserController {
     }
 
 
+    /**
+     * Search for users by a search query.
+     * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
+     *
+     * @param searchQuery   The query to search by
+     * @return              A set of matching results
+     */
     @GetMapping("/users/search")
-    @JsonView(UserViews.SearchUserView.class)
+    @JsonView(UserViews.SearchUserView.class) //Only return appropriate fields
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
 
-        //Todo full matches
+        // full matches
         Set<User> fullMatches =  userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
 
-
-        //Todo partial matches
+        // partial matches
         Set<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
         Set<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
+        Set<User> nicknamePartialMatches = userRepository.findAllByNicknameContainsAndNicknameNot(searchQuery, searchQuery);
+        Set<User> middleNamePartialMatches = userRepository.findAllByMiddleNameContainsAndMiddleNameNot(searchQuery, searchQuery);
 
+        // combine matches
 
-        //Todo combine matches
-        firstNamePartialMatches.addAll(lastNamePartialMatches);
+        Set<User> combinedResults = new HashSet<>();
+        combinedResults.addAll(fullMatches);
+        combinedResults.addAll(firstNamePartialMatches);
+        combinedResults.addAll(lastNamePartialMatches);
+        combinedResults.addAll(nicknamePartialMatches);
+        combinedResults.addAll(middleNamePartialMatches);
 
-        //Todo remove all important data
-
-
-        return ResponseEntity.status(200).body(firstNamePartialMatches);
+        return ResponseEntity.status(HttpStatus.OK).body(combinedResults);
     }
 
 
@@ -117,15 +127,22 @@ public class UserController {
         return errors;
     }
 
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+
+
     @GetMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.OK)
     @JsonView(UserViews.GetUserView.class)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
         User possibleUser = userRepository.findFirstById(userId);
-        System.out.println(possibleUser);
+        logger.info("possible User{}", possibleUser);
         if (possibleUser == null) {
             logger.warn("ID does not exist.");
-            return ResponseEntity.status(406).body("ID does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
         }
 
         // Not too sure what to do with Response 401 because it's possibly about security but do we need
@@ -135,6 +152,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
     }
 
+
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
@@ -142,7 +160,7 @@ public class UserController {
         User savedUser = userRepository.findFirstByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
-            return ResponseEntity.status(400).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
 
             String enteredPassword = login.getPassword();
@@ -153,7 +171,7 @@ public class UserController {
 
             if (!correctPassword) {
                 logger.warn("Attempted to login to account with incorrect password, dropping request: {}", login.getEmail());
-                return ResponseEntity.status(400).build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             } else {
                 logger.info("Account {}, logged into successfully", login.getEmail());
                 return ResponseEntity.status(HttpStatus.OK).build();
