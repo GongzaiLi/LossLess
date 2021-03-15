@@ -7,11 +7,12 @@
       "middleName": "Middlename",
       "nickname": "Someone",
       "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      "email": "johnsmith99@gmail.com",
+      "email": "admin@sengmail.com",
       "dateOfBirth": "1999-04-27",
       "phoneNumber": "+64 3 555 0129",
       "homeAddress": "4 Rountree Street, Upper Riccarton",
-      "created": "2020-11-07T11:35:27Z"
+      "created": "2020-11-07T11:35:27Z",
+      "role" : "globalApplicationAdmin"
     },
     {
       "id" : 1,
@@ -20,7 +21,7 @@
       "middleName" : "Olenka",
       "nickname" : "Ring dove",
       "bio" : "Enter Bio",
-      "email" : "ohalls0@amazonaws.com",
+      "email" : "user@sengmail.com",
       "dateOfBirth" : "2020-10-03",
       "phoneNumber" : "+86 168 564 2096",
       "homeAddress" : "18697 Nelson Drive",
@@ -34,7 +35,7 @@
       "middleName" : "Janene",
       "nickname" : "Lemur, sportive",
       "bio" : "Enter Bio",
-      "email" : "jmessingham1@eventbrite.com",
+      "email" : "defaultadmin@sengmail.com",
       "dateOfBirth" : "2020-06-27",
       "phoneNumber" : "+81 949 669 3384",
       "homeAddress" : "46111 Beilfuss Crossing",

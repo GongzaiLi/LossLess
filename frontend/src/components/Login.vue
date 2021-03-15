@@ -6,11 +6,12 @@ Date: 3/3/2021
 <template>
   <b-container>
     <b-alert variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered">
-      You have been successfully registered! Please log in with your email and password.</b-alert>
+      You have been successfully registered! Please log in with your email and password.
+    </b-alert>
     <b-row class="justify-content-md-center">
       <b-col class="col-md-5">
         <h2>Login to Wasteless</h2>
-        <b-form @submit="login" :novalidate="isActive">
+        <b-form @submit="login">
           <b-form-group
             label="Email"
             >
@@ -34,6 +35,7 @@ Date: 3/3/2021
           </b-form-group>
         </b-form>
 
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible show>{{ error }}</b-alert>
         <h6> Don't have an account?
           <router-link to="/register" >Register Here</router-link>
         </h6>
@@ -46,7 +48,7 @@ Date: 3/3/2021
         label-cols="auto"
         label="Demo Mode"
         label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isActive ? 'ON' : 'OFF'}} </b-button>
+      <b-button v-bind:variant="demoVariant" @click="toggle" >{{ isDemoMode ? 'ON' : 'OFF' }}</b-button>
     </b-form-group>
 
   </b-container>
@@ -59,23 +61,22 @@ import api from "../Api";
 export default {
   data: function () {
     return {
-      loginFailed: false,
       errors: [],
       email: null,
       password: "",
-      isActive: false,
+      isDemoMode: true,
     }
   },
   computed: {
     //if in demo mode or not change style of the button
     demoVariant() {
-      return this.isActive ? 'outline-success' : 'outline-danger';
+      return this.isDemoMode ? 'outline-success' : 'outline-danger';
     }
   },
   methods: {
     // toggle the demo mode variable when button clicked
     toggle: function() {
-      this.isActive = !this.isActive;
+      this.isDemoMode = !this.isDemoMode;
     },
     /**
      * only called if form page passes submit criteria
@@ -97,6 +98,7 @@ export default {
         email: this.email,
         password: this.password
       };
+      this.errors = [];
       console.log(loginData);
       api
           .login(loginData)
@@ -108,8 +110,12 @@ export default {
             this.goToUserProfilePage(response.userId);
           })
           .catch((error) => {
-            this.loginFailed = true;
             this.$log.debug(error);
+
+            // Currently we will always get a network error as we have no backend.
+            // In demos, don't show the network error. Delete this once we have a backend
+            if (this.isDemoMode) return;
+
             if (error.response && error.response.status === 400) {
               this.errors.push("The given username or password is incorrect.");
             } else {
@@ -117,10 +123,22 @@ export default {
             }
           });
       //if in demo mode set current user to default user 0 and go to user page
-      if (this.isActive) {
-        this.$currentUser = 0;
-        this.goToUserProfilePage(this.$currentUser);
+      if (this.isDemoMode) {
+        this.demoModeLogin();
       }
+    },
+    demoModeLogin() {
+      if (this.email === "admin@sengmail.com") {
+        this.$currentUser = 0;
+      } else if (this.email === "user@sengmail.com") {
+        this.$currentUser = 1;
+      } else if (this.email === "defaultadmin@sengmail.com") {
+        this.$currentUser = 2;
+      } else {
+        this.errors.push("The given username or password is incorrect.");
+        return;
+      }
+      this.goToUserProfilePage(this.$currentUser);
     },
     /**
      * Redirects to the profile page of the user with the specified userId.
