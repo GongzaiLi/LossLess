@@ -57,7 +57,6 @@ Date: 3/3/2021
 
       <div class="address-input">
         <textarea type="search" v-model="homeAddress" onkeypress=""
-          @input="onAddressChange"
           placeholder="Enter Address"
           autofocus
           autocomplete="off"
@@ -150,7 +149,28 @@ module.exports = {
       "homeAddress": "",
       "password": "",
       addressSearchQuery: "",
+      awaitingSearch: false,
       addressFind: [],
+    }
+  },
+
+  /**
+   * Author: Nitish Singh
+   * Watches for the user input in the Address box and
+   * calls another method to send query to Photon API
+   * after a delay i.e. 500 ms.
+   */
+
+  watch: {
+    homeAddress: function() {
+      if (!this.awaitingSearch) {
+        setTimeout(() => {
+          this.onAddressChange();
+          console.log(this.homeAddress);
+          this.awaitingSearch = false;
+          }, 500);
+      }
+  this.awaitingSearch = true;
     }
   },
   methods: {
@@ -198,6 +218,7 @@ module.exports = {
 
     //gets JSON from photon.komoot.io api with inputted string and returns an array of the results from the search
     async getJson(input) {
+
       const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
       let returned = await (await fetch(url)).json();
       return returned.features;
@@ -252,15 +273,6 @@ module.exports = {
     },
 
     /**
-     * Author: Nitish Singh
-     * Returns a promise to be awaited to add
-     * a delay of "ms" milliseconds when called.
-     */
-    timeout(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    },
-
-    /**
      * Authors: Phil Taylor, Gongzai Li, Eric Song
      * Queries the Photon Komoot API with the home address and puts the
      * results into addressFind.
@@ -271,11 +283,7 @@ module.exports = {
      */
     async onAddressChange() {
       const addressQueryString = this.homeAddress.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
-      await this.timeout(500);
 
-      // if (this.homeAddress.trim().length == 0) {
-      //   this.addressFind = [];
-      // }
       if (this.homeAddress.trim().length > 3) {
         let returnQuery = await this.getJson(addressQueryString);
 
@@ -290,8 +298,8 @@ module.exports = {
             this.addressFind.push(addressString);
           }
         }
-      // } else {
-      //   this.addressFind = [];
+      } else if(this.homeAddress.trim().length < 3) {
+        this.addressFind =[];
       }
     }
 
