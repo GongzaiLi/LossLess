@@ -1,6 +1,6 @@
 <!--
 Page for users to input their information for registration
-Author: Nitish Singh
+Authors: Nitish Singh, Eric Song
 Date: 3/3/2021
 -->
 
@@ -63,6 +63,12 @@ Date: 3/3/2021
       </b-form-group>
 
       <b-form-group
+          label="Home Address *"
+      >
+        <address-input v-model="homeAddress"/>
+      </b-form-group>
+
+      <b-form-group
         label="Date of Birth *"
       >
         <b-form-input type="date" v-model="dateOfBirth" required
@@ -84,16 +90,6 @@ Date: 3/3/2021
         />
         <div class="invalid-feedback">Please enter a phone # like 123-456-7890. This field is required.</div>
       </b-form-group>
-
-      <b-form-group
-        label="Home Address *"
-      >
-        <b-form-textarea v-model="homeAddress" required
-          placeholder="Home Address"
-          autofocus
-          autocomplete="off"
-        ></b-form-textarea>
-      </b-form-group>
       <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
     </b-form>
     <br>
@@ -113,14 +109,16 @@ Date: 3/3/2021
     </b-form-group>
   </div>
 
-
 </template>
 
 <script>
 import api from "@/Api";
+import AddressInput from "@/components/AddressInput";
 
 export default {
-
+  components: {
+    AddressInput
+  },
   data: function () {
     return {
       "firstName": "",
