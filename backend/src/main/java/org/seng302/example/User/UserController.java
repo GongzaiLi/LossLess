@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,12 +23,12 @@ import java.util.Set;
 public class UserController {
 
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
-    private UserRepository userRepository;
+    private UserService userService;
     private Encryption encryption;
 
     @Autowired
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -47,8 +46,7 @@ public class UserController {
         //Invalid users are detected by Spring and are rejected as 400.
 
         //Check user with this email address does not already exist
-        User possibleUser = userRepository.findFirstByEmail(user.getEmail());
-        if (possibleUser != null) {
+        if (userService.checkEmailAlreadyUsed(user.getEmail())) {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -65,7 +63,7 @@ public class UserController {
         //Encrypt the users password
         user.setPassword(encryption.generateHashedPassword(user.getPassword(), salt));
         //Save user object in h2 database
-        user = userRepository.save(user);
+        user = userService.createUser(user);
 
         logger.info("saved new user {}", user);
 
@@ -86,25 +84,9 @@ public class UserController {
     @JsonView(UserViews.SearchUserView.class) //Only return appropriate fields
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
 
-        // full matches
-        Set<User> fullMatches =  userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
-        // partial matches
-        Set<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
-        Set<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
-        Set<User> nicknamePartialMatches = userRepository.findAllByNicknameContainsAndNicknameNot(searchQuery, searchQuery);
-        Set<User> middleNamePartialMatches = userRepository.findAllByMiddleNameContainsAndMiddleNameNot(searchQuery, searchQuery);
-
-        // combine matches
-
-        Set<User> combinedResults = new HashSet<>();
-        combinedResults.addAll(fullMatches);
-        combinedResults.addAll(firstNamePartialMatches);
-        combinedResults.addAll(lastNamePartialMatches);
-        combinedResults.addAll(nicknamePartialMatches);
-        combinedResults.addAll(middleNamePartialMatches);
-
-        return ResponseEntity.status(HttpStatus.OK).body(combinedResults);
+        return ResponseEntity.status(HttpStatus.OK).body(searchResults);
     }
 
 
@@ -127,18 +109,12 @@ public class UserController {
         return errors;
     }
 
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
 
 
     @GetMapping("/users/{id}")
     @JsonView(UserViews.GetUserView.class)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
-        User possibleUser = userRepository.findFirstById(userId);
+        User possibleUser = userService.findUserById(userId);
         logger.info("possible User{}", possibleUser);
         if (possibleUser == null) {
             logger.warn("ID does not exist.");
@@ -157,7 +133,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
-        User savedUser = userRepository.findFirstByEmail(login.getEmail());
+        User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
