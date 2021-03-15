@@ -1,6 +1,7 @@
 <template>
   <b-navbar v-if="!['login', 'register'].includes($route.name)"
     toggleable="lg" type="dark" variant="dark" fixed="top"
+    class="shadow-lg"
   >
     <b-navbar-brand href="#">NavBar</b-navbar-brand>
 

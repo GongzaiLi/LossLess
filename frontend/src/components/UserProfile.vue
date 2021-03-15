@@ -5,7 +5,8 @@ Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
 <template>
-  <b-card border-variant="secondary" header-border-variant="secondary" style="max-width: 45rem" no-body>
+  <b-card border-variant="secondary" header-border-variant="secondary" 
+    class="profile-card shadow-lg" no-body>
     <template #header>
       <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
       <p class="mb-1">Member since:
@@ -74,6 +75,11 @@ Date: 5/3/2021
 </template>
 
 <style scoped>
+.profile-card {
+   max-width: 45rem;
+   margin-left: auto;
+   margin-right: auto;
+}
 h6 {
   line-height: 1.4;
 }

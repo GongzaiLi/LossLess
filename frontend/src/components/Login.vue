@@ -8,36 +8,37 @@ Date: 3/3/2021
     <b-alert variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered">
       You have been successfully registered! Please log in with your email and password.</b-alert>
     <b-row class="justify-content-md-center">
-      <b-col class="col-md-5">
-        <h2>Login to Wasteless</h2>
-        <b-form @submit="login" :novalidate="isActive">
-          <b-form-group
-            label="Email"
+      <b-col class="col-md-7">
+        <b-card class="shadow-lg">
+          <h2>Login to Wasteless</h2>
+          <b-form @submit="login" :novalidate="isActive">
+            <b-form-group
+              label="Email"
+              >
+              <b-form-input type="email" v-model="email" required
+                    autofocus
+                    autocomplete="off"
+              ></b-form-input>
+            </b-form-group>
+
+            <b-form-group
+                label="Password"
             >
-            <b-form-input type="email" v-model="email" required
-                   autofocus
-                   autocomplete="off"
-            ></b-form-input>
-          </b-form-group>
+              <b-form-input v-model="password" type="password" required
+                  autofocus
+                  autocomplete="off"
+              ></b-form-input>
+            </b-form-group>
+            <b-form-group
+            >
+            <b-button block type="submit" variant="primary" style="margin-top:0.7em">Login</b-button>
+            </b-form-group>
+          </b-form>
 
-          <b-form-group
-              label="Password"
-          >
-            <b-form-input v-model="password" type="password" required
-                 autofocus
-                 autocomplete="off"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group
-          >
-          <b-button block type="submit" variant="primary" style="margin-top:0.7em">Login</b-button>
-          </b-form-group>
-        </b-form>
-
-        <h6> Don't have an account?
-          <router-link to="/register" >Register Here</router-link>
-        </h6>
-        <br><br>
+          <h6> Don't have an account?
+            <router-link to="/register" >Register Here</router-link>
+          </h6>
+        </b-card>
       </b-col>
     </b-row>
 
