@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import UserProfile from './UserProfile'; // name of your Vue component
+import UserProfile from '../UserProfile'; // name of your Vue component
 
 let wrapper;
 let mockDateNow = '2019-05-14T11:01:58.135Z';

@@ -1,6 +1,6 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import UserSearch from './UserSearch'; // name of your Vue component
+import UserSearch from '../UserSearch'; // name of your Vue component
 
 let wrapper;
 let tableHeaderData = {

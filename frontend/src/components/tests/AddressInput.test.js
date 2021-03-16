@@ -1,6 +1,6 @@
 import {createLocalVue, shallowMount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import AddressInput from './AddressInput'; // name of your Vue component
+import AddressInput from '../AddressInput'; // name of your Vue component
 
 let wrapper;
 

@@ -99,7 +99,7 @@ h6 {
 
 <script>
 import api from "../Api";
-import usersInfo from './usersDate.json';
+import usersInfo from './data/usersDate.json';
 
 export default {
   data: function () {

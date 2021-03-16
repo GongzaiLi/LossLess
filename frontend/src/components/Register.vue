@@ -12,12 +12,11 @@ Date: 3/3/2021
     <b-form
       @submit="register"
       @input="setCustomValidities"
-      :novalidate="isDemoMode"
     >
       <b-form-group
         label="First Name *"
       >
-        <b-form-input v-model="firstName" required placeholder="First Name"></b-form-input>
+        <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -35,7 +34,7 @@ Date: 3/3/2021
       <b-form-group
         label="Nickname"
       >
-        <b-form-input v-model="nickname" placeholder="Nick Name" autofocus></b-form-input>
+        <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -73,7 +72,6 @@ Date: 3/3/2021
       >
         <b-form-input type="date" v-model="dateOfBirth" required
          placeholder="Date of Birth"
-         autofocus
          autocomplete="off"
          size=30;
         />
@@ -84,7 +82,6 @@ Date: 3/3/2021
       >
         <b-form-input v-model="phoneNumber"
          placeholder="Phone Number"
-         autofocus
          autocomplete="off"
          size=30;
         />
@@ -132,7 +129,7 @@ export default {
       "homeAddress": "",
       "password": "",
       "confirmPassword": "",
-      isDemoMode: false,
+      isDemoMode: true,
       errors: [],
     }
   },
