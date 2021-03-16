@@ -57,6 +57,7 @@ Date: 3/3/2021
 
 <script>
 import api from "../Api";
+import usersInfo from './usersDate.json';
 
 export default {
   data: function () {
@@ -129,16 +130,16 @@ export default {
     },
     demoModeLogin() {
       if (this.email === "admin@sengmail.com") {
-        this.$currentUser = 0;
+        this.$currentUser = usersInfo.users[0];
       } else if (this.email === "user@sengmail.com") {
-        this.$currentUser = 1;
+        this.$currentUser = usersInfo.users[1];
       } else if (this.email === "defaultadmin@sengmail.com") {
-        this.$currentUser = 2;
+        this.$currentUser = usersInfo.users[2];
       } else {
         this.errors.push("The given username or password is incorrect.");
         return;
       }
-      this.goToUserProfilePage(this.$currentUser);
+      this.goToUserProfilePage(this.$currentUser.id);
     },
     /**
      * Redirects to the profile page of the user with the specified userId.

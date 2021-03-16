@@ -12,7 +12,7 @@
         <b-nav-item to="/userSearch">User Search</b-nav-item>
         <b-nav-item-dropdown right>
           <template #button-content>
-            <em>User</em>
+            <em>{{getUserRole()}}</em>
           </template>
           <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
@@ -33,7 +33,10 @@ export default {
   name: "Navbar.vue",
   methods: {
     my_profile: function () {
-      this.$router.push({path: `/user/${this.$currentUser}`});
+      this.$router.push({path: `/user/${this.$currentUser.id}`});
+    },
+    getUserRole: function () {
+      return this.$currentUser.role;
     },
     /**
      * Logs out the current user and redirects to the login page.
