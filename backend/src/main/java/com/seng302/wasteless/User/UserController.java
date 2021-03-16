@@ -106,9 +106,10 @@ public class UserController {
     @JsonView(UserViews.SearchUserView.class) //Only return appropriate fields
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
 
-        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
-        if (type != null && !type.getValue().contains("USER")) {
-            logger.warn("Access token is missing or invalid: " + type.getValue());
+        //Temporary Session Authentication Method
+        Cookie type = WebUtils.getCookie(request, "JSESSIONID"); // Grabs the cookie from HttpServletRequest
+        if (type != null && !type.getValue().contains("USER")) { // Checks whether user has logged in through checking cookie
+            logger.warn("Access token is missing or invalid: " + type.getValue()); // Unauthorized if User hasn't logged in
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is missing or invalid");
         }
@@ -154,10 +155,10 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("possible User{}", possibleUser);
 
-        //
-        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
-        if (type != null && !type.getValue().contains("USER")) {
-            logger.warn("Access token is missing or invalid: " + type.getValue());
+        //Temporary Session Authentication Method
+        Cookie type = WebUtils.getCookie(request, "JSESSIONID"); // Grabs the cookie from HttpServletRequest
+        if (type != null && !type.getValue().contains("USER")) { // Checks whether user has logged in through checking cookie
+            logger.warn("Access token is missing or invalid: " + type.getValue()); // Unauthorized if User hasn't logged in
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is missing or invalid");
         }
