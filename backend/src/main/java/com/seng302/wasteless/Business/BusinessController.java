@@ -2,6 +2,8 @@ package com.seng302.wasteless.Business;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.MainApplicationRunner;
+import com.seng302.wasteless.User.User;
+import com.seng302.wasteless.User.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,10 +28,12 @@ public class BusinessController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
     private BusinessService businessService;
+    private UserService userService;
 
     @Autowired
-    public BusinessController(BusinessService businessService) {
+    public BusinessController(BusinessService businessService, UserService userService) {
         this.businessService = businessService;
+        this.userService = userService;
     }
 
     /**
@@ -39,8 +48,33 @@ public class BusinessController {
      */
     @PostMapping("/businesses")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business) {
+    public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
+
+        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
+        logger.warn(type);
+        if (type == null || !type.getValue().contains("USER")) {
+            logger.warn("Access token is missing or invalid.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is missing or invalid");
+        }
+
+        String cookieValue = type.getValue();
+        String userId = cookieValue.substring(0, cookieValue.length() - 5);
+
+        User user = userService.findUserById(Integer.parseInt(userId));
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is invalid");
+        }
+
+        business.setPrimaryAdministrator(user);
+
+        List<User> adminList = new ArrayList<>();
+        adminList.add(user);
+        business.setAdministrators(adminList);
+        
         logger.info("business was {}", business);
 
         //Validate business type
@@ -69,7 +103,16 @@ public class BusinessController {
      */
     @GetMapping("/businesses/{id}")
     @JsonView(BusinessViews.GetBusinessView.class)
-    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId) {
+    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+
+        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
+
+        if (type == null || !type.getValue().contains("USER")) {
+            logger.warn("Access token is missing or invalid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is missing or invalid");
+        }
+
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("possible Business{}", possibleBusiness);
         if (possibleBusiness == null) {

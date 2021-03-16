@@ -85,7 +85,7 @@ public class UserController {
         logger.info("saved new user {}", user);
 
         //Todo send back authenticated responses
-        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", "Example")
+        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", user.getId().toString() + "_USER")
                 .httpOnly(true)
                 .path("/")
                 .build();
@@ -107,8 +107,8 @@ public class UserController {
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
 
         Cookie type = WebUtils.getCookie(request, "JSESSIONID");
-        if (type != null && !type.getValue().contains("USER")) {
-            logger.warn("Access token is missing or invalid: " + type.getValue());
+        if (type == null || !type.getValue().contains("USER")) {
+            logger.warn("Access token is missing or invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is missing or invalid");
         }
@@ -147,8 +147,8 @@ public class UserController {
         logger.info("possible User{}", possibleUser);
 
         Cookie type = WebUtils.getCookie(request, "JSESSIONID");
-        if (type != null && !type.getValue().contains("USER")) {
-            logger.warn("Access token is missing or invalid: " + type.getValue());
+        if (type == null || !type.getValue().contains("USER")) {
+            logger.warn("Access token is missing or invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is missing or invalid");
         }

@@ -22,6 +22,10 @@ public class Business {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
 
+    @JoinColumn(name = "primary_administrator")
+    @OneToOne
+    private User primaryAdministrator;
+
     @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "administrators")
     @OneToMany
