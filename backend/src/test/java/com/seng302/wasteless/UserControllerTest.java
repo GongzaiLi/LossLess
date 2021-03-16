@@ -1,6 +1,7 @@
 package com.seng302.wasteless;
 
 import com.seng302.wasteless.User.UserController;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,5 +156,6 @@ public class UserControllerTest {
             throw new IllegalArgumentException("Invalid Request", e);
         }
     }
+
 }
 

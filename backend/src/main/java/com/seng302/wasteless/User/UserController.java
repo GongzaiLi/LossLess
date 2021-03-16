@@ -165,9 +165,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
     }
 
-
+    /**
+     * Takes an inputed username and password and checks the credentials against the database of saved users.
+     * Returns either a bad request response or an authenticated ok response with a JSESSIONID cookie.
+     *
+     * @param login The login object parsed from the request body by spring
+     * @return 200 ok for correct login, 400 bad request otherwise
+     */
     @PostMapping("/login")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
         User savedUser = userService.findUserByEmail(login.getEmail());
@@ -197,23 +203,6 @@ public class UserController {
 
                 return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(responseBody);
 
-
-
-                //   AuthenticatedResponse:
-                //      description: >
-                //        Response returned to client when they have performed an action to gain authentication (registering or logging in).
-                //        This response includes a session token that the client can use in future API requests to authenticate itself.
-                //        This session token is set as a cookie with name 'JSESSIONID', and will need to be included in subsequent requests to the server.
-                //      content:
-                //        application/json:
-                //          schema:
-                //            type: object
-                //            properties:
-                //              userId:
-                //                type: integer
-                //                description: The ID of the user that has just been authenticated
-                //                example: 100
-                //
             }
 
 
