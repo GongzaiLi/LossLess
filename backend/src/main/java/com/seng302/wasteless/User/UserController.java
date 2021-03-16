@@ -1,6 +1,7 @@
 package com.seng302.wasteless.User;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.MainApplicationRunner;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,10 +21,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 @RestController
@@ -113,7 +113,7 @@ public class UserController {
                     "Access token is missing or invalid");
         }
 
-        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+        LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
         return ResponseEntity.status(HttpStatus.OK).body(searchResults);
     }
@@ -138,8 +138,16 @@ public class UserController {
         return errors;
     }
 
-
-
+    /**
+     *  Uses a Get Request to grab the user with the specified ID
+     *  Returns either an unacceptable response if ID doesnt exist,
+     *  a body showing the details of the user if it does exist
+     *  and unauthorized if a user hasn't logged in
+     *
+     * @param userId The userID integer
+     * @param request
+     * @return
+     */
     @GetMapping("/users/{id}")
     @JsonView(UserViews.GetUserView.class)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId, HttpServletRequest request) {

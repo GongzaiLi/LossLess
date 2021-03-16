@@ -24,8 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) //Reset JPA stuff between test
-public class BusinessControllerTest {
-
+public class BusinessControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,56 +67,6 @@ public class BusinessControllerTest {
     }
 
     @Test
-    public void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .content(business)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingName_then400Response() throws Exception {
-        String business = "{\"address\" : \"Peanut Lane\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .content(business)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void whenPostRequestToBusiness_andInvalidBusiness_dueToAddress_then400Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .content(business)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingBusinessType_then400Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"description\": \"We sell peanuts\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .content(business)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void whenPostRequestToBusiness_andValidBusiness_withMissingDescription_then201Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Accommodation and Food Services\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .content(business)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
     public void whenPostRequestToBusiness_andInvalidBusiness_dueToIllegalBusinessType_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Oil Company\", \"description\": \"We sell peanuts\"}";
 
@@ -126,7 +75,6 @@ public class BusinessControllerTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
 
 
     private void createOneBusiness(String name, String address, String businessType, String description) {

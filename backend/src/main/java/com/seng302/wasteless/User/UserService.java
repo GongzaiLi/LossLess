@@ -3,8 +3,7 @@ package com.seng302.wasteless.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Service
 public class UserService {
@@ -63,19 +62,19 @@ public class UserService {
      * @param searchQuery       The search query
      * @return                  A set of all matching users
      */
-    public Set<User> searchForMatchingUsers(String searchQuery) {
+    public LinkedHashSet<User> searchForMatchingUsers(String searchQuery) {
         // full matches
-        Set<User> fullMatches = userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+        LinkedHashSet<User> fullMatches = userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
 
         // partial matches
-        Set<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
-        Set<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
-        Set<User> nicknamePartialMatches = userRepository.findAllByNicknameContainsAndNicknameNot(searchQuery, searchQuery);
-        Set<User> middleNamePartialMatches = userRepository.findAllByMiddleNameContainsAndMiddleNameNot(searchQuery, searchQuery);
+        LinkedHashSet<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
+        LinkedHashSet<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
+        LinkedHashSet<User> nicknamePartialMatches = userRepository.findAllByNicknameContainsAndNicknameNot(searchQuery, searchQuery);
+        LinkedHashSet<User> middleNamePartialMatches = userRepository.findAllByMiddleNameContainsAndMiddleNameNot(searchQuery, searchQuery);
 
         // combine matches
 
-        Set<User> combinedResults = new HashSet<>();
+        LinkedHashSet<User> combinedResults = new LinkedHashSet<>();
         combinedResults.addAll(fullMatches);
         combinedResults.addAll(firstNamePartialMatches);
         combinedResults.addAll(lastNamePartialMatches);
