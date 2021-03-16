@@ -5,70 +5,139 @@ Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
 <template>
-  <div id="userBox">
-    <h2>{{ userData.nickname }}'s Profile Page</h2>
-    <div>
-      <p id="member-since">Member since:
-        {{ dateR.day + " " + dateR.month[0] + " " + dateR.year + " (" + registrationTime + ") " }}</p>
-      <p  v-if="loggedInAsAdmin">
-        <label >{{userRoleDisplayString}}</label>
+  <div>
+    <b-card border-variant="secondary" header-border-variant="secondary"
+            style="max-width: 45rem" no-body
+            v-if="userFound"
+    >
 
-      <button v-if="userData.role!=='defaultGlobalApplicationAdmin'" @click="toggleAdmin">{{adminButtonText}}</button>
-      </p>
-    </div>
-    <hr>
-    <div>
+      <template #header>
 
-      <p><b>Name:</b> {{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</p>
-      <p><b>Date Of Birth:</b> {{ userData.dateOfBirth }}</p>
-      <p><b>Email:</b> {{ userData.email }}</p>
-      <p><b>Phone Number:</b> {{ userData.phoneNumber }}</p>
-      <p><b>Home Address:</b> {{ userData.homeAddress }}</p>
-      <p><b>Bio:</b> {{ userData.bio }}</p>
+          <b-row>
+            <b-col>
+              <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
+              <p class="mb-1">
+                {{ memberSince }}
+              </p>
+            </b-col>
+            <b-col cols="2" sm="auto" v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
+              <h4>{{ userRoleDisplayString }}</h4>
+              <b-button v-bind:variant="adminButtonToggle"
+                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$currentUser.id)"
+                        @click="toggleAdmin">{{ adminButtonText }}
+              </b-button>
+            </b-col>
 
-    </div>
+          </b-row>
 
-    <hr>
+        <b-row>
 
-    <button id="logout-button" @click="logOut" style="margin-top:10px">Log out</button>
+          <b-col cols="">
 
+          </b-col>
+        </b-row>
+      </template>
+
+      <b-list-group border-variant="secondary">
+        <b-list-group-item>
+          <b-card-text style="text-align: justify">
+            {{ userData.bio }}
+          </b-card-text>
+        </b-list-group-item>
+      </b-list-group>
+
+      <b-card-body>
+        <b-container>
+          <h6>
+            <b-row>
+              <b-col cols="0">
+                <b-icon-person-fill></b-icon-person-fill>
+              </b-col>
+              <b-col cols="4"><b>Full Name:</b></b-col>
+              <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row v-show="userData.nickname.length">
+              <b-col cols="0">
+                <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
+              </b-col>
+              <b-col cols="4"><b>Nickname:</b></b-col>
+              <b-col>{{ userData.nickname }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0">
+                <b-icon-calendar-event-fill></b-icon-calendar-event-fill>
+              </b-col>
+              <b-col cols="4"><b>Date Of Birth:</b></b-col>
+              <b-col>{{ userData.dateOfBirth }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0">
+                <b-icon-envelope-fill></b-icon-envelope-fill>
+              </b-col>
+              <b-col cols="4"><b>Email:</b></b-col>
+              <b-col>{{ userData.email }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0">
+                <b-icon-telephone-fill></b-icon-telephone-fill>
+              </b-col>
+              <b-col cols="4"><b>Phone Number:</b></b-col>
+              <b-col>{{ userData.phoneNumber }}</b-col>
+            </b-row>
+          </h6>
+          <h6>
+            <b-row>
+              <b-col cols="0">
+                <b-icon-house-fill></b-icon-house-fill>
+              </b-col>
+              <b-col cols="4"><b>Home Address:</b></b-col>
+              <b-col> {{ userData.homeAddress }}</b-col>
+            </b-row>
+          </h6>
+        </b-container>
+      </b-card-body>
+    </b-card>
+
+    <b-card border-variant="secondary" header-border-variant="secondary"
+            style="max-width: 45rem" no-body
+            v-if="!userFound"
+    >
+      <template #header>
+        <h4 class="mb-1">User not found</h4>
+      </template>
+      <b-card-body>
+        <h6>
+          The user you are looking for does not exist. The account may have been deleted, or you may have typed an
+          invalid URL into the address bar.<br><br>
+          Try
+          <router-link to="/userSearch">searching for a user here.</router-link>
+        </h6>
+      </b-card-body>
+    </b-card>
   </div>
-
 </template>
+
+<style scoped>
+h6 {
+  line-height: 1.4;
+}
+</style>
 
 <script>
 import api from "../Api";
 import usersInfo from './usersDate.json';
 
-function getCookie(cName) {
-  /*Gets the inputted cookie from the cookie document string
-  -Splits the string by ; character and turns it into an array then searches the array for inputted cookie name*/
-    let name = cName + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let cookieArray = decodedCookie.split(';');
-    for(let i = 0; i <cookieArray.length; i++) {
-      let c = cookieArray[i];
-      while (c.charAt(0) === ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-
-
-}
-
 export default {
   data: function () {
     return {
-      dateR: {
-        year: 0,
-        month: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        day: 0
-      },
-      registrationTime: 0,
       userData: {
         id: "",
         firstName: "",
@@ -79,17 +148,16 @@ export default {
         email: "",
         dateOfBirth: "",
         phoneNumber: "",
-        homeAddress: ""
+        homeAddress: "",
       },
-      loggedInAsAdmin: false,
+      userFound: true,
       demoMode: true
     }
   },
 
   mounted() {
     const userId = this.$route.params.id;
-    this.displayAdmin();
-    this.getUserInfo( userId );
+    this.getUserInfo(userId);
   },
 
   methods: {
@@ -100,34 +168,54 @@ export default {
      */
     getUserInfo: function (id) {
       api
-        .getUser(id)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.userData = response.data;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.error = "Failed to Load User Data"
-        })
+          .getUser(id) //
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.userData = response.data;
+            this.userFound = true;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            // Uncomment the below line once we have a backend
+            // this.userFound = false;
+          })
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
-      this.userData = usersInfo.users[id];
+      if (id >= usersInfo.users.length) {
+        this.userFound = false;
+      } else {
+        this.userData = usersInfo.users[id];
+        this.userFound = true;
+      }
     },
     logOut: function () {
       this.$router.push({path: '/login'})
     },
-    displayAdmin: function() {
-      //Changes userIsAdmin variable to true if user is logged in as admin (has GAA cookie)
-      if (getCookie('globalApplicationAdmin')==='1'){
-        this.loggedInAsAdmin = true;
+    /**
+     * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
+     * The months elapsed is not the total number of months elapsed, but the number months elapsed in
+     * addition to the years also elapsed. For example, 1 year and 2 months instead of 1 year, 14 months.
+     * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
+     * Returns data in the format {months: months_elapsed, years: years_elapsed}
+     */
+    getMonthsAndYearsBetween(start, end) {
+      const timeElapsed = end - start;
+      const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+      const yearsElapsed = Math.floor(daysElapsed / 365);
+      console.log(daysElapsed / 365);
+      const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
+      return {
+        months: monthsElapsed,
+        years: yearsElapsed
       }
     },
+
     /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.
      */
-    toggleAdmin: function() {
-      if (this.userData.role==='defaultGlobalApplicationAdmin' || this.userData.role==='globalApplicationAdmin') {
+    toggleAdmin: function () {
+      if (this.userData.role === 'defaultGlobalApplicationAdmin' || this.userData.role === 'globalApplicationAdmin') {
         this.revokeAdmin();
       } else {
         this.giveAdmin();
@@ -137,57 +225,79 @@ export default {
      *  Attempts to grant the displayed user the 'globalApplicationAdmin' role
      *  by sending a request to the API. Will show an error alert if unsuccessful.
      */
-    giveAdmin: function() {
+    giveAdmin: function () {
       api
-        .makeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Made user ${this.userData.id} admin`);
-          this.userData.role = 'globalApplicationAdmin';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .makeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Made user ${this.userData.id} admin`);
             this.userData.role = 'globalApplicationAdmin';
-            return;
-            //////////////////////////
-          }
+          })
+          .catch((error) => {
+            if (this.demoMode) {
+              // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+              this.userData.role = 'globalApplicationAdmin';
+              return;
+              //////////////////////////
+            }
 
-          this.$log.debug(error);
-          alert(error);
-        });
+            this.$log.debug(error);
+            alert(error);
+          });
     },
     /**
      *  Attempts to revoke the 'globalApplicationAdmin' role from the displayed user
      *  by sending a request to the API. Will show an error alert if unsuccessful.
      */
-    revokeAdmin: function() {
+    revokeAdmin: function () {
       api
-        .revokeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
-          this.userData.role = 'user';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .revokeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Revoked admin for user ${this.userData.id}`);
             this.userData.role = 'user';
-            return;
-            //////////////////////////
-          }
+          })
+          .catch((error) => {
+            if (this.demoMode) {
+              // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+              this.userData.role = 'user';
+              return;
+              //////////////////////////
+            }
 
-          this.$log.debug(error);
-          alert(error);
-        });
+            this.$log.debug(error);
+            alert(error);
+          });
     }
   },
   computed: {
+    adminButtonToggle() {
+      return this.userData.role === 'user' ? 'success' : 'danger';
+    },
+    memberSince: function () {
+      let registeredDate = new Date(this.userData.created);
+      const timeElapsed = this.getMonthsAndYearsBetween(registeredDate, Date.now());
+      const registeredYears = timeElapsed.years;
+      const registeredMonths = timeElapsed.months;
+
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
+      if (registeredYears > 0) {
+        message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
+        if (registeredMonths > 0) {
+          message += " and ";
+        }
+      }
+      if (registeredMonths > 0 || registeredYears === 0) {
+        message += registeredMonths + ((registeredMonths === 1) ? " Month" : " Months");
+      }
+      return message + ") ";
+    },
     /**
      * User friendly display string for the user role. Converts the user role
      * string given by the api (eg. 'user', 'globalApplicationAdmin') to
      * a more user-friendly string to be displayed (eg. 'User', 'Site Admin')
      */
-    userRoleDisplayString: function() {
-      switch(this.userData.role) {
+    userRoleDisplayString: function () {
+      switch (this.userData.role) {
         case 'globalApplicationAdmin':
           return "Site Admin";
         case 'defaultGlobalApplicationAdmin':
@@ -199,8 +309,8 @@ export default {
     /**
      * Toggles the button text to add/remove admin privileges on a profile based on the user's role
      */
-    adminButtonText: function() {
-      switch(this.userData.role) {
+    adminButtonText: function () {
+      switch (this.userData.role) {
         case 'globalApplicationAdmin':
           return "Remove Admin";
         default:  // Button won't even appear if they are default global admin so this is fine
@@ -208,7 +318,6 @@ export default {
       }
     }
   },
-
   watch: {
     /**
      * When the user navigates from /user/foo to /user/bar, this component is re-used. This watches for those routing
@@ -220,24 +329,9 @@ export default {
     $route(to, _from) {
       console.log(to);
       const userId = to.params.id;
-      this.getUserInfo( userId );
-    }
-  }
+      this.getUserInfo(userId);
+    },
+  },
+
 }
 </script>
-
-<style scoped>
-
-#userBox {
-  border: 2px solid #a1a1a1;
-  padding: 10px 40px;
-  background: floralwhite;
-  width: 400px;
-  border-radius: 10px;
-}
-
-#member-since {
-  margin-top: -10px;
-}
-
-</style>
