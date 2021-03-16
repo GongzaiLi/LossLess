@@ -39,14 +39,15 @@ public class UserController {
      * Request validated for create fields by Spring, if bad then returns 400 with map of errors
      * Checks email has not been previously used, if already used returns 409
      *
+     * The @Valid annotation ensures the correct fields are present
+     * The @JsonView prevents injection of readonly fields
+     *
      * @param user The user object parsed from the request body by spring
      * @return 201 created, 400 bad request with json of errors, 409 email address already used
      */
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
-
-        //Invalid users are detected by Spring and are rejected as 400.
+    public ResponseEntity<Object> createUser(@Valid @RequestBody @JsonView(UserViews.PostUserInputView.class) User user) {
 
         //Check user with this email address does not already exist
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
