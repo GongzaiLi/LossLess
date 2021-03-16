@@ -138,14 +138,23 @@ public class UserController {
         return errors;
     }
 
-
-
+    /**
+     *  Uses a Get Request to grab the user with the specified ID
+     *  Returns either an unacceptable response if ID doesnt exist,
+     *  a body showing the details of the user if it does exist
+     *  and unauthorized if a user hasn't logged in
+     *
+     * @param userId The userID integer
+     * @param request
+     * @return
+     */
     @GetMapping("/users/{id}")
     @JsonView(UserViews.GetUserView.class)
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId, HttpServletRequest request) {
         User possibleUser = userService.findUserById(userId);
         logger.info("possible User{}", possibleUser);
 
+        //
         Cookie type = WebUtils.getCookie(request, "JSESSIONID");
         if (type != null && !type.getValue().contains("USER")) {
             logger.warn("Access token is missing or invalid: " + type.getValue());
