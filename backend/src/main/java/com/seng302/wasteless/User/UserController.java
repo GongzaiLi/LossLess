@@ -4,19 +4,17 @@ import com.fasterxml.jackson.annotation.JsonView;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.example.MainApplicationRunner;
-import org.seng302.example.Security.WebSecurityConfig;
+import com.seng302.wasteless.MainApplicationRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.server.Session;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -41,14 +39,15 @@ public class UserController {
      * Request validated for create fields by Spring, if bad then returns 400 with map of errors
      * Checks email has not been previously used, if already used returns 409
      *
+     * The @Valid annotation ensures the correct fields are present
+     * The @JsonView prevents injection of readonly fields
+     *
      * @param user The user object parsed from the request body by spring
      * @return 201 created, 400 bad request with json of errors, 409 email address already used
      */
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
-
-        //Invalid users are detected by Spring and are rejected as 400.
+    public ResponseEntity<Object> createUser(@Valid @RequestBody @JsonView(UserViews.PostUserRequestView.class) User user) {
 
         //Check user with this email address does not already exist
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
@@ -139,8 +138,8 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
         User savedUser = userService.findUserByEmail(login.getEmail());

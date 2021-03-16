@@ -25,7 +25,7 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-package org.seng302.example;
+package com.seng302.wasteless;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
