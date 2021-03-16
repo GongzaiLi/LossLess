@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import UserProfile from './UserProfile'; // name of your Vue component
+import UserProfile from '../UserProfile'; // name of your Vue component
 
 let wrapper;
 let mockDateNow = '2019-05-14T11:01:58.135Z';

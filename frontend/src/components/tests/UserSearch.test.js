@@ -1,5 +1,5 @@
 import {shallowMount} from '@vue/test-utils';
-import UserSearch from './UserSearch'; // name of your Vue component
+import UserSearch from '../UserSearch'; // name of your Vue component
 
 let wrapper;
 let tableHeaderData = {

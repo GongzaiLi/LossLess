@@ -4,8 +4,7 @@ import Login from './../components/Login.vue'
 import Register from './../components/Register.vue'
 import UserProfile from './../components/UserProfile'
 import UserSearch from "../components/UserSearch";
-import {getInstance} from "../auth"
-//import Students from './../components/Students.vue'
+import {getInstance} from "@/auth"
 
 /**
  * This specifies all routing information used by Vue-Router.

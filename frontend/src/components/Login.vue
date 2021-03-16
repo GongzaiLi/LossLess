@@ -25,7 +25,6 @@ Date: 3/3/2021
               label="Password"
           >
             <b-form-input v-model="password" type="password" required
-                 autofocus
                  autocomplete="off"
             ></b-form-input>
           </b-form-group>
@@ -35,7 +34,7 @@ Date: 3/3/2021
           </b-form-group>
         </b-form>
 
-        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible show>{{ error }}</b-alert>
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}</b-alert>
         <h6> Don't have an account?
           <router-link to="/register" >Register Here</router-link>
         </h6>
@@ -57,7 +56,7 @@ Date: 3/3/2021
 
 <script>
 import api from "../Api";
-import usersInfo from './usersDate.json';
+import usersInfo from './data/usersDate.json';
 
 export default {
   data: function () {

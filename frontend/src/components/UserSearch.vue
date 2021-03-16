@@ -197,7 +197,7 @@ export default {
       if (this.currentPage === numPages) {
         if (this.totalResults !== this.perPage) {
           console.log(this.perPage * (this.currentPage));
-          if (this.totalResults % this.perPage == 0) {
+          if (this.totalResults % this.perPage === 0) {
             return this.perPage * (this.currentPage);
           }
           return this.perPage * (this.currentPage-1) + this.totalResults % this.perPage;

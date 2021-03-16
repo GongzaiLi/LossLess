@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import AddressInput from './AddressInput'; // name of your Vue component
+import AddressInput from '../AddressInput'; // name of your Vue component
 
 let wrapper;
 
