@@ -28,7 +28,7 @@ public class Business {
 
     @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "administrators")
-    @OneToMany
+    @ManyToMany
     private List<User> administrators;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})

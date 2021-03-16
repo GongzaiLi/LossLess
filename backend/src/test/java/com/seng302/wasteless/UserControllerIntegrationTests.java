@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -12,6 +13,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import javax.servlet.http.Cookie;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -93,29 +96,14 @@ public class UserControllerIntegrationTests {
         }
     }
 
-
-    @Test
-    public void whenSearchingForUsers_andNoUsers_thenEmptyArray() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Cob")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-
-        assertEquals("[]", result);
-
-    }
-
     @Test
     public void whenSearchingForUsers_andOneMatchingUsers_thenCorrectResult() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        Cookie userCookie = createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/search?searchQuery=James")
+                        .cookie(userCookie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -127,11 +115,12 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andNoMatchingUsers_thenCorrectResult() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        Cookie userCookie = createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/search?searchQuery=Steve")
+                        .cookie(userCookie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -145,7 +134,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andMultipleMatchingUsers_byFullMatch_andPartialMatch_thenCorrectOrder() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        Cookie userCookie = createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
         createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
 
         createOneUser("James123", "Harris", "jeh1281@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
@@ -155,6 +144,7 @@ public class UserControllerIntegrationTests {
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1238\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
+                        .cookie(userCookie)
                         .content(user1)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -162,6 +152,7 @@ public class UserControllerIntegrationTests {
         String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"12347\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
+                        .cookie(userCookie)
                         .content(user2)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -170,6 +161,7 @@ public class UserControllerIntegrationTests {
         String user3 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1236\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\", \"middleName\": \"James1234\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
+                        .cookie(userCookie)
                         .content(user3)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -177,12 +169,14 @@ public class UserControllerIntegrationTests {
         String user4 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"12345\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\", \"nickname\": \"James1234\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
+                        .cookie(userCookie)
                         .content(user4)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         MvcResult mvcResult = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/search?searchQuery=James")
+                        .cookie(userCookie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -207,12 +201,13 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        Cookie userCookie = createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
         createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
+                        .cookie(userCookie)
                         .content(user1)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -220,12 +215,14 @@ public class UserControllerIntegrationTests {
         String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
+                        .cookie(userCookie)
                         .content(user2)
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         MvcResult mvcResult = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/search?searchQuery=Jam")
+                        .cookie(userCookie)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -245,22 +242,26 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
+        Cookie userCookie = createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
 
         mockMvc.perform(get("/users/245")
+                .cookie(userCookie)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
 
-    private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
+    private Cookie createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": \"%s\", \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
 
         try {
-            mockMvc.perform(
+            MvcResult result = mockMvc.perform(
                     MockMvcRequestBuilders.post("/users")
                             .content(user)
                             .contentType(APPLICATION_JSON))
-                    .andExpect(status().isCreated());
+                    .andExpect(status().isCreated())
+                    .andReturn();
+
+            return result.getResponse().getCookie("JSESSIONID");
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Request", e);
