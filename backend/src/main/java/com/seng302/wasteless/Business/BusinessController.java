@@ -52,7 +52,7 @@ public class BusinessController {
 
 
         Cookie type = WebUtils.getCookie(request, "JSESSIONID");
-        logger.warn(type);
+
         if (type == null || !type.getValue().contains("USER")) {
             logger.warn("Access token is missing or invalid.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
