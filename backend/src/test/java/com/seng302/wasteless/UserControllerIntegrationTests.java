@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -12,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -87,6 +89,15 @@ public class UserControllerIntegrationTests {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Request", e);
         }
+    }
+
+    @Test
+    public void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
+
+        mockMvc.perform(get("/users/245")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
     }
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
