@@ -203,22 +203,22 @@ export default {
 
     itemsRangeMax() {// 1000 t 1000 p
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
-
+      let maxRange;
       if (this.currentPage === numPages) {
         if (this.totalResults !== this.perPage) {
-          console.log(this.perPage * (this.currentPage));
           if (this.totalResults % this.perPage === 0) {
-            return this.perPage * (this.currentPage);
+            maxRange = this.perPage * (this.currentPage);
           }
-          return this.perPage * (this.currentPage-1) + this.totalResults % this.perPage;
+          maxRange = this.perPage * (this.currentPage-1) + this.totalResults % this.perPage;
         }
         else {
-          return this.totalResults;
+          maxRange = this.totalResults;
         }
       }
       else {
-        return this.perPage * (this.currentPage - 1) + (this.getCurrentPageItems);
+        maxRange = this.perPage * (this.currentPage - 1) + (this.getCurrentPageItems);
       }
+      return maxRange;
     }
   }
 }
