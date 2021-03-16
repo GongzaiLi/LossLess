@@ -151,6 +151,7 @@ export default {
         homeAddress: "",
       },
       userFound: true,
+      demoMode: true
     }
   },
 
