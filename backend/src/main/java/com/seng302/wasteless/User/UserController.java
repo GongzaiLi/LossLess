@@ -47,7 +47,7 @@ public class UserController {
      */
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createUser(@Valid @RequestBody @JsonView(UserViews.PostUserInputView.class) User user) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody @JsonView(UserViews.PostUserRequestView.class) User user) {
 
         //Check user with this email address does not already exist
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
