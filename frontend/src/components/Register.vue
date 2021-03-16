@@ -6,106 +6,107 @@ Date: 3/3/2021
 
 
 <template>
-  <div class="register">
-
-    <h2> Sign Up to Wasteless </h2>
-    <b-form
-      @submit="register"
-      @input="setCustomValidities"
-    >
-      <b-form-group
-        label="First Name *"
+  <div>
+    <b-card class="shadow">
+      <h1> Sign Up to Wasteless </h1>
+      <br>
+      <b-form
+        @submit="register"
+        @input="setCustomValidities"
       >
-        <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="First Name *"
+        >
+          <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-        label="Last Name *"
-      >
-        <b-form-input v-model="lastName" required placeholder="Last Name"></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="Last Name *"
+        >
+          <b-form-input v-model="lastName" required placeholder="Last Name"></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-        label="Middle Name"
-      >
-        <b-form-input v-model="middleName" placeholder="Middle Name"></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="Middle Name"
+        >
+          <b-form-input v-model="middleName" placeholder="Middle Name"></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-        label="Nickname"
-      >
-        <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="Nickname"
+        >
+          <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-        label="Bio"
-      >
-        <b-form-textarea v-model="bio" placeholder="Enter your Bio"></b-form-textarea>
-      </b-form-group>
+        <b-form-group
+          label="Bio"
+        >
+          <b-form-textarea v-model="bio" placeholder="Enter your Bio"></b-form-textarea>
+        </b-form-group>
 
-      <b-form-group
-        label="Email *"
-      >
-        <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="Email *"
+        >
+          <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-        label="Password *"
-      >
-        <b-form-input type="password" required v-model="password" placeholder="Password"></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="Password *"
+        >
+          <b-form-input type="password" required v-model="password" placeholder="Password"></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-        label="Confirm Password *"
-      >
-        <b-form-input type="password" required v-model="confirmPassword" placeholder="Confirm Password" id="confirmPasswordInput" autocomplete="off"></b-form-input>
-      </b-form-group>
+        <b-form-group
+          label="Confirm Password *"
+        >
+          <b-form-input type="password" required v-model="confirmPassword" placeholder="Confirm Password" id="confirmPasswordInput" autocomplete="off"></b-form-input>
+        </b-form-group>
 
-      <b-form-group
-          label="Home Address *"
-      >
-        <address-input v-model="homeAddress"/>
-      </b-form-group>
+        <b-form-group
+            label="Home Address *"
+        >
+          <address-input v-model="homeAddress"/>
+        </b-form-group>
 
-      <b-form-group
-        label="Date of Birth *"
-      >
-        <b-form-input type="date" v-model="dateOfBirth" required
-         placeholder="Date of Birth"
-         autocomplete="off"
-         size=30;
-        />
-      </b-form-group>
+        <b-form-group
+          label="Date of Birth *"
+        >
+          <b-form-input type="date" v-model="dateOfBirth" required
+           placeholder="Date of Birth"
+           autocomplete="off"
+           size=30;
+          />
+        </b-form-group>
 
-      <b-form-group
-        label="Phone Number"
-      >
-        <b-form-input v-model="phoneNumber"
-         placeholder="Phone Number"
-         autocomplete="off"
-         size=30;
-        />
-        <div class="invalid-feedback">Please enter a phone # like 123-456-7890. This field is required.</div>
-      </b-form-group>
-      <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
-    </b-form>
+        <b-form-group
+          label="Phone Number"
+        >
+          <b-form-input v-model="phoneNumber"
+           placeholder="Phone Number"
+           autocomplete="off"
+           size=30;
+          />
+          <div class="invalid-feedback">Please enter a phone # like 123-456-7890. This field is required.</div>
+        </b-form-group>
+        <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
+      </b-form>
+      <br>
+      <div v-if="errors.length">
+        <h5 style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </h5>
+      </div>
+      <h6>
+        Already have an account? <router-link to="/login">Login here</router-link>
+      </h6>
+    </b-card>
     <br>
-    <div v-if="errors.length">
-      <h5 style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </h5>
-    </div>
-    <h6>
-      Already have an account? <router-link to="/login">Login here</router-link>
-    </h6>
 
     <b-form-group
-        class="fixed-bottom"
         label-cols="auto"
         label="Demo Mode"
         label-for="input-horizontal">
       <b-button v-bind:variant="demoVariant" @click="toggle" >{{isDemoMode ? 'ON' : 'OFF'}} </b-button>
     </b-form-group>
   </div>
-
 </template>
 
 <script>
