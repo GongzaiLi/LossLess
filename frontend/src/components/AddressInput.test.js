@@ -1,10 +1,17 @@
-import { shallowMount } from '@vue/test-utils';
+import {createLocalVue, shallowMount} from '@vue/test-utils';
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import AddressInput from './AddressInput'; // name of your Vue component
 
 let wrapper;
 
 beforeEach(() => {
+    const localVue = createLocalVue()
+
+    localVue.use(BootstrapVue);
+    localVue.use(BootstrapVueIcons);
+
     wrapper = shallowMount(AddressInput, {
+        localVue,
         propsData: {},
         mocks: {},
         stubs: {},

@@ -166,7 +166,6 @@ export default {
       const timeElapsed = end - start;
       const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
       const yearsElapsed = Math.floor(daysElapsed / 365);
-      console.log(daysElapsed / 365);
       const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
       return {
         months: monthsElapsed,
