@@ -287,7 +287,7 @@ test('100_total_result-in-20_perPage-in-5_currentPage-to-itemsRangeMax', async (
   wrapper.vm.perPage = 20;
   wrapper.vm.currentPage = 5;
   expect(wrapper.vm.itemsRangeMax)
-    .toBe(80);
+    .toBe(100);
 })
 //Exception itemsRangeMax()
 test('0_total_result-in-0_perPage-in-0_currentPage-to-itemsRangeMax', async () => {
