@@ -40,7 +40,7 @@ public class UserService {
      * Find user by id
      *
      * @param id        The id of the user to find
-     * @return          The found user, if any
+     * @return          The found user, if any, or wise null
      */
     public User findUserById(Integer id) {
         return userRepository.findFirstById(id);

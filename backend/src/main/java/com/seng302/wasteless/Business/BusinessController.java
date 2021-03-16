@@ -2,18 +2,19 @@ package com.seng302.wasteless.Business;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.MainApplicationRunner;
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserService;
-import com.seng302.wasteless.User.UserViews;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class BusinessController {
@@ -25,8 +26,6 @@ public class BusinessController {
     public BusinessController(BusinessService businessService) {
         this.businessService = businessService;
     }
-
-
 
     /**
      * Handle post request to /businesses endpoint for creating businesses
@@ -61,6 +60,48 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+
+    /**
+     * Get and return a business by its id
+     *
+     * @param businessId        The id of the business to get
+     * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
+     */
+    @GetMapping("/businesses/{id}")
+    @JsonView(BusinessViews.GetBusinessView.class)
+    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId) {
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+        logger.info("possible Business{}", possibleBusiness);
+        if (possibleBusiness == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+
+        logger.info("Business: {} retrieved successfully", possibleBusiness);
+        return ResponseEntity.status(HttpStatus.OK).body(possibleBusiness);
+    }
+
+
+
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException exception) {
+        Map<String, String> errors;
+        errors = new HashMap<>();
+        exception.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
 
 
 }

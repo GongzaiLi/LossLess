@@ -22,4 +22,17 @@ public class BusinessService {
     public Business createBusiness(Business business) {
         return businessRepository.save(business);
     }
+
+
+    /**
+     * Find business by id
+     *
+     * @param id        The id of the business to find
+     * @return          The found business, if any, or wise null
+     */
+    public Business findBusinessById(Integer id) {
+        return businessRepository.findFirstById(id);
+    }
+
+
 }

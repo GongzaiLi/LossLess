@@ -5,5 +5,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource
 public interface BusinessRepository extends JpaRepository<Business, Integer> {
+
+    Business findFirstById(Integer id);
 }
 
