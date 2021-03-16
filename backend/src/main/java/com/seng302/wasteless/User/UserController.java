@@ -1,10 +1,10 @@
 package com.seng302.wasteless.User;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.MainApplicationRunner;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.seng302.wasteless.MainApplicationRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,10 +20,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 @RestController
@@ -114,7 +113,7 @@ public class UserController {
                     "Access token is missing or invalid");
         }
 
-        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+        LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
         return ResponseEntity.status(HttpStatus.OK).body(searchResults);
     }
