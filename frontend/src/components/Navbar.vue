@@ -2,19 +2,20 @@
   <b-navbar v-if="!['login', 'register'].includes($route.name)"
     toggleable="lg" type="dark" variant="dark" fixed="top"
   >
-    <b-navbar-brand href="#">NavBar</b-navbar-brand>
+    <b-navbar-brand href="#">Wasteless</b-navbar-brand>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav>
         <b-nav-item v-on:click="my_profile">My Profile</b-nav-item>
         <b-nav-item to="/userSearch">User Search</b-nav-item>
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
             <em>{{getUserRole()}}</em>
           </template>
-          <b-dropdown-item href="#">Profile</b-dropdown-item>
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
