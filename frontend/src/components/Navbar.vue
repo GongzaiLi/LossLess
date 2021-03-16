@@ -43,6 +43,7 @@ export default {
      * Currently does nothing with managing cookies, this needs to be implemented later.
      */
     logOut() {
+      this.$currentUser = null;
       this.$router.push('/login');
     }
   },

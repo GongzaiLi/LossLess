@@ -31,6 +31,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import AuthPlugin from './auth'
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -51,27 +52,9 @@ const options = {
 };
 
 Vue.use(VueLogger, options);
-Vue.use(BootstrapVue)
-Vue.use(BootstrapVueIcons)
-
-/**
- * Author: Caleb
- * below code adapted from stack overflow (link included)
- * creates a global variable by creating another instance of vue
- * mixin makes updates to this variable availble to all Vue instances and components
-https://stackoverflow.com/questions/49256765/change-vue-prototype-variable-in-all-components
- **/
-let globalData = new Vue({
-  data: { $currentUser: 1 } //set to one to test that variable still updates as in testing only user 0 exists
-});
-Vue.mixin({
-  computed: {
-    $currentUser: {
-      get: function () { return globalData.$data.$currentUser },
-      set: function (newUser) { globalData.$data.$currentUser = newUser; }
-    }
-  }
-})
+Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons);
+Vue.use(AuthPlugin);
 
 /* eslint-disable no-new */
 new Vue({
