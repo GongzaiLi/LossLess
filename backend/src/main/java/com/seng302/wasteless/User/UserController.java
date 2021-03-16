@@ -1,6 +1,7 @@
 package org.seng302.example.User;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.User.*;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
