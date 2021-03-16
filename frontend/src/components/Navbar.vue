@@ -14,7 +14,8 @@
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
-            <em>{{getUserRole()}}</em>
+            <b-badge>{{getUserBadgeRole}}</b-badge>
+            <em class="ml-2">{{$currentUser.firstName}}</em>
           </template>
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -37,22 +38,6 @@ export default {
       this.$router.push({path: `/user/${this.$currentUser.id}`});
     },
     /**
-     * User friendly display string for the user role. Converts the user role
-     * string given by the api (eg. 'user', 'globalApplicationAdmin') to
-     * a more user-friendly string to be displayed (eg. 'User', 'Site Admin')
-     */
-    getUserRole: function () {
-      switch (this.$currentUser.role) {
-        case 'globalApplicationAdmin':
-          return "Site Admin";
-        case 'defaultGlobalApplicationAdmin':
-          return "Default Site Admin";
-        default:
-          return this.$currentUser.firstName;
-      }
-
-    },
-    /**
      * Logs out the current user and redirects to the login page.
      * Currently does nothing with managing cookies, this needs to be implemented later.
      */
@@ -61,5 +46,23 @@ export default {
       this.$router.push('/login');
     }
   },
+  computed: {
+    /**
+     * User friendly display string for the user role to be displayed as a badge.
+     * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
+     * a more user-friendly string to be displayed (eg. 'Site Admin').
+     * Returns empty string if they are a normal user, as they have no role worth displaying
+     */
+    getUserBadgeRole: function () {
+      switch (this.$currentUser.role) {
+        case 'globalApplicationAdmin':
+          return "Site Admin";
+        case 'defaultGlobalApplicationAdmin':
+          return "Default Site Admin";
+        default:
+          return "";
+      }
+    },
+  }
 }
 </script>
