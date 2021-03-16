@@ -1,11 +1,14 @@
-package org.seng302.example.User;
+package com.seng302.wasteless.User;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.seng302.example.MainApplicationRunner;
+import com.seng302.wasteless.MainApplicationRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -77,7 +80,12 @@ public class UserController {
         logger.info("saved new user {}", user);
 
         //Todo send back authenticated responses
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", "example")
+                .httpOnly(true)
+                .path("/")
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
 
     }
 
@@ -138,8 +146,8 @@ public class UserController {
     }
 
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
         User savedUser = userService.findUserByEmail(login.getEmail());
@@ -159,7 +167,18 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             } else {
                 logger.info("Account {}, logged into successfully", login.getEmail());
-                return ResponseEntity.status(HttpStatus.OK).build();
+                JSONObject responseBody = new JSONObject();
+                responseBody.put("id", savedUser.getId());
+
+                ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", "example")
+                        .httpOnly(true)
+                        .path("/")
+                        .build();
+
+                return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(responseBody);
+
+
+
                 //   AuthenticatedResponse:
                 //      description: >
                 //        Response returned to client when they have performed an action to gain authentication (registering or logging in).
