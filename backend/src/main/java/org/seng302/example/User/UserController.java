@@ -57,6 +57,15 @@ public class UserController {
 
         user.setCreated(LocalDate.now());
 
+
+        /**
+        ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        UserDetails springUser = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(springUser, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+         */
+
         //Create the users salt
         String salt = encryption.getNextSalt().toString();
         user.setSalt(salt);
