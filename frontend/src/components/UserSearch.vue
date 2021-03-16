@@ -139,7 +139,17 @@ export default {
       };
       for (const user of data) {
         tableHeader = user;
-        tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+        if (this.$currentUser.role != "user" && user.role != "user") {
+          let adminLabel;
+          if (user.role == "globalApplicationAdmin") {
+            adminLabel = "[ADMIN]";
+          } else if (user.role == "defaultGlobalApplicationAdmin") {
+            adminLabel = "[DEFAULT ADMIN]";
+          }
+          tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName} ${adminLabel}`;
+        } else {
+          tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+        }
         items.push(tableHeader);
       }
       return items;
