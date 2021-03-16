@@ -50,7 +50,6 @@ public class BusinessController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
-
         Cookie type = WebUtils.getCookie(request, "JSESSIONID");
 
         if (type == null || !type.getValue().contains("USER")) {

@@ -187,7 +187,8 @@ public class UserController {
         User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to log into an account with an email " +
+                    "that is not registered.");
         } else {
 
             String enteredPassword = login.getPassword();
@@ -198,7 +199,7 @@ public class UserController {
 
             if (!correctPassword) {
                 logger.warn("Attempted to login to account with incorrect password, dropping request: {}", login.getEmail());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have entered an incorrect password.");
             } else {
                 logger.info("Account {}, logged into successfully", login.getEmail());
                 JSONObject responseBody = new JSONObject();
