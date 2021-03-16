@@ -1,7 +1,5 @@
 package com.seng302.wasteless;
 
-import static org.hamcrest.CoreMatchers.is;
-
 import com.seng302.wasteless.Business.BusinessRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +11,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
