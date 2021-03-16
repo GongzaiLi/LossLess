@@ -14,9 +14,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +84,7 @@ public class UserController {
         logger.info("saved new user {}", user);
 
         //Todo send back authenticated responses
-        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", "example")
+        ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", "Example")
                 .httpOnly(true)
                 .path("/")
                 .build();
@@ -99,7 +103,14 @@ public class UserController {
      */
     @GetMapping("/users/search")
     @JsonView(UserViews.SearchUserView.class) //Only return appropriate fields
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
+
+        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
+        if (type != null && !type.getValue().contains("USER")) {
+            logger.warn("Access token is missing or invalid: " + type.getValue());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is missing or invalid");
+        }
 
         Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
@@ -130,9 +141,17 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     @JsonView(UserViews.GetUserView.class)
-    public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
+    public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId, HttpServletRequest request) {
         User possibleUser = userService.findUserById(userId);
         logger.info("possible User{}", possibleUser);
+
+        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
+        if (type != null && !type.getValue().contains("USER")) {
+            logger.warn("Access token is missing or invalid: " + type.getValue());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is missing or invalid");
+        }
+
         if (possibleUser == null) {
             logger.warn("ID does not exist.");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
@@ -170,7 +189,7 @@ public class UserController {
                 JSONObject responseBody = new JSONObject();
                 responseBody.put("id", savedUser.getId());
 
-                ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", "example")
+                ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", savedUser.getId().toString() + "_USER")
                         .httpOnly(true)
                         .path("/")
                         .build();
