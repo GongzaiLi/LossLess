@@ -7,7 +7,7 @@ Date: 5/3/2021
 <template>
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
-      style="max-width: 45rem" no-body
+      class="profile-card shadow" no-body
       v-if="userFound"
     >
       <template #header>
@@ -92,6 +92,11 @@ Date: 5/3/2021
 </template>
 
 <style scoped>
+.profile-card {
+   max-width: 45rem;
+   margin-left: auto;
+   margin-right: auto;
+}
 h6 {
   line-height: 1.4;
 }

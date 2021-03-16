@@ -15,19 +15,22 @@ Date: 7/3/2021
       </b-col>
     </b-row>
     <b-row>
-      <b-col><!--responsive sticky-header="500px"-->
-          <h3 v-if="items.length === 0" class="no-results-overlay" >No results to display</h3>
+      <b-col cols="12"><!--responsive sticky-header="500px"-->
         <b-table striped hover
          table-class="text-nowrap"
-         responsive="sm"
+         responsive="lg"
          no-border-collapse
          bordered
+         stacked="sm"
+         show-empty
          @row-clicked="rowClickHandler"
          :fields="fields"
          :per-page="perPage"
          :items="items"
-         :current-page="currentPage"
-         class="user-search-table">
+         :current-page="currentPage">
+         <template #empty>
+          <h3 class="no-results-overlay" >No results to display</h3>
+        </template>
         </b-table>
       </b-col>
     </b-row>
@@ -43,20 +46,9 @@ Date: 7/3/2021
 </template>
 
 <style>
-.user-search-table {
-  min-height: 36em;
-  table-layout: fixed;
-  border-top: 1px solid #dee2e6;
-  border-left: 3px solid #dee2e6;
-  border-right: 3px solid #dee2e6;
-  border-bottom: 3px solid #dee2e6;
-}
 .no-results-overlay {
-  position:absolute;
-  width:100%;
-  margin-top:9em;
-  height:100%;
-  z-index:999;
+  margin-top:7em;
+  margin-bottom:7em;
   text-align: center;
 }
 </style>

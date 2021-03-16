@@ -9,36 +9,37 @@ Date: 3/3/2021
       You have been successfully registered! Please log in with your email and password.
     </b-alert>
     <b-row class="justify-content-md-center">
-      <b-col class="col-md-5">
+      <b-col class="col-md-7">
+        <b-card class="shadow">
         <h2>Login to Wasteless</h2>
-        <b-form @submit="login">
-          <b-form-group
-            label="Email"
+          <b-form @submit="login">
+            <b-form-group
+              label="Email"
+              >
+              <b-form-input type="email" v-model="email" required
+                     autofocus
+                     autocomplete="off"
+              ></b-form-input>
+            </b-form-group>
+
+            <b-form-group
+                label="Password"
             >
-            <b-form-input type="email" v-model="email" required
-                   autofocus
+              <b-form-input v-model="password" type="password" required
                    autocomplete="off"
-            ></b-form-input>
-          </b-form-group>
+              ></b-form-input>
+            </b-form-group>
+            <b-form-group
+            >
+            <b-button block type="submit" variant="primary" style="margin-top:0.7em">Login</b-button>
+            </b-form-group>
+          </b-form>
 
-          <b-form-group
-              label="Password"
-          >
-            <b-form-input v-model="password" type="password" required
-                 autocomplete="off"
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group
-          >
-          <b-button block type="submit" variant="primary" style="margin-top:0.7em">Login</b-button>
-          </b-form-group>
-        </b-form>
-
-        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}</b-alert>
-        <h6> Don't have an account?
-          <router-link to="/register" >Register Here</router-link>
-        </h6>
-        <br><br>
+          <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}</b-alert>
+          <h6> Don't have an account?
+            <router-link to="/register" >Register Here</router-link>
+          </h6>
+        </b-card>
       </b-col>
     </b-row>
 
@@ -127,6 +128,12 @@ export default {
         this.demoModeLogin();
       }
     },
+    /**
+     * 'Logs' in the user by comparing the email to a bunch of dummy accounts
+     * Password's aren't checked, only the emails admin@sengmail.com, user@sengmail.com
+     * and defaultadmin@sengmail.com will give the dummy accounts
+     * FOR DEMO PURPOSES ONLY!!!!!
+     */
     demoModeLogin() {
       if (this.email === "admin@sengmail.com") {
         this.$currentUser = usersInfo.users[0];

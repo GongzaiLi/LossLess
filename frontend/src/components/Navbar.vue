@@ -1,6 +1,7 @@
 <template>
   <b-navbar v-if="!['login', 'register'].includes($route.name)"
     toggleable="lg" type="dark" variant="dark" fixed="top"
+    class="shadow"
   >
     <b-navbar-brand href="#">Wasteless</b-navbar-brand>
 
