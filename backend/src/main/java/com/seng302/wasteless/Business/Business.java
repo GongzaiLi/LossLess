@@ -17,33 +17,36 @@ import java.util.List;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Business {
 
+    @JsonView({BusinessViews.GetBusinessView.class})
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
 
+    @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "administrators")
-    @OneToMany //Todo this might actually be many to many
+    @OneToMany
     private List<User> administrators;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
     @NotBlank(message = "name is mandatory")
     @Column(name = "name")
     private String name;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
     @Column(name = "description")
     private String description;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
     @NotBlank(message = "address is mandatory")
     @Column(name = "address")
     private String address;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
     @NotBlank(message = "businessType is mandatory")
     @Column(name = "business_type")
     private String businessType;
 
+    @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "created")
     private LocalDate created;
 
