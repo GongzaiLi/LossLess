@@ -1,5 +1,3 @@
-import Vue from 'vue'
-
 /**
  * Author: Caleb, Eric
  * below code adapted from stack overflow (link included)
@@ -11,19 +9,23 @@ import Vue from 'vue'
 https://stackoverflow.com/questions/49256765/change-vue-prototype-variable-in-all-components
  **/
 
-const instance = new Vue({
-    data: { $currentUser: null }
-});
-
-export const getInstance = () => instance;
+/**
+ * Attempts to retrieve the current user from localstorage. A null value
+ * signifies that no current user is logged in.
+ */
+export const getUser = function () {
+    return JSON.parse(localStorage.getItem('currentUser'));
+};
 
 export default {
     install(Vue) {
         Vue.mixin({
             computed: {
                 $currentUser: {
-                    get: function () { return instance.$data.$currentUser },
-                    set: function (newUser) { instance.$data.$currentUser = newUser; }
+                    get: getUser,
+                    set: function (newUser) {
+                        localStorage.setItem('currentUser', JSON.stringify(newUser));
+                    }
                 }
             }
         });
