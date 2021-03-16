@@ -36,8 +36,21 @@ export default {
     my_profile: function () {
       this.$router.push({path: `/user/${this.$currentUser.id}`});
     },
+    /**
+     * User friendly display string for the user role. Converts the user role
+     * string given by the api (eg. 'user', 'globalApplicationAdmin') to
+     * a more user-friendly string to be displayed (eg. 'User', 'Site Admin')
+     */
     getUserRole: function () {
-      return this.$currentUser.role;
+      switch (this.$currentUser.role) {
+        case 'globalApplicationAdmin':
+          return "Site Admin";
+        case 'defaultGlobalApplicationAdmin':
+          return "Default Site Admin";
+        default:
+          return this.$currentUser.firstName;
+      }
+
     },
     /**
      * Logs out the current user and redirects to the login page.
