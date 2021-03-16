@@ -1,5 +1,5 @@
 /*
- * Created on Mon Feb 15 2021
+ * Created on Thu Feb 11 2021
  *
  * The Unlicense
  * This is free and unencumbered software released into the public domain.
@@ -25,36 +25,26 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-package org.seng302.example;
+package com.seng302.wasteless;
 
-import java.io.IOException;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.stereotype.Component;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
- * This class set headers properly for CORS compliance. Global filtering is
- * restrained in {@link Main#corsConfigurer())
+ * Main test class. Testing overall application sanity
  */
-@Component
-public class MainCORSFilter implements Filter {
+@SpringBootTest
+public class MainTests {
 
-  @Override
-  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-      throws IOException, ServletException {
-
-    HttpServletResponse response = (HttpServletResponse) res;
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH, HEAD");
-    response.setHeader("Access-Control-Max-Age", "6000");
-    response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    chain.doFilter(req, res);
+  /**
+   * This test will simply trigger the bootup of the application. Always true if
+   * the application actually start-up (i.e. no config problems)
+   */
+  @Test
+  void contextLoads() {
+    assertTrue(true);
   }
 
 }

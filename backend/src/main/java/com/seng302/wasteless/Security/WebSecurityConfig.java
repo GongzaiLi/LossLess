@@ -1,4 +1,4 @@
-package org.seng302.example.Security;
+package com.seng302.wasteless.Security;
 
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.context.annotation.Bean;

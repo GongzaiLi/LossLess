@@ -1,4 +1,4 @@
-package org.seng302.example.User;
+package com.seng302.wasteless.User;
 
 public class UserViews {
     public interface SearchUserView {};
