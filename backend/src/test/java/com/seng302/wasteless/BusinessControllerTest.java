@@ -35,7 +35,39 @@ public class BusinessControllerTest {
     @Autowired
     private BusinessRepository businessRepository;
 
-   
+    @Test
+    public void whenGetRequestToBusinessAndBusinessExists_thenCorrectBusiness() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        mockMvc.perform(get("/businesses/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("name", is("Business")))
+                .andExpect(jsonPath("description", is("I am a business")));
+    }
+
+    @Test
+    public void whenGetRequestToBusinessAndBusinessNotExists_then406Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        mockMvc.perform(get("/businesses/2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    public void whenGetRequestToBusinessAndMultipleBusinessExists_thenCorrectBusiness() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business2", "Location2", "Non-profit organisation", "I am a business 2");
+
+        mockMvc.perform(get("/businesses/2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name", is("Business2")))
+                .andExpect(jsonPath("description", is("I am a business 2")));
+    }
 
     @Test
     public void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
