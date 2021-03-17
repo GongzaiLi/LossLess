@@ -36,7 +36,9 @@ export default {
   name: "Navbar.vue",
   methods: {
     my_profile: function () {
-      this.$router.push({path: `/user/${this.$currentUser.id}`});
+      if (this.$route.params.id !== this.$currentUser.id.toString() ) {
+        this.$router.push({path: `/user/${this.$currentUser.id}`});
+      }
     },
     /**
      * Logs out the current user and redirects to the login page.

@@ -188,27 +188,19 @@ export default {
       return minRange;
     },
     /**
-     * Author: Nitish Singh
-     * Computes the upper range of items displaying on the table.
+     * Author: Nitish Singh, Eric Song, Caleb Sim
+     * Computes the upper range of items displaying on the table at the current page.
      * @returns {number}
      */
 
-    itemsRangeMax() {// 1000 t 1000 p
+    itemsRangeMax() {
       let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
       let maxRange;
-      if (this.currentPage === numPages) {
-        if (this.totalResults !== this.perPage) {
-          if (this.totalResults % this.perPage === 0) {
-            maxRange = this.perPage * (this.currentPage);
-          }
-          maxRange = this.perPage * (this.currentPage-1) + this.totalResults % this.perPage;
-        }
-        else {
-          maxRange = this.totalResults;
-        }
+      if (this.currentPage === numPages) { // You are on the last page
+        maxRange = this.totalResults; // Upper range is just the last item
       }
-      else {
-        maxRange = this.perPage * (this.currentPage - 1) + (this.getCurrentPageItems);
+      else { // Not on last page
+        maxRange = this.perPage * this.currentPage;
       }
       return maxRange;
     }

@@ -5,7 +5,7 @@ Date: 3/3/2021
 -->
 <template>
   <b-container>
-    <b-alert variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered">
+    <b-alert variant="success" class="fixed-top" dismissible v-if="$route.query.justRegistered" :show="true">
       You have been successfully registered! Please log in with your email and password.
     </b-alert>
     <b-row class="justify-content-md-center">
