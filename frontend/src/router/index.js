@@ -4,13 +4,13 @@ import Login from './../components/Login.vue'
 import Register from './../components/Register.vue'
 import UserProfile from './../components/UserProfile'
 import UserSearch from "../components/UserSearch";
-import {getInstance} from "@/auth"
+import {getUser} from '@/auth'
 
 /**
  * This specifies all routing information used by Vue-Router.
  */
 
-Vue.use(Router)
+Vue.use(Router);
 
 const router = new Router({
     routes: [
@@ -27,7 +27,7 @@ const router = new Router({
  * This applies to all routes except for the login and register routers.
  */
 router.beforeEach((to, _from, next) => {
-    if (!['login', 'register'].includes(to.name) && getInstance().$data.$currentUser == null) {
+    if (!['login', 'register'].includes(to.name) && getUser() == null) {
         next('/login');
     } else {
         next();
