@@ -92,7 +92,7 @@ export default {
     toggle: function() {
       this.isDemoMode = !this.isDemoMode;
     },
-    //Password can hold or show
+    //Password can hidden or shown by clicking button
     showPassword: function (value) {
       this.visiblePassword = !(value === 'show');
     },
@@ -117,7 +117,6 @@ export default {
         password: this.password
       };
       this.errors = [];
-      console.log(loginData);
       api
           .login(loginData)
           .then((response) => {

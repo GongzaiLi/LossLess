@@ -181,11 +181,11 @@ export default {
     toggle: function () {
       this.isDemoMode = !this.isDemoMode;
     },
-    //hold or show the password
+    //Password can hidden or shown by clicking button
     showPassword: function (value) {
       this.visiblePassword = !(value === 'show');
     },
-    //hold or show the ConfirmPassword
+    //ConfirmPassword can hidden or shown by clicking button
     showConfirmPassword: function (value) {
       this.visibleConfirmPassword = !(value === 'show');
     },

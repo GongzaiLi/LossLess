@@ -172,7 +172,6 @@ export default {
      * -the user's id will response the data and keep the data into this.userData
      */
     getUserInfo: function (id) {
-      console.log(id);
       api
           .getUser(id) //
           .then((response) => {
@@ -194,6 +193,7 @@ export default {
         this.userFound = true;
       }
     },
+    //return user to login screen
     logOut: function () {
       this.$router.push({path: '/login'})
     },
@@ -277,6 +277,9 @@ export default {
     adminButtonToggle() {
       return this.userData.role === 'user' ? 'success' : 'danger';
     },
+    /**
+     * calclates in years and months the time since the user account was created
+    */
     memberSince: function () {
       let registeredDate = new Date(this.userData.created);
       const timeElapsed = this.getMonthsAndYearsBetween(registeredDate, Date.now());
@@ -332,7 +335,6 @@ export default {
     /* The argument _from is not needed, so this is to stop eslint complaining:*/
     /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
     $route(to, _from) {
-      console.log(to);
       const userId = to.params.id;
       this.getUserInfo(userId);
     },
