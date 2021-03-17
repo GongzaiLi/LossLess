@@ -13,30 +13,27 @@ Date: 3/3/2021
         <b-card class="shadow">
         <h2>Login to Wasteless</h2>
           <b-form @submit="login">
-            <b-form-group
-              label="Email"
-              >
+            <b-form-group>
+              <b>Email</b>
               <b-form-input type="email" v-model="email" required
                      autofocus
                      autocomplete="off"
               ></b-form-input>
             </b-form-group>
 
-            <b-form-group
-                label="Password"
-            >
+            <b-form-group>
+              <b>Password</b>
               <div class="input-group mb-2 mr-sm-2">
                 <b-form-input v-if="visiblePassword"
                               type="text" required
                               v-model=password
                               class="form-control"
-                              autofocus
                               autocomplete="off"/>
                 <b-form-input v-else-if="!visiblePassword"
                               type="password" required
                               v-model=password
                               class="form-control"
-                              autofocus autocomplete="off"/>
+                              autocomplete="off"/>
                 <div class="input-group-prepend">
                   <div class="input-group-text" v-if="!visiblePassword">
                     <b-icon-eye-fill @click="showPassword"/>
