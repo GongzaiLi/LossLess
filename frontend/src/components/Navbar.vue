@@ -15,8 +15,8 @@
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
-            <b-badge>{{getUserBadgeRole}}</b-badge>
-            <em class="ml-2">{{$currentUser.firstName}}</em>
+            <b-badge>{{getUserBadgeRole()}}</b-badge>
+            <em class="ml-2">{{user().firstName}}</em>
           </template>
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import {getUser} from '@/auth'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -36,7 +37,7 @@ export default {
   name: "Navbar.vue",
   methods: {
     my_profile: function () {
-      if (this.$route.params.id !== this.$currentUser.id.toString() ) {
+      if (this.$route.params.id !== this.$currentUser.id.toString()) {
         this.$router.push({path: `/user/${this.$currentUser.id}`});
       }
     },
@@ -47,9 +48,10 @@ export default {
     logOut() {
       this.$currentUser = null;
       this.$router.push('/login');
-    }
-  },
-  computed: {
+    },
+    user() {
+      return getUser();
+    },
     /**
      * User friendly display string for the user role to be displayed as a badge.
      * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
@@ -57,7 +59,7 @@ export default {
      * Returns empty string if they are a normal user, as they have no role worth displaying
      */
     getUserBadgeRole: function () {
-      switch (this.$currentUser.role) {
+      switch (getUser().role) {
         case 'globalApplicationAdmin':
           return "Site Admin";
         case 'defaultGlobalApplicationAdmin':

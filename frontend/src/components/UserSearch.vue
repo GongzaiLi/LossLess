@@ -64,25 +64,6 @@ export default {
       perPage: 10,
       currentPage: 1,
       items: [],
-      fields: [
-        {
-          key: 'name',
-          //label: 'F name',
-          sortable: true
-        },
-        {
-          key: 'nickname',
-          sortable: true
-        },
-        {
-          key: 'email',
-          sortable: true
-        },
-        {
-          key: 'homeAddress',
-          sortable: true
-        }
-      ]
     }
   },
   methods: {
@@ -131,14 +112,17 @@ export default {
       };
       for (const user of data) {
         tableHeader = user;
-        if (this.$currentUser.role != "user" && user.role != "user") {
-          let adminLabel;
+        if (this.$currentUser.role != "user") {
+          let roleLabel;
           if (user.role == "globalApplicationAdmin") {
-            adminLabel = "[ADMIN]";
+            roleLabel = "ADMIN";
           } else if (user.role == "defaultGlobalApplicationAdmin") {
-            adminLabel = "[DEFAULT ADMIN]";
+            roleLabel = "DEFAULT ADMIN";
+          } else {
+            roleLabel = "USER";
           }
-          tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName} ${adminLabel}`;
+          tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+          tableHeader.userType = `${roleLabel}`;
         } else {
           tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
         }
@@ -186,6 +170,35 @@ export default {
         maxRange = this.perPage * this.currentPage;
       }
       return maxRange;
+    },
+
+    fields() {
+      let fields = [
+        {
+          key: 'name',
+          //label: 'F name',
+          sortable: true
+        },
+        {
+          key: 'nickname',
+          sortable: true
+        },
+        {
+          key: 'email',
+          sortable: true
+        },
+        {
+          key: 'homeAddress',
+          sortable: true
+        }
+      ];
+      if (this.$currentUser.role !== 'user') {
+        fields.push({
+              key: 'userType',
+              sortable: true
+        });
+      }
+      return fields;
     }
   }
 }
