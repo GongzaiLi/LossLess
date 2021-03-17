@@ -55,9 +55,8 @@ Date: 3/3/2021
         </b-card>
       </b-col>
     </b-row>
-
+    <br><br>
     <b-form-group
-        class="fixed-bottom"
         label-cols="auto"
         label="Demo Mode"
         label-for="input-horizontal">
