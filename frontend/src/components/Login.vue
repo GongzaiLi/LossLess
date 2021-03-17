@@ -25,9 +25,28 @@ Date: 3/3/2021
             <b-form-group
                 label="Password"
             >
-              <b-form-input v-model="password" type="password" required
-                   autocomplete="off"
-              ></b-form-input>
+              <div class="input-group mb-2 mr-sm-2">
+                <b-form-input v-if="visiblePassword"
+                              type="text" required
+                              v-model=password
+                              class="form-control"
+                              autofocus
+                              autocomplete="off"/>
+                <b-form-input v-else-if="!visiblePassword"
+                              type="password" required
+                              v-model=password
+                              class="form-control"
+                              autofocus autocomplete="off"/>
+                <div class="input-group-prepend">
+                  <div class="input-group-text" v-if="!visiblePassword">
+                    <b-icon-eye-fill @click="showPassword"/>
+                  </div>
+                  <div class="input-group-text" v-else-if="visiblePassword">
+                    <b-icon-eye-slash-fill @click="showPassword('show')"/>
+                  </div>
+                </div>
+              </div>
+
             </b-form-group>
             <b-form-group
             >
@@ -66,6 +85,7 @@ export default {
       email: null,
       password: "",
       isDemoMode: true,
+      visiblePassword: false
     }
   },
   computed: {
@@ -78,6 +98,10 @@ export default {
     // toggle the demo mode variable when button clicked
     toggle: function() {
       this.isDemoMode = !this.isDemoMode;
+    },
+    //Password can hold or show
+    showPassword: function (value) {
+      this.visiblePassword = !(value === 'show');
     },
     /**
      * only called if form page passes submit criteria

@@ -15,62 +15,102 @@ Date: 3/3/2021
         @input="setCustomValidities"
       >
         <b-form-group
-          label="First Name *"
         >
+          <b>First Name *</b>
           <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
-          label="Last Name *"
         >
+          <b>Last Name *</b>
           <b-form-input v-model="lastName" required placeholder="Last Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
-          label="Middle Name"
         >
+          <b>Middle Name</b>
           <b-form-input v-model="middleName" placeholder="Middle Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
-          label="Nickname"
         >
+          <b>Nickname</b>
           <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
-          label="Bio"
         >
+          <b>Bio</b>
           <b-form-textarea v-model="bio" placeholder="Enter your Bio"></b-form-textarea>
         </b-form-group>
 
         <b-form-group
-          label="Email *"
         >
+          <b>Email *</b>
           <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
         </b-form-group>
 
-        <b-form-group
-          label="Password *"
-        >
-          <b-form-input type="password" required v-model="password" placeholder="Password"></b-form-input>
+        <b-form-group>
+          <b>Password *</b>
+          <div class="input-group mb-2 mr-sm-2">
+            <b-form-input v-if="visiblePassword"
+                          type="text" required
+                          v-model=password
+                          class="form-control"
+                          placeholder="Password"></b-form-input>
+            <b-form-input v-else-if="!visiblePassword"
+                          type="password" required
+                          v-model=password
+                          class="form-control"
+                          placeholder="Password"></b-form-input>
+            <div class="input-group-prepend">
+              <div class="input-group-text" v-if="!visiblePassword">
+                <b-icon-eye-fill @click="showPassword"></b-icon-eye-fill>
+              </div>
+              <div class="input-group-text" v-else-if="visiblePassword">
+                <b-icon-eye-slash-fill @click="showPassword('show')"></b-icon-eye-slash-fill>
+              </div>
+            </div>
+          </div>
+        </b-form-group>
+
+        <b-form-group>
+          <b>Confirm Password *</b>
+          <div class="input-group mb-2 mr-sm-2">
+            <b-form-input v-if="visibleConfirmPassword"
+                          type="text" required
+                          v-model=confirmPassword
+                          class="form-control"
+                          id="confirmPasswordInput"
+                          placeholder="Confirm Password"
+                          autocomplete="off"/>
+            <b-form-input v-else-if="!visibleConfirmPassword"
+                          type="password" required
+                          v-model=confirmPassword
+                          class="form-control"
+                          id="confirmPasswordInput"
+                          placeholder="Confirm Password"
+                          autocomplete="off"/>
+            <div class="input-group-prepend">
+              <div class="input-group-text" v-if="!visibleConfirmPassword">
+                <b-icon-eye-fill @click="showConfirmPassword"/>
+              </div>
+              <div class="input-group-text" v-else-if="visibleConfirmPassword">
+                <b-icon-eye-slash-fill @click="showConfirmPassword('show')"/>
+              </div>
+            </div>
+          </div>
         </b-form-group>
 
         <b-form-group
-          label="Confirm Password *"
         >
-          <b-form-input type="password" required v-model="confirmPassword" placeholder="Confirm Password" id="confirmPasswordInput" autocomplete="off"></b-form-input>
-        </b-form-group>
-
-        <b-form-group
-            label="Home Address *"
-        >
+          <b>Home Address *</b>
           <address-input v-model="homeAddress"/>
         </b-form-group>
 
         <b-form-group
-          label="Date of Birth *"
         >
+          <b>Date of Birth *</b>
           <b-form-input type="date" v-model="dateOfBirth" required
            placeholder="Date of Birth"
            autocomplete="off"
@@ -79,8 +119,8 @@ Date: 3/3/2021
         </b-form-group>
 
         <b-form-group
-          label="Phone Number"
         >
+          <b>Phone Number</b>
           <b-form-input v-model="phoneNumber"
            placeholder="Phone Number"
            autocomplete="off"
@@ -132,11 +172,21 @@ export default {
       "confirmPassword": "",
       isDemoMode: true,
       errors: [],
+      visiblePassword: false,
+      visibleConfirmPassword: false
     }
   },
   methods: {
     toggle: function () {
       this.isDemoMode = !this.isDemoMode;
+    },
+    //hold or show the password
+    showPassword: function (value) {
+      this.visiblePassword = !(value === 'show');
+    },
+    //hold or show the ConfirmPassword
+    showConfirmPassword: function (value) {
+      this.visibleConfirmPassword = !(value === 'show');
     },
 
     getRegisterData() {
