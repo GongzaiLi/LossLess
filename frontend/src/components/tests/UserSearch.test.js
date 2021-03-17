@@ -94,10 +94,10 @@ test('100_total_result-in-20_perPage-in-5_currentPage-to-itemsRangeMin', async (
     .toBe(81);
 })
 //Exception itemsRangeMin()
-test('0_total_result-in-0_perPage-in-0_currentPage-to-itemsRangeMin', async () => {
+test('0_total_result-in-0_perPage-in-1_currentPage-to-itemsRangeMin', async () => {
   wrapper.vm.totalResults = 0;
   wrapper.vm.perPage = 0;
-  wrapper.vm.currentPage = 0;
+  wrapper.vm.currentPage = 1;
   expect(parseInt(wrapper.vm.itemsRangeMin))
     .toEqual(0);
 })
@@ -162,10 +162,10 @@ test('100_total_result-in-20_perPage-in-5_currentPage-to-itemsRangeMax', async (
     .toBe(100);
 })
 //Exception itemsRangeMax()
-test('0_total_result-in-0_perPage-in-0_currentPage-to-itemsRangeMax', async () => {
+test('0_total_result-in-0_perPage-in-1_currentPage-to-itemsRangeMax', async () => {
   wrapper.vm.totalResults = 0;
   wrapper.vm.perPage = 0;
-  wrapper.vm.currentPage = 0;
+  wrapper.vm.currentPage = 1;
   expect(parseInt(wrapper.vm.itemsRangeMax))
     .toEqual(0);
 })
