@@ -159,23 +159,6 @@ export default {
 
     /**
      * Author: Nitish Singh
-     * Computes current number of items displaying on the table.
-     * @returns {number}
-     */
-    getCurrentPageItems() {
-      let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
-
-      if (this.currentPage === numPages) {
-        return this.totalResults % this.perPage;
-      } else if (this.totalResults === 0) {
-        return 0;
-      } else {
-        return this.perPage;
-      }
-    },
-
-    /**
-     * Author: Nitish Singh
      * Computes the lower range of items displaying on the table.
      * Ranges (indexes) starts from 1, so plus 1
      * @returns {number}
