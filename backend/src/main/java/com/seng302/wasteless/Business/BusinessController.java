@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.User.UserViews;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,8 @@ public class BusinessController {
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
         business.setAdministrators(adminList);
-        
+        user.addPrimaryBusiness(business);
+
         logger.info("business was {}", business);
 
         //Validate business type
@@ -101,7 +103,7 @@ public class BusinessController {
      * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
      */
     @GetMapping("/businesses/{id}")
-    @JsonView(BusinessViews.GetBusinessView.class)
+    @JsonView({BusinessViews.GetBusinessView.class})
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
         Cookie type = WebUtils.getCookie(request, "JSESSIONID");

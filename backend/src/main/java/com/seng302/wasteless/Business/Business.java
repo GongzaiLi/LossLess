@@ -2,6 +2,7 @@ package com.seng302.wasteless.Business;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.User.User;
+import com.seng302.wasteless.User.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -17,7 +18,7 @@ import java.util.List;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Business {
 
-    @JsonView({BusinessViews.GetBusinessView.class})
+    @JsonView({BusinessViews.GetBusinessView.class, UserViews.GetUserView.class})
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
