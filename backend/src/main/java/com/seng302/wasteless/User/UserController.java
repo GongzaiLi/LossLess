@@ -56,7 +56,7 @@ public class UserController {
         //Check user with this email address does not already exist
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
         }
 
         if (!user.checkDateOfBirthValid()) {
@@ -84,13 +84,16 @@ public class UserController {
 
         logger.info("saved new user {}", user);
 
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("id", user.getId());
+
         //Todo send back authenticated responses
         ResponseCookie responseCookie = ResponseCookie.from("JSESSIONID", user.getId().toString() + "_USER")
                 .httpOnly(true)
                 .path("/")
                 .build();
 
-        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).build();
+        return ResponseEntity.status(HttpStatus.CREATED).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(responseBody);
 
     }
 
