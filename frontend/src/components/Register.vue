@@ -132,7 +132,7 @@ Date: 3/3/2021
       </b-form>
       <br>
       <div v-if="errors.length">
-        <h5 style="color:#ff0000" v-for="error in errors" v-bind:key="error" id="error-txt">{{ error }} </h5>
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }} </b-alert>
       </div>
       <h6>
         Already have an account? <router-link to="/login">Login here</router-link>
@@ -152,6 +152,7 @@ Date: 3/3/2021
 <script>
 import api from "@/Api";
 import AddressInput from "@/components/AddressInput";
+import usersInfo from "@/components/data/usersDate.json";
 
 export default {
   components: {
@@ -230,9 +231,13 @@ export default {
 
       api
         .login(registerData)
-        .then(() => {
+        .then((loginResponse) => {
           this.$log.debug("Registered");
-          this.$router.push({path: '/login', query: { justRegistered: true }});
+          return api.getUser(loginResponse.userId);
+        })
+        .then((userResponse) => {
+          this.$currentUser = userResponse.data;
+          this.$router.push({path: `/users/${userResponse.data.id}`});
         })
         .catch((error) => {
           this.errors = [];
@@ -244,7 +249,8 @@ export default {
           }
         });
       if (this.isDemoMode) {
-        this.$router.push({path: '/login', query: { justRegistered: true }});
+        this.$currentUser = usersInfo.users[1];
+        this.$router.push({path: '/user/1'});
       }
     },
   },

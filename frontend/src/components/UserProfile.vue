@@ -172,6 +172,7 @@ export default {
      * -the user's id will response the data and keep the data into this.userData
      */
     getUserInfo: function (id) {
+      console.log(id);
       api
           .getUser(id) //
           .then((response) => {

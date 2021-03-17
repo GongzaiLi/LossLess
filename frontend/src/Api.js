@@ -40,7 +40,7 @@ const instance = axios.create({
 export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
   register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
-  getUser: (searchParameter) => instance.get('users/' + searchParameter, {withCredentials: true}),
+  getUser: (userId) => instance.get('users/' + userId, {withCredentials: true}),
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),

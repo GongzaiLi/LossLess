@@ -148,7 +148,6 @@ export default {
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
       this.$emit('input', this.address);
-      console.log("DSFDSFDSF");
       if (!this.awaitingSearch) {
         setTimeout(() => {
           this.queryAddressAutocomplete();
@@ -169,7 +168,6 @@ export default {
         return;
       }
       this.showAutocompleteDropdown = true;
-      console.log(this.address);
       const addressQueryString = this.address.replace(/\s/gm," ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
       this.addressResults = [];
