@@ -1,6 +1,14 @@
 # Seng302 Team 20 Project
 
-Basic project template using `gradle`, `npm`, `Spring Boot`, `Vue.js` and `Gitlab CI`.
+## Demo / Testing info
+There are three test accounts on the system. The emails are:
+- ` admin@sengmail.com`
+- ` user@sengmail.com`
+- ` defaultadmin@sengmail.com`
+
+Currently, any password works for those accounts. Logging in with any other email will fail.
+
+We recommend you keep the 'Demo mode' switch turned ON. Turning it off will cause all API errors to be show. Thus errors will constantly be shown as the backend does not exist yet.
 
 ## Basic Project Structure
 
