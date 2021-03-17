@@ -28,26 +28,22 @@
 /**
  * Declare all available services here
  */
-import axios from 'axios'  
-  
+import axios from 'axios'
+
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
-const instance = axios.create({  
+const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 1000  
-});  
-  
-export default {  
-  // (C)reate  
-  createNew: (firstName, lastName) => instance.post('students', {firstName, lastName}),  
-  // (R)ead  
-  getAll: () => instance.get('students', {  
-    transformResponse: [function (data) {  
-      return data? JSON.parse(data)._embedded.students : data;  
-    }]  
-  }),  
-  // (U)pdate  
-  updateForId: (id, firstName, lastName) => instance.put('students/'+id, {firstName, lastName}), 
-  // (D)elete  
-  removeForId: (id) => instance.delete('students/'+id)  
+  timeout: 1000
+});
+
+export default {
+  login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
+  register: (registerData) => instance.post('register', registerData, {withCredentials: true}),
+  getUser: (userId) => instance.get('users/' + userId, {withCredentials: true}),
+  makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
+  revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
+  searchUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),
+
+
 }

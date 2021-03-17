@@ -30,6 +30,12 @@
  */
 import Vue from 'vue'
 import App from './App'
+import router from './router'
+import AuthPlugin from './auth'
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
 
 Vue.config.productionTip = false
 
@@ -46,9 +52,13 @@ const options = {
 };
 
 Vue.use(VueLogger, options);
+Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons);
+Vue.use(AuthPlugin);
 
 /* eslint-disable no-new */
 new Vue({
+  router,
   el: '#app',
   components: { App },
   template: '<App/>'
