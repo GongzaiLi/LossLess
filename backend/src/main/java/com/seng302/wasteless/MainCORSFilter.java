@@ -1,5 +1,5 @@
 /*
- * Created on Thu Feb 11 2021
+ * Created on Mon Feb 15 2021
  *
  * The Unlicense
  * This is free and unencumbered software released into the public domain.
@@ -25,26 +25,36 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-package org.seng302.example;
+package com.seng302.wasteless;
 
-import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 /**
- * This component requires to expose ID from JPA objects since Spring Data Rest
- * does not by default.
- * 
- * For example purpose only, Data REST is discouraged.
+ * This class set headers properly for CORS compliance. Global filtering is
+ * restrained in {@link Main#corsConfigurer())
  */
 @Component
-public class StudentRepositoryConfigurer implements RepositoryRestConfigurer {
+public class MainCORSFilter implements Filter {
 
   @Override
-  public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry registry) {
-    config.exposeIdsFor(Student.class);
+  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+      throws IOException, ServletException {
+
+    HttpServletResponse response = (HttpServletResponse) res;
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH, HEAD");
+    response.setHeader("Access-Control-Max-Age", "6000");
+    response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    chain.doFilter(req, res);
   }
 
 }

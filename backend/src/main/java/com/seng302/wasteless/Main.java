@@ -25,7 +25,7 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-package org.seng302.example;
+package com.seng302.wasteless;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,6 +56,7 @@ public class Main {
   public static void main(String[] args) {
     logger.info("-- booting up application --");
     SpringApplication.run(Main.class, args);
+
   }
 
   /**

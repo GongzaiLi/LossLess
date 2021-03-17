@@ -1,5 +1,5 @@
 /*
- * Created on Thu Feb 11 2021
+ * Created on Wed Feb 10 2021
  *
  * The Unlicense
  * This is free and unencumbered software released into the public domain.
@@ -25,26 +25,40 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-package org.seng302.example;
+package com.seng302.wasteless;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 
 /**
- * Main test class. Testing overall application sanity
+ * This spring component runs at application startup to do some initialisation
+ * work.
  */
-@SpringBootTest
-public class MainTests {
+@Component
+public class MainApplicationRunner implements ApplicationRunner {
+
+  private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
   /**
-   * This test will simply trigger the bootup of the application. Always true if
-   * the application actually start-up (i.e. no config problems)
+   * This constructor is implicitly called by Spring (purpose of the @Autowired
+   * annotation). Injected constructors can be supplied with instances of other
+   * classes (i.e. dependency injection)
    */
-  @Test
-  void contextLoads() {
-    assertTrue(true);
+  @Autowired
+  public MainApplicationRunner() {
+  }
+
+  /**
+   * By overriding the run method, we tell Spring to run this code at startup. See
+   * https://dzone.com/articles/spring-boot-applicationrunner-and-commandlinerunne
+   */
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+      logger.info("Startup application with {}", args);
   }
 
 }
