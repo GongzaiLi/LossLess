@@ -230,7 +230,7 @@ export default {
       console.log(registerData);
 
       api
-        .login(registerData)
+        .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");
           return api.getUser(loginResponse.userId);
