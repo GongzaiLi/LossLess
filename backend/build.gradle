@@ -34,7 +34,7 @@ plugins {
     id 'org.sonarqube' version '3.0'
 }
 
-group = 'Team 20'
+group = 'Team 8'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
@@ -55,9 +55,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
     // ability to expose RESTFul services (with controllers)
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // ability to validate requests
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     // security starter package
-    //implementation 'org.springframework.boot:spring-boot-starter-security'
-    //implementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-test'
     // connector to mariadb (mysql) database
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.7.2'
     // ability to use in-memory database (for testing only)

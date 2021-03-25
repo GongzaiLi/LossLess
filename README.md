@@ -1,14 +1,6 @@
-# Seng302 Team 20 Project
+# Seng302 Team 8 Wasteless Project
 
-## Demo / Testing info
-There are three test accounts on the system. The emails are:
-- ` admin@sengmail.com`
-- ` user@sengmail.com`
-- ` defaultadmin@sengmail.com`
-
-Currently, any password works for those accounts. Logging in with any other email will fail.
-
-We recommend you keep the 'Demo mode' switch turned ON. Turning it off will cause all API errors to be show. Thus errors will constantly be shown as the backend does not exist yet.
+Basic project template using `gradle`, `npm`, `Spring Boot`, `Vue.js` and `Gitlab CI`.
 
 ## Basic Project Structure
 
@@ -40,6 +32,12 @@ Running on: http://localhost:9500/ by default
 
 Running on: http://localhost:9499/ by default
 
+## Todo (S1)
+
+- Add team name into `build.gradle` and `package.json`
+- Update this README title (DONE)
+- Update this README contributors (DONE)
+
 ## Todo (S2)
 
 - Update team name into `build.gradle` and `package.json`
@@ -51,11 +49,10 @@ Running on: http://localhost:9499/ by default
 ## Contributors
 
 - SENG302 teaching team
-- Eric Song
-- Caleb Sim
-- Gongzai Li
-- Nitish Singh
-- Phil Taylor
+- Arish Myckel Abalos
+- Marcus Brorens
+- Oliver Cranshaw
+- James Harris
 
 ## References
 
