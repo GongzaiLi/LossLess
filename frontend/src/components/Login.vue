@@ -71,6 +71,7 @@ Date: 3/3/2021
 import api from "../Api";
 import usersInfo from './data/usersDate.json';
 
+
 export default {
   data: function () {
     return {
@@ -122,7 +123,7 @@ export default {
           .then((response) => {
             this.$log.debug("Logged in");
             //set global variable of logged in user
-            //this.$currentUser.set(response.id);
+            this.$setCurrentUser(response.data.id);
             // Go to profile page
             this.goToUserProfilePage(response.data.id);
           })

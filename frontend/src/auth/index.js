@@ -17,15 +17,14 @@ export const getUser = function () {
     return JSON.parse(localStorage.getItem('currentUser'));
 };
 
+
 export default {
     install(Vue) {
         Vue.mixin({
-            computed: {
-                $currentUser: {
-                    get: getUser,
-                    set: function (newUser) {
-                        localStorage.setItem('currentUser', JSON.stringify(newUser));
-                    }
+            methods: {
+                $getCurrentUser: getUser,
+                $setCurrentUser: function (newUser) {
+                    return localStorage.setItem('currentUser', newUser);
                 }
             }
         });
