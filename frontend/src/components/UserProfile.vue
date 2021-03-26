@@ -138,7 +138,7 @@ h6 {
 
 <script>
 import api from "../Api";
-// import usersInfo from './data/usersDate.json';
+import usersInfo from './data/usersDate.json';
 
 export default {
   data: function () {
@@ -174,25 +174,20 @@ export default {
       api
           .getUser(id) //
           .then((response) => {
-            console.log(response, "------------------------------------");
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
             this.userFound = true;
           })
           .catch((error) => {
             this.$log.debug(error);
-            this.userFound = false;
+            //todo uncomment when backend working
+            //this.userFound = false;
           })
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
-      /**
-      if (id >= usersInfo.users.length) {
-        this.userFound = false;
-      } else {
-        this.userData = usersInfo.users[id];
-        this.userFound = true;
-      }
-       **/
+      //todo DELETE ONCE BACKEND WORKING, or put in if statement
+      this.userData = usersInfo.users[id];
+      this.userFound = true;
     },
     //return user to login screen
     logOut: function () {

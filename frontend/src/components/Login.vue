@@ -164,7 +164,7 @@ export default {
         this.errors.push("The given username or password is incorrect.");
         return;
       }
-      this.goToUserProfilePage(this.$currentUser.id);
+      this.goToUserProfilePage(this.$getCurrentUser().id);
     },
     /**
      * Redirects to the profile page of the user with the specified userId.
