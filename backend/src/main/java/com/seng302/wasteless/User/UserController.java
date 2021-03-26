@@ -170,6 +170,35 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
     }
 
+
+    /**
+     * Endpoint to make a specified user an admin. Sets user role to GLOBAL_APPLICATION_ADMIN
+     * if successful. Returns 406 NOT_ACCEPTABLE status if the user id does not exist.
+     * Returns 403 FORBIDDEN if the user making the request is not an admin.
+     * @param userId The id of the user to be made an admin
+     * @return 200 OK, 406 Not Acceptable, 403 Forbidden
+     */
+    @PutMapping("/users/{id}/makeAdmin")
+    public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId) {
+
+        //Todo authentication
+
+        User possibleUser = userService.findUserById(userId);
+        logger.info("possible User{}", possibleUser);
+
+        if (possibleUser == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+
+        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+
+
     /**
      * Takes an inputed username and password and checks the credentials against the database of saved users.
      * Returns either a bad request response or an authenticated ok response with a JSESSIONID cookie.
