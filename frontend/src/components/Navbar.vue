@@ -37,8 +37,8 @@ export default {
   name: "Navbar.vue",
   methods: {
     my_profile: function () {
-      if (this.$route.params.id !== this.$currentUser.id.toString()) {
-        this.$router.push({path: `/user/${this.$currentUser.id}`});
+      if (this.$route.params.id !== this.$getCurrentUser().id.toString()) {
+        this.$router.push({path: `/user/${this.$getCurrentUser().id}`});
       }
     },
     /**
@@ -46,7 +46,7 @@ export default {
      * Currently does nothing with managing cookies, this needs to be implemented later.
      */
     logOut() {
-      this.$currentUser = null;
+      this.$setCurrentUser(null);
       this.$router.push('/login');
     },
     user() {

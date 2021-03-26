@@ -112,11 +112,11 @@ export default {
       };
       for (const user of data) {
         tableHeader = user;
-        if (this.$currentUser.role != "user") {
+        if (this.$getCurrentUser().role !== "user") {
           let roleLabel;
-          if (user.role == "globalApplicationAdmin") {
+          if (user.role === "globalApplicationAdmin") {
             roleLabel = "ADMIN";
-          } else if (user.role == "defaultGlobalApplicationAdmin") {
+          } else if (user.role === "defaultGlobalApplicationAdmin") {
             roleLabel = "DEFAULT ADMIN";
           } else {
             roleLabel = "USER";
@@ -192,7 +192,7 @@ export default {
           sortable: true
         }
       ];
-      if (this.$currentUser.role !== 'user') {
+      if (this.$getCurrentUser().role !== 'user') {
         fields.push({
               key: 'userType',
               sortable: true

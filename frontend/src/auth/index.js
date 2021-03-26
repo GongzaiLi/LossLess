@@ -24,7 +24,7 @@ export default {
             methods: {
                 $getCurrentUser: getUser,
                 $setCurrentUser: function (newUser) {
-                    return localStorage.setItem('currentUser', newUser);
+                    return localStorage.setItem('currentUser', JSON.stringify(newUser));
                 }
             }
         });

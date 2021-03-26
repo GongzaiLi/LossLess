@@ -122,10 +122,12 @@ export default {
           .login(loginData)
           .then((response) => {
             this.$log.debug("Logged in");
-            //set global variable of logged in user
-            this.$setCurrentUser(response.data.id);
+            return api.getUser(response.data.id);
+          })
+          .then((userResponse) => {
+            this.$setCurrentUser(userResponse.data);
             // Go to profile page
-            this.goToUserProfilePage(response.data.id);
+            this.goToUserProfilePage(userResponse.data.id);
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -153,11 +155,11 @@ export default {
      */
     demoModeLogin() {
       if (this.email === "admin@sengmail.com") {
-        this.$currentUser = usersInfo.users[0];
+        this.$setCurrentUser(usersInfo.users[0]);
       } else if (this.email === "user@sengmail.com") {
-        this.$currentUser = usersInfo.users[1];
+        this.$setCurrentUser(usersInfo.users[1]);
       } else if (this.email === "defaultadmin@sengmail.com") {
-        this.$currentUser = usersInfo.users[2];
+        this.$setCurrentUser(usersInfo.users[2]);
       } else {
         this.errors.push("The given username or password is incorrect.");
         return;
