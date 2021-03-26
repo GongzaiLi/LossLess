@@ -1,7 +1,7 @@
 <!--
 Page for users to input their information for registration
-Authors: Nitish Singh, Eric Song
-Date: 3/3/2021
+Authors: Nitish Singh, Arish Abalos
+Date: 26/3/2021
 -->
 
 
@@ -70,7 +70,7 @@ Date: 3/3/2021
 </template>
 
 <script>
-//import api from "@/Api";
+import api from "@/Api";
 import AddressInput from "@/components/AddressInput";
 import usersInfo from "@/components/data/usersDate.json";
 
@@ -123,26 +123,25 @@ export default {
       let businessData = this.getBusinessData();
       console.log(businessData);
 
-      //To do
-      // api
-      //   .register(businessData)
-      //   .then((loginResponse) => {
-      //     this.$log.debug("Registered");
-      //     return api.getUser(loginResponse.userId);
-      //   })
-      //   .then((userResponse) => {
-      //     this.$currentUser = userResponse.data;
-      //     this.$router.push({path: `/users/${userResponse.data.id}`});
-      //   })
-      //   .catch((error) => {
-      //     this.errors = [];
-      //     this.$log.debug(error);
-      //     if ((error.response && error.response.status === 400)) {
-      //       this.errors.push("Registration failed.");
-      //     } else {
-      //       this.errors.push(error.message);
-      //     }
-      //   });
+      api
+        .createBusiness(businessData)
+        .then((createResponse) => {
+          this.$log.debug("Business Created");
+          return api.getUser(createResponse.data.id);
+        })
+        .then((businessResponse) => {
+          this.$currentUser = businessResponse.data;
+          this.$router.push({path: `/business/${businessResponse.data.id}`});
+        })
+        .catch((error) => {
+          this.errors = [];
+          this.$log.debug(error);
+          if ((error.response && error.response.status === 401)) {
+            this.errors.push("Access token is missing or invalid");
+          } else {
+            this.errors.push(error.message);
+          }
+        });
       if (this.isDemoMode) {
         this.$currentUser = usersInfo.users[1];
         this.$router.push({path: '/user/1'});

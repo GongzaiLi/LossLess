@@ -224,6 +224,7 @@ export default {
      * The parameter event is passed
      */
     register(event) {
+      console.log("CLICKED");
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
