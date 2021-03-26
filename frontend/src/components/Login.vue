@@ -50,7 +50,7 @@ Date: 3/3/2021
 
           <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}</b-alert>
           <h6> Don't have an account?
-            <router-link to="/register" >Register Here</router-link>
+            <router-link to="/users" >Register Here</router-link>
           </h6>
         </b-card>
       </b-col>

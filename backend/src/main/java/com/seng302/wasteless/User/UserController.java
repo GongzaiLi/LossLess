@@ -183,7 +183,7 @@ public class UserController {
      * @param login The login object parsed from the request body by spring
      * @return 200 ok for correct login, 400 bad request otherwise
      */
-    @PostMapping("/login")
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST} )
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
