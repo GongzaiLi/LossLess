@@ -26,6 +26,15 @@ public class UserService {
     }
 
     /**
+     * Saves the given user object with updated fields in Database
+     *
+     * @param user      The updated user object to save in the DB
+     */
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+
+    /**
      * Checks if a user already has given email
      *
      * @param email     The email to check
@@ -54,6 +63,7 @@ public class UserService {
     public User findUserByEmail(String email) {
         return userRepository.findFirstByEmail(email);
     }
+
 
     /**
      * Search for users by a search query.

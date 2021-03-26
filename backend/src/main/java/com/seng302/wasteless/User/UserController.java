@@ -192,10 +192,39 @@ public class UserController {
         }
 
         possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+        userService.updateUser(possibleUser);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * Endpoint to revoke a specified user's admin role. Sets user role to USER
+     * if successful.
+     * @param userId The id of the user to be made an admin
+     * @return 200 OK if successful. 406 NOT_ACCEPTABLE status if the user id does not exist.
+     * 403 FORBIDDEN if the user making the request is not an admin. 409 CONFLICT if the admin
+     * tries to revoke their own admin status.
+     */
+    @PutMapping("/users/{id}/revokeAdmin")
+    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId) {
+
+        //Todo authentication
+
+        User possibleUser = userService.findUserById(userId);
+        logger.info("possible User{}", possibleUser);
+
+        if (possibleUser == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
+        }
+
+        possibleUser.setRole(UserRoles.USER);
+        userService.updateUser(possibleUser);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 
 
