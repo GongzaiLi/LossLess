@@ -122,9 +122,9 @@ export default {
           .then((response) => {
             this.$log.debug("Logged in");
             //set global variable of logged in user
-            this.$currentUser.set(response.userId);
+            //this.$currentUser.set(response.id);
             // Go to profile page
-            this.goToUserProfilePage(response.userId);
+            this.goToUserProfilePage(response.data.id);
           })
           .catch((error) => {
             this.$log.debug(error);
