@@ -1,5 +1,7 @@
 package com.seng302.wasteless.Business;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * This enum specifies types for businesses and provides functionality
  * for checking to see if a business is of a legal type
@@ -27,6 +29,7 @@ public enum BusinessTypes {
      * @see java.lang.Enum#toString()
      */
     @Override
+    @JsonValue
     public String toString() {
         return text;
     }

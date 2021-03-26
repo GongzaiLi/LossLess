@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -47,27 +48,27 @@ public class Business {
     private String address;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
-    @NotBlank(message = "businessType is mandatory")
+    @NotNull(message = "businessType is mandatory")
     @Column(name = "business_type")
-    private String businessType;
+    private BusinessTypes businessType;
 
     @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "created")
     private LocalDate created;
 
-    /**
-     * Check the business type is valid by checking it is in enum
-     *
-     * @return  True if valid type, otherwise false
-     */
-    public boolean checkValidBusinessType() {
-
-        for (BusinessTypes type : BusinessTypes.values()) {
-            if (type.toString().equals(this.businessType)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+//    /**
+//     * Check the business type is valid by checking it is in enum
+//     *
+//     * @return  True if valid type, otherwise false
+//     */
+//    public boolean checkValidBusinessType() {
+//
+//        for (BusinessTypes type : BusinessTypes.values()) {
+//            if (type.toString().equals(this.businessType)) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 }
