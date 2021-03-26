@@ -78,10 +78,10 @@ public class BusinessController {
 
         logger.info("business was {}", business);
 
-        //Validate business type
-        if(! business.checkValidBusinessType()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid business type");
-        }
+//        //Validate business type
+//        if(! business.checkValidBusinessType()) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid business type");
+//        }
 
         business.setCreated(LocalDate.now());
 

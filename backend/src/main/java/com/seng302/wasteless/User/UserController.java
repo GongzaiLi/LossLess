@@ -21,6 +21,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -30,8 +31,7 @@ import java.util.Map;
 public class UserController {
 
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
-    private UserService userService;
-    private Encryption encryption;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -65,20 +65,14 @@ public class UserController {
 
         user.setCreated(LocalDate.now());
 
+        user.setRole(UserRoles.USER);
 
-        /**
-        ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        UserDetails springUser = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(springUser, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-         */
 
         //Create the users salt
-        String salt = encryption.getNextSalt().toString();
+        String salt = Arrays.toString(Encryption.getNextSalt());
         user.setSalt(salt);
         //Encrypt the users password
-        user.setPassword(encryption.generateHashedPassword(user.getPassword(), salt));
+        user.setPassword(Encryption.generateHashedPassword(user.getPassword(), salt));
         //Save user object in h2 database
         user = userService.createUser(user);
 
@@ -148,8 +142,8 @@ public class UserController {
      *  and unauthorized if a user hasn't logged in
      *
      * @param userId The userID integer
-     * @param request
-     * @return
+     * @param request       The get request for getting the user
+     * @return              200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
     @JsonView(UserViews.GetUserView.class)
@@ -198,7 +192,7 @@ public class UserController {
             String savedPasswordHash = savedUser.getPassword();
             String savedSalt = savedUser.getSalt();
 
-            boolean correctPassword = encryption.verifyUserPassword(enteredPassword, savedPasswordHash, savedSalt);
+            boolean correctPassword = Encryption.verifyUserPassword(enteredPassword, savedPasswordHash, savedSalt);
 
             if (!correctPassword) {
                 logger.warn("Attempted to login to account with incorrect password, dropping request: {}", login.getEmail());
