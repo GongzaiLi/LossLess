@@ -111,8 +111,8 @@ export default {
     },
 
     /**
-     * Makes a request to the API to register a user with the form input.
-     * Then, will redirect to the login page if successful.
+     * Makes a request to the API to register a business with the form input.
+     * Then, will redirect to the business page if successful.
      * Performs no input validation. Validation is performed by the HTML form.
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
