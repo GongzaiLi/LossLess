@@ -84,6 +84,10 @@ public class User {
     @JsonView({UserViews.GetUserView.class})
     private LocalDate created;
 
+    @Column(name = "role")
+    private String role;
+
+
     //Omitted fields. Role: added in u4, business administered: added in u6
 
     /**
@@ -117,5 +121,6 @@ public class User {
     public void addPrimaryBusiness(Business business) {
         this.businessesPrimarilyAdministered.add(business);
     }
+
 }
 
