@@ -236,9 +236,8 @@ export default {
           return api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {
-
           this.$setCurrentUser(userResponse.data);
-          this.$router.push({path: `/user/${userResponse.data.id}`});
+          this.$router.push({path: `/users/${userResponse.data.id}`});
         })
         .catch((error) => {
           this.errors = [];
@@ -251,7 +250,7 @@ export default {
         });
       if (this.isDemoMode) {
         this.$setCurrentUser(usersInfo.users[1].id);
-        this.$router.push({path: '/user/1'});
+        this.$router.push({path: '/users/1'});
       }
     },
   },
