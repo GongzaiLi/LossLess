@@ -3,18 +3,26 @@ import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import UserSearch from '../UserSearch'; // name of your Vue component
 
 let wrapper;
-let tableHeaderData = {
-  name: 'Someone',
-  nickname: 'NickName',
-  email: 'Email@Email',
-  homeAddress: 'SomeWhere'
-};
+
+let userData = {
+  role:"user"
+}
+// fake the localStorage to doing the testing.
+const mockUserAuthPlugin = function install(Vue) {
+  Vue.mixin({
+    methods: {
+      $getCurrentUser: () => userData
+    }
+  });
+}
 
 beforeEach(() => {
+
   const localVue = createLocalVue()
 
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
+  localVue.use(mockUserAuthPlugin);
 
   wrapper = shallowMount(UserSearch, {
     localVue,
@@ -22,7 +30,7 @@ beforeEach(() => {
     mocks: {},
     stubs: {},
     methods: {},
-    computed: {}
+    computed: {},
   })
 });
 
@@ -38,6 +46,8 @@ describe('UserSearch', () => {
 
 //Boundary itemsRangeMin()
 test('1_total_result-in-1_perPage-in-1_currentPage-to-itemsRangeMin', async () => {
+
+
   wrapper.vm.totalResults = 1;
   wrapper.vm.perPage = 1;
   wrapper.vm.currentPage = 1;

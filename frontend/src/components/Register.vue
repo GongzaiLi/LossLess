@@ -227,16 +227,16 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      console.log(registerData);
+      //console.log(registerData);
 
       api
         .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");
-          return api.getUser(loginResponse.userId);
+          return api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {
-          this.$currentUser = userResponse.data;
+          this.$setCurrentUser(userResponse.data);
           this.$router.push({path: `/users/${userResponse.data.id}`});
         })
         .catch((error) => {
@@ -249,8 +249,8 @@ export default {
           }
         });
       if (this.isDemoMode) {
-        this.$currentUser = usersInfo.users[1];
-        this.$router.push({path: '/user/1'});
+        this.$setCurrentUser(usersInfo.users[1].id);
+        this.$router.push({path: '/users/1'});
       }
     },
   },
