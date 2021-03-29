@@ -1,13 +1,16 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.User.Encryption;
+import com.seng302.wasteless.Security.WebSecurityConfig;
 import com.seng302.wasteless.User.User;
+import com.seng302.wasteless.User.UserRoles;
 import com.seng302.wasteless.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -33,6 +36,8 @@ public class DefaultAdminCreatorService {
     public DefaultAdminCreatorService(UserService userService) throws IOException, InvalidParameterException {
         this();
         this.userService = userService;
+
+        createDefaultAdmin();
     }
 
     /**
@@ -62,12 +67,12 @@ public class DefaultAdminCreatorService {
     private void createDefaultAdmin() {
         User defaultAdmin = new User();
         defaultAdmin.setEmail(defaultEmail);
-
-        //Create the users salt
-        String salt = Arrays.toString(Encryption.getNextSalt());
-        defaultAdmin.setSalt(salt);
-        //Encrypt the users password
-        defaultAdmin.setPassword(Encryption.generateHashedPassword(defaultPassword, salt));
+        defaultAdmin.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
+        defaultAdmin.setHomeAddress("10 Downing Street");
+        defaultAdmin.setDateOfBirth(LocalDate.EPOCH);
+        defaultAdmin.setFirstName("Default");
+        defaultAdmin.setLastName("Admin");
+        defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
 
         userService.createUser(defaultAdmin);
     }

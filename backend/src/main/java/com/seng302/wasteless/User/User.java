@@ -85,6 +85,7 @@ public class User {
     private LocalDate created;
 
     @Column(name = "role")
+    @JsonView({UserViews.GetUserView.class})
     private UserRoles role;
 
     //Omitted fields. business administered: added in u6

@@ -57,7 +57,7 @@ Date: 5/3/2021
               <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
             </b-row>
           </h6>
-          <h6>
+          <h6 v-if="userData.nickname">
             <b-row v-show="userData.nickname.length">
               <b-col cols="0">
                 <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
