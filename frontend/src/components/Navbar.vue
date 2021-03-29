@@ -10,7 +10,7 @@
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item v-on:click="my_profile">My Profile</b-nav-item>
-        <b-nav-item to="/userSearch">User Search</b-nav-item>
+        <b-nav-item to="/users/search">User Search</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
@@ -38,7 +38,7 @@ export default {
   methods: {
     my_profile: function () {
       if (this.$route.params.id !== this.$getCurrentUser().id.toString()) {
-        this.$router.push({path: `/user/${this.$getCurrentUser().id}`});
+        this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
       }
     },
     /**

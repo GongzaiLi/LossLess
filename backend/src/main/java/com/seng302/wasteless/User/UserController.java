@@ -25,6 +25,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -34,12 +35,10 @@ import java.util.Map;
 public class UserController {
 
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
-    private UserService userService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-
-
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService,
@@ -77,18 +76,12 @@ public class UserController {
 
         user.setCreated(LocalDate.now());
 
+        user.setRole(UserRoles.USER);
 
-        /**
-        ArrayList<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        UserDetails springUser = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(springUser, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-         */
 
         Login login = new Login(user.getEmail(), user.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole("USER");
+        user.setRole(UserRoles.USER);
         //Save user object in h2 database
         userService.createUser(user);
         logger.info(String.format("Successful registration of user %d", user.getId()));
@@ -153,8 +146,8 @@ public class UserController {
      *  and unauthorized if a user hasn't logged in
      *
      * @param userId The userID integer
-     * @param request
-     * @return
+     * @param request       The get request for getting the user
+     * @return              200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
     @JsonView(UserViews.GetUserView.class)

@@ -71,7 +71,7 @@ export default {
      * When called changes page to the profile page based on the id of the user clicked
      */
     rowClickHandler: function(record){
-      this.$router.push({path: `/user/${record.id}`});
+      this.$router.push({path: `/users/${record.id}`});
     },
     /**
      * the function is search a user id the using api to find the user's detail

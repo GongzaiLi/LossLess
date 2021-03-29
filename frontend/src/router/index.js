@@ -16,9 +16,9 @@ const router = new Router({
     routes: [
         { path: '/', redirect: '/login' },
         { path: '/login', name: 'login', component: Login },
-        { path: '/users', name: 'register', component: Register },
-        { path: '/users/:id', name: 'user-profile', component: UserProfile},
+        { path: '/register', name: 'register', component: Register },
         { path: '/users/search', name: 'user-search', component: UserSearch},
+        { path: '/users/:id', name: 'user-profile', component: UserProfile},
     ]
 });
 
