@@ -19,9 +19,11 @@ import java.util.Properties;
  */
 @Component
 public class DefaultAdminCreatorService {
+    private static final String CONFIG_FILE_PATH = "global-admin.properties";
+
     private String defaultEmail;
     private String defaultPassword;
-    private String defaultTimeout;
+    private Integer defaultTimeout;
 
     private UserService userService;
 
@@ -29,35 +31,50 @@ public class DefaultAdminCreatorService {
      * Creates a new Creator service using parameters from a config file (resources/global-admin.properties).
      * This service periodically checks if a default admin exists and creates one if one does not.
      * @param userService The User Service autowired by Spring
-     * @throws IOException If the config file "global-admin.properties" does not exist in te resources/ directory
+     * @throws IOException If the config file "global-admin.properties" does not exist in the resources/ directory
      * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
      */
     @Autowired
     public DefaultAdminCreatorService(UserService userService) throws IOException, InvalidParameterException {
-        this();
+        InputStream configFileStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_PATH);
+        if (configFileStream == null) {
+            throw new IOException("Did not find global-admin.properties file in the resources directory");
+        }
+        this.readConfigFile(configFileStream);
+        configFileStream.close();
         this.userService = userService;
 
         createDefaultAdmin();
     }
 
     /**
-     * Creates a new Creator service using parameters from a config file (resources/global-admin.properties).
-     * DO NOT CALL THIS METHOD!! This is only used by the public DefaultAdminCreatorService constructor.
-     * @throws IOException If the config file "global-admin.properties" does not exist in te resources/ directory
+     * Takes an input stream (made from the config properties file) and reads from it the following config properties:
+     * 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
+     * Stores these values to be used for the default admin creation/checking service.
+     * DOES NOT CLOSE THE FILE STREAM AFTER READING. MAKE SURE YOU CLOSE IT AFTER CALLING THIS METHOD
+     * @param configFileStream Input stream made from the config properties file
      * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
+     * @throws IOException If reading the config file failed due to an external error, eg. the file was corrupted
      */
-    private DefaultAdminCreatorService() throws IOException, InvalidParameterException {
+    private void readConfigFile(InputStream configFileStream) throws InvalidParameterException, IOException {
         Properties defaultProps = new Properties();
-        InputStream configFile = getClass().getClassLoader().getResourceAsStream("global-admin.properties");
-        defaultProps.load(configFile);
-        configFile.close();
+        defaultProps.load(configFileStream);
 
         defaultEmail = defaultProps.getProperty("default-admin-username");
         defaultPassword = defaultProps.getProperty("default-admin-password");
-        defaultTimeout = defaultProps.getProperty("check-default-admin-period-seconds");
+        String defaultTimeoutString = defaultProps.getProperty("check-default-admin-period-seconds");
 
-        if (defaultPassword == null || defaultEmail == null || defaultTimeout == null) {
+        if (defaultPassword == null || defaultEmail == null || defaultTimeoutString == null) {
             throw new InvalidParameterException("Missing config fields. Must have 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'");
+        }
+        try {
+            defaultTimeout = Integer.parseInt(defaultTimeoutString);
+        } catch(NumberFormatException nfe) {
+            throw new InvalidParameterException("'check-default-admin-period-seconds' field of config file does not have an integer value.");
+        }
+
+        if (defaultTimeout <= 0) {
+            throw new InvalidParameterException("'check-default-admin-period-seconds' must be greater than zero.");
         }
     }
 
