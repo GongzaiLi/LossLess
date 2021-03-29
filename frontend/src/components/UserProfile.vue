@@ -20,10 +20,10 @@ Date: 5/3/2021
                 {{ memberSince }}
               </p>
             </b-col>
-            <b-col cols="2" sm="auto" v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
+            <b-col cols="2" sm="auto" v-if="($getCurrentUser().role==='defaultGlobalApplicationAdmin'||$getCurrentUser().role==='globalApplicationAdmin')">
               <h4>{{ userRoleDisplayString }}</h4>
               <b-button v-bind:variant="adminButtonToggle"
-                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$currentUser.id)"
+                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$getCurrentUser().id)"
                         @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
@@ -180,17 +180,14 @@ export default {
           })
           .catch((error) => {
             this.$log.debug(error);
-            // Uncomment the below line once we have a backend
-            // this.userFound = false;
+            //todo uncomment when backend working
+            //this.userFound = false;
           })
       // fake the Api data from the response data.
       // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
-      if (id >= usersInfo.users.length) {
-        this.userFound = false;
-      } else {
-        this.userData = usersInfo.users[id];
-        this.userFound = true;
-      }
+      //todo DELETE ONCE BACKEND WORKING, or put in if statement
+      this.userData = usersInfo.users[id];
+      this.userFound = true;
     },
     //return user to login screen
     logOut: function () {

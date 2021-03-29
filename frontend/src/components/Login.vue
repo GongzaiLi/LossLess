@@ -71,6 +71,7 @@ Date: 3/3/2021
 import api from "../Api";
 import usersInfo from './data/usersDate.json';
 
+
 export default {
   data: function () {
     return {
@@ -121,10 +122,12 @@ export default {
           .login(loginData)
           .then((response) => {
             this.$log.debug("Logged in");
-            //set global variable of logged in user
-            this.$currentUser.set(response.userId);
+            return api.getUser(response.data.id);
+          })
+          .then((userResponse) => {
+            this.$setCurrentUser(userResponse.data);
             // Go to profile page
-            this.goToUserProfilePage(response.userId);
+            this.goToUserProfilePage(userResponse.data.id);
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -152,16 +155,16 @@ export default {
      */
     demoModeLogin() {
       if (this.email === "admin@sengmail.com") {
-        this.$currentUser = usersInfo.users[0];
+        this.$setCurrentUser(usersInfo.users[0]);
       } else if (this.email === "user@sengmail.com") {
-        this.$currentUser = usersInfo.users[1];
+        this.$setCurrentUser(usersInfo.users[1]);
       } else if (this.email === "defaultadmin@sengmail.com") {
-        this.$currentUser = usersInfo.users[2];
+        this.$setCurrentUser(usersInfo.users[2]);
       } else {
         this.errors.push("The given username or password is incorrect.");
         return;
       }
-      this.goToUserProfilePage(this.$currentUser.id);
+      this.goToUserProfilePage(this.$getCurrentUser().id);
     },
     /**
      * Redirects to the profile page of the user with the specified userId.
