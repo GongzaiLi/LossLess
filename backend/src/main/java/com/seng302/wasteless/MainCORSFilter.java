@@ -50,10 +50,10 @@ public class MainCORSFilter implements Filter {
       throws IOException, ServletException {
 
     HttpServletResponse response = (HttpServletResponse) res;
-    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Credentials", "true"); // This bit is a saviour. NEVER DELETE THIS otherwise CORS will block you
     response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH, HEAD");
     response.setHeader("Access-Control-Max-Age", "6000");
-    response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Credentials, Accept");
     chain.doFilter(req, res);
   }
 

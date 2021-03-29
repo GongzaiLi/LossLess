@@ -20,10 +20,10 @@ Date: 5/3/2021
                 {{ memberSince }}
               </p>
             </b-col>
-            <b-col cols="2" sm="auto" v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
+            <b-col cols="2" sm="auto" v-if="($getCurrentUser().role==='defaultGlobalApplicationAdmin'||$getCurrentUser().role==='globalApplicationAdmin')">
               <h4>{{ userRoleDisplayString }}</h4>
               <b-button v-bind:variant="adminButtonToggle"
-                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$currentUser.id)"
+                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$getCurrentUser().id)"
                         @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
@@ -84,7 +84,7 @@ Date: 5/3/2021
               <b-col>{{ userData.email }}</b-col>
             </b-row>
           </h6>
-          <h6>
+          <h6 v-if="userData.phoneNumber">
             <b-row>
               <b-col cols="0">
                 <b-icon-telephone-fill></b-icon-telephone-fill>
@@ -138,7 +138,6 @@ h6 {
 
 <script>
 import api from "../Api";
-import usersInfo from './data/usersDate.json';
 
 export default {
   data: function () {
@@ -172,7 +171,7 @@ export default {
      */
     getUserInfo: function (id) {
       api
-          .getUser(id) //
+          .getUser(id)
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
@@ -180,17 +179,8 @@ export default {
           })
           .catch((error) => {
             this.$log.debug(error);
-            // Uncomment the below line once we have a backend
-            // this.userFound = false;
+            this.userFound = false;
           })
-      // fake the Api data from the response data.
-      // TESTING PURPOSES ONLY, REMOVE THIS WHEN THE BACKEND IS IMPLEMENTED
-      if (id >= usersInfo.users.length) {
-        this.userFound = false;
-      } else {
-        this.userData = usersInfo.users[id];
-        this.userFound = true;
-      }
     },
     //return user to login screen
     logOut: function () {
