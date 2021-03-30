@@ -1,5 +1,6 @@
 package com.seng302.wasteless.Security;
 
+import com.seng302.wasteless.User.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.context.annotation.Bean;
@@ -103,6 +104,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers( "/login", "/users", "/h2/**").permitAll()
+                    .antMatchers("/users/:id/makeAdmin", "/users/:id/revokeAdmin")
+                        .hasAnyAuthority(UserRoles.GLOBAL_APPLICATION_ADMIN.toString(), UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN.toString())
                     .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable()
