@@ -1,7 +1,7 @@
 <template>
   <b-container id="app">
     <Navbar/>
-    <router-view/>
+    <Register/>
   </b-container>
 </template>
 

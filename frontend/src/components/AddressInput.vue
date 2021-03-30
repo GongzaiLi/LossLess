@@ -1,34 +1,95 @@
 <template>
   <div class="address-input">
-    <b-form-textarea
-      v-model="address"
-      @input="onAddressChange"
-      placeholder="Enter Address"
-      v-bind:value="value"
-      required
-    />
+    <b-card>
+      <b-form-group>
+        <b-row>
+          <b-col><b>Street</b></b-col>
+        </b-row>
+        <b-form-input
+          v-model="homeAddress.street"
+          @input="onAddressChange"
+          placeholder="Street"
+          v-bind:value="value"
+          required
+        />
 
-    <b-list-group
-      class="address-options-list"
-      v-if="showAutocompleteDropdown && addressResults.length > 0"
-    >
+      </b-form-group>
 
-      <b-list-group-item button
-         v-for="address in addressResults"
-         v-bind:key="address"
-         @click="selectAddressOption(address)"
+      <b-list-group
+        class="address-options-list"
+        v-if="showAutocompleteDropdown && addressResults.length > 0"
       >
-        {{ address }}
-      </b-list-group-item>
 
-      <b-list-group-item button
-        class="address-option address-close"
-        @click="showAutocompleteDropdown = false"
-      >
-        &#10060; Close Suggestions
-      </b-list-group-item>
+        <b-list-group-item button
+                           v-for="address in addressResults"
+                           v-bind:key="address"
+                           @click="selectAddressOption(address)"
+        >
+          {{ address }}
+        </b-list-group-item>
 
-    </b-list-group>
+        <b-list-group-item button
+                           class="address-option address-close"
+                           @click="showAutocompleteDropdown = false"
+        >
+          &#10060; Close Suggestions
+        </b-list-group-item>
+      </b-list-group>
+
+
+      <b-form-group>
+        <b-row>
+          <b-col><b>City</b></b-col>
+          <b-col><b>Region</b></b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-input
+              v-model="homeAddress.city"
+              placeholder="Street"
+              v-bind:value="value"
+              required
+            />
+          </b-col>
+          <b-col>
+            <b-form-input
+              v-model="homeAddress.region"
+              placeholder="Street"
+              v-bind:value="value"
+              required
+            />
+          </b-col>
+        </b-row>
+      </b-form-group>
+
+      <b-form-group>
+        <b-row>
+          <b-col><b>Country</b></b-col>
+          <b-col><b>Post</b></b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-input
+              v-model="homeAddress.country"
+              placeholder="Street"
+              v-bind:value="value"
+              required
+            />
+          </b-col>
+          <b-col>
+            <b-form-input
+              v-model="homeAddress.postcode"
+              placeholder="Street"
+              v-bind:value="value"
+              required
+            />
+          </b-col>
+        </b-row>
+      </b-form-group>
+
+    </b-card>
+
+
   </div>
 </template>
 
@@ -62,10 +123,17 @@ export default {
 
   data: function () {
     return {
-      address: "",
       addressResults: [],
+      addressObject: [],
       showAutocompleteDropdown: false,
       awaitingSearch: false,
+      homeAddress: {
+        street: "",
+        city: "",
+        region: "",
+        country: "",
+        postcode: ""
+      }
     }
   },
 
@@ -87,7 +155,7 @@ export default {
      * - Address must have either a county, district, or city field
      * - Address must have either a house number and street, or a name field
      */
-    getStringFromPhotonAddress (address) {
+    getStringFromPhotonAddress(address) {
       let addressString = "";
       let addressValid = false;
 
@@ -127,13 +195,33 @@ export default {
      * Sets the address input field to the selected address
      * and closes the autocomplete drop down
      */
-    selectAddressOption (address) {
-      this.address = address;
+    selectAddressOption(address) {
+
+      const addressIndex = this.addressResults.indexOf(address);//---------------
+
+      this.splitAddress(this.addressObject[addressIndex]); //-------------------
+
+
+      this.addressObject = [];
       this.addressResults = [];
+
 
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
       this.$emit('input', address);
+
+    },
+
+    /**
+     *
+     */
+    splitAddress(addressObject) {
+      this.homeAddress.street = `${addressObject.housenumber} ${addressObject.street}`|| addressObject.street || addressObject.housenumber || '';
+      this.homeAddress.city = addressObject.county || addressObject.district || addressObject.city || '';
+      this.homeAddress.region = addressObject.state || "";
+      this.homeAddress.country = addressObject.country || "";
+      this.homeAddress.postcode = addressObject.postcode ||"";
+
     },
 
     /**
@@ -147,7 +235,8 @@ export default {
     async onAddressChange() {
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
-      this.$emit('input', this.address);
+      this.$emit('input', this.homeAddress.street);
+
       if (!this.awaitingSearch) {
         setTimeout(() => {
           this.queryAddressAutocomplete();
@@ -157,28 +246,38 @@ export default {
       this.awaitingSearch = true;
     },
 
+
+
     /**
      * Authors: Phil Taylor, Gongzai Li, Eric Song
      * Queries the Photon Komoot API with the home address and puts the
      * results into addressFind.
      */
     async queryAddressAutocomplete() {
-      if (this.address.trim().length <= 3) {
+      if (this.homeAddress.street.trim().length <= 3) {
         this.addressResults = [];
+
+        this.addressObject = [];//-----------------------------
         return;
       }
       this.showAutocompleteDropdown = true;
-      const addressQueryString = this.address.replace(/\s/gm," ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
+
+      const addressQueryString = this.homeAddress.street.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
       this.addressResults = [];
+
+      this.addressObject = [];//-----------------------------
 
       for (const result of returnQuery) {
         const addressString = this.getStringFromPhotonAddress(result.properties);
 
         if (addressString != null && !this.addressResults.includes(addressString)) {
           this.addressResults.push(addressString);
+          this.addressObject.push(result.properties);//----------------------------------
+
         }
       }
+
     }
   }
 }
