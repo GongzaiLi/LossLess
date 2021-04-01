@@ -1,7 +1,7 @@
 <template>
   <b-container id="app">
     <Navbar/>
-    <router-view/>
+    <home-page/>
   </b-container>
 </template>
 
@@ -11,6 +11,7 @@ import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 import UserSearch from "./components/UserSearch";
+import HomePage from "@/components/HomePage";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -19,6 +20,7 @@ import UserSearch from "./components/UserSearch";
 const app = {
   name: "app",
   components: {
+    HomePage,
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
     Login,
