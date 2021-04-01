@@ -168,7 +168,14 @@ export default {
       "email": "",
       "dateOfBirth": "",
       "phoneNumber": "",
-      "homeAddress": "",
+      "homeAddress": {
+        "streetNumber": "",
+        "streetName": "",
+        "city": "",
+        "region": "",
+        "country": "",
+        "postcode": ""
+      },
       "password": "",
       "confirmPassword": "",
       isDemoMode: true,
@@ -227,7 +234,7 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      //console.log(registerData);
+      console.log(registerData);
 
       api
         .register(registerData)

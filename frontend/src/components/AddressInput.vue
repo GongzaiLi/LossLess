@@ -6,7 +6,7 @@
           <b-col><b>Street</b></b-col>
         </b-row>
         <b-form-input
-          v-model="homeAddress.street"
+          v-model="addressStreetNameNumber"
           @input="onAddressChange"
           placeholder="Street"
           v-bind:value="value"
@@ -46,7 +46,7 @@
           <b-col>
             <b-form-input
               v-model="homeAddress.city"
-              placeholder="Street"
+              placeholder="city"
               v-bind:value="value"
               required
             />
@@ -54,7 +54,7 @@
           <b-col>
             <b-form-input
               v-model="homeAddress.region"
-              placeholder="Street"
+              placeholder="region"
               v-bind:value="value"
               required
             />
@@ -65,13 +65,13 @@
       <b-form-group>
         <b-row>
           <b-col><b>Country</b></b-col>
-          <b-col><b>Post</b></b-col>
+          <b-col><b>Postcode</b></b-col>
         </b-row>
         <b-row>
           <b-col>
             <b-form-input
               v-model="homeAddress.country"
-              placeholder="Street"
+              placeholder="country"
               v-bind:value="value"
               required
             />
@@ -79,7 +79,7 @@
           <b-col>
             <b-form-input
               v-model="homeAddress.postcode"
-              placeholder="Street"
+              placeholder="postcode"
               v-bind:value="value"
               required
             />
@@ -127,12 +127,14 @@ export default {
       addressObject: [],
       showAutocompleteDropdown: false,
       awaitingSearch: false,
+      addressStreetNameNumber: "",
       homeAddress: {
-        street: "",
-        city: "",
-        region: "",
-        country: "",
-        postcode: ""
+        "streetNumber": "",
+        "streetName": "",
+        "city": "",
+        "region": "",
+        "country": "",
+        "postcode": ""
       }
     }
   },
@@ -208,7 +210,7 @@ export default {
 
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
-      this.$emit('input', address);
+      this.$emit('input', this.homeAddress);
 
     },
 
@@ -216,11 +218,13 @@ export default {
      *
      */
     splitAddress(addressObject) {
-      this.homeAddress.street = `${addressObject.housenumber} ${addressObject.street}`|| addressObject.street || addressObject.housenumber || '';
+      this.homeAddress.streetNumber = addressObject.housenumber || '';
+      this.homeAddress.streetName = addressObject.street || '';
       this.homeAddress.city = addressObject.county || addressObject.district || addressObject.city || '';
       this.homeAddress.region = addressObject.state || "";
       this.homeAddress.country = addressObject.country || "";
       this.homeAddress.postcode = addressObject.postcode ||"";
+      this.addressStreetNameNumber = `${this.homeAddress.streetNumber} ${this.homeAddress.streetName}`;
 
     },
 
@@ -235,7 +239,7 @@ export default {
     async onAddressChange() {
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
-      this.$emit('input', this.homeAddress.street);
+      this.$emit('input', this.addressStreetNameNumber);
 
       if (!this.awaitingSearch) {
         setTimeout(() => {
@@ -254,7 +258,7 @@ export default {
      * results into addressFind.
      */
     async queryAddressAutocomplete() {
-      if (this.homeAddress.street.trim().length <= 3) {
+      if (this.addressStreetNameNumber.trim().length <= 2) {
         this.addressResults = [];
 
         this.addressObject = [];//-----------------------------
@@ -262,7 +266,7 @@ export default {
       }
       this.showAutocompleteDropdown = true;
 
-      const addressQueryString = this.homeAddress.street.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
+      const addressQueryString = this.addressStreetNameNumber.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
       this.addressResults = [];
 
