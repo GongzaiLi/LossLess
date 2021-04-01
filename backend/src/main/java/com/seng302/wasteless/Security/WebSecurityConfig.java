@@ -104,7 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers( "/login", "/users", "/h2/**").permitAll()
-                    .antMatchers("/users/:id/makeAdmin", "/users/:id/revokeAdmin")
+                    .antMatchers("/users/{\\d+}/makeAdmin", "/users/{\\d+}/revokeAdmin")
                         .hasAnyAuthority(UserRoles.GLOBAL_APPLICATION_ADMIN.toString(), UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN.toString())
                     .anyRequest().authenticated()
                 .and()

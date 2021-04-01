@@ -1,13 +1,22 @@
 package com.seng302.wasteless;
 
+import com.seng302.wasteless.Security.CustomUserDetails;
+import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserController;
+import com.seng302.wasteless.User.UserRoles;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,7 +27,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        classes = MockUserDetailsService.class
+)
 @AutoConfigureMockMvc
 public class UserControllerUnitTest {
 
@@ -140,7 +152,31 @@ public class UserControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void whenNotLoggedInAndTryMakeAdmin_thenUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+                .andExpect(status().isUnauthorized());
+    }
 
+    @Test
+    public void whenNotLoggedInAndTryRevokeAdmin_thenUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithUserDetails("user@700")
+    public void whenUserTryMakeAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("user@700")
+    public void whenUserTryRevokeAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
+                .andExpect(status().isForbidden());
+    }
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": \"%s\", \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);

@@ -1,5 +1,7 @@
 package com.seng302.wasteless;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -247,6 +251,20 @@ public class UserControllerIntegrationTests {
         mockMvc.perform(get("/users/245")
                 .cookie(userCookie)
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithUserDetails("deafultadmin@supersecretsengbackendmail.com")
+    public void whenUserToBeMadeAdminNotFound_thenNotAcceptable() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithUserDetails("defaultadmin@700")
+    public void whenTryRevokeUserNotExists_thenUnacceptable() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
                 .andExpect(status().isNotAcceptable());
     }
 
