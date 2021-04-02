@@ -1,7 +1,7 @@
 <template>
   <b-container id="app">
     <Navbar/>
-    <home-page/>
+    <router-view/>
   </b-container>
 </template>
 

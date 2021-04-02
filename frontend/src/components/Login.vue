@@ -50,7 +50,7 @@ Date: 3/3/2021
 
           <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}</b-alert>
           <h6> Don't have an account?
-            <router-link to="/users" >Register Here</router-link>
+            <router-link to="/register" >Register Here</router-link>
           </h6>
         </b-card>
       </b-col>
@@ -99,6 +99,8 @@ export default {
         password: this.password
       };
       this.errors = [];
+      /** todo move to inside second .then once backend working with cors */
+      this.goToUserHomePage();
       api
         .login(loginData)
         .then((response) => {
@@ -107,11 +109,11 @@ export default {
         })
         .then((userResponse) => {
           this.$setCurrentUser(userResponse.data);
+
           // Go to profile page
-          this.goToUserProfilePage(userResponse.data.id);
+          //this.goToUserProfilePage(userResponse.data.id);
         })
         .catch((error) => {
-          console.log("ERRRRR");
           console.log(error);
           this.$log.debug(error);
 
@@ -121,6 +123,10 @@ export default {
             this.errors.push(error.message);
           }
         });
+    },
+
+    goToUserHomePage : function () {
+      this.$router.push({path:`/homePage`});
     },
     /**
      * Redirects to the profile page of the user with the specified userId.
