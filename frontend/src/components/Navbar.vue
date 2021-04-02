@@ -17,10 +17,17 @@
           <template #button-content>
             <b-badge>{{getUserBadgeRole()}}</b-badge>
             <em class="ml-2">{{user().firstName}}</em>
+          </template>>
+          <b-dropdown-item >{{$getCurrentUser.firstName}}</b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown right>
+          <template #button-content>
+            <b-icon-list></b-icon-list>
           </template>
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+
     </b-collapse>
   </b-navbar>
 </template>
