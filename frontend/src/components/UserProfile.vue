@@ -182,10 +182,7 @@ export default {
             this.userFound = false;
           })
     },
-    //return user to login screen
-    logOut: function () {
-      this.$router.push({path: '/login'})
-    },
+
     /**
      * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
      * The months elapsed is not the total number of months elapsed, but the number months elapsed in
