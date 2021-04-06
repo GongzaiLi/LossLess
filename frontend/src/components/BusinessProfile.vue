@@ -13,7 +13,7 @@ Date: 29/03/2021
         <b-row>
           <b-col>
             <h4 class="mb-1">{{ businessData.name }}</h4>
-            <p class="mb-1">{{ memberSince }}</p>
+            <member-since :date="businessData.created"/>
           </b-col>
         </b-row>
       </template>
@@ -43,7 +43,7 @@ Date: 29/03/2021
                 <b-icon-geo-alt></b-icon-geo-alt> <!-- geo-alt-->
               </b-col>
               <b-col cols="4"><b>Address:</b></b-col>
-              <b-col>{{ Object.values(businessData.address).join(' ') }}</b-col>
+              <b-col>{{ getAddress }}</b-col>
             </b-row>
           </h6>
           <h6>
@@ -96,13 +96,15 @@ h6 {
 </style>
 
 <script>
-import dateCalculation from "./model/DateCalculation";
+import memberSince from "./MemberSince";
 import api from "@/Api";
 
+
 export default {
-
+  components: {
+    memberSince
+  },
   //Todo still has errors because I Did not connect to Navbar, and I check all errors and all show Navbar issues.
-
   data: function () {
     return {
       businessData: {
@@ -121,7 +123,7 @@ export default {
           postcode: "90210"
         },
         businessType: "Accommodation and Food Services",
-        created: "2020-07-14T14:52:00Z"
+        created: "2019-07-14T14:52:00Z"
       },
       memberSince: '',
       products: ['products1', 'products2', 'products3'],
@@ -134,7 +136,7 @@ export default {
     this.getBusinessInfo(businessId);
 
     //todo When is the getBusinessInfo can work, there can delete.
-    this.memberSince = dateCalculation.memberSince(this.businessData.created);
+    //this.memberSince = dateCalculation.memberSince(this.businessData.created);
   },
 
   methods: {
@@ -162,11 +164,17 @@ export default {
      * @param data
      */
     //todo may need split the data from response.
-    setResponseData: function(data) {
+    setResponseData: function (data) {
       this.businessData = data;
       //this.memberSince = (this.businessFind)? dateCalculation.memberSince(this.businessData.created) : '';
-      this.memberSince = dateCalculation.memberSince(this.businessData.created);
+      //this.memberSince = dateCalculation.memberSince(this.businessData.created);
+    }
+  },
+  computed: {
+    getAddress: function () {
+      return Object.values(this.businessData.address).join(' ');
     }
   }
+
 }
 </script>

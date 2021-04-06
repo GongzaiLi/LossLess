@@ -7,28 +7,27 @@ Date: 5/3/2021
 <template>
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
-      class="profile-card shadow" no-body
-      v-if="userFound"
+            class="profile-card shadow" no-body
+            v-if="userFound"
     >
 
       <template #header>
 
-          <b-row>
-            <b-col>
-              <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
-              <p class="mb-1">
-                {{ memberSince }}
-              </p>
-            </b-col>
-            <b-col cols="2" sm="auto" v-if="($getCurrentUser().role==='defaultGlobalApplicationAdmin'||$getCurrentUser().role==='globalApplicationAdmin')">
-              <h4>{{ userRoleDisplayString }}</h4>
-              <b-button v-bind:variant="adminButtonToggle"
-                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$getCurrentUser().id)"
-                        @click="toggleAdmin">{{ adminButtonText }}
-              </b-button>
-            </b-col>
+        <b-row>
+          <b-col>
+            <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
+            <member-since :date="userData.created"/>
+          </b-col>
+          <b-col cols="2" sm="auto"
+                 v-if="($getCurrentUser().role==='defaultGlobalApplicationAdmin'||$getCurrentUser().role==='globalApplicationAdmin')">
+            <h4>{{ userRoleDisplayString }}</h4>
+            <b-button v-bind:variant="adminButtonToggle"
+                      v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$getCurrentUser().id)"
+                      @click="toggleAdmin">{{ adminButtonText }}
+            </b-button>
+          </b-col>
 
-          </b-row>
+        </b-row>
 
         <b-row>
 
@@ -127,10 +126,11 @@ Date: 5/3/2021
 
 <style scoped>
 .profile-card {
-   max-width: 45rem;
-   margin-left: auto;
-   margin-right: auto;
+  max-width: 45rem;
+  margin-left: auto;
+  margin-right: auto;
 }
+
 h6 {
   line-height: 1.4;
 }
@@ -138,8 +138,13 @@ h6 {
 
 <script>
 import api from "../Api";
+import memberSince from "./MemberSince";
 
 export default {
+  components: {
+    memberSince
+  },
+
   data: function () {
     return {
       userData: {
@@ -153,6 +158,7 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
+        created: ""
       },
       userFound: true,
     }
@@ -171,39 +177,21 @@ export default {
      */
     getUserInfo: function (id) {
       api
-          .getUser(id)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.userData = response.data;
-            this.userFound = true;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.userFound = false;
-          })
+        .getUser(id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.userData = response.data;
+          this.userFound = true;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.userFound = false;
+        })
     },
     //return user to login screen
     logOut: function () {
       this.$router.push({path: '/login'})
     },
-    /**
-     * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
-     * The months elapsed is not the total number of months elapsed, but the number months elapsed in
-     * addition to the years also elapsed. For example, 1 year and 2 months instead of 1 year, 14 months.
-     * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
-     * Returns data in the format {months: months_elapsed, years: years_elapsed}
-     */
-    getMonthsAndYearsBetween(start, end) {
-      const timeElapsed = end - start;
-      const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
-      const yearsElapsed = Math.floor(daysElapsed / 365);
-      const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
-      return {
-        months: monthsElapsed,
-        years: yearsElapsed
-      }
-    },
-
     /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.
@@ -221,22 +209,22 @@ export default {
      */
     giveAdmin: function () {
       api
-          .makeUserAdmin(this.userData.id)
-          .then(() => {
-            this.$log.debug(`Made user ${this.userData.id} admin`);
+        .makeUserAdmin(this.userData.id)
+        .then(() => {
+          this.$log.debug(`Made user ${this.userData.id} admin`);
+          this.userData.role = 'globalApplicationAdmin';
+        })
+        .catch((error) => {
+          if (this.demoMode) {
+            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
             this.userData.role = 'globalApplicationAdmin';
-          })
-          .catch((error) => {
-            if (this.demoMode) {
-              // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-              this.userData.role = 'globalApplicationAdmin';
-              return;
-              //////////////////////////
-            }
+            return;
+            //////////////////////////
+          }
 
-            this.$log.debug(error);
-            alert(error);
-          });
+          this.$log.debug(error);
+          alert(error);
+        });
     },
     /**
      *  Attempts to revoke the 'globalApplicationAdmin' role from the displayed user
@@ -244,49 +232,27 @@ export default {
      */
     revokeAdmin: function () {
       api
-          .revokeUserAdmin(this.userData.id)
-          .then(() => {
-            this.$log.debug(`Revoked admin for user ${this.userData.id}`);
+        .revokeUserAdmin(this.userData.id)
+        .then(() => {
+          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
+          this.userData.role = 'user';
+        })
+        .catch((error) => {
+          if (this.demoMode) {
+            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
             this.userData.role = 'user';
-          })
-          .catch((error) => {
-            if (this.demoMode) {
-              // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-              this.userData.role = 'user';
-              return;
-              //////////////////////////
-            }
+            return;
+            //////////////////////////
+          }
 
-            this.$log.debug(error);
-            alert(error);
-          });
+          this.$log.debug(error);
+          alert(error);
+        });
     }
   },
   computed: {
     adminButtonToggle() {
       return this.userData.role === 'user' ? 'success' : 'danger';
-    },
-    /**
-     * calclates in years and months the time since the user account was created
-    */
-    memberSince: function () {
-      let registeredDate = new Date(this.userData.created);
-      const timeElapsed = this.getMonthsAndYearsBetween(registeredDate, Date.now());
-      const registeredYears = timeElapsed.years;
-      const registeredMonths = timeElapsed.months;
-
-      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
-      if (registeredYears > 0) {
-        message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
-        if (registeredMonths > 0) {
-          message += " and ";
-        }
-      }
-      if (registeredMonths > 0 || registeredYears === 0) {
-        message += registeredMonths + ((registeredMonths === 1) ? " Month" : " Months");
-      }
-      return message + ") ";
     },
     /**
      * User friendly display string for the user role. Converts the user role
