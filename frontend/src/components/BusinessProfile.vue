@@ -7,7 +7,7 @@ Date: 29/03/2021
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
             class="profile-card shadow" no-body
-    >
+    > <!-- v-if="businessFind" -->
 
       <template #header>
         <b-row>
@@ -97,9 +97,11 @@ h6 {
 
 <script>
 import dateCalculation from "./model/DateCalculation";
-//import api from "../Api";
+import api from "@/Api";
 
 export default {
+
+  //Todo still has errors because I Did not connect to Navbar, and I check all errors and all show Navbar issues.
 
   data: function () {
     return {
@@ -126,9 +128,45 @@ export default {
       businessFind: true
     }
   },
+
   mounted() {
-    //const businessDataId = this.$route.params.id;
+    const businessId = this.$route.params.id;
+    this.getBusinessInfo(businessId);
+
+    //todo When is the getBusinessInfo can work, there can delete.
     this.memberSince = dateCalculation.memberSince(this.businessData.created);
   },
+
+  methods: {
+    /**
+     * this is a get api which can take Specific business to display on the page
+     * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
+     * @param id
+     **/
+    //Todo need check the api is work.
+    getBusinessInfo: function (id) {
+      api
+        .getBusinesses(id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.setResponseData(response.data);
+          this.businessFind = true;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.businessFind = false;
+        })
+    },
+    /**
+     * set the response data to businessData
+     * @param data
+     */
+    //todo may need split the data from response.
+    setResponseData: function(data) {
+      this.businessData = data;
+      //this.memberSince = (this.businessFind)? dateCalculation.memberSince(this.businessData.created) : '';
+      this.memberSince = dateCalculation.memberSince(this.businessData.created);
+    }
+  }
 }
 </script>
