@@ -12,8 +12,8 @@ Date: 29/03/2021
       <template #header>
         <b-row>
           <b-col>
-            <h4 class="mb-1">{{ businessData.businessName }}</h4>
-            <p class="mb-1">{{ businessData.date }}</p>
+            <h4 class="mb-1">{{ businessData.name }}</h4>
+            <p class="mb-1">{{ memberSince }}</p>
           </b-col>
         </b-row>
       </template>
@@ -21,7 +21,7 @@ Date: 29/03/2021
       <b-list-group border-variant="secondary">
         <b-list-group-item>
           <b-card-text style="text-align: justify">
-            {{ businessData.describe }}
+            {{ businessData.description }}
           </b-card-text>
         </b-list-group-item>
       </b-list-group>
@@ -34,7 +34,7 @@ Date: 29/03/2021
                 <b-icon-tags></b-icon-tags>
               </b-col>
               <b-col cols="4"><b>Type:</b></b-col>
-              <b-col>{{ businessData.type }}</b-col>
+              <b-col>{{ businessData.businessType }}</b-col>
             </b-row>
           </h6>
           <h6>
@@ -43,7 +43,7 @@ Date: 29/03/2021
                 <b-icon-geo-alt></b-icon-geo-alt> <!-- geo-alt-->
               </b-col>
               <b-col cols="4"><b>Address:</b></b-col>
-              <b-col>{{ businessData.address }}</b-col>
+              <b-col>{{ Object.values(businessData.address).join(' ') }}</b-col>
             </b-row>
           </h6>
           <h6>
@@ -61,7 +61,7 @@ Date: 29/03/2021
                 <b-icon-phone-vibrate></b-icon-phone-vibrate>
               </b-col>
               <b-col cols="4"><b>Phone Number:</b></b-col>
-              <b-col>{{ businessData.phone }}</b-col>
+              <b-col>{{ businessData.phoneNumber }}</b-col>
             </b-row>
           </h6>
         </b-container>
@@ -72,9 +72,8 @@ Date: 29/03/2021
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Product</h4>
           </b-card-text>
-          <b-row v-for="product in businessData.products" :key="product">
-
-            <b-col cols="2" class="mb-1">{{product}}</b-col>
+          <b-row v-for="product in products" :key="product">
+            <b-col cols="2" class="mb-1">{{ product }}</b-col>
           </b-row>
         </b-list-group-item>
       </b-list-group>
@@ -86,7 +85,7 @@ Date: 29/03/2021
 
 <style scoped>
 .profile-card {
-  max-width: 45rem;
+  max-width: 50rem;
   margin-left: auto;
   margin-right: auto;
 }
@@ -97,22 +96,39 @@ h6 {
 </style>
 
 <script>
-
+import dateCalculation from "./model/DateCalculation";
+//import api from "../Api";
 
 export default {
+
   data: function () {
     return {
       businessData: {
-        businessName: 'Business Name',
-        describe: 'there are some Business describe',
-        address: 'some where',
-        type: 'supermarket',
-        date: '2021-04-01',
-        phone: 1234567,
-        email: 'email@email',
-        products: ['product1', 'product2', 'product3']
-      }
+        email: 'may have email',
+        phoneNumber: '+64 3 555 0129',
+        id: 1,
+        primaryAdministratorId: 20,
+        name: "Lumbridge General Store",
+        description: "A one-stop shop for all your adventuring needs",
+        address: {
+          streetNumber: "3/24",
+          streetName: "Ilam Road",
+          city: "Christchurch",
+          region: "Canterbury",
+          country: "New Zealand",
+          postcode: "90210"
+        },
+        businessType: "Accommodation and Food Services",
+        created: "2020-07-14T14:52:00Z"
+      },
+      memberSince: '',
+      products: ['products1', 'products2', 'products3'],
+      businessFind: true
     }
-  }
+  },
+  mounted() {
+    //const businessDataId = this.$route.params.id;
+    this.memberSince = dateCalculation.memberSince(this.businessData.created);
+  },
 }
 </script>
