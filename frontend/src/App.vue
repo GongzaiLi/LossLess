@@ -1,7 +1,7 @@
 <template>
   <b-container id="app">
     <Navbar/>
-    <BusinessProfile/>
+    <router-view/>
   </b-container>
 </template>
 
