@@ -71,8 +71,8 @@ Date: 3/3/2021
 
 <script>
 //import api from "@/Api";
-import AddressInput from "@/components/AddressInput";
-import usersInfo from "@/components/data/usersDate.json";
+import AddressInput from "../AddressInput";
+import usersInfo from "../data/usersDate.json";
 
 export default {
   components: {
