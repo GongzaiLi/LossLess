@@ -220,12 +220,12 @@ public class UserController {
         if (possibleUser == null) {
             logger.warn("ID does not exist.");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
         } else if (possibleUser.getId().equals(loggedInUser.getId())) {
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
+        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
         }
 
         possibleUser.setRole(UserRoles.USER);

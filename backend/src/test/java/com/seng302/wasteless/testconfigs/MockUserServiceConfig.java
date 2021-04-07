@@ -50,9 +50,9 @@ public class MockUserServiceConfig {
             user.setEmail("user@700");
             user.setPassword("password");
 
-            users.add(defaultAdmin);
-            users.add(admin);
-            users.add(user);
+            createUser(defaultAdmin);
+            createUser(admin);
+            createUser(user);
         }
 
         @Override
@@ -81,6 +81,11 @@ public class MockUserServiceConfig {
             users.add(user);
             user.setId(id);
             return user;
+        }
+
+        @Override
+        public void updateUser(User user) {
+            users.set(user.getId(), user);
         }
     }
 

@@ -1,6 +1,9 @@
 package com.seng302.wasteless;
 
+import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserController;
+import com.seng302.wasteless.User.UserRoles;
+import com.seng302.wasteless.User.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,9 @@ public class UserControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UserService userService;
 
     @Test
     public void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
@@ -156,9 +162,34 @@ public class UserControllerUnitTest {
 
     @Test
     @WithUserDetails("admin@700")
+    public void whenAdminTryDowngradeDefaultAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/makeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("admin@700")
+    public void whenAdminTryAddAdminToUser_thenOk() throws Exception {
+        User user = new User();
+        user.setEmail("blah");
+        user.setRole(UserRoles.USER);
+        user = userService.createUser(user);
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + user.getId().toString() + "/makeAdmin"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithUserDetails("admin@700")
     public void whenAdminTryRevokeDefaultAdmin_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("defaultadmin@700")
+    public void whenDefaultAdminTryRevokeSelf_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -166,6 +197,17 @@ public class UserControllerUnitTest {
     public void whenUserTryRevokeAdmin_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("defaultadmin@700")
+    public void whenDefaultAdminTryRevokeAdmin_thenOk() throws Exception {
+        User admin = new User();
+        admin.setEmail("blah");
+        admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+        admin = userService.createUser(admin);
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + admin.getId().toString() + "/revokeAdmin"))
+                .andExpect(status().isOk());
     }
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
