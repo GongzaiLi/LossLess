@@ -1,3 +1,7 @@
+<!--
+address input to be inserted into registration fields
+Date: sprint_1
+-->
 <template>
   <div class="address-input">
     <b-card>
@@ -10,7 +14,6 @@
           @input="onAddressChange"
           placeholder="Street"
           v-bind:value="value"
-          required
         />
 
       </b-form-group>
@@ -48,7 +51,6 @@
               v-model="homeAddress.city"
               placeholder="city"
               v-bind:value="value"
-              required
             />
           </b-col>
           <b-col>
@@ -56,7 +58,6 @@
               v-model="homeAddress.region"
               placeholder="region"
               v-bind:value="value"
-              required
             />
           </b-col>
         </b-row>
@@ -81,7 +82,6 @@
               v-model="homeAddress.postcode"
               placeholder="postcode"
               v-bind:value="value"
-              required
             />
           </b-col>
         </b-row>
@@ -198,34 +198,27 @@ export default {
      * and closes the autocomplete drop down
      */
     selectAddressOption(address) {
-
-      const addressIndex = this.addressResults.indexOf(address);//---------------
-
-      this.splitAddress(this.addressObject[addressIndex]); //-------------------
-
-
+      const addressIndex = this.addressResults.indexOf(address);
+      this.splitAddress(this.addressObject[addressIndex]);
       this.addressObject = [];
       this.addressResults = [];
-
-
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
       this.$emit('input', this.homeAddress);
-
     },
 
     /**
-     *
+     * take an address object and assign its values to the required fields for the home address object
+     * this is because the home address object is to the api spec
      */
     splitAddress(addressObject) {
-      this.homeAddress.streetNumber = addressObject.housenumber || '';
+      this.homeAddress.streetNumber = addressObject.housenumber || addressObject.name || '';
       this.homeAddress.streetName = addressObject.street || '';
-      this.homeAddress.city = addressObject.county || addressObject.district || addressObject.city || '';
-      this.homeAddress.region = addressObject.state || "";
-      this.homeAddress.country = addressObject.country || "";
-      this.homeAddress.postcode = addressObject.postcode ||"";
+      this.homeAddress.city = addressObject.county || addressObject.district || addressObject.city || ''; // order is to give better addresses to southern hemisphere locations
+      this.homeAddress.region = addressObject.state || addressObject.region || "";
+      this.homeAddress.country = addressObject.country;
+      this.homeAddress.postcode = addressObject.postcode || "";
       this.addressStreetNameNumber = `${this.homeAddress.streetNumber} ${this.homeAddress.streetName}`;
-
     },
 
     /**
@@ -260,24 +253,20 @@ export default {
     async queryAddressAutocomplete() {
       if (this.addressStreetNameNumber.trim().length <= 2) {
         this.addressResults = [];
-
-        this.addressObject = [];//-----------------------------
+        this.addressObject = [];
         return;
       }
       this.showAutocompleteDropdown = true;
 
       const addressQueryString = this.addressStreetNameNumber.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
-      this.addressResults = [];
-
-      this.addressObject = [];//-----------------------------
 
       for (const result of returnQuery) {
         const addressString = this.getStringFromPhotonAddress(result.properties);
 
         if (addressString != null && !this.addressResults.includes(addressString)) {
           this.addressResults.push(addressString);
-          this.addressObject.push(result.properties);//----------------------------------
+          this.addressObject.push(result.properties);
 
         }
       }

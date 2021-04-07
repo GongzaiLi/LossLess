@@ -136,3 +136,191 @@ test('all-fields', async () => {
     };
     expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, A County, New Zealand");
 });
+
+
+test('split-address-city-and-region', async () => {
+    const address = {
+        housenumber: "100",
+        street: "Sesame Street",
+        name: "A name",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        postcode: "1234"
+    };
+
+    const expectedAddress = {
+        "streetNumber": "100",
+        "streetName": "Sesame Street",
+        "city": "Gotham City",
+        "region": "canterbury",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.splitAddress(address);
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
+
+test('split-address-name', async () => {
+    const address = {
+        name: "A name",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        postcode: "1234"
+    };
+
+    const expectedAddress = {
+        "streetNumber": "A name",
+        "streetName": "",
+        "city": "Gotham City",
+        "region": "canterbury",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.splitAddress(address);
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
+
+test('split-address-name-and-streetname', async () => {
+    const address = {
+        street: "Sesame Street",
+        name: "A name",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        postcode: "1234"
+    };
+
+    const expectedAddress = {
+        "streetNumber": "A name",
+        "streetName": "Sesame Street",
+        "city": "Gotham City",
+        "region": "canterbury",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.splitAddress(address);
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
+test('split-address-name-and-streetname-and-number', async () => {
+    const address = {
+        housenumber: "100",
+        street: "Sesame Street",
+        name: "A name",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        postcode: "1234"
+    };
+
+    const expectedAddress = {
+        "streetNumber": "100",
+        "streetName": "Sesame Street",
+        "city": "Gotham City",
+        "region": "canterbury",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.splitAddress(address);
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
+
+test('split-address-county-district-city', async () => {
+    const address = {
+        housenumber: "100",
+        street: "Sesame Street",
+        name: "A name",
+        county: "a county",
+        district: "a district",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        postcode: "1234"
+    };
+
+    const expectedAddress = {
+        "streetNumber": "100",
+        "streetName": "Sesame Street",
+        "city": "a county",
+        "region": "canterbury",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.splitAddress(address);
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
+
+
+test('split-address-state-region', async () => {
+    const address = {
+        housenumber: "100",
+        street: "Sesame Street",
+        name: "A name",
+        county: "a county",
+        district: "a district",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        state: "a state",
+        postcode: "1234"
+    };
+
+    const expectedAddress = {
+        "streetNumber": "100",
+        "streetName": "Sesame Street",
+        "city": "a county",
+        "region": "a state",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.splitAddress(address);
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
+
+
+
+test('select-address-option, 1 address', async () => {
+    const address = {
+        housenumber: "100",
+        street: "Sesame Street",
+        name: "A name",
+        city: "Gotham City",
+        country: "New Zealand",
+        region: "canterbury",
+        postcode: "1234"
+
+    };
+    const address2 = {
+        housenumber: "50",
+        street: "jacks Street",
+        name: "bob",
+        city: "new york City",
+        country: "usa",
+        region: "South",
+        postcode: "5678"
+    };
+    const addressString = "100 Sesame Street, Gotham City, New Zealand";
+    const addressString2 = "50 jacks Street, new york City, usa";
+    const expectedAddress = {
+        "streetNumber": "100",
+        "streetName": "Sesame Street",
+        "city": "Gotham City",
+        "region": "canterbury",
+        "country": "New Zealand",
+        "postcode": "1234"
+    }
+    wrapper.vm.addressResults.push(addressString);
+    wrapper.vm.addressResults.push(addressString2);
+    wrapper.vm.addressObject.push(address);
+    wrapper.vm.addressObject.push(address2);
+    wrapper.vm.selectAddressOption(addressString)
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+});
