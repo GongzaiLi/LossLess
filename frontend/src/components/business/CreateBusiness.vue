@@ -12,7 +12,6 @@ Date: 3/3/2021
       <br>
       <b-form
           @submit="createBusiness"
-          @input="setCustomValidities"
       >
         <b-form-group
         >

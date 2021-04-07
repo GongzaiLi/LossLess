@@ -1,12 +1,17 @@
-import {shallowMount} from '@vue/test-utils';
+import {shallowMount, config} from '@vue/test-utils';
 // import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import CreateBusiness from '../business/CreateBusiness';
+config.showDeprecationWarnings = false  //to disable deprecation warnings
+
 
 let wrapper;
+let createBusiness;
 
 
 
 beforeEach(() => {
+    createBusiness = jest.fn();
+
 
     wrapper = shallowMount(CreateBusiness, {
         data() {
@@ -16,7 +21,9 @@ beforeEach(() => {
                 address: "",
                 businessType: "",
             }
-        }
+        }, methods: {
+            createBusiness,
+        },
     });
 });
 
@@ -33,17 +40,13 @@ describe('CreateBusiness', () => {
 describe('CreateBusiness', () => {
     test('Create button exists and gets called', async () => {
 
-        expect(wrapper.find("b-button").exists()).toBe(true);
 
+        const button = wrapper.find("b-button");
 
-        const createBtn = wrapper.find("b-button");
+        button.trigger("submit");
+        console.log(wrapper.vm.name);
 
-        const spy = jest.spyOn(CreateBusiness.methods, 'createBusiness');
-
-
-        await createBtn.trigger('submit');
-
-        expect(CreateBusiness.methods.createBusiness).toBeCalled();
+        expect(createBusiness).toHaveBeenCalledTimes(1);
 
 
     });
