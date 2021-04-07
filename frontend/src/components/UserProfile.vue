@@ -102,6 +102,20 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
+          <h6 v-if="userData.businessList" >
+            <b-row>
+              <b-col cols="0">
+                <b-icon-telephone-fill></b-icon-telephone-fill>
+              </b-col>
+              <b-col cols="4"><b>Businesses Adminned:</b></b-col>
+              <b-col>{{ userData.businessList[0] }}<ul id="example-1">
+                <li v-for="(item,index) in userData.businessList" :key="index">
+                  {{item}} {{index}}
+                </li>
+              </ul>
+                </b-col>
+            </b-row>
+          </h6>
         </b-container>
       </b-card-body>
     </b-card>
@@ -153,6 +167,8 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
+        businessList: [],
+        businessesAdministered: [],
       },
       userFound: true,
     }
@@ -161,6 +177,7 @@ export default {
   mounted() {
     const userId = this.$route.params.id;
     this.getUserInfo(userId);
+
   },
 
   methods: {
@@ -176,6 +193,7 @@ export default {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
             this.userFound = true;
+
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -261,6 +279,7 @@ export default {
             alert(error);
           });
     }
+
   },
   computed: {
     adminButtonToggle() {
@@ -313,6 +332,18 @@ export default {
         default:  // Button won't even appear if they are default global admin so this is fine
           return "Make Admin";
       }
+    },
+    businessesAdministratedList: function () {
+      let businessList = [];
+      for(let i = 0, size = this.userData.businessesAdministered.length; i < size ; i++){
+        businessList.push(this.userData.businessesAdministered[i].name);
+      }
+      businessList.push('a');
+      businessList.push('b');
+      businessList.push('c');
+      console.log('---------------',businessList)
+      return businessList;
+
     }
   },
   watch: {
