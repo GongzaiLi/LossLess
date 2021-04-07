@@ -9,6 +9,7 @@
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
+        <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item v-on:click="my_profile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
       </b-navbar-nav>
