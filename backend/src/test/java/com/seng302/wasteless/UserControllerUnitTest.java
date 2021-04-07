@@ -1,23 +1,13 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.Security.CustomUserDetails;
-import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserController;
-import com.seng302.wasteless.User.UserRoles;
-import org.junit.Before;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,18 +17,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
-        classes = MockUserDetailsService.class
-)
-@AutoConfigureMockMvc
+@WebMvcTest(UserController.class)
+@Import(MockUserServiceConfig.class)
 public class UserControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private UserController userController;
 
     @Test
     public void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
@@ -145,9 +129,8 @@ public class UserControllerUnitTest {
 
 
     @Test
+    @WithUserDetails("user@700")
     public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
-
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk());
     }
@@ -168,6 +151,13 @@ public class UserControllerUnitTest {
     @WithUserDetails("user@700")
     public void whenUserTryMakeAdmin_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("admin@700")
+    public void whenAdminTryRevokeDefaultAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
                 .andExpect(status().isForbidden());
     }
 
