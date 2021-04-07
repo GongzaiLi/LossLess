@@ -97,7 +97,7 @@ h6 {
 
 <script>
 import memberSince from "./MemberSince";
-import api from "@/Api";
+import api from "../Api";
 
 
 export default {
@@ -108,24 +108,23 @@ export default {
   data: function () {
     return {
       businessData: {
-        email: 'may have email',
-        phoneNumber: '+64 3 555 0129',
+        email: '',
+        phoneNumber: '',
         id: 1,
-        primaryAdministratorId: 20,
-        name: "Lumbridge General Store",
-        description: "A one-stop shop for all your adventuring needs",
+        primaryAdministratorId: 0,
+        name: "",
+        description: "",
         address: {
-          streetNumber: "3/24",
-          streetName: "Ilam Road",
-          city: "Christchurch",
-          region: "Canterbury",
-          country: "New Zealand",
-          postcode: "90210"
+          streetNumber: "",
+          streetName: "",
+          city: "",
+          region: "",
+          country: "",
+          postcode: ""
         },
-        businessType: "Accommodation and Food Services",
-        created: "2019-07-14T14:52:00Z"
+        businessType: "",
+        created: ""
       },
-      memberSince: '',
       products: ['products1', 'products2', 'products3'],
       businessFind: true
     }
