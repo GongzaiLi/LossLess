@@ -7,7 +7,8 @@ Date: 29/03/2021
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
             class="profile-card shadow" no-body
-    > <!-- v-if="businessFind" -->
+            v-if="businessFound"
+    >
 
       <template #header>
         <b-row>
@@ -78,6 +79,30 @@ Date: 29/03/2021
         </b-list-group-item>
       </b-list-group>
     </b-card>
+
+
+    <!--The business not found-->
+    <b-card border-variant="secondary" header-border-variant="secondary"
+            style="max-width: 50rem" no-body
+            v-if="!businessFound"
+    >
+      <template #header>
+        <h4 class="mb-1">Business not found</h4>
+      </template>
+      <b-card-body>
+        <h6>
+          <b-col>
+            The business you are looking for does not exist. The account may have been deleted, or you may have typed an
+            invalid URL into the address bar.
+          </b-col>
+          <b-col> Try again
+            <!--
+          <router-link to="/businesses">Create a new business here.</router-link>
+          -->
+          </b-col>
+        </h6>
+      </b-card-body>
+    </b-card>
   </div>
 
 
@@ -110,7 +135,7 @@ export default {
       businessData: {
         email: '',
         phoneNumber: '',
-        id: 1,
+        id: 0,
         primaryAdministratorId: 0,
         name: "",
         description: "",
@@ -126,7 +151,7 @@ export default {
         created: ""
       },
       products: ['products1', 'products2', 'products3'],
-      businessFind: true
+      businessFound: true // not smooth to switch the found or not find.
     }
   },
 
@@ -143,15 +168,15 @@ export default {
      **/
     getBusinessInfo: function (id) {
       api
-        .getBusinesses(id)
+        .getBusiness(id)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.setResponseData(response.data);
-          this.businessFind = true;
+          this.businessFound = true;
         })
         .catch((error) => {
           this.$log.debug(error);
-          this.businessFind = false;
+          this.businessFound = false;
         })
     },
     /**

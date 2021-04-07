@@ -23,7 +23,7 @@ beforeEach(() => {
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
 
-  Api.getBusinesses.mockRejectedValue(new Error(''));
+  Api.getBusiness.mockRejectedValue(new Error(''));
 
   wrapper = shallowMount(businessProfile, {
     localVue,
@@ -60,7 +60,7 @@ test('get-normal-data', async () => {
       created: "2019-07-14T14:52:00Z"
     }
   };
-  Api.getBusinesses.mockResolvedValue(response);
+  Api.getBusiness.mockResolvedValue(response);
   await wrapper.vm.getBusinessInfo(0);
   expect(wrapper.vm.businessData).toEqual(response.data);
 });
