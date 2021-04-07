@@ -57,7 +57,7 @@ Date: 5/3/2021
             </b-row>
           </h6>
           <h6>
-            <b-row v-show="userData.nickname.length">
+            <b-row v-show="userData.nickname">
               <b-col cols="0">
                 <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
               </b-col>
@@ -181,6 +181,7 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
+          console.log(this.userData, 1111111111);
           this.userFound = true;
         })
         .catch((error) => {
