@@ -84,22 +84,10 @@ public class User {
     @JsonView({UserViews.GetUserView.class})
     private LocalDate created;
 
-    //Omitted fields. Role: added in u4, business administered: added in u6
+    @Column(name = "role")
+    private UserRoles role;
 
-    /**
-     * Convenience constructor (it's discouraged to expose the JPA id field)
-     *
-     * @param firstName student first name
-     * @param lastName  student last name
-     */
-    public User(String firstName, String lastName, String email, LocalDate dateOfBirth, String homeAddress, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.dateOfBirth = dateOfBirth;
-        this.homeAddress = homeAddress;
-        this.password = password;
-    }
+    //Omitted fields. Role: added in u4, business administered: added in u6
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges

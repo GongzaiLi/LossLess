@@ -9,12 +9,19 @@ import javax.validation.constraints.NotNull;
 @ToString // generate a toString method
 public class Login {
 
+    private Login login;
+
     @NotNull(message = "email is mandatory")
     private String email;
 
     @NotNull(message = "password is mandatory")
     private String password;
 
+    public Login(String email, String password) {
+
+        this.email = email;
+        this.password = password;
+    }
 }
 
 

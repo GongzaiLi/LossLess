@@ -56,20 +56,13 @@ Date: 3/3/2021
       </b-col>
     </b-row>
     <br><br>
-    <b-form-group
-        label-cols="auto"
-        label="Demo Mode"
-        label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle" >{{ isDemoMode ? 'ON' : 'OFF' }}</b-button>
-    </b-form-group>
-
   </b-container>
 
 </template>
 
 <script>
 import api from "../Api";
-import usersInfo from './data/usersDate.json';
+
 
 export default {
   data: function () {
@@ -77,21 +70,10 @@ export default {
       errors: [],
       email: null,
       password: "",
-      isDemoMode: true,
       visiblePassword: false
     }
   },
-  computed: {
-    //if in demo mode or not change style of the button
-    demoVariant() {
-      return this.isDemoMode ? 'outline-success' : 'outline-danger';
-    }
-  },
   methods: {
-    // toggle the demo mode variable when button clicked
-    toggle: function() {
-      this.isDemoMode = !this.isDemoMode;
-    },
     //Password can hidden or shown by clicking button
     showPassword: function (value) {
       this.visiblePassword = !(value === 'show');
@@ -118,50 +100,27 @@ export default {
       };
       this.errors = [];
       api
-          .login(loginData)
-          .then((response) => {
-            this.$log.debug("Logged in");
-            //set global variable of logged in user
-            this.$currentUser.set(response.userId);
-            // Go to profile page
-            this.goToUserProfilePage(response.userId);
-          })
-          .catch((error) => {
-            this.$log.debug(error);
+        .login(loginData)
+        .then((response) => {
+          this.$log.debug("Logged in");
+          return api.getUser(response.data.id);
+        })
+        .then((userResponse) => {
+          this.$setCurrentUser(userResponse.data);
+          // Go to profile page
+          this.goToUserProfilePage(userResponse.data.id);
+        })
+        .catch((error) => {
+          console.log("ERRRRR");
+          console.log(error);
+          this.$log.debug(error);
 
-            // Currently we will always get a network error as we have no backend.
-            // In demos, don't show the network error. Delete this once we have a backend
-            if (this.isDemoMode) return;
-
-            if (error.response && error.response.status === 400) {
-              this.errors.push("The given username or password is incorrect.");
-            } else {
-              this.errors.push(error.message);
-            }
-          });
-      //if in demo mode set current user to default user 0 and go to user page
-      if (this.isDemoMode) {
-        this.demoModeLogin();
-      }
-    },
-    /**
-     * 'Logs' in the user by comparing the email to a bunch of dummy accounts
-     * Password's aren't checked, only the emails admin@sengmail.com, user@sengmail.com
-     * and defaultadmin@sengmail.com will give the dummy accounts
-     * FOR DEMO PURPOSES ONLY!!!!!
-     */
-    demoModeLogin() {
-      if (this.email === "admin@sengmail.com") {
-        this.$currentUser = usersInfo.users[0];
-      } else if (this.email === "user@sengmail.com") {
-        this.$currentUser = usersInfo.users[1];
-      } else if (this.email === "defaultadmin@sengmail.com") {
-        this.$currentUser = usersInfo.users[2];
-      } else {
-        this.errors.push("The given username or password is incorrect.");
-        return;
-      }
-      this.goToUserProfilePage(this.$currentUser.id);
+          if (error.response && error.response.status === 400) {
+            this.errors.push("The given username or password is incorrect.");
+          } else {
+            this.errors.push(error.message);
+          }
+        });
     },
     /**
      * Redirects to the profile page of the user with the specified userId.
@@ -169,7 +128,7 @@ export default {
      * so no loading spinner needs to be implemented here.
      */
     goToUserProfilePage: function (userId) {
-      this.$router.push({path: `/user/${userId}`});
+      this.$router.push({path: `/users/${userId}`});
     }
   }
 }
