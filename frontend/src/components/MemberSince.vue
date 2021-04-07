@@ -1,3 +1,8 @@
+<!--
+  Member since (date calculation)
+  Author: Gongzai Li
+  Date: 04/07/2021
+-->
 <template>
   <p class="mb-1" >{{ memberSince }}</p>
 </template>

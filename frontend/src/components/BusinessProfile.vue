@@ -134,9 +134,6 @@ export default {
   mounted() {
     const businessId = this.$route.params.id;
     this.getBusinessInfo(businessId);
-
-    //todo When is the getBusinessInfo can work, there can delete.
-    //this.memberSince = dateCalculation.memberSince(this.businessData.created);
   },
 
   methods: {
@@ -145,7 +142,6 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
      **/
-    //Todo need check the api is work.
     getBusinessInfo: function (id) {
       api
         .getBusinesses(id)
@@ -166,8 +162,6 @@ export default {
     //todo may need split the data from response.
     setResponseData: function (data) {
       this.businessData = data;
-      //this.memberSince = (this.businessFind)? dateCalculation.memberSince(this.businessData.created) : '';
-      //this.memberSince = dateCalculation.memberSince(this.businessData.created);
     }
   },
   computed: {

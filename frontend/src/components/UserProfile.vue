@@ -181,7 +181,6 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
-          console.log(this.userData, 1111111111);
           this.userFound = true;
         })
         .catch((error) => {
