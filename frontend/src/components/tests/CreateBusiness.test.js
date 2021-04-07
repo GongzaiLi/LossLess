@@ -1,18 +1,22 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {shallowMount} from '@vue/test-utils';
 // import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import CreateBusiness from '../business/CreateBusiness';
 
 let wrapper;
 
+
+
 beforeEach(() => {
-    const localVue = createLocalVue();
 
     wrapper = shallowMount(CreateBusiness, {
-        localVue,
-        propsData: {},
-        mocks: {},
-        stubs: {},
-        methods: {},
+        data() {
+            return {
+                name: "",
+                description: "",
+                address: "",
+                businessType: "",
+            }
+        }
     });
 });
 
@@ -26,6 +30,42 @@ describe('CreateBusiness', () => {
     });
 });
 
+describe('CreateBusiness', () => {
+    test('Create button exists and gets called', async () => {
+
+        expect(wrapper.find("b-button").exists()).toBe(true);
+
+
+        const createBtn = wrapper.find("b-button");
+
+        const spy = jest.spyOn(CreateBusiness.methods, 'createBusiness');
+
+
+        await createBtn.trigger('submit');
+
+        expect(CreateBusiness.methods.createBusiness).toBeCalled();
+
+
+    });
+});
+
+test('Create Business button records the filled by user and returns them.', async () => {
+
+
+
+})
+
+
+
+
+
+
+
+
+
+
+
+// HTML TESTING ----------------------------------------------------------------
 describe('CreateBusiness', () => {
     test('Page heading renders', () => {
         const headingExpected = "Create a Business";
@@ -57,7 +97,7 @@ describe('CreateBusiness', () => {
 
 describe('CreateBusiness', () => {
     test('Business Type label renders', () => {
-        const headingExpected = "Business Type";
+        const headingExpected = "Business Type *";
         expect(wrapper.findAll("b").at(3).text()).toEqual(headingExpected);
     });
 });

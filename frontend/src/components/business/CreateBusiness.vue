@@ -32,7 +32,7 @@ Date: 3/3/2021
         </b-form-group>
 
         <b-form-group >
-          <b>Business Type
+          <b>Business Type *
           </b>
           <div class="input-group mb-xl-5">
 
@@ -60,19 +60,12 @@ Date: 3/3/2021
     </b-card>
     <br>
 
-    <b-form-group
-        label-cols="auto"
-        label="Demo Mode"
-        label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isDemoMode ? 'ON' : 'OFF'}} </b-button>
-    </b-form-group>
   </div>
 </template>
 
 <script>
 //import api from "@/Api";
 import AddressInput from "../AddressInput";
-import usersInfo from "../data/usersDate.json";
 
 export default {
   components: {
@@ -84,15 +77,10 @@ export default {
       "description": "",
       "address": "",
       "businessType": "",
-      isDemoMode: true,
       errors: [],
     }
   },
   methods: {
-    toggle: function () {
-      this.isDemoMode = !this.isDemoMode;
-    },
-
     getBusinessData() {
       return {
         name: this.name,
@@ -100,14 +88,6 @@ export default {
         address: this.address,
         businessType: this.businessType
       };
-    },
-
-    /**
-     * Uses HTML constraint validation to set custom validity rules (so far, only checks that the 'password'
-     * and 'confirm password' fields match). See below for more info:
-     * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
-     */
-    setCustomValidities() {
     },
 
     /**
@@ -143,17 +123,8 @@ export default {
       //       this.errors.push(error.message);
       //     }
       //   });
-      if (this.isDemoMode) {
-        this.$currentUser = usersInfo.users[1];
-        this.$router.push({path: '/user/1'});
-      }
+
     },
-  },
-  computed: {
-    //if in demo mode or not change style of the button
-    demoVariant() {
-      return this.isDemoMode ? 'outline-success' : 'outline-danger';
-    }
   }
 }
 </script>
