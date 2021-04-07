@@ -67,17 +67,12 @@ public class BusinessController {
                     "Access token is invalid");
         }
 
-        logger.info("business was0 {}", business.toString());
         business.setPrimaryAdministrator(user);
 
-        logger.info("business was1 {}", business.toString());
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
-        logger.info("business was2 {}", business.toString());
         business.setAdministrators(adminList);
-        logger.info("business was3 {}", business.toString());
         user.addPrimaryBusiness(business);
-        logger.info("business was4 {}", business.toString());
 
         business.setCreated(LocalDate.now());
 
