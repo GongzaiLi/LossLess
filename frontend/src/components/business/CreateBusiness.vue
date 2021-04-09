@@ -96,7 +96,7 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    createBusiness(event) {
+    createBusiness() {
       //event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
      // let businessData = this.getBusinessData();
