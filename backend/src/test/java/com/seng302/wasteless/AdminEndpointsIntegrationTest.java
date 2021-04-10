@@ -4,6 +4,7 @@ import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserRoles;
 import com.seng302.wasteless.User.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
 
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -35,6 +37,54 @@ public class AdminEndpointsIntegrationTest {
 
     @Autowired
     UserService userService;
+
+    @Test
+    @WithMockCustomUser(email = "test@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+    public void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
+        User user = new User();
+
+        user.setRole(UserRoles.USER);
+        user.setEmail("Test@Gmail");
+        user.setPassword("password");
+        user.setDateOfBirth(LocalDate.now());
+        user.setBio("Bio1");
+        user.setFirstName("FirstName1");
+        user.setLastName("LastName1");
+        user.setHomeAddress("HomeAddress1");
+
+        userService.createUser(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin"))
+                .andExpect(status().isOk());
+
+        User resultUser = userService.findUserByEmail("Test@Gmail");
+
+        Assertions.assertEquals(UserRoles.GLOBAL_APPLICATION_ADMIN, resultUser.getRole());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "test@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+    public void whenTryMakeUserAdmin_andUserIsUserGlobalApplicationAdmin_andRequestFromDGAA_thenOk() throws Exception {
+        User user = new User();
+
+        user.setRole(UserRoles.USER);
+        user.setEmail("Test@Gmail");
+        user.setPassword("password");
+        user.setDateOfBirth(LocalDate.now());
+        user.setBio("Bio1");
+        user.setFirstName("FirstName1");
+        user.setLastName("LastName1");
+        user.setHomeAddress("HomeAddress1");
+
+        userService.createUser(user);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin"))
+                .andExpect(status().isOk());
+
+        User resultUser = userService.findUserByEmail("Test@Gmail");
+
+        Assertions.assertEquals(UserRoles.GLOBAL_APPLICATION_ADMIN, resultUser.getRole());
+    }
 
     @Test
     @WithMockCustomUser(email = "test@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
@@ -110,6 +160,10 @@ public class AdminEndpointsIntegrationTest {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin"))
                 .andExpect(status().isOk());
+
+        User resultUser = userService.findUserByEmail("Test@Gmail");
+
+        Assertions.assertEquals(UserRoles.USER, resultUser.getRole());
     }
 
     @Test
@@ -130,6 +184,10 @@ public class AdminEndpointsIntegrationTest {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin"))
                 .andExpect(status().isOk());
+
+        User resultUser = userService.findUserByEmail("Test@Gmail");
+
+        Assertions.assertEquals(UserRoles.USER, resultUser.getRole());
     }
 
 
