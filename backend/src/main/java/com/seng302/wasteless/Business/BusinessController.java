@@ -72,7 +72,7 @@ public class BusinessController {
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
         business.setAdministrators(adminList);
-        user.addPrimaryBusiness(business);
+        userService.addBusinessPrimarilyAdministered(user, business);
 
         business.setCreated(LocalDate.now());
 

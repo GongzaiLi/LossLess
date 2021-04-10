@@ -1,5 +1,6 @@
 package com.seng302.wasteless.User;
 
+import com.seng302.wasteless.Business.Business;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,4 +94,17 @@ public class UserService {
 
         return combinedResults;
     }
+
+    /**
+     * Add a primarily administered business to a user/
+     *
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     * @param user          The user to add to
+     * @param business      The business the user is a primary admin of
+     */
+    public void addBusinessPrimarilyAdministered(User user, Business business) {
+        user.addPrimaryBusiness(business);
+    }
+
 }

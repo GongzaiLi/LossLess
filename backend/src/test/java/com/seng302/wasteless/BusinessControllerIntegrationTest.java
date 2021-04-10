@@ -1,19 +1,14 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.Business.BusinessController;
-import com.seng302.wasteless.Business.BusinessRepository;
-import com.seng302.wasteless.Business.BusinessService;
-import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
+import com.seng302.wasteless.User.UserRoles;
+import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,24 +21,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@AutoConfigureMockMvc
-@Import(MockUserServiceConfig.class)
+@AutoConfigureMockMvc(addFilters = false) // Remove security
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties"
 )
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
 public class BusinessControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private BusinessService businessService;
-
-    @Autowired
-    private BusinessRepository businessRepository;
-
     @Test
-    @WithUserDetails("user@700")
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndBusinessExists_thenCorrectBusiness() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
 
@@ -57,16 +46,17 @@ public class BusinessControllerIntegrationTest {
     }
 
     @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndBusinessNotExists_then406Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
 
         mockMvc.perform(get("/businesses/2")
-                .cookie()
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndMultipleBusinessExists_thenCorrectBusiness() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
         createOneBusiness("Business2", "Location2", "Non-profit organisation", "I am a business 2");
@@ -79,6 +69,7 @@ public class BusinessControllerIntegrationTest {
     }
 
     @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusiness_andInvalidBusiness_dueToIllegalBusinessType_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Oil Company\", \"description\": \"We sell peanuts\"}";
 

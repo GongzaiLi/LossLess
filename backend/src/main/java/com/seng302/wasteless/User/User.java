@@ -103,7 +103,14 @@ public class User {
         return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));
     }
 
-    public void addPrimaryBusiness(Business business) {
+    /**
+     * Add a business to the list of businessesPrimarilyAdministered.
+     *
+     * Never call this directly, only call it from user service.
+     *
+     * @param business  The business to add to the list of businesses primarily administered
+     */
+    void addPrimaryBusiness(Business business) {
         this.businessesPrimarilyAdministered.add(business);
     }
 }

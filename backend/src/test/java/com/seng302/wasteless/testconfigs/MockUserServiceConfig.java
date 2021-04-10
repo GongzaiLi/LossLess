@@ -1,5 +1,7 @@
 package com.seng302.wasteless.testconfigs;
 
+import com.seng302.wasteless.Business.Business;
+import com.seng302.wasteless.Business.BusinessTypes;
 import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserRoles;
 import com.seng302.wasteless.User.UserService;
@@ -7,6 +9,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is a configuration file for a mocked UserService bean.
@@ -72,7 +75,12 @@ public class MockUserServiceConfig {
 
         @Override
         public User findUserById(Integer id) {
-            return users.get(id);
+            if (id < users.size()) {
+                return users.get(id);
+            } else {
+                return null;
+            }
+
         }
 
         @Override
@@ -81,6 +89,10 @@ public class MockUserServiceConfig {
             users.add(user);
             user.setId(id);
             return user;
+        }
+
+        @Override
+        public void addBusinessPrimarilyAdministered(User user, Business business) {
         }
 
         @Override
