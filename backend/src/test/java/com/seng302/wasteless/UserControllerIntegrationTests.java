@@ -185,19 +185,15 @@ public class UserControllerIntegrationTests {
     public void whenGetUserWithIdTwo_andOnlyOneCreatedUser_BesidedDefault_ThenGetCorrectUser() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
 
-        MvcResult mvcResult = mockMvc.perform(
+        mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-
-        assertEquals("{\"id\":2,\"firstName\":\"James\",\"lastName\":\"Harris\"," +
-                "\"middleName\":null,\"nickname\":null,\"bio\":null,\"email\":\"jeh128@uclive.ac.nz\"," +
-                "\"dateOfBirth\":\"2000-10-27\",\"phoneNumber\":null,\"homeAddress\":\"236a Blenheim Road\"," +
-                "\"businessesPrimarilyAdministered\":[],\"created\":\"2021-04-10\",\"role\":\"user\"}", result);
-    }
+                .andExpect(jsonPath("id", is(2)))
+                .andExpect(jsonPath("firstName", is("James")))
+                .andExpect(jsonPath("lastName", is("Harris")))
+                .andExpect(jsonPath("role", is("user")));
+        }
 
     @Test
     public void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
