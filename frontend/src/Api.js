@@ -44,6 +44,6 @@ export default {
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),
-  createBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: false}),
-
+  createBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
+  getBusinesses: (id) => instance.get(`businesses/${id}`, {withCredentials: true})
 }

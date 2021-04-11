@@ -60,19 +60,12 @@ Date: 26/3/2021
     </b-card>
     <br>
 
-    <b-form-group
-        label-cols="auto"
-        label="Demo Mode"
-        label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isDemoMode ? 'ON' : 'OFF'}} </b-button>
-    </b-form-group>
   </div>
 </template>
 
 <script>
 import api from "@/Api";
 import AddressInput from "@/components/AddressInput";
-import usersInfo from "@/components/data/usersDate.json";
 
 export default {
   components: {
@@ -89,9 +82,6 @@ export default {
     }
   },
   methods: {
-    toggle: function () {
-      this.isDemoMode = !this.isDemoMode;
-    },
 
     getBusinessData() {
       return {
@@ -125,13 +115,8 @@ export default {
 
       api
         .createBusiness(businessData)
-        .then((createResponse) => {
-          this.$log.debug("Business Created");
-          return api.getUser(createResponse.data.id);
-        })
         .then((businessResponse) => {
-          this.$currentUser = businessResponse.data;
-          this.$router.push({path: `/business/${businessResponse.data.id}`});
+          this.$router.push({path: `/businesses/${businessResponse.data.id}`});
         })
         .catch((error) => {
           this.errors = [];
@@ -142,10 +127,6 @@ export default {
             this.errors.push(error.message);
           }
         });
-      if (this.isDemoMode) {
-        this.$currentUser = usersInfo.users[1];
-        this.$router.push({path: '/user/1'});
-      }
     },
   },
   computed: {
