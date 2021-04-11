@@ -101,19 +101,17 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
-          <h6>
-          <router-link v-for="(card, index) in businessesAdministered"   :to="'/businesses/'+card.id" v-bind:key="card.id">
-            <b-row>
-              <b-col cols="0" v-if="index=0">
-                <b-icon-house-fill></b-icon-house-fill>
-              </b-col>
-              <b-col cols="4"><b>Business Name:</b></b-col>
-              <b-col> {{ card.name }}</b-col>
-            </b-row>
+          <h6><b-row>
+            <b-col cols="0">
+              <b-icon-building></b-icon-building>
+            </b-col>
+            <b-col cols="4"><b>Businesses Created:</b></b-col>
+            <b-col>
+            <router-link v-for="card in businessesAdministered"   :to="'/businesses/'+card.id.toString()" v-bind:key="card.id">
+                {{ card.name }}<br></router-link></b-col>
+          </b-row>
 
-
-          </router-link>
-            </h6>
+          </h6>
 
         </b-container>
       </b-card-body>
@@ -176,7 +174,7 @@ export default {
 
       },
       userFound: true,
-      businessesAdministered: [{name:'a', id: '1'}]
+      businessesAdministered: []
     }
   },
 
@@ -189,7 +187,9 @@ export default {
 
   methods: {
     createBusinessArray: function (){
-      this.businessesAdministered = [{name:'a', id: '1'},{name:'b', id: '2'},{name:'c', id: '3'}];
+      //todo
+      // this is currently just using demo data as the api does not correctly return business info
+      this.businessesAdministered = [{name:'Business A', id: 1, primaryAdministratorId: 1},{name:'Business b', id: 2, primaryAdministratorId: 2},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1}];
       //if(!userData.businessesAdministered){userData.businessesAdministered=testData}
     },
     /**
