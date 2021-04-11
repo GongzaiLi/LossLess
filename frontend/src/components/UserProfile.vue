@@ -107,7 +107,7 @@ Date: 5/3/2021
               <b-col cols="0" v-if="index=0">
                 <b-icon-house-fill></b-icon-house-fill>
               </b-col>
-              <b-col cols="4"><b>Home Address:</b></b-col>
+              <b-col cols="4"><b>Business Name:</b></b-col>
               <b-col> {{ card.name }}</b-col>
             </b-row>
 
