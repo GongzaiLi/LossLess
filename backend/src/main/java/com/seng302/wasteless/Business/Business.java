@@ -9,12 +9,13 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
-@ToString // generate a toString method
+@ToString(exclude = {"primaryAdministrator", "administrators"}) // generate a toString method
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Business {
 
@@ -47,27 +48,12 @@ public class Business {
     private String address;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
-    @NotBlank(message = "businessType is mandatory")
+    @NotNull(message = "businessType is mandatory")
     @Column(name = "business_type")
-    private String businessType;
+    private BusinessTypes businessType;
 
     @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "created")
     private LocalDate created;
 
-    /**
-     * Check the business type is valid by checking it is in enum
-     *
-     * @return  True if valid type, otherwise false
-     */
-    public boolean checkValidBusinessType() {
-
-        for (BusinessTypes type : BusinessTypes.values()) {
-            if (type.toString().equals(this.businessType)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

@@ -1,7 +1,7 @@
 <template>
   <b-container id="app">
     <Navbar/>
-    <CreateBusiness/>
+    <router-view/>
   </b-container>
 </template>
 
@@ -11,8 +11,7 @@ import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 import UserSearch from "./components/UserSearch";
-import CreateBusiness from "./components/business/CreateBusiness";
-
+import BusinessProfile from "./components/BusinessProfile";
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
@@ -27,7 +26,7 @@ const app = {
     UserProfile,
     Navbar,
     UserSearch,
-    CreateBusiness
+    BusinessProfile
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
