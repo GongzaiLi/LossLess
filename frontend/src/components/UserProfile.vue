@@ -101,6 +101,20 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
+          <h6>
+          <router-link v-for="(card, index) in businessesAdministered"   :to="'/businesses/'+card.id" v-bind:key="card.id">
+            <b-row>
+              <b-col cols="0" v-if="index=0">
+                <b-icon-house-fill></b-icon-house-fill>
+              </b-col>
+              <b-col cols="4"><b>Home Address:</b></b-col>
+              <b-col> {{ card.name }}</b-col>
+            </b-row>
+
+
+          </router-link>
+            </h6>
+
         </b-container>
       </b-card-body>
     </b-card>
@@ -158,18 +172,26 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
-        created: ""
+        created: "",
+
       },
       userFound: true,
+      businessesAdministered: [{name:'a', id: '1'}]
     }
   },
 
   mounted() {
     const userId = this.$route.params.id;
     this.getUserInfo(userId);
+    this.createBusinessArray(this.userData);
+    console.log(this.userData);
   },
 
   methods: {
+    createBusinessArray: function (){
+      this.businessesAdministered = [{name:'a', id: '1'},{name:'b', id: '2'},{name:'c', id: '3'}];
+      //if(!userData.businessesAdministered){userData.businessesAdministered=testData}
+    },
     /**
      * this is a get api which can take Specific user to display on the page
      * The function id means user's id, if the serve find -
