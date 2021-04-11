@@ -111,8 +111,6 @@ export default {
           this.goToUserProfilePage(userResponse.data.id);
         })
         .catch((error) => {
-          console.log("ERRRRR");
-          console.log(error);
           this.$log.debug(error);
 
           if (error.response && error.response.status === 400) {
