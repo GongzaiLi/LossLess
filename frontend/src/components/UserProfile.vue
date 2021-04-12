@@ -107,7 +107,7 @@ Date: 5/3/2021
             </b-col>
             <b-col cols="4"><b>Businesses Created:</b></b-col>
             <b-col>
-            <router-link v-for="card in businessesAdministered"   :to="'/businesses/'+card.id.toString()" v-bind:key="card.id">
+            <router-link v-for="card in this.userData.businessesPrimarilyAdministered"   :to="'/businesses/'+card.id.toString()" v-bind:key="card.id">
                 {{ card.name }}<br></router-link></b-col>
           </b-row>
 
@@ -171,27 +171,18 @@ export default {
         phoneNumber: "",
         homeAddress: "",
         created: "",
-
+        businessesPrimarilyAdministered:[],
       },
       userFound: true,
-      businessesAdministered: []
     }
   },
 
   mounted() {
     const userId = this.$route.params.id;
     this.getUserInfo(userId);
-    this.createBusinessArray(this.userData);
-    console.log(this.userData);
   },
 
   methods: {
-    createBusinessArray: function (){
-      //todo
-      // this is currently just using demo data as the api does not correctly return business info
-      this.businessesAdministered = [{name:'Business A', id: 1, primaryAdministratorId: 1},{name:'Business b', id: 2, primaryAdministratorId: 2},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1},{name:'Business c', id: 3,primaryAdministratorId: 1}];
-      //if(!userData.businessesAdministered){userData.businessesAdministered=testData}
-    },
     /**
      * this is a get api which can take Specific user to display on the page
      * The function id means user's id, if the serve find -
