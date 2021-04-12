@@ -5,6 +5,8 @@ import com.seng302.wasteless.repository.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BusinessService {
 
@@ -36,5 +38,13 @@ public class BusinessService {
         return businessRepository.findFirstById(id);
     }
 
+
+    /**
+     * Find all businesses administered by user id
+     *
+     * @param id        The id of the user administrators
+     * @return          All business ids administered by user id
+     */
+    public List<Business> findBusinessesByUserId(Integer id) {return businessRepository.findBySpecificAdminId(id); }
 
 }

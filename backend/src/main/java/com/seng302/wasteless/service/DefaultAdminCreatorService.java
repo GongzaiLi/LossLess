@@ -88,6 +88,7 @@ public class DefaultAdminCreatorService {
         defaultAdmin.setFirstName("Default");
         defaultAdmin.setLastName("Admin");
         defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
+        defaultAdmin.setCreated(LocalDate.now());
 
         userService.createUser(defaultAdmin);
     }
