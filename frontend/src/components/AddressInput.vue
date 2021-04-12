@@ -9,6 +9,7 @@ Date: sprint_1
         <b-row>
           <b-col><b>Street</b></b-col>
         </b-row>
+        <div>
         <b-form-input
           v-model="addressStreetNameNumber"
           @input="onAddressChange"
@@ -16,28 +17,28 @@ Date: sprint_1
           v-bind:value="value"
         />
 
+        <b-list-group
+          class="address-options-list"
+          v-if="showAutocompleteDropdown && addressResults.length > 0"
+        >
+
+          <b-list-group-item button
+                             v-for="address in addressResults"
+                             v-bind:key="address"
+                             @click="selectAddressOption(address)"
+          >
+            {{ address }}
+          </b-list-group-item>
+
+          <b-list-group-item button
+                             class="address-option address-close"
+                             @click="showAutocompleteDropdown = false"
+          >
+            &#10060; Close Suggestions
+          </b-list-group-item>
+        </b-list-group>
+        </div>
       </b-form-group>
-
-      <b-list-group
-        class="address-options-list"
-        v-if="showAutocompleteDropdown && addressResults.length > 0"
-      >
-
-        <b-list-group-item button
-                           v-for="address in addressResults"
-                           v-bind:key="address"
-                           @click="selectAddressOption(address)"
-        >
-          {{ address }}
-        </b-list-group-item>
-
-        <b-list-group-item button
-                           class="address-option address-close"
-                           @click="showAutocompleteDropdown = false"
-        >
-          &#10060; Close Suggestions
-        </b-list-group-item>
-      </b-list-group>
 
 
       <b-form-group>
@@ -104,11 +105,14 @@ Date: sprint_1
 }
 
 .address-options-list {
-  width: 100%;
+  width: calc(100% - 2 * 1.25rem);
   position: absolute;
   z-index: 9999;
   max-height: 16em;
   overflow-y: scroll;
+  top: 78px;
+
+
 }
 
 </style>
@@ -244,7 +248,6 @@ export default {
     },
 
 
-
     /**
      * Authors: Phil Taylor, Gongzai Li, Eric Song
      * Queries the Photon Komoot API with the home address and puts the
@@ -260,6 +263,9 @@ export default {
 
       const addressQueryString = this.addressStreetNameNumber.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
+
+      this.addressResults = [];
+      this.addressObject = [];
 
       for (const result of returnQuery) {
         const addressString = this.getStringFromPhotonAddress(result.properties);
