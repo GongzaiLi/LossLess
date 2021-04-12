@@ -2,11 +2,11 @@ package com.seng302.wasteless.User;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.MainApplicationRunner;
+import com.seng302.wasteless.Security.CustomUserDetails;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,13 +19,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -166,6 +163,78 @@ public class UserController {
         logger.info("Account: {} retrieved successfully", possibleUser);
         return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
     }
+
+
+    /**
+     * Endpoint to make a specified user an admin. Sets user role to GLOBAL_APPLICATION_ADMIN
+     * if successful. Returns 406 NOT_ACCEPTABLE status if the user id does not exist.
+     * Returns 403 FORBIDDEN if the user making the request is not an admin.
+     * @param userId The id of the user to be made an admin
+     * @param authentication Spring Security Authentication object, representing current user and token
+     * @return 200 OK, 406 Not Acceptable, 403 Forbidden
+     */
+    @PutMapping("/users/{id}/makeAdmin")
+    public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
+
+        User possibleUser = userService.findUserById(userId);
+        logger.info("possible User{}", possibleUser);
+
+        // The Spring Security principal can only be retrieved as an Object and needs to be cast
+        // to the correct UserDetails instance, see:
+        // https://www.baeldung.com/get-user-in-spring-security
+        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+
+        if (possibleUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot change role of a DGAA");
+        }
+
+        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+        userService.updateUser(possibleUser);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Endpoint to revoke a specified user's admin role. Sets user role to USER
+     * if successful.
+     * @param userId The id of the user to be made an admin
+     * @param authentication Spring Security Authentication object, representing current user and token
+     * @return 200 OK if successful. 406 NOT_ACCEPTABLE status if the user id does not exist.
+     * 403 FORBIDDEN if the user making the request is not an admin. 409 CONFLICT if the admin
+     * tries to revoke their own admin status.
+     */
+    @PutMapping("/users/{id}/revokeAdmin")
+    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
+
+        User possibleUser = userService.findUserById(userId);
+        logger.info("possible User{}", possibleUser);
+
+        // The Spring Security principal can only be retrieved as an Object and needs to be cast
+        // to the correct UserDetails instance, see:
+        // https://www.baeldung.com/get-user-in-spring-security
+        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+
+        if (possibleUser == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        } else if (possibleUser.getId().equals(loggedInUser.getId())) {
+            logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
+        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
+        }
+
+        possibleUser.setRole(UserRoles.USER);
+        userService.updateUser(possibleUser);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
 
     /**
      * Takes an inputed username and password and checks the credentials against the database of saved users.

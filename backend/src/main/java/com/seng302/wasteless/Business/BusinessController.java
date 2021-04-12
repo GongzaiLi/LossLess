@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -51,18 +53,14 @@ public class BusinessController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
-        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
+        logger.info("Request to create new business {}", business);
 
-        if (type == null || !type.getValue().contains("USER")) {
-            logger.warn("Access token is missing or invalid.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is missing or invalid");
-        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
 
-        String cookieValue = type.getValue();
-        String userId = cookieValue.substring(0, cookieValue.length() - 5);
+        User user = userService.findUserByEmail(currentPrincipalEmail);
 
-        User user = userService.findUserById(Integer.parseInt(userId));
+        logger.info("User trying to create business is: {}", user);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
@@ -74,18 +72,9 @@ public class BusinessController {
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
         business.setAdministrators(adminList);
-        user.addPrimaryBusiness(business);
-
-        logger.info("business was {}", business);
-
-//        //Validate business type
-//        if(! business.checkValidBusinessType()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid business type");
-//        }
+        userService.addBusinessPrimarilyAdministered(user, business);
 
         business.setCreated(LocalDate.now());
-
-        //Todo add association to the user who created this business
 
         //Save business
         business = businessService.createBusiness(business);
@@ -105,14 +94,6 @@ public class BusinessController {
     @GetMapping("/businesses/{id}")
     @JsonView({BusinessViews.GetBusinessView.class})
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
-
-        Cookie type = WebUtils.getCookie(request, "JSESSIONID");
-
-        if (type == null || !type.getValue().contains("USER")) {
-            logger.warn("Access token is missing or invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is missing or invalid");
-        }
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("possible Business{}", possibleBusiness);

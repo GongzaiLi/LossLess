@@ -1,6 +1,7 @@
 package com.seng302.wasteless.Security;
 
 import com.seng302.wasteless.User.User;
+import com.seng302.wasteless.User.UserRoles;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return user.getPassword();
+    }
+
+    public Integer getId() {
+        return user.getId();
     }
 
     @Override

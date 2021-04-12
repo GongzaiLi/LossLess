@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 import UserSearch from "./components/UserSearch";
 import HomePage from "@/components/HomePage";
+import CreateBusiness from "./components/business/CreateBusiness";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -20,13 +21,14 @@ import HomePage from "@/components/HomePage";
 const app = {
   name: "app",
   components: {
-    HomePage,
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
     Login,
     Register,
     UserProfile,
     Navbar,
+    HomePage,
+    CreateBusiness,
     UserSearch
   },
   // app initial state
