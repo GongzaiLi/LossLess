@@ -21,13 +21,7 @@ Date: 3/3/2021
             <b-form-group>
               <b>Password</b>
               <div class="input-group mb-2 mr-sm-2">
-                <b-form-input v-if="visiblePassword"
-                              type="text" required
-                              v-model=password
-                              class="form-control"
-                              autocomplete="off"/>
-                <b-form-input v-else-if="!visiblePassword"
-                              type="password" required
+                <b-form-input v-bind:type="passwordType" required
                               v-model=password
                               class="form-control"
                               autocomplete="off"/>
@@ -111,8 +105,6 @@ export default {
           this.goToUserProfilePage(userResponse.data.id);
         })
         .catch((error) => {
-          console.log("ERRRRR");
-          console.log(error);
           this.$log.debug(error);
 
           if (error.response && error.response.status === 400) {
@@ -129,6 +121,12 @@ export default {
      */
     goToUserProfilePage: function (userId) {
       this.$router.push({path: `/users/${userId}`});
+    }
+  },
+  computed: {
+    //if the password can visible to be text else be password
+    passwordType() {
+      return this.visiblePassword ? "text" : "password";
     }
   }
 }
