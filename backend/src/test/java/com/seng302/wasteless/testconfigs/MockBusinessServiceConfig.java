@@ -63,6 +63,8 @@ public class MockBusinessServiceConfig {
             return businesses.get(id);
         }
 
+        @Override
+        public List<Business> findBusinessesByUserId(Integer id) {return businesses; }
     }
 
 }

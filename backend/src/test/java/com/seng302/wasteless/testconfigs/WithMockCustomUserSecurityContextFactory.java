@@ -33,6 +33,7 @@ public class WithMockCustomUserSecurityContextFactory
         user.setFirstName("FirstName");
         user.setLastName("LastName");
         user.setHomeAddress("HomeAddress");
+        user.setCreated(LocalDate.now());
 
         userService.createUser(user);
 

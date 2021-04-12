@@ -22,7 +22,6 @@ public class GetUserDtoMapper {
     }
 
     public static GetUserDto toGetUserDto(User user) {
-        System.out.println(user);
 
         List<Business> businesses = businessService.findBusinessesByUserId(user.getId());
 
