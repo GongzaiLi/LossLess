@@ -99,8 +99,6 @@ export default {
         password: this.password
       };
       this.errors = [];
-      /** todo move to inside second .then once backend working with cors */
-      this.goToUserHomePage();
       api
         .login(loginData)
         .then((response) => {
@@ -109,9 +107,7 @@ export default {
         })
         .then((userResponse) => {
           this.$setCurrentUser(userResponse.data);
-
-          // Go to profile page
-          //this.goToUserProfilePage(userResponse.data.id);
+          this.goToUserHomePage();
         })
         .catch((error) => {
           console.log(error);
@@ -124,17 +120,11 @@ export default {
           }
         });
     },
-
+    /**
+     * Redirects to the home page of the user
+     */
     goToUserHomePage : function () {
       this.$router.push({path:`/homePage`});
-    },
-    /**
-     * Redirects to the profile page of the user with the specified userId.
-     * This will switch components immediately to the UserProfile component
-     * so no loading spinner needs to be implemented here.
-     */
-    goToUserProfilePage: function (userId) {
-      this.$router.push({path: `/users/${userId}`});
     }
   }
 }

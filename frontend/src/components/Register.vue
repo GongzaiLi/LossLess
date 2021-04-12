@@ -152,7 +152,6 @@ Date: 3/3/2021
 <script>
 import api from "@/Api";
 import AddressInput from "@/components/AddressInput";
-import usersInfo from "@/components/data/usersDate.json";
 
 export default {
   components: {
@@ -237,7 +236,7 @@ export default {
         })
         .then((userResponse) => {
           this.$setCurrentUser(userResponse.data);
-          this.$router.push({path: `/users/${userResponse.data.id}`});
+          this.$router.push({path: `/homePage`});
         })
         .catch((error) => {
           this.errors = [];
@@ -248,10 +247,6 @@ export default {
             this.errors.push(error.message);
           }
         });
-      if (this.isDemoMode) {
-        this.$setCurrentUser(usersInfo.users[1].id);
-        this.$router.push({path: '/users/1'});
-      }
     },
   },
   computed: {
