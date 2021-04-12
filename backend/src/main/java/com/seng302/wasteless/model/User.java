@@ -22,29 +22,28 @@ public class User {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView({UserViews.SearchUserView.class})
     private Integer id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
-    @JsonView({UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView(UserViews.PostUserRequestView.class)
     private String firstName;
 
     @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String lastName;
 
     @Column(name = "middle_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String middleName;
 
     @Column(name = "nick_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String nickname;
 
     @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String bio;
 
     @NotBlank(message = "email is mandatory")
@@ -64,7 +63,7 @@ public class User {
 
     @NotBlank(message = "homeAddress is mandatory")
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String homeAddress;
 
     @NotBlank(message = "password is mandatory")
