@@ -111,7 +111,9 @@ Date: 3/3/2021
         <b-form-group
         >
           <b>Date of Birth *</b>
+          <div>Note: you must be at least 13 years old to register</div>
           <b-form-input type="date" v-model="dateOfBirth" required
+           id="dateOfBirthInput"
            placeholder="Date of Birth"
            autocomplete="off"
            size=30;
@@ -126,7 +128,6 @@ Date: 3/3/2021
            autocomplete="off"
            size=30;
           />
-          <div class="invalid-feedback">Please enter a phone # like 123-456-7890. This field is required.</div>
         </b-form-group>
         <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
       </b-form>
@@ -150,9 +151,12 @@ Date: 3/3/2021
 </template>
 
 <script>
-import api from "@/Api";
-import AddressInput from "@/components/AddressInput";
-import usersInfo from "@/components/data/usersDate.json";
+import api from "../Api";
+import AddressInput from "./AddressInput";
+
+const MIN_AGE_YEARS = 13;
+const MAX_AGE_YEARS = 130;
+const UNIX_EPOCH_YEAR = 1970;
 
 export default {
   components: {
@@ -208,12 +212,16 @@ export default {
     /**
      * Author: Eric Song
      * Uses HTML constraint validation to set custom validity rules (so far, only checks that the 'password'
-     * and 'confirm password' fields match). See below for more info:
+     * and 'confirm password' fields match, and the date of birth is valid). See below for more info:
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
+      console.log(this.dateOfBirthCustomValidity);
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
       confirmPasswordInput.setCustomValidity(this.password !== this.confirmPassword ? "Passwords do not match." : "");
+
+      const dateOfBirthInput = document.getElementById('dateOfBirthInput');
+      dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
     },
 
     /**
@@ -227,37 +235,61 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      //console.log(registerData);
 
       api
-        .register(registerData)
-        .then((loginResponse) => {
-          this.$log.debug("Registered");
-          return api.getUser(loginResponse.data.id);
-        })
-        .then((userResponse) => {
-          this.$setCurrentUser(userResponse.data);
-          this.$router.push({path: `/users/${userResponse.data.id}`});
-        })
-        .catch((error) => {
-          this.errors = [];
-          this.$log.debug(error);
-          if ((error.response && error.response.status === 400)) {
-            this.errors.push("Registration failed.");
-          } else {
-            this.errors.push(error.message);
-          }
-        });
-      if (this.isDemoMode) {
-        this.$setCurrentUser(usersInfo.users[1].id);
-        this.$router.push({path: '/users/1'});
-      }
+          .register(registerData)
+          .then((loginResponse) => {
+            this.$log.debug("Registered");
+            return api.getUser(loginResponse.data.id);
+          })
+          .then((userResponse) => {
+            this.$setCurrentUser(userResponse.data);
+            this.$router.push({path: `/users/${userResponse.data.id}`});
+          })
+          .catch((error) => {
+            this.errors = [];
+            this.$log.debug(error);
+            if ((error.response && error.response.status === 400)) {
+              this.errors.push("Registration failed.");
+            } else {
+              this.errors.push(error.message);
+            }
+          });
     },
   },
   computed: {
     //if in demo mode or not change style of the button
     demoVariant() {
       return this.isDemoMode ? 'outline-success' : 'outline-danger';
+    },
+    passwordsMatch() {
+      return this.password === this.confirmPassword;
+    },
+    /**
+     * Returns the HTML5 validity string based on the value of the birth date input. Birth dates must be at least
+     * 13 years old and cannot be more tha 130 years old.
+     * See below for more details:
+     * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
+     * @returns {string} A HTML5 validity string. Equal to "" (empty string) if the birthdate is valid,
+     * otherwise "You must be at least 13 years old" or "Please enter a valid birthdate"
+     */
+    dateOfBirthCustomValidity() {
+      const dateOfBirthJSDate = Date.parse(this.dateOfBirth);
+      if (isNaN(dateOfBirthJSDate)) {
+        return "Please enter a valid birthdate";
+      }
+
+      // Taken from https://stackoverflow.com/questions/8152426/how-can-i-calculate-the-number-of-years-between-two-dates
+      const dateDiffMs = Date.now() - dateOfBirthJSDate;
+      const diffDate = new Date(dateDiffMs); // milliseconds from epoch
+      const yearsSinceBirthDay = diffDate.getUTCFullYear() - UNIX_EPOCH_YEAR;
+
+      if (yearsSinceBirthDay < MIN_AGE_YEARS) {
+        return "You must be at least 13 years old";
+      } else if (yearsSinceBirthDay > MAX_AGE_YEARS) {
+        return "Please enter a valid birthdate"
+      }
+      return "";
     }
   }
 }
