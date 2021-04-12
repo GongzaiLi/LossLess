@@ -4,31 +4,45 @@ Date: sprint_1
 -->
 <template>
   <div class="address-input">
-    <b-card>
-      <b-form-group>
-        <b-row>
-          <b-col><b>Street</b></b-col>
-        </b-row>
-        <div>
-        <b-form-input
-          v-model="addressStreetNameNumber"
-          @input="onAddressChange"
-          placeholder="Street"
-          v-bind:value="value"
-        />
+    <b-card >
 
-        <b-list-group
-          class="address-options-list"
+      <b-form-group>
+
+        <b-row>
+          <b-col><b>Street Address</b></b-col>
+        </b-row>
+
+        <b-row>
+          <b-col>
+            <b-input-group>
+              <b-form-input
+                style="max-width: 6em"
+                v-model="homeAddress.streetNumber"
+                placeholder="Number"
+                v-bind:value="value"
+              />
+              <b-form-input
+                v-model="homeAddress.streetName"
+                @input="onAddressChange"
+                placeholder="Street"
+                v-bind:value="value"
+              />
+            </b-input-group>
+          </b-col>
+        </b-row>
+        <div
+          class="address-options-wrapper"
           v-if="showAutocompleteDropdown && addressResults.length > 0"
         >
-
-          <b-list-group-item button
-                             v-for="address in addressResults"
-                             v-bind:key="address"
-                             @click="selectAddressOption(address)"
-          >
-            {{ address }}
-          </b-list-group-item>
+          <b-list-group class="address-options-list">
+            <b-list-group-item button
+                               v-for="address in addressResults"
+                               v-bind:key="address"
+                               @click="selectAddressOption(address)"
+            >
+              {{ address }}
+            </b-list-group-item>
+          </b-list-group>
 
           <b-list-group-item button
                              class="address-option address-close"
@@ -36,7 +50,6 @@ Date: sprint_1
           >
             &#10060; Close Suggestions
           </b-list-group-item>
-        </b-list-group>
         </div>
       </b-form-group>
 
@@ -50,14 +63,14 @@ Date: sprint_1
           <b-col>
             <b-form-input
               v-model="homeAddress.city"
-              placeholder="city"
+              placeholder="City"
               v-bind:value="value"
             />
           </b-col>
           <b-col>
             <b-form-input
               v-model="homeAddress.region"
-              placeholder="region"
+              placeholder="Region"
               v-bind:value="value"
             />
           </b-col>
@@ -70,20 +83,23 @@ Date: sprint_1
           <b-col><b>Postcode</b></b-col>
         </b-row>
         <b-row>
-          <b-col>
+          <b-col md="6">
             <b-form-input
               v-model="homeAddress.country"
-              placeholder="country"
+              placeholder="Country"
               v-bind:value="value"
               required
             />
           </b-col>
-          <b-col>
+          <b-col md="4">
             <b-form-input
               v-model="homeAddress.postcode"
-              placeholder="postcode"
+              placeholder="Postcode"
               v-bind:value="value"
             />
+          </b-col>
+          <b-col md="2">
+            <b-button variant="secondary" style="float:right" @click="clearAddress">Clear</b-button>
           </b-col>
         </b-row>
       </b-form-group>
@@ -104,15 +120,16 @@ Date: sprint_1
   text-align: center;
 }
 
-.address-options-list {
+.address-options-wrapper {
   width: calc(100% - 2 * 1.25rem);
   position: absolute;
   z-index: 9999;
-  max-height: 16em;
-  overflow-y: scroll;
   top: 78px;
+}
 
-
+.address-options-list {
+  max-height: 12.7em;
+  overflow-y: scroll;
 }
 
 </style>
@@ -124,21 +141,19 @@ export default {
   // This prop is needed for parent components to use v-model on this.
   // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
   props: ['value'],
-
   data: function () {
     return {
       addressResults: [],
       addressObject: [],
       showAutocompleteDropdown: false,
       awaitingSearch: false,
-      addressStreetNameNumber: "",
       homeAddress: {
-        "streetNumber": "",
-        "streetName": "",
-        "city": "",
-        "region": "",
-        "country": "",
-        "postcode": ""
+        streetNumber: "",
+        streetName: "",
+        city: "",
+        region: "",
+        country: "",
+        postcode: ""
       }
     }
   },
@@ -172,9 +187,6 @@ export default {
           if (address.housenumber && address.street) {
             addressString = address.housenumber + ' ' + address.street + ', ' + addressString;
             addressValid = true;
-          } else if (address.name) {
-            addressString = address.name + ', ' + addressString;
-            addressValid = true;
           }
         }
       }
@@ -191,7 +203,7 @@ export default {
      * JSON results. A limit of 10 is placed on the number of addresses returned.
      */
     async getPhotonJsonResults(input) {
-      const url = 'https://photon.komoot.io/api/?q=' + input + '&limit=10';
+      const url = 'https://photon.komoot.io/api/?q=' + input;// + '&limit=10'
       let returned = await (await fetch(url)).json();
       return returned.features;
     },
@@ -204,8 +216,7 @@ export default {
     selectAddressOption(address) {
       const addressIndex = this.addressResults.indexOf(address);
       this.splitAddress(this.addressObject[addressIndex]);
-      this.addressObject = [];
-      this.addressResults = [];
+      this.emptyAddressArray();
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
       this.$emit('input', this.homeAddress);
@@ -216,13 +227,12 @@ export default {
      * this is because the home address object is to the api spec
      */
     splitAddress(addressObject) {
-      this.homeAddress.streetNumber = addressObject.housenumber || addressObject.name || '';
+      this.homeAddress.streetNumber = addressObject.housenumber || '';
       this.homeAddress.streetName = addressObject.street || '';
       this.homeAddress.city = addressObject.county || addressObject.district || addressObject.city || ''; // order is to give better addresses to southern hemisphere locations
       this.homeAddress.region = addressObject.state || addressObject.region || "";
       this.homeAddress.country = addressObject.country;
       this.homeAddress.postcode = addressObject.postcode || "";
-      this.addressStreetNameNumber = `${this.homeAddress.streetNumber} ${this.homeAddress.streetName}`;
     },
 
     /**
@@ -236,7 +246,7 @@ export default {
     async onAddressChange() {
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
-      this.$emit('input', this.addressStreetNameNumber);
+      this.$emit('input', this.homeAddress.streetName);
 
       if (!this.awaitingSearch) {
         setTimeout(() => {
@@ -254,18 +264,23 @@ export default {
      * results into addressFind.
      */
     async queryAddressAutocomplete() {
-      if (this.addressStreetNameNumber.trim().length <= 2) {
-        this.addressResults = [];
-        this.addressObject = [];
+      if (this.homeAddress.streetName.trim().length <= 2) {
+        this.emptyAddressArray();
         return;
       }
       this.showAutocompleteDropdown = true;
 
-      const addressQueryString = this.addressStreetNameNumber.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
+      const addressQueryString = this.homeAddress.streetNumber.replace(/\s/gm, " ") + " " +
+        this.homeAddress.streetName.replace(/\s/gm, " ") + " " +
+        this.homeAddress.city.replace(/\s/gm, " ") + " " +
+        this.homeAddress.region.replace(/\s/gm, " ") + " " +
+        this.homeAddress.country.replace(/\s/gm, " ") + " " +
+        this.homeAddress.postcode.replace(/\s/gm, " ");  // Replace newlines and tabs with spaces, otherwise Photon gets confused
+
       let returnQuery = await this.getPhotonJsonResults(addressQueryString);
 
-      this.addressResults = [];
-      this.addressObject = [];
+
+      this.emptyAddressArray();
 
       for (const result of returnQuery) {
         const addressString = this.getStringFromPhotonAddress(result.properties);
@@ -277,6 +292,22 @@ export default {
         }
       }
 
+    },
+
+    /**
+     * clean address array
+     * clean address Object
+     */
+    emptyAddressArray() {
+      this.addressResults = [];
+      this.addressObject = [];
+    },
+
+    /**
+     * clear all address to be empty string.
+     */
+    clearAddress() {
+      Object.keys(this.homeAddress).forEach(key => this.homeAddress[key] = '');
     }
   }
 }
