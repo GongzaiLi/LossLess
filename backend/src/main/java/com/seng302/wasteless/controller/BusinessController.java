@@ -1,6 +1,8 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.model.Business;
@@ -92,7 +94,6 @@ public class BusinessController {
      * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
      */
     @GetMapping("/businesses/{id}")
-    @JsonView({BusinessViews.GetBusinessView.class})
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -103,7 +104,12 @@ public class BusinessController {
         }
 
         logger.info("Business: {} retrieved successfully", possibleBusiness);
-        return ResponseEntity.status(HttpStatus.OK).body(possibleBusiness);
+
+        GetBusinessesDto getBusinessesDto = GetBusinessesDtoMapper.toGetBusinessesDto(possibleBusiness);
+
+        logger.info(getBusinessesDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
     }
 
 

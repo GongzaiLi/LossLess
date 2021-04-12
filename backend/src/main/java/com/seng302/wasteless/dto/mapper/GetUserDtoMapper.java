@@ -28,7 +28,6 @@ public class GetUserDtoMapper {
 
         List<BusinessAdministered> businessesAdministered = new ArrayList<>();
 
-
         for (Business business : businesses) {
 
             List<String> administrators = new ArrayList<>();
@@ -39,13 +38,13 @@ public class GetUserDtoMapper {
 
             businessesAdministered.add(
                     new BusinessAdministered().setId(business.getId())
-                                            .setAdministrators(administrators)
-                    .setPrimaryAdministratorId(business.getPrimaryAdministrator().getId())
-                            .setName(business.getName())
-                    .setDescription(business.getDescription())
-                    .setAddress(business.getAddress())
-                    .setBusinessType(business.getBusinessType())
-                    .setCreated(business.getCreated().toString())
+                        .setAdministrators(administrators)
+                        .setPrimaryAdministratorId(business.getPrimaryAdministrator().getId())
+                        .setName(business.getName())
+                        .setDescription(business.getDescription())
+                        .setAddress(business.getAddress())
+                        .setBusinessType(business.getBusinessType())
+                        .setCreated(business.getCreated().toString())
             );
         }
 
