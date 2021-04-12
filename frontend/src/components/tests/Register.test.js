@@ -1,9 +1,15 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
-import { BootstrapVue } from 'bootstrap-vue';
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import Register from '../Register';
+import VueRouter from 'vue-router';
+
+
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
+localVue.use(BootstrapVueIcons);
+localVue.use(VueRouter);
+const router = new VueRouter()
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -17,6 +23,7 @@ beforeEach(() => {
     );
   wrapper = mount(Register, {
     localVue,
+    router
   });
 });
 
