@@ -5,6 +5,5 @@ package com.seng302.wasteless.view;
  * fields to be accepted/returned with request/responses.
  */
 public class UserViews {
-    public interface SearchUserView {}
     public interface PostUserRequestView {}
 }

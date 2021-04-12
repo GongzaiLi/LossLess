@@ -23,8 +23,6 @@ public class GetBusinessesDtoMapper {
 
     public static GetBusinessesDto toGetBusinessesDto(Business business) {
 
-        System.out.println("Businessefsdjhkfhkjsdf");
-
         List<User> businessAdministrators = business.getAdministrators();
 
         List<Administrator> formattedAdministrators = new ArrayList<>();
@@ -55,8 +53,6 @@ public class GetBusinessesDtoMapper {
                     .setBusinessesAdministered(businessesAdministeredIds)
                     );
         }
-
-        System.out.println("asdsadasda");
 
         return new GetBusinessesDto()
                 .setId(business.getId())

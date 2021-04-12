@@ -2,7 +2,6 @@ package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.BusinessViews;
-import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

@@ -32,10 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -114,15 +111,20 @@ public class UserController {
      * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
      *
      * @param searchQuery   The query to search by
-     * @return              A set of matching results
+     * @return              A list of matching results
      */
     @GetMapping("/users/search")
-    @JsonView(UserViews.SearchUserView.class) //Only return appropriate fields
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
 
         LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
-        return ResponseEntity.status(HttpStatus.OK).body(searchResults);
+        List<GetUserDto> searchResultsDto = new ArrayList<>();
+
+        for (User user : searchResults) {
+            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
     }
 
 
