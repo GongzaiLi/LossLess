@@ -57,6 +57,7 @@ Date: 7/3/2021
 import api from "../Api";
 
 export default {
+  name: 'UserSearch', // DO NOT DELETE!!! The <keep-alive include="UserSearch"> in App.vue only matches component names so we register a name here.
   data: function () {
     return {
       searchQuery: "",
