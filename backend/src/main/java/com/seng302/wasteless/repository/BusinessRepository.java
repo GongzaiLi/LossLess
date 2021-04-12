@@ -1,5 +1,6 @@
-package com.seng302.wasteless.Business;
+package com.seng302.wasteless.repository;
 
+import com.seng302.wasteless.model.Business;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

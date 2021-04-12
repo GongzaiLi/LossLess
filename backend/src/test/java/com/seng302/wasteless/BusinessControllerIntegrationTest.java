@@ -1,6 +1,6 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.User.UserRoles;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

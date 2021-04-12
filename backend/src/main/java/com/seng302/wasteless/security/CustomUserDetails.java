@@ -1,7 +1,6 @@
-package com.seng302.wasteless.Security;
+package com.seng302.wasteless.security;
 
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserRoles;
+import com.seng302.wasteless.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

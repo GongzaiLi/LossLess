@@ -1,4 +1,4 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.Business.Business;
-import com.seng302.wasteless.Business.BusinessViews;
+import com.seng302.wasteless.view.BusinessViews;
+import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -110,7 +110,7 @@ public class User {
      *
      * @param business  The business to add to the list of businesses primarily administered
      */
-    void addPrimaryBusiness(Business business) {
+    public void addPrimaryBusiness(Business business) {
         this.businessesPrimarilyAdministered.add(business);
     }
 }
