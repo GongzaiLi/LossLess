@@ -11,6 +11,12 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * GetUserDtoMapper is used to transform the User entity into a GetUserDto object.
+ * This includes getting businesses associated with the user, and the information associated with those businesses.
+ */
+
 @Component
 public class GetUserDtoMapper {
 

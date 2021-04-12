@@ -11,6 +11,13 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * GetBusinessesDtoMapper is used to transform the Business entity into a GetBusinessesDto object.
+ * This includes getting users (administrators) associated with the business,
+ * and the information associated with those users.
+ */
+
 @Component
 public class GetBusinessesDtoMapper {
 

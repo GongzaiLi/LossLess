@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 
+/**
+ * User service applies business logic over the User JPA repository.
+ */
+
 @Service
 public class UserService {
 
