@@ -16,7 +16,7 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
 //    @Query( "select u from User u inner join u.roles r where r.role in :roles" )
 //    List<User> findBySpecificRoles(@Param("roles") List<Role> roles);
 
-    @Query(value = "SELECT distinct business_id, * FROM BUSINESS_ADMINISTRATORS A join Business B where administrators_id = :user_id", nativeQuery = true)
+    @Query(value = "Select * from business where id in (SELECT distinct business_id FROM Business B inner join BUSINESS_ADMINISTRATORS A where administrators_id = :user_id)", nativeQuery = true)
     List<Business> findBySpecificAdminId(@Param("user_id") Integer user_id);
 }
 

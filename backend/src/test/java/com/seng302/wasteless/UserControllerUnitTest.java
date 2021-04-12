@@ -3,6 +3,7 @@ package com.seng302.wasteless;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;

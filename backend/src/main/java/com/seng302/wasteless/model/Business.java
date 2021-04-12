@@ -19,7 +19,7 @@ import java.util.List;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Business {
 
-    @JsonView({BusinessViews.GetBusinessView.class, UserViews.GetUserView.class})
+    @JsonView({BusinessViews.GetBusinessView.class})
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;

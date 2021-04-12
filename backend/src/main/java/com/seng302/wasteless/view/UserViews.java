@@ -6,6 +6,5 @@ package com.seng302.wasteless.view;
  */
 public class UserViews {
     public interface SearchUserView {}
-    public interface GetUserView {}
     public interface PostUserRequestView {}
 }
