@@ -101,14 +101,14 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
-          <h6><b-row>
+          <h6 v-if="userData.businessesAdministered.length"><b-row>
             <b-col cols="0">
               <b-icon-building></b-icon-building>
             </b-col>
             <b-col cols="4"><b>Businesses Created:</b></b-col>
             <b-col>
-            <router-link v-for="card in this.userData.businessesPrimarilyAdministered"   :to="'/businesses/'+card.id.toString()" v-bind:key="card.id">
-                {{ card.name }}<br></router-link></b-col>
+            <router-link v-for="business in this.userData.businessesAdministered"   :to="'/businesses/'+business.id.toString()" v-bind:key="business.id">
+              <template v-if="(business.primaryAdministratorId===userData.id)">{{ business.name }}<br></template></router-link></b-col>
           </b-row>
 
           </h6>
@@ -171,7 +171,7 @@ export default {
         phoneNumber: "",
         homeAddress: "",
         created: "",
-        businessesPrimarilyAdministered:[],
+        businessesAdministered:[],
       },
       userFound: true,
     }
