@@ -1,4 +1,4 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.Business.Business;
-import com.seng302.wasteless.Business.BusinessViews;
+import com.seng302.wasteless.view.BusinessViews;
+import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,49 +22,48 @@ public class User {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, BusinessViews.GetBusinessView.class})
     private Integer id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, UserViews.PostUserRequestView.class, BusinessViews.GetBusinessView.class})
+    @JsonView(UserViews.PostUserRequestView.class)
     private String firstName;
 
     @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, UserViews.PostUserRequestView.class, BusinessViews.GetBusinessView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String lastName;
 
     @Column(name = "middle_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String middleName;
 
     @Column(name = "nick_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String nickname;
 
     @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String bio;
 
     @NotBlank(message = "email is mandatory")
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String email;
 
     @NotNull(message = "dateOfBirth is mandatory")
     @Column(name = "date_of_birth") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     //Date format validated by spring. See spring.mvc.format.date=yyyy-MM-dd in application.properties
     private LocalDate dateOfBirth;
 
     @Column(name = "phone_number") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String phoneNumber;
 
     @NotBlank(message = "homeAddress is mandatory")
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class, UserViews.SearchUserView.class, UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class})
     private String homeAddress;
 
     @NotBlank(message = "password is mandatory")
@@ -76,18 +75,16 @@ public class User {
     private String salt;
 
     @Column(name = "businesses_primarily_administered")
-    @JsonView({UserViews.GetUserView.class})
     @ManyToMany
     private List<Business> businessesPrimarilyAdministered;
 
     @Column(name = "created") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.GetUserView.class})
     private LocalDate created;
 
     @Column(name = "role")
     private UserRoles role;
 
-    //Omitted fields. Role: added in u4, business administered: added in u6
+    //Omitted fields. business administered: added in u6
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges
@@ -102,6 +99,13 @@ public class User {
         return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));
     }
 
+    /**
+     * Add a business to the list of businessesPrimarilyAdministered.
+     *
+     * Never call this directly, only call it from user service.
+     *
+     * @param business  The business to add to the list of businesses primarily administered
+     */
     public void addPrimaryBusiness(Business business) {
         this.businessesPrimarilyAdministered.add(business);
     }

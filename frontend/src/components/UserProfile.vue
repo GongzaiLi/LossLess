@@ -206,6 +206,24 @@ export default {
       this.$router.push({path: '/login'})
     },
     /**
+     * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
+     * The months elapsed is not the total number of months elapsed, but the number months elapsed in
+     * addition to the years also elapsed. For example, 1 year and 2 months instead of 1 year, 14 months.
+     * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
+     * Returns data in the format {months: months_elapsed, years: years_elapsed}
+     */
+    getMonthsAndYearsBetween(start, end) {
+      const timeElapsed = end - start;
+      const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+      const yearsElapsed = Math.floor(daysElapsed / 365);
+      const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
+      return {
+        months: monthsElapsed,
+        years: yearsElapsed
+      }
+    },
+
+    /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.
      */
@@ -228,13 +246,6 @@ export default {
           this.userData.role = 'globalApplicationAdmin';
         })
         .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-            this.userData.role = 'globalApplicationAdmin';
-            return;
-            //////////////////////////
-          }
-
           this.$log.debug(error);
           alert(error);
         });
@@ -245,22 +256,15 @@ export default {
      */
     revokeAdmin: function () {
       api
-        .revokeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
-          this.userData.role = 'user';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .revokeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Revoked admin for user ${this.userData.id}`);
             this.userData.role = 'user';
-            return;
-            //////////////////////////
-          }
-
-          this.$log.debug(error);
-          alert(error);
-        });
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            alert(error);
+          });
     }
   },
   computed: {

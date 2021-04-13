@@ -1,8 +1,7 @@
-package com.seng302.wasteless.Business;
+package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserViews;
+import com.seng302.wasteless.view.BusinessViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,11 +14,10 @@ import java.util.List;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
-@ToString(exclude = {"primaryAdministrator", "administrators"}) // generate a toString method
+@ToString(exclude = {"primaryAdministrator", "administrators"}) // generate a toString method, excluded to prevent recursive problems
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Business {
 
-    @JsonView({BusinessViews.GetBusinessView.class, UserViews.GetUserView.class})
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
@@ -28,31 +26,29 @@ public class Business {
     @OneToOne
     private User primaryAdministrator;
 
-    @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "administrators")
     @ManyToMany
     private List<User> administrators;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "name is mandatory")
     @Column(name = "name")
     private String name;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class})
     @Column(name = "description")
     private String description;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "address is mandatory")
     @Column(name = "address")
     private String address;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.GetBusinessView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class})
     @NotNull(message = "businessType is mandatory")
     @Column(name = "business_type")
     private BusinessTypes businessType;
 
-    @JsonView({BusinessViews.GetBusinessView.class})
     @Column(name = "created")
     private LocalDate created;
 
