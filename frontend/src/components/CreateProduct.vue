@@ -6,8 +6,12 @@ Date: 13/4/2021
 
 <template>
   <div>
-    <b-card class="shadow">
-      <h1>New Item</h1>
+    <b-card border-variant="secondary" header-border-variant="secondary"
+            class="profile-card shadow"
+    >
+      <template #header>
+      <h1>Create Product</h1>
+      </template>
       <br>
       <b-form
         @submit="register"
@@ -33,10 +37,12 @@ Date: 13/4/2021
         <b-form-group
         >
           <b>Recommended Retail Price</b>
-          <b-form-input v-model="recommendedRetailPrice" placeholder="0.00"></b-form-input>
+          <b-form-input type="number" step="0.01" v-model="recommendedRetailPrice" placeholder="0.00"></b-form-input>
         </b-form-group>
 
-        <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
+        <b-button variant="primary" type="submit" style="margin-right:1em" id="register-btn">Create</b-button>
+          <router-link :to="'/businesses/'+this.businessId+'/products'" tag="button"><b-button variant="danger"   id="cancel-btn">Cancel</b-button></router-link>
+
       </b-form>
       <br>
       <div v-if="errors.length">
@@ -48,7 +54,15 @@ Date: 13/4/2021
 
   </div>
 </template>
+<style scoped>
+.profile-card {
+  max-width: 45rem;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+
+</style>
 <script>
 import api from "@/Api";
 
@@ -60,23 +74,21 @@ export default {
       "description": "",
       "manufacturer": "",
       "recommendedRetailPrice": "",
-      errors: []
+      errors: [],
+      businessId : null
     }
+  },
+  mounted() {
+    this.businessId = this.$route.params.id;
   },
   methods: {
 
-    getRegisterData() {
+    getProductData() {
       return {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        middleName: this.middleName,
-        nickname: this.nickname,
-        bio: this.bio,
-        email: this.email,
-        dateOfBirth: this.dateOfBirth,
-        phoneNumber: this.phoneNumber,
-        homeAddress: this.homeAddress,
-        password: this.password
+        fullName: this.fullName,
+        description: this.description,
+        manufacturer: this.manufacturer,
+        recommendedRetailPrice: this.recommendedRetailPrice
       };
     },
 
@@ -89,29 +101,30 @@ export default {
      * The parameter event is passed
      */
     register(event) {
+
+      console.log(event);
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
-      let registerData = this.getRegisterData();
-      //console.log(registerData);
+      let ProductData = this.getProductData();
+      console.log(ProductData);
 
       api
-        .register(registerData)
-        .then((loginResponse) => {
-          this.$log.debug("Registered");
-          return api.getUser(loginResponse.data.id);
-        })
-        .then((userResponse) => {
-          this.$setCurrentUser(userResponse.data);
-          this.$router.push({path: `/users/${userResponse.data.id}`});
+        .createProduct(this.businessId,ProductData)
+        .then((createProductResponse) => {
+          this.$log.debug("Product Created",createProductResponse);
+          this.$router.push({path: `/businesses/${this.businessId}/products`});
         })
         .catch((error) => {
           this.errors = [];
           this.$log.debug(error);
           if ((error.response && error.response.status === 400)) {
-            this.errors.push("Registration failed.");
+            this.errors.push("Creation failed. Please try again ");
+          } else if ((error.response && error.response.status === 403)) {
+            this.errors.push("Forbidden. You are not an authorized administrator");
           } else {
             this.errors.push(error.message);
           }
+          this.$router.push({path: `/businesses/${this.businessId}/products`});
         });
 
     },
