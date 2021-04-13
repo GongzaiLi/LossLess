@@ -13,17 +13,17 @@
         <b-nav-item to="/users/search">User Search</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown right>
+        <b-nav-item-dropdown right :text="$getCurrentUser.firstName">
           <template #button-content>
             <b-badge>{{getUserBadgeRole()}}</b-badge>
             <em class="ml-2">{{user().firstName}}</em>
-          </template>>
-          <b-dropdown-item >{{$getCurrentUser.firstName}}</b-dropdown-item>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown right>
-          <template #button-content>
-            <b-icon-list></b-icon-list>
           </template>
+          <b-dropdown-item
+              v-for="business in $getCurrentUser().businessesAdministered"
+              v-bind:key="business">
+            {{business.name}}
+          </b-dropdown-item>
+          <hr v-if="$getCurrentUser().businessesAdministered.length > 0" style="margin-top: 0.5em; margin-bottom: 0.5em;">
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
