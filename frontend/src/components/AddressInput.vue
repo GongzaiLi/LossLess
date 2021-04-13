@@ -20,12 +20,14 @@ Date: sprint_1
                 v-model="homeAddress.streetNumber"
                 placeholder="Number"
                 v-bind:value="value"
+                required
               />
               <b-form-input
                 v-model="homeAddress.streetName"
                 @input="onAddressChange"
                 placeholder="Street"
                 v-bind:value="value"
+                required
               />
             </b-input-group>
           </b-col>
@@ -65,6 +67,7 @@ Date: sprint_1
               v-model="homeAddress.city"
               placeholder="City"
               v-bind:value="value"
+              required
             />
           </b-col>
           <b-col>
@@ -72,6 +75,7 @@ Date: sprint_1
               v-model="homeAddress.region"
               placeholder="Region"
               v-bind:value="value"
+              required
             />
           </b-col>
         </b-row>
@@ -96,6 +100,7 @@ Date: sprint_1
               v-model="homeAddress.postcode"
               placeholder="Postcode"
               v-bind:value="value"
+              required
             />
           </b-col>
           <b-col md="2">
@@ -246,7 +251,7 @@ export default {
     async onAddressChange() {
       // Emit input event as the address has changed. This is needed for parent components to use v-model on this component.
       // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
-      this.$emit('input', this.homeAddress.streetName);
+      this.$emit('input', this.homeAddress);
 
       if (!this.awaitingSearch) {
         setTimeout(() => {

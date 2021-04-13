@@ -301,3 +301,115 @@ test('check-clearAddress-is-work', () => {
   wrapper.vm.clearAddress();
   expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
 });
+
+
+describe('regression-testing-for-address-change', () => {
+  const homeAddressinit = {
+    streetNumber: "98",
+    streetName: "Rattray Street",
+    city: "Christchurch City",
+    region: "Canterbury",
+    country: "New Zealand",
+    postcode: "8041"
+  };
+
+  beforeEach(() => {
+    const homeAddressInputInit = {
+      streetNumber: "98",
+      streetName: "Rattray Street",
+      city: "Christchurch City",
+      region: "Canterbury",
+      country: "New Zealand",
+      postcode: "8041"
+    };
+    wrapper.vm.homeAddress = homeAddressInputInit;
+
+  });
+  afterEach(() => {
+    wrapper.destroy();
+
+  });
+  test('when-change-street-number', () => {
+    const expectedAddress = {
+      streetNumber: "100",
+      streetName: "Rattray Street",
+      city: "Christchurch City",
+      region: "Canterbury",
+      country: "New Zealand",
+      postcode: "8041"
+    };
+    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+    wrapper.vm.homeAddress.streetNumber = '100';
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+  });
+
+  test('when-change-street-name', () => {
+    const expectedAddress = {
+      streetNumber: "98",
+      streetName: "a Street",
+      city: "Christchurch City",
+      region: "Canterbury",
+      country: "New Zealand",
+      postcode: "8041"
+    };
+    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+    wrapper.vm.homeAddress.streetName = 'a Street';
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+  });
+  test('when-change-city', () => {
+    const expectedAddress = {
+      streetNumber: "98",
+      streetName: "Rattray Street",
+      city: "a City",
+      region: "Canterbury",
+      country: "New Zealand",
+      postcode: "8041"
+    };
+    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+    wrapper.vm.homeAddress.city = 'a City';
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+  });
+  test('when-change-region', () => {
+    const expectedAddress = {
+      streetNumber: "98",
+      streetName: "Rattray Street",
+      city: "Christchurch City",
+      region: "a region",
+      country: "New Zealand",
+      postcode: "8041"
+    };
+    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+    wrapper.vm.homeAddress.region = 'a region';
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+  });
+  test('when-change-country', () => {
+    const expectedAddress = {
+      streetNumber: "98",
+      streetName: "Rattray Street",
+      city: "Christchurch City",
+      region: "Canterbury",
+      country: "New",
+      postcode: "8041"
+    };
+    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+    wrapper.vm.homeAddress.country = 'New';
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+  });
+  test('when-change-postcode', () => {
+    const expectedAddress = {
+      streetNumber: "98",
+      streetName: "Rattray Street",
+      city: "Christchurch City",
+      region: "Canterbury",
+      country: "New Zealand",
+      postcode: "1000"
+    };
+    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+    wrapper.vm.homeAddress.postcode = '1000';
+    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+  });
+});
