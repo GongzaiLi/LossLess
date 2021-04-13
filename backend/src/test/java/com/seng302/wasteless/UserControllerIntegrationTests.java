@@ -195,6 +195,13 @@ public class UserControllerIntegrationTests {
                 .andExpect(jsonPath("role", is("user")));
         }
 
+
+    @Test
+    public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
+        mockMvc.perform(get("/users/1"))
+                .andExpect(status().isOk());
+    }
+
     @Test
     public void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");

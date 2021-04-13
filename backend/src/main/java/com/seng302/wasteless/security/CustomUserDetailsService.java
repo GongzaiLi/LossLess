@@ -1,8 +1,7 @@
-package com.seng302.wasteless.Security;
+package com.seng302.wasteless.security;
 
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserRepository;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

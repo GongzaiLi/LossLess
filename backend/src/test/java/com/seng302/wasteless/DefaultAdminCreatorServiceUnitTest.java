@@ -1,20 +1,17 @@
 package com.seng302.wasteless;
 
 
-import com.seng302.wasteless.Business.BusinessController;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.service.DefaultAdminCreatorService;
+import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,8 +19,6 @@ import java.security.InvalidParameterException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -47,9 +42,9 @@ public class DefaultAdminCreatorServiceUnitTest {
 
         ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes()));
 
-        assertEquals(ReflectionTestUtils.getField(creatorService, "defaultEmail"), "admin@sengmail.com");
-        assertEquals(ReflectionTestUtils.getField(creatorService, "defaultPassword"), "supersecurepassword");
-        assertEquals(ReflectionTestUtils.getField(creatorService, "defaultTimeout"), 60);
+        Assertions.assertEquals(ReflectionTestUtils.getField(creatorService, "defaultEmail"), "admin@sengmail.com");
+        Assertions.assertEquals(ReflectionTestUtils.getField(creatorService, "defaultPassword"), "supersecurepassword");
+        Assertions.assertEquals(ReflectionTestUtils.getField(creatorService, "defaultTimeout"), 60);
     }
 
     @Test
@@ -58,9 +53,7 @@ public class DefaultAdminCreatorServiceUnitTest {
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
-        assertThrows(InvalidParameterException.class, () -> {
-            ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes()));
-        });
+        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
     }
 
     @Test
@@ -69,9 +62,7 @@ public class DefaultAdminCreatorServiceUnitTest {
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
-        assertThrows(InvalidParameterException.class, () -> {
-            ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes()));
-        });
+        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
     }
 
     @Test
@@ -80,17 +71,13 @@ public class DefaultAdminCreatorServiceUnitTest {
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
-        assertThrows(InvalidParameterException.class, () -> {
-            ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes()));
-        });
+        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
     }
 
     @Test
     public void throwsInvalidParameterExceptionWhenConfigEmpty() {
         String config = "";
 
-        assertThrows(InvalidParameterException.class, () -> {
-            ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes()));
-        });
+        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
     }
 }
