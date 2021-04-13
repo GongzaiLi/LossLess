@@ -1,14 +1,16 @@
 package com.seng302.wasteless;
 
+import com.seng302.wasteless.User.User;
 import com.seng302.wasteless.User.UserController;
-import org.junit.Before;
+import com.seng302.wasteless.User.UserRoles;
+import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -18,15 +20,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc
+@WebMvcTest(UserController.class)
+@Import(MockUserServiceConfig.class)
 public class UserControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private UserController userController;
+    @Autowired
+    private UserService userService;
 
     @Test
     public void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
@@ -133,14 +135,80 @@ public class UserControllerUnitTest {
 
 
     @Test
+    @WithUserDetails("user@700")
     public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
-
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void whenNotLoggedInAndTryMakeAdmin_thenUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+                .andExpect(status().isUnauthorized());
+    }
 
+    @Test
+    public void whenNotLoggedInAndTryRevokeAdmin_thenUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithUserDetails("user@700")
+    public void whenUserTryMakeAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("admin@700")
+    public void whenAdminTryDowngradeDefaultAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/makeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("admin@700")
+    public void whenAdminTryAddAdminToUser_thenOk() throws Exception {
+        User user = new User();
+        user.setEmail("blah");
+        user.setRole(UserRoles.USER);
+        user = userService.createUser(user);
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + user.getId().toString() + "/makeAdmin"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithUserDetails("admin@700")
+    public void whenAdminTryRevokeDefaultAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("defaultadmin@700")
+    public void whenDefaultAdminTryRevokeSelf_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @WithUserDetails("user@700")
+    public void whenUserTryRevokeAdmin_thenForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails("defaultadmin@700")
+    public void whenDefaultAdminTryRevokeAdmin_thenOk() throws Exception {
+        User admin = new User();
+        admin.setEmail("blah");
+        admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+        admin = userService.createUser(admin);
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + admin.getId().toString() + "/revokeAdmin"))
+                .andExpect(status().isOk());
+    }
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": \"%s\", \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);

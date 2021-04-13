@@ -54,16 +54,16 @@ Date: 5/3/2021
                 <b-icon-person-fill></b-icon-person-fill>
               </b-col>
               <b-col cols="4"><b>Full Name:</b></b-col>
-              <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
+              <b-col>{{ fullName }}</b-col>
             </b-row>
           </h6>
-          <h6>
-            <b-row v-show="userData.nickname.length">
+          <h6 v-if="userData.nickName">
+            <b-row v-show="userData.nickName.length">
               <b-col cols="0">
                 <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
               </b-col>
               <b-col cols="4"><b>Nickname:</b></b-col>
-              <b-col>{{ userData.nickname }}</b-col>
+              <b-col>{{ userData.nickName }}</b-col>
             </b-row>
           </h6>
           <h6>
@@ -147,7 +147,7 @@ export default {
         firstName: "",
         lastName: "",
         middleName: "",
-        nickname: "",
+        nickName: "",
         bio: "",
         email: "",
         dateOfBirth: "",
@@ -227,13 +227,6 @@ export default {
             this.userData.role = 'globalApplicationAdmin';
           })
           .catch((error) => {
-            if (this.demoMode) {
-              // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-              this.userData.role = 'globalApplicationAdmin';
-              return;
-              //////////////////////////
-            }
-
             this.$log.debug(error);
             alert(error);
           });
@@ -250,13 +243,6 @@ export default {
             this.userData.role = 'user';
           })
           .catch((error) => {
-            if (this.demoMode) {
-              // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
-              this.userData.role = 'user';
-              return;
-              //////////////////////////
-            }
-
             this.$log.debug(error);
             alert(error);
           });
@@ -265,6 +251,21 @@ export default {
   computed: {
     adminButtonToggle() {
       return this.userData.role === 'user' ? 'success' : 'danger';
+    },
+    /**
+     * Returns the full name of the user, in the format:
+     * Firstname Middlename Lastname (Nickname)
+     */
+    fullName: function() {
+      let fullName = this.userData.firstName;
+      if (this.userData.middleName) {
+        fullName += ' ' + this.userData.middleName;
+      }
+      fullName += ' ' + this.userData.lastName;
+      if (this.userData.nickName) {
+        fullName += ` (${this.userData.nickName})`
+      }
+      return fullName;
     },
     /**
      * calclates in years and months the time since the user account was created
