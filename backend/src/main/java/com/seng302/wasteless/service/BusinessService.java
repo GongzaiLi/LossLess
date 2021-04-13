@@ -1,12 +1,20 @@
-package com.seng302.wasteless.Business;
+package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.repository.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Business service applies business logic over the Business JPA repository.
+ */
 
 @Service
 public class BusinessService {
 
-    private BusinessRepository businessRepository;
+    private final BusinessRepository businessRepository;
 
     @Autowired
     public BusinessService(BusinessRepository businessRepository) {
@@ -34,5 +42,13 @@ public class BusinessService {
         return businessRepository.findFirstById(id);
     }
 
+
+    /**
+     * Find all businesses administered by user id
+     *
+     * @param id        The id of the user administrators
+     * @return          All business ids administered by user id
+     */
+    public List<Business> findBusinessesByUserId(Integer id) {return businessRepository.findBySpecificAdminId(id); }
 
 }

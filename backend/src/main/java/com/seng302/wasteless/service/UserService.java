@@ -1,10 +1,16 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.Business.Business;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
+
+/**
+ * User service applies business logic over the User JPA repository.
+ */
 
 @Service
 public class UserService {

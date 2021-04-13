@@ -1,9 +1,9 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserController;
-import com.seng302.wasteless.User.UserRoles;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.controller.UserController;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -131,14 +130,6 @@ public class UserControllerUnitTest {
                 .content(user)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithUserDetails("user@700")
-    public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
-        mockMvc.perform(get("/users/1"))
-                .andExpect(status().isOk());
     }
 
     @Test

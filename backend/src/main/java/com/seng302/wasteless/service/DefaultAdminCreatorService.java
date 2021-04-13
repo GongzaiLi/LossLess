@@ -1,9 +1,8 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.Security.WebSecurityConfig;
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserRoles;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -90,6 +88,7 @@ public class DefaultAdminCreatorService {
         defaultAdmin.setFirstName("Default");
         defaultAdmin.setLastName("Admin");
         defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
+        defaultAdmin.setCreated(LocalDate.now());
 
         userService.createUser(defaultAdmin);
     }
