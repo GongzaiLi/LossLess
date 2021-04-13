@@ -124,7 +124,6 @@ export default {
           } else {
             this.errors.push(error.message);
           }
-          this.$router.push({path: `/businesses/${this.businessId}/products`});
         });
 
     },
