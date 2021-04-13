@@ -20,7 +20,8 @@
           </template>
           <b-dropdown-item
               v-for="business in $getCurrentUser().businessesAdministered"
-              v-bind:key="business">
+              v-bind:key="business.name"
+              class="business-name-drop-down">
             {{business.name}}
           </b-dropdown-item>
           <hr v-if="$getCurrentUser().businessesAdministered.length > 0" style="margin-top: 0.5em; margin-bottom: 0.5em;">
@@ -33,7 +34,7 @@
 </template>
 
 <script>
-import {getUser} from '@/auth'
+import {getUser} from '../auth'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
