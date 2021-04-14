@@ -44,4 +44,5 @@ export default {
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get(`users/search?searchQuery=${searchParameter}`, {withCredentials: true}),
+  getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true})
 }
