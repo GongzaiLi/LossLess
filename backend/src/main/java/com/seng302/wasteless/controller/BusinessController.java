@@ -91,10 +91,10 @@ public class BusinessController {
      * Get and return a business by its id
      *
      * @param businessId        The id of the business to get
-     * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
+     * @return                  200 and business if valid, 401 if unauthorised, 403 if forbidden, 406 if invalid id,
      */
     @GetMapping("/businesses/{id}")
-    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusinessProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("possible Business{}", possibleBusiness);
@@ -110,6 +110,32 @@ public class BusinessController {
         logger.info(getBusinessesDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
+    }
+
+    /**
+     * Handle post request to /businesses/{id}/products endpoint for adding a new product to a business's catalogue
+     *
+     *
+     *
+     * @param business  The business parsed from the request
+     * @return          200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
+     */
+    @PostMapping("/businesses/{id}/products")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> createBusinessProduct(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    /**
+     * Handle get request to /businesses/{id}/products endpoint for retrieving all products in a business's catalogue
+     *
+     * @param businessId        The id of the business to get
+     * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
+     */
+    @GetMapping("/businesses/{id}/products")
+    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
