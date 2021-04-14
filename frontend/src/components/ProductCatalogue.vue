@@ -84,7 +84,7 @@ export default {
         .catch((error) => {
           this.$log.debug(error);
         })
-      // fake date can use be test.
+      // fake date can use to be test.
       /*
       this.items = [
         {
