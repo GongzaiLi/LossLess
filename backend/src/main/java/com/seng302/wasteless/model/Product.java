@@ -34,7 +34,7 @@ public class Product {
 
     @JsonView({ProductViews.PostProductRequestView.class})
     @Column(name = "recommended_retail_price")
-    private String recommendedRetailPrice;
+    private Double recommendedRetailPrice;
 
     @JsonView({ProductViews.PostProductRequestView.class})
     @Column(name = "created")

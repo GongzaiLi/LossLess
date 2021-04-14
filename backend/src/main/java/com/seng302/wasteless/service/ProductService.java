@@ -45,6 +45,13 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    /**
+     * Get all the products for a chosen business
+     *
+     * @param id The id of a business
+     * @return A list of business's products, if any, otherwise empty list
+     */
+    public List<Product> getAllProductsByBusinessId(Integer id) { return  productRepository.findAllByBusinessId(id); }
 
 }
 

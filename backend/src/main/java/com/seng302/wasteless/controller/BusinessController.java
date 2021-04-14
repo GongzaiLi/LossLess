@@ -103,7 +103,7 @@ public class BusinessController {
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("possible Business{}", possibleBusiness);
+        logger.info("possible Business {}", possibleBusiness);
         if (possibleBusiness == null) {
             logger.warn("ID does not exist.");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
@@ -151,27 +151,25 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
 
-        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, 20).replaceAll("\\P{Alnum}+$", "")
+        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, 25).replaceAll("\\P{Alnum}+$", "")
                                                     .replaceAll(" ", "-");
 
         if (productService.findProductById(productId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to create a " +
-                    "product that already exists in your business");
-        } else {
-
-            LocalDate dateCreated = LocalDate.now();
-
-            possibleProduct.setId(productId);
-            possibleProduct.setBusinessId(businessId);
-            possibleProduct.setCreated(dateCreated);
-
-            //Save product
-            possibleProduct = productService.createProduct(possibleProduct);
-
-            logger.info("saved new product {}", possibleProduct);
-
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
+                    "to one that is already in your catalogue.");
         }
+        LocalDate dateCreated = LocalDate.now();
+
+        possibleProduct.setId(productId);
+        possibleProduct.setBusinessId(businessId);
+        possibleProduct.setCreated(dateCreated);
+
+        //Save product
+        possibleProduct = productService.createProduct(possibleProduct);
+
+        logger.info("saved new product {}", possibleProduct);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
@@ -179,11 +177,42 @@ public class BusinessController {
      * Handle get request to /businesses/{id}/products endpoint for retrieving all products in a business's catalogue
      *
      * @param businessId        The id of the business to get
-     * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
+     * @return                  Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/products")
     public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).build();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        User user = userService.findUserByEmail(currentPrincipalEmail);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is invalid");
+        }
+
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+
+        if (possibleBusiness == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+        }
+
+
+        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+        }
+
+        List<Product> productList = productService.getAllProductsByBusinessId(businessId);
+
+        if (productList.size() == 0) {
+            logger.warn("Attempted to get products when none exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("No products exist for this business.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(productList);
+
     }
 
 
