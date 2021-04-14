@@ -304,7 +304,8 @@ test('check-clearAddress-is-work', () => {
 
 
 describe('regression-testing-for-address-change', () => {
-  const homeAddressinit = {
+
+  const homeAddressInit = {
     streetNumber: "98",
     streetName: "Rattray Street",
     city: "Christchurch City",
@@ -313,24 +314,30 @@ describe('regression-testing-for-address-change', () => {
     postcode: "8041"
   };
 
-  beforeEach(() => {
-    const homeAddressInputInit = {
-      streetNumber: "98",
-      streetName: "Rattray Street",
-      city: "Christchurch City",
-      region: "Canterbury",
-      country: "New Zealand",
-      postcode: "8041"
-    };
-    wrapper.vm.homeAddress = homeAddressInputInit;
+  const homeAddressFromAPIInit = {
+    housenumber: "98",
+    street: "Rattray Street",
+    county: '',
+    district: '',
+    city: "Christchurch City",
+    state: '',
+    region: "Canterbury",
+    country: "New Zealand",
+    postcode: "8041"
+  };
 
+  beforeEach(() => {
+    wrapper.vm.addressResults = [homeAddressFromAPIInit];
+    wrapper.vm.addressObject = [homeAddressFromAPIInit];
   });
+
   afterEach(() => {
     wrapper.destroy();
 
   });
-  test('when-change-street-number', () => {
-    const expectedAddress = {
+
+  test('when-change-street-number', async () => {
+    const changedAddress = {
       streetNumber: "100",
       streetName: "Rattray Street",
       city: "Christchurch City",
@@ -338,13 +345,22 @@ describe('regression-testing-for-address-change', () => {
       country: "New Zealand",
       postcode: "8041"
     };
-    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
     wrapper.vm.homeAddress.streetNumber = '100';
-    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress);
   });
 
-  test('when-change-street-name', () => {
-    const expectedAddress = {
+  test('when-change-street-name', async () => {
+    const changedAddress = {
       streetNumber: "98",
       streetName: "a Street",
       city: "Christchurch City",
@@ -352,12 +368,22 @@ describe('regression-testing-for-address-change', () => {
       country: "New Zealand",
       postcode: "8041"
     };
-    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
     wrapper.vm.homeAddress.streetName = 'a Street';
-    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress);
   });
-  test('when-change-city', () => {
-    const expectedAddress = {
+
+  test('when-change-city', async () => {
+    const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
       city: "a City",
@@ -365,13 +391,23 @@ describe('regression-testing-for-address-change', () => {
       country: "New Zealand",
       postcode: "8041"
     };
-    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
     wrapper.vm.homeAddress.city = 'a City';
-    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress);
 
   });
-  test('when-change-region', () => {
-    const expectedAddress = {
+
+  test('when-change-region', async () => {
+    const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
       city: "Christchurch City",
@@ -379,13 +415,23 @@ describe('regression-testing-for-address-change', () => {
       country: "New Zealand",
       postcode: "8041"
     };
-    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
     wrapper.vm.homeAddress.region = 'a region';
-    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress);
 
   });
-  test('when-change-country', () => {
-    const expectedAddress = {
+
+  test('when-change-country', async () => {
+    const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
       city: "Christchurch City",
@@ -393,13 +439,23 @@ describe('regression-testing-for-address-change', () => {
       country: "New",
       postcode: "8041"
     };
-    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
     wrapper.vm.homeAddress.country = 'New';
-    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress);
 
   });
-  test('when-change-postcode', () => {
-    const expectedAddress = {
+
+  test('when-change-postcode', async () => {
+    const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
       city: "Christchurch City",
@@ -407,9 +463,18 @@ describe('regression-testing-for-address-change', () => {
       country: "New Zealand",
       postcode: "1000"
     };
-    expect(wrapper.vm.homeAddress).toStrictEqual(homeAddressinit);
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
     wrapper.vm.homeAddress.postcode = '1000';
-    expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress)
 
   });
 });

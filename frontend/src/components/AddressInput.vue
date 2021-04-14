@@ -9,7 +9,7 @@ Date: sprint_1
       <b-form-group>
 
         <b-row>
-          <b-col><b>Street Address</b></b-col>
+          <b-col><b>Street Address *</b></b-col>
         </b-row>
 
         <b-row>
@@ -58,7 +58,7 @@ Date: sprint_1
 
       <b-form-group>
         <b-row>
-          <b-col><b>City</b></b-col>
+          <b-col><b>City *</b></b-col>
           <b-col><b>Region</b></b-col>
         </b-row>
         <b-row>
@@ -75,7 +75,6 @@ Date: sprint_1
               v-model="homeAddress.region"
               placeholder="Region"
               v-bind:value="value"
-              required
             />
           </b-col>
         </b-row>
@@ -83,8 +82,8 @@ Date: sprint_1
 
       <b-form-group>
         <b-row>
-          <b-col><b>Country</b></b-col>
-          <b-col><b>Postcode</b></b-col>
+          <b-col><b>Country *</b></b-col>
+          <b-col><b>Postcode *</b></b-col>
         </b-row>
         <b-row>
           <b-col md="6">
