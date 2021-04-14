@@ -3,10 +3,12 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
+import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
 import org.apache.logging.log4j.LogManager;
@@ -33,12 +35,15 @@ public class BusinessController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
     private BusinessService businessService;
+    private ProductService productService;
     private UserService userService;
 
     @Autowired
-    public BusinessController(BusinessService businessService, UserService userService) {
+    public BusinessController(BusinessService businessService, UserService userService, ProductService productService) {
         this.businessService = businessService;
         this.userService = userService;
+        this.productService = productService;
+
     }
 
     /**
@@ -117,12 +122,20 @@ public class BusinessController {
      *
      *
      *
-     * @param business  The business parsed from the request
+     * @param product  The product parsed from the request
      * @return          200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
      */
     @PostMapping("/businesses/{id}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusinessProduct(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
+    public ResponseEntity<Object> createBusinessProduct(@Valid @RequestBody Product product, HttpServletRequest request) {
+
+        product.setCreated(LocalDate.now());
+
+        //Save business
+        product = productService.createProduct(product);
+
+        logger.info("saved new product {}", product);
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

@@ -18,13 +18,22 @@ import java.util.List;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Product {
 
+    @PrePersist
+    public void prePersist() {
+        if(id == null || id == "") //Set the default value if one is not given.
+            id = name.toUpperCase().substring(0, 20).stripTrailing().replaceAll(" ", "-");
+    }
+
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    private String id;
+    private Integer productId;
 
-    @JoinColumn(name = "name")
+    @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
     private String name;
+
+    @Column(name = "code")
+    private String id;
 
     @Column(name = "description")
     private String description;
@@ -34,6 +43,9 @@ public class Product {
 
     @Column(name = "created")
     private LocalDate created;
+
+    @Column(name = "business_id")
+    private Integer businessId;
 
 //    @Column(name = "images")
 //    private List images;
