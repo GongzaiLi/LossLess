@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.model.Business;
@@ -99,7 +100,7 @@ public class BusinessController {
      * @return                  200 and business if valid, 401 if unauthorised, 403 if forbidden, 406 if invalid id,
      */
     @GetMapping("/businesses/{id}")
-    public ResponseEntity<Object> getBusinessProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("possible Business{}", possibleBusiness);
@@ -118,25 +119,59 @@ public class BusinessController {
     }
 
     /**
-     * Handle post request to /businesses/{id}/products endpoint for adding a new product to a business's catalogue
+     * Handle post request to /businesses/{id}/products endpoint for creating products
      *
-     *
-     *
-     * @param product  The product parsed from the request
-     * @return          200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
+     * @param businessId the id of the business that is creating the product
+     * @param possibleProduct the product that is trying to be added to the catalogue
+     * @return Http Response:  200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
      */
     @PostMapping("/businesses/{id}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusinessProduct(@Valid @RequestBody Product product, HttpServletRequest request) {
+    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody Product possibleProduct, HttpServletRequest request) {
 
-        product.setCreated(LocalDate.now());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
 
-        //Save business
-        product = productService.createProduct(product);
+        User user = userService.findUserByEmail(currentPrincipalEmail);
 
-        logger.info("saved new product {}", product);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is invalid");
+        }
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+
+        if (possibleBusiness == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+        }
+
+
+        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+        }
+
+        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, 20).replaceAll("\\P{Alnum}+$", "")
+                                                    .replaceAll(" ", "-");
+
+        if (productService.findProductById(productId) != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to create a " +
+                    "product that already exists in your business");
+        } else {
+
+            LocalDate dateCreated = LocalDate.now();
+
+            possibleProduct.setId(productId);
+            possibleProduct.setBusinessId(businessId);
+            possibleProduct.setCreated(dateCreated);
+
+            //Save product
+            possibleProduct = productService.createProduct(possibleProduct);
+
+            logger.info("saved new product {}", possibleProduct);
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
     }
 
 
@@ -147,7 +182,7 @@ public class BusinessController {
      * @return                  406 if invalid id, 401 is unauthorised, 200 and business if valid
      */
     @GetMapping("/businesses/{id}/products")
-    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
