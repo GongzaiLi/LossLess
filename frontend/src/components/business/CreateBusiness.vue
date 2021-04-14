@@ -12,7 +12,6 @@ Date: 26/3/2021
       <br>
       <b-form
           @submit="createBusiness"
-          @input="setCustomValidities"
       >
         <b-form-group
         >
@@ -32,7 +31,7 @@ Date: 26/3/2021
         </b-form-group>
 
         <b-form-group >
-          <b>Business Type
+          <b>Business Type *
           </b>
           <div class="input-group mb-xl-5">
 
@@ -64,8 +63,8 @@ Date: 26/3/2021
 </template>
 
 <script>
-import api from "@/Api";
-import AddressInput from "@/components/AddressInput";
+import api from "../../Api";
+import AddressInput from "../../components/AddressInput";
 
 export default {
   components: {
@@ -77,7 +76,6 @@ export default {
       "description": "",
       "address": "",
       "businessType": "",
-      isDemoMode: true,
       errors: [],
     }
   },
@@ -93,14 +91,6 @@ export default {
     },
 
     /**
-     * Uses HTML constraint validation to set custom validity rules (so far, only checks that the 'password'
-     * and 'confirm password' fields match). See below for more info:
-     * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
-     */
-    setCustomValidities() {
-    },
-
-    /**
      * Makes a request to the API to register a business with the form input.
      * Then, will redirect to the business page if successful.
      * Performs no input validation. Validation is performed by the HTML form.
@@ -108,32 +98,35 @@ export default {
      * The parameter event is passed
      */
     createBusiness(event) {
-      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+      let result = "success";
 
-      let businessData = this.getBusinessData();
-      console.log(businessData);
+      try {
 
-      api
-        .createBusiness(businessData)
-        .then((businessResponse) => {
-          this.$router.push({path: `/businesses/${businessResponse.data.id}`});
-        })
-        .catch((error) => {
-          this.errors = [];
-          this.$log.debug(error);
-          if ((error.response && error.response.status === 401)) {
-            this.errors.push("Access token is missing or invalid");
-          } else {
-            this.errors.push(error.message);
-          }
-        });
+        event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+
+        let businessData = this.getBusinessData();
+
+        // add api.createBusiness(businessData); and move api call to api.js
+
+        api
+            .createBusiness(businessData)
+            .then((businessResponse) => {
+              this.$router.push({path: `/businesses/${businessResponse.data.id}`});
+            })
+            .catch((error) => {
+              this.errors = [];
+              this.$log.debug(error);
+              if ((error.response && error.response.status === 401)) {
+                this.errors.push("Access token is missing or invalid");
+              } else {
+                this.errors.push(error.message);
+              }
+            });
+      } catch (e) {
+        result = e;
+      }
+      return result;
     },
   },
-  computed: {
-    //if in demo mode or not change style of the button
-    demoVariant() {
-      return this.isDemoMode ? 'outline-success' : 'outline-danger';
-    }
-  }
 }
 </script>
