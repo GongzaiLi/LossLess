@@ -38,7 +38,7 @@ Date: 26/3/2021
             <select v-model="businessType" required>
               <option disabled value=""> Choose ... </option>
               <option> Accommodation and Food Services </option>
-              <option> Retail Trade</option>
+              <option> Retail Trade </option>
               <option> Charitable organisation </option>
               <option> Non-profit organisation </option>
 

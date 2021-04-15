@@ -53,16 +53,11 @@ Date: 3/3/2021
         <b-form-group>
           <b>Password *</b>
           <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-if="visiblePassword"
-                          type="text" required
+            <b-form-input v-bind:type="passwordType" required
                           v-model=password
                           class="form-control"
-                          placeholder="Password"></b-form-input>
-            <b-form-input v-else-if="!visiblePassword"
-                          type="password" required
-                          v-model=password
-                          class="form-control"
-                          placeholder="Password"></b-form-input>
+                          placeholder="Password"
+                          autocomplete="off"/>
             <div class="input-group-prepend">
               <div class="input-group-text" v-if="!visiblePassword">
                 <b-icon-eye-fill @click="showPassword"></b-icon-eye-fill>
@@ -77,15 +72,7 @@ Date: 3/3/2021
         <b-form-group>
           <b>Confirm Password *</b>
           <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-if="visibleConfirmPassword"
-                          type="text" required
-                          v-model=confirmPassword
-                          class="form-control"
-                          id="confirmPasswordInput"
-                          placeholder="Confirm Password"
-                          autocomplete="off"/>
-            <b-form-input v-else-if="!visibleConfirmPassword"
-                          type="password" required
+            <b-form-input v-bind:type="confirmPasswordType" required
                           v-model=confirmPassword
                           class="form-control"
                           id="confirmPasswordInput"
@@ -111,10 +98,12 @@ Date: 3/3/2021
         <b-form-group
         >
           <b>Date of Birth *</b>
+          <div>Note: you must be at least 13 years old to register</div>
           <b-form-input type="date" v-model="dateOfBirth" required
-           placeholder="Date of Birth"
-           autocomplete="off"
-           size=30;
+                        id="dateOfBirthInput"
+                        placeholder="Date of Birth"
+                        autocomplete="off"
+                        size=30;
           />
         </b-form-group>
 
@@ -122,37 +111,43 @@ Date: 3/3/2021
         >
           <b>Phone Number</b>
           <b-form-input v-model="phoneNumber"
-           placeholder="Phone Number"
-           autocomplete="off"
-           size=30;
+                        placeholder="Phone Number"
+                        autocomplete="off"
+                        size=30;
           />
-          <div class="invalid-feedback">Please enter a phone # like 123-456-7890. This field is required.</div>
         </b-form-group>
         <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
       </b-form>
       <br>
       <div v-if="errors.length">
-        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }} </b-alert>
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{
+            error
+          }}
+        </b-alert>
       </div>
       <h6>
-        Already have an account? <router-link to="/login">Login here</router-link>
+        Already have an account?
+        <router-link to="/login">Login here</router-link>
       </h6>
     </b-card>
     <br>
 
     <b-form-group
-        label-cols="auto"
-        label="Demo Mode"
-        label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle" >{{isDemoMode ? 'ON' : 'OFF'}} </b-button>
+      label-cols="auto"
+      label="Demo Mode"
+      label-for="input-horizontal">
+      <b-button v-bind:variant="demoVariant" @click="toggle">{{ isDemoMode ? 'ON' : 'OFF' }}</b-button>
     </b-form-group>
   </div>
 </template>
 
 <script>
-import api from "@/Api";
-import AddressInput from "@/components/AddressInput";
-import usersInfo from "@/components/data/usersDate.json";
+import api from "../Api";
+import AddressInput from "./AddressInput";
+
+const MIN_AGE_YEARS = 13;
+const MAX_AGE_YEARS = 130;
+const UNIX_EPOCH_YEAR = 1970;
 
 export default {
   components: {
@@ -208,12 +203,16 @@ export default {
     /**
      * Author: Eric Song
      * Uses HTML constraint validation to set custom validity rules (so far, only checks that the 'password'
-     * and 'confirm password' fields match). See below for more info:
+     * and 'confirm password' fields match, and the date of birth is valid). See below for more info:
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
+
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
       confirmPasswordInput.setCustomValidity(this.password !== this.confirmPassword ? "Passwords do not match." : "");
+
+      const dateOfBirthInput = document.getElementById('dateOfBirthInput');
+      dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
     },
 
     /**
@@ -228,7 +227,6 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      //console.log(registerData);
 
       api
         .register(registerData)
@@ -249,16 +247,49 @@ export default {
             this.errors.push(error.message);
           }
         });
-      if (this.isDemoMode) {
-        this.$setCurrentUser(usersInfo.users[1].id);
-        this.$router.push({path: '/users/1'});
-      }
     },
   },
   computed: {
     //if in demo mode or not change style of the button
     demoVariant() {
       return this.isDemoMode ? 'outline-success' : 'outline-danger';
+    },
+    passwordsMatch() {
+      return this.password === this.confirmPassword;
+    },
+    //if the confirm password can visible to be text else be password
+    confirmPasswordType() {
+      return this.visibleConfirmPassword ? "text" : "password";
+    },
+    //if the password can visible to be text else be password
+    passwordType() {
+      return this.visiblePassword ? "text" : "password";
+    },
+    /**
+     * Returns the HTML5 validity string based on the value of the birth date input. Birth dates must be at least
+     * 13 years old and cannot be more tha 130 years old.
+     * See below for more details:
+     * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
+     * @returns {string} A HTML5 validity string. Equal to "" (empty string) if the birthdate is valid,
+     * otherwise "You must be at least 13 years old" or "Please enter a valid birthdate"
+     */
+    dateOfBirthCustomValidity() {
+      const dateOfBirthJSDate = Date.parse(this.dateOfBirth);
+      if (isNaN(dateOfBirthJSDate)) {
+        return "Please enter a valid birthdate";
+      }
+
+      // Taken from https://stackoverflow.com/questions/8152426/how-can-i-calculate-the-number-of-years-between-two-dates
+      const dateDiffMs = Date.now() - dateOfBirthJSDate;
+      const diffDate = new Date(dateDiffMs); // milliseconds from epoch
+      const yearsSinceBirthDay = diffDate.getUTCFullYear() - UNIX_EPOCH_YEAR;
+
+      if (yearsSinceBirthDay < MIN_AGE_YEARS) {
+        return "You must be at least 13 years old";
+      } else if (yearsSinceBirthDay > MAX_AGE_YEARS) {
+        return "Please enter a valid birthdate"
+      }
+      return "";
     }
   }
 }
