@@ -44,6 +44,20 @@ export default {
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),
-  createBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
+  createBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true})
+      .then((businessResponse) => {
+        this.$router.push({path: `/businesses/${businessResponse.data.id}`});
+        //return businessResponse;
+      })
+      .catch((error) => {
+        this.errors = [];
+        this.$log.debug(error);
+        if ((error.response && error.response.status === 401)) {
+          this.errors.push("Access token is missing or invalid");
+        } else {
+          this.errors.push(error.message);
+        }
+        //return error;
+      }),
   getBusinesses: (id) => instance.get(`businesses/${id}`, {withCredentials: true})
 }

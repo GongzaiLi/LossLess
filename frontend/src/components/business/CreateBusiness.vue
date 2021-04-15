@@ -106,22 +106,10 @@ export default {
 
         let businessData = this.getBusinessData();
 
-        // add api.createBusiness(businessData); and move api call to api.js
+        //result = api.createBusiness(businessData);
+        api.createBusiness(businessData);
 
-        api
-            .createBusiness(businessData)
-            .then((businessResponse) => {
-              this.$router.push({path: `/businesses/${businessResponse.data.id}`});
-            })
-            .catch((error) => {
-              this.errors = [];
-              this.$log.debug(error);
-              if ((error.response && error.response.status === 401)) {
-                this.errors.push("Access token is missing or invalid");
-              } else {
-                this.errors.push(error.message);
-              }
-            });
+
       } catch (e) {
         result = e;
       }
