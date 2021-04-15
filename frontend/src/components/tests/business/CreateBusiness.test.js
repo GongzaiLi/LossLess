@@ -6,8 +6,6 @@ import CreateBusiness from '../../business/CreateBusiness';
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 
-
-
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 
@@ -92,6 +90,16 @@ describe('Testing createBusiness method',  () => {
         const result = wrapper.vm.createBusiness(mockEvent);
         expect(result).toBe("success");
     });
+
+    it('should return an error', () => {
+
+        //const mockEvent = {preventDefault: jest.fn()}
+        const result = wrapper.vm.createBusiness();
+        expect(result.toString()).toBe("TypeError: Cannot read property 'preventDefault' of undefined");
+    });
+
+
+
 });
 
 
