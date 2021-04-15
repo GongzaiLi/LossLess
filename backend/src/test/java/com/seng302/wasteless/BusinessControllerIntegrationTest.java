@@ -1,6 +1,9 @@
 package com.seng302.wasteless;
 
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +33,9 @@ public class BusinessControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private BusinessService businessService;
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
@@ -92,6 +98,104 @@ public class BusinessControllerIntegrationTest {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Request", e);
         }
+    }
+
+    private void createOneProduct(String name, String description, String recommendedRetailPrice) {
+
+        String product = String.format("{\"name\": \"%s\", \"description\" : \"%s\", \"recommendedRetailPrice\": \"%s\"}", name, description, recommendedRetailPrice);
+
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+                    .content(product)
+                    .contentType(APPLICATION_JSON))
+                    .andExpect(status().isCreated());
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Request", e);
+        }
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/99/products")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessProducts_AndProductAlreadyExists_then400Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessProducts_AndUserIsBusinessAdminAndProductIsValid_then201Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+    public void whenPostRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductIsValid_then201Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
     }
 
 

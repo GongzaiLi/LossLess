@@ -151,7 +151,14 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
 
-        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, 25).replaceAll("\\P{Alnum}+$", "")
+        int maxLength = 25;
+        int nameLength = possibleProduct.getName().length();
+
+        if (nameLength < maxLength) {
+            maxLength = nameLength;
+        }
+
+        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
                                                     .replaceAll(" ", "-");
 
         if (productService.findProductById(productId) != null) {
