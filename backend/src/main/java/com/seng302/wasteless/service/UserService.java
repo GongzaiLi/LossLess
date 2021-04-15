@@ -1,9 +1,16 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
+
+/**
+ * User service applies business logic over the User JPA repository.
+ */
 
 @Service
 public class UserService {
@@ -23,6 +30,15 @@ public class UserService {
      */
     public User createUser(User user) {
         return userRepository.save(user);
+    }
+
+    /**
+     * Saves the given user object with updated fields in Database
+     *
+     * @param user      The updated user object to save in the DB
+     */
+    public void updateUser(User user) {
+        userRepository.save(user);
     }
 
     /**
@@ -55,6 +71,7 @@ public class UserService {
         return userRepository.findFirstByEmail(email);
     }
 
+
     /**
      * Search for users by a search query.
      *      * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
@@ -83,4 +100,17 @@ public class UserService {
 
         return combinedResults;
     }
+
+    /**
+     * Add a primarily administered business to a user/
+     *
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     * @param user          The user to add to
+     * @param business      The business the user is a primary admin of
+     */
+    public void addBusinessPrimarilyAdministered(User user, Business business) {
+        user.addPrimaryBusiness(business);
+    }
+
 }

@@ -25,7 +25,7 @@
  * For more information, please refer to <https://unlicense.org>
  */
 
-package com.seng302.wasteless;
+package com.seng302.wasteless.config;
 
 import java.io.IOException;
 
@@ -36,6 +36,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+import com.seng302.wasteless.Main;
 import org.springframework.stereotype.Component;
 
 /**

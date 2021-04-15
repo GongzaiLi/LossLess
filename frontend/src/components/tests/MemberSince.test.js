@@ -77,3 +77,38 @@ test('5-years-3-months', () => {
         new Date("2021-10-11T00:32:01Z")
     )).toEqual({years: 5, months: 5});
 });
+
+
+
+
+test('only-first-and-last-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Last");
+});
+
+test('first-and-middle-and-last-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    wrapper.vm.userData.middleName = "Middle";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Middle Last");
+});
+
+test('first-and-middle-and-last-and-nick-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    wrapper.vm.userData.middleName = "Middle";
+    wrapper.vm.userData.nickName = "Nick";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Middle Last (Nick)");
+});
+
+test('first-and-last-and-nick-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    wrapper.vm.userData.nickName = "Nick";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Last (Nick)");
+});

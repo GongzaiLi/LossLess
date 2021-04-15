@@ -53,16 +53,16 @@ Date: 5/3/2021
                 <b-icon-person-fill></b-icon-person-fill>
               </b-col>
               <b-col cols="4"><b>Full Name:</b></b-col>
-              <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
+              <b-col>{{ fullName }}</b-col>
             </b-row>
           </h6>
-          <h6>
-            <b-row v-show="userData.nickname">
+          <h6 v-if="userData.nickName">
+            <b-row v-show="userData.nickName.length">
               <b-col cols="0">
                 <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
               </b-col>
               <b-col cols="4"><b>Nickname:</b></b-col>
-              <b-col>{{ userData.nickname }}</b-col>
+              <b-col>{{ userData.nickName }}</b-col>
             </b-row>
           </h6>
           <h6>
@@ -152,7 +152,7 @@ export default {
         firstName: "",
         lastName: "",
         middleName: "",
-        nickname: "",
+        nickName: "",
         bio: "",
         email: "",
         dateOfBirth: "",
@@ -209,22 +209,15 @@ export default {
      */
     giveAdmin: function () {
       api
-        .makeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Made user ${this.userData.id} admin`);
-          this.userData.role = 'globalApplicationAdmin';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .makeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Made user ${this.userData.id} admin`);
             this.userData.role = 'globalApplicationAdmin';
-            return;
-            //////////////////////////
-          }
-
-          this.$log.debug(error);
-          alert(error);
-        });
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            alert(error);
+          });
     },
     /**
      *  Attempts to revoke the 'globalApplicationAdmin' role from the displayed user
@@ -232,27 +225,57 @@ export default {
      */
     revokeAdmin: function () {
       api
-        .revokeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
-          this.userData.role = 'user';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .revokeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Revoked admin for user ${this.userData.id}`);
             this.userData.role = 'user';
-            return;
-            //////////////////////////
-          }
-
-          this.$log.debug(error);
-          alert(error);
-        });
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            alert(error);
+          });
     }
   },
   computed: {
     adminButtonToggle() {
       return this.userData.role === 'user' ? 'success' : 'danger';
+    },
+    /**
+     * Returns the full name of the user, in the format:
+     * Firstname Middlename Lastname (Nickname)
+     */
+    fullName: function() {
+      let fullName = this.userData.firstName;
+      if (this.userData.middleName) {
+        fullName += ' ' + this.userData.middleName;
+      }
+      fullName += ' ' + this.userData.lastName;
+      if (this.userData.nickName) {
+        fullName += ` (${this.userData.nickName})`
+      }
+      return fullName;
+    },
+    /**
+     * calclates in years and months the time since the user account was created
+    */
+    memberSince: function () {
+      let registeredDate = new Date(this.userData.created);
+      const timeElapsed = this.getMonthsAndYearsBetween(registeredDate, Date.now());
+      const registeredYears = timeElapsed.years;
+      const registeredMonths = timeElapsed.months;
+
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
+      if (registeredYears > 0) {
+        message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
+        if (registeredMonths > 0) {
+          message += " and ";
+        }
+      }
+      if (registeredMonths > 0 || registeredYears === 0) {
+        message += registeredMonths + ((registeredMonths === 1) ? " Month" : " Months");
+      }
+      return message + ") ";
     },
     /**
      * User friendly display string for the user role. Converts the user role

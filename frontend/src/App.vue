@@ -12,6 +12,8 @@ import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 import UserSearch from "./components/UserSearch";
 import BusinessProfile from "./components/BusinessProfile";
+import CreateBusiness from "./components/business/CreateBusiness";
+
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
@@ -26,6 +28,7 @@ const app = {
     UserProfile,
     Navbar,
     UserSearch,
+    CreateBusiness,
     BusinessProfile
   },
   // app initial state

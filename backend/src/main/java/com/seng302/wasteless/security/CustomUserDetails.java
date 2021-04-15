@@ -1,6 +1,6 @@
-package com.seng302.wasteless.Security;
+package com.seng302.wasteless.security;
 
-import com.seng302.wasteless.User.User;
+import com.seng302.wasteless.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +24,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return user.getPassword();
+    }
+
+    public Integer getId() {
+        return user.getId();
     }
 
     @Override
