@@ -61,8 +61,7 @@ public class DefaultAdminCreatorService {
         configFileStream.close();
         this.userService = userService;
 
-        createDefaultAdmin();
-        log.info("[SERVER] Startup... DGAA created {}", dateFormat.format(new Date()));
+        scheduleCheckDefaultAdmin();
     }
 
     /**
@@ -119,7 +118,7 @@ public class DefaultAdminCreatorService {
      * and creates one using DefaultAdminCreatorService. It periodically runs depending on what is
      * set in the global-admin.properties. Currently set to 5 seconds
      */
-    @Scheduled(fixedDelayString = "${check-default-admin-period-seconds}", initialDelay = 10000)
+    @Scheduled(fixedDelayString = "${check-default-admin-period-seconds}")
     public void scheduleCheckDefaultAdmin() {
         log.info("[SERVER] DGAA Check: {}", dateFormat.format(new Date()));
         this.count.incrementAndGet();
