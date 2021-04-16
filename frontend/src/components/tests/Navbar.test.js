@@ -1,6 +1,8 @@
-import {createLocalVue, shallowMount} from '@vue/test-utils';
+import {createLocalVue, mount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import NavBar from '../NavBar'; // name of your Vue component
+import NavBar from '../Navbar'; // name of your Vue component
+import Auth from '../../auth'
+import Api from '../../Api'
 
 let wrapper;
 
@@ -54,19 +56,19 @@ let userData = {
   ]
 }
 
-let $getCurrentUser = () => userData;
+let $currentUser = userData;
 
 beforeEach(() => {
-
-  const localVue = createLocalVue()
+  const localVue = createLocalVue();
 
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
+  localVue.use(Auth);
 
-  wrapper = shallowMount(NavBar, {
+  wrapper = mount(NavBar, {
     localVue,
     propsData: {},
-    mocks: {$route, $getCurrentUser},
+    mocks: {$route, $currentUser},
     stubs: {},
     methods: {},
     computed: {},
@@ -118,5 +120,66 @@ describe('User Drop Down', () => {
     expect(wrapper.find("hr").exists()).toBeFalsy();
 
     userData.businessesAdministered = prevBusinesses; // Reset businesses
+  })
+});
+
+
+describe('Act as business', () => {
+  test('works on click with single business', async () => {
+    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
+    await wrapper.find(".business-name-drop-down a").trigger("click");
+    await wrapper.vm.$nextTick();
+    expect(actAsBusiness).toHaveBeenCalledWith(100);
+    expect(wrapper.findAll(".business-name-drop-down").length).toBe(0);
+    expect(wrapper.findAll("hr").length).toEqual(1);
+    expect(wrapper.find("#profile-name").text()).toEqual("Lumbridge General Store");
+    expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
+
+    userData.currentlyActingAs = null;
+  })
+
+  test('can go back to single user', async () => {
+    userData.currentlyActingAs = userData.businessesAdministered[0];
+
+    await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
+
+    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
+    await wrapper.find(".user-name-drop-down a").trigger("click");
+    await wrapper.vm.$nextTick();
+    expect(actAsBusiness).toHaveBeenCalledWith(null);
+    expect(wrapper.findAll(".business-name-drop-down").length).toEqual(1);
+    expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
+    expect(wrapper.find("#profile-name").text()).toEqual("John");
+    expect(wrapper.findAll("hr").length).toEqual(1);
+    expect(wrapper.findAll(".user-name-drop-down").length).toBe(0);
+
+    userData.currentlyActingAs = null;
+  })
+
+  test('works on click with multiple business', async () => {
+    const prevUser = JSON.parse(JSON.stringify(userData));
+    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
+
+    userData.businessesAdministered.push({
+      "id": 101,
+      "administrators": [],
+      "primaryAdministratorId": 20,
+      "name": "Another Store Name",
+      "businessType": "Blah Blah Blah",
+      "created": "2020-07-14T14:52:00Z"
+    });
+    await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
+
+    await wrapper.findAll(".business-name-drop-down a").at(1).trigger("click");
+    await wrapper.vm.$nextTick();
+
+    expect(actAsBusiness).toHaveBeenCalledWith(101);
+
+    expect(wrapper.find("#profile-name").text()).toEqual("Another Store Name");
+    expect(wrapper.findAll(".business-name-drop-down").length).toBe(1);
+    expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
+    expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
+    expect(wrapper.findAll("hr").length).toEqual(2);
+    userData = prevUser;
   })
 });

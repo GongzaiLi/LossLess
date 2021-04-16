@@ -16,7 +16,7 @@
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
-            <em class="ml-2">{{profileName}}</em>
+            <em class="ml-2" id="profile-name">{{profileName}}</em>
             <img src="../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
 
