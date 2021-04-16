@@ -2,6 +2,7 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,14 @@ public class UserService {
     public boolean checkEmailAlreadyUsed(String email) {
         return userRepository.findFirstByEmail(email) != null;
     }
+
+    /**
+     * Checks if a user with a specified role already exists
+     *
+     * @param roles     The role using UserRoles
+     * @return          boolean whether a user is found or not
+     */
+    public boolean checkRoleAlreadyExists(UserRoles roles) { return userRepository.findFirstByRole(roles) != null; }
 
     /**
      * Find user by id
