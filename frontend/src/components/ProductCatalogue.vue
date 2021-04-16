@@ -4,30 +4,62 @@ Author: Gongzai Li
 Date: 15/4/2021
 -->
 <template>
+
   <div>
-    <h2 align="center">Product Catalogue</h2>
-    <b-table striped hover
-             table-class="text-nowrap"
-             responsive="lg"
-             no-border-collapse
-             bordered
-             stacked="sm"
-             show-empty
-             :fields="fields"
-             :items="items">
-      <template #empty>
-        <h3 class="no-results-overlay">No Product to display</h3>
-      </template>
-    </b-table>
+    <h2>Product Catalogue</h2>
+    <div v-show="productFound">
+      <b-table striped hover
+               table-class="text-nowrap"
+               responsive="lg"
+               no-border-collapse
+               bordered
+               stacked="sm"
+               :fields="fields"
+               :items="items"
+               :per-page="perPage"
+               :current-page="currentPage"
+      >
+      </b-table>
+      <b-col>
+        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
+      </b-col>
+    </div>
 
-
+    <div v-show="!productFound" class="no-results-overlay">
+      <h4>No Product to display</h4>
+      <createButton></createButton>
+    </div>
   </div>
 </template>
 
+<style>
+.no-results-overlay {
+  margin-top: 7em;
+  margin-bottom: 7em;
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+h4 {
+  color: #880000;
+}
+</style>
+
 <script>
 import api from "../Api";
+import Vue from 'vue'
+
+
+
 
 export default {
+  component: {
+    createButton: Vue.component('createButton', {
+      template: `<b-button>Create</b-button>`
+    })
+  },
   data: function () {
     return {
       fields: [{
@@ -43,6 +75,9 @@ export default {
         {
           key: 'description',
           label: 'Description',
+          formatter: (value) => {
+            return `${value.split(0, 10)}...`;
+          },
           sortable: true
         },
         {
@@ -59,7 +94,10 @@ export default {
           },
           sortable: true
         }],
-      items: []
+      items: [],
+      productFound: false,
+      perPage: 10,
+      currentPage: 0
     }
   },
   mounted() {
@@ -85,17 +123,31 @@ export default {
           this.$log.debug(error);
         })
       // fake date can use be test.
-      /*
+
       this.items = [
         {
-          id: "WATT-420-BEANS",
+          id: "WATT-420-BEANS1",
+          name: "Watties Baked Beans - 420g can",
+          description: "Baked Beans as they should be.",
+          recommendedRetailPrice: 2.2,
+          created: "2021-04-14T13:01:58.660Z"
+        },
+        {
+          id: "WATT-420-BEANS2",
+          name: "Watties Baked Beans - 420g can",
+          description: "Baked Beans as they should be.",
+          recommendedRetailPrice: 2.2,
+          created: "2021-04-14T13:01:58.660Z"
+        },
+        {
+          id: "WATT-420-BEANS3",
           name: "Watties Baked Beans - 420g can",
           description: "Baked Beans as they should be.",
           recommendedRetailPrice: 2.2,
           created: "2021-04-14T13:01:58.660Z"
         }
       ];
-      */
+
     },
     /**
      * set the response data to items
@@ -105,11 +157,17 @@ export default {
     setResponseData: function (data) {
       this.items = data;
     }
+  },
+  computed: {
+    /**
+     * The rows function just computed how many pages in the search table.
+     * @returns {number}
+     */
+    rows() {
+      return this.items.length;
+    },
+
   }
 
 }
 </script>
-
-<style scoped>
-
-</style>
