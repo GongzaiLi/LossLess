@@ -97,7 +97,7 @@ export default {
       items: [],
       productFound: false,
       perPage: 10,
-      currentPage: 0
+      currentPage: 1
     }
   },
   mounted() {
