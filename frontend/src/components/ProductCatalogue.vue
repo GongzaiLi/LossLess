@@ -8,6 +8,9 @@ Date: 15/4/2021
   <div>
     <h2>Product Catalogue</h2>
     <div v-show="productFound">
+      <b-form-group>
+        <createButton :businessId="this.$route.params.id" class="float-right"></createButton>
+      </b-form-group>
       <b-table striped hover
                table-class="text-nowrap"
                responsive="lg"
@@ -27,7 +30,7 @@ Date: 15/4/2021
 
     <div v-show="!productFound" class="no-results-overlay">
       <h4>No Product to display</h4>
-      <createButton></createButton>
+      <createButton :businessId="this.$route.params.id"></createButton>
     </div>
   </div>
 </template>
@@ -57,7 +60,13 @@ import Vue from 'vue'
 export default {
   component: {
     createButton: Vue.component('createButton', {
-      template: `<b-button>Create</b-button>`
+      props: ['businessId'],
+
+      template: `<b-button @click="goToCreateProduct"> <b-icon-plus-square-fill  animation="throb"/> Create</b-button>`,
+      methods: {goToCreateProduct: function (){
+            this.$router.push({path: `/businesses/${this.businessId}/products/createProduct`});
+          }
+        }
     })
   },
   data: function () {
@@ -95,7 +104,7 @@ export default {
           sortable: true
         }],
       items: [],
-      productFound: false,
+      productFound: true,
       perPage: 10,
       currentPage: 1
     }
@@ -118,32 +127,34 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.setResponseData(response.data);
+          this.productFound = true;
         })
         .catch((error) => {
           this.$log.debug(error);
+          //this.productFound = false;
         })
       // fake date can use be test.
 
       this.items = [
         {
           id: "WATT-420-BEANS1",
-          name: "Watties Baked Beans - 420g can",
+          name: "Watties Baked Beans - 430g can",
           description: "Baked Beans as they should be.",
           recommendedRetailPrice: 2.2,
           created: "2021-04-14T13:01:58.660Z"
         },
         {
           id: "WATT-420-BEANS2",
-          name: "Watties Baked Beans - 420g can",
+          name: "Watties Baked Beans - 410g can",
           description: "Baked Beans as they should be.",
-          recommendedRetailPrice: 2.2,
+          recommendedRetailPrice: 2.4,
           created: "2021-04-14T13:01:58.660Z"
         },
         {
           id: "WATT-420-BEANS3",
-          name: "Watties Baked Beans - 420g can",
+          name: "Watties Baked Beans - 460g can",
           description: "Baked Beans as they should be.",
-          recommendedRetailPrice: 2.2,
+          recommendedRetailPrice: 2.7,
           created: "2021-04-14T13:01:58.660Z"
         }
       ];
