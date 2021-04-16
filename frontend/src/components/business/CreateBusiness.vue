@@ -117,6 +117,9 @@ export default {
 
 
     },
+    /**
+     * Pushes
+     */
     pushErrors(response) {
       const status = response[0];
       const value = response[1];
