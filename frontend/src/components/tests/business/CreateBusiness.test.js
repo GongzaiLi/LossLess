@@ -1,15 +1,38 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
 import { BootstrapVue } from 'bootstrap-vue';
 import CreateBusiness from '../../business/CreateBusiness';
+import VueRouter from 'vue-router';
+
+
+let userData = {
+    id:1
+}
+// fake the localStorage to doing the testing.
+const mockUserAuthPlugin = function install(Vue) {
+    Vue.mixin({
+        methods: {
+            $getCurrentUser: () => userData
+        }
+    });
+}
 
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
+localVue.use(VueRouter);
+localVue.use(mockUserAuthPlugin);
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 
 let wrapper;
+
+const router = new VueRouter();
+
+
+
+
+
 
 const name = "countdown"
 const description = "Countdown is New Zealand’s leading supermarket brand, serving more than 3 million " +
@@ -20,10 +43,9 @@ const address = "17 Chappie Place, Hornby, Christchurch 8042";
 
 
 beforeEach(() => {
-
-
     wrapper = mount(CreateBusiness, {
         localVue,
+        router,
     });
 });
 
@@ -84,20 +106,13 @@ describe('CreateBusiness Script Testing', () => {
 describe('Testing createBusiness method',  () => {
 
 
-    it('should return success after api call', () => {
+    it('should return success after api call', async () => {
 
         const mockEvent = {preventDefault: jest.fn()}
-        const result = wrapper.vm.createBusiness(mockEvent);
+        const result = await wrapper.vm.createBusiness(mockEvent);
         expect(result).toBe("success");
+        // expect(result instanceof Promise).toBe(false);
     });
-
-    it('should return an error', () => {
-
-        //const mockEvent = {preventDefault: jest.fn()}
-        const result = wrapper.vm.createBusiness();
-        expect(result.toString()).toBe("TypeError: Cannot read property 'preventDefault' of undefined");
-    });
-
 
 
 });

@@ -25,22 +25,22 @@ Date: 26/3/2021
           <b-form-textarea v-model="description" placeholder="Description"></b-form-textarea>
         </b-form-group>
 
-        <b-form-group >
+        <b-form-group>
           <b>Business Address *</b>
           <address-input v-model="address" required/>
         </b-form-group>
 
-        <b-form-group >
+        <b-form-group>
           <b>Business Type *
           </b>
           <div class="input-group mb-xl-5">
 
             <select v-model="businessType" required>
-              <option disabled value=""> Choose ... </option>
-              <option> Accommodation and Food Services </option>
-              <option> Retail Trade </option>
-              <option> Charitable organisation </option>
-              <option> Non-profit organisation </option>
+              <option disabled value=""> Choose ...</option>
+              <option> Accommodation and Food Services</option>
+              <option> Retail Trade</option>
+              <option> Charitable organisation</option>
+              <option> Non-profit organisation</option>
 
             </select>
 
@@ -54,7 +54,10 @@ Date: 26/3/2021
       </b-form>
       <br>
       <div v-if="errors.length">
-        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }} </b-alert>
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{
+            error
+          }}
+        </b-alert>
       </div>
     </b-card>
     <br>
@@ -97,24 +100,38 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    createBusiness(event) {
+    async createBusiness(event) {
       let result = "success";
+      // let afterPost;
 
-      try {
+      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
-        event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+      let businessData = this.getBusinessData();
 
-        let businessData = this.getBusinessData();
+      //result = api.createBusiness(businessData);
+      const response = await api.postBusiness(businessData);
+      await this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
 
-        //result = api.createBusiness(businessData);
-        api.createBusiness(businessData);
-
-
-      } catch (e) {
-        result = e;
-      }
+      this.pushErrors(response);
       return result;
+
+
     },
+    pushErrors(response) {
+      const status = response[0];
+      const value = response[1];
+      if (status == "error") {
+        this.errors = [];
+        //this.$log.debug(value);
+        if ((value.response && value.response.status === 401)) {
+          this.errors.push("Access token is missing or invalid");
+        } else {
+          this.errors.push(value.message);
+        }
+
+      }
+
+    }
   },
 }
 </script>
