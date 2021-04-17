@@ -11,23 +11,22 @@ Date: 15/4/2021
       <b-form-group>
         <createButton :businessId="$route.params.id" class="float-right"></createButton>
       </b-form-group>
-      <b-table striped hover
-               table-class="text-nowrap"
-               responsive="lg"
-               no-border-collapse
-               bordered
-               stacked="sm"
-               :fields="fields"
-               :items="items"
-               :per-page="perPage"
-               :current-page="currentPage"
-      >
+      <b-table
+        striped hovers
+        responsive="lg"
+        no-border-collapse
+        bordered
+        @row-clicked="tableRowClick"
+        :fields="fields"
+        :items="items"
+        :per-page="perPage"
+        :current-page="currentPage"
+      > <!--stacked="sm" table-class="text-nowrap"-->
       </b-table>
       <b-row>
         <b-col>
           <b-pagination v-model="currentPage" :total-rows="totalResults" :per-page="perPage"></b-pagination>
         </b-col>
-
         <b-col style="text-align: right; margin-top: 6px">
           Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalResults }} results.
         </b-col>
@@ -59,7 +58,7 @@ h4 {
 
 <script>
 import api from "../../Api";
-import Vue from 'vue'
+import Vue from 'vue';
 
 
 export default {
@@ -110,34 +109,40 @@ export default {
           this.$log.debug(error);
           //
           this.productFound = false;
-        })
-      // fake date can use be test.
-      this.items = [
-        {
-          id: "WATT-420-BEANS1",
-          name: "Watties Baked Beans - 430g can",
-          description: "Aaked Beans as they should be.",
-          recommendedRetailPrice: 2.2,
-          created: "2021-03-14T13:01:58.660Z"
-        },
-        {
-          id: "WATT-420-BEANS2",
-          name: "Watties Baked Beans - 410g can",
-          description: "Baked Beans as they should be.",
-          recommendedRetailPrice: 2.4,
-          created: "2021-04-14T13:01:58.660Z"
-        },
-        {
-          id: "WATT-420-BEANS3",
-          name: "Watties Baked Beans - 460g can",
-          description: "Caked Beans as they should be.",
-          recommendedRetailPrice: 2.7,
-          created: "2021-05-14T13:01:58.660Z"
-        }
-      ];
-      //this.productFound = true;
 
+          // fake date can use be test.
+          /*
+          this.items = [
+            {
+              id: "WATT-420-BEANS1",
+              name: "Watties Baked Beans - 430g can",
+              description: "Aaked Beans as they should be.",
+              recommendedRetailPrice: 2.2,
+              created: "2021-03-14T13:01:58.660Z"
+            },
+            {
+              id: "WATT-420-BEANS2",
+              name: "Watties Baked Beans - 410g can",
+              description: "Baked Beans as they should be.Baked Beans as they should " +
+                "be.Baked Beans as they should be.Baked Beans as they should be." +
+                "Baked Beans as they should be.Baked Beans as they should be.",
+              recommendedRetailPrice: 2.4,
+              created: "2021-04-14T13:01:58.660Z"
+            },
+            {
+              id: "WATT-420-BEANS3",
+              name: "Watties Baked Beans - 460g can",
+              description: "Caked Beans as they should be.",
+              recommendedRetailPrice: 2.7,
+              created: "2021-05-14T13:01:58.660Z"
+            }
+          ];
+          this.productFound = true;
+
+          */
+        })
     },
+
     /**
      * set the response data to items
      * @param data
@@ -167,7 +172,132 @@ export default {
       return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
         `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
         `${date.getUTCFullYear()}`;
+    },
+
+    /**
+     * when click the table will show a new model card.
+     * @param product object
+     */
+    tableRowClick(product) {
+      //console.log(product, 12212321312321321);
+      const productCard = this.$createElement
+      // Using HTML string
+      const titleVNode = productCard('div', {
+        domProps: {
+          innerHTML: '<h3>Product Detail</h3>'
+        }
+      })
+      // More complex structure
+      const messageVNode = productCard('div', {class: ['foobar']}, [
+
+        productCard('b-img', {
+          props: {
+            src: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
+            thumbnail: true,
+            center: true,
+            fluid: true,
+            rounded: 'circle',
+            width: 250,
+            height: 250
+          }
+        }),
+        productCard('b-card', {class: ['profile-card shadow']}, [
+          productCard('b-card-body', [
+            productCard('b-container', [
+              productCard('h6', [
+                productCard('b-row', [
+                  productCard('b-col', {
+                    props: {
+                      cols: '4'
+                    }
+                  }, [
+                    productCard('b', [
+                      'Name:'
+                    ])
+                  ]),
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    '--',
+                    product.name,
+                  ])])
+              ]),
+              productCard('h6', [
+                productCard('b-row', [
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    productCard('b', [
+                      'Recommended Retail Price:'
+                    ])
+                  ]),
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    '--',
+                    product.recommendedRetailPrice,
+                  ])])
+              ]),
+              productCard('h6', [
+                productCard('b-row', [
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    productCard('b', [
+                      'Created:'
+                    ])
+                  ]),
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    '--',
+                    product.created,
+                  ])])
+              ]),
+              productCard('h6', [
+                productCard('b-row', [
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    productCard('b', [
+                      'Description:'
+                    ])
+                  ]),
+                  productCard('b-col', {
+                    props: {
+                      cols: '10'
+                    }
+                  }, [
+                    '--',
+                    product.description,
+                  ])])
+              ])
+            ])
+          ])
+        ]),
+        //productCard('p', {class: ['text-center']}, [productCard('b-spinner')]),
+      ])
+      // We must pass the generated VNodes as arrays
+      this.$bvModal.msgBoxOk([messageVNode], {
+        title: [titleVNode],
+        buttonSize: 'sm',
+        centered: true,
+        size: 'md'
+      })
     }
+
   },
 
   computed: {
