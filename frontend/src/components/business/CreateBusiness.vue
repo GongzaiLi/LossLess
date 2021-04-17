@@ -1,5 +1,5 @@
 <!--
-Page for users to input their information for registration
+Page for users to input business information for registration of a Business
 Authors: Nitish Singh, Arish Abalos
 Date: 26/3/2021
 -->
@@ -101,38 +101,40 @@ export default {
      * The parameter event is passed
      */
     async createBusiness(event) {
-      let result = "success";
+      let result = "failed";    //if this page displays but current user not logged in/doesnt exist
       // let afterPost;
 
-      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+      event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
 
       let businessData = this.getBusinessData();
-
-      //result = api.createBusiness(businessData);
-      const response = await api.postBusiness(businessData);
-      await this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
-
-      this.pushErrors(response);
+      let response = ["error", {response: {status: 401}}]; //if this page displays but current user not logged in/doesnt exist
+      if (this.$getCurrentUser() != null) {                //if this page displays and current user exists
+        result = "success";
+        response = await api.postBusiness(businessData);
+        await this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
+      }
+      this.pushErrors(response);                          //for error displaying
       return result;
 
 
     },
     /**
-     * Pushes
+     * Pushes errors to errors list to be displayed as response on the screen,
+     * if there are any.
      */
     pushErrors(response) {
+      this.errors = [];
       const status = response[0];
       const value = response[1];
       if (status == "error") {
-        this.errors = [];
-        //this.$log.debug(value);
+        this.$log.debug(value);
         if ((value.response && value.response.status === 401)) {
           this.errors.push("Access token is missing or invalid");
         } else {
           this.errors.push(value.message);
         }
-
       }
+      return this.errors;
 
     }
   },

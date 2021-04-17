@@ -7,6 +7,11 @@ import VueRouter from 'vue-router';
 let userData = {
     id:1
 }
+const $log = {
+    debug: jest.fn(),
+};
+
+
 // fake the localStorage to doing the testing.
 const mockUserAuthPlugin = function install(Vue) {
     Vue.mixin({
@@ -46,6 +51,7 @@ beforeEach(() => {
     wrapper = mount(CreateBusiness, {
         localVue,
         router,
+        mocks: {$log}
     });
 });
 
@@ -103,15 +109,39 @@ describe('CreateBusiness Script Testing', () => {
     });
 });
 
-describe('Testing createBusiness method',  () => {
+describe('Testing api post request and the response method with errors',  () => {
+    const response401 = ["error", {response: {status: 401}, message: "Access token is missing or invalid"}];
+    const responseNot401 = ["error", {response: {status: 500}, message: "Network Error"}];
+    const responseNoError = ["success", {response: {status: 201}, message: "Business Registered"}];
 
 
-    it('should return success after api call', async () => {
+    it('current user exists, should return success after api call', async () => {
 
         const mockEvent = {preventDefault: jest.fn()}
         const result = await wrapper.vm.createBusiness(mockEvent);
         expect(result).toBe("success");
-        // expect(result instanceof Promise).toBe(false);
+    });
+
+    it('current user doesnt exist, should return failed after api call', async () => {
+        userData = null;
+        const mockEvent = {preventDefault: jest.fn()}
+        const result = await wrapper.vm.createBusiness(mockEvent);
+        expect(result).toBe("failed");
+    });
+
+    it('should push correct errors if 401 error exists in api response', async () => {
+        const pushedErrors = wrapper.vm.pushErrors(response401);
+        expect(pushedErrors[0]).toBe(response401[1].message);
+    });
+
+    it('should push correct errors if non-401 error exists in api response', async () => {
+        const pushedErrors = wrapper.vm.pushErrors(responseNot401);
+        expect(pushedErrors[0]).toBe(responseNot401[1].message);
+    });
+
+    it('should return empty list if no errors exist in api response', async () => {
+        const pushedErrors = wrapper.vm.pushErrors(responseNoError);
+        expect(pushedErrors[0]).toBe(undefined);
     });
 
 
