@@ -5,7 +5,7 @@ import Register from './../components/Register.vue'
 import UserProfile from './../components/UserProfile'
 import UserSearch from "../components/UserSearch";
 import BusinessProfile from "@/components/BusinessProfile";
-import ProductCatalogue from "@/components/ProductCatalogue";
+import ProductCatalogue from "@/components/product/ProductCatalogue";
 //import {getUser} from '@/auth'
 
 /**
