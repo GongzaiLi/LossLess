@@ -1,6 +1,6 @@
 <!--
 Page that stores table show the business products
-Author: Gongzai Li
+Author: Gongzai Li，Arish Abalos
 Date: 15/4/2021
 -->
 <template>
