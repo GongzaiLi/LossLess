@@ -121,8 +121,8 @@ h6 {
 </style>
 
 <script>
-import memberSince from "./MemberSince";
-import api from "../Api";
+import memberSince from "../MemberSince";
+import api from "../../Api";
 
 
 export default {

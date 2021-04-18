@@ -31,13 +31,30 @@ Date: 15/4/2021
           Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalResults }} results.
         </b-col>
       </b-row>
+
+      <b-modal id="product-card" hide-header centered>
+        <!--
+        <template #modal-header>
+          <small class="text-muted">Product Card</small>
+        </template>
+        -->
+        <product-detail-card :product="productSelect"/>
+        <!--
+        <template #modal-footer>
+          <small class="text-muted">Product Card</small>
+        </template>
+        -->
+      </b-modal>
+
     </div>
 
     <div v-if="!productFound" class="no-results-overlay">
-      <h4>No Product to display</h4>
+      <h4 style="color: #880000">No Product to display</h4>
       <createButton :businessId="$route.params.id"></createButton>
     </div>
   </div>
+
+
 </template>
 
 <style>
@@ -51,17 +68,18 @@ h2 {
   text-align: center;
 }
 
-h4 {
-  color: #880000;
-}
 </style>
 
 <script>
 import api from "../../Api";
 import Vue from 'vue';
+import productDetailCard from './ProductDetailCard';
 
 
 export default {
+  components: {
+    productDetailCard
+  },
   component: {
     createButton: Vue.component('createButton', {
       props: ['value'],
@@ -82,7 +100,8 @@ export default {
       items: [],
       productFound: true,
       perPage: 10,
-      currentPage: 1
+      currentPage: 1,
+      productSelect: {},
     }
   },
   mounted() {
@@ -118,23 +137,28 @@ export default {
               name: "Watties Baked Beans - 430g can",
               description: "Aaked Beans as they should be.",
               recommendedRetailPrice: 2.2,
-              created: "2021-03-14T13:01:58.660Z"
+              created: "2021-03-14T13:01:58.660Z",
+              image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
             },
             {
               id: "WATT-420-BEANS2",
-              name: "Watties Baked Beans - 410g can",
+              name: "Apple",
               description: "Baked Beans as they should be.Baked Beans as they should " +
                 "be.Baked Beans as they should be.Baked Beans as they should be." +
                 "Baked Beans as they should be.Baked Beans as they should be.",
               recommendedRetailPrice: 2.4,
-              created: "2021-04-14T13:01:58.660Z"
+              created: "1077-04-14T13:01:58.660Z",
+              image: 'https://i2.wp.com/ceklog.kindel.com/wp-content/uploads/2013/02/firefox_2018-07-10_07-50-11.png?w=641&ssl=1',
             },
             {
               id: "WATT-420-BEANS3",
-              name: "Watties Baked Beans - 460g can",
-              description: "Caked Beans as they should be.",
+              name: "Tip Top Super Soft Toast Bread White Superthick",
+              description: "Made in New Zealand with imported & local ingredients.\n" +
+                "\n" +
+                "Tip top supersoft white super thick is a kiwi classic. Delicious and soft white bread perfect for any occasion.",
               recommendedRetailPrice: 2.7,
-              created: "2021-05-14T13:01:58.660Z"
+              created: "2077-05-14T13:01:58.660Z",
+              image: 'https://static.countdown.co.nz/assets/product-images/zoom/9415142003740.jpg',
             }
           ];
           this.productFound = true;
@@ -153,12 +177,12 @@ export default {
     },
 
     /**
-     * modify the description only keep 10 words and then add ...
+     * modify the description only keep 5 words and then add ...
      * @param description
      * @return string
      */
     setDescription: function (description) {
-      const showTenWordDescription = description.split(' ').slice(0, 10).join(' ');
+      const showTenWordDescription = description.split(' ').slice(0, 5).join(' ');
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
     },
 
@@ -179,123 +203,8 @@ export default {
      * @param product object
      */
     tableRowClick(product) {
-      //console.log(product, 12212321312321321);
-      const productCard = this.$createElement
-      // Using HTML string
-      const titleVNode = productCard('div', {
-        domProps: {
-          innerHTML: '<h3>Product Detail</h3>'
-        }
-      })
-      // More complex structure
-      const messageVNode = productCard('div', {class: ['foobar']}, [
-
-        productCard('b-img', {
-          props: {
-            src: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
-            thumbnail: true,
-            center: true,
-            fluid: true,
-            rounded: 'circle',
-            width: 250,
-            height: 250
-          }
-        }),
-        productCard('b-card', {class: ['profile-card shadow']}, [
-          productCard('b-card-body', [
-            productCard('b-container', [
-              productCard('h6', [
-                productCard('b-row', [
-                  productCard('b-col', {
-                    props: {
-                      cols: '4'
-                    }
-                  }, [
-                    productCard('b', [
-                      'Name:'
-                    ])
-                  ]),
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    '--',
-                    product.name,
-                  ])])
-              ]),
-              productCard('h6', [
-                productCard('b-row', [
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    productCard('b', [
-                      'Recommended Retail Price:'
-                    ])
-                  ]),
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    '--',
-                    product.recommendedRetailPrice,
-                  ])])
-              ]),
-              productCard('h6', [
-                productCard('b-row', [
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    productCard('b', [
-                      'Created:'
-                    ])
-                  ]),
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    '--',
-                    product.created,
-                  ])])
-              ]),
-              productCard('h6', [
-                productCard('b-row', [
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    productCard('b', [
-                      'Description:'
-                    ])
-                  ]),
-                  productCard('b-col', {
-                    props: {
-                      cols: '10'
-                    }
-                  }, [
-                    '--',
-                    product.description,
-                  ])])
-              ])
-            ])
-          ])
-        ]),
-        //productCard('p', {class: ['text-center']}, [productCard('b-spinner')]),
-      ])
-      // We must pass the generated VNodes as arrays
-      this.$bvModal.msgBoxOk([messageVNode], {
-        title: [titleVNode],
-        buttonSize: 'sm',
-        centered: true,
-        size: 'md'
-      })
+      this.productSelect = product;
+      this.$bvModal.show('product-card');
     }
 
   },

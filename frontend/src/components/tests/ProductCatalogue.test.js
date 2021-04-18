@@ -2,6 +2,7 @@ import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import productCatalogue from '../product/ProductCatalogue';
 import Api from "../../Api";
+import productDetailCard from "../product/ProductDetailCard";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -311,9 +312,9 @@ describe('check-pagination-function', () => {
 });
 
 describe('check-setDescription-function', () => {
-  test('description-less-then-10-words', () => {
-    const description = "Baked Beans as they should be.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they should be...');
+  test('description-less-then-5-words', () => {
+    const description = "Baked Beans as they should.";
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they should...');
   });
 
   test('description-1-words', () => {
@@ -321,30 +322,51 @@ describe('check-setDescription-function', () => {
     expect(wrapper.vm.setDescription(description)).toEqual('Baked...');
   });
 
-  test('description-more-then-10-words', () => {
+  test('description-more-then-5-words', () => {
     const description = "Baked Beans as they should be. Baked Beans as they should be. Baked Beans as they should be.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they should be. Baked Beans as they...');
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they should...');
   });
 });
 
 describe('check-setCreated-function', () => {
   test('set-mouth-less-then-10-data', () => {
-    const created =  "2021-04-14T13:01:58.660Z";
+    const created = "2021-04-14T13:01:58.660Z";
     expect(wrapper.vm.setCreated(created)).toEqual('14/04/2021');
   });
 
   test('set-month-more-then-9-data', () => {
-    const created =  "2021-10-14T13:01:58.660Z";
+    const created = "2021-10-14T13:01:58.660Z";
     expect(wrapper.vm.setCreated(created)).toEqual('14/10/2021');
   });
 
   test('set-day-more-then-9-data', () => {
-    const created =  "2021-10-10T13:01:58.660Z";
+    const created = "2021-10-10T13:01:58.660Z";
     expect(wrapper.vm.setCreated(created)).toEqual('10/10/2021');
   });
 
   test('set-day-less-then-10-data', () => {
-    const created =  "2021-10-02T13:01:58.660Z";
+    const created = "2021-10-02T13:01:58.660Z";
     expect(wrapper.vm.setCreated(created)).toEqual('02/10/2021');
   });
+});
+
+describe('check-model-product-card-page', () => {
+  test('check-product-detail-card-component-exists', async () => {
+    const response = {
+      data: [{
+        id: "WATT-420-BEANS1",
+        name: "Watties Baked Beans - 430g can",
+        description: "Aaked Beans as they should be.",
+        recommendedRetailPrice: 2.2,
+        created: "2021-03-14T13:01:58.660Z",
+        image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
+      }]
+    };
+    Api.getProducts.mockResolvedValue(response);
+    await wrapper.vm.getProducts(0);
+
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
+  })
 });

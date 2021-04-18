@@ -12,7 +12,7 @@ import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 import UserSearch from "./components/UserSearch";
 import CreateBusiness from "./components/business/CreateBusiness";
-import BusinessProfile from "./components/BusinessProfile";
+import BusinessProfile from "./components/business/BusinessProfile";
 // Vue app instance
 // it is declared as a reusable component in this case.
 // For global instance https://vuejs.org/v2/guide/instance.html
