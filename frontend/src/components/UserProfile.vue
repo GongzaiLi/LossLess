@@ -19,10 +19,10 @@ Date: 5/3/2021
             <member-since :date="userData.created"/>
           </b-col>
           <b-col cols="2" sm="auto"
-                 v-if="($getCurrentUser().role==='defaultGlobalApplicationAdmin'||$getCurrentUser().role==='globalApplicationAdmin')">
+                 v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
             <h4>{{ userRoleDisplayString }}</h4>
             <b-button v-bind:variant="adminButtonToggle"
-                      v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$getCurrentUser().id)"
+                      v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$currentUser.id)"
                       @click="toggleAdmin">{{ adminButtonText }}
             </b-button>
           </b-col>

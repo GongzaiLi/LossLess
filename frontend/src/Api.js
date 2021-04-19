@@ -29,12 +29,17 @@
  * Declare all available services here
  */
 import axios from 'axios'
+import {getCurrentlyActingAs} from './auth'
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
+const businessActingAs = getCurrentlyActingAs();
+let businessActingAsId = businessActingAs ? businessActingAs.id : null;
+
 const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 1000
+  timeout: 1000,
+  headers: {'X-Business-Acting-As': businessActingAsId}
 });
 
 export default {
@@ -44,5 +49,6 @@ export default {
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get(`users/search?searchQuery=${searchParameter}`, {withCredentials: true}),
-  getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true})
+  getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
+  setBusinessActingAs: (businessId) => businessActingAsId = businessId,
 }

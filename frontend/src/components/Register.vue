@@ -231,7 +231,7 @@ export default {
           return api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {
-          this.$setCurrentUser(userResponse.data);
+          this.$currentUser = userResponse.data;
           this.$router.push({path: `/users/${userResponse.data.id}`});
         })
         .catch((error) => {
