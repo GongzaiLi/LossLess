@@ -1,8 +1,17 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.MainApplicationRunner;
-import com.seng302.wasteless.Security.CustomUserDetails;
+import com.seng302.wasteless.dto.GetUserDto;
+import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.repository.BusinessRepository;
+import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.view.UserViews;
+import com.seng302.wasteless.model.Login;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.security.CustomUserDetails;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,9 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -75,25 +82,24 @@ public class UserController {
 
         user.setRole(UserRoles.USER);
 
-
         Login login = new Login(user.getEmail(), user.getPassword());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRoles.USER);
+
         //Save user object in h2 database
         userService.createUser(user);
+
         logger.info(String.format("Successful registration of user %d", user.getId()));
+
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 login.getEmail(), login.getPassword());
         Authentication auth = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-
-
         logger.info("saved new user {}", user);
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("id", user.getId());
-
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
 
@@ -105,15 +111,20 @@ public class UserController {
      * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
      *
      * @param searchQuery   The query to search by
-     * @return              A set of matching results
+     * @return              A list of matching results
      */
     @GetMapping("/users/search")
-    @JsonView(UserViews.SearchUserView.class) //Only return appropriate fields
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
 
         LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
-        return ResponseEntity.status(HttpStatus.OK).body(searchResults);
+        List<GetUserDto> searchResultsDto = new ArrayList<>();
+
+        for (User user : searchResults) {
+            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
     }
 
 
@@ -143,12 +154,11 @@ public class UserController {
      *  and unauthorized if a user hasn't logged in
      *
      * @param userId The userID integer
-     * @param request       The get request for getting the user
      * @return              200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
-    @JsonView(UserViews.GetUserView.class)
-    public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId, HttpServletRequest request) {
+    public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
+
         User possibleUser = userService.findUserById(userId);
         logger.info("possible User{}", possibleUser);
 
@@ -161,7 +171,11 @@ public class UserController {
         // to have U4 for that or is it possible to do without it
 
         logger.info("Account: {} retrieved successfully", possibleUser);
-        return ResponseEntity.status(HttpStatus.OK).body(possibleUser);
+
+
+        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
     }
 
 

@@ -1,10 +1,9 @@
-package com.seng302.wasteless.Business;
+package com.seng302.wasteless.view;
 
 /**
  * Interfaces used with @JsonView annotation to allow for only specified
  * fields to be accepted/returned with request/responses.
  */
 public class BusinessViews {
-    public interface PostBusinessRequestView{};
-    public interface GetBusinessView{};
+    public interface PostBusinessRequestView{}
 }

@@ -1,4 +1,4 @@
-package com.seng302.wasteless.Business;
+package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

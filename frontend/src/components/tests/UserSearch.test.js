@@ -4,16 +4,8 @@ import UserSearch from '../UserSearch'; // name of your Vue component
 
 let wrapper;
 
-let userData = {
+let $currentUser = {
   role:"user"
-}
-// fake the localStorage to doing the testing.
-const mockUserAuthPlugin = function install(Vue) {
-  Vue.mixin({
-    methods: {
-      $getCurrentUser: () => userData
-    }
-  });
 }
 
 beforeEach(() => {
@@ -22,12 +14,11 @@ beforeEach(() => {
 
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
-  localVue.use(mockUserAuthPlugin);
 
   wrapper = shallowMount(UserSearch, {
     localVue,
     propsData: {},
-    mocks: {},
+    mocks: {$currentUser},
     stubs: {},
     methods: {},
     computed: {},

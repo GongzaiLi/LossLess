@@ -1,8 +1,8 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.model;
 
 import lombok.Data;
 import lombok.ToString;
-import javax.persistence.Column;
+
 import javax.validation.constraints.NotNull;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)

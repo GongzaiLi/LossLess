@@ -1,5 +1,7 @@
-package com.seng302.wasteless.User;
+package com.seng302.wasteless.repository;
 
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -11,6 +13,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findFirstByEmail(String email);
 
     User findFirstById(Integer id);
+
+    User findFirstByRole(UserRoles roles);
 
     LinkedHashSet<User> findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nickNameQuery);
 

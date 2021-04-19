@@ -1,25 +1,40 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.Security.WebSecurityConfig;
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserRoles;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+
+
 
 /**
  * Service for automatic default admin creation.
  */
 @Component
+@EnableScheduling
+@PropertySource("classpath:global-admin.properties")
 public class DefaultAdminCreatorService {
     private static final String CONFIG_FILE_PATH = "global-admin.properties";
+    private static final Logger log = LoggerFactory.getLogger(DefaultAdminCreatorService.class);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+
+    private AtomicInteger count = new AtomicInteger(0);
 
     private String defaultEmail;
     private String defaultPassword;
@@ -36,6 +51,8 @@ public class DefaultAdminCreatorService {
      */
     @Autowired
     public DefaultAdminCreatorService(UserService userService) throws IOException, InvalidParameterException {
+
+
         InputStream configFileStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_PATH);
         if (configFileStream == null) {
             throw new IOException("Did not find global-admin.properties file in the resources directory");
@@ -44,7 +61,7 @@ public class DefaultAdminCreatorService {
         configFileStream.close();
         this.userService = userService;
 
-        createDefaultAdmin();
+        scheduleCheckDefaultAdmin();
     }
 
     /**
@@ -90,7 +107,32 @@ public class DefaultAdminCreatorService {
         defaultAdmin.setFirstName("Default");
         defaultAdmin.setLastName("Admin");
         defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
+        defaultAdmin.setCreated(LocalDate.now());
 
         userService.createUser(defaultAdmin);
+    }
+
+    /**
+     * This is a scheduled task that starts 10 seconds after start-up. It periodically checks
+     * whether an DGAA exists inside the database, if it doesn't it logs that a DGAA does not exist
+     * and creates one using DefaultAdminCreatorService. It periodically runs depending on what is
+     * set in the global-admin.properties. Currently set to 5 seconds
+     */
+    @Scheduled(fixedDelayString = "${check-default-admin-period-seconds}")
+    public void scheduleCheckDefaultAdmin() {
+        log.info("[SERVER] DGAA Check: {}", dateFormat.format(new Date()));
+        this.count.incrementAndGet();
+        if (!userService.checkRoleAlreadyExists(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)) {
+            log.info("[SERVER] DGAA (404), creating DGAA...");
+            createDefaultAdmin();
+        }
+    }
+
+    /**
+     * Used for testing schedule
+     * @return getInvocationCount a Atomic Integer that increments
+     */
+    public int getInvocationCount() {
+        return this.count.get();
     }
 }
