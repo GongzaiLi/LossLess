@@ -6,10 +6,9 @@ Date: 19/4/2021
 <template>
 
   <b-card
-
-    class="profile-card shadow"
-    style="max-width: 550px; background-color: rgba(0,0,0,0.4);"
-  ><!--header-border-variant="secondary" border-variant="secondary"-->
+    class="profile-card"
+    style="max-width: 550px"
+  ><!--header-border-variant="secondary" border-variant="secondary"  background-color: rgba(0,255,0,0.4);-->
 
     <b-img v-bind:src=productCard.image center thumbnail rounded="circle" width="250" height="250"/>
 
@@ -47,7 +46,7 @@ Date: 19/4/2021
         <hr style="width:100%">
 
         <b-input-group>
-          <h6><b>description:</b></h6>
+          <h6><b>Description:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
