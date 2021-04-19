@@ -5,11 +5,11 @@ Date: 19/4/2021
 -->
 <template>
 
-  <b-card border-variant="secondary"
-          header-border-variant="secondary"
-          class="profile-card shadow"
-          style="max-width: 550px"
-          bg-variant="success"><!--light-->
+  <b-card
+
+    class="profile-card shadow"
+    style="max-width: 550px; background-color: rgba(0,0,0,0.4);"
+  ><!--header-border-variant="secondary" border-variant="secondary"-->
 
     <b-img v-bind:src=productCard.image center thumbnail rounded="circle" width="250" height="250"/>
 
@@ -57,7 +57,6 @@ Date: 19/4/2021
     </b-card-body>
   </b-card>
 
-
 </template>
 
 <script>
@@ -67,24 +66,19 @@ export default {
   data() {
     return {
       productCard: {
-        id: "WATT-420-BEANS1",
-        name: "Watties Baked Beans - 430g can",
-        description: "Baked Beans as they should be.Baked Beans as they should " +
-          "be.Baked Beans as they should be.Baked Beans as they should be." +
-          "Baked Beans as they should be.Baked Beans as they should be.",
-        recommendedRetailPrice: 2.2,
-        created: "2021-03-14T13:01:58.660Z",
-        image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
+        id: '',
+        name: '',
+        description: '',
+        recommendedRetailPrice: 0,
+        created: '',
+        image: '',
       },
       disabled: true
     }
   },
   mounted() {
     this.productCard = this.product;
+    this.productCard.created = new Date(this.productCard.created).toUTCString();
   }
 }
 </script>
-
-<style scoped>
-
-</style>

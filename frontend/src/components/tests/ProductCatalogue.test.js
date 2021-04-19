@@ -3,6 +3,7 @@ import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import productCatalogue from '../product/ProductCatalogue';
 import Api from "../../Api";
 import productDetailCard from "../product/ProductDetailCard";
+import Pagination from "../Pagination";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -87,8 +88,7 @@ describe('check-product-catalogue-page', () => {
     expect(wrapper.vm.productFound).toBeFalsy();
   });
 
-  test('product-found-in-html', async () => {
-
+  test('product-found-in-html-test-pagination-display', async () => {
     const response = {
 
       data: [{
@@ -104,8 +104,20 @@ describe('check-product-catalogue-page', () => {
 
     await wrapper.vm.$forceUpdate();
 
-    const msg = 'Displaying 1 - 1 of total 1 results.';
-    expect(wrapper.html()).toContain(msg);
+    const pagination = wrapper.findComponent(Pagination);
+    expect(pagination.exists()).toBeTruthy();
+  });
+
+  test('product-not-found-in-html-test-pagination-not-display', async () => {
+
+    const response = null;
+    Api.getProducts.mockResolvedValue(response);
+    await wrapper.vm.getProducts(0);
+
+    await wrapper.vm.$forceUpdate();
+
+    const pagination = wrapper.findComponent(Pagination);
+    expect(pagination.exists()).toBeFalsy();
   });
 
   test('product-not-found-in-html', async () => {
@@ -118,213 +130,55 @@ describe('check-product-catalogue-page', () => {
 
     const msg = 'No Product to display';
     expect(wrapper.html()).toContain(msg);
+
   });
 });
 
-
-describe('check-pagination-function', () => {
-
-  describe('check-itemsRangeMin-function', () => {
-
-    test('1_total_result-in-1_perPage-in-1_currentPage', () => {
-
-      wrapper.vm.items = Array(1).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMin).toBe(1);
-    });
-
-    test('1_total_result-in-100_perPage-in-1_currentPage', () => {
-
-      wrapper.vm.items = Array(1).fill({id: 1});
-      wrapper.vm.perPage = 100;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMin).toBe(1);
-    });
-
-    test('100_total_result-in-1_perPage-in-1_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMin).toBe(1);
-
-    });
-
-    test('1000_total_result-in-10_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMin).toBe(1);
-    });
-
-    test('100_total_result-in-10_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 10;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMin).toBe(91);
-    });
-
-    test('1000_total_result-in-10_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 10;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMin).toBe(91);
-    });
-
-    test('100_total_result-in-5_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 5;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMin).toBe(46);
-    });
-
-    test('1000_total_result-in-5_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 5;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMin).toBe(46);
-    });
-
-    test('100_total_result-in-1_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMin).toBe(10);
-    });
-
-    test('1000_total_result-in-1_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMin).toBe(10);
-    });
-
-  });
-
-  describe('check-itemsRangeMax-function', () => {
-
-    test('1_total_result-in-1_perPage-in-1_currentPage', () => {
-
-      wrapper.vm.items = Array(1).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMax).toBe(1);
-    });
-
-    test('1_total_result-in-100_perPage-in-1_currentPage', () => {
-
-      wrapper.vm.items = Array(1).fill({id: 1});
-      wrapper.vm.perPage = 100;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMax).toBe(1);
-    });
-
-    test('100_total_result-in-1_perPage-in-1_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMax).toBe(1);
-
-    });
-
-    test('1000_total_result-in-10_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 1;
-      expect(wrapper.vm.itemsRangeMax).toBe(1);
-    });
-
-    test('100_total_result-in-10_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 10;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(100);
-    });
-
-    test('1000_total_result-in-10_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 10;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(100);
-    });
-
-    test('100_total_result-in-5_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 5;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(50);
-    });
-
-    test('1000_total_result-in-5_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 5;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(50);
-    });
-
-    test('100_total_result-in-1_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(100).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(10);
-    });
-
-    test('1000_total_result-in-1_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(10);
-    });
-
-    test('1000_total_result-in-1_perPage-in-10_currentPage', () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 1;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(10);
-    });
-
-    test('1000_total_result-in-100_perPage-in-10_currentPage', async () => {
-
-      wrapper.vm.items = Array(1000).fill({id: 1});
-      wrapper.vm.perPage = 100;
-      wrapper.vm.currentPage = 10;
-      expect(wrapper.vm.itemsRangeMax).toBe(1000);
-    });
-  });
-
-});
 
 describe('check-setDescription-function', () => {
-  test('description-less-then-5-words', () => {
-    const description = "Baked Beans as they should.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they should...');
+  test('description-less-then-20-characters', () => {
+    const description = "Baked Beans as they";
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they...');
   });
 
-  test('description-1-words', () => {
-    const description = "Baked";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked...');
+  test('description-1-character', () => {
+    const description = "B";
+    expect(wrapper.vm.setDescription(description)).toEqual('B...');
   });
 
-  test('description-more-then-5-words', () => {
+  test('description-more-then-20-characters', () => {
     const description = "Baked Beans as they should be. Baked Beans as they should be. Baked Beans as they should be.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they should...');
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they...');
+  });
+
+  test('description-less-then-20-characters-end-with-"."', () => {
+    const description = "Baked Beans.";
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans...');
+  });
+
+  test('description-less-then-20-characters-end-with-". "', () => {
+    const description = "Baked Beans. ";
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans...');
+  });
+
+  test('description-one-space', () => {
+    const description = " ";
+    expect(wrapper.vm.setDescription(description)).toEqual('...');
+  });
+
+  test('description-ten-space', () => {
+    const description = "           ";
+    expect(wrapper.vm.setDescription(description)).toEqual('...');
+  });
+
+  test('description-one-character-end-with-10-space', () => {
+    const description = "a           ";
+    expect(wrapper.vm.setDescription(description)).toEqual('a...');
+  });
+
+  test('description-one-character-start-with-10-space', () => {
+    const description = "           a";
+    expect(wrapper.vm.setDescription(description)).toEqual('a...');
   });
 });
 

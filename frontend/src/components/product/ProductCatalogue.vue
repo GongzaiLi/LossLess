@@ -23,14 +23,7 @@ Date: 15/4/2021
         :current-page="currentPage"
       > <!--stacked="sm" table-class="text-nowrap"-->
       </b-table>
-      <b-row>
-        <b-col>
-          <b-pagination v-model="currentPage" :total-rows="totalResults" :per-page="perPage"></b-pagination>
-        </b-col>
-        <b-col style="text-align: right; margin-top: 6px">
-          Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalResults }} results.
-        </b-col>
-      </b-row>
+      <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header centered>
         <!--
@@ -74,11 +67,13 @@ h2 {
 import api from "../../Api";
 import Vue from 'vue';
 import productDetailCard from './ProductDetailCard';
+import pagination from '../Pagination';
 
 
 export default {
   components: {
-    productDetailCard
+    productDetailCard,
+    pagination
   },
   component: {
     createButton: Vue.component('createButton', {
@@ -163,7 +158,7 @@ export default {
           ];
           this.productFound = true;
 
-          */
+          //*/
         })
     },
 
@@ -177,12 +172,12 @@ export default {
     },
 
     /**
-     * modify the description only keep 5 words and then add ...
+     * modify the description only keep 20 characters and then add ...
      * @param description
      * @return string
      */
     setDescription: function (description) {
-      const showTenWordDescription = description.split(' ').slice(0, 5).join(' ');
+      const showTenWordDescription = description.slice(0, 20).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
     },
 
@@ -254,24 +249,8 @@ export default {
      * The totalResults function just computed how many pages in the search table.
      * @returns number
      */
-    totalResults: function () {
+    totalItems: function () {
       return this.items.length;
-    },
-
-    /**
-     * Computes the min range of product displaying on the table at the current page.
-     * @returns number
-     */
-    itemsRangeMin: function () {
-      return this.currentPage === 1 ? 1 : (this.currentPage - 1) * this.perPage + 1;
-    },
-
-    /**
-     * Computes the max range of product displaying on the table at the current page.
-     * @returns number
-     */
-    itemsRangeMax: function () {
-      return this.currentPage * this.perPage <= this.totalResults ? this.currentPage * this.perPage : this.totalResults;
     }
   }
 
