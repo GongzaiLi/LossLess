@@ -7,7 +7,7 @@ Date: 15/4/2021
 
   <div>
     <h2>Product Catalogue</h2>
-    <div v-if="productFound">
+    <div>
       <b-form-group>
         <createButton :businessId="$route.params.id" class="float-right"></createButton>
       </b-form-group>
@@ -16,12 +16,24 @@ Date: 15/4/2021
         responsive="lg"
         no-border-collapse
         bordered
+        show-empty
         @row-clicked="tableRowClick"
         :fields="fields"
         :items="items"
         :per-page="perPage"
         :current-page="currentPage"
+        :busy="tableLoading"
       > <!--stacked="sm" table-class="text-nowrap"-->
+        <template #empty>
+          <div class="no-results-overlay">
+            <h4>No Product to display</h4>
+          </div>
+        </template>
+        <template #table-busy>
+          <div class="no-results-overlay">
+            <h4>Loading...</h4>
+          </div>
+        </template>
       </b-table>
       <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
@@ -39,11 +51,6 @@ Date: 15/4/2021
         -->
       </b-modal>
 
-    </div>
-
-    <div v-if="!productFound" class="no-results-overlay">
-      <h4 style="color: #880000">No Product to display</h4>
-      <createButton :businessId="$route.params.id"></createButton>
     </div>
   </div>
 
@@ -93,10 +100,10 @@ export default {
   data: function () {
     return {
       items: [],
-      productFound: true,
       perPage: 10,
       currentPage: 1,
       productSelect: {},
+      tableLoading: true,
     }
   },
   mounted() {
@@ -117,15 +124,14 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.setResponseData(response.data);
-          this.productFound = true;
+          this.tableLoading = false;
         })
         .catch((error) => {
           this.$log.debug(error);
           //
-          this.productFound = false;
 
           // fake date can use be test.
-          /*
+/*
           this.items = [
             {
               id: "WATT-420-BEANS1",
@@ -156,10 +162,10 @@ export default {
               image: 'https://static.countdown.co.nz/assets/product-images/zoom/9415142003740.jpg',
             }
           ];
-          this.productFound = true;
-
-          //*/
-        })
+*/
+          this.tableLoading = false;
+          //
+        });
     },
 
     /**
