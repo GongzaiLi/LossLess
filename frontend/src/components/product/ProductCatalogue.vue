@@ -35,7 +35,7 @@ Date: 15/4/2021
           </div>
         </template>
       </b-table>
-      <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+      <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header centered>
         <!--

@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     /**
-     *
+     * Handler for when pagination buttons clicked. Emits current page for parent components to use
      */
     pageChange: async function () {
       await this.$forceUpdate();
