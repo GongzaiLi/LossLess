@@ -68,6 +68,10 @@ export default {
     isActingAsUser: function() {
       return this.$currentUser.currentlyActingAs == null;
     },
+    /**
+     * The name to be displayed in the profile area. It is either the first name of the user,
+     * or the name of whichever business the user is acting as.
+     */
     profileName: function() {
       if (this.isActingAsUser) {
         return this.$currentUser.firstName;
@@ -75,6 +79,10 @@ export default {
         return this.$currentUser.currentlyActingAs.name;
       }
     },
+    /**
+     * The businesses to show in the dropdown for the profile name. Contains
+     * all businesses the user can act as, except for the business the user is acting as currently
+     */
     businessesInDropDown: function() {
       return this.$currentUser.businessesAdministered.filter(
           (business) => (this.isActingAsUser || business.id !== this.$currentUser.currentlyActingAs.id)
@@ -82,6 +90,10 @@ export default {
     }
   },
   methods: {
+    /**
+     * Redirects to the user's profile. Doesn't redirect if the user
+     * is already on the profile since that throws a Vue Router error.
+     */
     goToUserProfile: function () {
       if (this.$route.params.id !== this.$currentUser.id.toString()) {
         this.$router.push({path: `/users/${this.$currentUser.id}`});
@@ -111,10 +123,19 @@ export default {
           return "";
       }
     },
+    /**
+     * Sets the user to act as the given business. Also sets the API
+     * module to send all future requests acting as this business
+     * @param business Object representing the business the user will act as
+     */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
       Api.setBusinessActingAs(business.id);
     },
+    /**
+     * Sets the user to act as themselves again. Also sets the API
+     * module to revert to sending all requests as the normal user
+     */
     actAsUser() {
       setCurrentlyActingAs(null);
       Api.setBusinessActingAs(null);
