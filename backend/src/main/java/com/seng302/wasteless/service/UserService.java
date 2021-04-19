@@ -71,6 +71,15 @@ public class UserService {
         return userRepository.findFirstByEmail(email);
     }
 
+    /**
+     * Checks whether the user is an admin in the business
+     *
+     * @param businessId    The business ID
+     * @param userId        The user ID
+     * @return              Returns true if user is admin to business else false
+     */
+    public boolean checkUserAdminsBusiness(Integer businessId, Integer userId) { return userRepository.findUserContainBusinessIdAndContainAdminId(businessId, userId) != null; }
+
 
     /**
      * Search for users by a search query.
