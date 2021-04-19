@@ -88,7 +88,7 @@ export default {
      * all businesses the user can act as, except for the business the user is acting as currently
      */
     businessesInDropDown: function() {
-      return this.$currentUser.businessesAdministered.filter(
+      return this.$currentUser.businessesPrimarilyAdministered.filter(
           (business) => (this.isActingAsUser || business.id !== this.$currentUser.currentlyActingAs.id)
       );
     }
