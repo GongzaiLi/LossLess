@@ -37,10 +37,10 @@ Date: 26/3/2021
 
             <select v-model="businessType" required>
               <option disabled value=""> Choose ...</option>
-              <option> Accommodation and Food Services</option>
-              <option> Retail Trade</option>
-              <option> Charitable organisation</option>
-              <option> Non-profit organisation</option>
+              <option> Accommodation and Food Services </option>
+              <option> Retail Trade </option>
+              <option> Charitable organisation </option>
+              <option> Non-profit organisation </option>
 
             </select>
 
@@ -109,9 +109,16 @@ export default {
       let businessData = this.getBusinessData();
       let response = ["error", {response: {status: 401}}]; //if this page displays but current user not logged in/doesnt exist
       if (this.$getCurrentUser() != null) {                //if this page displays and current user exists
-        result = "success";
-        response = await api.postBusiness(businessData);
-        await this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
+        api
+            .postBusiness(businessData)
+            .then((businessResponse) => {
+              response =  ["success", businessResponse];
+            })
+            .catch((error) => {
+              response = ["error", error];
+            });
+
+        result =  "success";
       }
       this.pushErrors(response);                          //for error displaying
       return result;

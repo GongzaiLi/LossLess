@@ -46,11 +46,6 @@ export default {
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get('https://virtserver.swaggerhub.com/nsi60/S302T29_Mock/3.0.0/users/search?searchQuery=' + searchParameter, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true})
-      .then((businessResponse) => {
-          return ["success", businessResponse];
-      })
-      .catch((error) => {
-        return ["error", error];
-      }),
+,
   getBusinesses: (id) => instance.get(`businesses/${id}`, {withCredentials: true})
 }
