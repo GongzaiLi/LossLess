@@ -100,7 +100,7 @@ export default {
           return api.getUser(response.data.id);
         })
         .then((userResponse) => {
-          this.$setCurrentUser(userResponse.data);
+          this.$currentUser = userResponse.data;
           // Go to profile page
           this.goToUserProfilePage(userResponse.data.id);
         })

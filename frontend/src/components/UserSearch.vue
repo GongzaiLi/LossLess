@@ -115,7 +115,7 @@ export default {
       };
       for (const user of data) {
         tableHeader = user;
-        if (this.$getCurrentUser().role !== "user") {
+        if (this.$currentUser.role !== "user") {
           let roleLabel;
           if (user.role === "globalApplicationAdmin") {
             roleLabel = "ADMIN";
@@ -195,7 +195,7 @@ export default {
           sortable: true
         }
       ];
-      if (this.$getCurrentUser().role !== 'user') {
+      if (this.$currentUser.role !== 'user') {
         fields.push({
               key: 'userType',
               sortable: true

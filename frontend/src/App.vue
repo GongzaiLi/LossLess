@@ -28,8 +28,8 @@ const app = {
     UserProfile,
     Navbar,
     UserSearch,
-    BusinessProfile,
-    CreateBusiness
+    CreateBusiness,
+    BusinessProfile
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
