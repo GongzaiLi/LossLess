@@ -295,7 +295,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then200Response() throws Exception {
+    public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then400Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
         createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
 
@@ -389,6 +389,20 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndRecommendedRetailPriceIsLetter_then400Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"AB\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndSuccess_AndAllDataUpdates_thenAllChangesShouldBeMade() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
         createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
@@ -406,4 +420,6 @@ public class BusinessControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].description", is("Example Product")))
                 .andExpect(jsonPath("$[0].recommendedRetailPrice", is(2.0)));
     }
+
+
 }
