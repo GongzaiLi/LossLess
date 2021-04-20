@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import UserProfile from '../UserProfile'; // name of your Vue component
+import memberSince from '../MemberSince';
 
 let wrapper;
 let mockDateNow = '2019-05-14T11:01:58.135Z';
@@ -10,11 +10,6 @@ jest
         new Date(mockDateNow).valueOf()
     );
 
-const $route = {
-    params: {
-        id: 0
-    }
-}
 
 beforeEach(() => {
     const localVue = createLocalVue()
@@ -22,12 +17,10 @@ beforeEach(() => {
     localVue.use(BootstrapVue);
     localVue.use(BootstrapVueIcons);
 
-    wrapper = shallowMount(UserProfile, {
+    wrapper = shallowMount(memberSince, {
         localVue,
         propsData: {},
-        mocks: {
-            $route
-        },
+        mocks: {},
         stubs: {},
         methods: {},
     });
@@ -44,7 +37,6 @@ describe('Register', () => {
 });
 
 test('same-start-end', () => {
-    wrapper.vm.userData.created = "2021-03-11T00:32:00Z";
     expect(wrapper.vm.getMonthsAndYearsBetween(
         new Date("2021-03-11T00:32:00Z"),
         new Date("2021-03-11T00:32:00Z")
@@ -52,7 +44,6 @@ test('same-start-end', () => {
 });
 
 test('almost-a-month', () => {
-    wrapper.vm.userData.created = "2021-03-11T00:32:00Z";
     expect(wrapper.vm.getMonthsAndYearsBetween(
         new Date("2021-03-10T00:32:00Z"),
         new Date("2021-04-09T00:32:01Z")
@@ -60,7 +51,6 @@ test('almost-a-month', () => {
 });
 
 test('one-month', () => {
-    wrapper.vm.userData.created = "2021-03-11T00:32:00Z";
     expect(wrapper.vm.getMonthsAndYearsBetween(
         new Date("2021-05-10T00:32:00Z"),
         new Date("2021-06-10T00:32:01Z")
@@ -68,7 +58,6 @@ test('one-month', () => {
 });
 
 test('almost-a-year', () => {
-    wrapper.vm.userData.created = "2021-03-11T00:32:00Z";
     expect(wrapper.vm.getMonthsAndYearsBetween(
         new Date("2020-01-01T00:00:00Z"),
         new Date("2020-12-30T23:59:58Z")
@@ -76,7 +65,6 @@ test('almost-a-year', () => {
 });
 
 test('1-year-difference', () => {
-    wrapper.vm.userData.created = "2021-03-11T00:32:00Z";
     expect(wrapper.vm.getMonthsAndYearsBetween(
         new Date("2020-05-10T00:32:00Z"),
         new Date("2021-05-10T00:32:01Z")
@@ -84,44 +72,8 @@ test('1-year-difference', () => {
 });
 
 test('5-years-3-months', () => {
-    wrapper.vm.userData.created = "2021-03-11T00:32:00Z";
     expect(wrapper.vm.getMonthsAndYearsBetween(
         new Date("2016-05-10T00:32:00Z"),
         new Date("2021-10-11T00:32:01Z")
     )).toEqual({years: 5, months: 5});
-});
-
-
-
-
-test('only-first-and-last-name', async () => {
-    wrapper.vm.userData.firstName = "First";
-    wrapper.vm.userData.lastName = "Last";
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Last");
-});
-
-test('first-and-middle-and-last-name', async () => {
-    wrapper.vm.userData.firstName = "First";
-    wrapper.vm.userData.lastName = "Last";
-    wrapper.vm.userData.middleName = "Middle";
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Middle Last");
-});
-
-test('first-and-middle-and-last-and-nick-name', async () => {
-    wrapper.vm.userData.firstName = "First";
-    wrapper.vm.userData.lastName = "Last";
-    wrapper.vm.userData.middleName = "Middle";
-    wrapper.vm.userData.nickName = "Nick";
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Middle Last (Nick)");
-});
-
-test('first-and-last-and-nick-name', async () => {
-    wrapper.vm.userData.firstName = "First";
-    wrapper.vm.userData.lastName = "Last";
-    wrapper.vm.userData.nickName = "Nick";
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Last (Nick)");
 });
