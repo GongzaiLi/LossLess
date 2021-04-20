@@ -151,15 +151,7 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
 
-        int maxLength = 25;
-        int nameLength = possibleProduct.getName().length();
-
-        if (nameLength < maxLength) {
-            maxLength = nameLength;
-        }
-
-        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
-                .replaceAll(" ", "-");
+        String productId = possibleProduct.createCode(businessId);
 
         if (productService.findProductById(productId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
@@ -250,16 +242,7 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist");
         }
 
-        int maxLength = 25;
-        int nameLength = editedProduct.getName().length();
-
-        if (nameLength < maxLength) {
-            maxLength = nameLength;
-        }
-
-        String newProductId = businessId + "-" + editedProduct.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
-                .replaceAll(" ", "-");
-
+        String newProductId = editedProduct.createCode(businessId);
         if (productService.findProductById(newProductId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
                     "to one that is already in your catalogue.");
