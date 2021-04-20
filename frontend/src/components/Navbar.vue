@@ -1,3 +1,7 @@
+<!--
+navbar at the top of screen once logged in to navigate the web app
+Date: sprint_1
+-->
 <template>
   <b-navbar v-if="!['login', 'register'].includes($route.name)"
     toggleable="lg" type="dark" variant="dark" fixed="top"
@@ -11,6 +15,7 @@
       <b-navbar-nav>
         <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
+        <b-nav-item to="/businesses">Create Business</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>

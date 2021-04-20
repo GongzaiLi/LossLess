@@ -127,13 +127,6 @@ Date: 3/3/2021
       </h6>
     </b-card>
     <br>
-
-    <b-form-group
-      label-cols="auto"
-      label="Demo Mode"
-      label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle">{{ isDemoMode ? 'ON' : 'OFF' }}</b-button>
-    </b-form-group>
   </div>
 </template>
 
@@ -159,19 +152,22 @@ export default {
       "email": "",
       "dateOfBirth": "",
       "phoneNumber": "",
-      "homeAddress": "",
+      "homeAddress": {
+        "streetNumber": "",
+        "streetName": "",
+        "city": "",
+        "region": "",
+        "country": "",
+        "postcode": ""
+      },
       "password": "",
       "confirmPassword": "",
-      isDemoMode: true,
       errors: [],
       visiblePassword: false,
       visibleConfirmPassword: false
     }
   },
   methods: {
-    toggle: function () {
-      this.isDemoMode = !this.isDemoMode;
-    },
     //Password can hidden or shown by clicking button
     showPassword: function () {
       this.visiblePassword = !this.visiblePassword;
@@ -219,9 +215,11 @@ export default {
      * The parameter event is passed
      */
     register(event) {
+      console.log("CLICKED");
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
+      console.log(registerData);
 
       api
         .register(registerData)
@@ -245,10 +243,6 @@ export default {
     },
   },
   computed: {
-    //if in demo mode or not change style of the button
-    demoVariant() {
-      return this.isDemoMode ? 'outline-success' : 'outline-danger';
-    },
     passwordsMatch() {
       return this.password === this.confirmPassword;
     },

@@ -7,8 +7,8 @@ Date: 5/3/2021
 <template>
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
-            class="profile-card shadow" no-body
-            v-if="userFound"
+      class="profile-card shadow" no-body
+      v-if="userFound"
     >
 
       <template #header>
@@ -27,7 +27,7 @@ Date: 5/3/2021
             </b-button>
           </b-col>
 
-        </b-row>
+          </b-row>
 
         <b-row>
 
@@ -101,6 +101,18 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
+          <h6 v-if="userData.businessesAdministered.length"><b-row>
+            <b-col cols="0">
+              <b-icon-building></b-icon-building>
+            </b-col>
+            <b-col cols="4"><b>Businesses Created:</b></b-col>
+            <b-col>
+            <router-link v-for="business in this.userData.businessesAdministered"   :to="'/businesses/'+business.id.toString()" v-bind:key="business.id">
+              <template v-if="(business.primaryAdministratorId===userData.id)">{{ business.name }}<br></template></router-link></b-col>
+          </b-row>
+
+          </h6>
+
         </b-container>
       </b-card-body>
     </b-card>
@@ -126,11 +138,10 @@ Date: 5/3/2021
 
 <style scoped>
 .profile-card {
-  max-width: 45rem;
-  margin-left: auto;
-  margin-right: auto;
+   max-width: 45rem;
+   margin-left: auto;
+   margin-right: auto;
 }
-
 h6 {
   line-height: 1.4;
 }
@@ -158,7 +169,8 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
-        created: ""
+        created: "",
+        businessesAdministered:[],
       },
       userFound: true,
     }
