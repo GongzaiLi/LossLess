@@ -50,5 +50,8 @@ export default {
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter) => instance.get(`users/search?searchQuery=${searchParameter}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
+  getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
+
   setBusinessActingAs: (businessId) => businessActingAsId = businessId,
-}
+
+  }

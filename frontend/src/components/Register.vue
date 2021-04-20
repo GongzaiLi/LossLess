@@ -59,11 +59,9 @@ Date: 3/3/2021
                           placeholder="Password"
                           autocomplete="off"/>
             <div class="input-group-prepend">
-              <div class="input-group-text" v-if="!visiblePassword">
-                <b-icon-eye-fill @click="showPassword"></b-icon-eye-fill>
-              </div>
-              <div class="input-group-text" v-else-if="visiblePassword">
-                <b-icon-eye-slash-fill @click="showPassword('show')"></b-icon-eye-slash-fill>
+              <div class="input-group-text" @click="showPassword">
+                <b-icon-eye-fill v-if="!visiblePassword"/>
+                <b-icon-eye-slash-fill v-else-if="visiblePassword"/>
               </div>
             </div>
           </div>
@@ -79,11 +77,9 @@ Date: 3/3/2021
                           placeholder="Confirm Password"
                           autocomplete="off"/>
             <div class="input-group-prepend">
-              <div class="input-group-text" v-if="!visibleConfirmPassword">
-                <b-icon-eye-fill @click="showConfirmPassword"/>
-              </div>
-              <div class="input-group-text" v-else-if="visibleConfirmPassword">
-                <b-icon-eye-slash-fill @click="showConfirmPassword('show')"/>
+              <div class="input-group-text" @click="showConfirmPassword">
+                <b-icon-eye-fill v-if="!visibleConfirmPassword"/>
+                <b-icon-eye-slash-fill v-else-if="visibleConfirmPassword"/>
               </div>
             </div>
           </div>
@@ -173,12 +169,12 @@ export default {
   },
   methods: {
     //Password can hidden or shown by clicking button
-    showPassword: function (value) {
-      this.visiblePassword = !(value === 'show');
+    showPassword: function () {
+      this.visiblePassword = !this.visiblePassword;
     },
     //ConfirmPassword can hidden or shown by clicking button
-    showConfirmPassword: function (value) {
-      this.visibleConfirmPassword = !(value === 'show');
+    showConfirmPassword: function () {
+      this.visibleConfirmPassword = !this.visibleConfirmPassword;
     },
 
     getRegisterData() {
