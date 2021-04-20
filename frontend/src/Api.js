@@ -31,6 +31,7 @@
 import axios from 'axios'
 import {getCurrentlyActingAs} from './auth'
 
+
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const businessActingAs = getCurrentlyActingAs();
@@ -51,7 +52,7 @@ export default {
   searchUser: (searchParameter) => instance.get(`users/search?searchQuery=${searchParameter}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
-
+  postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
   setBusinessActingAs: (businessId) => businessActingAsId = businessId,
 
   }

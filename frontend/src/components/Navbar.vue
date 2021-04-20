@@ -15,6 +15,7 @@ Date: sprint_1
       <b-navbar-nav>
         <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
+        <b-nav-item to="/businesses">Create Business</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>

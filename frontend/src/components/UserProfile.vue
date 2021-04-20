@@ -7,8 +7,8 @@ Date: 5/3/2021
 <template>
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
-            class="profile-card shadow" no-body
-            v-if="userFound"
+      class="profile-card shadow" no-body
+      v-if="userFound"
     >
 
       <template #header>
@@ -27,7 +27,7 @@ Date: 5/3/2021
             </b-button>
           </b-col>
 
-        </b-row>
+          </b-row>
 
         <b-row>
 
@@ -138,11 +138,10 @@ Date: 5/3/2021
 
 <style scoped>
 .profile-card {
-  max-width: 45rem;
-  margin-left: auto;
-  margin-right: auto;
+   max-width: 45rem;
+   margin-left: auto;
+   margin-right: auto;
 }
-
 h6 {
   line-height: 1.4;
 }
@@ -205,24 +204,6 @@ export default {
     logOut: function () {
       this.$router.push({path: '/login'})
     },
-    /**
-     * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
-     * The months elapsed is not the total number of months elapsed, but the number months elapsed in
-     * addition to the years also elapsed. For example, 1 year and 2 months instead of 1 year, 14 months.
-     * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
-     * Returns data in the format {months: months_elapsed, years: years_elapsed}
-     */
-    getMonthsAndYearsBetween(start, end) {
-      const timeElapsed = end - start;
-      const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
-      const yearsElapsed = Math.floor(daysElapsed / 365);
-      const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
-      return {
-        months: monthsElapsed,
-        years: yearsElapsed
-      }
-    },
-
     /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.
