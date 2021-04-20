@@ -102,7 +102,6 @@ export default {
      */
     async createBusiness(event) {
       let result = "failed";    //if this page displays but current user not logged in/doesnt exist
-      // let afterPost;
 
       event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
 
@@ -113,6 +112,7 @@ export default {
             .postBusiness(businessData)
             .then((businessResponse) => {
               response =  ["success", businessResponse];
+              this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
             })
             .catch((error) => {
               response = ["error", error];
