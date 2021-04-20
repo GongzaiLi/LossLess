@@ -231,9 +231,11 @@ public class BusinessController {
         String currentPrincipalEmail = authentication.getName();
 
         User user = userService.findUserByEmail(currentPrincipalEmail);
-        if (user == null || !userService.checkUserAdminsBusiness(businessId, user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                    "Method not allowed");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Product oldProduct = productService.findProductById(productId);
@@ -243,10 +245,6 @@ public class BusinessController {
         }
 
         String newProductId = editedProduct.createCode(businessId);
-        if (productService.findProductById(newProductId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
-                    "to one that is already in your catalogue.");
-        }
 
         Product newProduct = new Product();
         newProduct.setId(newProductId);

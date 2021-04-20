@@ -38,6 +38,8 @@ public class BusinessControllerIntegrationTest {
 
     @Autowired
     private BusinessService businessService;
+
+    @Autowired
     private ProductService productService;
 
     @Test
@@ -215,31 +217,193 @@ public class BusinessControllerIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
-//    @Test
-//    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-//    public void whenPutRequestToBusinessProducts_AndNotAdminToBusiness_then403Response() throws Exception {
-//
-//        Business business = new Business();
-//
-//        business.setName("New Business");
-//        business.setAddress("Home");
-//        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
-//
-//        businessService.createBusiness(business);
-//
-//        Product product = new Product();
-//
-//        product.setName("Kit Kat");
-//        product.setId(product.createCode(business.getId()));
-//        product.setBusinessId(business.getId());
-//
-//        productService.createProduct(product);
-//
-//        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
-//
-//        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
-//                .content(editProduct)
-//                .contentType(APPLICATION_JSON))
-//                .andExpect(status().isMethodNotAllowed());
-//    }
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndNotAdminToBusiness_then403Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        Product product = new Product();
+
+        product.setName("Kit Kat");
+        product.setId("1");
+        product.setBusinessId(business.getId());
+
+        productService.createProduct(product);
+
+        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndSuccess_then200Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndNameIsTheSame_then200Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainChangedProductCode_then200Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON));
+
+        String editProduct2 = "{\"name\": \"Raisin\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-KIT-KAT")
+                .content(editProduct2)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then200Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON));
+
+        String editProduct2 = "{\"name\": \"Raisin\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct2)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+    public void whenPutRequestToBusinessProducts_AndIsNotAdminToBusiness_ButIsGlobalAdmin_then200Response() throws Exception {
+        Business business = new Business();
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+        businessService.createBusiness(business);
+
+        Product product = new Product();
+        product.setName("Kit Kat");
+        product.setId("1");
+        product.setBusinessId(business.getId());
+        productService.createProduct(product);
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+    public void whenPutRequestToBusinessProducts_AndIsNotAdminToBusiness_ButIsDGAA_then200Response() throws Exception {
+        Business business = new Business();
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+        businessService.createBusiness(business);
+
+        Product product = new Product();
+        product.setName("Kit Kat");
+        product.setId("1");
+        product.setBusinessId(business.getId());
+        productService.createProduct(product);
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndNameMissing_then400Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndNameIsBlank_then400Response() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndSuccess_AndAllDataUpdates_thenAllChangesShouldBeMade() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
+                .content(editProduct)
+                .contentType(APPLICATION_JSON));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].id", is("1-KIT-KAT")))
+                .andExpect(jsonPath("$[0].name", is("Kit Kat")))
+                .andExpect(jsonPath("$[0].description", is("Example Product")))
+                .andExpect(jsonPath("$[0].recommendedRetailPrice", is(2.0)));
+    }
 }
