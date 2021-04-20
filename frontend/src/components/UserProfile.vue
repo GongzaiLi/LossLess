@@ -101,6 +101,18 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
+          <h6 v-if="userData.businessesAdministered.length"><b-row>
+            <b-col cols="0">
+              <b-icon-building></b-icon-building>
+            </b-col>
+            <b-col cols="4"><b>Businesses Created:</b></b-col>
+            <b-col>
+            <router-link v-for="business in this.userData.businessesAdministered"   :to="'/businesses/'+business.id.toString()" v-bind:key="business.id">
+              <template v-if="(business.primaryAdministratorId===userData.id)">{{ business.name }}<br></template></router-link></b-col>
+          </b-row>
+
+          </h6>
+
         </b-container>
       </b-card-body>
     </b-card>
@@ -158,7 +170,8 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
-        created: ""
+        created: "",
+        businessesAdministered:[],
       },
       userFound: true,
     }
@@ -192,6 +205,24 @@ export default {
     logOut: function () {
       this.$router.push({path: '/login'})
     },
+    /**
+     * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
+     * The months elapsed is not the total number of months elapsed, but the number months elapsed in
+     * addition to the years also elapsed. For example, 1 year and 2 months instead of 1 year, 14 months.
+     * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
+     * Returns data in the format {months: months_elapsed, years: years_elapsed}
+     */
+    getMonthsAndYearsBetween(start, end) {
+      const timeElapsed = end - start;
+      const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+      const yearsElapsed = Math.floor(daysElapsed / 365);
+      const monthsElapsed = Math.floor(((daysElapsed / 365) - yearsElapsed) * 12);
+      return {
+        months: monthsElapsed,
+        years: yearsElapsed
+      }
+    },
+
     /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.
