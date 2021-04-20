@@ -245,6 +245,10 @@ public class BusinessController {
         }
 
         String newProductId = editedProduct.createCode(businessId);
+        if (!oldProduct.getName().equals(editedProduct.getName()) && productService.findProductById(newProductId) != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
+                    "to one that is already in your catalogue.");
+        }
 
         Product newProduct = new Product();
         newProduct.setId(newProductId);
