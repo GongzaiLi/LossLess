@@ -33,7 +33,7 @@ let userData = {
   },
   "created": "2020-07-14T14:32:00Z",
   "role": "user",
-  "businessesAdministered": [
+  "businessesPrimarilyAdministered": [
     {
       "id": 100,
       "administrators": [
@@ -92,9 +92,9 @@ describe('User Drop Down', () => {
   })
 
   test('shows multiple businesses administered', async () => {
-    const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesAdministered));
+    const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesPrimarilyAdministered));
 
-    userData.businessesAdministered.push({
+    userData.businessesPrimarilyAdministered.push({
       "id": 100,
       "administrators": [],
       "primaryAdministratorId": 20,
@@ -107,19 +107,19 @@ describe('User Drop Down', () => {
     expect(wrapper.findAll(".business-name-drop-down").at(0).text()).toEqual("Lumbridge General Store");
     expect(wrapper.findAll(".business-name-drop-down").at(1).text()).toEqual("Another Store Name");
 
-    userData.businessesAdministered = prevBusinesses; // Reset businesses
+    userData.businessesPrimarilyAdministered = prevBusinesses; // Reset businesses
   })
 
   test('works if no businesses administered', async () => {
-    const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesAdministered));
+    const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesPrimarilyAdministered));
 
-    userData.businessesAdministered = [];
+    userData.businessesPrimarilyAdministered = [];
     await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
 
     expect(wrapper.find(".business-name-drop-down").exists()).toBeFalsy();
     expect(wrapper.find("hr").exists()).toBeFalsy();
 
-    userData.businessesAdministered = prevBusinesses; // Reset businesses
+    userData.businessesPrimarilyAdministered = prevBusinesses; // Reset businesses
   })
 });
 
@@ -139,7 +139,7 @@ describe('Act as business', () => {
   })
 
   test('can go back to single user', async () => {
-    userData.currentlyActingAs = userData.businessesAdministered[0];
+    userData.currentlyActingAs = userData.businessesPrimarilyAdministered[0];
 
     await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
 
@@ -160,7 +160,7 @@ describe('Act as business', () => {
     const prevUser = JSON.parse(JSON.stringify(userData));
     const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
 
-    userData.businessesAdministered.push({
+    userData.businessesPrimarilyAdministered.push({
       "id": 101,
       "administrators": [],
       "primaryAdministratorId": 20,

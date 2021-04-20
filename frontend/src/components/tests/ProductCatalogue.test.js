@@ -64,29 +64,6 @@ describe('check-getProducts-API-function', () => {
 
 describe('check-product-catalogue-page', () => {
 
-  test('product-found', async () => {
-
-    const response = {
-      data: [{
-        id: "WATT-420-BEANS",
-        name: "Watties Baked Beans - 420g can",
-        description: "Baked Beans as they should be.",
-        recommendedRetailPrice: 2.2,
-        created: "2021-04-14T13:01:58.660Z"
-      }]
-    };
-    Api.getProducts.mockResolvedValue(response);
-    await wrapper.vm.getProducts(0);
-    expect(wrapper.vm.productFound).toBeTruthy();
-  });
-
-  test('product-not-found', async () => {
-
-    const response = null;
-    Api.getProducts.mockResolvedValue(response);
-    await wrapper.vm.getProducts(0);
-    expect(wrapper.vm.productFound).toBeFalsy();
-  });
 
   test('product-found-in-html-test-pagination-display', async () => {
     const response = {
@@ -120,18 +97,6 @@ describe('check-product-catalogue-page', () => {
     expect(pagination.exists()).toBeFalsy();
   });
 
-  test('product-not-found-in-html', async () => {
-
-    const response = null;
-    Api.getProducts.mockResolvedValue(response);
-    await wrapper.vm.getProducts(0);
-
-    await wrapper.vm.$forceUpdate();
-
-    const msg = 'No Product to display';
-    expect(wrapper.html()).toContain(msg);
-
-  });
 });
 
 

@@ -184,7 +184,7 @@ describe('CreateBusiness HTML testing', () => {
 
     test('Business Type label renders', () => {
         const type = "Business Type *";
-        expect(wrapper.findAll("b").at(3).text()).toEqual(type);
+        expect(wrapper.findAll("b").at(8).text()).toEqual(type);
     });
 
     test('business types in drop down has default value Choose ...', () => {
@@ -214,6 +214,6 @@ describe('CreateBusiness HTML testing', () => {
 
     test('Create button renders', () => {
         const buttonLabel = "Create";
-        expect(wrapper.find("button").text()).toEqual(buttonLabel);
+        expect(wrapper.findAll("button").at(1).text()).toEqual(buttonLabel);
     });
 });

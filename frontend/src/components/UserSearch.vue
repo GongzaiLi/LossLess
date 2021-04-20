@@ -163,7 +163,7 @@ export default {
           sortable: true
         }
       ];
-      if (this.$currentUser.role !== 'user') {
+      if (this.$currentUser && this.$currentUser.role !== 'user') {
         fields.push({
           key: 'userType',
           sortable: true

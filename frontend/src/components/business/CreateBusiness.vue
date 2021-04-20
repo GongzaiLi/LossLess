@@ -11,7 +11,7 @@ Date: 26/3/2021
       <h1> Create a Business </h1>
       <br>
       <b-form
-          @submit="createBusiness"
+        @submit="createBusiness"
       >
         <b-form-group
         >
@@ -37,10 +37,10 @@ Date: 26/3/2021
 
             <select v-model="businessType" required>
               <option disabled value=""> Choose ...</option>
-              <option> Accommodation and Food Services </option>
-              <option> Retail Trade </option>
-              <option> Charitable organisation </option>
-              <option> Non-profit organisation </option>
+              <option> Accommodation and Food Services</option>
+              <option> Retail Trade</option>
+              <option> Charitable organisation</option>
+              <option> Non-profit organisation</option>
 
             </select>
 
@@ -107,18 +107,18 @@ export default {
 
       let businessData = this.getBusinessData();
       let response = ["error", {response: {status: 401}}]; //if this page displays but current user not logged in/doesnt exist
-      if (this.$getCurrentUser() != null) {                //if this page displays and current user exists
+      if (this.$currentUser != null) {                //if this page displays and current user exists
         api
-            .postBusiness(businessData)
-            .then((businessResponse) => {
-              response =  ["success", businessResponse];
-              this.$router.push({path: `/users/${this.$getCurrentUser().id}`});
-            })
-            .catch((error) => {
-              response = ["error", error];
-            });
+          .postBusiness(businessData)
+          .then((businessResponse) => {
+            response = ["success", businessResponse];
+            this.$router.push({path: `/users/${this.$currentUser.id}`});
+          })
+          .catch((error) => {
+            response = ["error", error];
+          });
 
-        result =  "success";
+        result = "success";
       }
       this.pushErrors(response);                          //for error displaying
       return result;
@@ -133,7 +133,7 @@ export default {
       this.errors = [];
       const status = response[0];
       const value = response[1];
-      if (status == "error") {
+      if (status === "error") {
         this.$log.debug(value);
         if ((value.response && value.response.status === 401)) {
           this.errors.push("Access token is missing or invalid");
