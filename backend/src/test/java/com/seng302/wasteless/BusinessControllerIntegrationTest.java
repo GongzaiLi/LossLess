@@ -2,8 +2,10 @@ package com.seng302.wasteless;
 
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.BusinessTypes;
+import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +38,7 @@ public class BusinessControllerIntegrationTest {
 
     @Autowired
     private BusinessService businessService;
+    private ProductService productService;
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
@@ -198,5 +201,45 @@ public class BusinessControllerIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessProducts_AndBusinessNotExists_then403Response() throws Exception {
 
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/99/products/1")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+//    @Test
+//    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+//    public void whenPutRequestToBusinessProducts_AndNotAdminToBusiness_then403Response() throws Exception {
+//
+//        Business business = new Business();
+//
+//        business.setName("New Business");
+//        business.setAddress("Home");
+//        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+//
+//        businessService.createBusiness(business);
+//
+//        Product product = new Product();
+//
+//        product.setName("Kit Kat");
+//        product.setId(product.createCode(business.getId()));
+//        product.setBusinessId(business.getId());
+//
+//        productService.createProduct(product);
+//
+//        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+//
+//        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
+//                .content(editProduct)
+//                .contentType(APPLICATION_JSON))
+//                .andExpect(status().isMethodNotAllowed());
+//    }
 }
