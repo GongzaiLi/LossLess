@@ -64,7 +64,7 @@ public class User {
     @NotBlank(message = "homeAddress is mandatory")
     @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
-    private String homeAddress;
+    private Address homeAddress;
 
     @NotBlank(message = "password is mandatory")
     @JsonView({UserViews.PostUserRequestView.class})
