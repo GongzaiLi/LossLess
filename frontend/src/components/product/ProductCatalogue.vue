@@ -24,6 +24,13 @@ Date: 15/4/2021
         :current-page="currentPage"
         :busy="tableLoading"
       > <!--stacked="sm" table-class="text-nowrap"-->
+
+        <template v-slot:cell(actions)="products">
+          <b-button id="edit-button" @click="editProduct(products.item)" size="sm">
+            Edit
+          </b-button>
+        </template>
+
         <template #empty>
           <div class="no-results-overlay">
             <h4>No Product to display</h4>
@@ -43,7 +50,7 @@ Date: 15/4/2021
           <small class="text-muted">Product Card</small>
         </template>
         -->
-        <product-detail-card :product="productSelect"/>
+        <product-detail-card :product="productSelect" :disabled="true"/>
         <!--
         <template #modal-footer>
           <small class="text-muted">Product Card</small>
@@ -51,6 +58,9 @@ Date: 15/4/2021
         -->
       </b-modal>
 
+      <b-modal id="edit-product-card" hide-header>
+        <product-detail-card :product="productEdit" :disabled="false"/>
+      </b-modal>
     </div>
   </div>
 
@@ -104,6 +114,7 @@ export default {
       currentPage: 1,
       productSelect: {},
       tableLoading: true,
+      productEdit: {}
     }
   },
   mounted() {
@@ -129,7 +140,7 @@ export default {
         .catch((error) => {
           this.$log.debug(error);
           //
-
+/*
           // fake date can use be test.
           this.items = [
             {
@@ -162,9 +173,9 @@ export default {
             }
           ];
 
-          this.tableLoading = false;
-          //
-        });
+            this.tableLoading = false;
+            //**/
+          });
     },
 
     /**
@@ -175,7 +186,6 @@ export default {
     setResponseData: function (data) {
       this.items = data;
     },
-
     /**
      * modify the description only keep 20 characters and then add ...
      * @param description
@@ -194,8 +204,8 @@ export default {
     setCreated: function (created) {
       const date = new Date(created);
       return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-        `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-        `${date.getUTCFullYear()}`;
+          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+          `${date.getUTCFullYear()}`;
     },
 
     /**
@@ -205,6 +215,15 @@ export default {
     tableRowClick(product) {
       this.productSelect = product;
       this.$bvModal.show('product-card');
+    },
+
+    /**
+     * button function when clicked shows edit card
+     * @param product edit product
+     */
+    editProduct: function (product) {
+      this.productEdit = product;
+      this.$bvModal.show('edit-product-card');
     }
 
   },
@@ -247,6 +266,10 @@ export default {
             return this.setCreated(value);
           },
           sortable: true
+        },
+        {
+          key: 'actions',
+          label: 'Action'
         }];
     },
 

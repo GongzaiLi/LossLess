@@ -19,7 +19,7 @@ Date: 19/4/2021
           <h6><b>Id:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" disabled="true" v-model="productCard.id"/>
+          <b-form-input type="text" disabled v-model="productCard.id"/>
         </b-input-group>
 
         <b-input-group>
@@ -40,7 +40,7 @@ Date: 19/4/2021
           <h6><b>Created:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" disabled="true" v-model="productCard.created"/>
+          <b-form-input type="text" disabled v-model="productCard.created"/>
         </b-input-group>
 
         <hr style="width:100%">
@@ -61,7 +61,7 @@ Date: 19/4/2021
 <script>
 export default {
   name: "product-detail-card",
-  props: ['product'],
+  props: ['product', 'disabled'],
   data() {
     return {
       productCard: {
@@ -72,7 +72,6 @@ export default {
         created: '',
         image: '',
       },
-      disabled: true
     }
   },
   mounted() {
