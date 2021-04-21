@@ -59,11 +59,9 @@ Date: 3/3/2021
                           placeholder="Password"
                           autocomplete="off"/>
             <div class="input-group-prepend">
-              <div class="input-group-text" v-if="!visiblePassword">
-                <b-icon-eye-fill @click="showPassword"></b-icon-eye-fill>
-              </div>
-              <div class="input-group-text" v-else-if="visiblePassword">
-                <b-icon-eye-slash-fill @click="showPassword('show')"></b-icon-eye-slash-fill>
+              <div class="input-group-text" @click="showPassword">
+                <b-icon-eye-fill v-if="!visiblePassword"/>
+                <b-icon-eye-slash-fill v-else-if="visiblePassword"/>
               </div>
             </div>
           </div>
@@ -79,11 +77,9 @@ Date: 3/3/2021
                           placeholder="Confirm Password"
                           autocomplete="off"/>
             <div class="input-group-prepend">
-              <div class="input-group-text" v-if="!visibleConfirmPassword">
-                <b-icon-eye-fill @click="showConfirmPassword"/>
-              </div>
-              <div class="input-group-text" v-else-if="visibleConfirmPassword">
-                <b-icon-eye-slash-fill @click="showConfirmPassword('show')"/>
+              <div class="input-group-text" @click="showConfirmPassword">
+                <b-icon-eye-fill v-if="!visibleConfirmPassword"/>
+                <b-icon-eye-slash-fill v-else-if="visibleConfirmPassword"/>
               </div>
             </div>
           </div>
@@ -131,13 +127,6 @@ Date: 3/3/2021
       </h6>
     </b-card>
     <br>
-
-    <b-form-group
-      label-cols="auto"
-      label="Demo Mode"
-      label-for="input-horizontal">
-      <b-button v-bind:variant="demoVariant" @click="toggle">{{ isDemoMode ? 'ON' : 'OFF' }}</b-button>
-    </b-form-group>
   </div>
 </template>
 
@@ -163,26 +152,29 @@ export default {
       "email": "",
       "dateOfBirth": "",
       "phoneNumber": "",
-      "homeAddress": "",
+      "homeAddress": {
+        "streetNumber": "",
+        "streetName": "",
+        "city": "",
+        "region": "",
+        "country": "",
+        "postcode": ""
+      },
       "password": "",
       "confirmPassword": "",
-      isDemoMode: true,
       errors: [],
       visiblePassword: false,
       visibleConfirmPassword: false
     }
   },
   methods: {
-    toggle: function () {
-      this.isDemoMode = !this.isDemoMode;
-    },
     //Password can hidden or shown by clicking button
-    showPassword: function (value) {
-      this.visiblePassword = !(value === 'show');
+    showPassword: function () {
+      this.visiblePassword = !this.visiblePassword;
     },
     //ConfirmPassword can hidden or shown by clicking button
-    showConfirmPassword: function (value) {
-      this.visibleConfirmPassword = !(value === 'show');
+    showConfirmPassword: function () {
+      this.visibleConfirmPassword = !this.visibleConfirmPassword;
     },
 
     getRegisterData() {
@@ -223,9 +215,11 @@ export default {
      * The parameter event is passed
      */
     register(event) {
+      console.log("CLICKED");
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
+      console.log(registerData);
 
       api
         .register(registerData)
@@ -234,7 +228,7 @@ export default {
           return api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {
-          this.$setCurrentUser(userResponse.data);
+          this.$currentUser = userResponse.data;
           this.$router.push({path: `/users/${userResponse.data.id}`});
         })
         .catch((error) => {
@@ -249,10 +243,6 @@ export default {
     },
   },
   computed: {
-    //if in demo mode or not change style of the button
-    demoVariant() {
-      return this.isDemoMode ? 'outline-success' : 'outline-danger';
-    },
     passwordsMatch() {
       return this.password === this.confirmPassword;
     },

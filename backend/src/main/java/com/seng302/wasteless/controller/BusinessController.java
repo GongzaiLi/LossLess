@@ -82,6 +82,7 @@ public class BusinessController {
         business.setAdministrators(adminList);
         userService.addBusinessPrimarilyAdministered(user, business);
 
+
         business.setCreated(LocalDate.now());
 
         //Save business
@@ -151,15 +152,7 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
 
-        int maxLength = 25;
-        int nameLength = possibleProduct.getName().length();
-
-        if (nameLength < maxLength) {
-            maxLength = nameLength;
-        }
-
-        String productId = businessId + "-" + possibleProduct.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
-                .replaceAll(" ", "-");
+        String productId = possibleProduct.createCode(businessId);
 
         if (productService.findProductById(productId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
@@ -239,9 +232,11 @@ public class BusinessController {
         String currentPrincipalEmail = authentication.getName();
 
         User user = userService.findUserByEmail(currentPrincipalEmail);
-        if (user == null || !userService.checkUserAdminsBusiness(businessId, user.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                    "Method not allowed");
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Product oldProduct = productService.findProductById(productId);
@@ -250,17 +245,8 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist");
         }
 
-        int maxLength = 25;
-        int nameLength = editedProduct.getName().length();
-
-        if (nameLength < maxLength) {
-            maxLength = nameLength;
-        }
-
-        String newProductId = businessId + "-" + editedProduct.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
-                .replaceAll(" ", "-");
-
-        if (productService.findProductById(newProductId) != null) {
+        String newProductId = editedProduct.createCode(businessId);
+        if (!oldProduct.getName().equals(editedProduct.getName()) && productService.findProductById(newProductId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
                     "to one that is already in your catalogue.");
         }

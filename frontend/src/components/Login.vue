@@ -26,11 +26,9 @@ Date: 3/3/2021
                               class="form-control"
                               autocomplete="off"/>
                 <div class="input-group-prepend">
-                  <div class="input-group-text" v-if="!visiblePassword">
-                    <b-icon-eye-fill @click="showPassword"/>
-                  </div>
-                  <div class="input-group-text" v-else-if="visiblePassword">
-                    <b-icon-eye-slash-fill @click="showPassword('show')"/>
+                  <div class="input-group-text" @click="showPassword">
+                    <b-icon-eye-fill v-if="!visiblePassword"/>
+                    <b-icon-eye-slash-fill v-if="visiblePassword"/>
                   </div>
                 </div>
               </div>
@@ -69,8 +67,8 @@ export default {
   },
   methods: {
     //Password can hidden or shown by clicking button
-    showPassword: function (value) {
-      this.visiblePassword = !(value === 'show');
+    showPassword: function () {
+      this.visiblePassword = !this.visiblePassword;
     },
     /**
      * only called if form page passes submit criteria
@@ -100,7 +98,7 @@ export default {
           return api.getUser(response.data.id);
         })
         .then((userResponse) => {
-          this.$setCurrentUser(userResponse.data);
+          this.$currentUser = userResponse.data;
           // Go to profile page
           this.goToUserProfilePage(userResponse.data.id);
         })

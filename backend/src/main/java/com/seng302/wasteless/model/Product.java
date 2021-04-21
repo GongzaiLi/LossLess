@@ -1,7 +1,6 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
@@ -45,5 +42,17 @@ public class Product {
 
 //    @Column(name = "images")
 //    private List images;
+
+    public String createCode(Integer businessId) {
+        int maxLength = 25;
+        int nameLength = this.getName().length();
+
+        if (nameLength < maxLength) {
+            maxLength = nameLength;
+        }
+
+        return businessId + "-" + this.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
+                .replaceAll(" ", "-");
+    }
 
 }
