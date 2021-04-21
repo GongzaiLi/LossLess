@@ -37,7 +37,7 @@ Date: 15/4/2021
       </b-table>
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
-      <b-modal id="product-card" hide-header centered>
+      <b-modal id="product-card" hide-header hide-footer centered>
         <!--
         <template #modal-header>
           <small class="text-muted">Product Card</small>
@@ -131,7 +131,6 @@ export default {
           //
 
           // fake date can use be test.
-/*
           this.items = [
             {
               id: "WATT-420-BEANS1",
@@ -162,7 +161,7 @@ export default {
               image: 'https://static.countdown.co.nz/assets/product-images/zoom/9415142003740.jpg',
             }
           ];
-*/
+
           this.tableLoading = false;
           //
         });
