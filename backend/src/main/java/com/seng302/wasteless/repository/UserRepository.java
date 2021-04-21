@@ -1,6 +1,7 @@
 package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     User findFirstByEmail(String email);
 
     User findFirstById(Integer id);
+
+    User findFirstByRole(UserRoles roles);
 
     LinkedHashSet<User> findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nickNameQuery);
 

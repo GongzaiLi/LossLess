@@ -82,6 +82,7 @@ public class BusinessController {
         business.setAdministrators(adminList);
         userService.addBusinessPrimarilyAdministered(user, business);
 
+
         business.setCreated(LocalDate.now());
 
         //Save business
