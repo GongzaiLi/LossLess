@@ -78,6 +78,33 @@ Date: 29/03/2021
           </b-row>
         </b-list-group-item>
       </b-list-group>
+
+      <b-list-group border-variant="secondary">
+        <b-list-group-item>
+          <b-card-text style="text-align: justify">
+            <h4 class="mb-1">Administrators</h4>
+          </b-card-text>
+          <b-row>
+            <b-col cols="12"><!--responsive sticky-header="500px"-->
+              <b-table hover
+                       striped
+                       table-class="text-nowrap"
+                       responsive="lg"
+                       small
+                       no-border-collapse
+                       stacked="sm"
+                       show-empty
+                       @row-clicked="rowClickHandler"
+                       :fields="fields"
+                       :items="businessData.administrators">
+                <template #empty>
+                  <h3 class="no-results-overlay" >No results to display</h3>
+                </template>
+              </b-table>
+            </b-col>
+          </b-row>
+        </b-list-group-item>
+      </b-list-group>
     </b-card>
 
 
@@ -147,11 +174,30 @@ export default {
           country: "",
           postcode: ""
         },
+        administrators: [
+          {
+            id: 0,
+            firstName: '',
+            lastName: '',
+            middleName: '',
+            nickName: '',
+            bio: '',
+            email: '',
+            dateOfBirth: '',
+            phoneNumber: '',
+            homeAddress: '',
+            created: '',
+            role: '',
+            businessesAdministered: [
+              "0"
+            ]
+          }
+        ],
         businessType: "",
-        created: ""
+        created: "",
       },
       products: ['products1', 'products2', 'products3'],
-      businessFound: true // not smooth to switch the found or not find.
+      businessFound: true, // not smooth to switch the found or not find.
     }
   },
 
@@ -162,22 +208,28 @@ export default {
 
   methods: {
     /**
+     * When called changes page to the profile page based on the id of the user clicked
+     */
+    rowClickHandler: function(record){
+      this.$router.push({path: `/users/${record.id}`});
+    },
+    /**
      * this is a get api which can take Specific business to display on the page
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
      **/
     getBusinessInfo: function (id) {
       api
-        .getBusiness(id)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.setResponseData(response.data);
-          this.businessFound = true;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.businessFound = false;
-        })
+          .getBusiness(id)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.setResponseData(response.data);
+            this.businessFound = true;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.businessFound = false;
+          })
     },
     /**
      * set the response data to businessData
@@ -191,8 +243,27 @@ export default {
   computed: {
     getAddress: function () {
       return Object.values(this.businessData.address).join(' ');
+    },
+    fields() {
+      return [
+        {
+          key: 'firstName',
+          //label: 'F name',
+          sortable: true
+        },
+        {
+          key: 'lastName',
+          //label: 'F name',
+          sortable: true
+        },
+        {
+          key: 'email',
+          sortable: true
+        },
+      ];
     }
   }
 
 }
 </script>
+
