@@ -140,6 +140,32 @@ test('business-found-in-html', async () => {
       primaryAdministratorId: 20,
       name: "Lumbridge General Store",
       description: "A one-stop shop for all your adventuring needs",
+      administrators: [
+        {
+          id: 0,
+          firstName: 'James',
+          lastName: 'Harris',
+          middleName: 'Edward',
+          nickName: 'Jimmy',
+          bio: 'My name is James',
+          email: 'jeh128@uclive.ac.nz',
+          dateOfBirth: '2000',
+          phoneNumber: '0271234567',
+          homeAddress: {
+              streetNumber: "3/24",
+              streetName: "Ilam Road",
+              city: "Christchurch",
+              region: "Canterbury",
+              country: "New Zealand",
+              postcode: "90210"
+          },
+          created: '',
+          role: '',
+          businessesAdministered: [
+            "0"
+          ]
+        }
+      ],
       address: {
         streetNumber: "3/24",
         streetName: "Ilam Road",
@@ -161,4 +187,5 @@ test('business-found-in-html', async () => {
   expect(wrapper.html()).toContain(response.data.phoneNumber);
   expect(wrapper.html()).toContain(response.data.businessType);
   expect(wrapper.html()).toContain(response.data.description);
+  expect(wrapper.html()).toContain(response.data.administrators[0])
 });
