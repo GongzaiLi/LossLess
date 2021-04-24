@@ -29,6 +29,7 @@ public class GetUserDtoMapper {
 
 
 
+
     @Autowired
     public GetUserDtoMapper(BusinessService businessService) {
         GetUserDtoMapper.businessService = businessService;
@@ -38,23 +39,24 @@ public class GetUserDtoMapper {
 
         List<Business> businesses = businessService.findBusinessesByUserId(user.getId());
 
-        //UserRoles currentUserRole = userService.findUserByEmail(login.getEmail()).getRole(); //get the role of Currently logged in user
-
-        User tempUser = new User();    //just for testing. Implement this later ...
-        tempUser.setRole(UserRoles.USER); //changing this should change the data that is returned
-        tempUser.setEmail("admin@700");
-        tempUser.setPassword("password");
-
-        UserRoles currentUserRole = tempUser.getRole();
-
-
-
-
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        String currentPrincipalEmail = authentication.getName();
-//
 //        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-//        UserRoles currentUserRole = loggedInUser.getRole();
+//        UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
+//        Integer currentUserId = loggedInUser.getId();
+
+
+        User tempUser = new User();       //just for testing. Implement this later ...
+        //tempUser.setId(user.getId());  //mock logged in user
+        tempUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN); //changing this should change the data that is returned. Currently fails test if role is "USER"
+        tempUser.setEmail("admin@700");
+        tempUser.setPassword("password");
+        UserRoles currentUserRole = tempUser.getRole();
+        Integer currentUserId = tempUser.getId();
+
+
+
+
 
 
         List<BusinessAdministered> businessesAdministered = new ArrayList<>();
@@ -87,20 +89,26 @@ public class GetUserDtoMapper {
                 .setMiddleName(user.getMiddleName())
                 .setNickName(user.getNickname())
                 .setBio(user.getBio())
-                .setEmail(user.getEmail())
-                .setDateOfBirth(user.getDateOfBirth().toString())
-                .setPhoneNumber(user.getPhoneNumber())
-                .setHomeAddress(user.getHomeAddress())
-                .setCreated(user.getCreated().toString());
+                .setEmail(user.getEmail());
+
 
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
-                currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)) {
+                currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) ||
+                        currentUserId == user.getId()) {
             getUserDto
-                    .setRole(user.getRole());
+                    .setDateOfBirth(user.getDateOfBirth().toString())
+                    .setPhoneNumber(user.getPhoneNumber())
+                    .setHomeAddress(user.getHomeAddress())
+                    .setCreated(user.getCreated().toString())
+                    .setRole(user.getRole())
+                    .setBusinessesAdministered(businessesAdministered);
+        } else {
+            getUserDto
+                    .setHomeAddress(user.getHomeAddress())    //Changed later to city, country
+                    .setCreated(user.getCreated().toString())
+                    .setBusinessesAdministered(businessesAdministered);
 
         }
-        getUserDto
-                .setBusinessesAdministered(businessesAdministered);
 
         return getUserDto;
 

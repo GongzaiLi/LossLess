@@ -192,8 +192,33 @@ public class UserControllerIntegrationTests {
                 .andExpect(jsonPath("id", is(2)))
                 .andExpect(jsonPath("firstName", is("James")))
                 .andExpect(jsonPath("lastName", is("Harris")))
-                .andExpect(jsonPath("role", is("user")));
+                .andExpect(jsonPath("role", is("user")));   //test for null role when returning data
         }
+
+    @Test
+    public void whenGetUserWithIdTwo_andOnlyOneCreatedUserAndAdminLoggedIn_BesidedDefault_ThenGetCorrectUser() {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        String login = "{\"email\": \"deafultadmin@supersecretsengbackendmail.com\", \"password\" : \"hTprxBCqpQK5k35Y6S7FeP6dEWky!M\"}";
+
+        try {
+            mockMvc.perform(
+                    MockMvcRequestBuilders.post("/login")
+                            .content(login)
+                            .contentType(APPLICATION_JSON))
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(
+                    MockMvcRequestBuilders.get("/users/2")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("id", is(2)))
+                    .andExpect(jsonPath("firstName", is("James")))
+                    .andExpect(jsonPath("lastName", is("Harris")))
+                    .andExpect(jsonPath("role", is("user")));      //returns null bcoz mocking admin login isnt implemented.
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Request", e);
+        }
+    }
 
 
     @Test
