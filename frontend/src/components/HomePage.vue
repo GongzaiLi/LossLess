@@ -27,7 +27,7 @@ export default {
   },
 
   mounted() {
-    const userId = this.$getCurrentUser().id;
+    const userId = this.$currentUser.id;
     this.getUserInfo(userId);
   },
 
