@@ -4,6 +4,9 @@ import Login from './../components/Login.vue'
 import Register from './../components/Register.vue'
 import UserProfile from './../components/UserProfile'
 import UserSearch from "../components/UserSearch";
+import BusinessProfile from "@/components/business/BusinessProfile";
+import ProductCatalogue from "@/components/product/ProductCatalogue";
+import CreateBusiness from "../components/business/CreateBusiness";
 import HomePage from "@/components/HomePage";
 //import {getUser} from '@/auth'
 
@@ -21,6 +24,9 @@ const router = new Router({
         { path: '/users/search', name: 'user-search', component: UserSearch},
         { path: '/users/:id', name: 'user-profile', component: UserProfile},
         { path: '/homePage', name: 'home-page', component: HomePage},
+        { path: '/businesses/:id', name: 'business-profile', component: BusinessProfile},
+        { path: '/businesses/:id/products', name: 'product-catalogue', component: ProductCatalogue},
+        { path: '/businesses', name: 'create-business', component: CreateBusiness}
     ]
 });
 

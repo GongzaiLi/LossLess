@@ -1,7 +1,7 @@
 <!--
-Page for users to input their information for registration
-Authors: Nitish Singh, Eric Song
-Date: 3/3/2021
+Page for users to input business information for registration of a Business
+Authors: Nitish Singh, Arish Abalos
+Date: 26/3/2021
 -->
 
 
@@ -11,7 +11,7 @@ Date: 3/3/2021
       <h1> Create a Business </h1>
       <br>
       <b-form
-          @submit="createBusiness"
+        @submit="createBusiness"
       >
         <b-form-group
         >
@@ -25,22 +25,22 @@ Date: 3/3/2021
           <b-form-textarea v-model="description" placeholder="Description"></b-form-textarea>
         </b-form-group>
 
-        <b-form-group >
+        <b-form-group>
           <b>Business Address *</b>
           <address-input v-model="address" required/>
         </b-form-group>
 
-        <b-form-group >
+        <b-form-group>
           <b>Business Type *
           </b>
           <div class="input-group mb-xl-5">
 
             <select v-model="businessType" required>
-              <option disabled value=""> Choose ... </option>
-              <option> Accommodation and Food Services </option>
-              <option> Retail Trade </option>
-              <option> Charitable organisation </option>
-              <option> Non-profit organisation </option>
+              <option disabled value=""> Choose ...</option>
+              <option> Accommodation and Food Services</option>
+              <option> Retail Trade</option>
+              <option> Charitable organisation</option>
+              <option> Non-profit organisation</option>
 
             </select>
 
@@ -54,7 +54,10 @@ Date: 3/3/2021
       </b-form>
       <br>
       <div v-if="errors.length">
-        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }} </b-alert>
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{
+            error
+          }}
+        </b-alert>
       </div>
     </b-card>
     <br>
@@ -63,8 +66,8 @@ Date: 3/3/2021
 </template>
 
 <script>
-//import api from "@/Api";
-import AddressInput from "../AddressInput";
+import api from "../../Api";
+import AddressInput from "../../components/AddressInput";
 
 export default {
   components: {
@@ -80,6 +83,7 @@ export default {
     }
   },
   methods: {
+
     getBusinessData() {
       return {
         name: this.name,
@@ -90,39 +94,56 @@ export default {
     },
 
     /**
-     * Makes a request to the API to register a user with the form input.
-     * Then, will redirect to the login page if successful.
+     * Makes a request to the API to register a business with the form input.
+     * Then, will redirect to the business page if successful.
      * Performs no input validation. Validation is performed by the HTML form.
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    createBusiness() {
-      //event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+    async createBusiness(event) {
+      let result = "failed";    //if this page displays but current user not logged in/doesnt exist
 
-     // let businessData = this.getBusinessData();
+      event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
 
-      //To do
-      // api
-      //   .register(businessData)
-      //   .then((loginResponse) => {
-      //     this.$log.debug("Registered");
-      //     return api.getUser(loginResponse.userId);
-      //   })
-      //   .then((userResponse) => {
-      //     this.$currentUser = userResponse.data;
-      //     this.$router.push({path: `/users/${userResponse.data.id}`});
-      //   })
-      //   .catch((error) => {
-      //     this.errors = [];
-      //     this.$log.debug(error);
-      //     if ((error.response && error.response.status === 400)) {
-      //       this.errors.push("Registration failed.");
-      //     } else {
-      //       this.errors.push(error.message);
-      //     }
-      //   });
+      let businessData = this.getBusinessData();
+      let response = ["error", {response: {status: 401}}]; //if this page displays but current user not logged in/doesnt exist
+      if (this.$currentUser != null) {                //if this page displays and current user exists
+        api
+          .postBusiness(businessData)
+          .then((businessResponse) => {
+            response = ["success", businessResponse];
+            this.$router.push({path: `/users/${this.$currentUser.id}`});
+          })
+          .catch((error) => {
+            response = ["error", error];
+          });
+
+        result = "success";
+      }
+      this.pushErrors(response);                          //for error displaying
+      return result;
+
 
     },
-  }
+    /**
+     * Pushes errors to errors list to be displayed as response on the screen,
+     * if there are any.
+     */
+    pushErrors(response) {
+      this.errors = [];
+      const status = response[0];
+      const value = response[1];
+      if (status === "error") {
+        this.$log.debug(value);
+        if ((value.response && value.response.status === 401)) {
+          this.errors.push("Access token is missing or invalid");
+        } else {
+          this.errors.push(value.message);
+        }
+      }
+      return this.errors;
+
+    }
+  },
 }
 </script>

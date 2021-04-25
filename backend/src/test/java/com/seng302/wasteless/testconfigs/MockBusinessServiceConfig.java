@@ -1,10 +1,10 @@
 package com.seng302.wasteless.testconfigs;
 
-import com.seng302.wasteless.Business.Business;
-import com.seng302.wasteless.Business.BusinessService;
-import com.seng302.wasteless.Business.BusinessTypes;
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserRoles;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.model.BusinessTypes;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import org.springframework.boot.test.context.TestConfiguration;
 
 import java.util.ArrayList;
@@ -63,6 +63,8 @@ public class MockBusinessServiceConfig {
             return businesses.get(id);
         }
 
+        @Override
+        public List<Business> findBusinessesByUserId(Integer id) {return businesses; }
     }
 
 }
