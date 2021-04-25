@@ -8,7 +8,8 @@ Date: 7/3/2021
     <h2>Search For a User</h2>
     <b-row style="height: 50px">
       <b-col cols="7">
-        <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search" placeholder="Search"></b-form-input>
+        <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search"
+                      placeholder="Search"></b-form-input>
       </b-col>
       <b-col cols="0">
         <b-button @click="displayResults(searchQuery)"> Search</b-button>
@@ -34,14 +35,7 @@ Date: 7/3/2021
         </b-table>
       </b-col>
     </b-row>
-    <b-row>
-      <b-col>
-        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage"></b-pagination>
-      </b-col>
-      <b-col style="text-align: right; margin-top: 6px">
-        Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalResults }} results.
-      </b-col>
-    </b-row>
+    <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
   </div>
 </template>
 
@@ -55,8 +49,13 @@ Date: 7/3/2021
 
 <script>
 import api from "../Api";
+import pagination from "./Pagination";
 
 export default {
+  components: {
+    pagination,
+  },
+  name: 'UserSearch', // DO NOT DELETE!!! The <keep-alive include="UserSearch"> in App.vue only matches component names so we register a name here.
   data: function () {
     return {
       searchQuery: "",
@@ -70,7 +69,7 @@ export default {
     /**
      * When called changes page to the profile page based on the id of the user clicked
      */
-    rowClickHandler: function(record){
+    rowClickHandler: function (record) {
       this.$router.push({path: `/users/${record.id}`});
     },
     /**
@@ -78,7 +77,7 @@ export default {
      * @param searchParameter id user is id or name other details
      */
     displayResults: function (searchParameter) {
-      if(!searchParameter.length){
+      if (!searchParameter.length) {
         return;
       }
       api
@@ -115,7 +114,7 @@ export default {
       };
       for (const user of data) {
         tableHeader = user;
-        if (this.$getCurrentUser().role !== "user") {
+        if (this.$currentUser.role !== "user") {
           let roleLabel;
           if (user.role === "globalApplicationAdmin") {
             roleLabel = "ADMIN";
@@ -140,39 +139,8 @@ export default {
      * The rows function just computed how many pages in the search table.
      * @returns {number}
      */
-    rows() {
+    totalItems() {
       return this.items.length;
-    },
-
-    /**
-     * Author: Nitish Singh
-     * Computes the lower range of items displaying on the table.
-     * Ranges (indexes) starts from 1, so plus 1
-     * @returns {number}
-     */
-    itemsRangeMin() {
-      let minRange = this.perPage * (this.currentPage - 1);
-      if (this.totalResults > 0) {
-        minRange++;
-      }
-      return minRange;
-    },
-    /**
-     * Author: Nitish Singh, Eric Song, Caleb Sim
-     * Computes the upper range of items displaying on the table at the current page.
-     * @returns {number}
-     */
-
-    itemsRangeMax() {
-      let numPages = Math.ceil(this.totalResults / this.perPage); //Max number of pages
-      let maxRange;
-      if (this.currentPage === numPages) { // You are on the last page
-        maxRange = this.totalResults; // Upper range is just the last item
-      }
-      else { // Not on last page
-        maxRange = this.perPage * this.currentPage;
-      }
-      return maxRange;
     },
 
     fields() {
@@ -195,10 +163,10 @@ export default {
           sortable: true
         }
       ];
-      if (this.$getCurrentUser().role !== 'user') {
+      if (this.$currentUser && this.$currentUser.role !== 'user') {
         fields.push({
-              key: 'userType',
-              sortable: true
+          key: 'userType',
+          sortable: true
         });
       }
       return fields;

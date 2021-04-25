@@ -7,8 +7,8 @@ Date: 5/3/2021
 <template>
   <div>
     <b-card border-variant="secondary" header-border-variant="secondary"
-            class="profile-card shadow" no-body
-            v-if="userFound"
+      class="profile-card shadow" no-body
+      v-if="userFound"
     >
 
       <template #header>
@@ -19,15 +19,15 @@ Date: 5/3/2021
             <member-since :date="userData.created"/>
           </b-col>
           <b-col cols="2" sm="auto"
-                 v-if="($getCurrentUser().role==='defaultGlobalApplicationAdmin'||$getCurrentUser().role==='globalApplicationAdmin')">
+                 v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
             <h4>{{ userRoleDisplayString }}</h4>
             <b-button v-bind:variant="adminButtonToggle"
-                      v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$getCurrentUser().id)"
+                      v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$currentUser.id)"
                       @click="toggleAdmin">{{ adminButtonText }}
             </b-button>
           </b-col>
 
-        </b-row>
+          </b-row>
 
         <b-row>
 
@@ -53,16 +53,16 @@ Date: 5/3/2021
                 <b-icon-person-fill></b-icon-person-fill>
               </b-col>
               <b-col cols="4"><b>Full Name:</b></b-col>
-              <b-col>{{ userData.firstName + " " + userData.middleName + " " + userData.lastName }}</b-col>
+              <b-col>{{ fullName }}</b-col>
             </b-row>
           </h6>
-          <h6>
-            <b-row v-show="userData.nickname">
+          <h6 v-if="userData.nickName">
+            <b-row v-show="userData.nickName.length">
               <b-col cols="0">
                 <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
               </b-col>
               <b-col cols="4"><b>Nickname:</b></b-col>
-              <b-col>{{ userData.nickname }}</b-col>
+              <b-col>{{ userData.nickName }}</b-col>
             </b-row>
           </h6>
           <h6>
@@ -101,6 +101,18 @@ Date: 5/3/2021
               <b-col> {{ userData.homeAddress }}</b-col>
             </b-row>
           </h6>
+          <h6 v-if="userData.businessesAdministered.length"><b-row>
+            <b-col cols="0">
+              <b-icon-building></b-icon-building>
+            </b-col>
+            <b-col cols="4"><b>Businesses Created:</b></b-col>
+            <b-col>
+            <router-link v-for="business in this.userData.businessesAdministered"   :to="'/businesses/'+business.id.toString()" v-bind:key="business.id">
+              <template v-if="(business.primaryAdministratorId===userData.id)">{{ business.name }}<br></template></router-link></b-col>
+          </b-row>
+
+          </h6>
+
         </b-container>
       </b-card-body>
     </b-card>
@@ -126,11 +138,10 @@ Date: 5/3/2021
 
 <style scoped>
 .profile-card {
-  max-width: 45rem;
-  margin-left: auto;
-  margin-right: auto;
+   max-width: 45rem;
+   margin-left: auto;
+   margin-right: auto;
 }
-
 h6 {
   line-height: 1.4;
 }
@@ -152,13 +163,14 @@ export default {
         firstName: "",
         lastName: "",
         middleName: "",
-        nickname: "",
+        nickName: "",
         bio: "",
         email: "",
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
-        created: ""
+        created: "",
+        businessesAdministered:[],
       },
       userFound: true,
     }
@@ -209,22 +221,15 @@ export default {
      */
     giveAdmin: function () {
       api
-        .makeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Made user ${this.userData.id} admin`);
-          this.userData.role = 'globalApplicationAdmin';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .makeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Made user ${this.userData.id} admin`);
             this.userData.role = 'globalApplicationAdmin';
-            return;
-            //////////////////////////
-          }
-
-          this.$log.debug(error);
-          alert(error);
-        });
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            alert(error);
+          });
     },
     /**
      *  Attempts to revoke the 'globalApplicationAdmin' role from the displayed user
@@ -232,27 +237,35 @@ export default {
      */
     revokeAdmin: function () {
       api
-        .revokeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
-          this.userData.role = 'user';
-        })
-        .catch((error) => {
-          if (this.demoMode) {
-            // DEMO PURPOSES ONLY. Remove this once we have an implementation of the API
+          .revokeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Revoked admin for user ${this.userData.id}`);
             this.userData.role = 'user';
-            return;
-            //////////////////////////
-          }
-
-          this.$log.debug(error);
-          alert(error);
-        });
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            alert(error);
+          });
     }
   },
   computed: {
     adminButtonToggle() {
       return this.userData.role === 'user' ? 'success' : 'danger';
+    },
+    /**
+     * Returns the full name of the user, in the format:
+     * Firstname Middlename Lastname (Nickname)
+     */
+    fullName: function() {
+      let fullName = this.userData.firstName;
+      if (this.userData.middleName) {
+        fullName += ' ' + this.userData.middleName;
+      }
+      fullName += ' ' + this.userData.lastName;
+      if (this.userData.nickName) {
+        fullName += ` (${this.userData.nickName})`
+      }
+      return fullName;
     },
     /**
      * User friendly display string for the user role. Converts the user role
