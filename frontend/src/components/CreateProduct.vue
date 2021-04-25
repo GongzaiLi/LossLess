@@ -14,7 +14,7 @@ Date: 13/4/2021
       </template>
       <br>
       <b-form
-        @submit="register"
+        @submit="CreateProduct"
       >
         <b-form-group
         >
@@ -100,7 +100,7 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    register(event) {
+    CreateProduct(event) {
 
       console.log(event);
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
