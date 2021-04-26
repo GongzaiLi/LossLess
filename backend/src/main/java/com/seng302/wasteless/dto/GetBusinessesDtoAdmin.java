@@ -10,19 +10,24 @@ import lombok.experimental.Accessors;
 import java.util.List;
 
 /**
- * Data transfer object for GetBusiness endpoint, used to return the correct data in the correct format.
- * Business entities are transformed into GetBusinessesDto via the GetBusinessesDtoMapper
+ * Data transfer object for GetBusiness endpoint, used to return the correct data in the correct format,
+ * for business and application admins and when user get their own business data.
+ * Business entities are transformed into GetBusinessesDtoAdmin via the GetBusinessesDtoMapper.
+ *
  */
 
 @Accessors(chain = true) //Allows chaining of getters and setters
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
-public class GetBusinessesDto {
+public class GetBusinessesDtoAdmin {
     private int id;
+    private List<Administrator> administrators;
+    private int primaryAdministratorId;
     private String name;
     private String description;
     private String address;
     private BusinessTypes businessType;
     private String created;
+
 }
