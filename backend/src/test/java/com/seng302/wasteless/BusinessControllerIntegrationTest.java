@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -196,6 +198,91 @@ public class BusinessControllerIntegrationTest {
                 .content(product)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
+    }
+
+    //GET REQ
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndProductsExist_then200Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].name", is("Chocolate Bar")))
+                .andExpect(jsonPath("$[0].description", is("Example Product First Edition")));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+    public void whenGetRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductsExist_then200Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("Juice", "Example Product Second Edition", "2.0");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].name", is("Chocolate Bar")))
+                .andExpect(jsonPath("$[0].description", is("Example Product First Edition")))
+                .andExpect(jsonPath("$[1].name", is("Juice")))
+                .andExpect(jsonPath("$[1].description", is("Example Product Second Edition")));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndNoProductsExist_then200Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
 
