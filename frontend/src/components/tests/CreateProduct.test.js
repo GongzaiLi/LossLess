@@ -2,38 +2,19 @@ import {mount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue} from 'bootstrap-vue';
 import CreateProduct from '../CreateProduct';
 import VueRouter from 'vue-router';
+import Api from "../../Api";
 
+jest.mock('../../Api')
 
-let userData = {
-  id: 1
-}
 const $log = {
   debug: jest.fn(),
 };
 
-// const $currentUser = {
-//   id: 1
-// }
-
-
-// fake the localStorage to doing the testing.
-const mockUserAuthPlugin = function install(Vue) {
-  Vue.mixin({
-    computed: {
-      $currentUser: {
-        get: function () {
-          return userData;
-        }
-      },
-    }
-  });
-}
 
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(VueRouter);
-localVue.use(mockUserAuthPlugin);
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -91,16 +72,41 @@ describe('CreateProduct Script Testing', () => {
 });
 
 describe('Testing api post request and the response method with errors', () => {
-  const response401 = ["error", {response: {status: 401}, message: "Access token is missing or invalid"}];
-  const responseNot401 = ["error", {response: {status: 500}, message: "Network Error"}];
-  const responseNoError = ["success", {response: {status: 201}, message: "Business Registered"}];
 
-
-  it('Succesful api sent', async () => {
-
+  it('Succesfully creates a product', async () => {
+    Api.createProduct.mockImplementation(() => Promise.resolve({
+      response : {status: 200}
+    }));
     const mockEvent = {preventDefault: jest.fn()}
     const result = await wrapper.vm.CreateProduct(mockEvent);
     expect(result).toBe("success");
+  });
+  it('400 error test', async () => {
+
+    Api.createProduct.mockImplementation(() => Promise.reject({
+      response : {status: 400}
+    }));
+    const mockEvent = {preventDefault: jest.fn()};
+    const result = await wrapper.vm.CreateProduct(mockEvent);
+    expect(result).toBe("Creation failed. Please try again");
+  });
+  it('403 error test', async () => {
+
+    Api.createProduct.mockImplementation(() => Promise.reject({
+      response : {status: 403}
+    }));
+    const mockEvent = {preventDefault: jest.fn()};
+    const result = await wrapper.vm.CreateProduct(mockEvent);
+    expect(result).toBe("Forbidden. You are not an authorized administrator");
+  });
+  it('other error test', async () => {
+
+    Api.createProduct.mockImplementation(() => Promise.reject({
+      response : {status: 500}
+    }));
+    const mockEvent = {preventDefault: jest.fn()};
+    const result = await wrapper.vm.CreateProduct(mockEvent);
+    expect(result).toBe("Server error");
   });
 
 

@@ -75,7 +75,7 @@ export default {
       "manufacturer": "",
       "recommendedRetailPrice": "",
       errors: [],
-      businessId : null
+      businessId : null,
     }
   },
   mounted() {
@@ -99,33 +99,31 @@ export default {
      */
     CreateProduct(event) {
 
-      console.log(event);
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let ProductData = this.getProductData();
-      console.log(ProductData);
-      let result = 'success'
-      api
+      let apiResponse = api
         .createProduct(this.businessId,ProductData)
         .then((createProductResponse) => {
           this.$log.debug("Product Created",createProductResponse);
           this.$router.push({path: `/businesses/${this.businessId}/products`});
-
+          return "success";
         })
         .catch((error) => {
-          result='failed'
           this.errors = [];
           this.$log.debug(error);
           if ((error.response && error.response.status === 400)) {
-            this.errors.push("Creation failed. Please try again ");
+            this.errors.push("Creation failed. Please try again");
           } else if ((error.response && error.response.status === 403)) {
             this.errors.push("Forbidden. You are not an authorized administrator");
           } else {
             this.errors.push("Server error");
           }
+          console.log(error.response);
+          return this.errors[0];
+        })
 
-        });
-      return result;
+      return apiResponse;
 
     },
   }
