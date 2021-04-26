@@ -13,6 +13,7 @@ import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import UserProfile from "./components/UserProfile";
 import UserSearch from "./components/UserSearch";
+import HomePage from "@/components/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
 
@@ -29,8 +30,9 @@ const app = {
     Register,
     UserProfile,
     Navbar,
-    UserSearch,
+    HomePage,
     CreateBusiness,
+    UserSearch,
     BusinessProfile
   },
   // app initial state

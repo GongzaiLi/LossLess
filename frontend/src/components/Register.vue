@@ -229,7 +229,7 @@ export default {
         })
         .then((userResponse) => {
           this.$currentUser = userResponse.data;
-          this.$router.push({path: `/users/${userResponse.data.id}`});
+          this.$router.push({path: `/homePage`});
         })
         .catch((error) => {
           this.errors = [];
