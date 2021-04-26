@@ -73,7 +73,7 @@ describe('CreateProduct Script Testing', () => {
 
 describe('Testing api post request and the response method with errors', () => {
 
-  it('Succesfully creates a product', async () => {
+  it('Succesfully creates a product ', async () => {
     Api.createProduct.mockImplementation(() => Promise.resolve({
       response : {status: 200}
     }));
