@@ -64,7 +64,7 @@ Date: 13/4/2021
 
 </style>
 <script>
-import api from "@/Api";
+import api from "../Api";
 
 export default {
 
@@ -94,11 +94,8 @@ export default {
 
 
     /**
-     * Makes a request to the API to register a user with the form input.
-     * Then, will redirect to the login page if successful.
-     * Performs no input validation. Validation is performed by the HTML form.
-     * Thus, this method should only ever be used as the @submit property of a form.
-     * The parameter event is passed
+     * Makes a request to the API to create a product with the form input.
+     * Then, will redirect back to the product list if successful.
      */
     CreateProduct(event) {
 
@@ -107,14 +104,16 @@ export default {
 
       let ProductData = this.getProductData();
       console.log(ProductData);
-
+      let result = 'success'
       api
         .createProduct(this.businessId,ProductData)
         .then((createProductResponse) => {
           this.$log.debug("Product Created",createProductResponse);
           this.$router.push({path: `/businesses/${this.businessId}/products`});
+
         })
         .catch((error) => {
+          result='failed'
           this.errors = [];
           this.$log.debug(error);
           if ((error.response && error.response.status === 400)) {
@@ -122,9 +121,11 @@ export default {
           } else if ((error.response && error.response.status === 403)) {
             this.errors.push("Forbidden. You are not an authorized administrator");
           } else {
-            this.errors.push(error.message);
+            this.errors.push("Server error");
           }
+
         });
+      return result;
 
     },
   }
