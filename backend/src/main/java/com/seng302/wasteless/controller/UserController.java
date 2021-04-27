@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.repository.BusinessRepository;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
@@ -43,11 +45,14 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
 
     private final UserService userService;
+    private final AddressService addressService;
 
     @Autowired
     public UserController(UserService userService,
+                          AddressService addressService,
                           BCryptPasswordEncoder passwordEncoder,
                           AuthenticationManager authenticationManager) {
+        this.addressService = addressService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -86,7 +91,10 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRoles.USER);
 
+
+
         //Save user object in h2 database
+        addressService.createAddress(user.getHomeAddress());
         userService.createUser(user);
 
         logger.info(String.format("Successful registration of user %d", user.getId()));

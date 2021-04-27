@@ -3,6 +3,7 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.model.Business;
@@ -32,11 +33,13 @@ import java.util.Map;
 public class BusinessController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
-    private BusinessService businessService;
-    private UserService userService;
+    private final BusinessService businessService;
+    private final UserService userService;
+    private final AddressService addressService;
 
     @Autowired
-    public BusinessController(BusinessService businessService, UserService userService) {
+    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService) {
+        this.addressService = addressService;
         this.businessService = businessService;
         this.userService = userService;
     }
@@ -74,13 +77,15 @@ public class BusinessController {
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
         business.setAdministrators(adminList);
-        userService.addBusinessPrimarilyAdministered(user, business);
 
 
         business.setCreated(LocalDate.now());
 
         //Save business
+        addressService.createAddress(business.getAddress());
         business = businessService.createBusiness(business);
+
+        userService.addBusinessPrimarilyAdministered(user, business);
 
         logger.info("saved new business {}", business);
 

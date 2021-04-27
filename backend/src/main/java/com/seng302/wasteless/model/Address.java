@@ -1,6 +1,8 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.BusinessViews;
+import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -23,26 +25,33 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "street_number is mandatory")
     @Column(name = "street_number")
     private String streetNumber;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "street_name is mandatory")
     @Column(name = "street_name")
     private String streetName;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "city is mandatory")
     @Column(name = "city")
     private String city;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @Column(name = "region")
     private String region;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "country is mandatory")
     @Column(name = "country")
     private String country;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "postcode is mandatory")
     @Column(name = "postcode")
     private String postcode;
+
 }

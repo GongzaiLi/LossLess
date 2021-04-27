@@ -102,7 +102,7 @@ public class DefaultAdminCreatorService {
         User defaultAdmin = new User();
         defaultAdmin.setEmail(defaultEmail);
         defaultAdmin.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
-        defaultAdmin.setHomeAddress("10 Downing Street");
+        //defaultAdmin.setHomeAddress("10 Downing Street");
         defaultAdmin.setDateOfBirth(LocalDate.EPOCH);
         defaultAdmin.setFirstName("Default");
         defaultAdmin.setLastName("Admin");
