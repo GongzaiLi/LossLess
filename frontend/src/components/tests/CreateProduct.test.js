@@ -23,8 +23,8 @@ let wrapper;
 
 const router = new VueRouter();
 
-
-let fullName = "Beans"
+const id = "WATT-420-BEANS"
+let name = "Beans"
 const description = "Baked Beans.";
 const manufacturer = "Watties";
 const recommendedRetailPrice = "1.00";
@@ -51,7 +51,7 @@ describe('CreateProduct Script Testing', () => {
 
 
   test('getProductData returns correct number of attributes', async () => {
-    const expectedAttributes = 4;
+    const expectedAttributes = 5;
     expect(Object.keys(wrapper.vm.getProductData()).length).toBe(expectedAttributes);
 
   });
@@ -59,15 +59,17 @@ describe('CreateProduct Script Testing', () => {
   test('Get business data returns correct values', () => {
 
 
-    wrapper.vm.fullName = fullName;
+    wrapper.vm.name = name;
     wrapper.vm.description = description;
     wrapper.vm.manufacturer = manufacturer;
     wrapper.vm.recommendedRetailPrice = recommendedRetailPrice;
+    wrapper.vm.id = id;
 
-    expect(wrapper.vm.getProductData().fullName).toBe(fullName);
+    expect(wrapper.vm.getProductData().name).toBe(name);
     expect(wrapper.vm.getProductData().description).toBe(description);
     expect(wrapper.vm.getProductData().manufacturer).toBe(manufacturer);
     expect(wrapper.vm.getProductData().recommendedRetailPrice).toBe(recommendedRetailPrice);
+    expect(wrapper.vm.getProductData().id).toBe(id);
   });
 });
 

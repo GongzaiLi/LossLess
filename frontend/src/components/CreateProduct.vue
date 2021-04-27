@@ -18,8 +18,15 @@ Date: 13/4/2021
       >
         <b-form-group
         >
+          <b>ID</b>
+          -This will be changed automatically into the correct format for you.
+          <b-form-input v-model="id" required placeholder="PRODUCT-ID" autofocus></b-form-input>
+
+        </b-form-group>
+        <b-form-group
+        >
           <b>Full Name *</b>
-          <b-form-input v-model="fullName" required placeholder="Full Name" autofocus></b-form-input>
+          <b-form-input v-model="name" required placeholder="Full Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
@@ -70,7 +77,8 @@ export default {
 
   data: function () {
     return {
-      "fullName": "",
+      "id": "",
+      "name": "",
       "description": "",
       "manufacturer": "",
       "recommendedRetailPrice": "",
@@ -85,7 +93,8 @@ export default {
 
     getProductData() {
       return {
-        fullName: this.fullName,
+        id: this.id,
+        name: this.name,
         description: this.description,
         manufacturer: this.manufacturer,
         recommendedRetailPrice: this.recommendedRetailPrice
