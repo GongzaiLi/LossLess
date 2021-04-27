@@ -2,6 +2,7 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,14 @@ public class UserService {
     }
 
     /**
+     * Checks if a user with a specified role already exists
+     *
+     * @param roles     The role using UserRoles
+     * @return          boolean whether a user is found or not
+     */
+    public boolean checkRoleAlreadyExists(UserRoles roles) { return userRepository.findFirstByRole(roles) != null; }
+
+    /**
      * Find user by id
      *
      * @param id        The id of the user to find
@@ -70,6 +79,15 @@ public class UserService {
     public User findUserByEmail(String email) {
         return userRepository.findFirstByEmail(email);
     }
+
+    /**
+     * Checks whether the user is an admin in the business
+     *
+     * @param businessId    The business ID
+     * @param userId        The user ID
+     * @return              Returns true if user is admin to business else false
+     */
+    public boolean checkUserAdminsBusiness(Integer businessId, Integer userId) { return userRepository.findUserContainBusinessIdAndContainAdminId(businessId, userId) != null; }
 
 
     /**

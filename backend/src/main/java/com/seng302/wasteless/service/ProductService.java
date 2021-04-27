@@ -46,6 +46,17 @@ public class ProductService {
     }
 
     /**
+     * Saves the given product object with updated fields in Database
+     *
+     * @param oldProduct    The old product object to delete in the DB
+     * @param newProduct    The new product object to save in the DB
+     */
+    public void updateProduct(Product oldProduct, Product newProduct) {
+        productRepository.delete(oldProduct);
+        productRepository.save(newProduct);
+    }
+
+    /**
      * Get all the products for a chosen business
      *
      * @param id The id of a business

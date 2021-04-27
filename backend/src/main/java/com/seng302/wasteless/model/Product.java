@@ -1,7 +1,6 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
@@ -19,6 +16,7 @@ import java.util.List;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Product {
 
+    @JsonView({ProductViews.PostProductRequestView.class})
     @Id // this field (attribute) is the table primary key
     @Column(name = "code")
     private String id;
@@ -33,6 +31,10 @@ public class Product {
     private String description;
 
     @JsonView({ProductViews.PostProductRequestView.class})
+    @Column(name = "manufacturer")
+    private String manufacturer;
+
+    @JsonView({ProductViews.PostProductRequestView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
 
@@ -45,5 +47,11 @@ public class Product {
 
 //    @Column(name = "images")
 //    private List images;
+
+    public String createCode(Integer businessId) {
+
+        return businessId + "-" + this.getId().toUpperCase().replaceAll("\\P{Alnum}+$", "")
+                .replaceAll(" ", "-");
+    }
 
 }
