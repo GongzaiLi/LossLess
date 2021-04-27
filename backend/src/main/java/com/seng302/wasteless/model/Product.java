@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Product {
 
+    @JsonView({ProductViews.PostProductRequestView.class})
     @Id // this field (attribute) is the table primary key
     @Column(name = "code")
     private String id;
@@ -28,6 +29,10 @@ public class Product {
     @JsonView({ProductViews.PostProductRequestView.class})
     @Column(name = "description")
     private String description;
+
+    @JsonView({ProductViews.PostProductRequestView.class})
+    @Column(name = "manufacturer")
+    private String manufacturer;
 
     @JsonView({ProductViews.PostProductRequestView.class})
     @Column(name = "recommended_retail_price")
@@ -44,14 +49,8 @@ public class Product {
 //    private List images;
 
     public String createCode(Integer businessId) {
-        int maxLength = 25;
-        int nameLength = this.getName().length();
 
-        if (nameLength < maxLength) {
-            maxLength = nameLength;
-        }
-
-        return businessId + "-" + this.getName().toUpperCase().substring(0, maxLength).replaceAll("\\P{Alnum}+$", "")
+        return businessId + "-" + this.getId().toUpperCase().replaceAll("\\P{Alnum}+$", "")
                 .replaceAll(" ", "-");
     }
 

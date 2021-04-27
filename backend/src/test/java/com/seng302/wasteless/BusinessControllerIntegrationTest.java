@@ -18,7 +18,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -105,9 +104,9 @@ public class BusinessControllerIntegrationTest {
         }
     }
 
-    private void createOneProduct(String name, String description, String recommendedRetailPrice) {
+    private void createOneProduct(String id, String name, String description, String manufacturer, String recommendedRetailPrice) {
 
-        String product = String.format("{\"name\": \"%s\", \"description\" : \"%s\", \"recommendedRetailPrice\": \"%s\"}", name, description, recommendedRetailPrice);
+        String product = String.format("{\"id\" : \"%s\", \"name\": \"%s\", \"description\" : \"%s\", \"manufacturer\" : \"%s\", \"recommendedRetailPrice\": \"%s\"}", id, name, description, manufacturer, recommendedRetailPrice);
 
         try {
             mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
@@ -126,7 +125,7 @@ public class BusinessControllerIntegrationTest {
 
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/99/products")
                 .content(product)
@@ -146,7 +145,7 @@ public class BusinessControllerIntegrationTest {
 
         businessService.createBusiness(business);
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
                 .content(product)
@@ -159,9 +158,9 @@ public class BusinessControllerIntegrationTest {
     public void whenPostRequestToBusinessProducts_AndProductAlreadyExists_then400Response() throws Exception {
 
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String product = "{\"id\": \"PRODUCT1\", \"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
                 .content(product)
@@ -175,7 +174,7 @@ public class BusinessControllerIntegrationTest {
 
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
                 .content(product)
@@ -195,12 +194,96 @@ public class BusinessControllerIntegrationTest {
 
         businessService.createBusiness(business);
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
                 .content(product)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndProductsExist_then200Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].name", is("Chocolate Bar")))
+                .andExpect(jsonPath("$[0].description", is("Example Product First Edition")));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+    public void whenGetRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductsExist_then200Response() throws Exception {
+
+        Business business = new Business();
+
+        business.setName("New Business");
+        business.setAddress("Home");
+        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
+
+        businessService.createBusiness(business);
+
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+        createOneProduct("PRODUCT2", "Juice", "Example Product Second Edition","example manufacturer", "2.0");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].name", is("Chocolate Bar")))
+                .andExpect(jsonPath("$[0].description", is("Example Product First Edition")))
+                .andExpect(jsonPath("$[1].name", is("Juice")))
+                .andExpect(jsonPath("$[1].description", is("Example Product Second Edition")));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndNoProductsExist_then200Response() throws Exception {
+
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
     }
 
     @Test
@@ -209,7 +292,7 @@ public class BusinessControllerIntegrationTest {
 
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/99/products/1")
                 .content(product)
@@ -237,7 +320,7 @@ public class BusinessControllerIntegrationTest {
 
         productService.createProduct(product);
 
-        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
                 .content(editProduct)
@@ -249,9 +332,9 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndSuccess_then200Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
@@ -263,9 +346,9 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameIsTheSame_then200Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"chocolate bar\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
@@ -277,15 +360,15 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainChangedProductCode_then200Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
                 .contentType(APPLICATION_JSON));
 
-        String editProduct2 = "{\"name\": \"Raisin\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct2 = "{\"name\": \"Raisin\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Raisin\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-KIT-KAT")
                 .content(editProduct2)
@@ -297,15 +380,15 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then400Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
                 .contentType(APPLICATION_JSON));
 
-        String editProduct2 = "{\"name\": \"Raisin\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct2 = "{\"name\": \"Raisin\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Raisin\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct2)
@@ -328,7 +411,7 @@ public class BusinessControllerIntegrationTest {
         product.setBusinessId(business.getId());
         productService.createProduct(product);
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
                 .content(editProduct)
@@ -351,7 +434,7 @@ public class BusinessControllerIntegrationTest {
         product.setBusinessId(business.getId());
         productService.createProduct(product);
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
                 .content(editProduct)
@@ -363,9 +446,9 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameMissing_then400Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
@@ -377,9 +460,9 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameIsBlank_then400Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
@@ -391,9 +474,9 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndRecommendedRetailPriceIsLetter_then400Response() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"AB\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"AB\", \"id\": \"PRODUCT1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)
@@ -405,9 +488,9 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndSuccess_AndAllDataUpdates_thenAllChangesShouldBeMade() throws Exception {
         createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneProduct("Chocolate Bar", "Example Product First Edition", "4.0");
+        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
-        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
+        String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-CHOCOLATE-BAR")
                 .content(editProduct)

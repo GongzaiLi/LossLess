@@ -12,6 +12,7 @@ import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
+import com.seng302.wasteless.view.ProductViews;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +129,7 @@ public class BusinessController {
      */
     @PostMapping("/businesses/{id}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody Product possibleProduct, HttpServletRequest request) {
+    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct, HttpServletRequest request) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalEmail = authentication.getName();
@@ -206,10 +207,6 @@ public class BusinessController {
 
         List<Product> productList = productService.getAllProductsByBusinessId(businessId);
 
-        if (productList.size() == 0) {
-            logger.warn("Attempted to get products when none exist.");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("No products exist for this business.");
-        }
 
         return ResponseEntity.status(HttpStatus.OK).body(productList);
 
@@ -246,7 +243,7 @@ public class BusinessController {
         }
 
         String newProductId = editedProduct.createCode(businessId);
-        if (!oldProduct.getName().equals(editedProduct.getName()) && productService.findProductById(newProductId) != null) {
+        if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
                     "to one that is already in your catalogue.");
         }
