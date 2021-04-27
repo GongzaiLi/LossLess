@@ -20,7 +20,7 @@ import java.util.List;
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
-public class GetUserDtoAdmin {
+public class GetUserDtoAdmin extends GetUserDto {
     private Integer id;
     private String firstName;
     private String lastName;

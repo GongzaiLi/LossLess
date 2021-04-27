@@ -1,6 +1,7 @@
 package com.seng302.wasteless;
 
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -194,56 +195,56 @@ public class UserControllerIntegrationTests {
                 .andExpect(jsonPath("id", is(2)))
                 .andExpect(jsonPath("firstName", is("James")))
                 .andExpect(jsonPath("lastName", is("Harris")))
-                .andExpect(jsonPath("role", is("user")));   //test for null role when returning data
+                .andExpect(jsonPath("role", is("user")));
+    }
+
+
+    @Test
+    public void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRole() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(3)))
+                .andExpect(jsonPath("firstName", is("Oliver")))
+                .andExpect(jsonPath("lastName", is("Cranshaw")))
+                .andExpect(jsonPath("role", is("user")));
         }
 
     @Test
-    @WithMockCustomUser(email = "test@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-    public void whenGetUserWithIdTwo_andOnlyOneCreatedUser_andAdminLoggedIn_BesidedDefault_ThenGetCorrectUser() throws Exception {
+    public void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRole() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(2)))
+                .andExpect(jsonPath("role").doesNotExist());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "test@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+    public void whenGetUserWithIdOne_andAdminLoggedIn_andAdminLoggedIn_BesidedDefault_ThenGetCorrectUserRole() throws Exception {
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())                    //check number of attributes
-                .andExpect(jsonPath("id", is(2)))
-                .andExpect(jsonPath("firstName", is("James")))
-                .andExpect(jsonPath("lastName", is("Harris")))
-                .andExpect(jsonPath("role", is("user")));
-    }
-
-    @Test
-    @WithMockCustomUser(email = "test@700", role = UserRoles.USER)
-    public void whenGetUserWithIdTwo_andOnlyOneCreatedUser_andUserLoggedIn_BesidedDefault_ThenGetCorrectUser() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/2")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())                      //Check number of attributes
-                .andExpect(jsonPath("id", is(2)))
-                .andExpect(jsonPath("firstName", is("James")))
-                .andExpect(jsonPath("lastName", is("Harris")))
-                .andExpect(jsonPath("role").doesNotExist());   //check that role doesn't exist
-    }
-
-    @Test
-    @WithMockCustomUser(email = "jeh128@uclive.ac.nz", role = UserRoles.USER)
-    public void whenGetUserWithIdTwo_andOnlyOneCreatedUser_andUserHimselfLoggedIn_BesidedDefault_ThenGetCorrectUser() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/2")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())                      //Check number of attributes
-                .andExpect(jsonPath("id", is(2)))
-                .andExpect(jsonPath("firstName", is("James")))
-                .andExpect(jsonPath("lastName", is("Harris")))
-                .andExpect(jsonPath("role", is("user")));
+                .andExpect(jsonPath("id", is(1)))
+                .andExpect(jsonPath("role", is("defaultGlobalApplicationAdmin")));
     }
 
 
+
+
+
     @Test
+    //@WithMockCustomUser(email = "test@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN) fails without this?
     public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk());

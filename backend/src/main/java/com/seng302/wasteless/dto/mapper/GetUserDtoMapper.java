@@ -52,7 +52,7 @@ public class GetUserDtoMapper {
 
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
                 currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-                //|| currentUserId == user.getId()
+                || currentUserId == user.getId()
         ) {
 
             List<Business> businesses = businessService.findBusinessesByUserId(user.getId());

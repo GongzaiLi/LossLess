@@ -49,7 +49,7 @@ public class GetBusinessesDtoMapper {
 
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
                 currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-               // || currentUserId == user.getId()
+                //|| currentUserId == user.getId()
         ) {
 
             List<User> businessAdministrators = business.getAdministrators();
