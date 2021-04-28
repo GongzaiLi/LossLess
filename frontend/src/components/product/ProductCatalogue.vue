@@ -210,7 +210,7 @@ export default {
      */
     goToCreateProduct: function () {
       this.$router.push({path: `/businesses/${this.$route.params.id}/products/createProduct`});
-    }
+    },
 
     /**
      * button function when clicked shows edit card
