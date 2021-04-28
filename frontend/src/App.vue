@@ -1,10 +1,10 @@
 <template>
-  <b-container id="app">
+  <div id="app">
     <Navbar/>
     <keep-alive include="UserSearch"> <!-- The keep-alive prevents the UserSearch component from being re-rendered each time, so you can got back to your search results -->
       <router-view/>
     </keep-alive>
-  </b-container>
+  </div>
 </template>
 
 <script>

@@ -21,6 +21,7 @@ Date: 15/4/2021
         bordered
         show-empty
         @row-clicked="tableRowClick"
+        class="catalogue-table"
         :fields="fields"
         :items="items"
         :per-page="perPage"
@@ -32,6 +33,10 @@ Date: 15/4/2021
           <b-button id="edit-button" @click="editProduct(products.item)" size="sm">
             Edit
           </b-button>
+        </template>
+
+        <template #cell(recommendedRetailPrice)="data">
+          {{ currency.symbol }}{{ data.item.recommendedRetailPrice }}
         </template>
 
         <template #empty>
@@ -53,7 +58,7 @@ Date: 15/4/2021
           <small class="text-muted">Product Card</small>
         </template>
         -->
-        <product-detail-card :product="productSelect" :disabled="true"/>
+        <product-detail-card :product="productSelect" :disabled="true" :currency="currency"/>
         <!--
         <template #modal-footer>
           <small class="text-muted">Product Card</small>
@@ -62,7 +67,7 @@ Date: 15/4/2021
       </b-modal>
 
       <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProduct" @cancel="refreshProduct">
-        <product-detail-card :product="productEdit" :disabled="false"/>
+        <product-detail-card :product="productEdit" :disabled="false" :currency="currency"/>
       </b-modal>
     </div>
   </div>
@@ -81,6 +86,10 @@ h2 {
   text-align: center;
 }
 
+.catalogue-table td {
+  cursor: pointer;
+}
+
 </style>
 
 <script>
@@ -96,6 +105,11 @@ export default {
   },
   data: function () {
     return {
+      currency: {
+        symbol: '$',
+        code: 'USD',
+        name: 'US Dollar',
+      },
       items: [],
       perPage: 10,
       currentPage: 1,
@@ -127,7 +141,7 @@ export default {
         .catch((error) => {
           this.$log.debug(error);
           //
-/**
+/*
           // fake date can use be test.
           this.items = [
             {
@@ -160,8 +174,8 @@ export default {
             }
           ];
 
-            this.tableLoading = false;
-            //**/
+            this.tableLoading = false;*/
+            //
           });
     },
 
@@ -271,7 +285,7 @@ export default {
         },
         {
           key: 'recommendedRetailPrice',
-          label: 'RRP',
+          label: `RRP (${this.currency.code})`,
           sortable: true
         },
         {
