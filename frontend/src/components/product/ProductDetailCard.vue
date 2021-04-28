@@ -19,14 +19,21 @@ Date: 19/4/2021
           <h6><b>Id:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" disabled v-model="productCard.id"/>
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.id"/>
         </b-input-group>
 
         <b-input-group>
           <h6><b>Name:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name"/>
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name" required/>
+        </b-input-group>
+
+        <b-input-group>
+          <h6><b>Manufacturer:</b></h6>
+        </b-input-group>
+        <b-input-group class="mb-1">
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.manufacturer"/>
         </b-input-group>
 
         <b-input-group>
@@ -51,6 +58,7 @@ Date: 19/4/2021
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
         </b-input-group>
+
       </div>
 
     </b-card-body>
@@ -68,6 +76,7 @@ export default {
         id: '',
         name: '',
         description: '',
+        manufacturer: '',
         recommendedRetailPrice: 0,
         created: '',
         image: '',

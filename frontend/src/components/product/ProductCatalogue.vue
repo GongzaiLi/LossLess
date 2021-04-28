@@ -44,7 +44,7 @@ Date: 15/4/2021
       </b-table>
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
-      <b-modal id="product-card" hide-header hide-footer centered>
+      <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
         <!--
         <template #modal-header>
           <small class="text-muted">Product Card</small>
@@ -58,7 +58,7 @@ Date: 15/4/2021
         -->
       </b-modal>
 
-      <b-modal id="edit-product-card" hide-header>
+      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProduct" @cancel="refreshProduct">
         <product-detail-card :product="productEdit" :disabled="false"/>
       </b-modal>
     </div>
@@ -119,7 +119,7 @@ export default {
   },
   mounted() {
     const businessId = this.$route.params.id;
-    this.getProducts(businessId);
+    this.getProducts(businessId);//this.getProducts(this.$route.params.id);
 
   },
   methods: {
@@ -140,7 +140,7 @@ export default {
         .catch((error) => {
           this.$log.debug(error);
           //
-/*
+/**
           // fake date can use be test.
           this.items = [
             {
@@ -179,6 +179,7 @@ export default {
     },
 
     /**
+     *
      * set the response data to items
      * @param data
      */
@@ -224,8 +225,23 @@ export default {
     editProduct: function (product) {
       this.productEdit = product;
       this.$bvModal.show('edit-product-card');
-    }
+    },
 
+    /**
+     * button function for ok when clicked calls an API
+     * place holder function for API task
+     */
+    modifyProduct: function () {
+      this.refreshProduct();
+    },
+
+    /**
+     * function when clicked refreshes the table so that it can be reloaded with
+     * new/edited data
+     */
+    refreshProduct: function () {
+      this.getProducts(this.$route.params.id);
+    }
   },
 
   computed: {
@@ -252,6 +268,11 @@ export default {
           formatter: (value) => {
             return this.setDescription(value);
           },
+          sortable: true
+        },
+        {
+          key: 'manufacturer',
+          label: 'Manufacturer',
           sortable: true
         },
         {
