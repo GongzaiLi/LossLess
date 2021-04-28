@@ -70,6 +70,56 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessAndMultipleBusinessExists_andNonAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business2", "Location2", "Non-profit organisation", "I am a business 2");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+
+        mockMvc.perform(get("/businesses/2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name", is("Business2")))
+                .andExpect(jsonPath("description", is("I am a business 2")))
+                .andExpect(jsonPath("administrators").doesNotExist())
+                .andExpect(jsonPath("primaryAdministratorId").doesNotExist());
+
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+    public void whenGetRequestToBusinessAndMultipleBusinessExists_andApplicationAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business2", "Location2", "Non-profit organisation", "I am a business 2");
+
+        mockMvc.perform(get("/businesses/2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name", is("Business2")))
+                .andExpect(jsonPath("description", is("I am a business 2")))
+                .andExpect(jsonPath("administrators").exists())
+                .andExpect(jsonPath("primaryAdministratorId",is(2)));
+
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenGetRequestToBusinessAndMultipleBusinessExists_andBusinessAdminUserLoggedIn_thenCorrectBusiness() throws Exception {
+        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business2", "Location2", "Non-profit organisation", "I am a business 2");
+
+        mockMvc.perform(get("/businesses/2")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name", is("Business2")))
+                .andExpect(jsonPath("description", is("I am a business 2")))
+                .andExpect(jsonPath("administrators").exists())
+                .andExpect(jsonPath("primaryAdministratorId", is(2)));
+
+
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusiness_andInvalidBusiness_dueToIllegalBusinessType_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Oil Company\", \"description\": \"We sell peanuts\"}";
 
@@ -88,6 +138,22 @@ public class BusinessControllerIntegrationTest {
                     .content(business)
                     .contentType(APPLICATION_JSON))
                     .andExpect(status().isCreated());
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Request", e);
+        }
+    }
+
+    private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
+        String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": \"%s\", \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
+
+        try {
+            mockMvc.perform(
+                    MockMvcRequestBuilders.post("/users")
+                            .content(user)
+                            .contentType(APPLICATION_JSON))
+                    .andExpect(status().isCreated())
+                    .andReturn();
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Request", e);

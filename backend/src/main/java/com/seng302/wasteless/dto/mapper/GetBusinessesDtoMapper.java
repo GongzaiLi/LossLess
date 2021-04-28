@@ -43,16 +43,16 @@ public class GetBusinessesDtoMapper {
         String currentPrincipalEmail = authentication.getName();
         User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
-        Integer currentUserId = loggedInUser.getId();
+
+        List<User> businessAdministrators = business.getAdministrators();
+
 
 
 
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
                 currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-                //|| currentUserId == user.getId()
-        ) {
+                || businessAdministrators.contains(loggedInUser)) {
 
-            List<User> businessAdministrators = business.getAdministrators();
 
             List<Administrator> formattedAdministrators = new ArrayList<>();
 
