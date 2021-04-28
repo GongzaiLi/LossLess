@@ -195,7 +195,9 @@ export default {
       this.$bvModal.show('product-card');
     },
 
-
+    /**
+     * route to the create product page
+     */
     goToCreateProduct: function () {
       this.$router.push({path: `/businesses/${this.$route.params.id}/products/createProduct`});
     }
