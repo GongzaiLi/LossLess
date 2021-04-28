@@ -61,7 +61,7 @@ Date: 15/4/2021
         -->
       </b-modal>
 
-      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProduct" @cancel="refreshProduct">
+      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="ModifyProduct" @cancel="refreshProduct">
         <product-detail-card :product="productEdit" :disabled="false"/>
       </b-modal>
     </div>
@@ -101,7 +101,8 @@ export default {
       currentPage: 1,
       productSelect: {},
       tableLoading: true,
-      productEdit: {}
+      productEdit: {},
+      oldProductId: 0,
     }
   },
   mounted() {
@@ -174,6 +175,14 @@ export default {
     setResponseData: function (data) {
       this.items = data;
     },
+
+    /**
+     * modify the ID so that it doesn't display the "{businessId}-" at the start
+     */
+    setId: function (id) {
+      return id.split(/-(.+)/)[1];
+    },
+
     /**
      * modify the description only keep 20 characters and then add ...
      * @param description
@@ -218,6 +227,8 @@ export default {
      */
     editProduct: function (product) {
       this.productEdit = product;
+      this.oldProductId = product.id;
+      this.productEdit.id = this.productEdit.id.split(/-(.+)/)[1]
       this.$bvModal.show('edit-product-card');
     },
 
@@ -225,8 +236,33 @@ export default {
      * button function for ok when clicked calls an API
      * place holder function for API task
      */
-    modifyProduct: function () {
-      this.refreshProduct();
+    ModifyProduct: function (event) {
+      event.preventDefault();
+
+      let editData = this.productEdit
+      delete editData["created"];
+      let productId = this.oldProductId
+      api
+          .modifyProduct(this.$route.params.id, productId, editData)
+          .then((editProductResponse) => {
+            this.$log.debug("Product has been edited",editProductResponse);
+            this.refreshProduct();
+            this.$bvModal.hide('edit-product-card');
+            return "success";
+          })
+          .catch((error) => {
+            this.errors = [];
+            this.$log.debug(error);
+            if ((error.response && error.response.status === 400)) {
+              this.errors.push("Creation failed. Please try again");
+            } else if ((error.response && error.response.status === 403)) {
+              this.errors.push("Forbidden. You are not an authorized administrator");
+            } else {
+              this.errors.push("Server error");
+            }
+            console.log(error.response);
+            return this.errors[0];
+          })
     },
 
     /**
@@ -249,6 +285,9 @@ export default {
         {
           key: 'id',
           label: 'ID',
+          formatter: (value) => {
+            return this.setId(value);
+          },
           sortable: true
         },
         {
