@@ -54,6 +54,7 @@ export default {
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
   setBusinessActingAs: (businessId) => businessActingAsId = businessId,
+  createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
 
   /**
    * Given the name of the user's country, gets currency data for that country.
@@ -77,5 +78,7 @@ export default {
           return currency;
         }
       })
+
   }
 }
+
