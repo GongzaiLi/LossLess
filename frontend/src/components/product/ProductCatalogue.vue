@@ -9,7 +9,10 @@ Date: 15/4/2021
     <h2>Product Catalogue</h2>
     <div>
       <b-form-group>
-        <createButton :businessId="$route.params.id" class="float-right"></createButton>
+        <b-button @click="goToCreateProduct" class="float-right">
+          <b-icon-plus-square-fill animation="fade"/>
+          Create
+        </b-button>
       </b-form-group>
       <b-table
         striped hovers
@@ -82,7 +85,6 @@ h2 {
 
 <script>
 import api from "../../Api";
-import Vue from 'vue';
 import productDetailCard from './ProductDetailCard';
 import pagination from '../Pagination';
 
@@ -91,21 +93,6 @@ export default {
   components: {
     productDetailCard,
     pagination
-  },
-  component: {
-    createButton: Vue.component('createButton', {
-      props: ['value'],
-      template: `
-        <b-button @click="goToCreateProduct">
-        <b-icon-plus-square-fill animation="fade"/>
-        Create
-        </b-button>`,
-      methods: {
-        goToCreateProduct: function () {
-          this.$router.push({path: `/businesses/${this.value}/products/createProduct`});
-        }
-      }
-    })
   },
   data: function () {
     return {
@@ -216,6 +203,13 @@ export default {
     tableRowClick(product) {
       this.productSelect = product;
       this.$bvModal.show('product-card');
+    },
+
+    /**
+     * route to the create product page
+     */
+    goToCreateProduct: function () {
+      this.$router.push({path: `/businesses/${this.$route.params.id}/products/createProduct`});
     },
 
     /**
