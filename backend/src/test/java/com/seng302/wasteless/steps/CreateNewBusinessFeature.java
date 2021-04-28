@@ -1,4 +1,4 @@
-package gradle.cucumber;
+package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.Main;
 import com.seng302.wasteless.MainApplicationRunner;
