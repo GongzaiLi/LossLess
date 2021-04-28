@@ -79,7 +79,7 @@ Date: 29/03/2021
         </b-list-group-item>
       </b-list-group>
 
-      <b-list-group border-variant="secondary" ref="businessAdministratorsTable">
+      <b-list-group border-variant="secondary" >
         <b-list-group-item>
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
@@ -96,7 +96,8 @@ Date: 29/03/2021
                        show-empty
                        @row-clicked="rowClickHandler"
                        :fields="fields"
-                       :items="businessData.administrators">
+                       :items="businessData.administrators"
+                       ref="businessAdministratorsTable">
                 <template #empty>
                   <h3 class="no-results-overlay" >No results to display</h3>
                 </template>
