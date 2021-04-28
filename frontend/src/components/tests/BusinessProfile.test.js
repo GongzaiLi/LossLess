@@ -187,5 +187,6 @@ test('business-found-in-html', async () => {
   expect(wrapper.html()).toContain(response.data.phoneNumber);
   expect(wrapper.html()).toContain(response.data.businessType);
   expect(wrapper.html()).toContain(response.data.description);
-  expect(wrapper.html()).toContain(response.data.administrators[0])
+
+  expect(wrapper.html()).toContain( "items=\"[object Object]\"")
 });

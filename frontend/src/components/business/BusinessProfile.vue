@@ -79,7 +79,7 @@ Date: 29/03/2021
         </b-list-group-item>
       </b-list-group>
 
-      <b-list-group border-variant="secondary">
+      <b-list-group border-variant="secondary" ref="businessAdministratorsTable">
         <b-list-group-item>
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
