@@ -18,7 +18,7 @@ Date: 13/4/2021
       >
         <b-form-group
         >
-          <b>ID</b>
+          <b>ID *</b>
           -This will be changed automatically into the correct format for you.
           <b-form-input v-model="id" required placeholder="PRODUCT-ID" autofocus></b-form-input>
 
