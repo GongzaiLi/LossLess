@@ -24,6 +24,13 @@ Date: 15/4/2021
         :current-page="currentPage"
         :busy="tableLoading"
       > <!--stacked="sm" table-class="text-nowrap"-->
+
+        <template v-slot:cell(actions)="products">
+          <b-button id="edit-button" @click="editProduct(products.item)" size="sm">
+            Edit
+          </b-button>
+        </template>
+
         <template #empty>
           <div class="no-results-overlay">
             <h4>No Product to display</h4>
@@ -37,13 +44,13 @@ Date: 15/4/2021
       </b-table>
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
-      <b-modal id="product-card" hide-header centered>
+      <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
         <!--
         <template #modal-header>
           <small class="text-muted">Product Card</small>
         </template>
         -->
-        <product-detail-card :product="productSelect"/>
+        <product-detail-card :product="productSelect" :disabled="true"/>
         <!--
         <template #modal-footer>
           <small class="text-muted">Product Card</small>
@@ -51,6 +58,9 @@ Date: 15/4/2021
         -->
       </b-modal>
 
+      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProduct" @cancel="refreshProduct">
+        <product-detail-card :product="productEdit" :disabled="false"/>
+      </b-modal>
     </div>
   </div>
 
@@ -104,11 +114,12 @@ export default {
       currentPage: 1,
       productSelect: {},
       tableLoading: true,
+      productEdit: {}
     }
   },
   mounted() {
     const businessId = this.$route.params.id;
-    this.getProducts(businessId);
+    this.getProducts(businessId);//this.getProducts(this.$route.params.id);
 
   },
   methods: {
@@ -129,9 +140,8 @@ export default {
         .catch((error) => {
           this.$log.debug(error);
           //
-
+/**
           // fake date can use be test.
-/*
           this.items = [
             {
               id: "WATT-420-BEANS1",
@@ -162,13 +172,14 @@ export default {
               image: 'https://static.countdown.co.nz/assets/product-images/zoom/9415142003740.jpg',
             }
           ];
-*/
-          this.tableLoading = false;
-          //
-        });
+
+            this.tableLoading = false;
+            //**/
+          });
     },
 
     /**
+     *
      * set the response data to items
      * @param data
      */
@@ -176,7 +187,6 @@ export default {
     setResponseData: function (data) {
       this.items = data;
     },
-
     /**
      * modify the description only keep 20 characters and then add ...
      * @param description
@@ -195,8 +205,8 @@ export default {
     setCreated: function (created) {
       const date = new Date(created);
       return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-        `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-        `${date.getUTCFullYear()}`;
+          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+          `${date.getUTCFullYear()}`;
     },
 
     /**
@@ -206,8 +216,32 @@ export default {
     tableRowClick(product) {
       this.productSelect = product;
       this.$bvModal.show('product-card');
-    }
+    },
 
+    /**
+     * button function when clicked shows edit card
+     * @param product edit product
+     */
+    editProduct: function (product) {
+      this.productEdit = product;
+      this.$bvModal.show('edit-product-card');
+    },
+
+    /**
+     * button function for ok when clicked calls an API
+     * place holder function for API task
+     */
+    modifyProduct: function () {
+      this.refreshProduct();
+    },
+
+    /**
+     * function when clicked refreshes the table so that it can be reloaded with
+     * new/edited data
+     */
+    refreshProduct: function () {
+      this.getProducts(this.$route.params.id);
+    }
   },
 
   computed: {
@@ -237,6 +271,11 @@ export default {
           sortable: true
         },
         {
+          key: 'manufacturer',
+          label: 'Manufacturer',
+          sortable: true
+        },
+        {
           key: 'recommendedRetailPrice',
           label: 'RRP',
           sortable: true
@@ -248,6 +287,10 @@ export default {
             return this.setCreated(value);
           },
           sortable: true
+        },
+        {
+          key: 'actions',
+          label: 'Action'
         }];
     },
 
