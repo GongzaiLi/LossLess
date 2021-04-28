@@ -17,9 +17,6 @@ const $log = {
   }
 };
 
-
-
-
 jest.mock('../../Api');
 
 beforeEach(() => {
@@ -29,8 +26,6 @@ beforeEach(() => {
   localVue.use(BootstrapVueIcons);
 
   Api.getBusiness.mockRejectedValue(new Error(''));
-
-
 
   wrapper = shallowMount(businessProfile, {
     localVue,
