@@ -257,10 +257,6 @@ export default {
           //label: 'F name',
           sortable: true
         },
-        {
-          key: 'email',
-          sortable: true
-        },
       ];
     }
   }
