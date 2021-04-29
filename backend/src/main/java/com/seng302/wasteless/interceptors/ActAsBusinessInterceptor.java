@@ -31,6 +31,9 @@ public class ActAsBusinessInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) { // Not our problem if they're not signed in
+            return true;
+        }
         String currentPrincipalEmail = authentication.getName();
 
         User user = userService.findUserByEmail(currentPrincipalEmail);
@@ -38,8 +41,7 @@ public class ActAsBusinessInterceptor implements HandlerInterceptor {
         String businessActingAsString = request.getHeader("X-Business-Acting-As");
 
         boolean isActingAsValidBusiness;
-
-        if (user == null || businessActingAsString == null || businessActingAsString.equals("null")) { // Not our problem if they're not signed in, or not acting as anyone
+        if (user == null || businessActingAsString == null) { // Not our problem if they're not signed in, or not acting as anyone
             isActingAsValidBusiness = true;
         } else {
             try {

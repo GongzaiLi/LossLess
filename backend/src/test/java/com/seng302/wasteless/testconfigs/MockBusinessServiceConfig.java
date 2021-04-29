@@ -5,7 +5,9 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,11 @@ public class MockBusinessServiceConfig {
 
         @Override
         public List<Business> findBusinessesByUserId(Integer id) {return businesses; }
+    }
+
+    @Bean
+    public BusinessService businessService() {
+        return new MockBusinessService();
     }
 
 }
