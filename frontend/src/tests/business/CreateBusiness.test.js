@@ -1,6 +1,6 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue} from 'bootstrap-vue';
-import CreateBusiness from '../../business/CreateBusiness';
+import CreateBusiness from '../../components/business/CreateBusiness';
 import VueRouter from 'vue-router';
 
 

@@ -1,6 +1,6 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue} from 'bootstrap-vue';
-import CreateProduct from '../CreateProduct';
+import CreateProduct from '../../components/product/CreateProduct';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
 

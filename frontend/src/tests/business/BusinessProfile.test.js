@@ -1,6 +1,6 @@
 import {shallowMount, createLocalVue} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import businessProfile from '../business/BusinessProfile';
+import businessProfile from '../../components/business/BusinessProfile';
 import Api from "../../Api";
 
 let wrapper;

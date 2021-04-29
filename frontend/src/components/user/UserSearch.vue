@@ -48,8 +48,8 @@ Date: 7/3/2021
 </style>
 
 <script>
-import api from "../Api";
-import pagination from "./Pagination";
+import api from "../../Api";
+import pagination from "../model/Pagination";
 
 export default {
   components: {
