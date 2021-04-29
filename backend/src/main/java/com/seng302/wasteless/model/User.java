@@ -84,8 +84,6 @@ public class User {
     @Column(name = "role")
     private UserRoles role;
 
-    //Omitted fields. business administered: added in u6
-
     /**
      * Check this objects date is within the expected maximum and minimum date ranges
      */

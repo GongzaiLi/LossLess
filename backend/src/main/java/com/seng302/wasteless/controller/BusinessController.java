@@ -2,13 +2,12 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.PutBusinessesMakeAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
-import com.seng302.wasteless.model.Product;
-import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.MainApplicationRunner;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
@@ -83,11 +82,12 @@ public class BusinessController {
         business.setAdministrators(adminList);
         userService.addBusinessPrimarilyAdministered(user, business);
 
-
         business.setCreated(LocalDate.now());
 
         //Save business
         business = businessService.createBusiness(business);
+
+        userService.saveUserChanges(user);
 
         logger.info("saved new business {}", business);
 
@@ -259,6 +259,53 @@ public class BusinessController {
         productService.updateProduct(oldProduct, newProduct);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
+    /**
+     *
+     */
+    @PutMapping("/businesses/{id}/makeAdministrator")
+    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesMakeAdminDto requestBody) {
+
+        Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
+        logger.info("possible Business {}", possibleBusinessToAddAdminFor);
+
+        if (possibleBusinessToAddAdminFor == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+
+        User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
+        logger.info("possible User {}", possibleUserToMakeAdmin);
+
+        if (possibleUserToMakeAdmin == null) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("User does not exist");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
+
+        //Check can make request (GAA or business primary)
+
+        if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
+            && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+            && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+
+        if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User already admin of business");
+        }
+
+        //Set user to be admin of business
+        businessService.addAdministratorToBusiness(possibleBusinessToAddAdminFor, possibleUserToMakeAdmin);
+        businessService.saveBusinessChanges(possibleBusinessToAddAdminFor);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 
     /**
