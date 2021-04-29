@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.PutBusinessesMakeAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
+import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.BusinessService;
@@ -35,12 +38,14 @@ import java.util.Map;
 public class BusinessController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
-    private BusinessService businessService;
-    private ProductService productService;
-    private UserService userService;
+    private final BusinessService businessService;
+    private final UserService userService;
+    private final AddressService addressService;
+    private final ProductService productService;
 
     @Autowired
-    public BusinessController(BusinessService businessService, UserService userService, ProductService productService) {
+    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService, ProductService productService) {
+        this.addressService = addressService;
         this.businessService = businessService;
         this.userService = userService;
         this.productService = productService;
@@ -80,12 +85,14 @@ public class BusinessController {
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
         business.setAdministrators(adminList);
-        userService.addBusinessPrimarilyAdministered(user, business);
 
         business.setCreated(LocalDate.now());
 
         //Save business
+        addressService.createAddress(business.getAddress());
         business = businessService.createBusiness(business);
+
+        userService.addBusinessPrimarilyAdministered(user, business);
 
         userService.saveUserChanges(user);
 
