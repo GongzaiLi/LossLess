@@ -1,5 +1,5 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
-import {BootstrapVue} from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import CreateProduct from '../../components/product/CreateProduct';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
@@ -12,16 +12,13 @@ const $log = {
 
 
 
-const localVue = createLocalVue();
-localVue.use(BootstrapVue);
-localVue.use(VueRouter);
+
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
-
 let wrapper;
 
-const router = new VueRouter();
+
 
 const id = "WATT-420-BEANS"
 let name = "Beans"
@@ -32,11 +29,23 @@ const recommendedRetailPrice = "1.00";
 
 
 beforeEach(() => {
+  const localVue = createLocalVue();
+  const router = new VueRouter();
+
+  localVue.use(BootstrapVue);
+  localVue.use(BootstrapVueIcons);
+  localVue.use(VueRouter);
+
   wrapper = mount(CreateProduct, {
     localVue,
     router,
-    mocks: {$log}
+    propsData: {},
+    mocks: {$log},
+    stubs: {},
+    methods: {},
   });
+
+  wrapper.vm.businessId = 0;
 });
 
 afterEach(() => {

@@ -15,6 +15,7 @@ const $log = {
 //   id: 1
 // }
 
+config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 // fake the localStorage to doing the testing.
 const mockUserAuthPlugin = function install(Vue) {

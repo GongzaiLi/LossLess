@@ -124,9 +124,7 @@ Date: 29/03/2021
             invalid URL into the address bar.
           </b-col>
           <b-col> Try again
-            <!--
           <router-link to="/businesses">Create a new business here.</router-link>
-          -->
           </b-col>
         </h6>
       </b-card-body>

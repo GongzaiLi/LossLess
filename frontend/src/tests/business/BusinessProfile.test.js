@@ -1,39 +1,49 @@
-import {shallowMount, createLocalVue} from '@vue/test-utils';
+import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import businessProfile from '../../components/business/BusinessProfile';
 import Api from "../../Api";
+import VueRouter from 'vue-router';
 
+
+
+jest.mock('../../Api');
 let wrapper;
 
-
-const $route = {
-  params: {
-    id: 0
-  }
-};
 
 const $log = {
   debug() {
   }
 };
 
-jest.mock('../../Api');
+config.showDeprecationWarnings = false;  //to disable deprecation warnings
+
+
 
 beforeEach(() => {
-  const localVue = createLocalVue()
+  const localVue = createLocalVue();
+  const router = new VueRouter();
 
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
+  localVue.use(VueRouter);
 
   Api.getBusiness.mockRejectedValue(new Error(''));
 
+
   wrapper = shallowMount(businessProfile, {
     localVue,
+    router,
     propsData: {},
-    mocks: {$route, $log},
+    mocks: {$log},
     stubs: {'another-component': true},
     methods: {},
   });
+
+  wrapper.route = {
+    params: {
+      id: 0
+    }
+  }
 
 });
 

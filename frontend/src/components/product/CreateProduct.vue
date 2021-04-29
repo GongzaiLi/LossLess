@@ -48,8 +48,8 @@ Date: 13/4/2021
         </b-form-group>
 
         <b-button variant="primary" type="submit" style="margin-right:1em" id="register-btn">Create</b-button>
-        <router-link :to="'/businesses/'+this.businessId+'/products'" tag="button">
-          <b-button variant="danger" id="cancel-btn">Cancel</b-button>
+        <router-link :to="'/businesses/'+this.businessId+'/products'" custom v-slot="{ navigate }">
+          <b-button variant="danger" id="cancel-btn" @click="navigate">Cancel</b-button>
         </router-link>
 
       </b-form>
@@ -86,7 +86,7 @@ export default {
       "name": "",
       "description": "",
       "manufacturer": "",
-      "recommendedRetailPrice": "",
+      "recommendedRetailPrice": "0.00",
       errors: [],
       businessId: null,
     }
@@ -134,7 +134,7 @@ export default {
             } else {
               this.errors.push("Server error");
             }
-            console.log(error.response);
+
             return this.errors[0];
           })
 
