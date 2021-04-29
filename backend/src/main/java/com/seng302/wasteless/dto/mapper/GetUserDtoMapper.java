@@ -47,7 +47,7 @@ public class GetUserDtoMapper {
                         .setPrimaryAdministratorId(business.getPrimaryAdministrator().getId())
                         .setName(business.getName())
                         .setDescription(business.getDescription())
-                        //.setAddress(business.getAddress())
+                        .setAddress(business.getAddress())
                         .setBusinessType(business.getBusinessType())
                         .setCreated(business.getCreated().toString())
             );
@@ -63,7 +63,7 @@ public class GetUserDtoMapper {
                 .setEmail(user.getEmail())
                 .setDateOfBirth(user.getDateOfBirth().toString())
                 .setPhoneNumber(user.getPhoneNumber())
-                //.setHomeAddress(user.getHomeAddress())
+                .setHomeAddress(user.getHomeAddress())
                 .setCreated(user.getCreated().toString())
                 .setRole(user.getRole())
                 .setBusinessesAdministered(businessesAdministered);
