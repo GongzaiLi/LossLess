@@ -262,7 +262,26 @@ public class BusinessController {
 
 
     /**
+     * Put request to make a user a administrator of a business
      *
+     * Checks if the business exists, and user to make admin exists
+     * Checks if the user making the request has permission to, either as the primary business admin
+     * for that business, or as a global application admin
+     *
+     * Gets the user currently logged in from Authentication, this is the person acting
+     *
+     * If the above passes adds the user to the businesses list of administrators
+     *
+     * Returns 200 on success
+     * Returns 400 if user does not exist, or if user is already admin
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 403 if forbidden request, i.e. the request is not allowed to make the request
+     * Returns 406 if business does not exist
+     *
+     *
+     * @param businessId    The id the business to add an administrator for
+     * @param requestBody   The request body containing the userId of the user to make admin
+     * @return  Response code with message, see above for codes
      */
     @PutMapping("/businesses/{id}/makeAdministrator")
     public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesMakeAdminDto requestBody) {
@@ -279,13 +298,19 @@ public class BusinessController {
         logger.info("possible User {}", possibleUserToMakeAdmin);
 
         if (possibleUserToMakeAdmin == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("User does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
         }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalEmail = authentication.getName();
 
         User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
+
+        System.out.println(userMakingRequest.getId());
+
+        System.out.println(possibleBusinessToAddAdminFor.getPrimaryAdministrator());
+
+        System.out.println(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId());
 
         //Check can make request (GAA or business primary)
 
@@ -296,7 +321,7 @@ public class BusinessController {
         }
 
         if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User already admin of business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
         }
 
         //Set user to be admin of business

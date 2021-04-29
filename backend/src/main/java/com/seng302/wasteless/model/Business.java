@@ -27,7 +27,7 @@ public class Business {
     private User primaryAdministrator;
 
     @Column(name = "administrators")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
     private List<User> administrators;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})

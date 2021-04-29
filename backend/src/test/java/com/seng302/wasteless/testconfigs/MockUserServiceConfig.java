@@ -41,19 +41,25 @@ public class MockUserServiceConfig {
             defaultAdmin.setEmail("defaultadmin@700");
             defaultAdmin.setPassword("password");
 
-            User admin = new User();
-            admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-            admin.setEmail("admin@700");
-            admin.setPassword("password");
-
             User user = new User();
             user.setRole(UserRoles.USER);
             user.setEmail("user@700");
             user.setPassword("password");
 
+            User admin = new User();
+            admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+            admin.setEmail("admin@700");
+            admin.setPassword("password");
+
+            User user2 = new User();
+            user2.setRole(UserRoles.USER);
+            user2.setEmail("user2@700");
+            user2.setPassword("password");
+
             createUser(defaultAdmin);
             createUser(admin);
             createUser(user);
+            createUser(user2);
         }
 
         @Override
@@ -96,6 +102,19 @@ public class MockUserServiceConfig {
         @Override
         public void updateUser(User user) {
             users.set(user.getId(), user);
+        }
+
+        @Override
+        public void saveUserChanges(User user) {
+            users.set(user.getId(), user);
+        }
+
+        @Override
+        public boolean checkUserAdminsBusiness(Integer businessId, Integer userId) {
+            if (userId.equals(1)) {
+                return true;
+            }
+            return false;
         }
     }
 
