@@ -2,6 +2,7 @@ package com.seng302.wasteless;
 
 
 import com.seng302.wasteless.controller.BusinessController;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
@@ -29,10 +30,20 @@ public class BusinessControllerUnitTest {
     @MockBean
     private BusinessService businessService;
 
+    @MockBean
+    private AddressService addressService;
+
     @Test
     @WithUserDetails("user@700")
     public void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
+        String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"}," +
+                "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
                 .content(business)
@@ -43,7 +54,14 @@ public class BusinessControllerUnitTest {
     @Test
     @WithUserDetails("user@700")
     public void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingName_then400Response() throws Exception {
-        String business = "{\"address\" : \"Peanut Lane\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
+        String business = "{\"address\" : {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
                 .content(business)
@@ -65,7 +83,14 @@ public class BusinessControllerUnitTest {
     @Test
     @WithUserDetails("user@700")
     public void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingBusinessType_then400Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"description\": \"We sell peanuts\"}";
+        String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
                 .content(business)
@@ -76,7 +101,14 @@ public class BusinessControllerUnitTest {
     @Test
     @WithUserDetails("user@700")
     public void whenPostRequestToBusiness_andValidBusiness_withMissingDescription_then201Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Accommodation and Food Services\"}";
+        String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"businessType\": \"Accommodation and Food Services\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
                 .content(business)

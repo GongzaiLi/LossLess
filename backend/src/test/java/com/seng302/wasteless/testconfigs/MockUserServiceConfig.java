@@ -3,6 +3,7 @@ package com.seng302.wasteless.testconfigs;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 @TestConfiguration
 public class MockUserServiceConfig {
 
+
     /**
      * Mock UserService class for testing purposes.
      * The mock UserService is implemented as a simple Array of users,
@@ -33,6 +35,7 @@ public class MockUserServiceConfig {
      */
     public static class MockUserService extends UserService {
         ArrayList<User> users = new ArrayList<>();
+
 
         public MockUserService () {
             super(null);
@@ -103,4 +106,5 @@ public class MockUserServiceConfig {
     public UserService userService() {
         return new MockUserService();
     }
+
 }

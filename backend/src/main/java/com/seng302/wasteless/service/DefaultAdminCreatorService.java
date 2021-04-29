@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.UserService;
@@ -40,6 +41,7 @@ public class DefaultAdminCreatorService {
     private String defaultPassword;
     private Integer defaultTimeout;
 
+    private AddressService addressService;
     private UserService userService;
 
     /**
@@ -50,7 +52,7 @@ public class DefaultAdminCreatorService {
      * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
      */
     @Autowired
-    public DefaultAdminCreatorService(UserService userService) throws IOException, InvalidParameterException {
+    public DefaultAdminCreatorService(UserService userService, AddressService addressService) throws IOException, InvalidParameterException {
 
 
         InputStream configFileStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE_PATH);
@@ -60,6 +62,7 @@ public class DefaultAdminCreatorService {
         this.readConfigFile(configFileStream);
         configFileStream.close();
         this.userService = userService;
+        this.addressService = addressService;
 
         scheduleCheckDefaultAdmin();
     }
@@ -102,7 +105,17 @@ public class DefaultAdminCreatorService {
         User defaultAdmin = new User();
         defaultAdmin.setEmail(defaultEmail);
         defaultAdmin.setPassword(new BCryptPasswordEncoder().encode(defaultPassword));
-        //defaultAdmin.setHomeAddress("10 Downing Street");
+
+        Address address = new Address();
+        address.setCountry("UK");
+        address.setCity("London");
+        address.setStreetNumber("10");
+        address.setStreetName("Downing St");
+        address.setPostcode("SW1A2AA");
+
+        addressService.createAddress(address);
+
+        defaultAdmin.setHomeAddress(address);
         defaultAdmin.setDateOfBirth(LocalDate.EPOCH);
         defaultAdmin.setFirstName("Default");
         defaultAdmin.setLastName("Admin");

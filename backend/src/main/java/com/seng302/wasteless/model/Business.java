@@ -41,6 +41,7 @@ public class Business {
     private String description;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @NotNull
     @OneToOne
     @JoinColumn(name = "address") // map camelcase name (java) to snake case (SQL)
     private Address address;

@@ -2,6 +2,8 @@ package com.seng302.wasteless;
 
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
 public class BusinessControllerIntegrationTest {
 
+    private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
+
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndBusinessExists_thenCorrectBusiness() throws Exception {
-        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
 
         mockMvc.perform(get("/businesses/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -48,7 +59,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndBusinessNotExists_then406Response() throws Exception {
-        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
 
         mockMvc.perform(get("/businesses/2")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -58,8 +76,22 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndMultipleBusinessExists_thenCorrectBusiness() throws Exception {
-        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
-        createOneBusiness("Business2", "Location2", "Non-profit organisation", "I am a business 2");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business2", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business 2");
 
         mockMvc.perform(get("/businesses/2")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -71,7 +103,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusiness_andInvalidBusiness_dueToIllegalBusinessType_then400Response() throws Exception {
-        String business = "{\"name\": \"James's Peanut Store\", \"address\" : \"Peanut Lane\", \"businessType\": \"Oil Company\", \"description\": \"We sell peanuts\"}";
+        String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"businessType\": \"Oil Company\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
                 .content(business)
@@ -80,8 +119,7 @@ public class BusinessControllerIntegrationTest {
     }
 
     private void createOneBusiness(String name, String address, String businessType, String description) {
-
-        String business = String.format("{\"name\": \"%s\", \"address\" : \"%s\", \"businessType\": \"%s\", \"description\": \"%s\"}", name, address, businessType, description);
+        String business = String.format("{\"name\": \"%s\", \"address\" : %s, \"businessType\": \"%s\", \"description\": \"%s\"}", name, address, businessType, description);
 
         try {
             mockMvc.perform(MockMvcRequestBuilders.post("/businesses")

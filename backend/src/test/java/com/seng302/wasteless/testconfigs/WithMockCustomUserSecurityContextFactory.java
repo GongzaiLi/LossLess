@@ -1,7 +1,9 @@
 package com.seng302.wasteless.testconfigs;
 
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +22,9 @@ public class WithMockCustomUserSecurityContextFactory
     @Autowired
     UserService userService;
 
+    @Autowired
+    AddressService addressService;
+
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -32,7 +37,16 @@ public class WithMockCustomUserSecurityContextFactory
         user.setBio("Bio");
         user.setFirstName("FirstName");
         user.setLastName("LastName");
-        user.setHomeAddress("HomeAddress");
+
+        Address address = new Address();
+        address.setCountry("NZ");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+
+        addressService.createAddress(address);
+        user.setHomeAddress(address);
         user.setCreated(LocalDate.now());
 
         userService.createUser(user);
