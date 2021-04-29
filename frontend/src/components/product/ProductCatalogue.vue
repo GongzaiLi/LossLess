@@ -128,41 +128,6 @@ export default {
         .catch((error) => {
           this.$log.debug(error);
           //
-/**
-          // fake date can use be test.
-          this.items = [
-            {
-              id: "WATT-420-BEANS1",
-              name: "Watties Baked Beans - 430g can",
-              description: "Aaked Beans as they should be.",
-              recommendedRetailPrice: 2.2,
-              created: "2021-03-14T13:01:58.660Z",
-              image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
-            },
-            {
-              id: "WATT-420-BEANS2",
-              name: "Apple",
-              description: "Baked Beans as they should be.Baked Beans as they should " +
-                "be.Baked Beans as they should be.Baked Beans as they should be." +
-                "Baked Beans as they should be.Baked Beans as they should be.",
-              recommendedRetailPrice: 2.4,
-              created: "1077-04-14T13:01:58.660Z",
-              image: 'https://i2.wp.com/ceklog.kindel.com/wp-content/uploads/2013/02/firefox_2018-07-10_07-50-11.png?w=641&ssl=1',
-            },
-            {
-              id: "WATT-420-BEANS3",
-              name: "Tip Top Super Soft Toast Bread White Superthick",
-              description: "Made in New Zealand with imported & local ingredients.\n" +
-                "\n" +
-                "Tip top supersoft white super thick is a kiwi classic. Delicious and soft white bread perfect for any occasion.",
-              recommendedRetailPrice: 2.7,
-              created: "2077-05-14T13:01:58.660Z",
-              image: 'https://static.countdown.co.nz/assets/product-images/zoom/9415142003740.jpg',
-            }
-          ];
-
-            this.tableLoading = false;
-            //**/
           });
     },
 
