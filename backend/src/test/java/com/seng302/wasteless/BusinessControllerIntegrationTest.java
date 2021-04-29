@@ -720,11 +720,25 @@ public class BusinessControllerIntegrationTest {
         user.setPassword("Steve");
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
-        user.setHomeAddress("Location");
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
 
         userService.createUser(user);
 
-        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         String request = "{\"userId\": \"1\"}";
 
@@ -745,11 +759,25 @@ public class BusinessControllerIntegrationTest {
         user.setPassword("Steve");
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
-        user.setHomeAddress("Location");
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
 
         userService.createUser(user);
 
-        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         String request = "{\"userId\": \"1\"}";
 
@@ -777,11 +805,25 @@ public class BusinessControllerIntegrationTest {
         user.setPassword("Steve");
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
-        user.setHomeAddress("Location");
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
 
         userService.createUser(user);
 
-        createOneBusiness("Business", "Location", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         String request = "{\"userId\": \"2\"}";
 

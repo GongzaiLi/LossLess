@@ -37,7 +37,7 @@ public class MockBusinessServiceConfig {
 
             Business business = new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
-            business.setPrimaryAdministrator(businessUser);
+            business.setPrimaryAdministrator(user);
 
             Address address = new Address();
             address.setCountry("NZ");
