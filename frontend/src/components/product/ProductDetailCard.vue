@@ -86,6 +86,6 @@ export default {
   mounted() {
     this.productCard = this.product;
     this.productCard.created = new Date(this.productCard.created).toUTCString();
-  }
+  },
 }
 </script>

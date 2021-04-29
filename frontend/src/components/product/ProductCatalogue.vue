@@ -48,17 +48,7 @@ Date: 15/4/2021
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
-        <!--
-        <template #modal-header>
-          <small class="text-muted">Product Card</small>
-        </template>
-        -->
         <product-detail-card :product="productSelect" :disabled="true"/>
-        <!--
-        <template #modal-footer>
-          <small class="text-muted">Product Card</small>
-        </template>
-        -->
       </b-modal>
 
       <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="ModifyProduct" @cancel="refreshProduct">
@@ -143,6 +133,7 @@ export default {
 
     /**
      * modify the ID so that it doesn't display the "{businessId}-" at the start
+     * @return string
      */
     setId: function (id) {
       return id.split(/-(.+)/)[1];
@@ -175,7 +166,8 @@ export default {
      * @param product object
      */
     tableRowClick(product) {
-      this.productSelect = product;
+      this.productSelect = Object.assign({}, product);
+      this.productSelect.id = this.productSelect.id.split(/-(.+)/)[1];
       this.$bvModal.show('product-card');
     },
 
@@ -191,9 +183,9 @@ export default {
      * @param product edit product
      */
     editProduct: function (product) {
-      this.productEdit = product;
+      this.productEdit = Object.assign({}, product);
       this.oldProductId = product.id;
-      this.productEdit.id = this.productEdit.id.split(/-(.+)/)[1]
+      this.productEdit.id = this.productEdit.id.split(/-(.+)/)[1];
       this.$bvModal.show('edit-product-card');
     },
 
@@ -206,9 +198,8 @@ export default {
 
       let editData = this.productEdit
       delete editData["created"];
-      let productId = this.oldProductId
       api
-          .modifyProduct(this.$route.params.id, productId, editData)
+          .modifyProduct(this.$route.params.id, this.oldProductId, editData)
           .then((editProductResponse) => {
             this.$log.debug("Product has been edited",editProductResponse);
             this.refreshProduct();
