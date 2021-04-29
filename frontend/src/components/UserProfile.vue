@@ -200,10 +200,7 @@ export default {
           this.userFound = false;
         })
     },
-    //return user to login screen
-    logOut: function () {
-      this.$router.push({path: '/login'})
-    },
+
     /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.

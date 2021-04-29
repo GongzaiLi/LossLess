@@ -42,6 +42,9 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    cucumberRuntime {
+        extendsFrom testImplementation
+    }
 }
 
 repositories {
@@ -77,6 +80,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
     testCompileOnly 'org.projectlombok:lombok:1.18.16'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.16'
+
+    // Cucumber dependencies
+    testImplementation 'io.cucumber:cucumber-java:6.9.1'
 }
 
 // create a specific task to run cucumber tests
@@ -85,6 +91,18 @@ task cucumber(type: Test) {
     testLogging.showStandardStreams = true
     useJUnit()
 }
+/*
+// specify a dedicated task for Cucumber
+task cucumber() {
+    dependsOn assemble, testClasses
+    doLast {
+        javaexec {
+            main = "io.cucumber.core.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
+        }
+    }
+}*/
 
 // configure test task to run on JUnit 5
 test {

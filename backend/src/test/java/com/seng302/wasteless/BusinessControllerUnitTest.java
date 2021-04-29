@@ -4,6 +4,7 @@ package com.seng302.wasteless;
 import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,9 @@ public class BusinessControllerUnitTest {
 
     @MockBean
     private AddressService addressService;
+
+    @MockBean
+    private ProductService productService;
 
     @Test
     @WithUserDetails("user@700")

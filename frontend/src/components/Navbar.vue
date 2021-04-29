@@ -13,6 +13,7 @@ Date: sprint_1
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
+        <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item to="/businesses">Create Business</b-nav-item>
