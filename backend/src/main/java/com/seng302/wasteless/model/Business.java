@@ -61,4 +61,6 @@ public class Business {
     public void addAdministrator(User user) {
         this.administrators.add(user);
     }
+
+    public void removeAdministrator(User user) {this.administrators.remove(user);}
 }
