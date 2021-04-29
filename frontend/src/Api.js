@@ -35,13 +35,17 @@ import {getCurrentlyActingAs} from './auth'
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const businessActingAs = getCurrentlyActingAs();
-let businessActingAsId = businessActingAs ? businessActingAs.id : null;
+const businessActingAsId = businessActingAs ? businessActingAs.id : null;
 
-const instance = axios.create({
+let axiosConfig = {
   baseURL: SERVER_URL,
   timeout: 1000,
-  headers: {'X-Business-Acting-As': businessActingAsId}
-});
+}
+if (businessActingAsId) {
+  axiosConfig.headers = {'X-Business-Acting-As': businessActingAsId};
+}
+
+const instance = axios.create(axiosConfig);
 
 export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
@@ -53,7 +57,8 @@ export default {
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
-  setBusinessActingAs: (businessId) => businessActingAsId = businessId,
+  setBusinessActingAs: (businessId) => instance.defaults.headers['X-Business-Acting-As'] = businessId,
+  actAsUser: () => delete instance.defaults.headers['X-Business-Acting-As'],
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
 
   /**

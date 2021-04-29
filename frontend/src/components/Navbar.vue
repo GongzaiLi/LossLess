@@ -110,6 +110,7 @@ export default {
      * Currently does nothing with managing cookies, this needs to be implemented later.
      */
     logOut() {
+      Api.actAsUser(); // Don't want to be stuck acting as a business when you're logged out
       this.$currentUser = null;
       this.$router.push('/login');
     },
@@ -144,7 +145,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
-      Api.setBusinessActingAs(null);
+      Api.actAsUser();
     }
   },
 }
