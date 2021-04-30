@@ -51,7 +51,7 @@ Date: 15/4/2021
         <product-detail-card :product="productSelect" :disabled="true"/>
       </b-modal>
 
-      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="ModifyProduct" @cancel="refreshProduct">
+      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProductAPI" @cancel="refreshProduct">
         <product-detail-card :product="productEdit" :disabled="false"/>
       </b-modal>
     </div>
@@ -86,6 +86,7 @@ export default {
   },
   data: function () {
     return {
+      errors: [],
       items: [],
       perPage: 10,
       currentPage: 1,
@@ -192,33 +193,30 @@ export default {
      * button function for ok when clicked calls an API
      * place holder function for API task
      */
-    ModifyProduct: function (event) {
+    modifyProductAPI: async function (event) {
       event.preventDefault();
 
       let editData = this.productEdit
       delete editData["created"];
-      let apiResponse = api
+      await api
           .modifyProduct(this.$route.params.id, this.oldProductId, editData)
           .then((editProductResponse) => {
             this.$log.debug("Product has been edited",editProductResponse);
             this.refreshProduct();
             this.$bvModal.hide('edit-product-card');
-            return "success";
           })
           .catch((error) => {
             this.errors = [];
             this.$log.debug(error);
             if ((error.response && error.response.status === 400)) {
-              this.errors.push("Creation failed. Please try again");
+              this.errors.push("Modifying products has failed. Please try again");
             } else if ((error.response && error.response.status === 403)) {
               this.errors.push("Forbidden. You are not an authorized administrator");
             } else {
               this.errors.push("Server error");
             }
             console.log(error.response);
-            return this.errors[0];
           })
-      return apiResponse;
     },
 
     /**
@@ -234,7 +232,7 @@ export default {
 
     /**
      * set table parameter
-     * @returns object
+     * @returns objectnpm
      */
     fields: function () {
       return [
