@@ -105,8 +105,8 @@ export default {
       let businessData = this.getBusinessData();
 
       try {
-        const businessResponse = await api.postBusiness(businessData).data;
-        this.$currentUser = await api.getUser(this.$currentUser.id).data;
+        const businessResponse = (await api.postBusiness(businessData)).data;
+        this.$currentUser = (await api.getUser(this.$currentUser.id)).data;
         await this.$router.push({path: `/businesses/${businessResponse.businessId}`});
       } catch(error) {
         console.log(error);

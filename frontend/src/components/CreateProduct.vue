@@ -43,8 +43,8 @@ Date: 13/4/2021
 
         <b-form-group
         >
-          <b>Recommended Retail Price</b>
-          <b-form-input type="number" step="0.01" v-model="recommendedRetailPrice" placeholder="0.00"></b-form-input>
+          <b>Recommended Retail Price *</b>
+          <b-form-input type="number" step="0.01" v-model="recommendedRetailPrice" placeholder="0.00" required></b-form-input>
         </b-form-group>
 
         <b-button variant="primary" type="submit" style="margin-right:1em" id="register-btn">Create</b-button>

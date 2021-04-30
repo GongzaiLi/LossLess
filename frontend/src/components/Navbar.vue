@@ -37,7 +37,7 @@ Date: sprint_1
 
           <b-dropdown-item
               v-for="business in businessesInDropDown"
-              v-bind:key="business.name"
+              v-bind:key="business.id"
               @click="actAsBusiness(business)"
               class="business-name-drop-down">
             {{business.name}}
