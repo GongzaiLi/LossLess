@@ -5,6 +5,7 @@ import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.testconfigs.MockBusinessServiceConfig;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -22,13 +23,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusinessController.class)
-@Import(MockUserServiceConfig.class)
+@Import({MockUserServiceConfig.class, MockBusinessServiceConfig.class})
 public class BusinessControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private BusinessService businessService;
 
     @MockBean
