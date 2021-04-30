@@ -76,7 +76,7 @@ h2 {
 <script>
 import api from "../../Api";
 import productDetailCard from './ProductDetailCard';
-import pagination from '../Pagination';
+import pagination from '../model/Pagination';
 
 
 export default {
@@ -106,7 +106,6 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param businessId
      */
-    //todo need check the api is work
     getProducts: function (businessId) {
       api
         .getProducts(businessId)
