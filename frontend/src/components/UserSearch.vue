@@ -115,6 +115,7 @@ export default {
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
+        tableHeader.homeAddress = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
         items.push(tableHeader);
       }
       return items;
