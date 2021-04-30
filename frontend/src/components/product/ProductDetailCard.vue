@@ -40,7 +40,13 @@ Date: 19/4/2021
           <h6><b>Recommended Retail Price:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
+          <template #prepend>
+            <b-input-group-text >{{currency.symbol}}</b-input-group-text>
+          </template>
           <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice"/>
+          <template #append>
+            <b-input-group-text >{{currency.code}}</b-input-group-text>
+          </template>
         </b-input-group>
 
         <b-input-group>
@@ -69,7 +75,7 @@ Date: 19/4/2021
 <script>
 export default {
   name: "product-detail-card",
-  props: ['product', 'disabled'],
+  props: ['product', 'disabled', 'currency'],
   data() {
     return {
       productCard: {

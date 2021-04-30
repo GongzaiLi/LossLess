@@ -2,39 +2,22 @@ import {mount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue} from 'bootstrap-vue';
 import CreateBusiness from '../../components/business/CreateBusiness';
 import VueRouter from 'vue-router';
+import Api from "../../Api";
 
+jest.mock('../../Api');
 
-let userData = {
+let $currentUser = {
   id: 1
 }
 const $log = {
   debug: jest.fn(),
 };
 
-// const $currentUser = {
-//   id: 1
-// }
-
 config.showDeprecationWarnings = false  //to disable deprecation warnings
-
-// fake the localStorage to doing the testing.
-const mockUserAuthPlugin = function install(Vue) {
-  Vue.mixin({
-    computed: {
-      $currentUser: {
-        get: function () {
-          return userData;
-        }
-      },
-    }
-  });
-}
-
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(VueRouter);
-localVue.use(mockUserAuthPlugin);
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -55,7 +38,7 @@ beforeEach(() => {
   wrapper = mount(CreateBusiness, {
     localVue,
     router,
-    mocks: {$log}
+    mocks: {$log, $currentUser}
   });
 });
 
@@ -112,40 +95,67 @@ describe('CreateBusiness Script Testing', () => {
 });
 
 describe('Testing api post request and the response method with errors', () => {
-  const response401 = ["error", {response: {status: 401}, message: "Access token is missing or invalid"}];
-  const responseNot401 = ["error", {response: {status: 500}, message: "Network Error"}];
-  const responseNoError = ["success", {response: {status: 201}, message: "Business Registered"}];
+  const response401 = {response: {status: 401}, message: "Access token is missing or invalid"};
+  const responseNot401 = {response: {status: 500}, message: "Network Error"};
 
+  const mockUser = {
+    "id": 100,
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "johnsmith99@gmail.com",
+    "dateOfBirth": "1999-04-27",
+    "homeAddress": {
+      "streetNumber": "3/24",
+      "streetName": "Ilam Road",
+      "city": "Christchurch",
+      "region": "Canterbury",
+      "country": "New Zealand",
+      "postcode": "90210"
+    },
+    "role": "user",
+    "businessesAdministered": []
+  };
 
-  it('current user exists, should return success after api call', async () => {
+  it('blue sky scenario', async () => {
 
     const mockEvent = {preventDefault: jest.fn()}
-    const result = await wrapper.vm.createBusiness(mockEvent);
-    expect(result).toBe("success");
+    Api.postBusiness.mockResolvedValue({
+      data: {
+        businessId: 100,
+      }
+    });
+    Api.getUser.mockResolvedValue({data: mockUser})
+
+    wrapper.vm.$router.push = jest.fn();
+
+    await wrapper.vm.createBusiness(mockEvent);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.$currentUser).toBe(mockUser);
+    expect(wrapper.vm.$router.push).toHaveBeenCalledWith({'path': `/businesses/100`})
+    expect(wrapper.vm.errors).toStrictEqual([]);
   });
 
   it('current user doesnt exist, should return failed after api call', async () => {
-    userData = null;
     const mockEvent = {preventDefault: jest.fn()}
-    const result = await wrapper.vm.createBusiness(mockEvent);
-    expect(result).toBe("failed");
+    Api.postBusiness.mockResolvedValue({
+      data: {
+        businessId: 100,
+      }
+    });
+    Api.getUser.mockRejectedValue(response401);
+    await wrapper.vm.createBusiness(mockEvent);
+    expect(wrapper.vm.errors).toStrictEqual(['Access token is missing or invalid']);
   });
 
-  it('should push correct errors if 401 error exists in api response', async () => {
-    const pushedErrors = wrapper.vm.pushErrors(response401);
-    expect(pushedErrors[0]).toBe(response401[1].message);
-  });
 
-  it('should push correct errors if non-401 error exists in api response', async () => {
-    const pushedErrors = wrapper.vm.pushErrors(responseNot401);
-    expect(pushedErrors[0]).toBe(responseNot401[1].message);
+  it('create product failed, should return failed after api call', async () => {
+    const mockEvent = {preventDefault: jest.fn()}
+    Api.postBusiness.mockRejectedValue(responseNot401);
+    Api.getUser.mockResolvedValue({data: mockUser});
+    await wrapper.vm.createBusiness(mockEvent);
+    expect(wrapper.vm.errors).toStrictEqual(['Network Error']);
   });
-
-  it('should return empty list if no errors exist in api response', async () => {
-    const pushedErrors = wrapper.vm.pushErrors(responseNoError);
-    expect(pushedErrors[0]).toBe(undefined);
-  });
-
 
 });
 

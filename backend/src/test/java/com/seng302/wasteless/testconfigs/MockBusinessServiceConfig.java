@@ -2,7 +2,12 @@ package com.seng302.wasteless.testconfigs;
 
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.model.BusinessTypes;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,14 +30,15 @@ public class MockBusinessServiceConfig {
         public MockBusinessService () {
             super(null);
 
-            User businessUser = new User();
-            businessUser.setRole(UserRoles.USER);
-            businessUser.setEmail("businessUser@800");
-            businessUser.setPassword("password");
+            User user = new User();
+            user.setRole(UserRoles.USER);
+            user.setId(2);
+            user.setEmail("user@700");
+            user.setPassword("password");
 
             Business business = new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
-            business.setPrimaryAdministrator(businessUser);
+            business.setPrimaryAdministrator(user);
 
             Address address = new Address();
             address.setCountry("NZ");
@@ -46,13 +52,15 @@ public class MockBusinessServiceConfig {
             business.setName("Mako's Tacos");
 
             List<User> admins = new ArrayList<>();
-            admins.add(businessUser);
+            admins.add(user);
             business.setAdministrators(admins);
 
             List<Business> businessesAdministered = new ArrayList<>();
             businessesAdministered.add(business);
 
-            businessUser.setBusinessesPrimarilyAdministered(businessesAdministered);
+            user.setBusinessesPrimarilyAdministered(businessesAdministered);
+
+            createBusiness(business);
         }
 
         @Override
@@ -65,11 +73,27 @@ public class MockBusinessServiceConfig {
 
         @Override
         public Business findBusinessById(Integer id) {
-            return businesses.get(id);
+            if (id < businesses.size()) {
+                return businesses.get(id);
+            } else {
+                return null;
+            }
+
         }
 
         @Override
         public List<Business> findBusinessesByUserId(Integer id) {return businesses; }
+
+        @Override
+        public void saveBusinessChanges(Business business) {
+            businesses.set(business.getId(), business);
+        }
+
+    }
+
+    @Bean
+    public BusinessService businessService() {
+        return new MockBusinessServiceConfig.MockBusinessService();
     }
 
 }

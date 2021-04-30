@@ -21,6 +21,7 @@ Date: 15/4/2021
         bordered
         show-empty
         @row-clicked="tableRowClick"
+        class="catalogue-table"
         :fields="fields"
         :items="items"
         :per-page="perPage"
@@ -32,6 +33,10 @@ Date: 15/4/2021
           <b-button id="edit-button" @click="editProduct(products.item)" size="sm">
             Edit
           </b-button>
+        </template>
+
+        <template #cell(recommendedRetailPrice)="data">
+          {{ currency.symbol }}{{ data.item.recommendedRetailPrice }}
         </template>
 
         <template #empty>
@@ -48,11 +53,11 @@ Date: 15/4/2021
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
-        <product-detail-card :product="productSelect" :disabled="true"/>
+        <product-detail-card :product="productSelect" :disabled="true" :currency="currency"/>
       </b-modal>
 
       <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProductAPI" @cancel="refreshProduct">
-        <product-detail-card :product="productEdit" :disabled="false"/>
+        <product-detail-card :product="productEdit" :disabled="false" :currency="currency"/>
       </b-modal>
     </div>
   </div>
@@ -71,6 +76,10 @@ h2 {
   text-align: center;
 }
 
+.catalogue-table td {
+  cursor: pointer;
+}
+
 </style>
 
 <script>
@@ -86,6 +95,11 @@ export default {
   },
   data: function () {
     return {
+      currency: {
+        symbol: '$',
+        code: 'USD',
+        name: 'US Dollar',
+      },
       errors: [],
       items: [],
       perPage: 10,
@@ -107,28 +121,24 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param businessId
      */
-    getProducts: function (businessId) {
-      api
-        .getProducts(businessId)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.setResponseData(response.data);
-          this.tableLoading = false;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          //
-          });
-    },
+    getProducts: async function (businessId) {
+      // We need to make 3 asynchronous requests: Get all business products,
+      // get the current business's address, and get the currency using that address.
 
-    /**
-     *
-     * set the response data to items
-     * @param data
-     */
-    //todo may need rebuilt the data form.
-    setResponseData: function (data) {
-      this.items = data;
+      const getProductsPromise = api.getProducts(businessId);  // Promise for getting products
+      const getCurrencyPromise = // Promise for getting the company address, and then the currency data
+          api.getBusiness(businessId)
+              .then((resp) => api.getUserCurrency(resp.data.address.country))
+
+      try {
+        const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
+
+        this.items = productsResponse.data;
+        this.tableLoading = false;
+        this.currency = currency;
+      } catch(error) {
+        this.$log.debug(error);
+      }
     },
 
     /**
@@ -232,7 +242,7 @@ export default {
 
     /**
      * set table parameter
-     * @returns objectnpm
+     * @returns object
      */
     fields: function () {
       return [
@@ -264,7 +274,7 @@ export default {
         },
         {
           key: 'recommendedRetailPrice',
-          label: 'RRP',
+          label: `RRP (${this.currency.code})`,
           sortable: true
         },
         {
