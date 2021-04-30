@@ -101,8 +101,9 @@ export default {
      * is already on the profile since that throws a Vue Router error.
      */
     goToUserProfile: function () {
-      if (this.$route.params.id !== this.$currentUser.id.toString()) {
-        this.$router.push({path: `/users/${this.$currentUser.id}`});
+      const pathToGoTo = `/users/${this.$currentUser.id}`;
+      if (this.$route.fullPath !== pathToGoTo) {
+        this.$router.push({path: pathToGoTo});
       }
     },
     /**
