@@ -30,8 +30,12 @@ beforeEach(() => {
   localVue.use(BootstrapVueIcons);
 
   Api.getProducts.mockRejectedValue(new Error(''));
-  Api.getUserCurrency.mockRejectedValue(new Error(''));
-  Api.getBusiness.mockRejectedValue(new Error(''));
+  Api.getBusiness.mockResolvedValue({data: {"address": {"country": "New Zealand"}}});
+  Api.getUserCurrency.mockResolvedValue({
+    symbol: '$',
+    code: 'USD',
+    name: 'United States Dollar'
+  });
 
   wrapper = shallowMount(productCatalogue, {
     localVue,
