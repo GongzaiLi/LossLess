@@ -95,7 +95,7 @@ describe('User Drop Down', () => {
     const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesAdministered));
 
     userData.businessesAdministered.push({
-      "id": 100,
+      "id": 101,
       "administrators": [],
       "primaryAdministratorId": 20,
       "name": "Another Store Name",
