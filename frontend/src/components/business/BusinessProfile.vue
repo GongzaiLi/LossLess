@@ -86,6 +86,8 @@ Date: 29/03/2021
           </b-card-text>
           <b-row>
             <b-col cols="12"><!--responsive sticky-header="500px"-->
+
+
               <b-table hover
                        striped
                        table-class="text-nowrap"
@@ -101,7 +103,16 @@ Date: 29/03/2021
                 <template #empty>
                   <h3 class="no-results-overlay" >No results to display</h3>
                 </template>
+                <template #cell(actions)="row" >
+                  <div v-if="checkCanRevokeAdmin(row.item.id)">
+                    <b-button size="sm" @click="removeAdminClickHandler(row.item.id)"  class="mr-1">
+                      Revoke Admin
+                    </b-button>
+                  </div>
+                </template>
               </b-table>
+
+
             </b-col>
           </b-row>
         </b-list-group-item>
@@ -151,6 +162,7 @@ h6 {
 <script>
 import memberSince from "../MemberSince";
 import api from "../../Api";
+import {getUser} from "@/auth";
 
 
 export default {
@@ -222,6 +234,29 @@ export default {
       this.$router.push({path: `/users/${record.id}`});
     },
     /**
+     * Revoke admin from given userID by making api request
+     * @param userId the id of the user to revoke admin from
+     */
+    removeAdminClickHandler: function(userId){
+      if (userId == null) {
+        return;
+      }
+
+      const revokeAdminRequestData = {
+        userId: userId
+      }
+
+      api.
+          revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
+          .then((response) => {
+             this.$log.debug("Response from request to revoke admin: ", response);
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.businessFound = false;
+          })
+    },
+    /**
      * this is a get api which can take Specific business to display on the page
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
@@ -246,7 +281,26 @@ export default {
     //todo may need split the data from response.
     setResponseData: function (data) {
       this.businessData = data;
-    }
+    },
+    checkCanRevokeAdmin: function (userId) {
+      if (getUser() == null) {
+        //Nobody is logged in
+        console.log(this.$currentUser);
+        return false;
+      } else if (userId === this.businessData.primaryAdministratorId) {
+        //User is primary administrator
+        return false;
+      } else if (this.businessData.primaryAdministratorId === this.$currentUser.id) {
+        //User is primary admin of business
+        return true;
+      } else if (this.$currentUser.role === "globalApplicationAdmin"
+          || this.$currentUser.role === "defaultGlobalApplicationAdmin") {
+        //User is DGAA or GAA
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
   computed: {
     getAddress: function () {
@@ -256,14 +310,16 @@ export default {
       return [
         {
           key: 'firstName',
-          //label: 'F name',
           sortable: true
         },
         {
           key: 'lastName',
-          //label: 'F name',
           sortable: true
         },
+        {
+          key: 'actions',
+          label: 'Actions'
+        }
       ];
     }
   }
