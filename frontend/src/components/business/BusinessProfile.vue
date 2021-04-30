@@ -48,7 +48,7 @@ Date: 29/03/2021
             </b-row>
           </h6>
           <h6>
-            <b-row>
+            <b-row v-if="businessData.email">
               <b-col cols="0">
                 <b-icon-envelope></b-icon-envelope>
               </b-col>
@@ -57,7 +57,7 @@ Date: 29/03/2021
             </b-row>
           </h6>
           <h6>
-            <b-row>
+            <b-row v-if="businessData.phoneNumber">
               <b-col cols="0">
                 <b-icon-phone-vibrate></b-icon-phone-vibrate>
               </b-col>
@@ -67,17 +67,6 @@ Date: 29/03/2021
           </h6>
         </b-container>
       </b-card-body>
-
-      <b-list-group border-variant="secondary">
-        <b-list-group-item>
-          <b-card-text style="text-align: justify">
-            <h4 class="mb-1">Product</h4>
-          </b-card-text>
-          <b-row v-for="product in products" :key="product">
-            <b-col cols="2" class="mb-1">{{ product }}</b-col>
-          </b-row>
-        </b-list-group-item>
-      </b-list-group>
 
       <b-list-group border-variant="secondary" >
         <b-list-group-item>
@@ -204,7 +193,6 @@ export default {
         businessType: "",
         created: "",
       },
-      products: ['products1', 'products2', 'products3'],
       businessFound: true, // not smooth to switch the found or not find.
     }
   },

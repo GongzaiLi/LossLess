@@ -101,48 +101,26 @@ export default {
      * The parameter event is passed
      */
     async createBusiness(event) {
-      let result = "failed";    //if this page displays but current user not logged in/doesnt exist
-
       event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
 
       let businessData = this.getBusinessData();
-      let response = ["error", {response: {status: 401}}]; //if this page displays but current user not logged in/doesnt exist
-      if (this.$currentUser != null) {                //if this page displays and current user exists
-        api
-          .postBusiness(businessData)
-          .then((businessResponse) => {
-            response = ["success", businessResponse];
-            this.$router.push({path: `/users/${this.$currentUser.id}`});
-          })
-          .catch((error) => {
-            response = ["error", error];
-          });
-
-        result = "success";
-      }
-      this.pushErrors(response);                          //for error displaying
-      return result;
-
-
+      api
+        .postBusiness(businessData)
+        .then((businessResponse) => {
+          console.log(businessResponse);
+          this.$router.push({path: `/businesses/${businessResponse.data.businessId}`});
+        })
+        .catch((error) => {
+          console.log(error);
+          this.pushErrors(error);
+        });
     },
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
      * if there are any.
      */
-    pushErrors(response) {
-      this.errors = [];
-      const status = response[0];
-      const value = response[1];
-      if (status === "error") {
-        this.$log.debug(value);
-        if ((value.response && value.response.status === 401)) {
-          this.errors.push("Access token is missing or invalid");
-        } else {
-          this.errors.push(value.message);
-        }
-      }
-      return this.errors;
-
+    pushErrors(error) {
+      this.errors.push(error.message);
     }
   },
 }
