@@ -5,6 +5,8 @@ import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.testconfigs.MockBusinessServiceConfig;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -22,13 +24,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusinessController.class)
-@Import(MockUserServiceConfig.class)
+@Import({MockUserServiceConfig.class, MockBusinessServiceConfig.class})
 public class BusinessControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private BusinessService businessService;
 
     @MockBean
@@ -36,6 +38,7 @@ public class BusinessControllerUnitTest {
 
     @MockBean
     private ProductService productService;
+
 
     @Test
     @WithUserDetails("user@700")
@@ -118,6 +121,64 @@ public class BusinessControllerUnitTest {
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
+    }
+
+
+    @Test
+    @WithUserDetails("user@700")
+    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithUserDetails("user2@700")
+    public void whenPutRequestToBusinessMakeAdmin_andUserNotAllowedToMakeRequest_then403Response() throws Exception {
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @WithUserDetails("user@700")
+    public void whenPutRequestToBusinessMakeAdmin_andBusinessDoesntExist_then406Response() throws Exception {
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/3/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+
+    @Test
+    @WithUserDetails("admin@700")
+    public void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseGlobalApplicationAdmin_then200Response() throws Exception {
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithUserDetails("defaultadmin@700")
+    public void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseDefaultGlobalApplicationAdmin_then200Response() throws Exception {
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
 

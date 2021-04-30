@@ -28,7 +28,7 @@ public class Business {
     private User primaryAdministrator;
 
     @Column(name = "administrators")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
     private List<User> administrators;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
@@ -54,4 +54,13 @@ public class Business {
     @Column(name = "created")
     private LocalDate created;
 
+    /**
+     * Add an administrator to a business
+     * Never call this directly, only call it from business service.
+     *
+     * @param user The user to add to the list of administrators
+     */
+    public void addAdministrator(User user) {
+        this.administrators.add(user);
+    }
 }

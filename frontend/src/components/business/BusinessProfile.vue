@@ -4,7 +4,7 @@ Author: Gongzai Li
 Date: 29/03/2021
 -->
 <template>
-  <div v-show="loading">
+  <div v-show="!loading">
     <b-card border-variant="secondary" header-border-variant="secondary"
             class="profile-card shadow" no-body
             v-if="businessFound"
@@ -14,7 +14,7 @@ Date: 29/03/2021
         <b-row>
           <b-col>
             <h4 class="mb-1">{{ businessData.name }}</h4>
-            <member-since :date="businessData.created"/>
+            Registered on: <member-since :date="businessData.created"/>
           </b-col>
         </b-row>
       </template>
@@ -48,7 +48,7 @@ Date: 29/03/2021
             </b-row>
           </h6>
           <h6>
-            <b-row>
+            <b-row v-if="businessData.email">
               <b-col cols="0">
                 <b-icon-envelope></b-icon-envelope>
               </b-col>
@@ -57,7 +57,7 @@ Date: 29/03/2021
             </b-row>
           </h6>
           <h6>
-            <b-row>
+            <b-row v-if="businessData.phoneNumber">
               <b-col cols="0">
                 <b-icon-phone-vibrate></b-icon-phone-vibrate>
               </b-col>
@@ -68,18 +68,7 @@ Date: 29/03/2021
         </b-container>
       </b-card-body>
 
-      <b-list-group border-variant="secondary">
-        <b-list-group-item>
-          <b-card-text style="text-align: justify">
-            <h4 class="mb-1">Product</h4>
-          </b-card-text>
-          <b-row v-for="product in products" :key="product">
-            <b-col cols="2" class="mb-1">{{ product }}</b-col>
-          </b-row>
-        </b-list-group-item>
-      </b-list-group>
-
-      <b-list-group border-variant="secondary">
+      <b-list-group border-variant="secondary" >
         <b-list-group-item>
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
@@ -201,9 +190,8 @@ export default {
         businessType: "",
         created: "",
       },
-      products: ['products1', 'products2', 'products3'],
       businessFound: true, // not smooth to switch the found or not find.
-      loading: false
+      loading: true
     }
   },
 
@@ -216,14 +204,10 @@ export default {
 
     /**
      * set up the page
-     * add debounced delay 400 ms to launch the page
      **/
     launchPage(businessId) {
-      this.loading = false;
+      this.loading = true;
       this.getBusinessInfo(businessId);
-      setTimeout(() => {
-        this.loading = true;
-      }, 400);
     },
 
     /**
@@ -245,10 +229,12 @@ export default {
           this.$log.debug("Data loaded: ", response.data);
           this.setResponseData(response.data);
           this.businessFound = true;
+          this.loading = false;
         })
         .catch((error) => {
           this.$log.debug(error);
           this.businessFound = false;
+          this.loading = false;
         })
     },
 

@@ -7,7 +7,7 @@ Date: 5/3/2021
 <template>
 
   <div>
-    <div v-show="loading">
+    <div v-show="!loading">
       <b-card border-variant="secondary" header-border-variant="secondary"
               class="profile-card shadow" no-body
               v-if="userFound"
@@ -18,7 +18,7 @@ Date: 5/3/2021
           <b-row>
             <b-col>
               <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
-              <member-since :date="userData.created"/>
+              Member since: <member-since :date="userData.created"/>
             </b-col>
             <b-col cols="2" sm="auto"
                    v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
@@ -188,7 +188,7 @@ export default {
         businessesAdministered: [],
       },
       userFound: true,
-      loading: false
+      loading: true
     }
   },
 
@@ -203,11 +203,8 @@ export default {
      * add debounced delay 400 ms to launch the page
      **/
     launchPage(userId) {
-      this.loading = false;
+      this.loading = true;
       this.getUserInfo(userId);
-      setTimeout(() => {
-        this.loading = true;
-      }, 400);
     },
 
     /**
@@ -222,10 +219,12 @@ export default {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
           this.userFound = true;
+          this.loading = false;
         })
         .catch((error) => {
           this.$log.debug(error);
           this.userFound = false;
+          this.loading = false;
         })
     },
 
