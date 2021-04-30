@@ -65,6 +65,29 @@ describe('check-getProducts-API-function', () => {
 
 describe('check-product-catalogue-page', () => {
 
+  test('product-found-in-html-test-product-table-display', async () => {
+    const response = {
+      data: [{
+        id: "WATT-420-BEANS",
+        name: "Watties Baked Beans - 420g can",
+        description: "Baked Beans as they should be.",
+        recommendedRetailPrice: 2.2,
+        created: "2021-04-14T13:01:58.660Z"
+      }]
+    };
+
+    Api.getProducts.mockResolvedValue(response);
+    await wrapper.vm.getProducts(0);
+    await wrapper.vm.$forceUpdate();
+
+
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].id).toBe("WATT-420-BEANS");
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].name).toBe("Watties Baked Beans - 420g can");
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].description).toBe("Baked Beans as they should be.");
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].recommendedRetailPrice).toBe(2.2);
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].created).toBe("2021-04-14T13:01:58.660Z");
+  });
+
 
   test('product-found-in-html-test-pagination-display', async () => {
     const response = {
