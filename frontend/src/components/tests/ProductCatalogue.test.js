@@ -30,6 +30,8 @@ beforeEach(() => {
   localVue.use(BootstrapVueIcons);
 
   Api.getProducts.mockRejectedValue(new Error(''));
+  Api.getUserCurrency.mockRejectedValue(new Error(''));
+  Api.getBusiness.mockRejectedValue(new Error(''));
 
   wrapper = shallowMount(productCatalogue, {
     localVue,
@@ -47,7 +49,7 @@ afterEach(() => {
 
 describe('check-getProducts-API-function', () => {
   test('get-normal-data', async () => {
-    const response = {
+    const productsResponse = {
       data: [{
         id: "WATT-420-BEANS",
         name: "Watties Baked Beans - 420g can",
@@ -56,9 +58,42 @@ describe('check-getProducts-API-function', () => {
         created: "2021-04-14T13:01:58.660Z"
       }]
     };
-    Api.getProducts.mockResolvedValue(response);
+    const businessResponse = {
+      data: {
+      "id": 100,
+      "primaryAdministratorId": 20,
+      "name": "Lumbridge General Store",
+      "description": "A one-stop shop for all your adventuring needs",
+      "address": {
+        "streetNumber": "3/24",
+          "streetName": "Ilam Road",
+          "city": "Christchurch",
+          "region": "Canterbury",
+          "country": "New Zealand",
+          "postcode": "90210"
+      },
+      "businessType": "Accommodation and Food Services",
+      "created": "2020-07-14T14:52:00Z"
+      }
+    };
+
+    const mockCurrencyData = {
+      symbol: '$',
+      code: 'NZD',
+      name: 'New Zealand Dollar'
+    };
+    Api.getProducts.mockResolvedValue(productsResponse);
+    Api.getBusiness.mockResolvedValue(businessResponse);
+
+    const userCurrencyMock = jest.fn();
+    userCurrencyMock.mockResolvedValue(mockCurrencyData);
+    Api.getUserCurrency = userCurrencyMock;
+
     await wrapper.vm.getProducts(0);
-    expect(wrapper.vm.items).toEqual(response.data);
+
+    expect(wrapper.vm.items).toEqual(productsResponse.data);
+    expect(wrapper.vm.currency).toEqual(mockCurrencyData);
+    expect(userCurrencyMock).toHaveBeenCalledWith('New Zealand');
   });
 });
 

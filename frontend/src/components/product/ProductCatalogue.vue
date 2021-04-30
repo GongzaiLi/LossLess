@@ -120,8 +120,7 @@ export default {
   },
   mounted() {
     const businessId = this.$route.params.id;
-    this.getProducts(businessId);//this.getProducts(this.$route.params.id);
-
+    this.getProducts(businessId);
   },
   methods: {
     /**
@@ -129,7 +128,7 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param businessId
      */
-    getProducts: function (businessId) {
+    getProducts: async function (businessId) {
       // We need to make 3 asynchronous requests: Get all business products,
       // get the current business's address, and get the currency using that address.
 
@@ -138,25 +137,15 @@ export default {
           api.getBusiness(businessId)
               .then((resp) => api.getUserCurrency(resp.data.address.country))
 
-      Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
-        .then(([productsResponse, currency]) => {
-          this.setResponseData(productsResponse.data);
-          this.tableLoading = false;
-          this.currency = currency
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-        });
-    },
+      try {
+        const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
 
-    /**
-     *
-     * set the response data to items
-     * @param data
-     */
-    //todo may need rebuilt the data form.
-    setResponseData: function (data) {
-      this.items = data;
+        this.items = productsResponse.data;
+        this.tableLoading = false;
+        this.currency = currency;
+      } catch(error) {
+        this.$log.debug(error);
+      }
     },
     /**
      * modify the description only keep 20 characters and then add ...
