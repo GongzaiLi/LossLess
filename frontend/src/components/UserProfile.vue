@@ -16,7 +16,7 @@ Date: 5/3/2021
         <b-row>
           <b-col>
             <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
-            <member-since :date="userData.created"/>
+            Member since: <member-since :date="userData.created"/>
           </b-col>
           <b-col cols="2" sm="auto"
                  v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">

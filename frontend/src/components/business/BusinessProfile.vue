@@ -14,7 +14,7 @@ Date: 29/03/2021
         <b-row>
           <b-col>
             <h4 class="mb-1">{{ businessData.name }}</h4>
-            <member-since :date="businessData.created"/>
+            Registered on: <member-since :date="businessData.created"/>
           </b-col>
         </b-row>
       </template>

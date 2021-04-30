@@ -83,7 +83,6 @@ export default {
     }
   },
   methods: {
-
     getBusinessData() {
       return {
         name: this.name,
@@ -104,16 +103,15 @@ export default {
       event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
 
       let businessData = this.getBusinessData();
-      api
-        .postBusiness(businessData)
-        .then((businessResponse) => {
-          console.log(businessResponse);
-          this.$router.push({path: `/businesses/${businessResponse.data.businessId}`});
-        })
-        .catch((error) => {
-          console.log(error);
-          this.pushErrors(error);
-        });
+
+      try {
+        const businessResponse = await api.postBusiness(businessData).data;
+        this.$currentUser = await api.getUser(this.$currentUser.id).data;
+        await this.$router.push({path: `/businesses/${businessResponse.businessId}`});
+      } catch(error) {
+        console.log(error);
+        this.pushErrors(error);
+      }
     },
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
