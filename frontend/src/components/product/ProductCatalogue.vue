@@ -53,17 +53,7 @@ Date: 15/4/2021
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
-        <!--
-        <template #modal-header>
-          <small class="text-muted">Product Card</small>
-        </template>
-        -->
         <product-detail-card :product="productSelect" :disabled="true" :currency="currency"/>
-        <!--
-        <template #modal-footer>
-          <small class="text-muted">Product Card</small>
-        </template>
-        -->
       </b-modal>
 
       <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProduct" @cancel="refreshProduct">
@@ -95,7 +85,7 @@ h2 {
 <script>
 import api from "../../Api";
 import productDetailCard from './ProductDetailCard';
-import pagination from '../Pagination';
+import pagination from '../model/Pagination';
 
 
 export default {

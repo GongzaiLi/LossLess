@@ -1,9 +1,9 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import productCatalogue from '../product/ProductCatalogue';
+import productCatalogue from '../../components/product/ProductCatalogue';
 import Api from "../../Api";
-import productDetailCard from "../product/ProductDetailCard";
-import Pagination from "../Pagination";
+import productDetailCard from "../../components/product/ProductDetailCard";
+import Pagination from "../../components/model/Pagination";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 

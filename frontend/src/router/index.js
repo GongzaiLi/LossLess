@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Login from './../components/Login.vue'
-import Register from './../components/Register.vue'
-import UserProfile from './../components/UserProfile'
-import UserSearch from "../components/UserSearch";
+import Login from '../components/user/Login.vue'
+import Register from '../components/user/Register.vue'
+import UserProfile from '../components/user/UserProfile'
+import UserSearch from "../components/user/UserSearch";
 import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
-import HomePage from "@/components/HomePage";
-import CreateProduct from "@/components/CreateProduct";
+import HomePage from "@/components/user/HomePage";
+import CreateProduct from "@/components/product/CreateProduct";
 import {getUser} from '@/auth'
 
 /**

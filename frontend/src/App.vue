@@ -8,12 +8,12 @@
 </template>
 
 <script>
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Navbar from "./components/Navbar";
-import UserProfile from "./components/UserProfile";
-import UserSearch from "./components/UserSearch";
-import HomePage from "@/components/HomePage";
+import Login from "./components/user/Login";
+import Register from "./components/user/Register";
+import Navbar from "./components/model/Navbar";
+import UserProfile from "./components/user/UserProfile";
+import UserSearch from "./components/user/UserSearch";
+import HomePage from "@/components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
 

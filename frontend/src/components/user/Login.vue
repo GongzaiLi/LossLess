@@ -53,7 +53,7 @@ Date: 3/3/2021
 </template>
 
 <script>
-import api from "../Api";
+import api from "../../Api";
 
 
 export default {

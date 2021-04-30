@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import userProfile from '../UserProfile';
+import userProfile from '../../components/user/UserProfile';
 
 const $route = {
   params: {
