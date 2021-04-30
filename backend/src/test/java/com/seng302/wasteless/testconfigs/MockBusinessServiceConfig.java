@@ -96,9 +96,4 @@ public class MockBusinessServiceConfig {
         return new MockBusinessServiceConfig.MockBusinessService();
     }
 
-    @Bean
-    public BusinessService businessService() {
-        return new MockBusinessServiceConfig.MockBusinessService();
-    }
-
 }
