@@ -14,6 +14,7 @@ import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.ProductViews;
+import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,10 @@ public class BusinessController {
 
         logger.info("saved new business {}", business);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("businessId", business.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
 

@@ -9,7 +9,7 @@ import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
 import HomePage from "@/components/user/HomePage";
 import CreateProduct from "@/components/product/CreateProduct";
-//import {getUser} from '@/auth'
+import {getUser} from '@/auth'
 
 /**
  * This specifies all routing information used by Vue-Router.
@@ -35,13 +35,13 @@ const router = new Router({
 /**
  * Route guard that redirects users to the login page if they are not authenticated.
  * This applies to all routes except for the login and register routers.
-
+ */
 router.beforeEach((to, _from, next) => {
     if (!['login', 'register'].includes(to.name) && getUser() == null) {
         next('/login');
     } else {
         next();
     }
-});*/
+});
 
 export default router;
