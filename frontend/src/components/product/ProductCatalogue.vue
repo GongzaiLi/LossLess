@@ -197,7 +197,7 @@ export default {
 
       let editData = this.productEdit
       delete editData["created"];
-      api
+      let apiResponse = api
           .modifyProduct(this.$route.params.id, this.oldProductId, editData)
           .then((editProductResponse) => {
             this.$log.debug("Product has been edited",editProductResponse);
@@ -218,6 +218,7 @@ export default {
             console.log(error.response);
             return this.errors[0];
           })
+      return apiResponse;
     },
 
     /**

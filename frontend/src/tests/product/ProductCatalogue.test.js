@@ -210,3 +210,44 @@ describe('check-model-product-card-page', () => {
     expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
   })
 });
+
+describe('Testing api put request and the response method with errors', () => {
+
+  it('Succesfully edits a product ', async () => {
+    Api.modifyProduct.mockImplementation(() => Promise.resolve({
+      response : {status: 200}
+    }));
+    const mockEvent = {preventDefault: jest.fn()}
+    const result = await wrapper.vm.ModifyProduct(mockEvent);
+    expect(result).toBe("success");
+  });
+
+  it('400 error test', async () => {
+    Api.modifyProduct.mockImplementation(() => Promise.reject({
+      response : {status: 400}
+    }));
+    const mockEvent = {preventDefault: jest.fn()};
+    const result = await wrapper.vm.ModifyProduct(mockEvent);
+    expect(result).toBe("Creation failed. Please try again");
+  });
+
+  it('403 error test', async () => {
+    Api.modifyProduct.mockImplementation(() => Promise.reject({
+      response : {status: 403}
+    }));
+    const mockEvent = {preventDefault: jest.fn()};
+    const result = await wrapper.vm.ModifyProduct(mockEvent);
+    expect(result).toBe("Forbidden. You are not an authorized administrator");
+  });
+
+  it('other error test', async () => {
+
+    Api.modifyProduct.mockImplementation(() => Promise.reject({
+      response : {status: 500}
+    }));
+    const mockEvent = {preventDefault: jest.fn()};
+    const result = await wrapper.vm.ModifyProduct(mockEvent);
+    expect(result).toBe("Server error");
+  });
+
+});
