@@ -1,10 +1,7 @@
 package com.seng302.wasteless.testconfigs;
 
-import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.model.BusinessTypes;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
 import org.springframework.boot.test.context.TestConfiguration;
 
 import java.util.ArrayList;
@@ -36,7 +33,15 @@ public class MockBusinessServiceConfig {
             Business business = new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
             business.setPrimaryAdministrator(businessUser);
-            business.setAddress("27 Mako Road");
+
+            Address address = new Address();
+            address.setCountry("NZ");
+            address.setCity("Christchurch");
+            address.setStreetNumber("1");
+            address.setStreetName("Ilam Rd");
+            address.setPostcode("8041");
+
+            business.setAddress(address);
             business.setDescription("The best tacos in town");
             business.setName("Mako's Tacos");
 
