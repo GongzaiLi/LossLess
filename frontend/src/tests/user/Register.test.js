@@ -1,6 +1,6 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import Register from '../Register';
+import Register from '../../components/user/Register';
 import VueRouter from 'vue-router';
 
 

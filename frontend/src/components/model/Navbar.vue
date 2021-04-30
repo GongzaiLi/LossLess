@@ -23,7 +23,7 @@ Date: sprint_1
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
-            <img src="../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img src="../../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
 
           <b-dropdown-item
@@ -37,7 +37,7 @@ Date: sprint_1
 
           <b-dropdown-item
               v-for="business in businessesInDropDown"
-              v-bind:key="business.name"
+              v-bind:key="business.id"
               @click="actAsBusiness(business)"
               class="business-name-drop-down">
             {{business.name}}
@@ -60,8 +60,8 @@ Date: sprint_1
 </style>
 
 <script>
-import {setCurrentlyActingAs} from '../auth'
-import Api from '../Api'
+import {setCurrentlyActingAs} from '../../auth'
+import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -101,8 +101,9 @@ export default {
      * is already on the profile since that throws a Vue Router error.
      */
     goToUserProfile: function () {
-      if (this.$route.params.id !== this.$currentUser.id.toString()) {
-        this.$router.push({path: `/users/${this.$currentUser.id}`});
+      const pathToGoTo = `/users/${this.$currentUser.id}`;
+      if (this.$route.fullPath !== pathToGoTo) {
+        this.$router.push({path: pathToGoTo});
       }
     },
     /**

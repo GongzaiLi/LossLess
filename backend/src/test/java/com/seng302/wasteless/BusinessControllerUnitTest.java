@@ -30,6 +30,8 @@ public class BusinessControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private BusinessService businessService;
 
     @MockBean
     private AddressService addressService;
