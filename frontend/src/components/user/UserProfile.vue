@@ -100,7 +100,7 @@ Date: 5/3/2021
                   <b-icon-house-fill></b-icon-house-fill>
                 </b-col>
                 <b-col cols="4"><b>Home Address:</b></b-col>
-                <b-col> {{ userData.homeAddress }}</b-col>
+                <b-col> {{ getAddress }}</b-col>
               </b-row>
             </h6>
             <h6 v-if="userData.businessesAdministered.length">
@@ -176,7 +176,14 @@ export default {
         email: "",
         dateOfBirth: "",
         phoneNumber: "",
-        homeAddress: "",
+        homeAddress: {
+          streetNumber: "",
+          streetName: "",
+          city: "",
+          region: "",
+          country: "",
+          postcode: ""
+        },
         created: "",
         businessesAdministered: [],
       },
@@ -269,6 +276,12 @@ export default {
   computed: {
     adminButtonToggle() {
       return this.userData.role === 'user' ? 'success' : 'danger';
+    },
+    /**
+     * Combine fields of address
+     */
+    getAddress: function () {
+      return Object.values(this.userData.homeAddress).join(' ');
     },
     /**
      * Returns the full name of the user, in the format:
