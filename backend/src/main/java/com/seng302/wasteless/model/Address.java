@@ -1,5 +1,6 @@
 package com.seng302.wasteless.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.UserViews;
@@ -25,6 +26,7 @@ public class Address {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @JsonIgnore
     private Integer id;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})

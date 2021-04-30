@@ -54,7 +54,7 @@ public class GetBusinessesDtoMapper {
                     .setEmail(businessAdministrator.getEmail())
                     .setDateOfBirth(businessAdministrator.getDateOfBirth().toString())
                     .setPhoneNumber(businessAdministrator.getPhoneNumber())
-                    //.setHomeAddress(businessAdministrator.getHomeAddress())
+                    .setHomeAddress(businessAdministrator.getHomeAddress())
                     .setCreated(businessAdministrator.getCreated().toString())
                     .setRole(businessAdministrator.getRole())
                     .setBusinessesAdministered(businessesAdministeredIds)
@@ -67,7 +67,7 @@ public class GetBusinessesDtoMapper {
                 .setPrimaryAdministratorId(business.getPrimaryAdministrator().getId())
                 .setName(business.getName())
                 .setDescription(business.getDescription())
-                //.setAddress(business.getAddress())
+                .setAddress(business.getAddress())
                 .setBusinessType(business.getBusinessType())
                 .setCreated(business.getCreated().toString());
     }
