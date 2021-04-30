@@ -1,11 +1,11 @@
 const sonarqubeScanner =  require('sonarqube-scanner');
 sonarqubeScanner(
     {
-        serverUrl:  'https://csse-s302g12.canterbury.ac.nz/sonarqube/',
-        token: "FIXME",
+        serverUrl:  'https://csse-s302g7.canterbury.ac.nz/sonarqube/',
+        token: "ec9d1ffd23013bea8fea1ee96a8d55b0b5f441b9",
         options : {
-            'sonar.projectKey': 'team-1100-client',
-            'sonar.projectName': 'Team 1100 - Client',
+            'sonar.projectKey': 'team-700-client',
+            'sonar.projectName': 'Team 700 - Client',
             "sonar.sourceEncoding": "UTF-8",
             'sonar.sources': 'src',
             'sonar.tests': 'src/test',
