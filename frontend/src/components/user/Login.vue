@@ -53,7 +53,7 @@ Date: 3/3/2021
 </template>
 
 <script>
-import api from "../Api";
+import api from "../../Api";
 
 
 export default {
@@ -99,8 +99,7 @@ export default {
         })
         .then((userResponse) => {
           this.$currentUser = userResponse.data;
-          // Go to profile page
-          this.goToUserProfilePage(userResponse.data.id);
+          this.goToUserHomePage();
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -113,12 +112,10 @@ export default {
         });
     },
     /**
-     * Redirects to the profile page of the user with the specified userId.
-     * This will switch components immediately to the UserProfile component
-     * so no loading spinner needs to be implemented here.
+     * Redirects to the home page of the user
      */
-    goToUserProfilePage: function (userId) {
-      this.$router.push({path: `/users/${userId}`});
+    goToUserHomePage : function () {
+      this.$router.push({path:`/homePage`});
     }
   },
   computed: {

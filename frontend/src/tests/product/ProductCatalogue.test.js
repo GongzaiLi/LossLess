@@ -1,9 +1,9 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import productCatalogue from '../product/ProductCatalogue';
+import productCatalogue from '../../components/product/ProductCatalogue';
 import Api from "../../Api";
-import productDetailCard from "../product/ProductDetailCard";
-import Pagination from "../Pagination";
+import productDetailCard from "../../components/product/ProductDetailCard";
+import Pagination from "../../components/model/Pagination";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -20,11 +20,12 @@ const $log = {
   }
 };
 
+
 jest.mock('../../Api');
 
 beforeEach(() => {
-  const localVue = createLocalVue()
 
+  const localVue = createLocalVue()
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
 
@@ -98,7 +99,6 @@ describe('check-product-catalogue-page', () => {
   });
 
 });
-
 
 describe('check-setDescription-function', () => {
   test('description-less-then-20-characters', () => {
@@ -183,6 +183,27 @@ describe('check-model-product-card-page', () => {
     };
     Api.getProducts.mockResolvedValue(response);
     await wrapper.vm.getProducts(0);
+    await wrapper.vm.tableRowClick(response.data[0]);
+
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
+  });
+
+  test('check-product-detail-card-component-exists-when-click-edit-button', async () => {
+    const response = {
+      data: [{
+        id: "WATT-420-BEANS1",
+        name: "Watties Baked Beans - 430g can",
+        description: "Aaked Beans as they should be.",
+        recommendedRetailPrice: 2.2,
+        created: "2021-03-14T13:01:58.660Z",
+        image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
+      }]
+    };
+    Api.getProducts.mockResolvedValue(response);
+    await wrapper.vm.getProducts(0);
+    await wrapper.vm.editProduct(response.data[0]);
 
     await wrapper.vm.$forceUpdate();
 

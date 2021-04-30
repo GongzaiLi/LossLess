@@ -131,8 +131,8 @@ Date: 3/3/2021
 </template>
 
 <script>
-import api from "../Api";
-import AddressInput from "./AddressInput";
+import api from "../../Api";
+import AddressInput from "../model/AddressInput";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 130;
@@ -229,7 +229,7 @@ export default {
         })
         .then((userResponse) => {
           this.$currentUser = userResponse.data;
-          this.$router.push({path: `/users/${userResponse.data.id}`});
+          this.$router.push({path: `/homePage`});
         })
         .catch((error) => {
           this.errors = [];

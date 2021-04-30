@@ -26,7 +26,14 @@ Date: 19/4/2021
           <h6><b>Name:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name"/>
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name" required/>
+        </b-input-group>
+
+        <b-input-group>
+          <h6><b>Manufacturer:</b></h6>
+        </b-input-group>
+        <b-input-group class="mb-1">
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.manufacturer"/>
         </b-input-group>
 
         <b-input-group>
@@ -40,7 +47,7 @@ Date: 19/4/2021
           <h6><b>Created:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.created"/>
+          <b-form-input type="text" disabled v-model="productCard.created"/>
         </b-input-group>
 
         <hr style="width:100%">
@@ -51,6 +58,7 @@ Date: 19/4/2021
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
         </b-input-group>
+
       </div>
 
     </b-card-body>
@@ -61,18 +69,18 @@ Date: 19/4/2021
 <script>
 export default {
   name: "product-detail-card",
-  props: ['product'],
+  props: ['product', 'disabled'],
   data() {
     return {
       productCard: {
         id: '',
         name: '',
         description: '',
+        manufacturer: '',
         recommendedRetailPrice: 0,
         created: '',
         image: '',
       },
-      disabled: true
     }
   },
   mounted() {

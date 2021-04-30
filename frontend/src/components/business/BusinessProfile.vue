@@ -4,7 +4,7 @@ Author: Gongzai Li
 Date: 29/03/2021
 -->
 <template>
-  <div>
+  <div v-show="loading">
     <b-card border-variant="secondary" header-border-variant="secondary"
             class="profile-card shadow" no-body
             v-if="businessFound"
@@ -78,6 +78,34 @@ Date: 29/03/2021
           </b-row>
         </b-list-group-item>
       </b-list-group>
+
+      <b-list-group border-variant="secondary">
+        <b-list-group-item>
+          <b-card-text style="text-align: justify">
+            <h4 class="mb-1">Administrators</h4>
+          </b-card-text>
+          <b-row>
+            <b-col cols="12"><!--responsive sticky-header="500px"-->
+              <b-table hover
+                       striped
+                       table-class="text-nowrap"
+                       responsive="lg"
+                       small
+                       no-border-collapse
+                       stacked="sm"
+                       show-empty
+                       @row-clicked="rowClickHandler"
+                       :fields="fields"
+                       :items="businessData.administrators"
+                       ref="businessAdministratorsTable">
+                <template #empty>
+                  <h3 class="no-results-overlay">No results to display</h3>
+                </template>
+              </b-table>
+            </b-col>
+          </b-row>
+        </b-list-group-item>
+      </b-list-group>
     </b-card>
 
 
@@ -96,9 +124,7 @@ Date: 29/03/2021
             invalid URL into the address bar.
           </b-col>
           <b-col> Try again
-            <!--
           <router-link to="/businesses">Create a new business here.</router-link>
-          -->
           </b-col>
         </h6>
       </b-card-body>
@@ -121,7 +147,7 @@ h6 {
 </style>
 
 <script>
-import memberSince from "../MemberSince";
+import memberSince from "../model/MemberSince";
 import api from "../../Api";
 
 
@@ -129,7 +155,6 @@ export default {
   components: {
     memberSince
   },
-  //Todo still has errors because I Did not connect to Navbar, and I check all errors and all show Navbar issues.
   data: function () {
     return {
       businessData: {
@@ -147,20 +172,67 @@ export default {
           country: "",
           postcode: ""
         },
+        administrators: [
+          {
+            id: 0,
+            firstName: '',
+            lastName: '',
+            middleName: '',
+            nickName: '',
+            bio: '',
+            email: '',
+            dateOfBirth: '',
+            phoneNumber: '',
+            homeAddress: {
+              streetNumber: "",
+              streetName: "",
+              city: "",
+              region: "",
+              country: "",
+              postcode: ""
+            },
+            created: '',
+            role: '',
+            businessesAdministered: [
+              "0"
+            ]
+          }
+        ],
         businessType: "",
-        created: ""
+        created: "",
       },
       products: ['products1', 'products2', 'products3'],
-      businessFound: true // not smooth to switch the found or not find.
+      businessFound: true, // not smooth to switch the found or not find.
+      loading: false
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
-    this.getBusinessInfo(businessId);
+    this.launchPage(businessId);
   },
 
   methods: {
+
+    /**
+     * set up the page
+     * add debounced delay 400 ms to launch the page
+     **/
+    launchPage(businessId) {
+      this.loading = false;
+      this.getBusinessInfo(businessId);
+      setTimeout(() => {
+        this.loading = true;
+      }, 400);
+    },
+
+    /**
+     * When called changes page to the profile page based on the id of the user clicked
+     */
+    rowClickHandler: function (record) {
+      this.$router.push({path: `/users/${record.id}`});
+    },
+
     /**
      * this is a get api which can take Specific business to display on the page
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
@@ -179,6 +251,7 @@ export default {
           this.businessFound = false;
         })
     },
+
     /**
      * set the response data to businessData
      * @param data
@@ -189,10 +262,34 @@ export default {
     }
   },
   computed: {
+
+    /**
+     * the street number, street name, city, region,
+     * country and postcode join with space between the echo to a string
+     * @return {string}
+     */
     getAddress: function () {
       return Object.values(this.businessData.address).join(' ');
+    },
+
+    /**
+     * set table parameter
+     * @returns object
+     */
+    fields() {
+      return [
+        {
+          key: 'firstName',
+          sortable: true
+        },
+        {
+          key: 'lastName',
+          sortable: true
+        },
+      ];
     }
   }
 
 }
 </script>
+

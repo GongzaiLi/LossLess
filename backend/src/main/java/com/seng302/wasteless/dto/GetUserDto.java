@@ -1,5 +1,6 @@
 package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.BusinessAdministered;
 import com.seng302.wasteless.model.UserRoles;
 import lombok.Data;
@@ -27,6 +28,6 @@ public class GetUserDto {
     private String nickName;
     private String bio;
     private String email;                      //change later
-    private String homeAddress;                //change later
+    private Address homeAddress;               //change later
     private String created;
 }
