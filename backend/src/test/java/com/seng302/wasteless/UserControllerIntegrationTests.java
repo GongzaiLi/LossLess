@@ -32,19 +32,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
 public class UserControllerIntegrationTests {
 
+    String homeAddress = "{\n" +
+            "    \"streetNumber\": \"3/24\",\n" +
+            "    \"streetName\": \"Ilam Road\",\n" +
+            "    \"city\": \"Christchurch\",\n" +
+            "    \"region\": \"Canterbury\",\n" +
+            "    \"country\": \"New Zealand\",\n" +
+            "    \"postcode\": \"90210\"\n" +
+            "  }";
+
+
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     public void whenLoggingIntoAccountWithIncorrectRequestBody() {
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "Password123");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"username\": \"wrongemail@uclive.ac.nz\", \"pass\" : \"Password123\"}";
 
         try {
@@ -60,14 +63,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenLoggingIntoAccountThatDoesNotExist() {
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "Password123");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"email\": \"wrongemail@uclive.ac.nz\", \"password\" : \"Password123\"}";
 
         try {
@@ -83,14 +79,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenLoggingIntoAccountWithIncorrectPassword() {
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "Password123");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"email\": \"ojc31@uclive.ac.nz\", \"password\" : \"wrongPassword\"}";
 
         try {
@@ -106,14 +95,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenLoggingIntoAccountWithCorrectPassword() {
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "Password123");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"email\": \"ojc31@uclive.ac.nz\", \"password\" : \"Password123\"}";
 
         try {
@@ -129,22 +111,8 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andOneMatchingUsers_thenCorrectResult() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"56\",\n" +
-                "    \"streetName\": \"Clyde Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"8021\"\n" +
-                "  }", "Password123");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
        mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/search?searchQuery=James")
@@ -157,22 +125,8 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andNoMatchingUsers_thenCorrectResult() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"56\",\n" +
-                "    \"streetName\": \"Clyde Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"8041\"\n" +
-                "  }", "Password123");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/search?searchQuery=Steve")
@@ -189,39 +143,11 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andMultipleMatchingUsers_byFullMatch_andPartialMatch_thenCorrectOrder() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
-        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
-        createOneUser("James123", "Harris", "jeh1281@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
-        createOneUser("Nothing", "James123", "jeh1@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
+        createOneUser("James123", "Harris", "jeh1281@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James123", "jeh1@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1238\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
@@ -298,14 +224,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenGetUserWithIdTwo_andOnlyOneCreatedUser_BesidedDefault_ThenGetCorrectUser() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/2")
@@ -320,8 +239,8 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRole() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/3")
@@ -330,20 +249,28 @@ public class UserControllerIntegrationTests {
                 .andExpect(jsonPath("id", is(3)))
                 .andExpect(jsonPath("firstName", is("Oliver")))
                 .andExpect(jsonPath("lastName", is("Cranshaw")))
-                .andExpect(jsonPath("role", is("user")));
+                .andExpect(jsonPath("role", is("user")))
+                .andExpect(jsonPath("streetNumber").doesNotExist())
+                .andExpect(jsonPath("country").doesNotExist())
+                .andExpect(jsonPath("homeAddress").exists());
         }
 
     @Test
     public void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRole() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "14 Tyndale Pl", "Password123");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/2")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id", is(2)))
-                .andExpect(jsonPath("role").doesNotExist());
+                .andExpect(jsonPath("role").doesNotExist())
+                .andExpect(jsonPath("homeAddress").doesNotExist())
+                .andExpect(jsonPath("streetNumber").doesNotExist())
+                .andExpect(jsonPath("city", is("Christchurch")))
+                .andExpect(jsonPath("region", is("Canterbury")))
+                .andExpect(jsonPath("country", is("New Zealand")));
     }
 
     @Test
@@ -355,15 +282,14 @@ public class UserControllerIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())                    //check number of attributes
                 .andExpect(jsonPath("id", is(1)))
-                .andExpect(jsonPath("role", is("defaultGlobalApplicationAdmin")));
+                .andExpect(jsonPath("role", is("defaultGlobalApplicationAdmin")))
+                .andExpect(jsonPath("homeAddress").exists())
+                .andExpect(jsonPath("city").doesNotExist());
     }
 
 
-
-
-
     @Test
-    //@WithMockCustomUser(email = "test@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN) fails without this?
+    @WithMockCustomUser(email = "test@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN) //fails without this?
     public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk());
@@ -371,22 +297,8 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
-        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -430,14 +342,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     public void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", "{\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }", "Password123");
+        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         mockMvc.perform(get("/users/245")
                 .contentType(MediaType.APPLICATION_JSON))

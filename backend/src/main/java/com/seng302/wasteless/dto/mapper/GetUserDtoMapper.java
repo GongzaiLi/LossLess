@@ -27,9 +27,6 @@ public class GetUserDtoMapper {
 
 
 
-
-
-
     @Autowired
     public GetUserDtoMapper(BusinessService businessService, UserService userService) {
         GetUserDtoMapper.businessService = businessService;
@@ -103,7 +100,9 @@ public class GetUserDtoMapper {
                     .setNickName(user.getNickname())
                     .setBio(user.getBio())
                     .setEmail(user.getEmail())                      //change later
-                    .setHomeAddress(user.getHomeAddress())          //change later
+                    .setCity(user.getHomeAddress().getCity())          //change later
+                    .setRegion(user.getHomeAddress().getRegion())
+                    .setCountry(user.getHomeAddress().getCountry())
                     .setCreated(user.getCreated().toString());
 
         }

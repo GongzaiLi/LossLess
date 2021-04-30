@@ -28,6 +28,8 @@ public class GetUserDto {
     private String nickName;
     private String bio;
     private String email;                      //change later
-    private Address homeAddress;               //change later
+    private String city;
+    private String region;
+    private String country;
     private String created;
 }
