@@ -284,7 +284,7 @@ public class UserController {
 
                 logger.info("Account {}, logged into successfully", login.getEmail());
                 JSONObject responseBody = new JSONObject();
-                responseBody.put("id", savedUser.getId());
+                responseBody.put("userId", savedUser.getId());
 
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseBody);

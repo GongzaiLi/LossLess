@@ -95,7 +95,7 @@ export default {
         .login(loginData)
         .then((response) => {
           this.$log.debug("Logged in");
-          return api.getUser(response.data.id);
+          return api.getUser(response.data.userId);
         })
         .then((userResponse) => {
           this.$currentUser = userResponse.data;
