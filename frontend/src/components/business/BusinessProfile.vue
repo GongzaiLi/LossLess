@@ -162,7 +162,6 @@ h6 {
 <script>
 import memberSince from "../MemberSince";
 import api from "../../Api";
-import {getUser} from "@/auth";
 
 
 export default {
@@ -172,6 +171,7 @@ export default {
   //Todo still has errors because I Did not connect to Navbar, and I check all errors and all show Navbar issues.
   data: function () {
     return {
+      error: [],
       businessData: {
         email: '',
         phoneNumber: '',
@@ -246,14 +246,13 @@ export default {
         userId: userId
       }
 
-      api.
-          revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
+      api
+          .revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
           .then((response) => {
              this.$log.debug("Response from request to revoke admin: ", response);
           })
           .catch((error) => {
             this.$log.debug(error);
-            this.businessFound = false;
           })
     },
     /**
@@ -282,12 +281,16 @@ export default {
     setResponseData: function (data) {
       this.businessData = data;
     },
+    /**
+     * Check whether the user currently logged can revoke admin from an given administrator in
+     * the administrators table or not, for the purposes
+     * of displaying the revoke admin button.
+     *
+     * @param userId    The id of the user to check if admin can be revoked from
+     * @returns {boolean} Whether or not the user can revoke admin
+     */
     checkCanRevokeAdmin: function (userId) {
-      if (getUser() == null) {
-        //Nobody is logged in
-        console.log(this.$currentUser);
-        return false;
-      } else if (userId === this.businessData.primaryAdministratorId) {
+      if (userId === this.businessData.primaryAdministratorId) {
         //User is primary administrator
         return false;
       } else if (this.businessData.primaryAdministratorId === this.$currentUser.id) {
