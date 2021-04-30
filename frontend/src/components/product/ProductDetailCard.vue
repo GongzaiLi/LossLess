@@ -10,7 +10,7 @@ Date: 19/4/2021
     style="max-width: 550px"
   ><!--header-border-variant="secondary" border-variant="secondary"  background-color: rgba(0,255,0,0.4);-->
 
-    <b-img v-bind:src=productCard.image center thumbnail rounded="circle" width="250" height="250"/>
+    <b-img v-bind:src=productCard.image center thumbnail rounded alt="Rounded image" width="250" height="250"/> <!--"circle"-->
 
     <b-card-body>
 
@@ -73,6 +73,7 @@ Date: 19/4/2021
 </template>
 
 <script>
+
 export default {
   name: "product-detail-card",
   props: ['product', 'disabled', 'currency'],
@@ -92,6 +93,7 @@ export default {
   mounted() {
     this.productCard = this.product;
     this.productCard.created = new Date(this.productCard.created).toUTCString();
+    this.productCard.image = 'https://pngimage.net/wp-content/uploads/2018/05/default-image-png-8.png';
   }
 }
 </script>
