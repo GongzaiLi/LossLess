@@ -1,6 +1,7 @@
 package com.seng302.wasteless;
 
 
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.DefaultAdminCreatorService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -29,9 +30,12 @@ public class DefaultAdminCreatorServiceUnitTest {
     @Mock
     private UserService userService;
 
+    @Mock
+    private AddressService addressService;
+
     @BeforeEach
     public void init() throws IOException {
-        creatorService = new DefaultAdminCreatorService(userService);
+        creatorService = new DefaultAdminCreatorService(userService, addressService);
     }
 
     @Test

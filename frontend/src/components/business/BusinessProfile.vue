@@ -186,7 +186,14 @@ export default {
             email: '',
             dateOfBirth: '',
             phoneNumber: '',
-            homeAddress: '',
+            homeAddress: {
+              streetNumber: "",
+              streetName: "",
+              city: "",
+              region: "",
+              country: "",
+              postcode: ""
+            },
             created: '',
             role: '',
             businessesAdministered: [
