@@ -313,14 +313,6 @@ public class BusinessController {
 
         User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
 
-        System.out.println(userMakingRequest.getId());
-
-        System.out.println(possibleBusinessToAddAdminFor.getPrimaryAdministrator());
-
-        System.out.println(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId());
-
-        //Check can make request (GAA or business primary)
-
         if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
             && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
             && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
