@@ -2,7 +2,7 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
-import com.seng302.wasteless.dto.PutBusinessesMakeAdminDto;
+import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.model.Product;
@@ -293,7 +293,7 @@ public class BusinessController {
      * @return  Response code with message, see above for codes
      */
     @PutMapping("/businesses/{id}/makeAdministrator")
-    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesMakeAdminDto requestBody) {
+    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
 
         Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
         logger.info("possible Business {}", possibleBusinessToAddAdminFor);
