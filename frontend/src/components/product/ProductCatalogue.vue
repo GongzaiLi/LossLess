@@ -53,11 +53,11 @@ Date: 15/4/2021
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
-        <product-detail-card :product="productSelect" :disabled="true" :currency="currency"/>
+        <product-detail-card :product="productSelect" :disabled="true" :currency="currency" :errors="errors"/>
       </b-modal>
 
-      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProductAPI" @cancel="refreshProduct">
-        <product-detail-card :product="productEdit" :disabled="false" :currency="currency"/>
+      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProductAPI">
+        <product-detail-card :product="productEdit" :disabled="false" :currency="currency" :errors="errors"/>
       </b-modal>
     </div>
   </div>
@@ -212,14 +212,14 @@ export default {
           .modifyProduct(this.$route.params.id, this.oldProductId, editData)
           .then((editProductResponse) => {
             this.$log.debug("Product has been edited",editProductResponse);
-            this.refreshProduct();
+            this.getProducts(this.$route.params.id);
             this.$bvModal.hide('edit-product-card');
           })
           .catch((error) => {
             this.errors = [];
             this.$log.debug(error);
             if ((error.response && error.response.status === 400)) {
-              this.errors.push("Modifying products has failed. Please try again");
+              this.errors.push(error.response.data);
             } else if ((error.response && error.response.status === 403)) {
               this.errors.push("Forbidden. You are not an authorized administrator");
             } else {
@@ -228,14 +228,6 @@ export default {
             console.log(error.response);
           })
     },
-
-    /**
-     * function when clicked refreshes the table so that it can be reloaded with
-     * new/edited data
-     */
-    refreshProduct: function () {
-      this.getProducts(this.$route.params.id);
-    }
   },
 
   computed: {
