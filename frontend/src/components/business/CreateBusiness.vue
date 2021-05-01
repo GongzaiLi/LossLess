@@ -109,7 +109,7 @@ export default {
         this.$currentUser = (await api.getUser(this.$currentUser.id)).data;
         await this.$router.push({path: `/businesses/${businessResponse.businessId}`});
       } catch(error) {
-        console.log(error);
+        //console.log(error);
         this.pushErrors(error);
       }
     },
