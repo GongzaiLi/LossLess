@@ -262,13 +262,22 @@ describe('Testing api put request and the response method with errors', () => {
     expect(Api.getProducts).toHaveBeenCalledWith(0);
   });
 
-  it('400 error test', async () => {
-    Api.modifyProduct.mockRejectedValue({response : {status: 400}});
+  it('400 error test if Product ID already exists', async () => {
+    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product ID provided already exists."}});
 
     const mockEvent = {preventDefault: jest.fn()};
     await wrapper.vm.modifyProductAPI(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual(["Modifying products has failed. Please try again"]);
+    expect(wrapper.vm.errors).toStrictEqual(["Product ID provided already exists."]);
+  });
+
+  it('400 error test if Product ID provided does not exist', async () => {
+    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product does not exist."}});
+
+    const mockEvent = {preventDefault: jest.fn()};
+    await wrapper.vm.modifyProductAPI(mockEvent);
+
+    expect(wrapper.vm.errors).toStrictEqual(["Product does not exist."]);
   });
 
   it('403 error test', async () => {
