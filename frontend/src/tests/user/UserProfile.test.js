@@ -14,6 +14,11 @@ const $log = {
   debug: jest.fn(),
 };
 
+const $currentUser = {
+  id: 1,
+  role: 'user'
+}
+
 jest.mock('../../Api');
 
 let wrapper;
@@ -38,7 +43,7 @@ beforeEach(() => {
     localVue,
     router,
     propsData: {},
-    mocks: {$log},
+    mocks: {$log, $currentUser},
     stubs: {},
     methods: {},
   });
@@ -54,38 +59,40 @@ describe('Profile', () => {
   });
 });
 
+describe('fullname-computed', () => {
 
-test('only-first-and-last-name', async () => {
-  wrapper.vm.userData.firstName = "First";
-  wrapper.vm.userData.lastName = "Last";
-  await wrapper.vm.$nextTick();
-  expect(wrapper.vm.fullName).toEqual("First Last");
-});
+  test('only-first-and-last-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Last");
+  });
 
-test('first-and-middle-and-last-name', async () => {
-  wrapper.vm.userData.firstName = "First";
-  wrapper.vm.userData.lastName = "Last";
-  wrapper.vm.userData.middleName = "Middle";
-  await wrapper.vm.$nextTick();
-  expect(wrapper.vm.fullName).toEqual("First Middle Last");
-});
+  test('first-and-middle-and-last-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    wrapper.vm.userData.middleName = "Middle";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Middle Last");
+  });
 
-test('first-and-middle-and-last-and-nick-name', async () => {
-  wrapper.vm.userData.firstName = "First";
-  wrapper.vm.userData.lastName = "Last";
-  wrapper.vm.userData.middleName = "Middle";
-  wrapper.vm.userData.nickName = "Nick";
-  await wrapper.vm.$nextTick();
-  expect(wrapper.vm.fullName).toEqual("First Middle Last (Nick)");
-});
+  test('first-and-middle-and-last-and-nick-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    wrapper.vm.userData.middleName = "Middle";
+    wrapper.vm.userData.nickName = "Nick";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Middle Last (Nick)");
+  });
 
-test('first-and-last-and-nick-name', async () => {
-  wrapper.vm.userData.firstName = "First";
-  wrapper.vm.userData.lastName = "Last";
-  wrapper.vm.userData.nickName = "Nick";
-  await wrapper.vm.$nextTick();
-  expect(wrapper.vm.fullName).toEqual("First Last (Nick)");
-});
+  test('first-and-last-and-nick-name', async () => {
+    wrapper.vm.userData.firstName = "First";
+    wrapper.vm.userData.lastName = "Last";
+    wrapper.vm.userData.nickName = "Nick";
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.fullName).toEqual("First Last (Nick)");
+  });
+})
 
 
 // getUserInfo
@@ -143,6 +150,74 @@ describe('check-getUserInfo-API-function-in-user-profile', () => {
   });
 });
 
+describe('User Role', () => {
+  test('displays-if-current-user-is-admin', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.showUserRole).toBe(true);
+  });
+
+  test('displays-if-current-user-is-dgaa', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.showUserRole).toBe(true);
+  });
+
+  test('doesnt-display-if-current-user-is-user', async () => {
+    wrapper.vm.$currentUser.role = 'user';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.showUserRole).toBe(false);
+  });
+})
+
+describe('Toggle Admin Button', () => {
+  test('displays-if-current-user-is-admin', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.showToggleAdminButton).toBe(true);
+  });
+
+  test('doesnt-display-if-displayed-user-is-dgaa', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    wrapper.vm.userData.role = 'defaultGlobalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.showToggleAdminButton).toBe(false);
+  });
+
+  test('doesnt-display-if-displayed-user-is-current-user', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    wrapper.vm.userData.id = 1;
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.showToggleAdminButton).toBe(false);
+  });
+})
+
+describe('User Role String', () => {
+  test('works-for-admin', async () => {
+    wrapper.vm.userData.role = 'globalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userRoleDisplayString).toEqual('Site Admin');
+  })
+
+  test('works-for-dgaa', async () => {
+    wrapper.vm.userData.role = 'defaultGlobalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userRoleDisplayString).toEqual('Default Site Admin');
+  })
+
+  test('works-for-user', async () => {
+    wrapper.vm.userData.role = 'user';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userRoleDisplayString).toEqual('User');
+  })
+})
+
 //giveAdmin
 describe('Testing-api-put-giveAdmin', () => {
   beforeEach(() => {
@@ -197,5 +272,45 @@ describe('Testing-api-put-revokeAdmin', () => {
     window.alert = () => {};
     await wrapper.vm.revokeAdmin();
     expect(wrapper.vm.userData.role).toStrictEqual("globalApplicationAdmin");
+  });
+});
+
+
+describe('Testing-toggleAdmin', () => {
+
+  it('toggleAdmin-works-on-normal-user', async () => {
+    wrapper.vm.userData.role = "user";
+
+    Api.revokeUserAdmin.mockResolvedValue({
+      status: 200
+    });
+
+    Api.makeUserAdmin.mockResolvedValue({
+      status: 200
+    });
+
+    wrapper.vm.userData.id = 0;
+    await wrapper.vm.toggleAdmin();
+    expect(wrapper.vm.userData.role).toStrictEqual('globalApplicationAdmin');
+    await wrapper.vm.toggleAdmin();
+    expect(wrapper.vm.userData.role).toStrictEqual('user');
+  });
+
+  it('toggleAdmin-works-on-admin', async () => {
+    wrapper.vm.userData.role = "globalApplicationAdmin";
+
+    Api.revokeUserAdmin.mockResolvedValue({
+      status: 200
+    });
+
+    Api.makeUserAdmin.mockResolvedValue({
+      status: 200
+    });
+
+    wrapper.vm.userData.id = 0;
+    await wrapper.vm.toggleAdmin();
+    expect(wrapper.vm.userData.role).toStrictEqual('user');
+    await wrapper.vm.toggleAdmin();
+    expect(wrapper.vm.userData.role).toStrictEqual('globalApplicationAdmin');
   });
 });
