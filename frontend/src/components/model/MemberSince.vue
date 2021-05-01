@@ -51,7 +51,7 @@ export default {
       if (registeredMonths > 0 || registeredYears === 0) {
         message += registeredMonths + ((registeredMonths === 1) ? " Month" : " Months");
       }
-      return message + ") ";
+      return message + ")";
     }
   }
 }
