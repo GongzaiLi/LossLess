@@ -250,13 +250,12 @@ public class BusinessController {
         Product oldProduct = productService.findProductById(productId);
         if (oldProduct == null) {
             logger.warn("Product does not exist.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
         }
 
         String newProductId = editedProduct.createCode(businessId);
         if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
-                    "to one that is already in your catalogue.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
         }
 
         Product newProduct = new Product();
