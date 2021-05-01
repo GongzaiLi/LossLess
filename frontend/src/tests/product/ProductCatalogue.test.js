@@ -1,9 +1,9 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import productCatalogue from '../product/ProductCatalogue';
+import productCatalogue from '../../components/product/ProductCatalogue';
 import Api from "../../Api";
-import productDetailCard from "../product/ProductDetailCard";
-import Pagination from "../Pagination";
+import productDetailCard from "../../components/product/ProductDetailCard";
+import Pagination from "../../components/model/Pagination";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -20,15 +20,22 @@ const $log = {
   }
 };
 
+
 jest.mock('../../Api');
 
 beforeEach(() => {
-  const localVue = createLocalVue()
 
+  const localVue = createLocalVue()
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
 
   Api.getProducts.mockRejectedValue(new Error(''));
+  Api.getBusiness.mockResolvedValue({data: {"address": {"country": "New Zealand"}}});
+  Api.getUserCurrency.mockResolvedValue({
+    symbol: '$',
+    code: 'USD',
+    name: 'United States Dollar'
+  });
 
   wrapper = shallowMount(productCatalogue, {
     localVue,
@@ -46,7 +53,7 @@ afterEach(() => {
 
 describe('check-getProducts-API-function', () => {
   test('get-normal-data', async () => {
-    const response = {
+    const productsResponse = {
       data: [{
         id: "WATT-420-BEANS",
         name: "Watties Baked Beans - 420g can",
@@ -55,9 +62,42 @@ describe('check-getProducts-API-function', () => {
         created: "2021-04-14T13:01:58.660Z"
       }]
     };
-    Api.getProducts.mockResolvedValue(response);
+    const businessResponse = {
+      data: {
+      "id": 100,
+      "primaryAdministratorId": 20,
+      "name": "Lumbridge General Store",
+      "description": "A one-stop shop for all your adventuring needs",
+      "address": {
+        "streetNumber": "3/24",
+          "streetName": "Ilam Road",
+          "city": "Christchurch",
+          "region": "Canterbury",
+          "country": "New Zealand",
+          "postcode": "90210"
+      },
+      "businessType": "Accommodation and Food Services",
+      "created": "2020-07-14T14:52:00Z"
+      }
+    };
+
+    const mockCurrencyData = {
+      symbol: '$',
+      code: 'NZD',
+      name: 'New Zealand Dollar'
+    };
+    Api.getProducts.mockResolvedValue(productsResponse);
+    Api.getBusiness.mockResolvedValue(businessResponse);
+
+    const userCurrencyMock = jest.fn();
+    userCurrencyMock.mockResolvedValue(mockCurrencyData);
+    Api.getUserCurrency = userCurrencyMock;
+
     await wrapper.vm.getProducts(0);
-    expect(wrapper.vm.items).toEqual(response.data);
+
+    expect(wrapper.vm.items).toEqual(productsResponse.data);
+    expect(wrapper.vm.currency).toEqual(mockCurrencyData);
+    expect(userCurrencyMock).toHaveBeenCalledWith('New Zealand');
   });
 });
 
@@ -98,7 +138,6 @@ describe('check-product-catalogue-page', () => {
   });
 
 });
-
 
 describe('check-setDescription-function', () => {
   test('description-less-then-20-characters', () => {
@@ -183,6 +222,27 @@ describe('check-model-product-card-page', () => {
     };
     Api.getProducts.mockResolvedValue(response);
     await wrapper.vm.getProducts(0);
+    await wrapper.vm.tableRowClick(response.data[0]);
+
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
+  });
+
+  test('check-product-detail-card-component-exists-when-click-edit-button', async () => {
+    const response = {
+      data: [{
+        id: "WATT-420-BEANS1",
+        name: "Watties Baked Beans - 430g can",
+        description: "Aaked Beans as they should be.",
+        recommendedRetailPrice: 2.2,
+        created: "2021-03-14T13:01:58.660Z",
+        image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
+      }]
+    };
+    Api.getProducts.mockResolvedValue(response);
+    await wrapper.vm.getProducts(0);
+    await wrapper.vm.editProduct(response.data[0]);
 
     await wrapper.vm.$forceUpdate();
 

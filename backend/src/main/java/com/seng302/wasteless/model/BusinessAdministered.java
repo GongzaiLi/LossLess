@@ -19,7 +19,7 @@ public class BusinessAdministered {
     private int primaryAdministratorId;
     private String name;
     private String description;
-    private String address;
+    private Address address;
     private BusinessTypes businessType;
     private String created;
 }

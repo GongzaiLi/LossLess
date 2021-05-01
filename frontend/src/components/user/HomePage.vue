@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import api from "../Api";
+import api from "../../Api";
 
 export default {
 

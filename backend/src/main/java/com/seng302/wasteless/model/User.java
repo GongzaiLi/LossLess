@@ -61,10 +61,11 @@ public class User {
     @JsonView({UserViews.PostUserRequestView.class})
     private String phoneNumber;
 
-    @NotBlank(message = "homeAddress is mandatory")
-    @Column(name = "home_address") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
-    private String homeAddress;
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "home_address") // map camelcase name (java) to snake case (SQL)
+    private Address homeAddress;
 
     @NotBlank(message = "password is mandatory")
     @JsonView({UserViews.PostUserRequestView.class})
@@ -75,7 +76,7 @@ public class User {
     private String salt;
 
     @Column(name = "businesses_primarily_administered")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Business> businessesPrimarilyAdministered;
 
     @Column(name = "created") // map camelcase name (java) to snake case (SQL)
@@ -83,8 +84,6 @@ public class User {
 
     @Column(name = "role")
     private UserRoles role;
-
-    //Omitted fields. business administered: added in u6
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges

@@ -129,6 +129,16 @@ public class UserService {
      */
     public void addBusinessPrimarilyAdministered(User user, Business business) {
         user.addPrimaryBusiness(business);
+
+    }
+
+    /**
+     * Save changes to a user
+     *
+     * @param user  The user to save changes to
+     */
+    public void saveUserChanges(User user) {
+        userRepository.save(user);
     }
 
 }

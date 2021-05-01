@@ -2,6 +2,7 @@ package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.BusinessViews;
+import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -27,7 +28,7 @@ public class Business {
     private User primaryAdministrator;
 
     @Column(name = "administrators")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
     private List<User> administrators;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
@@ -40,9 +41,10 @@ public class Business {
     private String description;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
-    @NotBlank(message = "address is mandatory")
-    @Column(name = "address")
-    private String address;
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "address") // map camelcase name (java) to snake case (SQL)
+    private Address address;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
     @NotNull(message = "businessType is mandatory")
@@ -52,4 +54,13 @@ public class Business {
     @Column(name = "created")
     private LocalDate created;
 
+    /**
+     * Add an administrator to a business
+     * Never call this directly, only call it from business service.
+     *
+     * @param user The user to add to the list of administrators
+     */
+    public void addAdministrator(User user) {
+        this.administrators.add(user);
+    }
 }

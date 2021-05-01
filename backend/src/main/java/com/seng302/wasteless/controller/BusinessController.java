@@ -2,17 +2,20 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.PutBusinessesMakeAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.MainApplicationRunner;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.ProductViews;
+import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +39,14 @@ import java.util.Map;
 public class BusinessController {
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
-    private BusinessService businessService;
-    private ProductService productService;
-    private UserService userService;
+    private final BusinessService businessService;
+    private final UserService userService;
+    private final AddressService addressService;
+    private final ProductService productService;
 
     @Autowired
-    public BusinessController(BusinessService businessService, UserService userService, ProductService productService) {
+    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService, ProductService productService) {
+        this.addressService = addressService;
         this.businessService = businessService;
         this.userService = userService;
         this.productService = productService;
@@ -81,17 +86,23 @@ public class BusinessController {
         List<User> adminList = new ArrayList<>();
         adminList.add(user);
         business.setAdministrators(adminList);
-        userService.addBusinessPrimarilyAdministered(user, business);
-
 
         business.setCreated(LocalDate.now());
 
         //Save business
+        addressService.createAddress(business.getAddress());
         business = businessService.createBusiness(business);
+
+        userService.addBusinessPrimarilyAdministered(user, business);
+
+        userService.saveUserChanges(user);
 
         logger.info("saved new business {}", business);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("businessId", business.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
 
@@ -259,6 +270,70 @@ public class BusinessController {
         productService.updateProduct(oldProduct, newProduct);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
+    /**
+     * Put request to make a user a administrator of a business
+     *
+     * Checks if the business exists, and user to make admin exists
+     * Checks if the user making the request has permission to, either as the primary business admin
+     * for that business, or as a global application admin
+     *
+     * Gets the user currently logged in from Authentication, this is the person acting
+     *
+     * If the above passes adds the user to the businesses list of administrators
+     *
+     * Returns 200 on success
+     * Returns 400 if user does not exist, or if user is already admin
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 403 if forbidden request, i.e. the request is not allowed to make the request
+     * Returns 406 if business does not exist
+     *
+     *
+     * @param businessId    The id the business to add an administrator for
+     * @param requestBody   The request body containing the userId of the user to make admin
+     * @return  Response code with message, see above for codes
+     */
+    @PutMapping("/businesses/{id}/makeAdministrator")
+    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesMakeAdminDto requestBody) {
+
+        Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
+        logger.info("possible Business {}", possibleBusinessToAddAdminFor);
+
+        if (possibleBusinessToAddAdminFor == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+
+        User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
+        logger.info("possible User {}", possibleUserToMakeAdmin);
+
+        if (possibleUserToMakeAdmin == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
+
+        if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
+            && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+            && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+
+        if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
+        }
+
+        //Set user to be admin of business
+        businessService.addAdministratorToBusiness(possibleBusinessToAddAdminFor, possibleUserToMakeAdmin);
+        businessService.saveBusinessChanges(possibleBusinessToAddAdminFor);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 
     /**

@@ -48,8 +48,8 @@ Date: 7/3/2021
 </style>
 
 <script>
-import api from "../Api";
-import pagination from "./Pagination";
+import api from "../../Api";
+import pagination from "../model/Pagination";
 
 export default {
   components: {
@@ -77,9 +77,6 @@ export default {
      * @param searchParameter id user is id or name other details
      */
     displayResults: function (searchParameter) {
-      if (!searchParameter.length) {
-        return;
-      }
       api
         .searchUser(searchParameter)
         .then((response) => {
@@ -114,23 +111,29 @@ export default {
       };
       for (const user of data) {
         tableHeader = user;
+        tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
-          let roleLabel;
-          if (user.role === "globalApplicationAdmin") {
-            roleLabel = "ADMIN";
-          } else if (user.role === "defaultGlobalApplicationAdmin") {
-            roleLabel = "DEFAULT ADMIN";
-          } else {
-            roleLabel = "USER";
-          }
-          tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
-          tableHeader.userType = `${roleLabel}`;
-        } else {
-          tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+          tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
+        tableHeader.homeAddress = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
         items.push(tableHeader);
       }
       return items;
+    },
+    /**
+     * Given a user object, returns a string representation of the user's role
+     * to be displayed in the table. Example values: 'USER', 'ADMIN'
+     */
+    getUserRoleString(user) {
+      let roleLabel;
+      if (user.role === "globalApplicationAdmin") {
+        roleLabel = "ADMIN";
+      } else if (user.role === "defaultGlobalApplicationAdmin") {
+        roleLabel = "DEFAULT ADMIN";
+      } else {
+        roleLabel = "USER";
+      }
+      return roleLabel;
     }
   },
 
