@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import net.minidev.json.JSONObject;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class GetUserDtoAdmin extends GetUserDto {
     private String email;
     private String dateOfBirth;
     private String phoneNumber;
-    private Address homeAddress;
+    private JSONObject homeAddress;
     private String created;
     private UserRoles role;
     private List<BusinessAdministered> businessesAdministered;

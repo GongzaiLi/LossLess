@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import net.minidev.json.JSONObject;
 
 import java.util.List;
 
@@ -28,8 +29,6 @@ public class GetUserDto {
     private String nickName;
     private String bio;
     private String email;                      //change later
-    private String city;
-    private String region;
-    private String country;
+    private JSONObject homeAddress;
     private String created;
 }

@@ -238,7 +238,7 @@ public class UserControllerIntegrationTests {
 
 
     @Test
-    public void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRole() throws Exception {
+    public void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRoleAndAddress() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
@@ -250,13 +250,12 @@ public class UserControllerIntegrationTests {
                 .andExpect(jsonPath("firstName", is("Oliver")))
                 .andExpect(jsonPath("lastName", is("Cranshaw")))
                 .andExpect(jsonPath("role", is("user")))
-                .andExpect(jsonPath("streetNumber").doesNotExist())
-                .andExpect(jsonPath("country").doesNotExist())
-                .andExpect(jsonPath("homeAddress").exists());
+                .andExpect(jsonPath("homeAddress.streetNumber", is("3/24")))
+                .andExpect(jsonPath("homeAddress.country", is("New Zealand")));
         }
 
     @Test
-    public void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRole() throws Exception {
+    public void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRoleAndAddress() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
@@ -266,11 +265,9 @@ public class UserControllerIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id", is(2)))
                 .andExpect(jsonPath("role").doesNotExist())
-                .andExpect(jsonPath("homeAddress").doesNotExist())
-                .andExpect(jsonPath("streetNumber").doesNotExist())
-                .andExpect(jsonPath("city", is("Christchurch")))
-                .andExpect(jsonPath("region", is("Canterbury")))
-                .andExpect(jsonPath("country", is("New Zealand")));
+                .andExpect(jsonPath("homeAddress.streetNumber").doesNotExist())
+                .andExpect(jsonPath("homeAddress.city", is("Christchurch")))
+                .andExpect(jsonPath("homeAddress.country", is("New Zealand")));
     }
 
     @Test
