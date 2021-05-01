@@ -64,7 +64,13 @@ Date: 19/4/2021
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
         </b-input-group>
-
+      </div>
+      <br>
+      <div v-if="errors.length">
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{
+            error
+          }}
+        </b-alert>
       </div>
 
     </b-card-body>
@@ -75,7 +81,7 @@ Date: 19/4/2021
 <script>
 export default {
   name: "product-detail-card",
-  props: ['product', 'disabled', 'currency'],
+  props: ['product', 'disabled', 'currency', 'errors'],
   data() {
     return {
       productCard: {
