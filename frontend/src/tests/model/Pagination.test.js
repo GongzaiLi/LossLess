@@ -1,6 +1,6 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import pagination from "../Pagination";
+import pagination from "../../components/model/Pagination";
 
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings

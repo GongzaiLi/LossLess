@@ -3,6 +3,7 @@ package com.seng302.wasteless.testconfigs;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 @TestConfiguration
 public class MockUserServiceConfig {
 
+
     /**
      * Mock UserService class for testing purposes.
      * The mock UserService is implemented as a simple Array of users,
@@ -34,6 +36,7 @@ public class MockUserServiceConfig {
     public static class MockUserService extends UserService {
         ArrayList<User> users = new ArrayList<>();
 
+
         public MockUserService () {
             super(null);
             User defaultAdmin = new User();
@@ -41,19 +44,25 @@ public class MockUserServiceConfig {
             defaultAdmin.setEmail("defaultadmin@700");
             defaultAdmin.setPassword("password");
 
-            User admin = new User();
-            admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-            admin.setEmail("admin@700");
-            admin.setPassword("password");
-
             User user = new User();
             user.setRole(UserRoles.USER);
             user.setEmail("user@700");
             user.setPassword("password");
 
+            User admin = new User();
+            admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+            admin.setEmail("admin@700");
+            admin.setPassword("password");
+
+            User user2 = new User();
+            user2.setRole(UserRoles.USER);
+            user2.setEmail("user2@700");
+            user2.setPassword("password");
+
             createUser(defaultAdmin);
             createUser(admin);
             createUser(user);
+            createUser(user2);
         }
 
         @Override
@@ -97,10 +106,24 @@ public class MockUserServiceConfig {
         public void updateUser(User user) {
             users.set(user.getId(), user);
         }
+
+        @Override
+        public void saveUserChanges(User user) {
+            users.set(user.getId(), user);
+        }
+
+        @Override
+        public boolean checkUserAdminsBusiness(Integer businessId, Integer userId) {
+            if (userId.equals(1)) {
+                return true;
+            }
+            return false;
+        }
     }
 
     @Bean
     public UserService userService() {
         return new MockUserService();
     }
+
 }
