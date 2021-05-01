@@ -242,23 +242,51 @@ describe('check-model-product-card-page', () => {
     };
     Api.getProducts.mockResolvedValue(response);
     await wrapper.vm.getProducts(0);
-    await wrapper.vm.editProduct(response.data[0]);
+    await wrapper.vm.openEditProductCard(response.data[0]);
 
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
+  })
+
+  test('check-product-detail-card-component-exists-when-click-create-button', async () => {
+    await wrapper.vm.openCreateProductModal();
+
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
+  })
+
+  test('check-product-detail-card-component-not-exists-when-click-close-button', async () => {
+    await wrapper.vm.openCreateProductModal();
+    await wrapper.vm.$forceUpdate();
+
+    await wrapper.vm.closeProductCardModal();
     await wrapper.vm.$forceUpdate();
 
     expect(wrapper.find(productDetailCard).exists()).toBeTruthy()
   })
 });
 
-describe('Testing api put request and the response method with errors', () => {
+describe('Testing api put/post request and the response method with errors', () => {
 
   it('Succesfully edits a product ', async () => {
     Api.modifyProduct.mockResolvedValue({response : {status: 200}});
 
     const mockEvent = {preventDefault: jest.fn()}
-    await wrapper.vm.modifyProductAPI(mockEvent);
+    await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual([]);
+    expect(wrapper.vm.productCardError).toBe("");
+    expect(Api.getProducts).toHaveBeenCalledWith(0);
+  });
+
+  it('Succesfully creates a product ', async () => {
+    Api.createProduct.mockResolvedValue({response : {status: 200}});
+
+    const mockEvent = {preventDefault: jest.fn()}
+    await wrapper.vm.createProduct(mockEvent);
+
+    expect(wrapper.vm.productCardError).toBe("");
     expect(Api.getProducts).toHaveBeenCalledWith(0);
   });
 
@@ -266,27 +294,36 @@ describe('Testing api put request and the response method with errors', () => {
     Api.modifyProduct.mockRejectedValue({response : {status: 400}});
 
     const mockEvent = {preventDefault: jest.fn()};
-    await wrapper.vm.modifyProductAPI(mockEvent);
+    await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual(["Modifying products has failed. Please try again"]);
+    expect(wrapper.vm.productCardError).toBe("Product has the same name or id as another product. Please try again");
   });
 
   it('403 error test', async () => {
     Api.modifyProduct.mockRejectedValue({response : {status: 403}});
 
     const mockEvent = {preventDefault: jest.fn()};
-    await wrapper.vm.modifyProductAPI(mockEvent);
+    await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual(["Forbidden. You are not an authorized administrator"]);
+    expect(wrapper.vm.productCardError).toBe("Forbidden. You are not an authorized administrator");
+  });
+
+  it('no internet test', async () => {
+    Api.modifyProduct.mockRejectedValue({request: {path: 'blah'}});
+
+    const mockEvent = {preventDefault: jest.fn()};
+    await wrapper.vm.modifyProduct(mockEvent);
+
+    expect(wrapper.vm.productCardError).toBe("No Internet Connectivity");
   });
 
   it('other error test', async () => {
     Api.modifyProduct.mockRejectedValue({response : {status: 500}});
 
     const mockEvent = {preventDefault: jest.fn()};
-    await wrapper.vm.modifyProductAPI(mockEvent);
+    await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual(["Server error"]);
+    expect(wrapper.vm.productCardError).toBe("Server error");
   });
 
 });
