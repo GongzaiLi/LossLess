@@ -16,7 +16,8 @@ Date: sprint_1
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
-        <b-nav-item to="/businesses">Create Business</b-nav-item>
+        <b-nav-item to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item v-if="$currentUser.currentlyActingAs !== null" :to="businessRouteLink">Product Catalogue</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
@@ -93,6 +94,12 @@ export default {
       return this.$currentUser.businessesAdministered.filter(
           (business) => (this.isActingAsUser || business.id !== this.$currentUser.currentlyActingAs.id)
       );
+    },
+    /**
+     * Returns a string constructed to go to the product page url
+     */
+    businessRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/products";
     }
   },
   methods: {
