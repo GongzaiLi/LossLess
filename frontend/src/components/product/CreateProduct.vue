@@ -128,7 +128,8 @@ export default {
             this.errors = [];
             this.$log.debug(error);
             if ((error.response && error.response.status === 400)) {
-              this.errors.push("Creation failed. Please try again");
+              console.log(error.response)
+              this.errors.push("Creation failed. Please try again. "+error.response.data);
             } else if ((error.response && error.response.status === 403)) {
               this.errors.push("Forbidden. You are not an authorized administrator");
             } else {
