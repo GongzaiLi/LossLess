@@ -167,7 +167,7 @@ public class BusinessController {
         String productId = possibleProduct.createCode(businessId);
 
         if (productService.findProductById(productId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The ID of the product you have entered is too similar " +
                     "to one that is already in your catalogue.");
         }
         LocalDate dateCreated = LocalDate.now();
