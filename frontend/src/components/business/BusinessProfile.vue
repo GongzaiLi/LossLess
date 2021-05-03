@@ -135,6 +135,7 @@ Date: 29/03/2021
 
     <b-modal id="admin-modal" hide-header hide-footer size="xl">
       <make-admin-modal :make-admin-action="this.makeAdminAction"/>
+      <b-alert :show="makeAdminError.length > 0 ? 120 : 0" variant="danger">{{ makeAdminError }}</b-alert>
     </b-modal>
   </div>
 
@@ -215,6 +216,7 @@ export default {
       businessFound: true, // not smooth to switch the found or not find.
       loading: true,
       makeAdminAction: () => {},
+      makeAdminError: "",
     }
   },
 
@@ -336,12 +338,32 @@ export default {
           .makeBusinessAdmin(this.businessData.id, makeAdminRequestData)
           .then((response) => {
             this.$log.debug("Response from request to make admin: ", response);
+            this.$bvModal.hide('admin-modal');
+            this.getBusinessInfo(this.$route.params.id);
           })
           .catch((error) => {
+            this.makeAdminError = this.getErrorMessageFromApiError(error);
             this.$log.debug(error);
           })
-    }
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST and PUT requests for products
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        return error.response.data;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
+    },
   },
+
   computed: {
 
     /**

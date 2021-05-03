@@ -2,15 +2,14 @@
 
   <b-card
       class="profile-card"
-      style="min-width: 1000px"
+      style="min-width: 1100px"
   ><!--header-border-variant="secondary" border-variant="secondary"  background-color: rgba(0,255,0,0.4);-->
 
-    <b-card-text style="text-align: center">
-    <h2>Assign a New Administrator</h2>
-    <h6>Search and select by clicking on the user you would like to make admin to your business</h6>
+    <b-card-text style="text-align: left">
+    <h3>Assign a New Administrator</h3>
+    <h6>Search User by name and select by clicking on the User to assign business administrator role.</h6>
     </b-card-text>
-    <br>
-    <user-search>
+    <user-search :is-make-admin="true" @rowSelect="rowSelect" >
     </user-search>
 
   </b-card>
@@ -29,9 +28,6 @@ export default {
   data() {
     return {
       }
-  },
-  mounted() {
-    this.$vueEventBus.$on("rowSelect", this.rowSelect);
   },
 
   methods: {

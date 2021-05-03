@@ -16,8 +16,6 @@ import {getUser} from '@/auth'
 
 Vue.use(Router);
 
-Vue.prototype.$vueEventBus = new Vue(); //Global so that component functions can be emitted to each other
-
 const router = new Router({
     routes: [
         { path: '/', redirect: '/login' },
