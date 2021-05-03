@@ -32,18 +32,13 @@ const router = new Router({
 
 /**
  * Route guard that redirects users to the login page if they are not authenticated.
- * This applies to all routes except for the login and register routes. Additionally,
- * the route guard will redirect the current user to their home page if they are in a
- * product catalogue page they should not have access to.
+ * This applies to all routes except for the login and register routes. 
  */
 router.beforeEach((to, _from, next) => {
     console.log(to);
     const currentUser = getUser();
     if (!['login', 'register'].includes(to.name) && currentUser == null) {
         next('/login');
-    } else if (to.name === 'product-catalogue' && currentUser.role === 'user' &&
-      (!currentUser.currentlyActingAs || currentUser.currentlyActingAs.id !== parseInt(to.params.id))) {
-        next(`/businesses/${to.params.id}`);
     } else {
         next();
     }

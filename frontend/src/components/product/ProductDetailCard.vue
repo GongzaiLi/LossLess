@@ -12,15 +12,14 @@ Date: 19/4/2021
         @submit="okAction"
     >
     <b-card-body>
-        <b-input-group>
-          <h6><b>Id:</b></h6>
-        </b-input-group>
+        <h6><b>ID*:</b></h6>
+        This will be automatically changed into the correct format.
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.id" required/>
+          <b-form-input type="text" v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
         </b-input-group>
 
         <b-input-group>
-          <h6><b>Name:</b></h6>
+          <h6><b>Name*:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name" required/>
@@ -34,13 +33,13 @@ Date: 19/4/2021
         </b-input-group>
 
         <b-input-group>
-          <h6><b>Recommended Retail Price:</b></h6>
+          <h6><b>Recommended Retail Price*:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <template #prepend>
             <b-input-group-text >{{currency.symbol}}</b-input-group-text>
           </template>
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
+          <b-form-input type="number" v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
           <template #append>
             <b-input-group-text >{{currency.code}}</b-input-group-text>
           </template>

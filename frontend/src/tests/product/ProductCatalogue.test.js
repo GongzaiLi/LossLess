@@ -24,7 +24,12 @@ const $currentUser = {
   role: 'user',
   currentlyActingAs: {
     id: 0
-  }
+  },
+  businessesAdministered: [
+    {id: 0, name: "blah"},
+    {id: 1, name: "blah1"},
+    {id: 2, name: "blah2"}
+  ]
 };
 
 
@@ -367,36 +372,68 @@ describe('Testing api put/post request and the response method with errors', () 
 
 });
 
+describe('businessNameIfAdminOfThisBusiness', () => {
+
+  it('Works if user admins business', async () => {
+    expect(wrapper.vm.businessNameIfAdminOfThisBusiness).toBe("blah");
+  });
+
+  it('Works if user not admins business', async () => {
+    wrapper.vm.$route = {
+      params: {
+        id: 3
+      }
+    }
+
+    expect(wrapper.vm.businessNameIfAdminOfThisBusiness).toBe(null);
+  });
+
+})
+
 
 describe('Testing currently acting as watcher', () => {
 
-  it('Shows modal if switch to normal user', async () => {
+  it('Does not load data if switch to normal user', async () => {
     wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', null);
 
-    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    jest.spyOn(wrapper.vm, 'getProducts');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.$bvModal.show).toBeCalled();
+    expect(wrapper.vm.getProducts).not.toBeCalled();
   });
 
-  it('Shows modal if switch to other business', async () => {
+  it('Does not load data if switch to other business', async () => {
     wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
 
-    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    jest.spyOn(wrapper.vm, 'getProducts');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.$bvModal.show).toBeCalled();
+    expect(wrapper.vm.getProducts).not.toBeCalled();
   });
 
-  it('Does not show modal if switch to other business but is admin', async () => {
+  it('Loads if switch to other business and acting as', async () => {
+    wrapper.vm.$route = {
+      params: {
+        id: 2
+      }
+    }
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 2});
+
+    jest.spyOn(wrapper.vm, 'getProducts');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getProducts).toHaveBeenCalledWith(2);
+  });
+
+
+  it('Loads data if switch to other business but is admin', async () => {
     wrapper.vm.$set(wrapper.vm.$currentUser, 'role', 'globalApplicationAdmin');
     wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
 
-    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    jest.spyOn(wrapper.vm, 'getProducts');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.$bvModal.show).not.toBeCalled();
+    expect(wrapper.vm.getProducts).toHaveBeenCalledWith(0);
   });
-
 
 });
