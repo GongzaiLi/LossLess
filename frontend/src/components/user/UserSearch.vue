@@ -70,6 +70,7 @@ export default {
      * When called changes page to the profile page based on the id of the user clicked
      */
     rowClickHandler: function (record) {
+      this.$vueEventBus.$emit('rowSelect', record);
       this.$router.push({path: `/users/${record.id}`});
     },
     /**

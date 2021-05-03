@@ -104,6 +104,9 @@ Date: 29/03/2021
 
             </b-col>
           </b-row>
+          <br>
+          <h6 class="font-weight-bold">Assign a New Administrator:</h6>
+          <b-button @click="showMakeAdminModal()">Add Amin</b-button>
         </b-list-group-item>
       </b-list-group>
     </b-card>
@@ -129,6 +132,10 @@ Date: 29/03/2021
         </h6>
       </b-card-body>
     </b-card>
+
+    <b-modal id="admin-modal" hide-header hide-footer size="xl">
+      <make-admin-modal :make-admin-action="this.makeAdminAction"/>
+    </b-modal>
   </div>
 
 
@@ -149,11 +156,14 @@ h6 {
 <script>
 import memberSince from "../model/MemberSince";
 import api from "../../Api";
+import makeAdminModal from './MakeAdminModal';
+
 
 
 export default {
   components: {
-    memberSince
+    memberSince,
+    makeAdminModal
   },
   data: function () {
     return {
@@ -203,7 +213,8 @@ export default {
         created: "",
       },
       businessFound: true, // not smooth to switch the found or not find.
-      loading: true
+      loading: true,
+      makeAdminAction: () => {},
     }
   },
 
@@ -233,7 +244,7 @@ export default {
      * Revoke admin from given userID by making api request
      * @param userId the id of the user to revoke admin from
      */
-    removeAdminClickHandler: function(userId){
+    removeAdminClickHandler: function (userId) {
       if (userId == null) {
         return;
       }
@@ -245,7 +256,7 @@ export default {
       api
           .revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
           .then((response) => {
-             this.$log.debug("Response from request to revoke admin: ", response);
+            this.$log.debug("Response from request to revoke admin: ", response);
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -303,6 +314,33 @@ export default {
         return false;
       }
     },
+
+    /**
+     * When clicking button Add Admin this modal will show
+     */
+    showMakeAdminModal: function () {
+      this.makeAdminAction = this.makeAdminHandler;
+      this.$bvModal.show('admin-modal');
+    },
+
+    /**
+     * Method of the API request to make user become admin
+     *
+     * @param userId ID of the user that is requested to make admin
+     */
+    makeAdminHandler: function (userId) {
+      const makeAdminRequestData = {
+        userId: userId
+      }
+      api
+          .makeBusinessAdmin(this.businessData.id, makeAdminRequestData)
+          .then((response) => {
+            this.$log.debug("Response from request to make admin: ", response);
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          })
+    }
   },
   computed: {
 
