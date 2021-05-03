@@ -2,15 +2,13 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
-import com.seng302.wasteless.dto.PutBusinessesMakeAdminDto;
+import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
@@ -37,7 +35,7 @@ import java.util.Map;
 
 @RestController
 public class BusinessController {
-    private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
+    private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
 
     private final BusinessService businessService;
     private final UserService userService;
@@ -293,7 +291,7 @@ public class BusinessController {
      * @return  Response code with message, see above for codes
      */
     @PutMapping("/businesses/{id}/makeAdministrator")
-    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesMakeAdminDto requestBody) {
+    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
 
         Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
         logger.info("possible Business {}", possibleBusinessToAddAdminFor);
@@ -332,6 +330,53 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+
+    /**
+     * Handles Put request for /businesses/{id}/makeAdministrator endpoint for
+     * removing an admin from a business.
+     *
+     * @param businessId The Id of the business
+     * @param requestBody DTO that contains userId
+     * @return (400) User with userId does not exist or Admin to remove is Primary, (406) business does not exist,
+     *         (403) User is not admin, (200) if put request runs with out errors
+     */
+    @PutMapping("/businesses/{id}/removeAdministrator")
+    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
+
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+        User possibleUser = userService.findUserById(requestBody.getUserId());
+        logger.info("possible Business{}", possibleBusiness);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+
+        if (possibleBusiness == null) {
+            logger.warn("Business does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+        if (possibleUser == null) {
+            logger.warn("User does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID does not exist");
+        }
+        if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
+            logger.warn("User is primary admin");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
+        }
+        if (!loggedInUser.getBusinessesPrimarilyAdministered().contains(possibleBusiness) && loggedInUser.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && loggedInUser.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            logger.warn("You are not a primary business admin");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+        if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), possibleUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not admin of business");
+        }
+
+        businessService.removeAdministratorFromBusiness(possibleBusiness, possibleUser);
+        businessService.saveBusinessChanges(possibleBusiness);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 
     /**
