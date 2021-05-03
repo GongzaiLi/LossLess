@@ -4,22 +4,19 @@ Author: Gongzai Li
 Date: 19/4/2021
 -->
 <template>
-
   <b-card
     class="profile-card"
     style="max-width: 550px"
   ><!--header-border-variant="secondary" border-variant="secondary"  background-color: rgba(0,255,0,0.4);-->
-
-    <b-img v-bind:src=productCard.image center thumbnail rounded alt="Rounded image" width="250" height="250"/> <!--"circle"-->
-
+    <b-form
+        @submit="okAction"
+    >
     <b-card-body>
-
-      <div>
         <b-input-group>
           <h6><b>Id:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.id"/>
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.id" required/>
         </b-input-group>
 
         <b-input-group>
@@ -43,18 +40,20 @@ Date: 19/4/2021
           <template #prepend>
             <b-input-group-text >{{currency.symbol}}</b-input-group-text>
           </template>
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice"/>
+          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
           <template #append>
             <b-input-group-text >{{currency.code}}</b-input-group-text>
           </template>
         </b-input-group>
 
-        <b-input-group>
-          <h6><b>Created:</b></h6>
-        </b-input-group>
-        <b-input-group class="mb-1">
-          <b-form-input type="text" disabled v-model="productCard.created"/>
-        </b-input-group>
+        <div v-if="disabled"><!--Only show if we're not in the 'modify' or 'create' mode-->
+          <b-input-group>
+            <h6><b>Created:</b></h6>
+          </b-input-group>
+          <b-input-group class="mb-1">
+            <b-form-input type="text" disabled v-model="productCard.created"/>
+          </b-input-group>
+        </div>
 
         <hr style="width:100%">
 
@@ -64,19 +63,21 @@ Date: 19/4/2021
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
         </b-input-group>
-
-      </div>
-
     </b-card-body>
+    <hr style="width:100%">
+      <div v-if="!disabled">
+        <b-button style="float: right" variant="primary" type="submit">OK</b-button>
+        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
+      </div>
+    </b-form>
   </b-card>
 
 </template>
 
 <script>
-
 export default {
   name: "product-detail-card",
-  props: ['product', 'disabled', 'currency'],
+  props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
   data() {
     return {
       productCard: {
@@ -92,8 +93,10 @@ export default {
   },
   mounted() {
     this.productCard = this.product;
-    this.productCard.created = new Date(this.productCard.created).toUTCString();
-    this.productCard.image = 'https://pngimage.net/wp-content/uploads/2018/05/default-image-png-8.png';
-  }
+    // Sometimes the product passed in should not have a 'created' attribute, eg. if it is a new object for creation.
+    if (this.productCard.created) {
+      this.productCard.created = new Date(this.productCard.created).toUTCString();
+    }
+  },
 }
 </script>

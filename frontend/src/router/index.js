@@ -8,7 +8,6 @@ import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
 import HomePage from "@/components/user/HomePage";
-import CreateProduct from "@/components/product/CreateProduct";
 import {getUser} from '@/auth'
 
 /**
@@ -28,7 +27,6 @@ const router = new Router({
         { path: '/businesses/:id', name: 'business-profile', component: BusinessProfile},
         { path: '/businesses/:id/products', name: 'product-catalogue', component: ProductCatalogue},
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
-        { path: '/businesses/:id/products/createProduct', name: 'createProduct', component: CreateProduct},
     ]
 });
 
