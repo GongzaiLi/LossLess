@@ -115,7 +115,7 @@ export default {
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
-        tableHeader.homeAddress = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
+        tableHeader.location = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
         items.push(tableHeader);
       }
       return items;
@@ -160,13 +160,13 @@ export default {
         {
           key: 'email',
           sortable: true
+        },{
+          key: 'location',
+          sortable: true
         },
       ];
       if (this.$currentUser && this.$currentUser.role !== 'user') {
         fields.push({
-          key: 'homeAddress',
-          sortable: true
-        }, {
           key: 'userType',
           sortable: true
         });
