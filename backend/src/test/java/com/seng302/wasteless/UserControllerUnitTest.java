@@ -1,14 +1,16 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserController;
-import com.seng302.wasteless.User.UserRoles;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.controller.UserController;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -16,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -30,9 +31,19 @@ public class UserControllerUnitTest {
     @Autowired
     private UserService userService;
 
+    @MockBean
+    private AddressService addressService;
+
     @Test
     public void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -41,7 +52,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToMissingFirstName_thenCorrectResponse() throws Exception {
-        String user = "{\"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27-10-2000\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
+        String user = "{\"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27-10-2000\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -51,7 +69,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToMissingLastName_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
+        String user = "{\"firstName\": \"James\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -60,7 +85,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToMissingEmail_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -69,7 +101,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToMissingDateOfBirth_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"homeAddress\": \"236a Blenheim Road\", \"password\": \"1337\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }: \"236a Blenheim Road\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -87,7 +126,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToMissingPassword_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -96,7 +142,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToAlreadyUsedEmail_thenCorrectResponse() throws Exception {
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "236a Blenheim Road", "1337");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "1337");
 
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
 
@@ -108,7 +161,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthTooOld_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"1800-20-10\", \"homeAddress\": \"236a Blenheim Road\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"1800-20-10\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -117,7 +177,14 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthTooYoung_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2200-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2200-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -126,19 +193,18 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenPostRequestToUsersAndUserInvalidDueToMalformedDateOfBirth_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"10/27/1000\", \"homeAddress\": \"236a Blenheim Road\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"10/27/1000\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithUserDetails("user@700")
-    public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
-        mockMvc.perform(get("/users/1"))
-                .andExpect(status().isOk());
     }
 
     @Test
@@ -211,7 +277,7 @@ public class UserControllerUnitTest {
     }
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
-        String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": \"%s\", \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
+        String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": %s, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
 
         try {
             mockMvc.perform(

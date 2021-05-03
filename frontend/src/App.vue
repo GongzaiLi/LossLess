@@ -1,17 +1,21 @@
 <template>
-  <b-container id="app">
+  <div id="app">
     <Navbar/>
-    <router-view/>
-  </b-container>
+    <keep-alive include="UserSearch"> <!-- The keep-alive prevents the UserSearch component from being re-rendered each time, so you can got back to your search results -->
+      <router-view/>
+    </keep-alive>
+  </div>
 </template>
 
 <script>
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Navbar from "./components/Navbar";
-import UserProfile from "./components/UserProfile";
-import UserSearch from "./components/UserSearch";
+import Login from "./components/user/Login";
+import Register from "./components/user/Register";
+import Navbar from "./components/model/Navbar";
+import UserProfile from "./components/user/UserProfile";
+import UserSearch from "./components/user/UserSearch";
+import HomePage from "@/components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
+import BusinessProfile from "./components/business/BusinessProfile";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -26,8 +30,10 @@ const app = {
     Register,
     UserProfile,
     Navbar,
+    HomePage,
+    CreateBusiness,
     UserSearch,
-    CreateBusiness
+    BusinessProfile
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods

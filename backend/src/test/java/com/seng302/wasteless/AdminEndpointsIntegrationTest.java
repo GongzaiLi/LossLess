@@ -1,17 +1,18 @@
 package com.seng302.wasteless;
 
-import com.seng302.wasteless.User.User;
-import com.seng302.wasteless.User.UserRoles;
-import com.seng302.wasteless.User.UserService;
+import com.seng302.wasteless.model.Address;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
+import io.cucumber.java.bs.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,6 +39,9 @@ public class AdminEndpointsIntegrationTest {
     @Autowired
     UserService userService;
 
+    @Autowired
+    AddressService addressService;
+
     @Test
     @WithMockCustomUser(email = "test@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
@@ -50,7 +54,17 @@ public class AdminEndpointsIntegrationTest {
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
-        user.setHomeAddress("HomeAddress1");
+
+        Address address = new Address();
+        address.setCountry("NZ");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+
+        addressService.createAddress(address);
+
+        user.setHomeAddress(address);
 
         userService.createUser(user);
 
@@ -74,7 +88,17 @@ public class AdminEndpointsIntegrationTest {
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
-        user.setHomeAddress("HomeAddress1");
+
+        Address address = new Address();
+        address.setCountry("NZ");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+
+        addressService.createAddress(address);
+
+        user.setHomeAddress(address);
 
         userService.createUser(user);
 
@@ -154,7 +178,17 @@ public class AdminEndpointsIntegrationTest {
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
-        user.setHomeAddress("HomeAddress1");
+
+        Address address = new Address();
+        address.setCountry("NZ");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+
+        addressService.createAddress(address);
+
+        user.setHomeAddress(address);
 
         userService.createUser(user);
 
@@ -178,7 +212,17 @@ public class AdminEndpointsIntegrationTest {
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
-        user.setHomeAddress("HomeAddress1");
+
+        Address address = new Address();
+        address.setCountry("NZ");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+
+        addressService.createAddress(address);
+
+        user.setHomeAddress(address);
 
         userService.createUser(user);
 
