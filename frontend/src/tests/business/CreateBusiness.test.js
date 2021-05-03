@@ -7,7 +7,8 @@ import Api from "../../Api";
 jest.mock('../../Api');
 
 let $currentUser = {
-  id: 1
+  id: 1,
+  dateOfBirth: '01/01/2001'
 }
 const $log = {
   debug: jest.fn(),
@@ -58,7 +59,8 @@ describe('CreateBusiness Script Testing', () => {
       localVue,
       methods: {
         createBusiness
-      }
+      },
+      mocks: {$log, $currentUser}
     });
 
 
@@ -215,5 +217,13 @@ describe('CreateBusiness HTML testing', () => {
   test('Create button renders', () => {
     const buttonLabel = "Create";
     expect(wrapper.findAll("button").at(1).text()).toEqual(buttonLabel);
+  });
+
+
+  test('Cant create if too young', async () => {
+    wrapper.vm.$currentUser.dateOfBirth = '01/01/2015';
+
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.canCreateBusiness).toBeFalsy();
   });
 });
