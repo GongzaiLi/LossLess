@@ -35,7 +35,7 @@ Date: 7/3/2021
         </b-table>
       </b-col>
     </b-row>
-    <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+    <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage" v-show="items.length"/>
   </div>
 </template>
 
@@ -124,7 +124,7 @@ export default {
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
-        tableHeader.homeAddress = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
+        tableHeader.location = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
         items.push(tableHeader);
       }
       return items;
@@ -169,11 +169,10 @@ export default {
         {
           key: 'email',
           sortable: true
-        },
-        {
-          key: 'homeAddress',
+        },{
+          key: 'location',
           sortable: true
-        }
+        },
       ];
       if (this.$currentUser && this.$currentUser.role !== 'user') {
         fields.push({

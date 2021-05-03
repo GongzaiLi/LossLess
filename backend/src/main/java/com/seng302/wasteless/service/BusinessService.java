@@ -60,8 +60,17 @@ public class BusinessService {
      */
     public void addAdministratorToBusiness(Business business, User user) {
         business.addAdministrator(user);
-
     }
+
+    /**
+     * Remove administrator from a business
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     */
+    public void removeAdministratorFromBusiness(Business business, User user) {
+        business.removeAdministrator(user);
+    }
+
 
     /**
      * Save changes to business
