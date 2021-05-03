@@ -6,7 +6,7 @@ Date: 15/4/2021
 <template>
 
   <div>
-    <h2>Product Catalogue</h2>
+    <h2>Product Catalogue: {{businessName}}</h2>
     <div>
       <b-form-group>
         <b-button @click="openCreateProductModal" class="float-right">
@@ -54,7 +54,7 @@ Date: 15/4/2021
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
       <b-modal id="product-card" hide-header hide-footer
-               :no-close-on-backdrop="!isProductCardReadOnly"
+               :no-close-on-backdrop="!isProductCardReadOnly" :no-close-on-esc="!isProductCardReadOnly"
       >
         <product-detail-card :product="productDisplayedInCard"
                              :disabled="isProductCardReadOnly"
@@ -63,6 +63,13 @@ Date: 15/4/2021
                              :cancelAction="closeProductCardModal"
         />
         <b-alert :show="productCardError.length > 0 ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
+      </b-modal>
+
+      <b-modal id="changed-acting-as-modal" title="Account Changed"
+               ok-only canno-close-on-backdrop no-close-on-esc hide-header-close
+               @ok="goToHomePage"
+      >
+        <h6> <b>You have selected another account to act as.</b> <br> As you can only edit this page while you are acting as this business, you will be redirected to this business's home page.</h6>
       </b-modal>
     </div>
   </div>
@@ -100,6 +107,7 @@ export default {
   },
   data: function () {
     return {
+      businessName: "",
       currency: {
         symbol: '$',
         code: 'USD',
@@ -114,12 +122,12 @@ export default {
       currentPage: 1,
       tableLoading: true,
       oldProductId: 0,
+      currentUser: {},
     }
   },
   mounted() {
     const businessId = this.$route.params.id;
     this.getProducts(businessId);//this.getProducts(this.$route.params.id);
-
   },
   methods: {
     /**
@@ -134,7 +142,10 @@ export default {
       const getProductsPromise = api.getProducts(businessId);  // Promise for getting products
       const getCurrencyPromise = // Promise for getting the company address, and then the currency data
           api.getBusiness(businessId)
-              .then((resp) => api.getUserCurrency(resp.data.address.country))
+              .then((resp) => {
+                this.businessName = resp.data.name;
+                return api.getUserCurrency(resp.data.address.country);
+              })
 
       try {
         const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
@@ -294,6 +305,14 @@ export default {
       this.createProductError = "";
       this.modifyProductError = "";
       this.getProducts(this.$route.params.id);
+    },
+    /**
+     * Redirects to the home page of the current business (used when the user switches who they are acting as)
+     */
+    goToHomePage: function () {
+      // There is a route guard in the router module that does this redirect when they are in this route,
+      // so we only need to refresh the page to trigger the guard
+      this.$router.go();
     }
   },
 
@@ -356,8 +375,22 @@ export default {
      */
     totalItems: function () {
       return this.items.length;
-    }
-  }
+    },
+  },
 
+  watch: {
+    /**
+     * Watches the current user data (specifically, who the user is acting as). If this changes to someone without permission
+     * to access the catalogue, then a modal is shown informing them that they will be redirected to the business's home page.
+     */
+    $currentUser: {
+      handler(val){
+        if (val.role === 'user' && (!val.currentlyActingAs || val.currentlyActingAs.id !== parseInt(this.$route.params.id))) {
+          this.$bvModal.show('changed-acting-as-modal');
+        }
+      },
+      deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)
+    },
+  }
 }
 </script>
