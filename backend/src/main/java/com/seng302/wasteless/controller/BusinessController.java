@@ -147,6 +147,10 @@ public class BusinessController {
 
         User user = userService.findUserByEmail(currentPrincipalEmail);
 
+        if (!possibleProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+        }
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is invalid");

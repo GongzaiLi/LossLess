@@ -236,6 +236,27 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessProducts_AndProductCodeInvalid_then400Response() throws Exception {
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String product = "{\"id\": \"Invalid Product ';%\", \"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+                .content(product)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusinessProducts_AndUserIsBusinessAdminAndProductIsValid_then201Response() throws Exception {
 
         createOneBusiness("Business2", "{\n" +
@@ -247,7 +268,7 @@ public class BusinessControllerIntegrationTest {
                 "    \"postcode\": \"8041\"\n" +
                 "  }", "Non-profit organisation", "I am a business 2");
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT_1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
                 .content(product)
@@ -274,7 +295,7 @@ public class BusinessControllerIntegrationTest {
 
         businessService.createBusiness(business);
 
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
+        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT-1\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
                 .content(product)
@@ -471,7 +492,7 @@ public class BusinessControllerIntegrationTest {
                 "    \"postcode\": \"8041\"\n" +
                 "  }", "Non-profit organisation", "I am a business");
 
-        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+        createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
@@ -493,7 +514,7 @@ public class BusinessControllerIntegrationTest {
                 "    \"postcode\": \"8041\"\n" +
                 "  }", "Non-profit organisation", "I am a business");
 
-        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+        createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"chocolate bar\"}";
 
@@ -514,7 +535,7 @@ public class BusinessControllerIntegrationTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"8041\"\n" +
                 "  }", "Non-profit organisation", "I am a business");
-        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+        createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
@@ -541,7 +562,7 @@ public class BusinessControllerIntegrationTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"8041\"\n" +
                 "  }", "Non-profit organisation", "I am a business");
-        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+        createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
@@ -693,7 +714,7 @@ public class BusinessControllerIntegrationTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"8041\"\n" +
                 "  }", "Non-profit organisation", "I am a business");
-        createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+        createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
 
