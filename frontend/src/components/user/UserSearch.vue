@@ -35,7 +35,7 @@ Date: 7/3/2021
         </b-table>
       </b-col>
     </b-row>
-    <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+    <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage" v-show="items.length"/>
   </div>
 </template>
 
@@ -161,13 +161,12 @@ export default {
           key: 'email',
           sortable: true
         },
-        {
-          key: 'homeAddress',
-          sortable: true
-        }
       ];
       if (this.$currentUser && this.$currentUser.role !== 'user') {
         fields.push({
+          key: 'homeAddress',
+          sortable: true
+        }, {
           key: 'userType',
           sortable: true
         });
