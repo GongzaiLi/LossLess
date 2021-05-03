@@ -20,6 +20,13 @@ const $log = {
   }
 };
 
+const $currentUser = {
+  role: 'user',
+  currentlyActingAs: {
+    id: 0
+  }
+};
+
 
 jest.mock('../../Api');
 
@@ -40,7 +47,7 @@ beforeEach(() => {
   wrapper = shallowMount(productCatalogue, {
     localVue,
     propsData: {},
-    mocks: {$route, $log},
+    mocks: {$route, $log, $currentUser},
     stubs: {'another-component': true},
     methods: {},
   });
@@ -317,9 +324,9 @@ describe('Testing api put/post request and the response method with errors', () 
     Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product ID provided already exists."}});
 
     const mockEvent = {preventDefault: jest.fn()};
-    await wrapper.vm.modifyProductAPI(mockEvent);
+    await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual(["Product ID provided already exists."]);
+    expect(wrapper.vm.productCardError).toBe("Product ID provided already exists.");
   });
 
   it('400 error test if Product ID provided does not exist', async () => {
@@ -328,8 +335,7 @@ describe('Testing api put/post request and the response method with errors', () 
     const mockEvent = {preventDefault: jest.fn()};
     await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.errors).toStrictEqual(["Product does not exist."]);
-    expect(wrapper.vm.productCardError).toBe("Product has the same name or id as another product. Please try again");
+    expect(wrapper.vm.productCardError).toBe("Product does not exist.");
   });
 
   it('403 error test', async () => {
@@ -358,5 +364,39 @@ describe('Testing api put/post request and the response method with errors', () 
 
     expect(wrapper.vm.productCardError).toBe("Server error");
   });
+
+});
+
+
+describe('Testing currently acting as watcher', () => {
+
+  it('Shows modal if switch to normal user', async () => {
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', null);
+
+    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.$bvModal.show).toBeCalled();
+  });
+
+  it('Shows modal if switch to other business', async () => {
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
+
+    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.$bvModal.show).toBeCalled();
+  });
+
+  it('Does not show modal if switch to other business but is admin', async () => {
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'role', 'globalApplicationAdmin');
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
+
+    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.$bvModal.show).not.toBeCalled();
+  });
+
 
 });
