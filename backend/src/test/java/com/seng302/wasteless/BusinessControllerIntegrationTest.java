@@ -5,8 +5,6 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
 public class BusinessControllerIntegrationTest {
 
-    private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
     @Autowired
     private MockMvc mockMvc;
