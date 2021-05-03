@@ -109,7 +109,7 @@ test {
     description = "Runs JUnit 5/Jupiter tests (unit tests)"
     testLogging.showStandardStreams = true
     useJUnitPlatform()
-    finalizedBy jacocoTestReport
+
 }
 
 // Jacoco test coverage configuration
