@@ -9,7 +9,7 @@ Date: 15/4/2021
     <h2>Product Catalogue</h2>
     <div>
       <b-form-group>
-        <b-button @click="goToCreateProduct" class="float-right">
+        <b-button @click="openCreateProductModal" class="float-right">
           <b-icon-plus-square-fill animation="fade"/>
           Create
         </b-button>
@@ -21,17 +21,23 @@ Date: 15/4/2021
         bordered
         show-empty
         @row-clicked="tableRowClick"
+        class="catalogue-table"
         :fields="fields"
         :items="items"
         :per-page="perPage"
         :current-page="currentPage"
         :busy="tableLoading"
+        ref="productCatalogueTable"
       > <!--stacked="sm" table-class="text-nowrap"-->
 
         <template v-slot:cell(actions)="products">
-          <b-button id="edit-button" @click="editProduct(products.item)" size="sm">
+          <b-button id="edit-button" @click="openEditProductCard(products.item)" size="sm">
             Edit
           </b-button>
+        </template>
+
+        <template #cell(recommendedRetailPrice)="data">
+          {{ currency.symbol }}{{ data.item.recommendedRetailPrice }}
         </template>
 
         <template #empty>
@@ -47,22 +53,16 @@ Date: 15/4/2021
       </b-table>
       <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 
-      <b-modal id="product-card" hide-header hide-footer centered @click="this.getProducts($route.params.id)">
-        <!--
-        <template #modal-header>
-          <small class="text-muted">Product Card</small>
-        </template>
-        -->
-        <product-detail-card :product="productSelect" :disabled="true"/>
-        <!--
-        <template #modal-footer>
-          <small class="text-muted">Product Card</small>
-        </template>
-        -->
-      </b-modal>
-
-      <b-modal id="edit-product-card" hide-header no-close-on-backdrop @ok="modifyProduct" @cancel="refreshProduct">
-        <product-detail-card :product="productEdit" :disabled="false"/>
+      <b-modal id="product-card" hide-header hide-footer
+               :no-close-on-backdrop="!isProductCardReadOnly"
+      >
+        <product-detail-card :product="productDisplayedInCard"
+                             :disabled="isProductCardReadOnly"
+                             :currency="currency"
+                             :okAction="productCardAction"
+                             :cancelAction="closeProductCardModal"
+        />
+        <b-alert :show="productCardError.length > 0 ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
     </div>
   </div>
@@ -81,12 +81,16 @@ h2 {
   text-align: center;
 }
 
+.catalogue-table td {
+  cursor: pointer;
+}
+
 </style>
 
 <script>
 import api from "../../Api";
 import productDetailCard from './ProductDetailCard';
-import pagination from '../Pagination';
+import pagination from '../model/Pagination';
 
 
 export default {
@@ -96,12 +100,20 @@ export default {
   },
   data: function () {
     return {
+      currency: {
+        symbol: '$',
+        code: 'USD',
+        name: 'US Dollar',
+      },
+      productCardAction: () => {},
+      productCardError: "",
+      productDisplayedInCard: {},
+      isProductCardReadOnly: true,
       items: [],
       perPage: 10,
       currentPage: 1,
-      productSelect: {},
       tableLoading: true,
-      productEdit: {}
+      oldProductId: 0,
     }
   },
   mounted() {
@@ -115,65 +127,34 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param businessId
      */
-    //todo need check the api is work
-    getProducts: function (businessId) {
-      api
-        .getProducts(businessId)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.setResponseData(response.data);
-          this.tableLoading = false;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          //
-/**
-          // fake date can use be test.
-          this.items = [
-            {
-              id: "WATT-420-BEANS1",
-              name: "Watties Baked Beans - 430g can",
-              description: "Aaked Beans as they should be.",
-              recommendedRetailPrice: 2.2,
-              created: "2021-03-14T13:01:58.660Z",
-              image: 'https://mk0kiwikitchenr2pa0o.kinstacdn.com/wp-content/uploads/2016/05/Watties-Baked-Beans-In-Tomato-Sauce-420g.jpg',
-            },
-            {
-              id: "WATT-420-BEANS2",
-              name: "Apple",
-              description: "Baked Beans as they should be.Baked Beans as they should " +
-                "be.Baked Beans as they should be.Baked Beans as they should be." +
-                "Baked Beans as they should be.Baked Beans as they should be.",
-              recommendedRetailPrice: 2.4,
-              created: "1077-04-14T13:01:58.660Z",
-              image: 'https://i2.wp.com/ceklog.kindel.com/wp-content/uploads/2013/02/firefox_2018-07-10_07-50-11.png?w=641&ssl=1',
-            },
-            {
-              id: "WATT-420-BEANS3",
-              name: "Tip Top Super Soft Toast Bread White Superthick",
-              description: "Made in New Zealand with imported & local ingredients.\n" +
-                "\n" +
-                "Tip top supersoft white super thick is a kiwi classic. Delicious and soft white bread perfect for any occasion.",
-              recommendedRetailPrice: 2.7,
-              created: "2077-05-14T13:01:58.660Z",
-              image: 'https://static.countdown.co.nz/assets/product-images/zoom/9415142003740.jpg',
-            }
-          ];
+    getProducts: async function (businessId) {
+      // We need to make 3 asynchronous requests: Get all business products,
+      // get the current business's address, and get the currency using that address.
 
-            this.tableLoading = false;
-            //**/
-          });
+      const getProductsPromise = api.getProducts(businessId);  // Promise for getting products
+      const getCurrencyPromise = // Promise for getting the company address, and then the currency data
+          api.getBusiness(businessId)
+              .then((resp) => api.getUserCurrency(resp.data.address.country))
+
+      try {
+        const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
+
+        this.items = productsResponse.data;
+        this.tableLoading = false;
+        this.currency = currency;
+      } catch(error) {
+        this.$log.debug(error);
+      }
     },
 
     /**
-     *
-     * set the response data to items
-     * @param data
+     * modify the ID so that it doesn't display the "{businessId}-" at the start
+     * @return string
      */
-    //todo may need rebuilt the data form.
-    setResponseData: function (data) {
-      this.items = data;
+    setId: function (id) {
+      return id.split(/-(.+)/)[1];
     },
+
     /**
      * modify the description only keep 20 characters and then add ...
      * @param description
@@ -201,39 +182,117 @@ export default {
      * @param product object
      */
     tableRowClick(product) {
-      this.productSelect = product;
+      this.isProductCardReadOnly = true;
+
+      this.productDisplayedInCard = Object.assign({}, product);
+      this.productDisplayedInCard.id = this.setId(this.productDisplayedInCard.id);
       this.$bvModal.show('product-card');
     },
 
     /**
      * route to the create product page
      */
-    goToCreateProduct: function () {
-      this.$router.push({path: `/businesses/${this.$route.params.id}/products/createProduct`});
+    openCreateProductModal: function () {
+      this.isProductCardReadOnly = false;
+      this.productCardAction = this.createProduct;
+
+      this.productDisplayedInCard = {
+        id: '',
+        name: '',
+        description: '',
+        manufacturer: '',
+        recommendedRetailPrice: 0,
+        image: '',
+      }
+      this.$bvModal.show('product-card');
     },
 
     /**
      * button function when clicked shows edit card
      * @param product edit product
      */
-    editProduct: function (product) {
-      this.productEdit = product;
-      this.$bvModal.show('edit-product-card');
+    openEditProductCard: function (product) {
+      this.isProductCardReadOnly = false;
+      this.productCardAction = this.modifyProduct;
+
+      this.productDisplayedInCard = Object.assign({}, product);
+      this.oldProductId = product.id;
+      this.productDisplayedInCard.id = this.setId(this.productDisplayedInCard.id);
+      this.$bvModal.show('product-card');
+    },
+
+    /**
+     * Closes the modal popup for the show/edit/create product card, and clears any errors displayed.
+     */
+    closeProductCardModal: function () {
+      this.$bvModal.hide('product-card');
+      this.productCardError = '';
+    },
+
+    /**
+     * Makes a request to the API to create a product with the form input.
+     * Then, will hide the product popup and reload the table items if successful.
+     */
+    async createProduct(event) {
+      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+      await api
+          .createProduct(this.$route.params.id, this.productDisplayedInCard)
+          .then((createProductResponse) => {
+            this.$log.debug("Product Created", createProductResponse);
+            this.$bvModal.hide('product-card');
+            this.refreshProducts();
+          })
+          .catch((error) => {
+            this.productCardError = this.getErrorMessageFromApiError(error);
+            this.$log.debug(error);
+          });
     },
 
     /**
      * button function for ok when clicked calls an API
      * place holder function for API task
      */
-    modifyProduct: function () {
-      this.refreshProduct();
+    modifyProduct: async function (event) {
+      event.preventDefault();
+
+      let editData = this.productDisplayedInCard;
+      delete editData["created"];
+      await api
+          .modifyProduct(this.$route.params.id, this.oldProductId, editData)
+          .then((editProductResponse) => {
+            this.$log.debug("Product has been edited",editProductResponse);
+            this.$bvModal.hide('product-card');
+            this.refreshProducts();
+          })
+          .catch((error) => {
+            this.productCardError = this.getErrorMessageFromApiError(error);
+            this.$log.debug(error);
+          })
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST and PUT requests for products
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        return error.response.data;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
     },
 
     /**
      * function when clicked refreshes the table so that it can be reloaded with
      * new/edited data
      */
-    refreshProduct: function () {
+    refreshProducts: function () {
+      this.createProductError = "";
+      this.modifyProductError = "";
       this.getProducts(this.$route.params.id);
     }
   },
@@ -249,6 +308,9 @@ export default {
         {
           key: 'id',
           label: 'ID',
+          formatter: (value) => {
+            return this.setId(value);
+          },
           sortable: true
         },
         {
@@ -271,7 +333,7 @@ export default {
         },
         {
           key: 'recommendedRetailPrice',
-          label: 'RRP',
+          label: `RRP (${this.currency.code})`,
           sortable: true
         },
         {

@@ -56,6 +56,7 @@ export default {
   setBusinessActingAs: (businessId) => businessActingAsId = businessId,
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/revokeAdmin`, revokeAdminData, {withCredentials: true}),
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
+  modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials:true}),
 
   /**
    * Given the name of the user's country, gets currency data for that country.

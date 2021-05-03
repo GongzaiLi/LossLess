@@ -1,6 +1,6 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import NavBar from '../Navbar'; // name of your Vue component
+import NavBar from '../../components/model/Navbar'; // name of your Vue component
 import Auth from '../../auth'
 import Api from '../../Api'
 
@@ -95,7 +95,7 @@ describe('User Drop Down', () => {
     const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesAdministered));
 
     userData.businessesAdministered.push({
-      "id": 100,
+      "id": 101,
       "administrators": [],
       "primaryAdministratorId": 20,
       "name": "Another Store Name",

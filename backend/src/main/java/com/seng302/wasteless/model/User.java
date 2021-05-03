@@ -76,7 +76,7 @@ public class User {
     private String salt;
 
     @Column(name = "businesses_primarily_administered")
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Business> businessesPrimarilyAdministered;
 
     @Column(name = "created") // map camelcase name (java) to snake case (SQL)
@@ -84,8 +84,6 @@ public class User {
 
     @Column(name = "role")
     private UserRoles role;
-
-    //Omitted fields. business administered: added in u6
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges

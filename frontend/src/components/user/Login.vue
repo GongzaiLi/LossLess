@@ -53,7 +53,7 @@ Date: 3/3/2021
 </template>
 
 <script>
-import api from "../Api";
+import api from "../../Api";
 
 
 export default {
@@ -85,13 +85,13 @@ export default {
      * Sends the values entered into the email and password fields.
      * Login errors (eg. incorrect password) are displayed
      */
-    makeLoginRequest: function () {
+    makeLoginRequest: async function () {
       let loginData = {
         email: this.email,
         password: this.password
       };
       this.errors = [];
-      api
+      await api
         .login(loginData)
         .then((response) => {
           this.$log.debug("Logged in");

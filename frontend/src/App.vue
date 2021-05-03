@@ -1,19 +1,19 @@
 <template>
-  <b-container id="app">
+  <div id="app">
     <Navbar/>
     <keep-alive include="UserSearch"> <!-- The keep-alive prevents the UserSearch component from being re-rendered each time, so you can got back to your search results -->
       <router-view/>
     </keep-alive>
-  </b-container>
+  </div>
 </template>
 
 <script>
-import Login from "./components/Login";
-import Register from "./components/Register";
-import Navbar from "./components/Navbar";
-import UserProfile from "./components/UserProfile";
-import UserSearch from "./components/UserSearch";
-import HomePage from "@/components/HomePage";
+import Login from "./components/user/Login";
+import Register from "./components/user/Register";
+import Navbar from "./components/model/Navbar";
+import UserProfile from "./components/user/UserProfile";
+import UserSearch from "./components/user/UserSearch";
+import HomePage from "@/components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
 

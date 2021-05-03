@@ -1,9 +1,14 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import Register from '../Register';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
+import Register from '../../components/user/Register';
 import VueRouter from 'vue-router';
+import Api from "../../Api";
 
+const $log = {
+  debug: jest.fn(),
+};
 
+jest.mock('../../Api');
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -23,7 +28,8 @@ beforeEach(() => {
     );
   wrapper = mount(Register, {
     localVue,
-    router
+    router,
+    mocks: {$log},
   });
 });
 
@@ -70,5 +76,47 @@ describe('Date Validation', () => {
     wrapper.vm.dateOfBirth = "04/11/1890";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("Please enter a valid birthdate");
+  });
+});
+
+describe('Testing-api-post-register', () => {
+  const event = {
+    preventDefault: () => {
+    }
+  };
+  it('Successful-register', async () => {
+    Api.register.mockResolvedValue({
+      data: {
+        id: 0
+      },
+      status: 201
+    });
+    Api.getUser.mockResolvedValue({
+        data: {
+          id: 0
+        }
+      }
+    )
+
+    await wrapper.vm.register(event);
+    expect(wrapper.vm.errors).toStrictEqual([]);
+  });
+
+  it('400-error-register-testing', async () => {
+    Api.register.mockRejectedValue({
+      response:
+        {status: 400}
+    });
+    await wrapper.vm.register(event);
+    expect(wrapper.vm.errors).toStrictEqual(["Registration failed."]);
+  });
+
+  it('409-error-register-testing', async () => {
+    Api.register.mockRejectedValue({
+      message: "Email address already in use",
+      status: 409
+    });
+    await wrapper.vm.register(event);
+    expect(wrapper.vm.errors).toStrictEqual(["Email address already in use"]);
   });
 });

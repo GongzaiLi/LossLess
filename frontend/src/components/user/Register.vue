@@ -131,8 +131,8 @@ Date: 3/3/2021
 </template>
 
 <script>
-import api from "../Api";
-import AddressInput from "./AddressInput";
+import api from "../../Api";
+import AddressInput from "../model/AddressInput";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 130;
@@ -214,14 +214,14 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    register(event) {
-      console.log("CLICKED");
+    async register(event) {
+      //console.log("CLICKED");
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      console.log(registerData);
+      //console.log(registerData);
 
-      api
+      await api
         .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");

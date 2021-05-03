@@ -4,7 +4,7 @@
   Date: 04/07/2021
 -->
 <template>
-  <p class="mb-1" >{{ memberSince }}</p>
+  <span class="mb-1" >{{ memberSince }}</span>
 </template>
 
 <script>
@@ -41,7 +41,7 @@ export default {
       const registeredMonths = timeElapsed.months;
 
       const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      let message = "Member since: " + registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
+      let message = registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
       if (registeredYears > 0) {
         message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
         if (registeredMonths > 0) {
@@ -51,7 +51,7 @@ export default {
       if (registeredMonths > 0 || registeredYears === 0) {
         message += registeredMonths + ((registeredMonths === 1) ? " Month" : " Months");
       }
-      return message + ") ";
+      return message + ")";
     }
   }
 }

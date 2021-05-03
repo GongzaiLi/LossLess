@@ -16,14 +16,15 @@ Date: sprint_1
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
-        <b-nav-item to="/businesses">Create Business</b-nav-item>
+        <b-nav-item to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
-            <img src="../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img src="../../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
 
           <b-dropdown-item
@@ -37,7 +38,7 @@ Date: sprint_1
 
           <b-dropdown-item
               v-for="business in businessesInDropDown"
-              v-bind:key="business.name"
+              v-bind:key="business.id"
               @click="actAsBusiness(business)"
               class="business-name-drop-down">
             {{business.name}}
@@ -60,8 +61,8 @@ Date: sprint_1
 </style>
 
 <script>
-import {setCurrentlyActingAs} from '../auth'
-import Api from '../Api'
+import {setCurrentlyActingAs} from '../../auth'
+import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -93,6 +94,12 @@ export default {
       return this.$currentUser.businessesAdministered.filter(
           (business) => (this.isActingAsUser || business.id !== this.$currentUser.currentlyActingAs.id)
       );
+    },
+    /**
+     * Returns a string constructed to go to the product page url
+     */
+    businessRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/products";
     }
   },
   methods: {
@@ -101,8 +108,9 @@ export default {
      * is already on the profile since that throws a Vue Router error.
      */
     goToUserProfile: function () {
-      if (this.$route.params.id !== this.$currentUser.id.toString()) {
-        this.$router.push({path: `/users/${this.$currentUser.id}`});
+      const pathToGoTo = `/users/${this.$currentUser.id}`;
+      if (this.$route.fullPath !== pathToGoTo) {
+        this.$router.push({path: pathToGoTo});
       }
     },
     /**

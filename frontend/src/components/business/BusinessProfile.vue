@@ -4,7 +4,7 @@ Author: Gongzai Li
 Date: 29/03/2021
 -->
 <template>
-  <div>
+  <div v-show="!loading">
     <b-card border-variant="secondary" header-border-variant="secondary"
             class="profile-card shadow" no-body
             v-if="businessFound"
@@ -14,7 +14,7 @@ Date: 29/03/2021
         <b-row>
           <b-col>
             <h4 class="mb-1">{{ businessData.name }}</h4>
-            <member-since :date="businessData.created"/>
+            Registered on: <member-since :date="businessData.created"/>
           </b-col>
         </b-row>
       </template>
@@ -48,7 +48,7 @@ Date: 29/03/2021
             </b-row>
           </h6>
           <h6>
-            <b-row>
+            <b-row v-if="businessData.email">
               <b-col cols="0">
                 <b-icon-envelope></b-icon-envelope>
               </b-col>
@@ -57,7 +57,7 @@ Date: 29/03/2021
             </b-row>
           </h6>
           <h6>
-            <b-row>
+            <b-row v-if="businessData.phoneNumber">
               <b-col cols="0">
                 <b-icon-phone-vibrate></b-icon-phone-vibrate>
               </b-col>
@@ -67,17 +67,6 @@ Date: 29/03/2021
           </h6>
         </b-container>
       </b-card-body>
-
-      <b-list-group border-variant="secondary">
-        <b-list-group-item>
-          <b-card-text style="text-align: justify">
-            <h4 class="mb-1">Product</h4>
-          </b-card-text>
-          <b-row v-for="product in products" :key="product">
-            <b-col cols="2" class="mb-1">{{ product }}</b-col>
-          </b-row>
-        </b-list-group-item>
-      </b-list-group>
 
       <b-list-group border-variant="secondary" >
         <b-list-group-item>
@@ -101,7 +90,7 @@ Date: 29/03/2021
                        :items="businessData.administrators"
                        ref="businessAdministratorsTable">
                 <template #empty>
-                  <h3 class="no-results-overlay" >No results to display</h3>
+                  <h3 class="no-results-overlay">No results to display</h3>
                 </template>
                 <template #cell(actions)="row" >
                   <div v-if="checkCanRevokeAdmin(row.item.id)">
@@ -135,9 +124,7 @@ Date: 29/03/2021
             invalid URL into the address bar.
           </b-col>
           <b-col> Try again
-            <!--
           <router-link to="/businesses">Create a new business here.</router-link>
-          -->
           </b-col>
         </h6>
       </b-card-body>
@@ -160,7 +147,7 @@ h6 {
 </style>
 
 <script>
-import memberSince from "../MemberSince";
+import memberSince from "../model/MemberSince";
 import api from "../../Api";
 
 
@@ -168,7 +155,6 @@ export default {
   components: {
     memberSince
   },
-  //Todo still has errors because I Did not connect to Navbar, and I check all errors and all show Navbar issues.
   data: function () {
     return {
       error: [],
@@ -216,23 +202,33 @@ export default {
         businessType: "",
         created: "",
       },
-      products: ['products1', 'products2', 'products3'],
       businessFound: true, // not smooth to switch the found or not find.
+      loading: true
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
-    this.getBusinessInfo(businessId);
+    this.launchPage(businessId);
   },
 
   methods: {
+
+    /**
+     * set up the page
+     **/
+    launchPage(businessId) {
+      this.loading = true;
+      this.getBusinessInfo(businessId);
+    },
+
     /**
      * When called changes page to the profile page based on the id of the user clicked
      */
-    rowClickHandler: function(record){
+    rowClickHandler: function (record) {
       this.$router.push({path: `/users/${record.id}`});
     },
+
     /**
      * Revoke admin from given userID by making api request
      * @param userId the id of the user to revoke admin from
@@ -262,17 +258,20 @@ export default {
      **/
     getBusinessInfo: function (id) {
       api
-          .getBusiness(id)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.setResponseData(response.data);
-            this.businessFound = true;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-            this.businessFound = false;
-          })
+        .getBusiness(id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.setResponseData(response.data);
+          this.businessFound = true;
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+          this.businessFound = false;
+          this.loading = false;
+        })
     },
+
     /**
      * set the response data to businessData
      * @param data
@@ -306,9 +305,20 @@ export default {
     },
   },
   computed: {
+
+    /**
+     * the street number, street name, city, region,
+     * country and postcode join with space between the echo to a string
+     * @return {string}
+     */
     getAddress: function () {
       return Object.values(this.businessData.address).join(' ');
     },
+
+    /**
+     * set table parameter
+     * @returns object
+     */
     fields() {
       return [
         {
