@@ -150,7 +150,7 @@ describe('Act as business', () => {
     expect(wrapper.findAll(".business-name-drop-down").length).toEqual(1);
     expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
     expect(wrapper.find("#profile-name").text()).toEqual("John");
-    expect(wrapper.findAll("hr").length).toEqual(1);
+    expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.findAll(".user-name-drop-down").length).toBe(0);
 
     userData.currentlyActingAs = null;
@@ -179,7 +179,7 @@ describe('Act as business', () => {
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(1);
     expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
     expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
-    expect(wrapper.findAll("hr").length).toEqual(2);
+    expect(wrapper.findAll("hr").length).toEqual(3);
     userData = prevUser;
   })
 });

@@ -13,14 +13,14 @@ Date: 19/4/2021
     >
     <b-card-body>
         <b-input-group>
-          <h6><b>Id:</b></h6>
+          <h6><b>Id*:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.id" required/>
+          <b-form-input type="text" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled v-model="productCard.id" required/>
         </b-input-group>
 
         <b-input-group>
-          <h6><b>Name:</b></h6>
+          <h6><b>Name*:</b></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name" required/>
