@@ -99,6 +99,7 @@ deploy-staging-backend:
   stage: deploy
   script:
     - cd backend
+    - ECHO 'spring.profiles.active=staging' >> /src/main/resources/application.properties
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/staging-backend/ || true
     - mkdir /home/gitlab-runner/staging-backend/
@@ -138,6 +139,7 @@ deploy-production-backend:
   stage: deploy
   script:
     - cd backend
+    - ECHO 'spring.profiles.active=prod' >> /src/main/resources/application.properties
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/production-backend/ || true
     - mkdir /home/gitlab-runner/production-backend/
