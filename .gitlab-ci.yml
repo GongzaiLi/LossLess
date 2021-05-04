@@ -27,6 +27,9 @@ junit:
   script:
     - cd backend
     - ./gradlew test
+  artifacts:
+    paths:
+      - backend/build/jacoco
 
 # Run acceptance (cucumber) tests
 # Uncomment after ATDD workshop (at the latest)
@@ -50,7 +53,7 @@ jest:
    - npm run test
   artifacts:
     paths:
-      - frontend/coverage/test-reporter.xml
+      - frontend/coverage
     expire_in: 1 week
 
 # Export sonarqube (static code analysis) reports
@@ -64,10 +67,8 @@ dev-sonarqube:
    policy: pull
   script:
    - cd frontend
-   - npm run test
    - npm run sonarqube
    - cd ../backend
-   - ./gradlew test
    - ./gradlew sonarqube
   only:
    - dev
