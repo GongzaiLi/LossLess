@@ -67,6 +67,7 @@ dev-sonarqube:
    - npm run test
    - npm run sonarqube
    - cd ../backend
+   - ./gradlew test
    - ./gradlew sonarqube
   only:
    - dev
