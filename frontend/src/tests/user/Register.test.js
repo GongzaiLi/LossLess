@@ -29,7 +29,7 @@ beforeEach(() => {
   wrapper = mount(Register, {
     localVue,
     router,
-    mocks: {$log},
+    mocks: {$log}
   });
 });
 
