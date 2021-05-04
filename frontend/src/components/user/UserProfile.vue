@@ -103,7 +103,7 @@ Date: 5/3/2021
                 <b-col> {{ getAddress }}</b-col>
               </b-row>
             </h6>
-            <h6 v-if="userData.businessesAdministered.length">
+            <h6 v-if="userData.businessesAdministered">
               <b-row>
                 <b-col cols="0">
                   <b-icon-building></b-icon-building>
