@@ -48,6 +48,10 @@ jest:
   script:
    - cd frontend
    - npm run test
+  artifacts:
+    paths:
+      - frontend/coverage/test-reporter.xml
+    expire_in: 1 week
 
 # Export sonarqube (static code analysis) reports
 # Uncomment after ATDD workshop (at the latest)
@@ -60,8 +64,6 @@ dev-sonarqube:
    policy: pull
   script:
    - cd frontend
-   - npm run test
-   - cat coverage/test-reporter.xml
    - npm run sonarqube
    - cd ../backend
    - ./gradlew sonarqube
