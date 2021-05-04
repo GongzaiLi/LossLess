@@ -73,43 +73,61 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createUser(@Valid @RequestBody @JsonView(UserViews.PostUserRequestView.class) User user) {
 
-        //Check user with this email address does not already exist
-        if (userService.checkEmailAlreadyUsed(user.getEmail())) {
-            logger.warn("Attempted to create user with already used email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
+        logger.debug("Request to create a new with data User: {}", user);
+
+        try {
+
+            if (userService.checkEmailAlreadyUsed(user.getEmail())) {
+                logger.warn("Attempted to create user with already used email, dropping request: {}", user);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
+            }
+            logger.info("Email validated for user: {}", user);
+
+
+            if (!user.checkDateOfBirthValid()) {
+                logger.warn("Invalid date for user: {}", user);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
+            }
+            logger.debug("Validated date for user: {}", user);
+
+            logger.debug("Setting created date");
+            user.setCreated(LocalDate.now());
+            logger.debug("Setting created date");
+            user.setRole(UserRoles.USER);
+
+            logger.debug("Logging in user: {}", user);
+            Login login = new Login(user.getEmail(), user.getPassword());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRole(UserRoles.USER);
+
+
+            //Save user object in h2 database
+            logger.debug("Creating Address Entity for user: {}", user);
+            addressService.createAddress(user.getHomeAddress());
+            logger.debug("Creating user: {}", user);
+            userService.createUser(user);
+
+            logger.info("Successfully registered user: {}", user.getId());
+
+            logger.debug("Authenticating user: {}", user.getId());
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                    login.getEmail(), login.getPassword());
+            Authentication auth = authenticationManager.authenticate(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            logger.info("Saved and authenticated new user {}", user);
+
+            JSONObject responseBody = new JSONObject();
+            responseBody.put("id", user.getId());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        } catch (Exception e) {
+            logger.error("Failed to create user with data: {}", user + " " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create User");
+
         }
 
-        if (!user.checkDateOfBirthValid()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
-        }
-
-        user.setCreated(LocalDate.now());
-
-        user.setRole(UserRoles.USER);
-
-        Login login = new Login(user.getEmail(), user.getPassword());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(UserRoles.USER);
-
-
-
-        //Save user object in h2 database
-        addressService.createAddress(user.getHomeAddress());
-        userService.createUser(user);
-
-        logger.info(String.format("Successful registration of user %d", user.getId()));
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                login.getEmail(), login.getPassword());
-        Authentication auth = authenticationManager.authenticate(token);
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        logger.info("saved new user {}", user);
-
-        JSONObject responseBody = new JSONObject();
-        responseBody.put("id", user.getId());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
 
     }
 
@@ -124,15 +142,30 @@ public class UserController {
     @GetMapping("/users/search")
     public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
 
-        LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+        logger.debug("Request to search for users with query: {}", searchQuery);
 
-        List<GetUserDto> searchResultsDto = new ArrayList<>();
+        try {
 
-        for (User user : searchResults) {
-            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+            logger.debug("Getting users matching query: {}", searchQuery);
+            LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+
+            List<GetUserDto> searchResultsDto = new ArrayList<>();
+
+            logger.debug("Adding all matched users to list");
+            for (User user : searchResults) {
+                searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+            }
+
+            logger.info("User matching the query: {} are: {}", searchQuery, searchResultsDto);
+
+            return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
+        } catch (Exception e) {
+            logger.error("Failed to search users with query: {}", searchQuery + " " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to search users");
+
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
     }
 
 
@@ -150,6 +183,7 @@ public class UserController {
         exception.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+//            logger.error(errorMessage); doesnt work. I am not sure why.
             errors.put(fieldName, errorMessage);
         });
         return errors;
@@ -167,24 +201,34 @@ public class UserController {
     @GetMapping("/users/{id}")
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
 
-        User possibleUser = userService.findUserById(userId);
-        logger.info("possible User{}", possibleUser);
+        logger.debug("Request to get a user ith ID: {}", userId);
 
-        if (possibleUser == null) {
-            logger.warn("ID does not exist.");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
+        try {
 
-        // Not too sure what to do with Response 401 because it's possibly about security but do we need
-        // to have U4 for that or is it possible to do without it
+            User possibleUser = userService.findUserById(userId);
+            logger.debug("possible User: {}", possibleUser);
 
-        logger.info("Account: {} retrieved successfully", possibleUser);
+            if (possibleUser == null) {
+                logger.warn("User with ID: {} does not exist", userId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+            }
 
+            // Not too sure what to do with Response 401 because it's possibly about security but do we need
+            // to have U4 for that or is it possible to do without it
 
-        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+            logger.info("Account: {} retrieved successfully using ID: {}", possibleUser, userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
+            GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+
+            return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
+        } catch (Exception e) {
+        logger.error("Failed to retrieve user with id: {}", userId + " " + e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve user.");
+
     }
+
+}
 
 
     /**
@@ -198,25 +242,40 @@ public class UserController {
     @PutMapping("/users/{id}/makeAdmin")
     public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
 
-        User possibleUser = userService.findUserById(userId);
-        logger.info("possible User{}", possibleUser);
+        logger.debug("Request to make user: {} an application admin", userId);
+        try {
 
-        // The Spring Security principal can only be retrieved as an Object and needs to be cast
-        // to the correct UserDetails instance, see:
-        // https://www.baeldung.com/get-user-in-spring-security
-        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+            logger.debug("Trying to find user with ID: {}", userId);
+            User possibleUser = userService.findUserById(userId);
 
-        if (possibleUser == null) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot change role of a DGAA");
+            // The Spring Security principal can only be retrieved as an Object and needs to be cast
+            // to the correct UserDetails instance, see:
+            // https://www.baeldung.com/get-user-in-spring-security
+            CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+
+            if (possibleUser == null) {
+                logger.warn("User with ID: {} does not exist", userId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+            } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+                logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot change role of a DGAA");
+            }
+
+            logger.info("User: {} found using Id : {}", possibleUser, userId);
+
+            logger.debug("Setting role to admin for user: {}", possibleUser.getId());
+            possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+            logger.debug("Updating user: {} ith new role", possibleUser.getId());
+            userService.updateUser(possibleUser);
+            logger.info("User: {} successfully made application administrator.", possibleUser.getId());
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } catch (Exception e) {
+            logger.error("Failed to user: {}  an application admin", userId + " " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to user and application admin.");
+
         }
 
-        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-        userService.updateUser(possibleUser);
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -231,29 +290,47 @@ public class UserController {
     @PutMapping("/users/{id}/revokeAdmin")
     public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
 
-        User possibleUser = userService.findUserById(userId);
-        logger.info("possible User{}", possibleUser);
+        logger.debug("Request to revoke admin status for  user: {}", userId);
 
-        // The Spring Security principal can only be retrieved as an Object and needs to be cast
-        // to the correct UserDetails instance, see:
-        // https://www.baeldung.com/get-user-in-spring-security
-        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+        try {
 
-        if (possibleUser == null) {
-            logger.warn("ID does not exist.");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getId().equals(loggedInUser.getId())) {
-            logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
+            logger.debug("Trying to find user with ID: {}", userId);
+            User possibleUser = userService.findUserById(userId);
+            logger.info("User: {} found using Id : {}", possibleUser, userId);
+
+
+            // The Spring Security principal can only be retrieved as an Object and needs to be cast
+            // to the correct UserDetails instance, see:
+            // https://www.baeldung.com/get-user-in-spring-security
+            CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+
+            if (possibleUser == null) {
+                logger.warn("Could not find user with ID: {}", userId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+            } else if (possibleUser.getId().equals(loggedInUser.getId())) {
+                logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
+            } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+                logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
+            }
+
+            logger.debug("User: {} found using Id : {}", possibleUser, userId);
+
+            logger.debug("Revoking admin status for user: {} ", possibleUser.getId());
+            possibleUser.setRole(UserRoles.USER);
+            logger.debug("Updating user: {} ith new role", possibleUser.getId());
+            userService.updateUser(possibleUser);
+            logger.info("Successfully revoked admin rights for user: {}", possibleUser.getId());
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } catch (Exception e) {
+            logger.error("Failed to revoke admin status for user: {}", userId + " " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to revoke admin status.");
+
         }
 
-        possibleUser.setRole(UserRoles.USER);
-        userService.updateUser(possibleUser);
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
@@ -269,33 +346,48 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
 
-        User savedUser = userService.findUserByEmail(login.getEmail());
-        if (savedUser == null) {
-            logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to log into an account with an email " +
-                    "that is not registered.");
-        } else {
+        logger.debug("Request to authenticate user login for user with data: {}" , login);
 
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    login.getEmail(), login.getPassword());
-            try {
-                Authentication auth = authenticationManager.authenticate(token);
-                SecurityContextHolder.getContext().setAuthentication(auth);
+        try {
 
-                logger.info("Account {}, logged into successfully", login.getEmail());
-                JSONObject responseBody = new JSONObject();
-                responseBody.put("id", savedUser.getId());
+            User savedUser = userService.findUserByEmail(login.getEmail());
+            if (savedUser == null) {
+                logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to log into an account with an email " +
+                        "that is not registered.");
+            } else {
+                logger.debug("User: {} found using data : {}", savedUser, login);
+                logger.debug("Authenticating user: {} with {}", savedUser, login);
+
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        login.getEmail(), login.getPassword());
+                try {
+                    Authentication auth = authenticationManager.authenticate(token);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+
+                    JSONObject responseBody = new JSONObject();
+                    logger.debug("Getting user ID for user: {}", savedUser);
+                    responseBody.put("id", savedUser.getId());
 
 
-                return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+                    logger.info("Successfully logged into user: {} with {}", savedUser, login);
 
-            } catch (AuthenticationException e) {
-                logger.error("Incorrect email or password.");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
+                    return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+
+                } catch (AuthenticationException e) {
+                    logger.warn("Login unsuccessful. " + e.getMessage());
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
+                }
+
+
             }
+        } catch (Exception e) {
+            logger.error("Failed to authenticate user with data: {}", login + " " + e.getMessage());
 
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to authenticate user.");
 
         }
+
 
     }
 }

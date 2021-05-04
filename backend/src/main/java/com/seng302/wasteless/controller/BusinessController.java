@@ -68,7 +68,8 @@ public class BusinessController {
     public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
 
-            logger.info("Request to create new business {}", business);
+        logger.debug("Request to create new business {}", business);
+        try {
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String currentPrincipalEmail = authentication.getName();
@@ -78,42 +79,49 @@ public class BusinessController {
             logger.info("User trying to create business is: {}", user);
 
             if (user == null) {
-                logger.info("Failed to create Business. Access token invalid for user: {}", user);
+                logger.warn("Failed to create Business. Access token invalid for user: {}", user);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                         "Access token is invalid");
             }
             logger.info("Access token valid for user: {}. Creating Business .... ", user);
 
-
+            logger.debug("Adding business data");
             business.setPrimaryAdministrator(user);
 
             List<User> adminList = new ArrayList<>();
             adminList.add(user);
             business.setAdministrators(adminList);
 
+            logger.debug("Adding business date");
             business.setCreated(LocalDate.now());
 
             //Save business
             Address address = business.getAddress();
-            logger.info("Attempt to create Address Entity: {} entered by user: {}", address, user);
+            logger.debug("Attempt to create Address Entity: {} entered by user: {}", address, user);
             addressService.createAddress(address);
 
-            logger.info("Attempt to create Business Entity: {} by user: {}", business, user);
+            logger.debug("Attempt to create Business Entity: {} by user: {}", business, user);
             business = businessService.createBusiness(business);
 
             logger.info("Successfully created Business Entity: {} requested by user: {}", business, user);
 
-            logger.info("Trying to set user: {} as admin of business: {}", user, business);
+            logger.debug("Trying to set user: {} as admin of business: {}", user, business);
             userService.addBusinessPrimarilyAdministered(user, business);
 
-            logger.info("Trying to update user: {} with business: {}", user, business);
+            logger.debug("Trying to update user: {} with business: {}", user, business);
             userService.saveUserChanges(user);
-            logger.info("Successfully saved business: {} created by user: {}", business);
+            logger.info("Successfully saved business: {} created by user: {}", business, user);
 
             JSONObject responseBody = new JSONObject();
             responseBody.put("businessId", business.getId());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        } catch (Exception e) {
+            logger.error("Failed to create Business"+ e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Business");
+
+        }
 
 
     }
@@ -128,22 +136,29 @@ public class BusinessController {
     @GetMapping("/businesses/{id}")
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
-        logger.info("Request to get business with ID: {}", businessId);
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+
+        logger.debug("Request to get business with ID: {}", businessId);
+        try {
+            Business possibleBusiness = businessService.findBusinessById(businessId);
+            if (possibleBusiness == null) {
+                logger.warn("Business ID: {} does not exist.", businessId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+            }
+            logger.info("Successfully Retrieved Business: {} using ID: {}", possibleBusiness, businessId);
+
+
+            logger.debug("Request to get formatted business: {}", businessId);
+            GetBusinessesDto getBusinessesDto = GetBusinessesDtoMapper.toGetBusinessesDto(possibleBusiness);
+
+            logger.info("Successfully retrieved formatted business: {}", getBusinessesDto);
+            return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
+        } catch (Exception e) {
+            logger.error("Failed to retrieve Business: {}", businessId + " " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve Business");
+
         }
-        logger.info("Successfully Retrieved Business: {} using ID: {}", possibleBusiness, businessId);
 
-
-
-
-        logger.info("Request to get formatted business: {}", businessId);
-        GetBusinessesDto getBusinessesDto = GetBusinessesDtoMapper.toGetBusinessesDto(possibleBusiness);
-
-        logger.info("Successfully retrieved formatted business: {}", getBusinessesDto);
-        return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
     }
 
     /**
@@ -157,65 +172,71 @@ public class BusinessController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct, HttpServletRequest request) {
 
-        logger.info("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
+        logger.debug("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentPrincipalEmail = authentication.getName();
 
-        logger.info("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
+            logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+            User user = userService.findUserByEmail(currentPrincipalEmail);
 
-        if (user == null) {
-            logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
+            if (user == null) {
+                logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        "Access token is invalid");
+            }
+            logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+
+
+            logger.debug("Request to get business with ID: {}", businessId);
+            Business possibleBusiness = businessService.findBusinessById(businessId);
+
+            if (possibleBusiness == null) {
+                logger.warn("Business ID: {} does not exist.", businessId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+            }
+            logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+
+
+            if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+                logger.warn("Cannot create product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+            }
+            logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+            logger.debug("Trying to create product: {} for business: {}", possibleProduct, possibleBusiness);
+
+            logger.debug("Generating product ID");
+            String productId = possibleProduct.createCode(businessId);
+
+            if (productService.findProductById(productId) != null) {
+                logger.warn("Product ID not generated. ID already exists");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
+            }
+            logger.info("Product ID: {} generated for product: {}", productId, possibleProduct);
+
+
+            LocalDate dateCreated = LocalDate.now();
+
+            logger.debug("Setting product data.");
+            possibleProduct.setId(productId);
+            possibleProduct.setBusinessId(businessId);
+            possibleProduct.setCreated(dateCreated);
+
+            //Save product
+            logger.debug("Trying to create Product Entity for product: {}", possibleProduct);
+            possibleProduct = productService.createProduct(possibleProduct);
+
+            logger.info("Successfully created Product Entity: {}", possibleProduct);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+
+        } catch (Exception e) {
+            logger.error("Failed to create business product: {}", possibleProduct + " " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create business product");
+
         }
-        logger.info("Validated toke for user: {} with Email: {}.", user, currentPrincipalEmail);
 
-
-        logger.info("Request to get business with ID: {}", businessId);
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
-
-
-
-        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.info("Cannot create product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
-        logger.info("Trying to create product: {} for business: {}", possibleProduct, possibleBusiness);
-
-        logger.info("Generating product ID");
-        String productId = possibleProduct.createCode(businessId);
-
-        if (productService.findProductById(productId) != null) {
-            logger.info("Product ID not generated. ID already exists");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
-        }
-        logger.info("Product ID: {} generated for product: {}", productId, possibleProduct);
-
-
-
-        logger.info("Getting product creation date.");
-        LocalDate dateCreated = LocalDate.now();
-
-        logger.info("Setting product data.");
-        possibleProduct.setId(productId);
-        possibleProduct.setBusinessId(businessId);
-        possibleProduct.setCreated(dateCreated);
-
-        //Save product
-        logger.info("Trying to create Product Entity for product: {}", possibleProduct);
-        possibleProduct = productService.createProduct(possibleProduct);
-
-        logger.info("Successfully created Product Entity: {}", possibleProduct);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
@@ -228,48 +249,56 @@ public class BusinessController {
     @GetMapping("/businesses/{id}/products")
     public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
-        logger.info("Request to get business products");
+        logger.debug("Request to get business products");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        try {
 
-        logger.info("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentPrincipalEmail = authentication.getName();
 
-        if (user == null) {
-            logger.info("Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated toke for user: {} with Email: {}.", user, currentPrincipalEmail);
+            logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+            User user = userService.findUserByEmail(currentPrincipalEmail);
 
-
-        logger.info("Request to get business with ID: {}", businessId);
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+            if (user == null) {
+                logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                        "Access token is invalid");
+            }
+            logger.info("Validated toke for user: {} with Email: {}.", user, currentPrincipalEmail);
 
 
+            logger.debug("Request to get business with ID: {}", businessId);
+            Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.info("Cannot create product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+            if (possibleBusiness == null) {
+                logger.warn("Business ID: {} does not exist.", businessId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+            }
+            logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
+            if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+                logger.warn("Cannot create product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+            }
+            logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
-        logger.info("Trying to retrieve products for business: {}", possibleBusiness);
-        List<Product> productList = productService.getAllProductsByBusinessId(businessId);
 
-        logger.info("Products retrieved: {} for business: {}", productList, possibleBusiness);
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+            logger.debug("Trying to retrieve products for business: {}", possibleBusiness);
+            List<Product> productList = productService.getAllProductsByBusinessId(businessId);
+
+            logger.info("Products retrieved: {} for business: {}", productList, possibleBusiness);
+            return ResponseEntity.status(HttpStatus.OK).body(productList);
+
+        } catch (Exception e) {
+        logger.error("Failed to retrieve business products for business: {}", businessId + " " + e.getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve business products");
 
     }
+
+
+}
 
     /**
      * Handle put request to /businesses/{businessId}/products/{productId} endpoint for updating a product
@@ -282,60 +311,68 @@ public class BusinessController {
      */
     @PutMapping("/businesses/{businessId}/products/{productId}")
     public ResponseEntity<Object> editBusinessProduct(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @Valid @RequestBody Product editedProduct) {
-        logger.info("Request to update product with data: {} for business ID: {}", editedProduct, businessId);
+        logger.debug("Request to update product with data: {} for business ID: {}", editedProduct, businessId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentPrincipalEmail = authentication.getName();
 
-        logger.info("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-        if (user == null) {
-            logger.info("Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+            User user = userService.findUserByEmail(currentPrincipalEmail);
+            if (user == null) {
+                logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+
+
+            if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
+                logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, businessId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            logger.info("User: {} validated as global admin or admin of business: {}.", user, businessId);
+
+            logger.debug("Trying to find product with ID: {} in the catalogue", productId);
+            Product oldProduct = productService.findProductById(productId);
+
+            if (oldProduct == null) {
+                logger.warn("Could not find product with ID: {}", productId);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
+            }
+            logger.info("Found product: {} using ID: {}", oldProduct, productId);
+
+
+            logger.debug("Generating new product ID");
+            String newProductId = editedProduct.createCode(businessId);
+            if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
+                logger.warn("Product ID already exists. Not updating.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
+            }
+            logger.info("Product ID: {} generated for old product: {}", newProductId, productId);
+
+
+            logger.debug("Creating new Product Entity and setting data.");
+            Product newProduct = new Product();
+            newProduct.setId(newProductId);
+            newProduct.setName(editedProduct.getName());
+            newProduct.setDescription(editedProduct.getDescription());
+            newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
+            newProduct.setBusinessId(oldProduct.getBusinessId());
+            newProduct.setCreated(oldProduct.getCreated());
+
+            logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, newProduct);
+            productService.updateProduct(oldProduct, newProduct);
+
+            logger.info("Successfully updated old product: {} with new product: {}", oldProduct, newProduct);
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } catch (Exception e) {
+            logger.error("Failed to edit business product: {} with data: {}", productId, businessId + " " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to edit business product");
+
         }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
 
-
-        if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
-            logger.info("Cannot edit product. User: {} is not global admin or admin of business: {}", user, businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, businessId);
-
-        logger.info("Trying to find product with ID: {} in the catalogue", productId);
-        Product oldProduct = productService.findProductById(productId);
-
-        if (oldProduct == null) {
-            logger.warn("Could not find product with ID: {}", productId );
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
-        }
-        logger.info("Found product: {} using ID: {}", oldProduct, productId );
-
-
-        logger.info("Generating new product ID");
-        String newProductId = editedProduct.createCode(businessId);
-        if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
-            logger.info("Product ID already exists. Not updating.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
-        }
-        logger.info("Product ID: {} generated for old product: {}", newProductId, productId);
-
-
-
-        logger.info("Creating new Product Entity");
-        Product newProduct = new Product();
-        newProduct.setId(newProductId);
-        newProduct.setName(editedProduct.getName());
-        newProduct.setDescription(editedProduct.getDescription());
-        newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
-        newProduct.setBusinessId(oldProduct.getBusinessId());
-        newProduct.setCreated(oldProduct.getCreated());
-
-        logger.info("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, newProduct);
-        productService.updateProduct(oldProduct, newProduct);
-
-        logger.info("Successfully updated old product: {} with new product: {}", oldProduct, newProduct);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
@@ -364,58 +401,65 @@ public class BusinessController {
     @PutMapping("/businesses/{id}/makeAdministrator")
     public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesMakeAdminDto requestBody) {
 
-        logger.info("Request to make user: {} the admin of business: {}", requestBody.getUserId(), businessId);
+        logger.debug("Request to make user: {} the admin of business: {}", requestBody.getUserId(), businessId);
 
-        logger.info("Request to get business with ID: {}", businessId);
-        Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
+        try {
+            logger.debug("Request to get business with ID: {}", businessId);
+            Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
 
-        if (possibleBusinessToAddAdminFor == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+            if (possibleBusinessToAddAdminFor == null) {
+                logger.warn("Business ID: {} does not exist.", businessId);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+            }
+            logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusinessToAddAdminFor, businessId);
+
+
+            logger.debug("Trying to find user with ID: {}", requestBody.getUserId());
+            User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
+
+            if (possibleUserToMakeAdmin == null) {
+                logger.warn("User with ID: {} does not exist", requestBody.getUserId());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+            }
+            logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
+
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentPrincipalEmail = authentication.getName();
+
+            logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+            User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
+
+            if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
+                    && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+                    && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
+                logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", userMakingRequest, businessId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+            }
+            logger.info("User: {} validated as global admin or admin of business: {}.", userMakingRequest, businessId);
+
+
+            if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
+                logger.warn("Cannot process request. User: {} is already an admin of business: {}.", requestBody.getUserId(), businessId);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
+            }
+
+
+            //Set user to be admin of business
+            logger.debug("Making user: {} an admin of business: {}.", possibleUserToMakeAdmin, businessId);
+            businessService.addAdministratorToBusiness(possibleBusinessToAddAdminFor, possibleUserToMakeAdmin);
+            logger.debug("Updating business: {} with new admin: {}", businessId, possibleUserToMakeAdmin);
+            businessService.saveBusinessChanges(possibleBusinessToAddAdminFor);
+
+            logger.info("Successfully made user: {} an admin of business: {}.", requestBody.getUserId(), businessId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            logger.error("Failed to make user: {} admin of business: {}", requestBody.getUserId(), businessId + " " + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to make user an admin of business.");
+
         }
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusinessToAddAdminFor, businessId);
 
-
-        logger.info("trying to find user with ID: {}", requestBody.getUserId());
-        User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
-
-        if (possibleUserToMakeAdmin == null) {
-            logger.warn("Could not find user with ID: {}", requestBody.getUserId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
-        }
-        logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
-
-
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.info("Validating user with Email: {}", currentPrincipalEmail);
-        User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
-            && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-            && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
-            logger.warn("Cannot process request. User: {} is not global admin or admin of business: {}", userMakingRequest, businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", userMakingRequest, businessId);
-
-
-        if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
-            logger.info("Cannot process request. User: {} is already an admin of business: {}.", possibleUserToMakeAdmin, businessId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
-        }
-
-
-        //Set user to be admin of business
-        logger.info("Making user: {} an admin of business: {}.", possibleUserToMakeAdmin, businessId);
-        businessService.addAdministratorToBusiness(possibleBusinessToAddAdminFor, possibleUserToMakeAdmin);
-        logger.info("Updating business: {} with new admin: {}", businessId, possibleUserToMakeAdmin);
-        businessService.saveBusinessChanges(possibleBusinessToAddAdminFor);
-
-        logger.info("Successfully made user: {} an admin of business: {}.", possibleUserToMakeAdmin, businessId);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
@@ -433,9 +477,9 @@ public class BusinessController {
         Map<String, String> errors;
         errors = new HashMap<>();
         exception.getBindingResult().getAllErrors().forEach((error) -> {
-//            logger.error(error);
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+//            logger.error(errorMessage); it doesnt work I am not sure why
             errors.put(fieldName, errorMessage);
         });
         return errors;
