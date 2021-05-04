@@ -1,8 +1,6 @@
 stages:
   - npm-dependencies
   - build
-  - test
-  - sonarqube
   - deploy
 
 tag_checker:
