@@ -8,6 +8,11 @@ const $route = {
   }
 };
 
+const $log = {
+  debug() {
+  }
+};
+
 let wrapper;
 let mockDateNow = '2019-05-14T11:01:58.135Z';
 jest
@@ -26,7 +31,7 @@ beforeEach(() => {
   wrapper = shallowMount(userProfile, {
     localVue,
     propsData: {},
-    mocks: {$route},
+    mocks: {$route, $log},
     stubs: {},
     methods: {},
   });

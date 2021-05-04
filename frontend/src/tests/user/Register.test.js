@@ -15,6 +15,11 @@ config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let wrapper;
 
+const $log = {
+  debug() {
+  }
+};
+
 beforeEach(() => {
   jest
     .spyOn(global.Date, 'now')
@@ -23,7 +28,8 @@ beforeEach(() => {
     );
   wrapper = mount(Register, {
     localVue,
-    router
+    router,
+    mocks: {$log}
   });
 });
 
