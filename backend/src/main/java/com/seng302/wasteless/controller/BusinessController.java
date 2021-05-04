@@ -2,18 +2,18 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.MainApplicationRunner;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.ProductViews;
+import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 @RestController
 public class BusinessController {
-    private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
+    private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
 
     private final BusinessService businessService;
     private final UserService userService;
@@ -85,7 +85,6 @@ public class BusinessController {
         adminList.add(user);
         business.setAdministrators(adminList);
 
-
         business.setCreated(LocalDate.now());
 
         //Save business
@@ -94,9 +93,14 @@ public class BusinessController {
 
         userService.addBusinessPrimarilyAdministered(user, business);
 
+        userService.saveUserChanges(user);
+
         logger.info("saved new business {}", business);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("businessId", business.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
 
@@ -161,8 +165,7 @@ public class BusinessController {
         String productId = possibleProduct.createCode(businessId);
 
         if (productService.findProductById(productId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
-                    "to one that is already in your catalogue.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
         }
         LocalDate dateCreated = LocalDate.now();
 
@@ -244,13 +247,12 @@ public class BusinessController {
         Product oldProduct = productService.findProductById(productId);
         if (oldProduct == null) {
             logger.warn("Product does not exist.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
         }
 
         String newProductId = editedProduct.createCode(businessId);
         if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The name of the product you have entered is too similar " +
-                    "to one that is already in your catalogue.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
         }
 
         Product newProduct = new Product();
@@ -262,6 +264,117 @@ public class BusinessController {
         newProduct.setCreated(oldProduct.getCreated());
 
         productService.updateProduct(oldProduct, newProduct);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    /**
+     * Put request to make a user a administrator of a business
+     *
+     * Checks if the business exists, and user to make admin exists
+     * Checks if the user making the request has permission to, either as the primary business admin
+     * for that business, or as a global application admin
+     *
+     * Gets the user currently logged in from Authentication, this is the person acting
+     *
+     * If the above passes adds the user to the businesses list of administrators
+     *
+     * Returns 200 on success
+     * Returns 400 if user does not exist, or if user is already admin
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 403 if forbidden request, i.e. the request is not allowed to make the request
+     * Returns 406 if business does not exist
+     *
+     *
+     * @param businessId    The id the business to add an administrator for
+     * @param requestBody   The request body containing the userId of the user to make admin
+     * @return  Response code with message, see above for codes
+     */
+    @PutMapping("/businesses/{id}/makeAdministrator")
+    public ResponseEntity<Object> makeAdministrator(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
+
+        Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
+        logger.info("possible Business {}", possibleBusinessToAddAdminFor);
+
+        if (possibleBusinessToAddAdminFor == null) {
+            logger.warn("ID does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+
+        User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
+        logger.info("possible User {}", possibleUserToMakeAdmin);
+
+        if (possibleUserToMakeAdmin == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
+
+        if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
+            && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
+            && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+
+        if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
+        }
+
+        //Set user to be admin of business
+        businessService.addAdministratorToBusiness(possibleBusinessToAddAdminFor, possibleUserToMakeAdmin);
+        businessService.saveBusinessChanges(possibleBusinessToAddAdminFor);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    /**
+     * Handles Put request for /businesses/{id}/makeAdministrator endpoint for
+     * removing an admin from a business.
+     *
+     * @param businessId The Id of the business
+     * @param requestBody DTO that contains userId
+     * @return (400) User with userId does not exist or Admin to remove is Primary, (406) business does not exist,
+     *         (403) User is not admin, (200) if put request runs with out errors
+     */
+    @PutMapping("/businesses/{id}/removeAdministrator")
+    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
+
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+        User possibleUser = userService.findUserById(requestBody.getUserId());
+        logger.info("possible Business{}", possibleBusiness);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+
+        if (possibleBusiness == null) {
+            logger.warn("Business does not exist.");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
+        }
+        if (possibleUser == null) {
+            logger.warn("User does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID does not exist");
+        }
+        if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
+            logger.warn("User is primary admin");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
+        }
+        if (!(possibleBusiness.getPrimaryAdministrator().getId().equals(loggedInUser.getId())) && loggedInUser.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && loggedInUser.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            logger.warn("You are not a primary business admin");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+        if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), possibleUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not admin of business");
+        }
+
+        businessService.removeAdministratorFromBusiness(possibleBusiness, possibleUser);
+        businessService.saveBusinessChanges(possibleBusiness);
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

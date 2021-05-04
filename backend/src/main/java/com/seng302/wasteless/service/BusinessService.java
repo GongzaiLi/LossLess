@@ -1,6 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,4 +52,32 @@ public class BusinessService {
      */
     public List<Business> findBusinessesByUserId(Integer id) {return businessRepository.findBySpecificAdminId(id); }
 
+    /**
+     * Add administrator to a business
+     *
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     */
+    public void addAdministratorToBusiness(Business business, User user) {
+        business.addAdministrator(user);
+    }
+
+    /**
+     * Remove administrator from a business
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     */
+    public void removeAdministratorFromBusiness(Business business, User user) {
+        business.removeAdministrator(user);
+    }
+
+
+    /**
+     * Save changes to business
+     *
+     * @param business Save changes to a business
+     */
+    public void saveBusinessChanges(Business business) {
+        businessRepository.save(business);
+    }
 }

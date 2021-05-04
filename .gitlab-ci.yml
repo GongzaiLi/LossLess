@@ -95,6 +95,7 @@ branch-build:
 deploy-staging-backend:
   stage: deploy
   script:
+    - echo "$DB_USERNAME"
     - cd backend
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/staging-backend/ || true

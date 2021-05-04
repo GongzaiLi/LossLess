@@ -3,6 +3,7 @@ package com.seng302.wasteless;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +18,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -41,6 +47,9 @@ public class BusinessControllerIntegrationTest {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private UserService userService;
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
@@ -700,5 +709,251 @@ public class BusinessControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].recommendedRetailPrice", is(2.0)));
     }
 
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
+
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_thenUserActuallyUpdated() throws Exception {
+
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Business businessAfter = businessService.findBusinessById(1);
+
+        List<User> administrators = businessAfter.getAdministrators();
+        assertEquals(2, administrators.get(0).getId());
+        assertEquals(1, administrators.get(1).getId());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessMakeAdmin_andInvalidRequestBecauseUserAlreadyAdmin_then400Response() throws Exception {
+
+
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessRevokeAdmin_andValidRequest_then200Response() throws Exception {
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessRevokeAdmin_andValidRequest_thenBusinessIsUpdated() throws Exception {
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON));
+
+        Business businessAfter = businessService.findBusinessById(1);
+        assertEquals(true, !businessAfter.getAdministrators().contains(user));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessRevokeAdmin_andUserIsNotAdmin_then403Request() throws Exception {
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"3\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 
 }

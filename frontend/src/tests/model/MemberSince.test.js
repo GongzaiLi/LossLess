@@ -30,7 +30,7 @@ afterEach(() => {
     wrapper.destroy();
 });
 
-describe('Register', () => {
+describe('MemberSince', () => {
     test('is a Vue instance', () => {
         expect(wrapper.isVueInstance).toBeTruthy();
     });
@@ -76,4 +76,92 @@ test('5-years-3-months', () => {
         new Date("2016-05-10T00:32:00Z"),
         new Date("2021-10-11T00:32:01Z")
     )).toEqual({years: 5, months: 5});
+});
+
+
+describe('MemberSince', () => {
+
+    test('correct if 0 years and months', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2016-05-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2016-05-10T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('10 May 2016 (0 Months)')
+    });
+
+    test('correct if 0 years and 1 month', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2016-05-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2016-04-09T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('9 April 2016 (1 Month)')
+    });
+
+    test('correct if 9 months', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2016-11-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2016-02-09T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('9 February 2016 (9 Months)')
+    });
+
+    test('correct if 1 year and 0 months', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2016-05-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2015-05-09T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('9 May 2015 (1 Year)')
+    });
+
+    test('correct if 1 year and 1 month', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2016-05-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2015-04-09T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('9 April 2015 (1 Year and 1 Month)')
+    });
+
+    test('correct if 4 years and 9 months', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2019-10-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2015-01-09T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('9 January 2015 (4 Years and 9 Months)')
+    });
+
+    test('correct if 5 years', async () => {
+        jest
+          .spyOn(global.Date, 'now')
+          .mockImplementationOnce(() =>
+            new Date('2016-05-10T00:32:00Z').valueOf()
+          );
+
+        await wrapper.setProps({ date: '2011-05-09T00:32:00Z' });
+
+        expect(wrapper.vm.memberSince).toBe('9 May 2011 (5 Years)')
+    });
 });
