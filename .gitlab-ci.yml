@@ -60,6 +60,7 @@ dev-sonarqube:
    policy: pull
   script:
    - cd frontend
+   - cat coverage/test-reporter.xml
    - npm run sonarqube
    - cd ../backend
    - ./gradlew sonarqube
