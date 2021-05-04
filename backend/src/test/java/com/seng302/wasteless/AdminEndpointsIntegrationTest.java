@@ -147,13 +147,6 @@ public class AdminEndpointsIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "admin@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-    public void whenTryRevokeUserExists_andUserIsSelf_andRequestFromDGAA_thenConflict() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin"))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    @WithMockCustomUser(email = "admin@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenTryRevokeUserExists_andUserIsDGAARole_andRequestFromDGAA_thenForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin"))
                 .andExpect(status().isForbidden());
