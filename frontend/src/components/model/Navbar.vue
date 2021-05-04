@@ -27,14 +27,22 @@ Date: sprint_1
             <img src="../../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
 
-          <b-dropdown-item
-              v-if="!isActingAsUser"
-              @click="actAsUser()"
-              class="user-name-drop-down">
-            {{$currentUser.firstName}}
-          </b-dropdown-item>
 
-          <hr v-if="!isActingAsUser" style="margin-top: 0.5em; margin-bottom: 0.5em;">
+          <div v-if="!isActingAsUser">
+            <hr style="margin-top: 0.5em; margin-bottom: 0;">
+            <sub style="padding-left:2em;">User Accounts</sub>
+            <b-dropdown-item
+                style="margin-top: 0.1em"
+                @click="actAsUser()"
+                class="user-name-drop-down">
+              {{$currentUser.firstName}}
+            </b-dropdown-item>
+          </div>
+
+          <div v-if="businessesInDropDown.length > 0" style="margin-bottom: 0.1em">
+            <hr style="margin-top: 0.5em; margin-bottom: 0;">
+            <sub style="margin-left:2em">Business Accounts</sub>
+          </div>
 
           <b-dropdown-item
               v-for="business in businessesInDropDown"
