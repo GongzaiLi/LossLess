@@ -89,15 +89,26 @@ public class User {
      * Check this objects date is within the expected maximum and minimum date ranges
      */
     public boolean checkDateOfBirthValid() {
-        //Todo minimum age to allow
+
         LocalDate today = LocalDate.now();
 
-        LocalDate minimumDOB = today.minusYears(0);
+        LocalDate minimumDOB = today.minusYears(13).plusDays(1);
         LocalDate maximumDOB = today.minusYears(120);
 
         return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));
     }
+    /**
+     * Check this objects date is within the expected maximum and minimum date ranges
+     */
+    public boolean checkIsOverSixteen() {
 
+        LocalDate today = LocalDate.now();
+
+        LocalDate minimumDOB = today.minusYears(16).plusDays(1);
+        LocalDate maximumDOB = today.minusYears(120);
+
+        return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));
+    }
     /**
      * Add a business to the list of businessesPrimarilyAdministered.
      *
