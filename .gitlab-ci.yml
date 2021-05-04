@@ -100,7 +100,7 @@ deploy-staging-backend:
   script:
     - cd backend
     - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
-    - echo $'\ndefault-admin-username=${DGAA_USERNAME} >> src/main/resources/global-admin.properties
+    - echo $'\ndefault-admin-username=${DGAA_EMAIL} >> src/main/resources/global-admin.properties
     - echo $'\ndefault-admin-password=${DGAA_PASSWORD} >> src/main/resources/global-admin.properties
     - echo $'\nspring.profiles.active=staging' >> src/main/resources/application.properties
     - ./gradlew bootJar
@@ -143,7 +143,7 @@ deploy-production-backend:
   script:
     - cd backend
     - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
-    - echo $'\ndefault-admin-username=${DGAA_USERNAME} >> src/main/resources/global-admin.properties
+    - echo $'\ndefault-admin-username=${DGAA_EMAIL} >> src/main/resources/global-admin.properties
     - echo $'\ndefault-admin-password=${DGAA_PASSWORD} >> src/main/resources/global-admin.properties
     - echo $'\nspring.profiles.active=prod' >> src/main/resources/application.properties
     - ./gradlew bootJar
