@@ -9,6 +9,6 @@ import lombok.experimental.Accessors;
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
-public class PutBusinessesMakeAdminDto {
+public class PutBusinessesAdminDto {
     private Integer userId;
 }
