@@ -64,11 +64,12 @@ dev-sonarqube:
    policy: pull
   script:
    - cd frontend
+   - npm run test
    - npm run sonarqube
    - cd ../backend
    - ./gradlew sonarqube
   only:
-   - Setup_Sonarqube
+   - dev
 
 # builds all branches, except dev and master
 branch-build:
