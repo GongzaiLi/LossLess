@@ -125,6 +125,7 @@
 2021-05-03 15:45:19.845  INFO 110965 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2021-05-03 15:45:19.846  INFO 110965 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2021-05-03 15:45:19.850  INFO 110965 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+<<<<<<< HEAD
 2021-05-04 15:06:59.857  INFO 46543 --- [main] com.seng302.wasteless.Main               : Starting Main using Java 11.0.9.1 on cs17070jp with PID 46543 (/home/cosc/student/nsi60/Documents/2021/SENG302/Project/team-700/backend/build/classes/java/main started by nsi60 in /home/cosc/student/nsi60/Documents/2021/SENG302/Project/team-700/backend)
 2021-05-04 15:06:59.858  INFO 46543 --- [main] com.seng302.wasteless.Main               : No active profile set, falling back to default profiles: default
 2021-05-04 15:07:00.280  INFO 46543 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
@@ -460,3 +461,5 @@
 2021-05-04 15:17:20.290  INFO 48764 --- [SpringContextShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2021-05-04 15:17:20.291  INFO 48764 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2021-05-04 15:17:20.295  INFO 48764 --- [SpringContextShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+=======
+>>>>>>> 3170daf4cad68ed90fb8d7e4e035ce7f33c46414
