@@ -6,6 +6,7 @@ build/
 !**/src/test/**
 dist/
 node_modules/
+application.properties
 
 ### STS ###
 .apt_generated
