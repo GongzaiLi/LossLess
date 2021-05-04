@@ -3,6 +3,7 @@ package com.seng302.wasteless;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +18,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -42,28 +48,20 @@ public class BusinessControllerIntegrationTest {
     @Autowired
     private ProductService productService;
 
-    String address1 = "{\n" +
-            "    \"streetNumber\": \"56\",\n" +
-            "    \"streetName\": \"Clyde Road\",\n" +
-            "    \"city\": \"Christchurch\",\n" +
-            "    \"region\": \"Canterbury\",\n" +
-            "    \"country\": \"New Zealand\",\n" +
-            "    \"postcode\": \"8041\"\n" +
-            "  }";
-
-    String homeAddress = "{\n" +
-            "    \"streetNumber\": \"3/24\",\n" +
-            "    \"streetName\": \"Ilam Road\",\n" +
-            "    \"city\": \"Christchurch\",\n" +
-            "    \"region\": \"Canterbury\",\n" +
-            "    \"country\": \"New Zealand\",\n" +
-            "    \"postcode\": \"90210\"\n" +
-            "  }";
+    @Autowired
+    private UserService userService;
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndBusinessExists_thenCorrectBusiness() throws Exception {
-        createOneBusiness("Business", homeAddress, "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
 
         mockMvc.perform(get("/businesses/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -77,7 +75,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndBusinessNotExists_then406Response() throws Exception {
-        createOneBusiness("Business", homeAddress, "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
 
         mockMvc.perform(get("/businesses/2")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -87,8 +92,22 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessAndMultipleBusinessExists_thenCorrectBusiness() throws Exception {
-        createOneBusiness("Business", homeAddress, "Accommodation and Food Services", "I am a business");
-        createOneBusiness("Business2", address1, "Non-profit organisation", "I am a business 2");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("Business2", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business 2");
 
         mockMvc.perform(get("/businesses/2")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -214,7 +233,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
 
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
 
@@ -255,7 +281,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusinessProducts_AndProductAlreadyExists_then400Response() throws Exception {
 
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
         createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
 
@@ -271,7 +304,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPostRequestToBusinessProducts_AndUserIsBusinessAdminAndProductIsValid_then201Response() throws Exception {
 
-        createOneBusiness("Business2", address1, "Non-profit organisation", "I am a business 2");
+        createOneBusiness("Business2", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business 2");
 
         String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
@@ -313,7 +353,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
 
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
 
@@ -350,7 +397,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndProductsExist_then200Response() throws Exception {
 
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
 
@@ -400,7 +454,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndNoProductsExist_then200Response() throws Exception {
 
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
                 .contentType(APPLICATION_JSON))
@@ -412,7 +473,14 @@ public class BusinessControllerIntegrationTest {
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndBusinessNotExists_then403Response() throws Exception {
 
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
 
@@ -460,7 +528,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndSuccess_then200Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
 
@@ -475,7 +550,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameIsTheSame_then200Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
@@ -490,7 +572,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainChangedProductCode_then200Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
         createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
@@ -510,7 +599,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then400Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
         createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
@@ -590,7 +686,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameMissing_then400Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
 
         createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
@@ -606,7 +709,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndNameIsBlank_then400Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
         createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
@@ -620,7 +730,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndRecommendedRetailPriceIsLetter_then400Response() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
         createOneProduct("PRODUCT1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"AB\", \"id\": \"PRODUCT1\"}";
@@ -634,7 +751,14 @@ public class BusinessControllerIntegrationTest {
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
     public void whenPutRequestToBusinessProducts_AndSuccess_AndAllDataUpdates_thenAllChangesShouldBeMade() throws Exception {
-        createOneBusiness("Business", address1, "Non-profit organisation", "I am a business");
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
         createOneProduct("chocolate bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
 
         String editProduct = "{\"name\": \"Kit Kat\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"Kit Kat\"}";
@@ -651,5 +775,251 @@ public class BusinessControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].recommendedRetailPrice", is(2.0)));
     }
 
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
+
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_thenUserActuallyUpdated() throws Exception {
+
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Business businessAfter = businessService.findBusinessById(1);
+
+        List<User> administrators = businessAfter.getAdministrators();
+        assertEquals(2, administrators.get(0).getId());
+        assertEquals(1, administrators.get(1).getId());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessMakeAdmin_andInvalidRequestBecauseUserAlreadyAdmin_then400Response() throws Exception {
+
+
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"2\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessRevokeAdmin_andValidRequest_then200Response() throws Exception {
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessRevokeAdmin_andValidRequest_thenBusinessIsUpdated() throws Exception {
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"1\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/makeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON));
+
+        Business businessAfter = businessService.findBusinessById(1);
+        assertEquals(true, !businessAfter.getAdministrators().contains(user));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPutRequestToBusinessRevokeAdmin_andUserIsNotAdmin_then403Request() throws Exception {
+        User user = new User();
+        user.setEmail("jabob@gmail.com");
+        user.setFirstName("Jacob");
+        user.setPassword("Steve");
+        user.setLastName("Steve");
+        user.setDateOfBirth(LocalDate.now().minusYears(20));
+        user.setHomeAddress(new Address()
+                .setCity("Thames")
+                .setId(1)
+                .setCountry("Nz")
+                .setPostcode("3500")
+                .setRegion("Waikato")
+                .setStreetName("Queen Street")
+                .setStreetNumber("30"));
+
+        userService.createUser(user);
+
+        createOneBusiness("Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+        String request = "{\"userId\": \"3\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
 
 }

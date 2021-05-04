@@ -26,7 +26,7 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
      * @param user_id   The Id of the user
      * @return          A list of businesses administrated with the user
      */
-    @Query(value = "Select * from business where id in (SELECT distinct business_id FROM Business B inner join BUSINESS_ADMINISTRATORS A where administrators_id = :user_id)", nativeQuery = true)
+    @Query(value = "Select * from Business where id in (SELECT distinct business_id FROM Business B inner join Business_administrators A where administrators_id = :user_id)", nativeQuery = true)
     List<Business> findBySpecificAdminId(@Param("user_id") Integer user_id);
 }
 
