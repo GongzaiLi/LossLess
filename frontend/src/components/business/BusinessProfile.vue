@@ -258,6 +258,7 @@ export default {
       api
           .revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
           .then((response) => {
+            this.getBusinessInfo(this.$route.params.id)
             this.$log.debug("Response from request to revoke admin: ", response);
           })
           .catch((error) => {
