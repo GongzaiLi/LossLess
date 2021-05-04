@@ -1,5 +1,6 @@
 package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.Administrator;
 import com.seng302.wasteless.model.BusinessTypes;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class GetBusinessesDtoAdmin extends GetBusinessesDto {
     private int primaryAdministratorId;
     private String name;
     private String description;
-    private String address;
+    private Address address;
     private BusinessTypes businessType;
     private String created;
 

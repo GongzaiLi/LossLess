@@ -5,6 +5,7 @@ import com.seng302.wasteless.dto.GetUserDtoAdmin;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,9 +28,6 @@ public class GetUserDtoMapper {
 
 
 
-
-
-
     @Autowired
     public GetUserDtoMapper(BusinessService businessService, UserService userService) {
         GetUserDtoMapper.businessService = businessService;
@@ -45,6 +43,7 @@ public class GetUserDtoMapper {
         User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
         Integer currentUserId = loggedInUser.getId();
+
 
 
 
@@ -80,6 +79,17 @@ public class GetUserDtoMapper {
                 );
             }
 
+            JSONObject fullAddress = new JSONObject();
+            fullAddress.put("streetNumber", user.getHomeAddress().getStreetNumber());
+            fullAddress.put("streetName", user.getHomeAddress().getStreetName());
+            fullAddress.put("city", user.getHomeAddress().getCity());
+            fullAddress.put("region", user.getHomeAddress().getRegion());
+            fullAddress.put("country", user.getHomeAddress().getCountry());
+            fullAddress.put("postcode", user.getHomeAddress().getPostcode());
+
+
+
+
             return new GetUserDtoAdmin()
                     .setId(user.getId())
                     .setFirstName(user.getFirstName())
@@ -90,11 +100,17 @@ public class GetUserDtoMapper {
                     .setEmail(user.getEmail())
                     .setDateOfBirth(user.getDateOfBirth().toString())
                     .setPhoneNumber(user.getPhoneNumber())
-                    .setHomeAddress(user.getHomeAddress())
+                    .setHomeAddress(fullAddress)
                     .setCreated(user.getCreated().toString())
                     .setRole(user.getRole())
                     .setBusinessesAdministered(businessesAdministered);
         } else {
+            JSONObject publicAddress = new JSONObject();
+            publicAddress.put("city", user.getHomeAddress().getCity());
+            publicAddress.put("region", user.getHomeAddress().getRegion());
+            publicAddress.put("country", user.getHomeAddress().getCountry());
+            publicAddress.put("postcode", user.getHomeAddress().getPostcode());
+
             return new GetUserDto()
                     .setId(user.getId())
                     .setFirstName(user.getFirstName())
@@ -103,7 +119,7 @@ public class GetUserDtoMapper {
                     .setNickName(user.getNickname())
                     .setBio(user.getBio())
                     .setEmail(user.getEmail())                      //change later
-                    .setHomeAddress(user.getHomeAddress())          //change later
+                    .setHomeAddress(publicAddress)
                     .setCreated(user.getCreated().toString());
 
         }

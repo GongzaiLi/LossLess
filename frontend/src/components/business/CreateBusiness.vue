@@ -67,7 +67,7 @@ Date: 26/3/2021
 
 <script>
 import api from "../../Api";
-import AddressInput from "../../components/AddressInput";
+import AddressInput from "../model/AddressInput";
 
 export default {
   components: {

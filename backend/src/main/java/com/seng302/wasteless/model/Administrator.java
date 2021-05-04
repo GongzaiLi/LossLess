@@ -23,7 +23,7 @@ public class Administrator {
     private String email;
     private String dateOfBirth;
     private String phoneNumber;
-    private String homeAddress;
+    private Address homeAddress;
     private String created;
     private UserRoles role;
     private List<String> businessesAdministered;
