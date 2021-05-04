@@ -133,6 +133,7 @@ public class UserController {
         LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
         List<GetUserDto> searchResultsDto = new ArrayList<>();
+        //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?
 
         for (User user : searchResults) {
             searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
