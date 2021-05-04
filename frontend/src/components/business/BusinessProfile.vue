@@ -331,11 +331,11 @@ export default {
      *
      * @param userId ID of the user that is requested to make admin
      */
-    makeAdminHandler: function (userId) {
+    makeAdminHandler: async function (userId) {
       const makeAdminRequestData = {
         userId: userId
       }
-      api
+      await api
           .makeBusinessAdmin(this.businessData.id, makeAdminRequestData)
           .then((response) => {
             this.$log.debug("Response from request to make admin: ", response);

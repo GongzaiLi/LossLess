@@ -23,12 +23,8 @@ export default {
   components: {
     userSearch,
   },
-  props: ['makeAdminAction'],
+  props: ['makeAdminAction', 'userIdToAdmin'],
   name: "make-admin-modal",
-  data() {
-    return {
-      }
-  },
 
   methods: {
     rowSelect: async function (record) {
