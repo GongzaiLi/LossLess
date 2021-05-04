@@ -74,7 +74,7 @@ Date: 29/03/2021
             <h4 class="mb-1">Administrators</h4>
           </b-card-text>
           <b-row>
-            <b-col cols="12"><!--responsive sticky-header="500px"-->
+            <b-col cols="12">
 
 
               <b-table hover

@@ -27,7 +27,7 @@ Date: 15/4/2021
         :current-page="currentPage"
         :busy="tableLoading"
         ref="productCatalogueTable"
-      > <!--stacked="sm" table-class="text-nowrap"-->
+      >
 
         <template v-slot:cell(actions)="products">
           <b-button id="edit-button" @click="openEditProductCard(products.item)" size="sm">

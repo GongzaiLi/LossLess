@@ -7,7 +7,7 @@ Date: 19/4/2021
   <b-card
     class="profile-card"
     style="max-width: 550px"
-  ><!--header-border-variant="secondary" border-variant="secondary"  background-color: rgba(0,255,0,0.4);-->
+  >
     <b-form
         @submit="okAction"
     >

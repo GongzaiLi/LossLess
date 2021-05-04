@@ -254,7 +254,6 @@ export default {
         })
         .catch((error) => {
           this.$log.debug(error);
-          alert(error);
         });
     },
     /**
@@ -270,7 +269,6 @@ export default {
         })
         .catch((error) => {
           this.$log.debug(error);
-          alert(error);
         });
     },
   },
@@ -330,11 +328,10 @@ export default {
      * Toggles the button text to add/remove admin privileges on a profile based on the user's role
      */
     adminButtonText: function () {
-      switch (this.userData.role) {
-        case 'globalApplicationAdmin':
-          return "Remove Admin";
-        default:  // Button won't even appear if they are default global admin so this is fine
-          return "Make Admin";
+      if (this.userData.role === 'globalApplicationAdmin') {
+        return "Remove Admin";
+      }else {  // Button won't even appear if they are default global admin so this is fine
+        return "Make Admin";
       }
     },
 
