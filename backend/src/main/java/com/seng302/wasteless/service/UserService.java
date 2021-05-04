@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 /**
  * User service applies business logic over the User JPA repository.
  */
-
 @Service
 public class UserService {
 

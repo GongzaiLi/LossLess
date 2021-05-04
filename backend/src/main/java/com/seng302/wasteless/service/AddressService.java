@@ -7,6 +7,9 @@ import com.seng302.wasteless.repository.BusinessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Business service applies address logic over the Address JPA repository.
+ */
 @Service
 public class AddressService {
 

@@ -14,6 +14,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * An implementation of User model.
+ * This class creates a User JPA entity that is mapped to an SQL table.
+ */
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method

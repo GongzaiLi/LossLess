@@ -8,6 +8,10 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
+/**
+ * BusinessRepository is repository interface for Business.
+ * Used to declare accessors to JPA objects.
+ */
 @RepositoryRestResource
 public interface BusinessRepository extends JpaRepository<Business, Integer> {
 

@@ -7,6 +7,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+/**
+ * CustomUserDetailsService is a modified implementation of UserDetailsService
+ * Service applies address logic over the UserDetails JPA repository.
+ */
 public class CustomUserDetailsService implements UserDetailsService {
 
 
