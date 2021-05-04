@@ -98,7 +98,7 @@ deploy-staging-backend:
   stage: deploy
   script:
     - cd backend
-    - ./gradlew bootJar -Dspring.profiles.active=staging
+    - ./gradlew bootJar --args='--spring.profiles.active=staging'
     - rm -rf /home/gitlab-runner/staging-backend/ || true
     - mkdir /home/gitlab-runner/staging-backend/
     - cp -r ./build/libs /home/gitlab-runner/staging-backend
@@ -137,7 +137,7 @@ deploy-production-backend:
   stage: deploy
   script:
     - cd backend
-    - ./gradlew bootJar -Dspring.profiles.active=prod
+    - ./gradlew bootJar --args='--spring.profiles.active=prod'
     - rm -rf /home/gitlab-runner/production-backend/ || true
     - mkdir /home/gitlab-runner/production-backend/
     - cp -r ./build/libs /home/gitlab-runner/production-backend
