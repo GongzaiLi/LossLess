@@ -16,7 +16,6 @@ import java.util.List;
  * Business entities are transformed into GetBusinessesDtoAdmin via the GetBusinessesDtoMapper.
  *
  */
-
 @Accessors(chain = true) //Allows chaining of getters and setters
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)

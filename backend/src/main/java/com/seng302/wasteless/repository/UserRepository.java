@@ -9,6 +9,10 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.LinkedHashSet;
 
+/**
+ * UserRepository is a repository interface for User.
+ * Used to declare accessors to JPA objects.
+ */
 @RepositoryRestResource
 public interface UserRepository extends JpaRepository<User, Integer> {
 

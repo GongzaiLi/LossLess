@@ -33,6 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * BusinessController is used for mapping all Restful API requests starting with the address "/businesses".
+ */
 @RestController
 public class BusinessController {
     private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
@@ -264,6 +267,7 @@ public class BusinessController {
         newProduct.setName(editedProduct.getName());
         newProduct.setDescription(editedProduct.getDescription());
         newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
+        newProduct.setManufacturer(editedProduct.getManufacturer());
         newProduct.setBusinessId(oldProduct.getBusinessId());
         newProduct.setCreated(oldProduct.getCreated());
 
