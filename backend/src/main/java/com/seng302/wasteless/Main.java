@@ -72,7 +72,7 @@ public class Main {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-            .allowedOrigins("http://localhost:9500", "https://csse-s302g12.canterbury.ac.nz")
+            .allowedOrigins("http://localhost:9500", "https://csse-s302g7.canterbury.ac.nz")
                 .allowCredentials(true); // This bit is a saviour. NEVER DELETE THIS otherwise CORS will block you
       }
     };

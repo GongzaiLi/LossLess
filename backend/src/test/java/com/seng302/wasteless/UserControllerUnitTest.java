@@ -17,6 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +50,54 @@ public class UserControllerUnitTest {
                 .content(user)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void whenPostRequestToUsers_AndEmailWithoutATSymbol_thenBadResponse() throws Exception {
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void whenPostRequestToUsers_AndEmailWithATSymbolAtTheEnd_thenBadResponse() throws Exception {
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1@\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void whenPostRequestToUsers_AndEmailWithATSymbolAtTheStart_thenBadResponse() throws Exception {
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"@1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -168,7 +218,7 @@ public class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }}";
+                "  },\"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -176,19 +226,38 @@ public class UserControllerUnitTest {
     }
 
     @Test
-    public void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthTooYoung_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2200-10-27\", \"homeAddress\": {\n" +
+    public void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthUnderThirteen_thenCorrectResponse() throws Exception {
+        LocalDate today = LocalDate.now();
+        String minimumDOB = today.minusYears(12).toString();
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }}";
+                "  },\"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+    @Test
+    public void whenPostRequestToUsersAndUserValidOnBirthday() throws Exception {
+        LocalDate today = LocalDate.now();
+        String minimumDOB = today.minusYears(13).toString();
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\"password\": \"1337\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -200,7 +269,7 @@ public class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }}";
+                "  },\"password\":\"a\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))

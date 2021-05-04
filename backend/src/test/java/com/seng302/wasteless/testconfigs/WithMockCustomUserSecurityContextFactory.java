@@ -33,7 +33,7 @@ public class WithMockCustomUserSecurityContextFactory
         user.setRole(customUser.role());
         user.setEmail(customUser.email());
         user.setPassword(customUser.password());
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.now().minusYears(17));
         user.setBio("Bio");
         user.setFirstName("FirstName");
         user.setLastName("LastName");

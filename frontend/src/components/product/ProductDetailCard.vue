@@ -15,7 +15,7 @@ Date: 19/4/2021
         <h6><b>ID*:</b></h6>
         This will be automatically changed into the correct format.
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
+          <b-form-input type="text" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
         </b-input-group>
 
         <b-input-group>

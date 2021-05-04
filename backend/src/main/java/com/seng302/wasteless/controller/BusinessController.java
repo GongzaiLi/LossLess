@@ -79,6 +79,10 @@ public class BusinessController {
                     "Access token is invalid");
         }
 
+        if (!user.checkIsOverSixteen()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Must be 16 to create a business");
+        }
+
         business.setPrimaryAdministrator(user);
 
         List<User> adminList = new ArrayList<>();
@@ -364,7 +368,7 @@ public class BusinessController {
             logger.warn("User is primary admin");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
         }
-        if (!loggedInUser.getBusinessesPrimarilyAdministered().contains(possibleBusiness) && loggedInUser.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && loggedInUser.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+        if (!(possibleBusiness.getPrimaryAdministrator().getId().equals(loggedInUser.getId())) && loggedInUser.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && loggedInUser.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
             logger.warn("You are not a primary business admin");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
         }

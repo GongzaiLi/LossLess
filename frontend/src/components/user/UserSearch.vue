@@ -5,7 +5,7 @@ Date: 7/3/2021
 -->
 <template>
   <div>
-    <h2>Search For a User</h2>
+    <h2 v-bind:hidden=isMakeAdmin>Search For a User</h2>
     <b-row style="height: 50px">
       <b-col cols="7">
         <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search"
@@ -55,6 +55,7 @@ export default {
   components: {
     pagination,
   },
+  props: {isMakeAdmin: {default: false, type: Boolean}},
   name: 'UserSearch', // DO NOT DELETE!!! The <keep-alive include="UserSearch"> in App.vue only matches component names so we register a name here.
   data: function () {
     return {
@@ -63,14 +64,22 @@ export default {
       perPage: 10,
       currentPage: 1,
       items: [],
+      isMakeAdminModal: false,
     }
+  },
+  mounted(){
+    this.isMakeAdminModal = this.isMakeAdmin
   },
   methods: {
     /**
      * When called changes page to the profile page based on the id of the user clicked
      */
     rowClickHandler: function (record) {
+      if (this.isMakeAdminModal) {
+        this.$emit('rowSelect', record);
+      } else {
       this.$router.push({path: `/users/${record.id}`});
+      }
     },
     /**
      * the function is search a user id the using api to find the user's detail
@@ -115,7 +124,7 @@ export default {
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
-        tableHeader.homeAddress = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
+        tableHeader.location = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
         items.push(tableHeader);
       }
       return items;
@@ -160,13 +169,13 @@ export default {
         {
           key: 'email',
           sortable: true
+        },{
+          key: 'location',
+          sortable: true
         },
       ];
       if (this.$currentUser && this.$currentUser.role !== 'user') {
         fields.push({
-          key: 'homeAddress',
-          sortable: true
-        }, {
           key: 'userType',
           sortable: true
         });
