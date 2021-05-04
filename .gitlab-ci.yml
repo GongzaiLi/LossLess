@@ -99,6 +99,7 @@ deploy-staging-backend:
   stage: deploy
   script:
     - cd backend
+    - export DB_URL="${DB_URL}-test"
     - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
     - echo $'\n' >> src/main/resources/global-admin.properties
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
@@ -144,6 +145,7 @@ deploy-production-backend:
   stage: deploy
   script:
     - cd backend
+    - export DB_URL="${DB_URL}-prod"
     - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
     - echo $'\n' >> src/main/resources/global-admin.properties
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
