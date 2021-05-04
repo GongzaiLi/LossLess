@@ -79,6 +79,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
         }
 
+        //check the email validation
+        if (!userService.checkEmailValid(user.getEmail())) {
+            logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email address is invalid");
+        }
+        //check the date of birth is over 13.
         if (!user.checkDateOfBirthValid()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
         }
