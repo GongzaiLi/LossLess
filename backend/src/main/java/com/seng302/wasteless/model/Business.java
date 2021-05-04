@@ -17,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString(exclude = {"primaryAdministrator", "administrators"}) // generate a toString method, excluded to prevent recursive problems
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
-@Table(name = "Business")
 public class Business {
 
     @Id // this field (attribute) is the table primary key
