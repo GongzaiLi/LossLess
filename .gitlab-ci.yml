@@ -105,7 +105,6 @@ deploy-staging-backend:
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
     - echo $'\n' >> src/main/resources/global-admin.properties
     - echo $"default-admin-password=${DGAA_PASSWORD}" >> src/main/resources/global-admin.properties
-    - echo $'\nspring.profiles.active=staging' >> src/main/resources/application.properties
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/staging-backend/ || true
     - mkdir /home/gitlab-runner/staging-backend/
