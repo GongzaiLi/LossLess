@@ -39,6 +39,26 @@ public class BusinessControllerIntegrationTest {
 
     private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
 
+    String address1 = "{\n" +
+            "    \"streetNumber\": \"56\",\n" +
+            "    \"streetName\": \"Clyde Road\",\n" +
+            "    \"city\": \"Christchurch\",\n" +
+            "    \"region\": \"Canterbury\",\n" +
+            "    \"country\": \"New Zealand\",\n" +
+            "    \"postcode\": \"8041\"\n" +
+            "  }";
+
+    String homeAddress = "{\n" +
+            "    \"streetNumber\": \"3/24\",\n" +
+            "    \"streetName\": \"Ilam Road\",\n" +
+            "    \"city\": \"Christchurch\",\n" +
+            "    \"region\": \"Canterbury\",\n" +
+            "    \"country\": \"New Zealand\",\n" +
+            "    \"postcode\": \"90210\"\n" +
+            "  }";
+
+
+
     @Autowired
     private MockMvc mockMvc;
 
