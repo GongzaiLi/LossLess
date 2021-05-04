@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User service applies business logic over the User JPA repository.
@@ -50,6 +52,18 @@ public class UserService {
      */
     public boolean checkEmailAlreadyUsed(String email) {
         return userRepository.findFirstByEmail(email) != null;
+    }
+    /**
+     * Checks if a email address contains an @ symbol at has something preceding and after the @ symbol
+     *
+     * @param email     The email to check
+     * @return          Whether the email is valid or not
+     */
+    public boolean checkEmailValid(String email) {
+        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     /**

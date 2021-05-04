@@ -19,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -69,6 +71,25 @@ public class BusinessControllerUnitTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
                 "  }, \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .content(business)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithUserDetails("user3@700")
+    public void whenPostRequestToBusiness_andUserUnder16_then400Response() throws Exception {
+
+        String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"}," +
+                "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
                 .content(business)
@@ -180,6 +201,5 @@ public class BusinessControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
-
 
 }
