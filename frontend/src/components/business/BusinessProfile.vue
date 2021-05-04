@@ -396,7 +396,19 @@ export default {
         }
       ];
     }
-  }
+  },
+  watch: {
+    /**
+     * This watches for those routing changes, and will update the profile with the data of the business specified by the new route.
+     * See https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes for more info
+     */
+    /* The argument _from is not needed, so this is to stop eslint complaining:*/
+    /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
+    $route(to, _from) {
+      const id = to.params.id;
+      this.launchPage(id);
+    },
+  },
 
 }
 </script>

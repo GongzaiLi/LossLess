@@ -15,7 +15,7 @@ Date: sprint_1
       <b-navbar-nav>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/homepage">Home Page</b-nav-item>
         <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
-        <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
+        <b-nav-item v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item to="/businesses/">Create Business</b-nav-item>
       </b-navbar-nav>
@@ -112,11 +112,18 @@ export default {
   },
   methods: {
     /**
-     * Redirects to the user's profile. Doesn't redirect if the user
+     * Redirects to the profile of the account the user is acting as.
+     * This will be the either the use profile if they are not acting as anyone,
+     * of the profile of the business they are acting as. Doesn't redirect if the user
      * is already on the profile since that throws a Vue Router error.
      */
-    goToUserProfile: function () {
-      const pathToGoTo = `/users/${this.$currentUser.id}`;
+    goToProfile: function () {
+      let pathToGoTo;
+      if (this.$currentUser.currentlyActingAs) {
+        pathToGoTo = `/businesses/${this.$currentUser.currentlyActingAs.id}`;
+      } else {
+        pathToGoTo = `/users/${this.$currentUser.id}`;
+      }
       if (this.$route.fullPath !== pathToGoTo) {
         this.$router.push({path: pathToGoTo});
       }
