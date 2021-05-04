@@ -3,6 +3,7 @@ import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import businessProfile from '../../components/business/BusinessProfile';
 import Api from "../../Api";
 import VueRouter from 'vue-router';
+import makeAdminModal from "../../components/business/MakeAdminModal";
 
 
 
@@ -572,6 +573,62 @@ test('business-administrators-table-correct-data', async () => {
 
   expect(wrapper.vm.$refs.businessAdministratorsTable.$props.items[0].firstName).toBe("James");
   expect(wrapper.vm.$refs.businessAdministratorsTable.$props.items[1].firstName).toBe("Michael");
+});
+
+test('make-Admin-Handler', async () => {
+  const response = null;
+  Api.makeBusinessAdmin.mockResolvedValue(response);
+  await wrapper.vm.makeAdminHandler(1);
+  expect(wrapper.vm.error).toStrictEqual([]);
+});
+
+test('make-Admin-Handler-null', async () => {
+  const response = null;
+  Api.makeBusinessAdmin.mockResolvedValue(response);
+  const result = await wrapper.vm.makeAdminHandler(null);
+  expect(result).toStrictEqual(undefined);
+});
+
+describe('check-modal-Make-Admin-Modal', () => {
+  test('check-product-detail-card-component-exists-when-click-create-button', async () => {
+    await wrapper.vm.showMakeAdminModal();
+
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(makeAdminModal).exists()).toBeTruthy()
+  })
+});
+
+it('400 error test', async () => {
+  Api.makeBusinessAdmin.mockRejectedValue({response : {status: 400, data: "User with ID does not exist"}});
+
+  await wrapper.vm.makeAdminHandler(1);
+
+  expect(wrapper.vm.makeAdminError).toBe("User with ID does not exist");
+});
+
+it('403 error test', async () => {
+  Api.makeBusinessAdmin.mockRejectedValue({response : {status: 403}});
+
+  await wrapper.vm.makeAdminHandler(1);
+
+  expect(wrapper.vm.makeAdminError).toBe("Forbidden. You are not an authorized administrator");
+});
+
+it('no internet test', async () => {
+  Api.makeBusinessAdmin.mockRejectedValue({request: {path: 'blah'}});
+
+  await wrapper.vm.makeAdminHandler(1);
+
+  expect(wrapper.vm.makeAdminError).toBe("No Internet Connectivity");
+});
+
+it('other error test', async () => {
+  Api.makeBusinessAdmin.mockRejectedValue({response : {status: 500}});
+
+  await wrapper.vm.makeAdminHandler(1);;
+
+  expect(wrapper.vm.makeAdminError).toBe("Server error");
 });
 
 

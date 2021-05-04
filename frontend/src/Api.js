@@ -55,7 +55,7 @@ export default {
   postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
   setBusinessActingAs: (businessId) => businessActingAsId = businessId,
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
-  revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/revokeAdmin`, revokeAdminData, {withCredentials: true}),
+  revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
   modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials:true}),
 
