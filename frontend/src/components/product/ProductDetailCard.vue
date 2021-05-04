@@ -12,28 +12,28 @@ Date: 19/4/2021
         @submit="okAction"
     >
     <b-card-body>
-        <h6><b>ID*:</b></h6>
+        <h6><strong>ID*:</strong></h6>
         This will be automatically changed into the correct format.
         <b-input-group class="mb-1">
           <b-form-input type="text" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
         </b-input-group>
 
         <b-input-group>
-          <h6><b>Name*:</b></h6>
+          <h6><strong>Name*:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name" required/>
         </b-input-group>
 
         <b-input-group>
-          <h6><b>Manufacturer:</b></h6>
+          <h6><strong>Manufacturer:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.manufacturer"/>
         </b-input-group>
 
         <b-input-group>
-          <h6><b>Recommended Retail Price*:</b></h6>
+          <h6><strong>Recommended Retail Price*:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <template #prepend>
@@ -47,7 +47,7 @@ Date: 19/4/2021
 
         <div v-if="disabled"><!--Only show if we're not in the 'modify' or 'create' mode-->
           <b-input-group>
-            <h6><b>Created:</b></h6>
+            <h6><strong>Created:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-1">
             <b-form-input type="text" disabled v-model="productCard.created"/>
@@ -57,7 +57,7 @@ Date: 19/4/2021
         <hr style="width:100%">
 
         <b-input-group>
-          <h6><b>Description:</b></h6>
+          <h6><strong>Description:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
