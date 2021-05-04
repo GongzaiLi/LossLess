@@ -221,7 +221,7 @@ public class UserControllerIntegrationTests {
                 "  }", "1337");
 
 
-        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1238\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1238@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
@@ -235,7 +235,7 @@ public class UserControllerIntegrationTests {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"12347\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF7\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
@@ -250,7 +250,7 @@ public class UserControllerIntegrationTests {
                 .andExpect(status().isCreated());
 
 
-        String user3 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1236\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+        String user3 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1236@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
@@ -264,7 +264,7 @@ public class UserControllerIntegrationTests {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        String user4 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"12345\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+        String user4 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"12345@efsf\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
@@ -340,7 +340,7 @@ public class UserControllerIntegrationTests {
                 "    \"postcode\": \"90210\"\n" +
                 "  }", "1337");
 
-        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
@@ -354,7 +354,7 @@ public class UserControllerIntegrationTests {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
                 "    \"city\": \"Christchurch\",\n" +

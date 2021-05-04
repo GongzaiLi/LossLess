@@ -79,6 +79,10 @@ public class BusinessController {
                     "Access token is invalid");
         }
 
+        if (!user.checkIsOverSixteen()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Must be 16 to create a business");
+        }
+
         business.setPrimaryAdministrator(user);
 
         List<User> adminList = new ArrayList<>();
