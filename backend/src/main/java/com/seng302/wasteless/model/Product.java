@@ -10,6 +10,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
+/**
+ * An implementation of Product model.
+ * This class creates a Product JPA entity that is mapped to an SQL table.
+ */
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method, excluded to prevent recursive problems
@@ -48,8 +52,15 @@ public class Product {
 //    @Column(name = "images")
 //    private List images;
 
+    /**
+     * Formats a code by taking the BusinessId and the Product Object's ID
+     * setting it to uppercase and replaces spaces with "-" and replaces
+     * and removes alphanumeric
+     *
+     * @param businessId
+     * @return String that is formatted as the Product Code
+     */
     public String createCode(Integer businessId) {
-
         return businessId + "-" + this.getId().toUpperCase().replaceAll("\\P{Alnum}+$", "")
                 .replaceAll(" ", "-");
     }

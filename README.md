@@ -1,19 +1,23 @@
-# Seng302 Team 8 Wasteless Project
+<table align="center"><tr><td align="center" width="999">
 
-Basic project template using `gradle`, `npm`, `Spring Boot`, `Vue.js` and `Gitlab CI`.
 
-## Basic Project Structure
+## Welcome to Wasteless! 
+### To access the deployed development application, visit:  
 
-A frontend sub-project (web GUI):
-
-- `frontend/src` Frontend source code (Vue.js)
-- `frontend/public` publicly accessible web assets (e.g., icons, images, style sheets)
-- `frontend/dist` Frontend production build
-
-A backend sub-project (business logic and persistence server):
-
-- `backend/src` Backend source code (Java - Spring)
-- `backend/out` Backend production build
+### https://csse-s302g7.canterbury.ac.nz/test
+### To access the deployed production application, visit: 
+### https://csse-s302g7.canterbury.ac.nz/prod
+### Create an account, log in, and use the navbar for easy navigation
+### Or use the following routes to access all features below:
+### `login`: `/` or `/login`
+### `register`: `/register`
+### `User Profile`: `/users/:id`
+### `User Search`: `/users/search`
+### `Home Page`: `/homePage`
+### `Create Business`: `/businesses`
+### `Business Profile`: `/businesses/:id`
+### `Product Catalogue`: `/businesses/:id/products`
+</td></tr></table>
 
 ## How to run
 
@@ -32,19 +36,19 @@ Running on: http://localhost:9500/ by default
 
 Running on: http://localhost:9499/ by default
 
-## Todo (S1)
+## Default Global Application Admin (DGAA)
+A DGAA is just an admin account with the following property: the application must always have a DGAA when it is running.
+This allows you to still get into the system if something goes wrong.  
+Our system periodically checks whether a DGAA exists, and will create a default account if one does not.
+You can tweak the length of that period through changing the `check-default-admin-period-ms` property of the config file: 
+`backend/src/main/resources/global-admin.properties`.
+The default period is 60000 milliseconds (1 minute). Note this will require a rebuild of the application.  
+The username and password of the DGAA is taken at startup from the following environment variables:
 
-- Add team name into `build.gradle` and `package.json`
-- Update this README title (DONE)
-- Update this README contributors (DONE)
+    DGAA_EMAIL
+    DGAA_PASSWORD
 
-## Todo (S2)
-
-- Update team name into `build.gradle` and `package.json`
-- Update this README title
-- Update this README contributors
-- Set up Gitlab CI server (refer to the student guide on learn)
-- Decide on a LICENSE
+If you do not have these environment variables defined then the application will not start.
 
 ## Contributors
 
@@ -53,10 +57,8 @@ Running on: http://localhost:9499/ by default
 - Marcus Brorens
 - Oliver Cranshaw
 - James Harris
-
-## References
-
-- [Spring Boot Docs](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
-- [Spring JPA docs](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)
-- [Vue docs](https://vuejs.org/v2/guide/)
-- [Learn resources](https://learn.canterbury.ac.nz/course/view.php?id=10577&section=11)
+- Eric Song
+- Caleb Sim
+- Gongzai Li
+- Nitish Singh
+- Phil Taylor

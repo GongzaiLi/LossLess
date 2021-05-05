@@ -8,6 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * CustomerUserDetails is an modified implementation of Spring's UserDetails.
+ * This is used by Spring Security in the WebSecurityConfig
+ */
 public class CustomUserDetails implements UserDetails {
 
     private User user;

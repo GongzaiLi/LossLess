@@ -39,7 +39,7 @@ let businessActingAsId = businessActingAs ? businessActingAs.id : null;
 
 const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 1000,
+  timeout: 5000,
   headers: {'X-Business-Acting-As': businessActingAsId}
 });
 
@@ -54,7 +54,10 @@ export default {
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
   setBusinessActingAs: (businessId) => businessActingAsId = businessId,
+  makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
+  revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
+  modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials:true}),
 
   /**
    * Given the name of the user's country, gets currency data for that country.

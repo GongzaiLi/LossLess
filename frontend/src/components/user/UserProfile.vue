@@ -18,14 +18,16 @@ Date: 5/3/2021
           <b-row>
             <b-col>
               <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
-              Member since: <member-since :date="userData.created"/>
+              Member since:
+              <member-since :date="userData.created"/>
             </b-col>
             <b-col cols="2" sm="auto"
-                   v-if="($currentUser.role==='defaultGlobalApplicationAdmin'||$currentUser.role==='globalApplicationAdmin')">
+                   v-if="showUserRole">
               <h4>{{ userRoleDisplayString }}</h4>
-              <b-button v-bind:variant="adminButtonToggle"
-                        v-if="(userData.role!=='defaultGlobalApplicationAdmin'&&userData.id!==$currentUser.id)"
-                        @click="toggleAdmin">{{ adminButtonText }}
+              <b-button
+                v-bind:variant="toggleAdminButtonVariant"
+                v-if="showToggleAdminButton"
+                @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
 
@@ -85,7 +87,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.email }}</b-col>
               </b-row>
             </h6>
-            <h6 v-if="userData.phoneNumber">
+            <h6 v-show="userData.phoneNumber && checkRole">
               <b-row>
                 <b-col cols="0">
                   <b-icon-telephone-fill></b-icon-telephone-fill>
@@ -94,7 +96,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.phoneNumber }}</b-col>
               </b-row>
             </h6>
-            <h6>
+            <h6 v-show="checkRole">
               <b-row>
                 <b-col cols="0">
                   <b-icon-house-fill></b-icon-house-fill>
@@ -103,8 +105,8 @@ Date: 5/3/2021
                 <b-col> {{ getAddress }}</b-col>
               </b-row>
             </h6>
-            <h6 v-if="userData.businessesAdministered.length">
-              <b-row>
+            <h6 v-if="userData.businessesAdministered">
+              <b-row v-if="userData.businessesAdministered.length">
                 <b-col cols="0">
                   <b-icon-building></b-icon-building>
                 </b-col>
@@ -270,10 +272,10 @@ export default {
           this.$log.debug(error);
           alert(error);
         });
-    }
+    },
   },
   computed: {
-    adminButtonToggle() {
+    toggleAdminButtonVariant() {
       return this.userData.role === 'user' ? 'success' : 'danger';
     },
     /**
@@ -313,6 +315,18 @@ export default {
       }
     },
     /**
+     * Computed function that returns a boolean. True if the user role should be shown in the profile page, false otherwise.
+     */
+    showUserRole: function () {
+      return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.role === 'globalApplicationAdmin';
+    },
+    /**
+     * Computed function that returns a boolean. True if the Make/Revoke admin button should be shown in the profile page, false otherwise.
+     */
+    showToggleAdminButton: function () {
+      return this.userData.role !== 'defaultGlobalApplicationAdmin' && this.userData.id !== this.$currentUser.id;
+    },
+    /**
      * Toggles the button text to add/remove admin privileges on a profile based on the user's role
      */
     adminButtonText: function () {
@@ -322,6 +336,14 @@ export default {
         default:  // Button won't even appear if they are default global admin so this is fine
           return "Make Admin";
       }
+    },
+
+    /**
+     * checkRole is user is legal to view other's user information
+     **/
+    checkRole: function () {
+      return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.id === this.userData.id
+        || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     }
 
 

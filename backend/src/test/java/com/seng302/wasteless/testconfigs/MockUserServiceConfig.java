@@ -8,7 +8,9 @@ import com.seng302.wasteless.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * This is a configuration file for a mocked UserService bean.
@@ -43,26 +45,37 @@ public class MockUserServiceConfig {
             defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
             defaultAdmin.setEmail("defaultadmin@700");
             defaultAdmin.setPassword("password");
+            defaultAdmin.setDateOfBirth(LocalDate.now().minusYears(17));
 
             User user = new User();
             user.setRole(UserRoles.USER);
             user.setEmail("user@700");
             user.setPassword("password");
+            user.setDateOfBirth(LocalDate.now().minusYears(17));
 
             User admin = new User();
             admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
             admin.setEmail("admin@700");
             admin.setPassword("password");
+            admin.setDateOfBirth(LocalDate.now().minusYears(17));
 
             User user2 = new User();
             user2.setRole(UserRoles.USER);
             user2.setEmail("user2@700");
             user2.setPassword("password");
+            user2.setDateOfBirth(LocalDate.now().minusYears(17));
+
+            User user3 = new User();
+            user3.setRole(UserRoles.USER);
+            user3.setEmail("user3@700");
+            user3.setPassword("password");
+            user3.setDateOfBirth(LocalDate.now().minusYears(14));
 
             createUser(defaultAdmin);
             createUser(admin);
             createUser(user);
             createUser(user2);
+            createUser(user3);
         }
 
         @Override
