@@ -27,6 +27,9 @@ junit:
   script:
     - cd backend
     - ./gradlew test
+  artifacts:
+    paths:
+      - backend/build/jacoco
 
 # Run acceptance (cucumber) tests
 # Uncomment after ATDD workshop (at the latest)
@@ -38,33 +41,37 @@ junit:
 
 # Run Jest (Javascript) tests
 # Uncomment after Jest workshop (at the latest)
-# jest:
-#   stage: test
-#   cache:
-#     key: node-modules
-#     paths:
-#       - frontend/node_modules
-#     policy: pull
-#   script:
-#     - cd frontend
-#     - npm run test
+jest:
+  stage: test
+  cache:
+   key: node-modules
+   paths:
+     - frontend/node_modules
+   policy: pull
+  script:
+   - cd frontend
+   - npm run test
+  artifacts:
+    paths:
+      - frontend/coverage
+    expire_in: 1 week
 
 # Export sonarqube (static code analysis) reports
 # Uncomment after ATDD workshop (at the latest)
-# dev-sonarqube:
-#   stage: sonarqube
-#   cache:
-#     key: node-modules
-#     paths:
-#       - frontend/node_modules
-#     policy: pull
-#   script:
-#     - cd frontend
-#     - npm run sonarqube
-#     - cd ../backend
-#     - ./gradlew sonarqube
-#   only:
-#     - dev
+dev-sonarqube:
+  stage: sonarqube
+  cache:
+   key: node-modules
+   paths:
+     - frontend/node_modules
+   policy: pull
+  script:
+   - cd frontend
+   - npm run sonarqube
+   - cd ../backend
+   - ./gradlew sonarqube
+  only:
+   - dev
 
 # builds all branches, except dev and master
 branch-build:
@@ -92,6 +99,18 @@ deploy-staging-backend:
   stage: deploy
   script:
     - cd backend
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.url=${DB_URL}-test" >> src/main/resources/application-staging.properties
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.username=${DB_USERNAME}" >> src/main/resources/application-staging.properties
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.password=${DB_PASSWORD}" >> src/main/resources/application-staging.properties
+    - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
+    - echo $'\n' >> src/main/resources/global-admin.properties
+    - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
+    - echo $'\n' >> src/main/resources/global-admin.properties
+    - echo $"default-admin-password=${DGAA_PASSWORD}" >> src/main/resources/global-admin.properties
+    - echo $'\nspring.profiles.active=staging' >> src/main/resources/application.properties
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/staging-backend/ || true
     - mkdir /home/gitlab-runner/staging-backend/
@@ -131,6 +150,18 @@ deploy-production-backend:
   stage: deploy
   script:
     - cd backend
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.url=${DB_URL}-prod" >> src/main/resources/application-prod.properties
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.username=${DB_USERNAME}" >> src/main/resources/application-prod.properties
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.password=${DB_PASSWORD}" >> src/main/resources/application-prod.properties
+    - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
+    - echo $'\n' >> src/main/resources/global-admin.properties
+    - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
+    - echo $'\n' >> src/main/resources/global-admin.properties
+    - echo $"default-admin-password=${DGAA_PASSWORD}" >> src/main/resources/global-admin.properties
+    - echo $'\nspring.profiles.active=prod' >> src/main/resources/application.properties
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/production-backend/ || true
     - mkdir /home/gitlab-runner/production-backend/
