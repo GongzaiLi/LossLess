@@ -178,6 +178,10 @@ public class BusinessController {
         if (productService.findProductById(productId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
         }
+
+        if (possibleProduct.getRecommendedRetailPrice() < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
+        }
         LocalDate dateCreated = LocalDate.now();
 
         possibleProduct.setId(productId);
@@ -268,6 +272,10 @@ public class BusinessController {
         String newProductId = editedProduct.createCode(businessId);
         if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
+        }
+
+        if (editedProduct.getRecommendedRetailPrice() < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
         }
 
         Product newProduct = new Product();
