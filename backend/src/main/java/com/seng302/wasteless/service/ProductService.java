@@ -13,7 +13,6 @@ import java.util.List;
 /**
  * Product service applies product logic over the Product JPA repository.
  */
-
 @Service
 public class ProductService {
 

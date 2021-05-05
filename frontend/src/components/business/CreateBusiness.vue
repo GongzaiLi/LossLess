@@ -7,7 +7,7 @@ Date: 26/3/2021
 
 <template>
   <div>
-    <b-card class="shadow">
+    <b-card class="shadow" v-if="canCreateBusiness">
       <h1> Create a Business </h1>
       <br>
       <b-form
@@ -60,14 +60,45 @@ Date: 26/3/2021
         </b-alert>
       </div>
     </b-card>
-    <br>
+    <b-card v-else>
+      <b-card-title>
+        Not old enough to create a business
+        <b-iconstack font-scale="3" style="float:right">
+          <b-icon
+              stacked
+              icon="calendar2-x"
+              variant="danger"
+              scale="0.75"
+          ></b-icon>
+        </b-iconstack>
 
+        <b-iconstack font-scale="3" style="float:right">
+          <b-icon
+              stacked
+              icon="building"
+              variant="info"
+              scale="0.75"
+          ></b-icon>
+          <b-icon
+              stacked
+              icon="x-circle"
+              variant="danger"
+          ></b-icon>
+        </b-iconstack>
+      </b-card-title>
+      <hr>
+
+      <h4>You must be at least <b>16 years old</b> to create a business.</h4>
+    </b-card>
   </div>
 </template>
 
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
+import getMonthsAndYearsBetween from '../../util';
+
+const MIN_AGE_TO_CREATE_BUSINESS = 16;
 
 export default {
   components: {
@@ -109,7 +140,7 @@ export default {
         this.$currentUser = (await api.getUser(this.$currentUser.id)).data;
         await this.$router.push({path: `/businesses/${businessResponse.businessId}`});
       } catch(error) {
-        console.log(error);
+        //console.log(error);
         this.pushErrors(error);
       }
     },
@@ -121,5 +152,12 @@ export default {
       this.errors.push(error.message);
     }
   },
+  computed: {
+    canCreateBusiness: function() {
+      const monthsAndYearsBetween = getMonthsAndYearsBetween(new Date(this.$currentUser.dateOfBirth), Date.now());
+      console.log(this.$currentUser.dateOfBirth);
+      return monthsAndYearsBetween.years >= MIN_AGE_TO_CREATE_BUSINESS;
+    }
+  }
 }
 </script>

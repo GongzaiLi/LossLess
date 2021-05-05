@@ -2,6 +2,10 @@ package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * This enum specifies types for users and provides functionality
+ * for checking to see if a user is of a legal type
+ */
 public enum UserRoles {
     USER("user"),
     GLOBAL_APPLICATION_ADMIN("globalApplicationAdmin"),

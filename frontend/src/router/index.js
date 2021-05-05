@@ -32,10 +32,12 @@ const router = new Router({
 
 /**
  * Route guard that redirects users to the login page if they are not authenticated.
- * This applies to all routes except for the login and register routers.
+ * This applies to all routes except for the login and register routes. 
  */
 router.beforeEach((to, _from, next) => {
-    if (!['login', 'register'].includes(to.name) && getUser() == null) {
+    console.log(to);
+    const currentUser = getUser();
+    if (!['login', 'register'].includes(to.name) && currentUser == null) {
         next('/login');
     } else {
         next();

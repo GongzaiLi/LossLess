@@ -49,7 +49,7 @@ public class DefaultAdminCreatorService {
      * This service periodically checks if a default admin exists and creates one if one does not.
      * @param userService The User Service autowired by Spring
      * @throws IOException If the config file "global-admin.properties" does not exist in the resources/ directory
-     * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
+     * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-ms'
      */
     @Autowired
     public DefaultAdminCreatorService(UserService userService, AddressService addressService) throws IOException, InvalidParameterException {
@@ -69,11 +69,11 @@ public class DefaultAdminCreatorService {
 
     /**
      * Takes an input stream (made from the config properties file) and reads from it the following config properties:
-     * 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
+     * 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-ms'
      * Stores these values to be used for the default admin creation/checking service.
      * DOES NOT CLOSE THE FILE STREAM AFTER READING. MAKE SURE YOU CLOSE IT AFTER CALLING THIS METHOD
      * @param configFileStream Input stream made from the config properties file
-     * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'
+     * @throws InvalidParameterException If the config file does not have all of the properties: 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-ms'
      * @throws IOException If reading the config file failed due to an external error, eg. the file was corrupted
      */
     private void readConfigFile(InputStream configFileStream) throws InvalidParameterException, IOException {
@@ -82,19 +82,19 @@ public class DefaultAdminCreatorService {
 
         defaultEmail = defaultProps.getProperty("default-admin-username");
         defaultPassword = defaultProps.getProperty("default-admin-password");
-        String defaultTimeoutString = defaultProps.getProperty("check-default-admin-period-seconds");
+        String defaultTimeoutString = defaultProps.getProperty("check-default-admin-period-ms");
 
         if (defaultPassword == null || defaultEmail == null || defaultTimeoutString == null) {
-            throw new InvalidParameterException("Missing config fields. Must have 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-seconds'");
+            throw new InvalidParameterException("Missing config fields. Must have 'default-admin-username', 'default-admin-password', and 'check-default-admin-period-ms'");
         }
         try {
             defaultTimeout = Integer.parseInt(defaultTimeoutString);
         } catch(NumberFormatException nfe) {
-            throw new InvalidParameterException("'check-default-admin-period-seconds' field of config file does not have an integer value.");
+            throw new InvalidParameterException("'check-default-admin-period-ms' field of config file does not have an integer value.");
         }
 
         if (defaultTimeout <= 0) {
-            throw new InvalidParameterException("'check-default-admin-period-seconds' must be greater than zero.");
+            throw new InvalidParameterException("'check-default-admin-period-ms' must be greater than zero.");
         }
     }
 
@@ -131,7 +131,7 @@ public class DefaultAdminCreatorService {
      * and creates one using DefaultAdminCreatorService. It periodically runs depending on what is
      * set in the global-admin.properties. Currently set to 5 seconds
      */
-    @Scheduled(fixedDelayString = "${check-default-admin-period-seconds}")
+    @Scheduled(fixedDelayString = "${check-default-admin-period-ms}")
     public void scheduleCheckDefaultAdmin() {
         log.info("[SERVER] DGAA Check: {}", dateFormat.format(new Date()));
         this.count.incrementAndGet();

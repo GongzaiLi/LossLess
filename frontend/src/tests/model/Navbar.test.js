@@ -95,7 +95,7 @@ describe('User Drop Down', () => {
     const prevBusinesses = JSON.parse(JSON.stringify(userData.businessesAdministered));
 
     userData.businessesAdministered.push({
-      "id": 100,
+      "id": 101,
       "administrators": [],
       "primaryAdministratorId": 20,
       "name": "Another Store Name",
@@ -150,7 +150,7 @@ describe('Act as business', () => {
     expect(wrapper.findAll(".business-name-drop-down").length).toEqual(1);
     expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
     expect(wrapper.find("#profile-name").text()).toEqual("John");
-    expect(wrapper.findAll("hr").length).toEqual(1);
+    expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.findAll(".user-name-drop-down").length).toBe(0);
 
     userData.currentlyActingAs = null;
@@ -179,7 +179,7 @@ describe('Act as business', () => {
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(1);
     expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
     expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
-    expect(wrapper.findAll("hr").length).toEqual(2);
+    expect(wrapper.findAll("hr").length).toEqual(3);
     userData = prevUser;
   })
 });

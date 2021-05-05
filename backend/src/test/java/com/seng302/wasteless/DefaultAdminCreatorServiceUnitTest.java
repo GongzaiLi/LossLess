@@ -40,7 +40,7 @@ public class DefaultAdminCreatorServiceUnitTest {
 
     @Test
     public void correctFieldsWhenReadConfigFile() {
-        String config = "check-default-admin-period-seconds=60\n" +
+        String config = "check-default-admin-period-ms=60\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
@@ -53,7 +53,7 @@ public class DefaultAdminCreatorServiceUnitTest {
 
     @Test
     public void throwsInvalidParameterExceptionWhenPeriodNotANumber() {
-        String config = "check-default-admin-period-seconds=asdf\n" +
+        String config = "check-default-admin-period-ms=asdf\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
@@ -62,7 +62,7 @@ public class DefaultAdminCreatorServiceUnitTest {
 
     @Test
     public void throwsInvalidParameterExceptionWhenPeriodIsZero() {
-        String config = "check-default-admin-period-seconds=0\n" +
+        String config = "check-default-admin-period-ms=0\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
@@ -71,7 +71,7 @@ public class DefaultAdminCreatorServiceUnitTest {
 
     @Test
     public void throwsInvalidParameterExceptionWhenPeriodIsNegative() {
-        String config = "check-default-admin-period-seconds=-5\n" +
+        String config = "check-default-admin-period-ms=-5\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 

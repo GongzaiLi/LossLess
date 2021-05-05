@@ -20,6 +20,18 @@ const $log = {
   }
 };
 
+const $currentUser = {
+  role: 'user',
+  currentlyActingAs: {
+    id: 0
+  },
+  businessesAdministered: [
+    {id: 0, name: "blah"},
+    {id: 1, name: "blah1"},
+    {id: 2, name: "blah2"}
+  ]
+};
+
 
 jest.mock('../../Api');
 
@@ -40,7 +52,7 @@ beforeEach(() => {
   wrapper = shallowMount(productCatalogue, {
     localVue,
     propsData: {},
-    mocks: {$route, $log},
+    mocks: {$route, $log, $currentUser},
     stubs: {'another-component': true},
     methods: {},
   });
@@ -103,6 +115,29 @@ describe('check-getProducts-API-function', () => {
 
 
 describe('check-product-catalogue-page', () => {
+
+  test('product-found-in-html-test-product-table-display', async () => {
+    const response = {
+      data: [{
+        id: "WATT-420-BEANS",
+        name: "Watties Baked Beans - 420g can",
+        description: "Baked Beans as they should be.",
+        recommendedRetailPrice: 2.2,
+        created: "2021-04-14T13:01:58.660Z"
+      }]
+    };
+
+    Api.getProducts.mockResolvedValue(response);
+    await wrapper.vm.getProducts(0);
+    await wrapper.vm.$forceUpdate();
+
+
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].id).toBe("WATT-420-BEANS");
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].name).toBe("Watties Baked Beans - 420g can");
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].description).toBe("Baked Beans as they should be.");
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].recommendedRetailPrice).toBe(2.2);
+    expect(wrapper.vm.$refs.productCatalogueTable.$props.items[0].created).toBe("2021-04-14T13:01:58.660Z");
+  });
 
 
   test('product-found-in-html-test-pagination-display', async () => {
@@ -290,13 +325,22 @@ describe('Testing api put/post request and the response method with errors', () 
     expect(Api.getProducts).toHaveBeenCalledWith(0);
   });
 
-  it('400 error test', async () => {
-    Api.modifyProduct.mockRejectedValue({response : {status: 400}});
+  it('400 error test if Product ID already exists', async () => {
+    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product ID provided already exists."}});
 
     const mockEvent = {preventDefault: jest.fn()};
     await wrapper.vm.modifyProduct(mockEvent);
 
-    expect(wrapper.vm.productCardError).toBe("Product has the same name or id as another product. Please try again");
+    expect(wrapper.vm.productCardError).toBe("Product ID provided already exists.");
+  });
+
+  it('400 error test if Product ID provided does not exist', async () => {
+    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product does not exist."}});
+
+    const mockEvent = {preventDefault: jest.fn()};
+    await wrapper.vm.modifyProduct(mockEvent);
+
+    expect(wrapper.vm.productCardError).toBe("Product does not exist.");
   });
 
   it('403 error test', async () => {
@@ -324,6 +368,72 @@ describe('Testing api put/post request and the response method with errors', () 
     await wrapper.vm.modifyProduct(mockEvent);
 
     expect(wrapper.vm.productCardError).toBe("Server error");
+  });
+
+});
+
+describe('businessNameIfAdminOfThisBusiness', () => {
+
+  it('Works if user admins business', async () => {
+    expect(wrapper.vm.businessNameIfAdminOfThisBusiness).toBe("blah");
+  });
+
+  it('Works if user not admins business', async () => {
+    wrapper.vm.$route = {
+      params: {
+        id: 3
+      }
+    }
+
+    expect(wrapper.vm.businessNameIfAdminOfThisBusiness).toBe(null);
+  });
+
+})
+
+
+describe('Testing currently acting as watcher', () => {
+
+  it('Does not load data if switch to normal user', async () => {
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', null);
+
+    jest.spyOn(wrapper.vm, 'getProducts');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getProducts).not.toBeCalled();
+  });
+
+  it('Does not load data if switch to other business', async () => {
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
+
+    jest.spyOn(wrapper.vm, 'getProducts');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getProducts).not.toBeCalled();
+  });
+
+  it('Loads if switch to other business and acting as', async () => {
+    wrapper.vm.$route = {
+      params: {
+        id: 2
+      }
+    }
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 2});
+
+    jest.spyOn(wrapper.vm, 'getProducts');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getProducts).toHaveBeenCalledWith(2);
+  });
+
+
+  it('Loads data if switch to other business but is admin', async () => {
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'role', 'globalApplicationAdmin');
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
+
+    jest.spyOn(wrapper.vm, 'getProducts');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getProducts).toHaveBeenCalledWith(0);
   });
 
 });
