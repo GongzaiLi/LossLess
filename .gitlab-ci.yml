@@ -8,7 +8,7 @@ stages:
 tag_checker:
   stage: build
   script:
-    - python tag_checker.py $CI_COMMIT_TAG
+    - python3 tag_checker.py $CI_COMMIT_TAG
   only:
     - tags
 
