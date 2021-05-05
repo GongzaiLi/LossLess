@@ -1,8 +1,10 @@
 package com.seng302.wasteless.steps;
 
+import com.jayway.jsonpath.JsonPath;
 import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.repository.UserRepository;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import com.seng302.wasteless.testconfigs.MockitoUserServiceConfig;
@@ -11,6 +13,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.junit.Cucumber;
+import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -23,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,17 +49,26 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @AutoConfigureWebMvc
 @Import(MockitoUserServiceConfig.class)
 public class LoginFeature {
+    String homeAddress = "{\n" +
+            "    \"streetNumber\": \"3/24\",\n" +
+            "    \"streetName\": \"Ilam Road\",\n" +
+            "    \"city\": \"Christchurch\",\n" +
+            "    \"region\": \"Canterbury\",\n" +
+            "    \"country\": \"New Zealand\",\n" +
+            "    \"postcode\": \"90210\"\n" +
+            "  }";
+
     private MockMvc mockMvc;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     private ResultActions result;
 
-    private User currentExistingUser;
+    private Integer userId;
 
     /**
      * For some reason this works but @Autowired mockMvc doesn't. I have no idea why and I'm too tired to find out.
@@ -66,26 +80,15 @@ public class LoginFeature {
 
     @Given("The user with email {string} exists and has password {string}")
     public void the_user_with_email_exists_and_has_password(String email, String password) {
-        currentExistingUser = new User();
-        currentExistingUser.setEmail(email);
-        currentExistingUser.setPassword(new BCryptPasswordEncoder().encode(password));
-        currentExistingUser.setFirstName("Blah");
-        currentExistingUser.setLastName("Blah");
-        currentExistingUser.setRole(UserRoles.USER);
-        currentExistingUser.setId(100);
+        createOneUser("Oliver", "Cranshaw", email, "2000-11-11", homeAddress, password);
     }
 
     @Given("The user with email {string} does not exist")
     public void the_user_with_email_does_not_exist(String string) {
-        currentExistingUser = null;
     }
 
     @When("The user logs in with user email {string} and password {string}")
     public void the_user_logs_in_with_user_email_and_password(String email, String password) throws Exception {
-        if (currentExistingUser != null) {
-            doReturn(currentExistingUser).when(userService).findUserByEmail(currentExistingUser.getEmail());
-        }
-
         String user = String.format("{\"email\": \"%s\", \"password\" : \"%s\"}", email, password);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/login")
@@ -95,10 +98,6 @@ public class LoginFeature {
 
     @When("The user logs in with user email {string} and without a password")
     public void theUserLogsInWithUserEmailAndWithoutAPassword(String email) throws Exception {
-        if (currentExistingUser != null) {
-            doReturn(currentExistingUser).when(userService).findUserByEmail(currentExistingUser.getEmail());
-        }
-
         String user = String.format("{\"email\": \"%s\"}", email);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/login")
@@ -108,10 +107,6 @@ public class LoginFeature {
 
     @When("The user logs in without an email and with password {string}")
     public void theUserLogsInWithoutAnEmailAndWithPassword(String password) throws Exception {
-        if (currentExistingUser != null) {
-            doReturn(currentExistingUser).when(userService).findUserByEmail(currentExistingUser.getEmail());
-        }
-
         String user = String.format("{\"password\": \"%s\"}", password);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/login")
@@ -129,6 +124,23 @@ public class LoginFeature {
     @Then("The user will be logged in as themselves")
     public void the_user_will_be_logged_in_as_themselves() throws Exception {
         result.andExpect(status().isOk());
-        result.andExpect(content().string(String.format("{\"userId\":%d}", currentExistingUser.getId())));
+        result.andExpect(content().string(String.format("{\"userId\":%d}", userId)));
+    }
+
+    private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
+        String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": %s, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
+
+        try {
+            MvcResult result = mockMvc.perform(
+                    MockMvcRequestBuilders.post("/users")
+                            .content(user)
+                            .contentType(APPLICATION_JSON))
+                    .andExpect(status().isCreated())
+                    .andReturn();
+
+            userId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid Request", e);
+        }
     }
 }

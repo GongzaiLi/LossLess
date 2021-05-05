@@ -25,7 +25,7 @@ Feature: Login
     Then The user will receive an error message of "{\"password\":\"password is mandatory\"}"
 
   Scenario: Log in with correct details
-    Given The user with email "johnsmith@email.com" exists and has password "securepassword"
-    When The user logs in with user email "johnsmith@email.com" and password "securepassword"
+    Given The user with email "janedoe@email.com" exists and has password "securepassword"
+    When The user logs in with user email "janedoe@email.com" and password "securepassword"
     Then The user will be logged in as themselves
 

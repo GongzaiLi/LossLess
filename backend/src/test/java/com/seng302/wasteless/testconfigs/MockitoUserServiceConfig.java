@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 @TestConfiguration
 public class MockitoUserServiceConfig {
     @Bean
+    @Primary
     public UserService userService() {
         return Mockito.mock(UserService.class);
     }

@@ -1,4 +1,4 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.steps;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;

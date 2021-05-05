@@ -90,6 +90,10 @@ task cucumber(type: Test) {
     description = "Runs JUnit 4 tests (cucumber tests)"
     testLogging.showStandardStreams = true
     useJUnit()
+    filter {
+        //specific test class, this can match 'SomeTest' class and corresponding method under any package
+        includeTestsMatching "com.seng302.wasteless.steps.CucumberRunnerTest"
+    }
 }
 /*
 // specify a dedicated task for Cucumber

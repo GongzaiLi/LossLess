@@ -33,7 +33,7 @@ junit:
 
 # Run acceptance (cucumber) tests
 # Uncomment after ATDD workshop (at the latest)
- cucumber:
+cucumber:
    stage: test
    script:
      - cd backend
