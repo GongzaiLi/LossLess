@@ -261,6 +261,10 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
         }
 
+        if (!oldProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+        }
+
         String newProductId = editedProduct.createCode(businessId);
         if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
