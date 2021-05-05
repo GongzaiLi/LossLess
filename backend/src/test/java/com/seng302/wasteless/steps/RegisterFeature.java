@@ -1,6 +1,7 @@
 package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.controller.UserController;
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.UserService;
@@ -32,12 +33,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
+
 import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(UserController.class)
@@ -64,8 +66,10 @@ public class RegisterFeature {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
-
     @Given("User is not registered and is on the register page")
+    public void userIsNotRegisteredAndIsOnTheRegisterPage() {
+    }
+
     @When("User tries to create an account with no first name, last name {string}, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
     public void userTriesToCreateAnAccountWithNoFirstNameLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9) throws Exception {
         String user = String.format("{\"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": {\n" +
@@ -104,4 +108,59 @@ public class RegisterFeature {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @When("User tries to create an account with first name {string}, last name {string}, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
+    public void userTriesToCreateAnAccountWithFirstNameLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String firstName, String lastName, String email, String dateOfBirth, String country, String streetNumber, String streetName, String city, String region, String postcode, String password) throws Exception {
+        String user = String.format("{" +
+                "\"firstName\" : \"%s\", " +
+                "\"lastName\" : \"%s\", " +
+                "\"email\": \"%s\", " +
+                "\"dateOfBirth\": \"%s\", " +
+                "\"homeAddress\": {\n" +
+                "\"streetNumber\": \"%s\",\n" +
+                "\"streetName\": \"%s\",\n" +
+                "\"city\": \"%s\",\n" +
+                "\"region\": \"%s\",\n" +
+                "\"country\": \"%s\",\n" +
+                "\"postcode\": \"%s\"\n" +
+                "  }, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, streetNumber, streetName, city, region, country, postcode, password);
+
+        result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().is4xxClientError());
+    }
+
+
+    @Then("The registering user will receive an error message of {string}")
+    public void the_registering_user_will_receive_an_error_message_of(String message) throws Exception {
+        // Write code here that turns the phrase above into concrete actions
+        result.andExpect(status().is4xxClientError());
+        System.out.println(result.toString());
+        result.andExpect(content().string(message));
+    }
+
+
+    @Given("The user with email {string} has an account and user is on register page")
+    public void theUserWithEmailHasAnAccountAndUserIsOnRegisterPage(String email) throws Exception {
+        String user = String.format("{" +
+                "\"firstName\" : \"name\", " +
+                "\"lastName\" : \"name\", " +
+                "\"email\": \"%s\", " +
+                "\"dateOfBirth\": \"1998-04-27\", " +
+                "\"homeAddress\": {\n" +
+                "\"streetNumber\": \"number\",\n" +
+                "\"streetName\": \"name\",\n" +
+                "\"city\": \"city\",\n" +
+                "\"region\": \"region\",\n" +
+                "\"country\": \"country\",\n" +
+                "\"postcode\": \"9201\"\n" +
+                "  }, \"password\": \"password\"}", email);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON));
+    }
+
+
 }
