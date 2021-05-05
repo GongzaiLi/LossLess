@@ -19,7 +19,7 @@ Date: 29/03/2021
         </b-row>
       </template>
 
-      <b-list-group border-variant="secondary">
+      <b-list-group border-variant="secondary" v-show="businessData.description">
         <b-list-group-item>
           <b-card-text style="text-align: justify">
             {{ businessData.description }}
@@ -65,6 +65,18 @@ Date: 29/03/2021
               <b-col>{{ businessData.phoneNumber }}</b-col>
             </b-row>
           </h6>
+
+          <h6 v-if="$currentUser.currentlyActingAs">
+            <router-link  :to="{ name: 'product-catalogue', params: { id: $currentUser.currentlyActingAs.id }}">
+            <b-row>
+              <b-col cols="0" >
+                <b-icon-box-seam></b-icon-box-seam>
+              </b-col>
+              <b-col cols="4"><strong>Product Catalogue</strong></b-col>
+            </b-row>
+            </router-link>
+          </h6>
+
         </b-container>
       </b-card-body>
 

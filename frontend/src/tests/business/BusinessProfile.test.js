@@ -6,7 +6,26 @@ import VueRouter from 'vue-router';
 import makeAdminModal from "../../components/business/MakeAdminModal";
 
 
+let userData = {
+  id: 1,
+  currentlyActingAs: null,
+}
+;
 
+const mockUserAuthPlugin = function install(Vue) {
+  Vue.mixin({
+    computed: {
+      $currentUser: {
+        get: function () {
+          return userData;
+        },
+        set: function () {
+          return null;
+        },
+      },
+    }
+  });
+}
 jest.mock('../../Api');
 let wrapper;
 
@@ -27,6 +46,7 @@ beforeEach(() => {
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
   localVue.use(VueRouter);
+  localVue.use(mockUserAuthPlugin);
 
   Api.getBusiness.mockRejectedValue(new Error(''));
 
@@ -42,9 +62,9 @@ beforeEach(() => {
 
   wrapper.route = {
     params: {
-      id: 0
+      id: 0,
     }
-  }
+  };
 
 });
 
@@ -71,7 +91,7 @@ test('get-normal-data', async () => {
         postcode: "90210"
       },
       businessType: "Accommodation and Food Services",
-      created: "2019-07-14T14:52:00Z"
+      created: "2019-07-14T14:52:00Z",
     }
   };
   Api.getBusiness.mockResolvedValue(response);
@@ -626,7 +646,7 @@ it('no internet test', async () => {
 it('other error test', async () => {
   Api.makeBusinessAdmin.mockRejectedValue({response : {status: 500}});
 
-  await wrapper.vm.makeAdminHandler(1);;
+  await wrapper.vm.makeAdminHandler(1);
 
   expect(wrapper.vm.makeAdminError).toBe("Server error");
 });
