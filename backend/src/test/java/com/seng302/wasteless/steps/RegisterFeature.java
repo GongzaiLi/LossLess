@@ -198,24 +198,6 @@ public class RegisterFeature {
                 .andExpect(status().isBadRequest());
     }
 
-    @When("User tries to create an account with first name {string}, last name {string}, email {string}, date of birth {string}, no streetNumber,  streetName {string},  city {string},  region {string}, country {string},  postcode {string} and password {string}")
-    public void userTriesToCreateAnAccountWithFirstNameLastNameEmailDateOfBirthNoStreetNumberStreetNameCityRegionCountryPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9) throws Exception {
-
-        String user = String.format("{\"firstName\" : \"%s\", \"lastName\" : \"%s\",\"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": {\n" +
-                "    \"streetNumber\": \"%s\",\n" +
-                "    \"streetName\": \"%s\",\n" +
-                "    \"city\": \"%s\",\n" +
-                "    \"region\": \"%s\",\n" +
-                "    \"country\": \"%s\",\n" +
-                "    \"postcode\": \"%s\"\n" +
-                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, "", arg4, arg5, arg6, arg7, arg8, arg9);
-
-        result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
     @Then("The registering user will receive an error message of {string}")
     public void theRegisteringUserWillReceiveAnErrorMessageOf(String message) throws Exception {
         // Write code here that turns the phrase above into concrete actions

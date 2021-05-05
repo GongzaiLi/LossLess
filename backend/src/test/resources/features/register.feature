@@ -30,11 +30,6 @@ Feature: Register
     Then The registering user will receive an error message of "{\"homeAddress\":\"homeAddress is mandatory\"}"
 
 
-  Scenario: Register user with no street number in home address
-    Given User is not registered and is on the register page
-    When User tries to create an account with first name "John", last name "Smith", email "johnsmith99@gmail.com", date of birth "1999-04-27", no streetNumber,  streetName "Ilam Road",  city "Christchurch",  region "Canterbury", country "New Zealand",  postcode "90210" and password "securepassword"
-    Then The registering user will receive an error message of "{\"email\":\"email is mandatory\"}"
-
         #Tests for all address parts
 
   Scenario: Register user with no password
