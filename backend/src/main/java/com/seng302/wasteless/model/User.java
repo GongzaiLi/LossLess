@@ -66,7 +66,7 @@ public class User {
     private String phoneNumber;
 
     @JsonView({UserViews.PostUserRequestView.class})
-    @NotNull
+    @NotNull(message = "homeAddress is mandatory")
     @OneToOne
     @JoinColumn(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private Address homeAddress;

@@ -119,13 +119,6 @@ public class LoginFeature {
                 .contentType(APPLICATION_JSON));
     }
 
-    @Then("The user will receive an error message of {string}")
-    public void the_user_will_receive_an_error_message_of(String message) throws Exception {
-        // Write code here that turns the phrase above into concrete actions
-        result.andExpect(status().is4xxClientError());
-        result.andExpect(content().string(message));
-    }
-
     @Then("The user will be logged in as themselves")
     public void the_user_will_be_logged_in_as_themselves() throws Exception {
         result.andExpect(status().isOk());

@@ -7,27 +7,33 @@ Feature: Register
   Scenario: Register user with no first name
     Given User is not registered and is on the register page
     When User tries to create an account with no first name, last name "Smith", email "johnsmith99@gmail.com", date of birth "1999-04-27", country "New Zealand",  streetNumber "3/24",  streetName "Ilam Road",  city "Christchurch",  region "Canterbury",  postcode "90210" and password "securepassword"
-    Then The registering user will receive an error message of "firstName is mandatory"
+    Then The registering user will receive an error message of "{\"firstName\":\"firstName is mandatory\"}"
 
   Scenario: Register user with no last name
     Given User is not registered and is on the register page
     When User tries to create an account with first name "John", no last name, email "johnsmith99@gmail.com", date of birth "1999-04-27", country "New Zealand",  streetNumber "3/24",  streetName "Ilam Road",  city "Christchurch",  region "Canterbury",  postcode "90210" and password "securepassword"
-    Then The registering user will receive an error message of "lastname is mandatory"
+    Then The registering user will receive an error message of "{\"lastName\":\"lastName is mandatory\"}"
 
   Scenario: Register user with no email address
     Given User is not registered and is on the register page
-    When User tries to create an account with first name "John", last name "Smith", email "johnsmith99@gmail.com", date of birth "1999-04-27", country "New Zealand",  streetNumber "3/24",  streetName "Ilam Road",  city "Christchurch",  region "Canterbury",  postcode "90210" and password "securepassword"
-    Then The registering user will receive an error message of "email is mandatory"
+    When User tries to create an account with first name "John", last name "Smith", no email, date of birth "1999-04-27", country "New Zealand",  streetNumber "3/24",  streetName "Ilam Road",  city "Christchurch",  region "Canterbury",  postcode "90210" and password "securepassword"
+    Then The registering user will receive an error message of "{\"email\":\"email is mandatory\"}"
 
   Scenario: Register user with no date of birth
     Given User is not registered and is on the register page
-    When User tries to create an account with first name "John", last name "Smith", email "johnsmith99@gmail.com", date of birth "", home address "{"country": "New Zealand",  "streetNumber": "3/24",  "streetName": "Ilam Road",  "city": "Christchurch",  "region": "Canterbury",  "postcode": "90210"}" and password "securepassword"
-    Then The registering user will receive an error message of "dateOfBirth is mandatory"
+    When User tries to create an account with first name "John", last name "Smith", email "johnsmith99@gmail.com", no date of birth, country "New Zealand",  streetNumber "3/24",  streetName "Ilam Road",  city "Christchurch",  region "Canterbury",  postcode "90210" and password "securepassword"
+    Then The registering user will receive an error message of "{\"dateOfBirth\":\"dateOfBirth is mandatory\"}"
 
   Scenario: Register user with no home address
     Given User is not registered and is on the register page
-    When User tries to create an account with first name "John", last name "Smith", email "johnsmith@99gmail.com", date of birth "1998-04-27", password "securepassword"
-    Then The registering user will receive an error message of "streetNumber is mandatory"
+    When User tries to create an account with first name "John", last name "Smith", email "johnsmith99@gmail.com", date of birth "1999-04-27", no home address and password "securepassword"
+    Then The registering user will receive an error message of "{\"homeAddress\":\"homeAddress is mandatory\"}"
+
+
+  Scenario: Register user with no street number in home address
+    Given User is not registered and is on the register page
+    When User tries to create an account with first name "John", last name "Smith", email "johnsmith99@gmail.com", date of birth "1999-04-27", no streetNumber,  streetName "Ilam Road",  city "Christchurch",  region "Canterbury", country "New Zealand",  postcode "90210" and password "securepassword"
+    Then The registering user will receive an error message of "{\"email\":\"email is mandatory\"}"
 
         #Tests for all address parts
 
