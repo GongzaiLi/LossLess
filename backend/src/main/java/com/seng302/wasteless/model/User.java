@@ -76,9 +76,6 @@ public class User {
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     private String password;
 
-    @Column(name = "salt") // map camelcase name (java) to snake case (SQL)
-    private String salt;
-
     @Column(name = "businesses_primarily_administered")
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Business> businessesPrimarilyAdministered;
