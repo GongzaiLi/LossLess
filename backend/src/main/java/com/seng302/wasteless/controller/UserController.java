@@ -32,6 +32,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
@@ -181,6 +182,26 @@ public class UserController {
 //            logger.error(errorMessage); doesnt work. I am not sure why.
             errors.put(fieldName, errorMessage);
         });
+        return errors;
+    }
+
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Map<String, String> handleValidationExceptions(
+            ConstraintViolationException exception) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        String constraintName = exception.getConstraintViolations().toString();
+        String errorMsg = exception.getMessage();
+
+        errors.put(constraintName, errorMsg);
         return errors;
     }
 
@@ -339,8 +360,8 @@ public class UserController {
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
                 JSONObject responseBody = new JSONObject();
+                responseBody.put("userId", savedUser.getId());
                 logger.debug("Getting user ID for user: {}", savedUser);
-                responseBody.put("id", savedUser.getId());
 
 
                 logger.info("Successfully logged into user: {} with {}", savedUser, login);

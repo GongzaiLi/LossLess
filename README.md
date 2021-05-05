@@ -43,7 +43,8 @@ Our system periodically checks whether a DGAA exists, and will create a default 
 You can tweak the length of that period through changing the `check-default-admin-period-ms` property of the config file: 
 `backend/src/main/resources/global-admin.properties`.
 The default period is 60000 milliseconds (1 minute). Note this will require a rebuild of the application.  
-The username and password of the DGAA is taken at startup from the following environment variables:
+The username and password of the DGAA is taken at startup from the same properties file (properties `default-admin-username` and `default-admin-password`). NOTE: on the deployed environment,
+the following gitlab CI variables are used instead:
 
     DGAA_EMAIL
     DGAA_PASSWORD
