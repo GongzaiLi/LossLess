@@ -12,7 +12,6 @@ export default {
 
   data: function () {
     return {
-      whoseHomePage: "",
       userData: {
         id: "",
         firstName: "",
@@ -41,14 +40,14 @@ export default {
      */
     getUserInfo: function (id) {
       api
-          .getUser(id)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.userData = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
+        .getUser(id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.userData = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+        })
     }
   }
 }
