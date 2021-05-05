@@ -5,14 +5,20 @@ Date: 15/4/2021
 -->
 <template>
   <div>
-    <div v-if="canEditCatalogue">
-      <h2 v-if="!tableLoading">Product Catalogue: {{businessName}}</h2>
-      <b-form-group>
-        <b-button @click="openCreateProductModal" class="float-right">
-          <b-icon-plus-square-fill animation="fade"/>
-          Create
-        </b-button>
-      </b-form-group>
+    <b-card v-if="canEditCatalogue">
+      <b-card-title v-if="!tableLoading">Product Catalogue: {{businessName}}</b-card-title>
+      <hr class='m-0'>
+      <b-row align-v="center">
+        <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
+        <b-col md="4">
+          <b-form-group>
+            <b-button @click="openCreateProductModal" class="float-right">
+              <b-icon-plus-square-fill animation="fade"/>
+              Create
+            </b-button>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-table
         striped hovers
         responsive="lg"
@@ -63,7 +69,7 @@ Date: 15/4/2021
         />
         <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
-    </div>
+    </b-card>
 
     <b-card id="catalogue-locked-card" v-if="!canEditCatalogue">
       <b-card-title>
@@ -174,7 +180,11 @@ export default {
      * @return string
      */
     setDescription: function (description) {
-      const showTenWordDescription = description.slice(0, 20).trim();
+      if (description === "" || description.length <= 10) {
+        const trimmedDescription = description.trim();
+        return trimmedDescription;
+      }
+      const showTenWordDescription = description.slice(0, 10).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
     },
 
