@@ -56,7 +56,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-person-fill></b-icon-person-fill>
                 </b-col>
-                <b-col cols="4"><b>Full Name:</b></b-col>
+                <b-col cols="4"><strong>Full Name:</strong></b-col>
                 <b-col>{{ fullName }}</b-col>
               </b-row>
             </h6>
@@ -65,7 +65,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
                 </b-col>
-                <b-col cols="4"><b>Nickname:</b></b-col>
+                <b-col cols="4"><strong>Nickname:</strong></b-col>
                 <b-col>{{ userData.nickName }}</b-col>
               </b-row>
             </h6>
@@ -74,7 +74,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-calendar-event-fill></b-icon-calendar-event-fill>
                 </b-col>
-                <b-col cols="4"><b>Date Of Birth:</b></b-col>
+                <b-col cols="4"><strong>Date Of Birth:</strong></b-col>
                 <b-col>{{ userData.dateOfBirth }}</b-col>
               </b-row>
             </h6>
@@ -83,7 +83,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-envelope-fill></b-icon-envelope-fill>
                 </b-col>
-                <b-col cols="4"><b>Email:</b></b-col>
+                <b-col cols="4"><strong>Email:</strong></b-col>
                 <b-col>{{ userData.email }}</b-col>
               </b-row>
             </h6>
@@ -92,7 +92,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-telephone-fill></b-icon-telephone-fill>
                 </b-col>
-                <b-col cols="4"><b>Phone Number:</b></b-col>
+                <b-col cols="4"><strong>Phone Number:</strong></b-col>
                 <b-col>{{ userData.phoneNumber }}</b-col>
               </b-row>
             </h6>
@@ -101,7 +101,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-house-fill></b-icon-house-fill>
                 </b-col>
-                <b-col cols="4"><b>Home Address:</b></b-col>
+                <b-col cols="4"><strong>Home Address:</strong></b-col>
                 <b-col> {{ getAddress }}</b-col>
               </b-row>
             </h6>
@@ -110,7 +110,7 @@ Date: 5/3/2021
                 <b-col cols="0">
                   <b-icon-building></b-icon-building>
                 </b-col>
-                <b-col cols="4"><b>Businesses Created:</b></b-col>
+                <b-col cols="4"><strong>Businesses Created:</strong></b-col>
                 <b-col>
                   <router-link v-for="business in this.userData.businessesAdministered"
                                :to="'/businesses/'+business.id.toString()" v-bind:key="business.id">
@@ -256,7 +256,6 @@ export default {
         })
         .catch((error) => {
           this.$log.debug(error);
-          alert(error);
         });
     },
     /**
@@ -272,7 +271,6 @@ export default {
         })
         .catch((error) => {
           this.$log.debug(error);
-          alert(error);
         });
     },
   },
@@ -332,11 +330,10 @@ export default {
      * Toggles the button text to add/remove admin privileges on a profile based on the user's role
      */
     adminButtonText: function () {
-      switch (this.userData.role) {
-        case 'globalApplicationAdmin':
-          return "Remove Admin";
-        default:  // Button won't even appear if they are default global admin so this is fine
-          return "Make Admin";
+      if (this.userData.role === 'globalApplicationAdmin') {
+        return "Remove Admin";
+      }else {  // Button won't even appear if they are default global admin so this is fine
+        return "Make Admin";
       }
     },
 
