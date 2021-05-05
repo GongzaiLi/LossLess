@@ -71,7 +71,7 @@ dev-sonarqube:
    - cd ../backend
    - ./gradlew sonarqube
   only:
-   - SonarQube_bug_fixes
+   - dev
 
 # builds all branches, except dev and master
 branch-build:
