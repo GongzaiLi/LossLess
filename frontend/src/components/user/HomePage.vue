@@ -2,6 +2,9 @@
   <b-card border-variant="secondary" header-border-variant="secondary">
       <h1 v-if="$currentUser.currentlyActingAs !== null ">{{$currentUser.currentlyActingAs.name + "'s Home Page"}}</h1>
       <h1 v-else>{{userData.firstName + "'s Home Page"}}</h1>
+    <router-link :to="{ name: 'user-profile', params: { id: this.$currentUser.id }}">
+      <h4>My profile page</h4>
+    </router-link>
   </b-card>
 </template>
 
