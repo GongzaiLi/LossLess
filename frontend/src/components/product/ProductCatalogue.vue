@@ -174,7 +174,10 @@ export default {
      * @return string
      */
     setDescription: function (description) {
-      const showTenWordDescription = description.slice(0, 20).trim();
+      if (description === "" || description.length <= 10) {
+        return description;
+      }
+      const showTenWordDescription = description.slice(0, 10).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
     },
 
