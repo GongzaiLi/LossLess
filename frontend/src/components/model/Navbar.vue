@@ -13,18 +13,18 @@ Date: sprint_1
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/homepage">Home Page</b-nav-item>
-        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
+        <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
-            <img src="../../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
 
 
@@ -62,14 +62,8 @@ Date: sprint_1
   </b-navbar>
 </template>
 
-<style scoped>
-  .nav-item {
-    font-size: 1.2em;
-  }
-</style>
-
 <script>
-import {setCurrentlyActingAs} from '../../auth'
+import {setCurrentlyActingAs} from '@/auth'
 import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.

@@ -1,6 +1,7 @@
 <template>
   <b-card border-variant="secondary" header-border-variant="secondary">
-      <h1>{{userData.firstName + "'s Home Page"}}</h1>
+      <h1 v-if="this.$currentUser.currentlyActingAs !== null ">{{this.$currentUser.currentlyActingAs.name + "'s Home Page"}}</h1>
+      <h1 v-else>{{userData.firstName + "'s Home Page"}}</h1>
   </b-card>
 </template>
 
@@ -11,6 +12,7 @@ export default {
 
   data: function () {
     return {
+      whoseHomePage: "",
       userData: {
         id: "",
         firstName: "",
@@ -22,6 +24,7 @@ export default {
         dateOfBirth: "",
         phoneNumber: "",
         homeAddress: "",
+        currentlyActingAs: "",
       }
     }
   },
