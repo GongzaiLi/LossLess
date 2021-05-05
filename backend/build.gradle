@@ -142,3 +142,7 @@ sonarqube {
         property "sonar.login", "ec9d1ffd23013bea8fea1ee96a8d55b0b5f441b9"
     }
 }
+
+bootRun {
+    systemProperty 'spring.profiles.active', System.properties['spring.profiles.active']
+}
