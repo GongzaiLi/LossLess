@@ -9,6 +9,10 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.LinkedHashSet;
 
+/**
+ * UserRepository is a repository interface for User.
+ * Used to declare accessors to JPA objects.
+ */
 @RepositoryRestResource
 public interface UserRepository extends JpaRepository<User, Integer> {
 
@@ -29,7 +33,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     LinkedHashSet<User> findAllByNicknameContainsAndNicknameNot(String nicknameQuery, String nicknameNot);
 
 
-    @Query(value = "select * from USER where ID = (select ADMINISTRATORS_ID from BUSINESS_ADMINISTRATORS where BUSINESS_ID = :businessId and ADMINISTRATORS_ID = :userId)", nativeQuery = true)
+    @Query(value = "select * from User where id = (select administrators_id from Business_administrators where business_id = :businessId and administrators_id = :userId)", nativeQuery = true)
     User findUserContainBusinessIdAndContainAdminId(@Param("businessId") Integer businessId, @Param("userId") Integer userId);
 
 }

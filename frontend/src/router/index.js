@@ -8,7 +8,6 @@ import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
 import HomePage from "@/components/user/HomePage";
-import CreateProduct from "@/components/product/CreateProduct";
 import {getUser} from '@/auth'
 
 /**
@@ -28,16 +27,17 @@ const router = new Router({
         { path: '/businesses/:id', name: 'business-profile', component: BusinessProfile},
         { path: '/businesses/:id/products', name: 'product-catalogue', component: ProductCatalogue},
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
-        { path: '/businesses/:id/products/createProduct', name: 'createProduct', component: CreateProduct},
     ]
 });
 
 /**
  * Route guard that redirects users to the login page if they are not authenticated.
- * This applies to all routes except for the login and register routers.
+ * This applies to all routes except for the login and register routes. 
  */
 router.beforeEach((to, _from, next) => {
-    if (!['login', 'register'].includes(to.name) && getUser() == null) {
+    console.log(to);
+    const currentUser = getUser();
+    if (!['login', 'register'].includes(to.name) && currentUser == null) {
         next('/login');
     } else {
         next();

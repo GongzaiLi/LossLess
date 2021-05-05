@@ -134,7 +134,7 @@ describe('User Search', () => {
     expect(headers.at(0).text()).toContain('Name');
     expect(headers.at(1).text()).toContain('Nickname');
     expect(headers.at(2).text()).toContain('Email');
-    expect(headers.at(3).text()).toContain('Home Address');
+    expect(headers.at(3).text()).toContain('Location');
     expect(headers.at(4).text()).toContain('User Type');
     expect(wrapper.html()).toContain('USER');
   });
@@ -150,7 +150,7 @@ describe('User Search', () => {
     expect(headers.at(0).text()).toContain('Name');
     expect(headers.at(1).text()).toContain('Nickname');
     expect(headers.at(2).text()).toContain('Email');
-    expect(headers.at(3).text()).toContain('Home Address');
+    expect(headers.at(3).text()).toContain('Location');
     expect(headers.at(4).text()).toContain('User Type');
     expect(wrapper.html()).toContain('USER');
   });

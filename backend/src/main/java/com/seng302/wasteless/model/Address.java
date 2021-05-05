@@ -16,7 +16,6 @@ import javax.validation.constraints.NotNull;
 /**
  * Type for Address object for users and buisnesses used by DTOs to return the correct (and correctly formatted) data.
  */
-
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
