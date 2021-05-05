@@ -34,7 +34,7 @@ Date: 29/03/2021
               <b-col cols="0">
                 <b-icon-tags></b-icon-tags>
               </b-col>
-              <b-col cols="4"><b>Type:</b></b-col>
+              <b-col cols="4"><strong>Type:</strong></b-col>
               <b-col>{{ businessData.businessType }}</b-col>
             </b-row>
           </h6>
@@ -43,7 +43,7 @@ Date: 29/03/2021
               <b-col cols="0">
                 <b-icon-geo-alt></b-icon-geo-alt> <!-- geo-alt-->
               </b-col>
-              <b-col cols="4"><b>Address:</b></b-col>
+              <b-col cols="4"><strong>Address:</strong></b-col>
               <b-col>{{ getAddress }}</b-col>
             </b-row>
           </h6>
@@ -52,7 +52,7 @@ Date: 29/03/2021
               <b-col cols="0">
                 <b-icon-envelope></b-icon-envelope>
               </b-col>
-              <b-col cols="4"><b>Email:</b></b-col>
+              <b-col cols="4"><strong>Email:</strong></b-col>
               <b-col>{{ businessData.email }}</b-col>
             </b-row>
           </h6>
@@ -61,7 +61,7 @@ Date: 29/03/2021
               <b-col cols="0">
                 <b-icon-phone-vibrate></b-icon-phone-vibrate>
               </b-col>
-              <b-col cols="4"><b>Phone Number:</b></b-col>
+              <b-col cols="4"><strong>Phone Number:</strong></b-col>
               <b-col>{{ businessData.phoneNumber }}</b-col>
             </b-row>
           </h6>
@@ -74,7 +74,7 @@ Date: 29/03/2021
             <h4 class="mb-1">Administrators</h4>
           </b-card-text>
           <b-row>
-            <b-col cols="12"><!--responsive sticky-header="500px"-->
+            <b-col cols="12">
 
 
               <b-table hover
@@ -309,13 +309,8 @@ export default {
       } else if (this.businessData.primaryAdministratorId === this.$currentUser.id) {
         //User is primary admin of business
         return true;
-      } else if (this.$currentUser.role === "globalApplicationAdmin"
-          || this.$currentUser.role === "defaultGlobalApplicationAdmin") {
-        //User is DGAA or GAA
-        return true;
-      } else {
-        return false;
-      }
+      } else return this.$currentUser.role === "globalApplicationAdmin"
+          || this.$currentUser.role === "defaultGlobalApplicationAdmin";
     },
 
     /**

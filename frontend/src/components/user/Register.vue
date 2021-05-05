@@ -16,42 +16,42 @@ Date: 3/3/2021
       >
         <b-form-group
         >
-          <b>First Name *</b>
+          <strong>First Name *</strong>
           <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Last Name *</b>
+          <strong>Last Name *</strong>
           <b-form-input v-model="lastName" required placeholder="Last Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Middle Name</b>
+          <strong>Middle Name</strong>
           <b-form-input v-model="middleName" placeholder="Middle Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Nickname</b>
+          <strong>Nickname</strong>
           <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Bio</b>
+          <strong>Bio</strong>
           <b-form-textarea v-model="bio" placeholder="Enter your Bio"></b-form-textarea>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Email *</b>
+          <strong>Email *</strong>
           <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
         </b-form-group>
 
         <b-form-group>
-          <b>Password *</b>
+          <strong>Password *</strong>
           <div class="input-group mb-2 mr-sm-2">
             <b-form-input v-bind:type="passwordType" required
                           v-model=password
@@ -68,7 +68,7 @@ Date: 3/3/2021
         </b-form-group>
 
         <b-form-group>
-          <b>Confirm Password *</b>
+          <strong>Confirm Password *</strong>
           <div class="input-group mb-2 mr-sm-2">
             <b-form-input v-bind:type="confirmPasswordType" required
                           v-model=confirmPassword
@@ -87,13 +87,13 @@ Date: 3/3/2021
 
         <b-form-group
         >
-          <b>Home Address *</b>
+          <strong>Home Address *</strong>
           <address-input v-model="homeAddress"/>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Date of Birth *</b>
+          <strong>Date of Birth *</strong>
           <div>Note: you must be at least 13 years old to register</div>
           <b-form-input type="date" v-model="dateOfBirth" required
                         id="dateOfBirthInput"
@@ -105,7 +105,7 @@ Date: 3/3/2021
 
         <b-form-group
         >
-          <b>Phone Number</b>
+          <strong>Phone Number</strong>
           <b-form-input v-model="phoneNumber"
                         placeholder="Phone Number"
                         autocomplete="off"

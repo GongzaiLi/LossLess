@@ -27,7 +27,7 @@ Date: 15/4/2021
         :current-page="currentPage"
         :busy="tableLoading"
         ref="productCatalogueTable"
-      > <!--stacked="sm" table-class="text-nowrap"-->
+      >
 
         <template v-slot:cell(actions)="products">
           <b-button id="edit-button" @click="openEditProductCard(products.item)" size="sm">
@@ -69,7 +69,7 @@ Date: 15/4/2021
       <b-card-title>
         <b-icon-lock/> Can't edit product catalogue
       </b-card-title>
-      <h6 v-if="businessNameIfAdminOfThisBusiness"><b>You're an administrator of this business. To edit this catalogue, you must be acting as this business.</b>
+      <h6 v-if="businessNameIfAdminOfThisBusiness"><strong>You're an administrator of this business. To edit this catalogue, you must be acting as this business.</strong>
         <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business ('{{businessNameIfAdminOfThisBusiness}}') from the drop-down menu.</h6>
       <h6 v-else> You are not an administrator of this business. If you need to edit this catalogue, contact the administrators of the business. <br>
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>

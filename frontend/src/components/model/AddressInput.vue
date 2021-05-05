@@ -9,7 +9,7 @@ Date: sprint_1
       <b-form-group>
 
         <b-row>
-          <b-col><b>Street Address *</b></b-col>
+          <b-col><strong>Street Address *</strong></b-col>
         </b-row>
 
         <b-row>
@@ -58,8 +58,8 @@ Date: sprint_1
 
       <b-form-group>
         <b-row>
-          <b-col><b>City *</b></b-col>
-          <b-col><b>Region</b></b-col>
+          <b-col><strong>City *</strong></b-col>
+          <b-col><strong>Region</strong></b-col>
         </b-row>
         <b-row>
           <b-col>
@@ -82,8 +82,8 @@ Date: sprint_1
 
       <b-form-group>
         <b-row>
-          <b-col><b>Country *</b></b-col>
-          <b-col><b>Postcode *</b></b-col>
+          <b-col><strong>Country *</strong></b-col>
+          <b-col><strong>Postcode *</strong></b-col>
         </b-row>
         <b-row>
           <b-col md="6">
