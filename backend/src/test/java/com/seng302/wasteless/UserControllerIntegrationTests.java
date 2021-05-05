@@ -238,7 +238,7 @@ public class UserControllerIntegrationTests {
 
 
     @Test
-    public void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRoleAndAddress() throws Exception {
+    void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRoleAndAddress() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
@@ -255,7 +255,7 @@ public class UserControllerIntegrationTests {
         }
 
     @Test
-    public void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRoleAndAddress() throws Exception {
+    void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRoleAndAddress() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
@@ -272,7 +272,7 @@ public class UserControllerIntegrationTests {
 
     @Test
     @WithMockCustomUser(email = "test@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
-    public void whenGetUserWithIdOne_andAdminLoggedIn_andAdminLoggedIn_BesidedDefault_ThenGetCorrectUserRole() throws Exception {
+    void whenGetUserWithIdOne_andAdminLoggedIn_andAdminLoggedIn_BesidedDefault_ThenGetCorrectUserRole() throws Exception {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")

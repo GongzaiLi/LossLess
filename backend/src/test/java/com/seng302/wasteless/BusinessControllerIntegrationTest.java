@@ -138,7 +138,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenGetRequestToBusinessAndMultipleBusinessExists_andNonAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
+    void whenGetRequestToBusinessAndMultipleBusinessExists_andNonAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
         createOneBusiness("Business", address1, "Accommodation and Food Services", "I am a business");
         createOneBusiness("Business2", address1, "Non-profit organisation", "I am a business 2");
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
@@ -155,7 +155,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
-    public void whenGetRequestToBusinessAndMultipleBusinessExists_andApplicationAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
+    void whenGetRequestToBusinessAndMultipleBusinessExists_andApplicationAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
         createOneBusiness("Business", address1, "Accommodation and Food Services", "I am a business");
         createOneBusiness("Business2", address1, "Non-profit organisation", "I am a business 2");
 
@@ -171,7 +171,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenGetRequestToBusinessAndMultipleBusinessExists_andBusinessAdminUserLoggedIn_thenCorrectBusiness() throws Exception {
+    void whenGetRequestToBusinessAndMultipleBusinessExists_andBusinessAdminUserLoggedIn_thenCorrectBusiness() throws Exception {
         createOneBusiness("Business", address1, "Accommodation and Food Services", "I am a business");
         createOneBusiness("Business2", address1, "Non-profit organisation", "I am a business 2");
 
@@ -322,7 +322,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPostRequestToBusinessProducts_AndProductCodeInvalid_then400Response() throws Exception {
+    void whenPostRequestToBusinessProducts_AndProductCodeInvalid_then400Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -819,7 +819,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
 
         User user = new User();
         user.setEmail("jabob@gmail.com");
@@ -858,7 +858,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_thenUserActuallyUpdated() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andValidRequest_thenUserActuallyUpdated() throws Exception {
 
         User user = new User();
         user.setEmail("jabob@gmail.com");
@@ -903,7 +903,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessMakeAdmin_andInvalidRequestBecauseUserAlreadyAdmin_then400Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andInvalidRequestBecauseUserAlreadyAdmin_then400Response() throws Exception {
 
 
         User user = new User();
@@ -943,7 +943,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessRevokeAdmin_andValidRequest_then200Response() throws Exception {
+    void whenPutRequestToBusinessRevokeAdmin_andValidRequest_then200Response() throws Exception {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
@@ -985,7 +985,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessRevokeAdmin_andValidRequest_thenBusinessIsUpdated() throws Exception {
+    void whenPutRequestToBusinessRevokeAdmin_andValidRequest_thenBusinessIsUpdated() throws Exception {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
@@ -1028,7 +1028,7 @@ public class BusinessControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessRevokeAdmin_andUserIsNotAdmin_then403Request() throws Exception {
+    void whenPutRequestToBusinessRevokeAdmin_andUserIsNotAdmin_then403Request() throws Exception {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");

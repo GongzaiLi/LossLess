@@ -53,7 +53,7 @@ public class UserControllerUnitTest {
     }
 
     @Test
-    public void whenPostRequestToUsers_AndEmailWithoutATSymbol_thenBadResponse() throws Exception {
+    void whenPostRequestToUsers_AndEmailWithoutATSymbol_thenBadResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -69,7 +69,7 @@ public class UserControllerUnitTest {
     }
 
     @Test
-    public void whenPostRequestToUsers_AndEmailWithATSymbolAtTheEnd_thenBadResponse() throws Exception {
+    void whenPostRequestToUsers_AndEmailWithATSymbolAtTheEnd_thenBadResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1@\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -85,7 +85,7 @@ public class UserControllerUnitTest {
     }
 
     @Test
-    public void whenPostRequestToUsers_AndEmailWithATSymbolAtTheStart_thenBadResponse() throws Exception {
+    void whenPostRequestToUsers_AndEmailWithATSymbolAtTheStart_thenBadResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"@1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -226,7 +226,7 @@ public class UserControllerUnitTest {
     }
 
     @Test
-    public void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthUnderThirteen_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthUnderThirteen_thenCorrectResponse() throws Exception {
         LocalDate today = LocalDate.now();
         String minimumDOB = today.minusYears(12).toString();
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
@@ -243,7 +243,7 @@ public class UserControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
     @Test
-    public void whenPostRequestToUsersAndUserValidOnBirthday() throws Exception {
+    void whenPostRequestToUsersAndUserValidOnBirthday() throws Exception {
         LocalDate today = LocalDate.now();
         String minimumDOB = today.minusYears(13).toString();
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
