@@ -80,7 +80,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user3@700")
-    public void whenPostRequestToBusiness_andUserUnder16_then400Response() throws Exception {
+    void whenPostRequestToBusiness_andUserUnder16_then400Response() throws Exception {
 
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -147,7 +147,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
@@ -158,7 +158,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user2@700")
-    public void whenPutRequestToBusinessMakeAdmin_andUserNotAllowedToMakeRequest_then403Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andUserNotAllowedToMakeRequest_then403Response() throws Exception {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
@@ -170,7 +170,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPutRequestToBusinessMakeAdmin_andBusinessDoesntExist_then406Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andBusinessDoesntExist_then406Response() throws Exception {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/3/makeAdministrator")
@@ -182,7 +182,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("admin@700")
-    public void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseGlobalApplicationAdmin_then200Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseGlobalApplicationAdmin_then200Response() throws Exception {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
@@ -193,7 +193,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("defaultadmin@700")
-    public void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseDefaultGlobalApplicationAdmin_then200Response() throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseDefaultGlobalApplicationAdmin_then200Response() throws Exception {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
