@@ -1,6 +1,9 @@
 <template>
   <b-card border-variant="secondary" header-border-variant="secondary">
-      <h1>{{userData.firstName + "'s Home Page"}}</h1>
+    <h1>{{ userData.firstName + "'s Home Page" }}</h1>
+    <router-link :to="{ name: 'user-profile', params: { id: this.$currentUser.id }}">
+      <h4>My profile page</h4>
+    </router-link>
   </b-card>
 </template>
 
@@ -39,14 +42,14 @@ export default {
      */
     getUserInfo: function (id) {
       api
-          .getUser(id)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.userData = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
+        .getUser(id)
+        .then((response) => {
+          this.$log.debug("Data loaded: ", response.data);
+          this.userData = response.data;
+        })
+        .catch((error) => {
+          this.$log.debug(error);
+        })
     }
   }
 }
