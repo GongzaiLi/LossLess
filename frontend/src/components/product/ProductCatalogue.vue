@@ -152,7 +152,9 @@ export default {
 
         this.items = productsResponse.data;
         this.tableLoading = false;
-        this.currency = currency;
+        if(currency != null){
+          this.currency = currency;
+        }
       } catch(error) {
         this.$log.debug(error);
       }
