@@ -29,7 +29,7 @@ Date: sprint_1
 
 
           <div v-if="!isActingAsUser">
-            <hr style="margin-top: 0.5em; margin-bottom: 0;">
+            <hr style="margin-top: 0; margin-bottom: 0;">
             <sub style="padding-left:2em;">User Accounts</sub>
             <b-dropdown-item
                 style="margin-top: 0.1em"
@@ -37,22 +37,23 @@ Date: sprint_1
                 class="user-name-drop-down">
               {{$currentUser.firstName}}
             </b-dropdown-item>
+            <hr style="margin-top: 0.5em; margin-bottom: 0;">
           </div>
 
           <div v-if="businessesInDropDown.length > 0" style="margin-bottom: 0.1em">
-            <hr style="margin-top: 0.5em; margin-bottom: 0;">
+            <hr v-if="isActingAsUser" style="margin-top: 0; margin-bottom: 0;" >
             <sub style="margin-left:2em">Business Accounts</sub>
+
+            <b-dropdown-item
+                v-for="business in businessesInDropDown"
+                v-bind:key="business.id"
+                @click="actAsBusiness(business)"
+                class="business-name-drop-down">
+              {{business.name}}
+            </b-dropdown-item>
+
+            <hr style="margin-top: 0.5em; margin-bottom: 0.5em;">
           </div>
-
-          <b-dropdown-item
-              v-for="business in businessesInDropDown"
-              v-bind:key="business.id"
-              @click="actAsBusiness(business)"
-              class="business-name-drop-down">
-            {{business.name}}
-          </b-dropdown-item>
-
-          <hr v-if="businessesInDropDown.length > 0" style="margin-top: 0.5em; margin-bottom: 0.5em;">
 
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
