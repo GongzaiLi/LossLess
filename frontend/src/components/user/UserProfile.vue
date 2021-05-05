@@ -69,7 +69,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.nickName }}</b-col>
               </b-row>
             </h6>
-            <h6>
+            <h6 v-show="viewable">
               <b-row>
                 <b-col cols="0">
                   <b-icon-calendar-event-fill></b-icon-calendar-event-fill>
@@ -87,7 +87,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.email }}</b-col>
               </b-row>
             </h6>
-            <h6 v-show="userData.phoneNumber && checkRole">
+            <h6 v-show="userData.phoneNumber && viewable">
               <b-row>
                 <b-col cols="0">
                   <b-icon-telephone-fill></b-icon-telephone-fill>
@@ -96,7 +96,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.phoneNumber }}</b-col>
               </b-row>
             </h6>
-            <h6 v-show="checkRole">
+            <h6 v-show="viewable">
               <b-row>
                 <b-col cols="0">
                   <b-icon-house-fill></b-icon-house-fill>
@@ -197,6 +197,7 @@ export default {
   mounted() {
     const userId = this.$route.params.id;
     this.launchPage(userId);
+
   },
 
   methods: {
@@ -220,6 +221,7 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
+          console.log(response.data);
           this.userFound = true;
           this.loading = false;
         })
@@ -339,9 +341,9 @@ export default {
     },
 
     /**
-     * checkRole is user is legal to view other's user information
+     * viewable is user is legal to view other's user information
      **/
-    checkRole: function () {
+    viewable: function () {
       return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.id === this.userData.id
         || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     }

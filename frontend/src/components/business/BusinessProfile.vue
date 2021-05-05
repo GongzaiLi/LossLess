@@ -106,7 +106,7 @@ Date: 29/03/2021
           </b-row>
           <br>
           <h6 class="font-weight-bold">Assign a New Administrator:</h6>
-          <b-button @click="showMakeAdminModal()">Add Amin</b-button>
+          <b-button @click="showMakeAdminModal()">Add Admin</b-button>
         </b-list-group-item>
       </b-list-group>
     </b-card>
@@ -309,13 +309,8 @@ export default {
       } else if (this.businessData.primaryAdministratorId === this.$currentUser.id) {
         //User is primary admin of business
         return true;
-      } else if (this.$currentUser.role === "globalApplicationAdmin"
-          || this.$currentUser.role === "defaultGlobalApplicationAdmin") {
-        //User is DGAA or GAA
-        return true;
-      } else {
-        return false;
-      }
+      } else return this.$currentUser.role === "globalApplicationAdmin"
+          || this.$currentUser.role === "defaultGlobalApplicationAdmin";
     },
 
     /**

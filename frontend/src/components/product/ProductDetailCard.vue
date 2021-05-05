@@ -13,7 +13,8 @@ Date: 19/4/2021
     >
     <b-card-body>
         <h6><b>ID*:</b></h6>
-        This will be automatically changed into the correct format.
+        <p v-bind:hidden=disabled style="margin:0">Ensure there are no special characters (e.g. "/","?").
+          <br>This will be automatically changed into the correct format.</p>
         <b-input-group class="mb-1">
           <b-form-input type="text" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
         </b-input-group>
@@ -39,7 +40,7 @@ Date: 19/4/2021
           <template #prepend>
             <b-input-group-text >{{currency.symbol}}</b-input-group-text>
           </template>
-          <b-form-input type="number" v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
+          <b-form-input type="number" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
           <template #append>
             <b-input-group-text >{{currency.code}}</b-input-group-text>
           </template>
