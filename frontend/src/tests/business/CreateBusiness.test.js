@@ -1,5 +1,5 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
-import {BootstrapVue} from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import CreateBusiness from '../../components/business/CreateBusiness';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
@@ -18,6 +18,7 @@ config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
+localVue.use(BootstrapVueIcons);
 localVue.use(VueRouter);
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings

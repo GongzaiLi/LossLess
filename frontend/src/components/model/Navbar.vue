@@ -64,7 +64,7 @@ Date: sprint_1
 </template>
 
 <script>
-import {setCurrentlyActingAs} from '@/auth'
+import {setCurrentlyActingAs} from '../../auth'
 import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
