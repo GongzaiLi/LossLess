@@ -39,7 +39,7 @@ let businessActingAsId = businessActingAs ? businessActingAs.id : null;
 
 const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 1000,
+  timeout: 5000,
   headers: {'X-Business-Acting-As': businessActingAsId}
 });
 
