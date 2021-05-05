@@ -66,7 +66,7 @@ public class User {
     private String phoneNumber;
 
     @JsonView({UserViews.PostUserRequestView.class})
-    @NotNull
+    @NotNull(message = "homeAddress is mandatory")
     @OneToOne
     @JoinColumn(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private Address homeAddress;
@@ -75,9 +75,6 @@ public class User {
     @JsonView({UserViews.PostUserRequestView.class})
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     private String password;
-
-    @Column(name = "salt") // map camelcase name (java) to snake case (SQL)
-    private String salt;
 
     @Column(name = "businesses_primarily_administered")
     @ManyToMany(fetch = FetchType.EAGER)

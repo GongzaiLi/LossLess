@@ -90,6 +90,10 @@ task cucumber(type: Test) {
     description = "Runs JUnit 4 tests (cucumber tests)"
     testLogging.showStandardStreams = true
     useJUnit()
+    filter {
+        //specific test class, this can match 'SomeTest' class and corresponding method under any package
+        includeTestsMatching "com.seng302.wasteless.steps.CucumberRunnerTest"
+    }
 }
 /*
 // specify a dedicated task for Cucumber
@@ -137,4 +141,8 @@ sonarqube {
         property "sonar.host.url", "https://csse-s302g7.canterbury.ac.nz/sonarqube/"
         property "sonar.login", "ec9d1ffd23013bea8fea1ee96a8d55b0b5f441b9"
     }
+}
+
+bootRun {
+    systemProperty 'spring.profiles.active', System.properties['spring.profiles.active']
 }

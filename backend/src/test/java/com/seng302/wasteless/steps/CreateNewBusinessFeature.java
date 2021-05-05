@@ -27,13 +27,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(Cucumber.class)
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false) // Remove security
-@TestPropertySource(
-        locations = "classpath:application-integrationtest.properties"
-)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
 public class CreateNewBusinessFeature {
     private String name;
     private String description;

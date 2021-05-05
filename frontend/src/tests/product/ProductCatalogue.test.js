@@ -175,49 +175,39 @@ describe('check-product-catalogue-page', () => {
 });
 
 describe('check-setDescription-function', () => {
-  test('description-less-then-20-characters', () => {
-    const description = "Baked Beans as they";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they...');
+  test('description-less-then-10-characters', () => {
+    const description = "Baked Bean";
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Bean');
   });
 
   test('description-1-character', () => {
     const description = "B";
-    expect(wrapper.vm.setDescription(description)).toEqual('B...');
+    expect(wrapper.vm.setDescription(description)).toEqual('B');
   });
 
-  test('description-more-then-20-characters', () => {
+  test('description-more-then-10-characters', () => {
     const description = "Baked Beans as they should be. Baked Beans as they should be. Baked Beans as they should be.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they...');
-  });
-
-  test('description-less-then-20-characters-end-with-"."', () => {
-    const description = "Baked Beans.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans...');
-  });
-
-  test('description-less-then-20-characters-end-with-". "', () => {
-    const description = "Baked Beans. ";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans...');
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Bean...');
   });
 
   test('description-one-space', () => {
     const description = " ";
-    expect(wrapper.vm.setDescription(description)).toEqual('...');
+    expect(wrapper.vm.setDescription(description)).toEqual('');
   });
 
   test('description-ten-space', () => {
-    const description = "           ";
-    expect(wrapper.vm.setDescription(description)).toEqual('...');
+    const description = "          ";
+    expect(wrapper.vm.setDescription(description)).toEqual('');
   });
 
   test('description-one-character-end-with-10-space', () => {
-    const description = "a           ";
+    const description = "a          ";
     expect(wrapper.vm.setDescription(description)).toEqual('a...');
   });
 
   test('description-one-character-start-with-10-space', () => {
-    const description = "           a";
-    expect(wrapper.vm.setDescription(description)).toEqual('a...');
+    const description = "         a";
+    expect(wrapper.vm.setDescription(description)).toEqual('a');
   });
 });
 

@@ -131,7 +131,7 @@ describe('Act as business', () => {
     await wrapper.vm.$nextTick();
     expect(actAsBusiness).toHaveBeenCalledWith(100);
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(0);
-    expect(wrapper.findAll("hr").length).toEqual(1);
+    expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.find("#profile-name").text()).toEqual("Lumbridge General Store");
     expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
 

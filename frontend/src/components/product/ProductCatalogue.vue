@@ -5,14 +5,20 @@ Date: 15/4/2021
 -->
 <template>
   <div>
-    <div v-if="canEditCatalogue">
-      <h2 v-if="!tableLoading">Product Catalogue: {{businessName}}</h2>
-      <b-form-group>
-        <b-button @click="openCreateProductModal" class="float-right">
-          <b-icon-plus-square-fill animation="fade"/>
-          Create
-        </b-button>
-      </b-form-group>
+    <b-card v-if="canEditCatalogue">
+      <b-card-title v-if="!tableLoading">Product Catalogue: {{businessName}}</b-card-title>
+      <hr class='m-0'>
+      <b-row align-v="center">
+        <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
+        <b-col md="4">
+          <b-form-group>
+            <b-button @click="openCreateProductModal" class="float-right">
+              <b-icon-plus-square-fill animation="fade"/>
+              Create
+            </b-button>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-table
         striped hovers
         responsive="lg"
@@ -27,7 +33,7 @@ Date: 15/4/2021
         :current-page="currentPage"
         :busy="tableLoading"
         ref="productCatalogueTable"
-      > <!--stacked="sm" table-class="text-nowrap"-->
+      >
 
         <template v-slot:cell(actions)="products">
           <b-button id="edit-button" @click="openEditProductCard(products.item)" size="sm">
@@ -63,13 +69,13 @@ Date: 15/4/2021
         />
         <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
-    </div>
+    </b-card>
 
     <b-card id="catalogue-locked-card" v-if="!canEditCatalogue">
       <b-card-title>
         <b-icon-lock/> Can't edit product catalogue
       </b-card-title>
-      <h6 v-if="businessNameIfAdminOfThisBusiness"><b>You're an administrator of this business. To edit this catalogue, you must be acting as this business.</b>
+      <h6 v-if="businessNameIfAdminOfThisBusiness"><strong>You're an administrator of this business. To edit this catalogue, you must be acting as this business.</strong>
         <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business ('{{businessNameIfAdminOfThisBusiness}}') from the drop-down menu.</h6>
       <h6 v-else> You are not an administrator of this business. If you need to edit this catalogue, contact the administrators of the business. <br>
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
@@ -154,7 +160,9 @@ export default {
 
         this.items = productsResponse.data;
         this.tableLoading = false;
-        this.currency = currency;
+        if(currency != null){
+          this.currency = currency;
+        }
       } catch(error) {
         this.$log.debug(error);
       }
@@ -174,7 +182,11 @@ export default {
      * @return string
      */
     setDescription: function (description) {
-      const showTenWordDescription = description.slice(0, 20).trim();
+      if (description === "" || description.length <= 10) {
+        const trimmedDescription = description.trim();
+        return trimmedDescription;
+      }
+      const showTenWordDescription = description.slice(0, 10).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
     },
 

@@ -8,7 +8,8 @@ let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let userData = {
-  id: 1
+  id: 1,
+  currentlyActingAs: null,
 }
 
 jest.mock('../../Api');

@@ -15,24 +15,24 @@ Date: 26/3/2021
       >
         <b-form-group
         >
-          <b>Business name *</b>
+          <strong>Business name *</strong>
           <b-form-input v-model="name" required placeholder="Business Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
-          <b>Description</b>
+          <strong>Description</strong>
           <b-form-textarea v-model="description" placeholder="Description"></b-form-textarea>
         </b-form-group>
 
         <b-form-group>
-          <b>Business Address *</b>
+          <strong>Business Address *</strong>
           <address-input v-model="address" required/>
         </b-form-group>
 
         <b-form-group>
-          <b>Business Type *
-          </b>
+          <strong>Business Type *
+          </strong>
           <div class="input-group mb-xl-5">
 
             <select v-model="businessType" required>
@@ -88,7 +88,7 @@ Date: 26/3/2021
       </b-card-title>
       <hr>
 
-      <h4>You must be at least <b>16 years old</b> to create a business.</h4>
+      <h4>You must be at least <strong>16 years old</strong> to create a business.</h4>
     </b-card>
   </div>
 </template>

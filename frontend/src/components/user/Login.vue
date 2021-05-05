@@ -11,7 +11,7 @@ Date: 3/3/2021
         <h2>Login to Wasteless</h2>
           <b-form @submit="login">
             <b-form-group>
-              <b>Email</b>
+              <strong>Email</strong>
               <b-form-input type="email" v-model="email" required
                      autofocus
                      autocomplete="off"
@@ -19,7 +19,7 @@ Date: 3/3/2021
             </b-form-group>
 
             <b-form-group>
-              <b>Password</b>
+              <strong>Password</strong>
               <div class="input-group mb-2 mr-sm-2">
                 <b-form-input v-bind:type="passwordType" required
                               v-model=password
@@ -95,7 +95,7 @@ export default {
         .login(loginData)
         .then((response) => {
           this.$log.debug("Logged in");
-          return api.getUser(response.data.id);
+          return api.getUser(response.data.userId);
         })
         .then((userResponse) => {
           this.$currentUser = userResponse.data;
