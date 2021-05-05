@@ -33,7 +33,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class DefaultAdminCreatorService {
     private static final String CONFIG_FILE_PATH = "global-admin.properties";
     private static final Logger log = LoggerFactory.getLogger(DefaultAdminCreatorService.class);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private AtomicInteger count = new AtomicInteger(0);
 
