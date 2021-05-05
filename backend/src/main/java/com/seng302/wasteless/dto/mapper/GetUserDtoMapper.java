@@ -19,7 +19,6 @@ import java.util.List;
  * GetUserDtoMapper is used to transform the User entity into a GetUserDto object.
  * This includes getting businesses associated with the user, and the information associated with those businesses.
  */
-
 @Component
 public class GetUserDtoMapper {
 
@@ -51,7 +50,7 @@ public class GetUserDtoMapper {
 
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
                 currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-                || currentUserId == user.getId()
+                || currentUserId.equals(user.getId())
         ) {
 
             List<Business> businesses = businessService.findBusinessesByUserId(user.getId());

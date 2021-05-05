@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * Type for Administrators of businesses, used by DTOs to return the correct (and correctly formatted) data.
  */
-
 @Accessors(chain = true) //Allows chaining of getters and setters
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @ToString // generate a toString method

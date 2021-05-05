@@ -22,7 +22,6 @@ import java.util.List;
  * This includes getting users (administrators) associated with the business,
  * and the information associated with those users.
  */
-
 @Component
 public class GetBusinessesDtoMapper {
 

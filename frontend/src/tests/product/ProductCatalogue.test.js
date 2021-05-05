@@ -24,7 +24,12 @@ const $currentUser = {
   role: 'user',
   currentlyActingAs: {
     id: 0
-  }
+  },
+  businessesAdministered: [
+    {id: 0, name: "blah"},
+    {id: 1, name: "blah1"},
+    {id: 2, name: "blah2"}
+  ]
 };
 
 
@@ -170,49 +175,39 @@ describe('check-product-catalogue-page', () => {
 });
 
 describe('check-setDescription-function', () => {
-  test('description-less-then-20-characters', () => {
-    const description = "Baked Beans as they";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they...');
+  test('description-less-then-10-characters', () => {
+    const description = "Baked Bean";
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Bean');
   });
 
   test('description-1-character', () => {
     const description = "B";
-    expect(wrapper.vm.setDescription(description)).toEqual('B...');
+    expect(wrapper.vm.setDescription(description)).toEqual('B');
   });
 
-  test('description-more-then-20-characters', () => {
+  test('description-more-then-10-characters', () => {
     const description = "Baked Beans as they should be. Baked Beans as they should be. Baked Beans as they should be.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans as they...');
-  });
-
-  test('description-less-then-20-characters-end-with-"."', () => {
-    const description = "Baked Beans.";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans...');
-  });
-
-  test('description-less-then-20-characters-end-with-". "', () => {
-    const description = "Baked Beans. ";
-    expect(wrapper.vm.setDescription(description)).toEqual('Baked Beans...');
+    expect(wrapper.vm.setDescription(description)).toEqual('Baked Bean...');
   });
 
   test('description-one-space', () => {
     const description = " ";
-    expect(wrapper.vm.setDescription(description)).toEqual('...');
+    expect(wrapper.vm.setDescription(description)).toEqual('');
   });
 
   test('description-ten-space', () => {
-    const description = "           ";
-    expect(wrapper.vm.setDescription(description)).toEqual('...');
+    const description = "          ";
+    expect(wrapper.vm.setDescription(description)).toEqual('');
   });
 
   test('description-one-character-end-with-10-space', () => {
-    const description = "a           ";
+    const description = "a          ";
     expect(wrapper.vm.setDescription(description)).toEqual('a...');
   });
 
   test('description-one-character-start-with-10-space', () => {
-    const description = "           a";
-    expect(wrapper.vm.setDescription(description)).toEqual('a...');
+    const description = "         a";
+    expect(wrapper.vm.setDescription(description)).toEqual('a');
   });
 });
 
@@ -367,36 +362,68 @@ describe('Testing api put/post request and the response method with errors', () 
 
 });
 
+describe('businessNameIfAdminOfThisBusiness', () => {
+
+  it('Works if user admins business', async () => {
+    expect(wrapper.vm.businessNameIfAdminOfThisBusiness).toBe("blah");
+  });
+
+  it('Works if user not admins business', async () => {
+    wrapper.vm.$route = {
+      params: {
+        id: 3
+      }
+    }
+
+    expect(wrapper.vm.businessNameIfAdminOfThisBusiness).toBe(null);
+  });
+
+})
+
 
 describe('Testing currently acting as watcher', () => {
 
-  it('Shows modal if switch to normal user', async () => {
+  it('Does not load data if switch to normal user', async () => {
     wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', null);
 
-    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    jest.spyOn(wrapper.vm, 'getProducts');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.$bvModal.show).toBeCalled();
+    expect(wrapper.vm.getProducts).not.toBeCalled();
   });
 
-  it('Shows modal if switch to other business', async () => {
+  it('Does not load data if switch to other business', async () => {
     wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
 
-    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    jest.spyOn(wrapper.vm, 'getProducts');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.$bvModal.show).toBeCalled();
+    expect(wrapper.vm.getProducts).not.toBeCalled();
   });
 
-  it('Does not show modal if switch to other business but is admin', async () => {
+  it('Loads if switch to other business and acting as', async () => {
+    wrapper.vm.$route = {
+      params: {
+        id: 2
+      }
+    }
+    wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 2});
+
+    jest.spyOn(wrapper.vm, 'getProducts');
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getProducts).toHaveBeenCalledWith(2);
+  });
+
+
+  it('Loads data if switch to other business but is admin', async () => {
     wrapper.vm.$set(wrapper.vm.$currentUser, 'role', 'globalApplicationAdmin');
     wrapper.vm.$set(wrapper.vm.$currentUser, 'currentlyActingAs', {id: 1});
 
-    jest.spyOn(wrapper.vm.$bvModal, 'show');
+    jest.spyOn(wrapper.vm, 'getProducts');
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.$bvModal.show).not.toBeCalled();
+    expect(wrapper.vm.getProducts).toHaveBeenCalledWith(0);
   });
-
 
 });

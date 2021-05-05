@@ -33,6 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * BusinessController is used for mapping all Restful API requests starting with the address "/businesses".
+ */
 @RestController
 public class BusinessController {
     private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
@@ -149,6 +152,10 @@ public class BusinessController {
 
         User user = userService.findUserByEmail(currentPrincipalEmail);
 
+        if (!possibleProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+        }
+
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is invalid");
@@ -170,6 +177,10 @@ public class BusinessController {
 
         if (productService.findProductById(productId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
+        }
+
+        if (possibleProduct.getRecommendedRetailPrice() < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
         }
         LocalDate dateCreated = LocalDate.now();
 
@@ -254,9 +265,17 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
         }
 
+        if (!oldProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+        }
+
         String newProductId = editedProduct.createCode(businessId);
         if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
+        }
+
+        if (editedProduct.getRecommendedRetailPrice() < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
         }
 
         Product newProduct = new Product();
@@ -264,6 +283,7 @@ public class BusinessController {
         newProduct.setName(editedProduct.getName());
         newProduct.setDescription(editedProduct.getDescription());
         newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
+        newProduct.setManufacturer(editedProduct.getManufacturer());
         newProduct.setBusinessId(oldProduct.getBusinessId());
         newProduct.setCreated(oldProduct.getCreated());
 

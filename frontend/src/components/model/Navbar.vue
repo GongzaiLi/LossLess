@@ -13,23 +13,23 @@ Date: sprint_1
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/homepage">Home Page</b-nav-item>
-        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
-        <b-nav-item v-on:click="goToUserProfile">My Profile</b-nav-item>
+        <b-nav-item to="/homepage">Home Page</b-nav-item>
+        <b-nav-item v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
-            <img src="../../../public/profile-default.jpg" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
 
 
           <div v-if="!isActingAsUser">
-            <hr style="margin-top: 0.5em; margin-bottom: 0;">
+            <hr style="margin-top: 0; margin-bottom: 0;">
             <sub style="padding-left:2em;">User Accounts</sub>
             <b-dropdown-item
                 style="margin-top: 0.1em"
@@ -37,22 +37,23 @@ Date: sprint_1
                 class="user-name-drop-down">
               {{$currentUser.firstName}}
             </b-dropdown-item>
+            <hr style="margin-top: 0.5em; margin-bottom: 0;">
           </div>
 
           <div v-if="businessesInDropDown.length > 0" style="margin-bottom: 0.1em">
-            <hr style="margin-top: 0.5em; margin-bottom: 0;">
+            <hr v-if="isActingAsUser" style="margin-top: 0; margin-bottom: 0;" >
             <sub style="margin-left:2em">Business Accounts</sub>
+
+            <b-dropdown-item
+                v-for="business in businessesInDropDown"
+                v-bind:key="business.id"
+                @click="actAsBusiness(business)"
+                class="business-name-drop-down">
+              {{business.name}}
+            </b-dropdown-item>
+
+            <hr style="margin-top: 0.5em; margin-bottom: 0.5em;">
           </div>
-
-          <b-dropdown-item
-              v-for="business in businessesInDropDown"
-              v-bind:key="business.id"
-              @click="actAsBusiness(business)"
-              class="business-name-drop-down">
-            {{business.name}}
-          </b-dropdown-item>
-
-          <hr v-if="businessesInDropDown.length > 0" style="margin-top: 0.5em; margin-bottom: 0.5em;">
 
           <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
         </b-nav-item-dropdown>
@@ -61,12 +62,6 @@ Date: sprint_1
     </b-collapse>
   </b-navbar>
 </template>
-
-<style scoped>
-  .nav-item {
-    font-size: 1.2em;
-  }
-</style>
 
 <script>
 import {setCurrentlyActingAs} from '../../auth'
@@ -112,11 +107,18 @@ export default {
   },
   methods: {
     /**
-     * Redirects to the user's profile. Doesn't redirect if the user
+     * Redirects to the profile of the account the user is acting as.
+     * This will be the either the use profile if they are not acting as anyone,
+     * of the profile of the business they are acting as. Doesn't redirect if the user
      * is already on the profile since that throws a Vue Router error.
      */
-    goToUserProfile: function () {
-      const pathToGoTo = `/users/${this.$currentUser.id}`;
+    goToProfile: function () {
+      let pathToGoTo;
+      if (this.$currentUser.currentlyActingAs) {
+        pathToGoTo = `/businesses/${this.$currentUser.currentlyActingAs.id}`;
+      } else {
+        pathToGoTo = `/users/${this.$currentUser.id}`;
+      }
       if (this.$route.fullPath !== pathToGoTo) {
         this.$router.push({path: pathToGoTo});
       }

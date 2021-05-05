@@ -16,7 +16,7 @@ Date: 7/3/2021
       </b-col>
     </b-row>
     <b-row>
-      <b-col cols="12"><!--responsive sticky-header="500px"-->
+      <b-col cols="12">
         <b-table striped hover
          table-class="text-nowrap"
          responsive="lg"

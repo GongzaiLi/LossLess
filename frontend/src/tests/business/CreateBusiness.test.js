@@ -1,5 +1,5 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
-import {BootstrapVue} from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import CreateBusiness from '../../components/business/CreateBusiness';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
@@ -18,6 +18,7 @@ config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
+localVue.use(BootstrapVueIcons);
 localVue.use(VueRouter);
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -171,22 +172,22 @@ describe('CreateBusiness HTML testing', () => {
 
   test('Business Name label renders', () => {
     const name = "Business name *";
-    expect(wrapper.findAll("b").at(0).text()).toEqual(name);
+    expect(wrapper.findAll("strong").at(0).text()).toEqual(name);
   });
 
   test('Description label renders', () => {
     const description = "Description";
-    expect(wrapper.findAll("b").at(1).text()).toEqual(description);
+    expect(wrapper.findAll("strong").at(1).text()).toEqual(description);
   });
 
   test('Business Address label renders', () => {
     const address = "Business Address *";
-    expect(wrapper.findAll("b").at(2).text()).toEqual(address);
+    expect(wrapper.findAll("strong").at(2).text()).toEqual(address);
   });
 
   test('Business Type label renders', () => {
     const type = "Business Type *";
-    expect(wrapper.findAll("b").at(8).text()).toEqual(type);
+    expect(wrapper.findAll("strong").at(8).text()).toEqual(type);
   });
 
   test('business types in drop down has default value Choose ...', () => {

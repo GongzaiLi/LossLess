@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * Business service applies business logic over the Business JPA repository.
  */
-
 @Service
 public class BusinessService {
 

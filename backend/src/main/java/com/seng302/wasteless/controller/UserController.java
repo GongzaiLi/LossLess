@@ -36,7 +36,9 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 
-
+/**
+ * UserController is used for mapping all Restful API requests starting with the address "/users".
+ */
 @RestController
 public class UserController {
 

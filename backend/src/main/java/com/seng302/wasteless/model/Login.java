@@ -5,6 +5,9 @@ import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * An implementation of Login model.
+ */
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @ToString // generate a toString method
 public class Login {

@@ -99,6 +99,12 @@ deploy-staging-backend:
   stage: deploy
   script:
     - cd backend
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.url=${DB_URL}-test" >> src/main/resources/application-staging.properties
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.username=${DB_USERNAME}" >> src/main/resources/application-staging.properties
+    - echo $'\n' >> src/main/resources/application-staging.properties
+    - echo $"spring.datasource.password=${DB_PASSWORD}" >> src/main/resources/application-staging.properties
     - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
     - echo $'\n' >> src/main/resources/global-admin.properties
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
@@ -144,6 +150,12 @@ deploy-production-backend:
   stage: deploy
   script:
     - cd backend
+    - echo $'\n' >> src/main/resources/application-prod.properties
+    - echo $"spring.datasource.url=${DB_URL}-prod" >> src/main/resources/application-prod.properties
+    - echo $'\n' >> src/main/resources/application-prod.properties
+    - echo $"spring.datasource.username=${DB_USERNAME}" >> src/main/resources/application-prod.properties
+    - echo $'\n' >> src/main/resources/application-prod.properties
+    - echo $"spring.datasource.password=${DB_PASSWORD}" >> src/main/resources/application-prod.properties
     - echo $'check-default-admin-period-ms=60000' > src/main/resources/global-admin.properties
     - echo $'\n' >> src/main/resources/global-admin.properties
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties

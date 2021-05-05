@@ -4,16 +4,21 @@ Author: Gongzai Li，Arish Abalos
 Date: 15/4/2021
 -->
 <template>
-
   <div>
-    <h2>Product Catalogue: {{businessName}}</h2>
-    <div>
-      <b-form-group>
-        <b-button @click="openCreateProductModal" class="float-right">
-          <b-icon-plus-square-fill animation="fade"/>
-          Create
-        </b-button>
-      </b-form-group>
+    <b-card v-if="canEditCatalogue">
+      <b-card-title v-if="!tableLoading">Product Catalogue: {{businessName}}</b-card-title>
+      <hr class='m-0'>
+      <b-row align-v="center">
+        <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
+        <b-col md="4">
+          <b-form-group>
+            <b-button @click="openCreateProductModal" class="float-right">
+              <b-icon-plus-square-fill animation="fade"/>
+              Create
+            </b-button>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-table
         striped hovers
         responsive="lg"
@@ -28,7 +33,7 @@ Date: 15/4/2021
         :current-page="currentPage"
         :busy="tableLoading"
         ref="productCatalogueTable"
-      > <!--stacked="sm" table-class="text-nowrap"-->
+      >
 
         <template v-slot:cell(actions)="products">
           <b-button id="edit-button" @click="openEditProductCard(products.item)" size="sm">
@@ -62,16 +67,19 @@ Date: 15/4/2021
                              :okAction="productCardAction"
                              :cancelAction="closeProductCardModal"
         />
-        <b-alert :show="productCardError.length > 0 ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
+        <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
+    </b-card>
 
-      <b-modal id="changed-acting-as-modal" title="Account Changed"
-               ok-only canno-close-on-backdrop no-close-on-esc hide-header-close
-               @ok="goToHomePage"
-      >
-        <h6> <b>You have selected another account to act as.</b> <br> As you can only edit this page while you are acting as this business, you will be redirected to this business's home page.</h6>
-      </b-modal>
-    </div>
+    <b-card id="catalogue-locked-card" v-if="!canEditCatalogue">
+      <b-card-title>
+        <b-icon-lock/> Can't edit product catalogue
+      </b-card-title>
+      <h6 v-if="businessNameIfAdminOfThisBusiness"><strong>You're an administrator of this business. To edit this catalogue, you must be acting as this business.</strong>
+        <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business ('{{businessNameIfAdminOfThisBusiness}}') from the drop-down menu.</h6>
+      <h6 v-else> You are not an administrator of this business. If you need to edit this catalogue, contact the administrators of the business. <br>
+      Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
+    </b-card>
   </div>
 
 
@@ -138,7 +146,7 @@ export default {
     getProducts: async function (businessId) {
       // We need to make 3 asynchronous requests: Get all business products,
       // get the current business's address, and get the currency using that address.
-
+      this.tableLoading = true;
       const getProductsPromise = api.getProducts(businessId);  // Promise for getting products
       const getCurrencyPromise = // Promise for getting the company address, and then the currency data
           api.getBusiness(businessId)
@@ -174,7 +182,11 @@ export default {
      * @return string
      */
     setDescription: function (description) {
-      const showTenWordDescription = description.slice(0, 20).trim();
+      if (description === "" || description.length <= 10) {
+        const trimmedDescription = description.trim();
+        return trimmedDescription;
+      }
+      const showTenWordDescription = description.slice(0, 10).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
     },
 
@@ -304,18 +316,9 @@ export default {
      * new/edited data
      */
     refreshProducts: function () {
-      this.createProductError = "";
-      this.modifyProductError = "";
+      this.productCardError = "";
       this.getProducts(this.$route.params.id);
     },
-    /**
-     * Redirects to the home page of the current business (used when the user switches who they are acting as)
-     */
-    goToHomePage: function () {
-      // There is a route guard in the router module that does this redirect when they are in this route,
-      // so we only need to refresh the page to trigger the guard
-      this.$router.go();
-    }
   },
 
   computed: {
@@ -378,20 +381,52 @@ export default {
     totalItems: function () {
       return this.items.length;
     },
+
+    /**
+     * True if the user can edit this catalogue (ie they are an admin or acting as this business)
+     */
+    canEditCatalogue: function() {
+      return this.$currentUser.role !== 'user' ||
+          (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
+    },
+
+    /**
+     * Returns the name of the business if the user is an admin of this business, otherwise returns null
+     */
+    businessNameIfAdminOfThisBusiness: function() {
+      for (const business of this.$currentUser.businessesAdministered) {
+        if (business.id === parseInt(this.$route.params.id)) {
+          return business.name;
+        }
+      }
+      return null;
+    }
   },
 
   watch: {
     /**
      * Watches the current user data (specifically, who the user is acting as). If this changes to someone without permission
      * to access the catalogue, then a modal is shown informing them that they will be redirected to the business's home page.
-     */
+    */
     $currentUser: {
-      handler(val){
-        if (val.role === 'user' && (!val.currentlyActingAs || val.currentlyActingAs.id !== parseInt(this.$route.params.id))) {
-          this.$bvModal.show('changed-acting-as-modal');
+      handler() {
+        if (this.canEditCatalogue) {
+          this.getProducts(this.$route.params.id);
         }
       },
       deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)
+    },
+    /**
+     * This watches for those routing changes, and will update the profile with the catalogue of the business specified by the new route.
+     * See https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes for more info
+     */
+    /* The argument _from is not needed, so this is to stop eslint complaining:*/
+    /* eslint no-unused-vars: ["error", { "argsIgnorePattern": "^_" }] */
+    $route(to, _from) {
+      const id = to.params.id;
+      if (this.canEditCatalogue) {
+        this.getProducts(id);
+      }
     },
   }
 }

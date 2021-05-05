@@ -3,7 +3,7 @@
   <b-card
       class="profile-card"
       style="min-width: 1100px"
-  ><!--header-border-variant="secondary" border-variant="secondary"  background-color: rgba(0,255,0,0.4);-->
+  >
 
     <b-card-text style="text-align: left">
     <h3>Assign a New Administrator</h3>
