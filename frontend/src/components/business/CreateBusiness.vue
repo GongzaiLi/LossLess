@@ -16,13 +16,13 @@ Date: 26/3/2021
         <b-form-group
         >
           <strong>Business name *</strong>
-          <b-form-input v-model="name" required placeholder="Business Name" autofocus></b-form-input>
+          <b-form-input v-model="name" required placeholder="Business Name" maxlength="50" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Description</strong>
-          <b-form-textarea v-model="description" placeholder="Description"></b-form-textarea>
+          <b-form-textarea v-model="description" placeholder="Description" maxlength="250"></b-form-textarea>
         </b-form-group>
 
         <b-form-group>
