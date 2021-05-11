@@ -7,6 +7,7 @@ Restart=always
 RestartSec=10
 User=gitlab-runner
 WorkingDirectory=/home/gitlab-runner
+EnvironmentFile=/etc/onlyfoods/backend-prod.conf
 ExecStart=/usr/bin/bash production-backend.sh
 
 [Install]
