@@ -1,0 +1,25 @@
+Check Inputs:
+Product ID:
+    there is a label
+    is required
+    has a star next to label to indicate it is required.
+    has a description indicating valid inputs
+    ensure you cannot enter too many characters. eg more than 50
+    notification if the product id already exists after attempted submitting
+Name:
+    there is a label
+    is required
+    has a star next to label to indicate it is required.
+    ensure you cannot enter too many characters. eg more than 50
+Manufacturer:
+    there is a label
+    is not required
+    ensure you cannot enter too many characters. eg more than 50
+Recommended Retail Price:
+    there is a label
+    can only enter numbers
+    can enter up to 2 decimal places.
+    correct currency is shown for user.
+
+Description:
+    ensure you cannot enter too many characters. eg more than 250
