@@ -100,9 +100,9 @@ deploy-staging-backend:
   stage: deploy
   script:
     - cd backend
-    - echo $"DB_URL=${DB_URL}" > /etc/onlyfoods/backend-staging.conf
-    - echo $"DB_USERNAME=${DB_USERNAME}" >> /etc/onlyfoods/backend-staging.conf
-    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> /etc/onlyfoods/backend-staging.conf
+    - echo $"DB_URL=${DB_URL}" > etc/onlyfoods/backend-staging.conf
+    - echo $"DB_USERNAME=${DB_USERNAME}" >> etc/onlyfoods/backend-staging.conf
+    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> etc/onlyfoods/backend-staging.conf
     - echo $"check-default-admin-period-ms=60000" > src/main/resources/global-admin.properties
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
     - echo $"default-admin-password=${DGAA_PASSWORD}" >> src/main/resources/global-admin.properties
@@ -146,9 +146,9 @@ deploy-production-backend:
   stage: deploy
   script:
     - cd backend
-    - echo $"DB_URL=${DB_URL}" > /etc/onlyfoods/backend-prod.conf
-    - echo $"DB_USERNAME=${DB_USERNAME}" >> /etc/onlyfoods/backend-prod.conf
-    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> /etc/onlyfoods/backend-prod.conf
+    - echo $"DB_URL=${DB_URL}" > etc/onlyfoods/backend-prod.conf
+    - echo $"DB_USERNAME=${DB_USERNAME}" >> etc/onlyfoods/backend-prod.conf
+    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> etc/onlyfoods/backend-prod.conf
     - echo $"check-default-admin-period-ms=60000" > src/main/resources/global-admin.properties
     - echo $"default-admin-username=${DGAA_EMAIL}" >> src/main/resources/global-admin.properties
     - echo $"default-admin-password=${DGAA_PASSWORD}" >> src/main/resources/global-admin.properties
