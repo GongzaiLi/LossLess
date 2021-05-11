@@ -22,4 +22,13 @@ Recommended Retail Price:
     correct currency is shown for user.
 
 Description:
+    there is a label
+    is not required
     ensure you cannot enter too many characters. eg more than 250
+
+Cancel Button:
+    Exits out of card back to product catalogue without making any changes
+
+OK Button:
+    Creates product if it meets all the other criteria
+    refreshes product catalogue with changes made
