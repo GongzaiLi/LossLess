@@ -17,7 +17,22 @@ Date: sprint_1
         <b-nav-item v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item to="/businesses/">Create Business</b-nav-item>
-        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
+        <b-nav-item-dropdown
+            v-if="$currentUser.currentlyActingAs"
+            id="business-link-dropdown"
+            text="Management"
+            toggle-class="nav-link-custom"
+        >
+          <b-dropdown-item :to="businessProductRouteLink">
+            <b-icon-newspaper/> Product Catalogue
+          </b-dropdown-item>
+          <b-dropdown-item :to="businessInventoryRouteLink">
+            <b-icon-box-seam/> Inventory
+          </b-dropdown-item>
+          <b-dropdown-item disabled> <!-- Disabled as there is no Sales List page -->
+            <b-icon-cart/> Sales List
+          </b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
@@ -98,11 +113,19 @@ export default {
           (business) => (this.isActingAsUser || business.id !== this.$currentUser.currentlyActingAs.id)
       );
     },
+
     /**
      * Returns a string constructed to go to the product page url
      */
-    businessRouteLink: function() {
+    businessProductRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/products";
+    },
+
+    /**
+     * Returns a string constructed to go to the inventory page
+     */
+    businessInventoryRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/inventory"
     }
   },
   methods: {
