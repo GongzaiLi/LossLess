@@ -110,9 +110,10 @@ deploy-staging-backend:
     - cp -r ./build/libs /home/gitlab-runner/staging-backend
     - cp ../runner/staging-backend.sh /home/gitlab-runner/staging-backend.sh
     - chmod u+x /home/gitlab-runner/staging-backend.sh
-    - echo $"DB_URL=${DB_URL}" > home/gitlab-runner/staging-backend/backend-staging.conf
-    - echo $"DB_USERNAME=${DB_USERNAME}" >> home/gitlab-runner/staging-backend/backend-staging.conf
-    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> home/gitlab-runner/staging-backend/backend-staging.conf
+    - touch /home/gitlab-runner/staging-backend/backend-staging.conf
+    - echo $"DB_URL=${DB_URL}" > /home/gitlab-runner/staging-backend/backend-staging.conf
+    - echo $"DB_USERNAME=${DB_USERNAME}" >> /home/gitlab-runner/staging-backend/backend-staging.conf
+    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/staging-backend/backend-staging.conf
     - sudo systemctl restart seng302-staging-backend
   artifacts:
     paths:
@@ -156,9 +157,10 @@ deploy-production-backend:
     - cp -r ./build/libs /home/gitlab-runner/production-backend
     - cp ../runner/production-backend.sh /home/gitlab-runner/production-backend.sh
     - chmod u+x /home/gitlab-runner/production-backend.sh
-    - echo $"DB_URL=${DB_URL}" > etc/onlyfoods/backend-prod.conf
-    - echo $"DB_USERNAME=${DB_USERNAME}" >> etc/onlyfoods/backend-prod.conf
-    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> etc/onlyfoods/backend-prod.conf
+    - touch /home/gitlab-runner/production-backend/backend-prod.conf
+    - echo $"DB_URL=${DB_URL}" > /home/gitlab-runner/production-backend/backend-prod.conf
+    - echo $"DB_USERNAME=${DB_USERNAME}" >> /home/gitlab-runner/production-backend/backend-prod.conf
+    - echo $"DB_PASSWORD=${DB_PASSWORD}" >> /home/gitlab-runner/production-backend/backend-prod.conf
     - sudo systemctl restart seng302-production-backend
   artifacts:
     paths:
