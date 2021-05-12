@@ -20,7 +20,7 @@ Date: sprint_1
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
             id="business-link-dropdown"
-            text="Management"
+            text="Product Management"
             toggle-class="nav-link-custom"
         >
           <b-dropdown-item :to="businessProductRouteLink">
@@ -30,7 +30,7 @@ Date: sprint_1
             <b-icon-box-seam/> Inventory
           </b-dropdown-item>
           <b-dropdown-item disabled> <!-- Disabled as there is no Sales List page -->
-            <b-icon-cart/> Sales List
+            <b-icon-receipt/> Sales List
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
