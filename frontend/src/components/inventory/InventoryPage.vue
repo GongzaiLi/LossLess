@@ -9,7 +9,7 @@ Date: 11/5/2021
       <hr class='m-0'>
     </b-card>
 
-    <b-card id="catalogue-locked-card" v-if="!canEditInventory">
+    <b-card id="inventory-locked-card" v-if="!canEditInventory">
       <b-card-title>
         <b-icon-lock/> Can't edit inventory page
       </b-card-title>
