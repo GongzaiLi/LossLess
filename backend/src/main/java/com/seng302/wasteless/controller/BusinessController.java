@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * BusinessController is used for mapping all Restful API requests starting with the address "/businesses".
+ * BusinessController is used for mapping all Restful API requests related directly to businesses
  */
 @RestController
 public class BusinessController {

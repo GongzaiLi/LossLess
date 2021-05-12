@@ -1,11 +1,14 @@
 package com.seng302.wasteless.controller;
 
 
+import com.seng302.wasteless.dto.PostInventoryDto;
+import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
+import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +20,12 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * BusinessController is used for mapping all Restful API requests starting with the address "/businesses".
+ * InventoryController is used for mapping all Restful API requests starting with the address "/businesses".
  */
 @RestController
 public class InventoryController {
@@ -31,20 +33,85 @@ public class InventoryController {
 
     private final BusinessService businessService;
     private final UserService userService;
-    //private final InventoryService inventoryService;
-
-    private final ProductService inventoryService;    //Change to InventoryService
+    private final InventoryService inventoryService;
+    private final ProductService productService;
 
     @Autowired
-    public InventoryController(BusinessService businessService, UserService userService, ProductService productService) {
+    public InventoryController(BusinessService businessService, UserService userService, ProductService productService, InventoryService inventoryService) {
         this.businessService = businessService;
         this.userService = userService;
-//        this.inventoryService = inventoryService;
-
-        this.inventoryService = productService;    //Needs inventory service
-
+        this.inventoryService = inventoryService;
+        this.productService = productService;
 
     }
+
+    /**
+     * Handle POST request to /businesses/{id}/inventory endpoint for creating new inventory item for business
+     *
+     * Checks business with id from path exists
+     * Checks user making request exists, and has privileges (admin of business, or (D)GAA)
+     * Checks product with id exists
+     * Other validation of inventory handled by the inventory entity class
+     *
+     *
+     * @param businessId    The id of the business to create inventory item for
+     * @param inventoryDtoRequest     Dto containing information needed to create an inventory product
+     * @return Error code detailing error or 201 create with inventoryItemId
+     */
+    @PostMapping("/businesses/{id}/inventory")
+    public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, PostInventoryDto inventoryDtoRequest) {
+        logger.debug("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User user = userService.findUserByEmail(currentPrincipalEmail);
+
+        if (user == null) {
+            logger.warn("Error, no logged in user making request to post inventory endpoint: {}", currentPrincipalEmail);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    "Access token is invalid");
+        }
+        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+
+        logger.debug("Retrieving business with id: {}", businessId);
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+
+        if (possibleBusiness == null) {
+            logger.warn("Cannot create INVENTORY product. Business ID: {} does not exist.", businessId);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+        }
+        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+
+        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+            logger.warn("Cannot create INVENTORY product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+        }
+        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+
+
+        logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", inventoryDtoRequest.getProductId(), businessId);
+        Product possibleProduct = productService.findProductById(inventoryDtoRequest.getProductId());
+
+        if (possibleProduct == null) {
+            logger.warn("Cannot create inventory item for product that does not exist");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Product with given id does not exist");
+        }
+
+        Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
+
+        inventory = inventoryService.createInventory(inventory);
+
+        logger.info("Created new inventory item {}", inventory);
+
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("inventoryItemId", inventory.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+    }
+
+
 
     /**
      * Handle get request to /businesses/{id}/inventory endpoint for retrieving all products in a business's inventory
@@ -53,10 +120,9 @@ public class InventoryController {
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/inventory")
-    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId) {
 
         logger.debug("Request to get business INVENTORY products");
-
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalEmail = authentication.getName();
@@ -90,14 +156,12 @@ public class InventoryController {
 
 
         logger.debug("Trying to retrieve INVENTORY products for business: {}", possibleBusiness);
-        List<Product> productList = inventoryService.getAllProductsByBusinessId(businessId);
+        List<Product> productList = productService.getAllProductsByBusinessId(businessId);
 
         logger.info("INVENTORY Products retrieved: {} for business: {}", productList, possibleBusiness);
         return ResponseEntity.status(HttpStatus.OK).body(productList);
 
     }
-
-
 
 
     /**
