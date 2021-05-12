@@ -50,6 +50,7 @@ public class MainApplicationRunner implements ApplicationRunner {
    */
   @Autowired
   public MainApplicationRunner() {
+    //This constructor is implicitly called by Spring, see above Docstring
   }
 
   /**
