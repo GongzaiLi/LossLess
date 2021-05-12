@@ -66,8 +66,8 @@ Date: 29/03/2021
             </b-row>
           </h6>
 
-          <h6 v-if="$currentUser.currentlyActingAs">
-            <router-link  :to="{ name: 'product-catalogue', params: { id: $currentUser.currentlyActingAs.id }}">
+          <h6 v-if="isAdmin">
+            <router-link  :to="{ name: 'product-catalogue', params: { id: businessData.id }}">
             <b-row>
               <b-col cols="0" >
                 <b-icon-box-seam></b-icon-box-seam>
@@ -80,7 +80,7 @@ Date: 29/03/2021
         </b-container>
       </b-card-body>
 
-      <b-list-group border-variant="secondary" >
+      <b-list-group border-variant="secondary" v-if="isAdmin">
         <b-list-group-item>
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
@@ -373,6 +373,13 @@ export default {
   },
 
   computed: {
+    /**
+     * True if the user can should be able to see all business information (ie they are an admin or acting as this business)
+     */
+    isAdmin: function() {
+      return this.$currentUser.role !== 'user' ||
+          (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
+    },
 
     /**
      * the street number, street name, city, region,

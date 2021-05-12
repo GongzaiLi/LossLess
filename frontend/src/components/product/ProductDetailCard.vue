@@ -16,31 +16,31 @@ Date: 19/4/2021
         <p v-bind:hidden=disabled style="margin:0">Ensure there are no special characters (e.g. "/","?").
           <br>This will be automatically changed into the correct format.</p>
         <b-input-group class="mb-1">
-          <b-form-input type="text" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
+          <b-form-input type="text" maxlength="50" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Name*:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.name" required/>
+          <b-form-input type="text" maxlength="50" v-bind:disabled=disabled v-model="productCard.name" required/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Manufacturer:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" v-bind:disabled=disabled v-model="productCard.manufacturer"/>
+          <b-form-input type="text" maxlength="50" v-bind:disabled=disabled v-model="productCard.manufacturer"/>
         </b-input-group>
 
         <b-input-group>
-          <h6><strong>Recommended Retail Price*:</strong></h6>
+          <h6><strong>Recommended Retail Price:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
           <template #prepend>
             <b-input-group-text >{{currency.symbol}}</b-input-group-text>
           </template>
-          <b-form-input type="number" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
+          <b-form-input type="number" maxlength="15" step=".01" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
           <template #append>
             <b-input-group-text >{{currency.code}}</b-input-group-text>
           </template>
@@ -51,7 +51,7 @@ Date: 19/4/2021
             <h6><strong>Created:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-1">
-            <b-form-input type="text" disabled v-model="productCard.created"/>
+            <b-form-input type="text" maxlength="50" disabled v-model="productCard.created"/>
           </b-input-group>
         </div>
 
@@ -61,7 +61,7 @@ Date: 19/4/2021
           <h6><strong>Description:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-textarea rows="5" type="text" v-bind:disabled=disabled v-model="productCard.description"/>
+          <b-form-textarea rows="5" type="text" maxlength="255" v-bind:disabled=disabled v-model="productCard.description "/>
         </b-input-group>
     </b-card-body>
     <hr style="width:100%">
