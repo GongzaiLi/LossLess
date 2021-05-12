@@ -30,15 +30,18 @@ public class Inventory {
     private Product productId;
 
     @Positive
+    @Max(1000000000)
     @NotNull(message = "Product quantity is Mandatory")
     @Column(name = "quantity")
     private int quantity;
 
     @PositiveOrZero
+    @Max(1000000000)
     @Column(name = "price_per_item")
     private double pricePerItem;
 
     @PositiveOrZero
+    @Max(1000000000)
     @Column(name = "total_price")
     private double totalPrice;
 

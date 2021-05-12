@@ -50,7 +50,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.USER);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
@@ -84,7 +84,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.USER);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
@@ -167,7 +167,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.USER);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
@@ -201,7 +201,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
