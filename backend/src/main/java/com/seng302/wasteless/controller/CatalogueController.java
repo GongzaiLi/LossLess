@@ -240,6 +240,7 @@ public class CatalogueController {
         newProduct.setId(newProductId);
         newProduct.setName(editedProduct.getName());
         newProduct.setDescription(editedProduct.getDescription());
+        newProduct.setManufacturer(editedProduct.getManufacturer());
         newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
         newProduct.setBusinessId(oldProduct.getBusinessId());
         newProduct.setCreated(oldProduct.getCreated());
