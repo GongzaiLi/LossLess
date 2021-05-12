@@ -14,15 +14,15 @@ Date: sprint_1
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
-        <b-nav-item v-on:click="goToProfile">My Profile</b-nav-item>
+        <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
-        <b-nav-item to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
         <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
-            <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
+            <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
             <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
@@ -103,7 +103,23 @@ export default {
      */
     businessRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/products";
-    }
+    },
+    /**
+     * User friendly display string for the user role to be displayed as a badge.
+     * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
+     * a more user-friendly string to be displayed (eg. 'Site Admin').
+     * Returns empty string if they are a normal user, as they have no role worth displaying
+     */
+    userBadgeRole: function () {
+      switch (this.$currentUser.role) {
+        case 'globalApplicationAdmin':
+          return "Site Admin";
+        case 'defaultGlobalApplicationAdmin':
+          return "Default Site Admin";
+        default:
+          return "";
+      }
+    },
   },
   methods: {
     /**
@@ -130,22 +146,6 @@ export default {
     logOut() {
       this.$currentUser = null;
       this.$router.push('/login');
-    },
-    /**
-     * User friendly display string for the user role to be displayed as a badge.
-     * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
-     * a more user-friendly string to be displayed (eg. 'Site Admin').
-     * Returns empty string if they are a normal user, as they have no role worth displaying
-     */
-    getUserBadgeRole: function () {
-      switch (this.$currentUser.role) {
-        case 'globalApplicationAdmin':
-          return "Site Admin";
-        case 'defaultGlobalApplicationAdmin':
-          return "Default Site Admin";
-        default:
-          return "";
-      }
     },
     /**
      * Sets the user to act as the given business. Also sets the API
