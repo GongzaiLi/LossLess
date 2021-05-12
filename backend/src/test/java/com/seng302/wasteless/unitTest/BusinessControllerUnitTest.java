@@ -1,11 +1,10 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.unitTest;
 
 
 import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
-import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockBusinessServiceConfig;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDate;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
