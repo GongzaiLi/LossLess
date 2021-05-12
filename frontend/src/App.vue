@@ -16,6 +16,7 @@ import UserSearch from "./components/user/UserSearch";
 import HomePage from "@/components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
+import InventoryPage from "./components/inventory/InventoryPage";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -33,7 +34,8 @@ const app = {
     HomePage,
     CreateBusiness,
     UserSearch,
-    BusinessProfile
+    BusinessProfile,
+    InventoryPage
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods
