@@ -9,6 +9,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,10 +38,12 @@ public class Business {
     @JsonView({BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "name is mandatory")
     @Column(name = "name")
+    @Size(min = 0, max = 50)
     private String name;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
     @Column(name = "description")
+    @Size(min = 0, max = 250)
     private String description;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
