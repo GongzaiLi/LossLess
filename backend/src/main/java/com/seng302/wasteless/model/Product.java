@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 /**
@@ -38,6 +39,7 @@ public class Product {
     @Column(name = "manufacturer")
     private String manufacturer;
 
+    @Positive
     @JsonView({ProductViews.PostProductRequestView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
@@ -49,15 +51,13 @@ public class Product {
     @Column(name = "business_id")
     private Integer businessId;
 
-//    @Column(name = "images")
-//    private List images;
 
     /**
      * Formats a code by taking the BusinessId and the Product Object's ID
      * setting it to uppercase and replaces spaces with "-" and replaces
      * and removes alphanumeric
      *
-     * @param businessId
+     * @param businessId Id of business product belongs to
      * @return String that is formatted as the Product Code
      */
     public String createCode(Integer businessId) {

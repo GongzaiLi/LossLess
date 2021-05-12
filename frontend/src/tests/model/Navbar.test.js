@@ -13,6 +13,10 @@ const $route = {
   }
 }
 
+const $router = {
+  push: jest.fn()
+}
+
 let userData = {
   "id": 100,
   "firstName": "John",
@@ -23,6 +27,7 @@ let userData = {
   "email": "johnsmith99@gmail.com",
   "dateOfBirth": "1999-04-27",
   "phoneNumber": "+64 3 555 0129",
+  currentlyActingAs: null,
   "homeAddress": {
     "streetNumber": "3/24",
     "streetName": "Ilam Road",
@@ -68,7 +73,7 @@ beforeEach(() => {
   wrapper = mount(NavBar, {
     localVue,
     propsData: {},
-    mocks: {$route, $currentUser},
+    mocks: {$route, $router, $currentUser},
     stubs: {},
     methods: {},
     computed: {},
@@ -124,6 +129,43 @@ describe('User Drop Down', () => {
 });
 
 
+describe('User role', () => {
+  test('works for admin', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userBadgeRole).toEqual("Site Admin");
+  })
+  test('works for dgaa', async () => {
+    wrapper.vm.$currentUser.role = 'defaultGlobalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userBadgeRole).toEqual("Default Site Admin");
+  })
+  test('works for user', async () => {
+    wrapper.vm.$currentUser.role = 'user';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userBadgeRole).toEqual("");
+  })
+});
+
+
+describe('Got to profile', () => {
+  test('works when acting as user', async () => {
+    await wrapper.find("#go-to-profile a").trigger("click");
+    await wrapper.vm.$nextTick();
+
+    expect($router.push).toHaveBeenCalledWith({path: '/users/100'});
+  })
+
+  test('works when acting as business', async () => {
+    wrapper.vm.$currentUser.currentlyActingAs = {id: 69};
+    await wrapper.vm.$nextTick();
+    await wrapper.find("#go-to-profile a").trigger("click");
+    await wrapper.vm.$nextTick();
+
+    expect($router.push).toHaveBeenCalledWith({path: '/businesses/69'});
+  })
+});
+
 describe('Act as business', () => {
   test('works on click with single business', async () => {
     const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
@@ -134,6 +176,8 @@ describe('Act as business', () => {
     expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.find("#profile-name").text()).toEqual("Lumbridge General Store");
     expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
+
+    expect(wrapper.html()).not.toContain("Create Business");
 
     userData.currentlyActingAs = null;
   })
@@ -152,6 +196,8 @@ describe('Act as business', () => {
     expect(wrapper.find("#profile-name").text()).toEqual("John");
     expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.findAll(".user-name-drop-down").length).toBe(0);
+
+    expect(wrapper.html()).toContain("Create Business");
 
     userData.currentlyActingAs = null;
   })

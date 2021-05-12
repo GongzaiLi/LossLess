@@ -1,4 +1,4 @@
-package com.seng302.wasteless.model;
+package com.seng302.wasteless.dto;
 
 import lombok.Data;
 import lombok.ToString;
@@ -10,9 +10,9 @@ import javax.validation.constraints.NotNull;
  */
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @ToString // generate a toString method
-public class Login {
+public class LoginDto {
 
-    private Login login;
+    private LoginDto login;
 
     @NotNull(message = "email is mandatory")
     private String email;
@@ -20,7 +20,7 @@ public class Login {
     @NotNull(message = "password is mandatory")
     private String password;
 
-    public Login(String email, String password) {
+    public LoginDto(String email, String password) {
 
         this.email = email;
         this.password = password;

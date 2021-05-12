@@ -1,4 +1,4 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.integrationTest;
 
 import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.User;
@@ -6,7 +6,6 @@ import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
-import io.cucumber.java.bs.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -50,7 +49,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.USER);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
@@ -84,7 +83,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.USER);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
@@ -167,7 +166,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.USER);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");
@@ -201,7 +200,7 @@ public class AdminEndpointsIntegrationTest {
         user.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
         user.setEmail("Test@Gmail");
         user.setPassword("password");
-        user.setDateOfBirth(LocalDate.now());
+        user.setDateOfBirth(LocalDate.ofYearDay(2000, 69));
         user.setBio("Bio1");
         user.setFirstName("FirstName1");
         user.setLastName("LastName1");

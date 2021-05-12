@@ -1,4 +1,4 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.User;
