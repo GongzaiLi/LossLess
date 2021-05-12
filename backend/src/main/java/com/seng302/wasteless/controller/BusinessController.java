@@ -294,7 +294,7 @@ public class BusinessController {
             MethodArgumentNotValidException exception) {
         Map<String, String> errors;
         errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error) -> {
+        exception.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
 //            logger.error(errorMessage); it doesnt work I am not sure why

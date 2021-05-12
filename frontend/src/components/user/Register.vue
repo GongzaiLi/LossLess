@@ -17,37 +17,37 @@ Date: 3/3/2021
         <b-form-group
         >
           <strong>First Name *</strong>
-          <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
+          <b-form-input v-model="firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Last Name *</strong>
-          <b-form-input v-model="lastName" required placeholder="Last Name"></b-form-input>
+          <b-form-input v-model="lastName" maxLength=50 required placeholder="Last Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Middle Name</strong>
-          <b-form-input v-model="middleName" placeholder="Middle Name"></b-form-input>
+          <b-form-input v-model="middleName" maxLength=50 placeholder="Middle Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Nickname</strong>
-          <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
+          <b-form-input v-model="nickname" maxLength=50 placeholder="Nick Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Bio</strong>
-          <b-form-textarea v-model="bio" placeholder="Enter your Bio"></b-form-textarea>
+          <b-form-textarea v-model="bio" maxLength=250 placeholder="Enter your Bio"></b-form-textarea>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Email *</strong>
-          <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
+          <b-form-input required type="email" maxLength=50 v-model="email" placeholder="Email"></b-form-input>
         </b-form-group>
 
         <b-form-group>
@@ -55,6 +55,7 @@ Date: 3/3/2021
           <div class="input-group mb-2 mr-sm-2">
             <b-form-input v-bind:type="passwordType" required
                           v-model=password
+                          maxLength=50
                           class="form-control"
                           placeholder="Password"
                           autocomplete="off"/>
@@ -72,6 +73,7 @@ Date: 3/3/2021
           <div class="input-group mb-2 mr-sm-2">
             <b-form-input v-bind:type="confirmPasswordType" required
                           v-model=confirmPassword
+                          maxLength=50
                           class="form-control"
                           id="confirmPasswordInput"
                           placeholder="Confirm Password"
@@ -107,6 +109,7 @@ Date: 3/3/2021
         >
           <strong>Phone Number</strong>
           <b-form-input v-model="phoneNumber"
+                        maxLength=50
                         placeholder="Phone Number"
                         autocomplete="off"
                         size=30;
