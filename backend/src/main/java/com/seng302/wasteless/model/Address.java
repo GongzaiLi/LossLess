@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 /**
  * Type for Address object for users and buisnesses used by DTOs to return the correct (and correctly formatted) data.

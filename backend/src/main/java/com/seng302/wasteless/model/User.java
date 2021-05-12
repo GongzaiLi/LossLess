@@ -1,14 +1,15 @@
 package com.seng302.wasteless.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,11 +51,13 @@ public class User {
     @JsonView({UserViews.PostUserRequestView.class})
     private String bio;
 
+    @Email
     @NotBlank(message = "email is mandatory")
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
     private String email;
 
+    @Past
     @NotNull(message = "dateOfBirth is mandatory")
     @Column(name = "date_of_birth") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})

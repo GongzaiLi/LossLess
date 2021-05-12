@@ -1,17 +1,13 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.dto.GetUserDto;
+import com.seng302.wasteless.dto.LoginDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
-import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.repository.BusinessRepository;
 import com.seng302.wasteless.service.AddressService;
-import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
-import com.seng302.wasteless.model.Login;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.security.CustomUserDetails;
 import net.minidev.json.JSONObject;
@@ -43,7 +39,7 @@ import java.util.*;
 @RestController
 public class UserController {
 
-    private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
+    private static final Logger logger = LogManager.getLogger(UserController.class.getName());
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
@@ -103,7 +99,9 @@ public class UserController {
         user.setRole(UserRoles.USER);
 
         logger.debug("Logging in user: {}", user);
-        Login login = new Login(user.getEmail(), user.getPassword());
+        String tempEmail = user.getEmail();
+        String tempPassword = user.getPassword();
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRoles.USER);
 
@@ -118,7 +116,7 @@ public class UserController {
 
         logger.debug("Authenticating user: {}", user.getId());
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                login.getEmail(), login.getPassword());
+                tempEmail, tempPassword);
         Authentication auth = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -176,7 +174,7 @@ public class UserController {
     public Map<String, String> handleValidationExceptions(
             MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error) -> {
+        exception.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
 //            logger.error(errorMessage); doesnt work. I am not sure why.
@@ -337,9 +335,9 @@ public class UserController {
      * @param login The login object parsed from the request body by spring
      * @return 200 ok for correct login, 400 bad request otherwise
      */
-    @RequestMapping(value = "/login", method = {RequestMethod.POST} )
+    @PostMapping(value = "/login")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
+    public ResponseEntity<Object> verifyLogin(@Validated @RequestBody LoginDto login) {
 
         logger.debug("Request to authenticate user login for user with data: {}" , login);
 
@@ -369,7 +367,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.OK).body(responseBody);
 
             } catch (AuthenticationException e) {
-                logger.warn("Login unsuccessful. " + e.getMessage());
+                logger.warn("Login unsuccessful. {}", e.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
             }
 
