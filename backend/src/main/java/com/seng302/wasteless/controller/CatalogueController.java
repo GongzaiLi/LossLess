@@ -30,7 +30,7 @@ import java.util.*;
 @RestController
 public class CatalogueController {
 
-    private static final Logger logger = LogManager.getLogger(BusinessController.class.getName());
+    private static final Logger logger = LogManager.getLogger(CatalogueController.class.getName());
 
     private final BusinessService businessService;
     private final UserService userService;
@@ -263,7 +263,7 @@ public class CatalogueController {
             MethodArgumentNotValidException exception) {
         Map<String, String> errors;
         errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error) -> {
+        exception.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
 //            logger.error(errorMessage); it doesnt work I am not sure why
