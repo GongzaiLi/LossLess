@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;

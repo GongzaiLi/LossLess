@@ -5,7 +5,6 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.service.UserService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 

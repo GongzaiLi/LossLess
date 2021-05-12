@@ -1,4 +1,4 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.integrationTest;
 
 import com.seng302.wasteless.service.DefaultAdminCreatorService;
 import org.junit.jupiter.api.Test;
