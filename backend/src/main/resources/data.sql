@@ -1,4 +1,4 @@
-INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (826,'Glendale Court','Ogema','Illinois','Qatar',9762);
+INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (1,'Chocolate Drive','Chocolate','Tasty','New Zealand',9762);
 INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (162,'Duryea Place','Longoria','Michigan','Yugoslavia',215);
 INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (278,'Fillmore Avenue','Ernstville','Maine','Kazakhstan',7262);
 INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (837,'Cooper Street','Bath','New Jersey','Liechtenstein',6307);
