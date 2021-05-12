@@ -1,7 +1,9 @@
 package com.seng302.wasteless.controller;
 
 
+import com.seng302.wasteless.dto.GetInventoryDto;
 import com.seng302.wasteless.dto.PostInventoryDto;
+import com.seng302.wasteless.dto.mapper.GetInventoryDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
@@ -156,10 +158,11 @@ public class InventoryController {
 
 
         logger.debug("Trying to retrieve INVENTORY products for business: {}", possibleBusiness);
-        List<Product> productList = productService.getAllProductsByBusinessId(businessId);
+        List<Inventory> inventoryList = inventoryService.getInventory(businessId);
 
-        logger.info("INVENTORY Products retrieved: {} for business: {}", productList, possibleBusiness);
-        return ResponseEntity.status(HttpStatus.OK).body(productList);
+
+        logger.info("INVENTORY Products retrieved: {} for business: {}", inventoryList, possibleBusiness);
+        return ResponseEntity.status(HttpStatus.OK).body(inventoryList);
 
     }
 
