@@ -21,7 +21,7 @@ Date: 15/4/2021
       </b-row>
       <b-table
         striped hovers
-        responsive="lg"
+        responsive
         no-border-collapse
         bordered
         show-empty

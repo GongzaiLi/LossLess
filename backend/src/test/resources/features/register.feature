@@ -46,7 +46,7 @@ Feature: Register
   Scenario: Register with invalid email format
     Given User is not registered and is on the register page
     When User tries to create an account with first name "John", last name "Smith", email "johnsmith99gmail.com", date of birth "1998-04-27", country "New Zealand",  streetNumber "3/24",  streetName "Ilam Road",  city "Christchurch",  region "Canterbury",  postcode "90210" and password "securepassword"
-    Then The registering user will receive an error message of "Email address is invalid"
+    Then The registering user will receive an error message of "{\"email\":\"must be a well-formed email address\"}"
 
 
   Scenario: Register with email that is already registered

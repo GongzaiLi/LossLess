@@ -19,6 +19,7 @@ Date: sprint_1
                 style="max-width: 6em"
                 v-model="homeAddress.streetNumber"
                 placeholder="Number"
+                maxLength=50
                 v-bind:value="value"
                 required
               />
@@ -26,6 +27,7 @@ Date: sprint_1
                 v-model="homeAddress.streetName"
                 @input="onAddressChange"
                 placeholder="Street"
+                maxLength=50
                 v-bind:value="value"
                 required
               />
@@ -65,6 +67,7 @@ Date: sprint_1
           <b-col>
             <b-form-input
               v-model="homeAddress.city"
+              maxLength=50
               placeholder="City"
               v-bind:value="value"
               required
@@ -73,6 +76,7 @@ Date: sprint_1
           <b-col>
             <b-form-input
               v-model="homeAddress.region"
+              maxLength=50
               placeholder="Region"
               v-bind:value="value"
             />
@@ -89,6 +93,7 @@ Date: sprint_1
           <b-col md="6">
             <b-form-input
               v-model="homeAddress.country"
+              maxLength=50
               placeholder="Country"
               v-bind:value="value"
               required
@@ -97,6 +102,7 @@ Date: sprint_1
           <b-col md="4">
             <b-form-input
               v-model="homeAddress.postcode"
+              maxLength=50
               placeholder="Postcode"
               v-bind:value="value"
               required
