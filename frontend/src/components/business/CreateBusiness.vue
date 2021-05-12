@@ -60,6 +60,15 @@ Date: 26/3/2021
         </b-alert>
       </div>
     </b-card>
+
+    <b-card id="create-business-locked-card" v-else-if="this.$currentUser.currentlyActingAs">
+      <b-card-title>
+        <b-icon-lock/> Can't create business while acting as a business
+      </b-card-title>
+      <h6 ><strong>You can't create a business while acting as a business. You must be acting as a user</strong>
+        <br><br>To do so, click your profile picture on top-right of the screen. Then, select your name ('{{$currentUser.firstName}}') from the drop-down menu.</h6>
+    </b-card>
+
     <b-card v-else>
       <b-card-title>
         Not old enough to create a business
@@ -155,8 +164,7 @@ export default {
   computed: {
     canCreateBusiness: function() {
       const monthsAndYearsBetween = getMonthsAndYearsBetween(new Date(this.$currentUser.dateOfBirth), Date.now());
-      console.log(this.$currentUser.dateOfBirth);
-      return monthsAndYearsBetween.years >= MIN_AGE_TO_CREATE_BUSINESS;
+      return monthsAndYearsBetween.years >= MIN_AGE_TO_CREATE_BUSINESS && !this.$currentUser.currentlyActingAs;
     }
   }
 }

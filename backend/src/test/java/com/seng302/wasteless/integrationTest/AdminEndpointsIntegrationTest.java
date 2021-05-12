@@ -1,4 +1,4 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.integrationTest;
 
 import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.User;
@@ -6,7 +6,6 @@ import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
-import io.cucumber.java.bs.A;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

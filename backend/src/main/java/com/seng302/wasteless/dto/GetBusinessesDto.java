@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+
 /**
  * Data transfer object for GetBusiness endpoint, used to return the correct data in the correct format.
  * Business entities are transformed into GetBusinessesDto via the GetBusinessesDtoMapper

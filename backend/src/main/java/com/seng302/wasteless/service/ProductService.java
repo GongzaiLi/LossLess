@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;

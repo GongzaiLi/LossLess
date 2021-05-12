@@ -1,4 +1,4 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.unitTest;
 
 
 import com.seng302.wasteless.service.AddressService;
@@ -17,8 +17,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
