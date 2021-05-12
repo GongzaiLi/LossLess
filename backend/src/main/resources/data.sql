@@ -48,7 +48,9 @@ INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALU
 INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (885,'Classon Avenue','Warsaw','Montana','Armenia',413);
 INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (730,'Robert Street','Yogaville','Missouri','Italy',8069);
 INSERT INTO Address(street_number,street_name,city,region,country,postcode) VALUES (404,'Duffield Street','Carlos','Colorado','Christmas Island',8672);
-INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Marisa','Howell','Henry',NULL,'ipsum nostrud incididunt Lorem deserunt aliquip voluptate occaecat sint esse labore ea do pariatur minim tempor deserunt minim magna aliqua','marisa.howell@microluxe.com','1998-07-15','2019-12-03','(946) 570-2232',1,'a',0);
+
+
+INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Willy','Wonka','Chocolate','Chocolate Man','The Lord of Chocolate','Willy.Wonka@TheChocolateFactory.com','1990-07-15','2019-12-03','(946) 570-2232',1,'$2a$10$sE1aW/VTng8e71r.oaTzw.3hZtOpVymFcbqsnxmb22BlOsbHfbTjC',0);
 INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Corinne','Mendez',NULL,'Stacy','nostrud minim esse est aliquip ut minim incididunt fugiat adipisicing anim laborum officia qui occaecat fugiat in in sit deserunt','corinne.mendez@zaj.com','1997-11-04','2011-12-16','(921) 546-3999',2,'a',0);
 INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Lawson','Newman','Hutchinson','Penny','ipsum consectetur adipisicing duis sunt minim Lorem culpa culpa magna nisi nisi amet et reprehenderit elit id ad cillum tempor','lawson.newman@calcula.com','1983-01-05','2013-07-10',NULL,3,'a',0);
 INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Kristine','Bush',NULL,NULL,'in qui aute proident anim aliqua dolor fugiat eu sint esse exercitation id excepteur aliquip tempor id anim consectetur labore','kristine.bush@marqet.com','1979-08-09','2010-08-06',NULL,4,'a',0);
@@ -98,7 +100,9 @@ INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_bi
 INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Duke','Anderson','Alta','Lee','ad eu irure velit consequat officia irure dolore fugiat dolore qui ea non qui non et ipsum culpa adipisicing occaecat','duke.anderson@securia.com','1996-04-26','2012-08-28',NULL,48,'a',0);
 INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Love','Wallace','Ericka','Barron','dolore excepteur minim qui duis qui amet exercitation tempor Lorem veniam tempor dolor labore veniam dolor id amet velit deserunt','love.wallace@eplosion.com','2007-08-10','2021-05-18','(996) 549-3875',49,'a',0);
 INSERT INTO User(first_name,last_name,middle_name,nick_name,bio,email,date_of_birth,created,phone_number,home_address,password,role) VALUES ('Luna','Dickerson',NULL,'Burns','exercitation tempor consectetur minim fugiat nostrud ex amet proident non velit laboris elit cillum enim elit sint exercitation duis cillum','luna.dickerson@plasmosis.com','1972-05-16','2014-07-23',NULL,50,'a',0);
-INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (2,'2018-03-22','cillum minim nulla in voluptate do minim fugiat fugiat excepteur ut eiusmod cupidatat nulla mollit sint elit fugiat culpa voluptate','Sonique',1,1);
+
+
+INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (2,'2015-03-22','We make the best chocolate in the world','Wonka Chocolate',1,1);
 INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (3,'2017-12-24','Lorem laborum consectetur sunt veniam id sint do qui nostrud aliquip nulla minim proident ad culpa ex incididunt reprehenderit veniam','Nimon',2,2);
 INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (1,'2015-10-01','quis enim dolore consequat consequat sint deserunt commodo commodo in quis amet in ea consequat consectetur amet esse deserunt officia','Surelogic',3,3);
 INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (0,'2010-11-08','ea et do incididunt ullamco non consectetur laboris incididunt mollit anim duis reprehenderit proident incididunt id adipisicing tempor non nisi','Updat',4,4);
@@ -148,6 +152,8 @@ INSERT INTO Business(business_type,created,description,name,address,primary_admi
 INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (0,'2015-06-15','excepteur mollit sunt exercitation laboris cupidatat excepteur et tempor pariatur anim labore ullamco cupidatat non consequat ullamco anim nostrud id','Imperium',48,48);
 INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (3,'2011-03-10','laborum proident incididunt eiusmod consectetur cupidatat ullamco do ad est commodo laboris est eiusmod anim enim pariatur tempor Lorem dolore','Avenetro',49,49);
 INSERT INTO Business(business_type,created,description,name,address,primary_administrator) VALUES (1,'2012-08-26','reprehenderit et esse sit consectetur deserunt duis culpa mollit cupidatat quis sint occaecat cillum minim aliqua sit ullamco aliquip dolor','Insectus',50,50);
+
+
 INSERT INTO Business_administrators(administrators_id,business_id) VALUES (1,1);
 INSERT INTO Business_administrators(administrators_id,business_id) VALUES (2,2);
 INSERT INTO Business_administrators(administrators_id,business_id) VALUES (3,3);
@@ -198,6 +204,8 @@ INSERT INTO Business_administrators(administrators_id,business_id) VALUES (47,47
 INSERT INTO Business_administrators(administrators_id,business_id) VALUES (48,48);
 INSERT INTO Business_administrators(administrators_id,business_id) VALUES (49,49);
 INSERT INTO Business_administrators(administrators_id,business_id) VALUES (50,50);
+
+
 INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdministered_id) VALUES (1,1);
 INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdministered_id) VALUES (2,2);
 INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdministered_id) VALUES (3,3);
@@ -248,6 +256,8 @@ INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdmi
 INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdministered_id) VALUES (48,48);
 INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdministered_id) VALUES (49,49);
 INSERT INTO User_businessesPrimarilyAdministered(User_id,businessesPrimarilyAdministered_id) VALUES (50,50);
+
+
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (31,'2010-08-08','eiusmod commodo quis incididunt quis velit aute ut eu aliqua veniam ea sunt est id ipsum et excepteur ullamco anim','Elita','sint',12.00,'31-SINT');
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (7,'2014-04-23','do id ea exercitation id pariatur adipisicing amet esse exercitation fugiat ad esse consequat exercitation incididunt sit eu cupidatat ullamco','Neurocell','excepteur',8.00,'7-EXCEPTEUR');
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (19,'2018-09-05','Lorem enim velit occaecat pariatur cillum incididunt aute est sit aliqua sint amet dolore consectetur veniam consectetur ad cillum aliquip','Isologia','veniam',14.00,'19-VENIAM');
@@ -295,7 +305,16 @@ INSERT INTO Product(business_id,created,description,manufacturer,name,recommende
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (3,'2011-11-25','exercitation officia nulla dolor irure ad non consectetur minim duis amet ut dolor veniam mollit est mollit et occaecat officia','Zillacon','incididunt',10.00,'3-INCIDIDUNT');
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (45,'2014-07-06','est reprehenderit elit duis esse ipsum fugiat id pariatur officia ex est pariatur anim do aliquip eiusmod mollit eu excepteur','Corecom','Lorem',10.00,'45-LOREM');
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (13,'2015-09-07','officia proident fugiat excepteur dolor nulla irure pariatur amet duis reprehenderit culpa ut minim eu pariatur reprehenderit minim ad qui','Emtrac','anim',29.00,'13-ANIM');
-INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2021-04-15','elit amet nostrud commodo aliquip aute tempor occaecat laboris quis elit elit eiusmod officia exercitation esse tempor mollit eiusmod esse','Apexia','duis',31.00,'1-DUIS');
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (50,'2018-03-16','duis nisi consequat incididunt nulla velit ex ea amet amet nulla ut eu cillum ad laborum do quis culpa amet','Tetak','adipisicing',46.00,'50-ADIPISICING');
-INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (36,'2011-06-15','sit nulla pariatur cillum amet consectetur sint sit reprehenderit amet mollit anim ut ipsum enim duis ex incididunt minim proident','Gadtron','voluptate',21.00,'36-VOLUPTATE');
+INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2017-08-08','A tasty dark chocolate bar','The Chocolate Factory','Dark Chocolate Bar',2.5,'1-WONKA-DARK');
+INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2017-08-08','A tasty milk chocolate bar','The Chocolate Factory','Milk Chocolate Bar',2.5,'1-WONKA-MILK');
+INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2017-08-08','A tasty white chocolate bar','The Chocolate Factory','White Chocolate Bar',2.5,'1-WONKA-WHITE');
+INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2017-08-08','An exploding candy','The Chocolate Factory','Exploding Candy',3.5,'1-WONKA-EXPLODE');
+INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2017-08-08','A treat that never ends','The Chocolate Factory','Ever-Lasting Gobstopper',8.99,'1-WONKA-ELG');
 
+
+INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',2.5,5,'2021-05-26',12.5,'1-WONKA-DARK');
+INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',2.5,2,'2021-05-26',5,'1-WONKA-MILK');
+INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',2.5,8,'2021-05-26',20,'1-WONKA-WHITE');
+INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',3.5,10,'2021-05-26',35,'1-WONKA-EXPLODE');
+INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',9.5,3,'2021-05-26',28.5,'1-WONKA-ELG');
