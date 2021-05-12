@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -278,27 +279,31 @@ public class UserControllerUnitTest {
 
     @Test
     public void whenNotLoggedInAndTryMakeAdmin_thenUnauthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void whenNotLoggedInAndTryRevokeAdmin_thenUnauthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithUserDetails("user@700")
     public void whenUserTryMakeAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithUserDetails("admin@700")
     public void whenAdminTryDowngradeDefaultAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -309,28 +314,32 @@ public class UserControllerUnitTest {
         user.setEmail("blah");
         user.setRole(UserRoles.USER);
         user = userService.createUser(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + user.getId().toString() + "/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + user.getId().toString() + "/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithUserDetails("admin@700")
     public void whenAdminTryRevokeDefaultAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithUserDetails("defaultadmin@700")
     public void whenDefaultAdminTryRevokeSelf_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isConflict());
     }
 
     @Test
     @WithUserDetails("user@700")
     public void whenUserTryRevokeAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -341,7 +350,8 @@ public class UserControllerUnitTest {
         admin.setEmail("blah");
         admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
         admin = userService.createUser(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + admin.getId().toString() + "/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + admin.getId().toString() + "/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isOk());
     }
 

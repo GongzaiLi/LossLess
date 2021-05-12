@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -53,6 +54,7 @@ public class BusinessControllerUnitTest {
                 "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -71,6 +73,7 @@ public class BusinessControllerUnitTest {
                 "  }, \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -90,6 +93,7 @@ public class BusinessControllerUnitTest {
                 "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -101,6 +105,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"name\": \"James's Peanut Store\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -119,6 +124,7 @@ public class BusinessControllerUnitTest {
                 "  }, \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -137,6 +143,7 @@ public class BusinessControllerUnitTest {
                 "  }, \"businessType\": \"Accommodation and Food Services\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -149,6 +156,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -160,6 +168,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -172,6 +181,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/3/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
@@ -184,6 +194,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -195,6 +206,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
