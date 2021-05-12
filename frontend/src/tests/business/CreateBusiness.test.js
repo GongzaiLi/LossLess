@@ -8,7 +8,8 @@ jest.mock('../../Api');
 
 let $currentUser = {
   id: 1,
-  dateOfBirth: '01/01/2001'
+  dateOfBirth: '01/01/2001',
+  currentlyActingAs: null
 }
 const $log = {
   debug: jest.fn(),
@@ -40,7 +41,7 @@ beforeEach(() => {
   wrapper = mount(CreateBusiness, {
     localVue,
     router,
-    mocks: {$log, $currentUser}
+    mocks: {$log, $currentUser : JSON.parse(JSON.stringify($currentUser))}
   });
 });
 
@@ -226,5 +227,14 @@ describe('CreateBusiness HTML testing', () => {
 
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.canCreateBusiness).toBeFalsy();
+  });
+
+  test('Cant create if acting as business', async () => {
+    wrapper.vm.$currentUser.currentlyActingAs = {'balh' : 'blah'};
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.canCreateBusiness).toBeFalsy();
+    expect(wrapper.find("#create-business-locked-card").exists()).toBeTruthy();
   });
 });
