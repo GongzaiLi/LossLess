@@ -1,11 +1,12 @@
 package com.seng302.wasteless.controller;
 
 
-import com.seng302.wasteless.dto.GetInventoryDto;
 import com.seng302.wasteless.dto.PostInventoryDto;
-import com.seng302.wasteless.dto.mapper.GetInventoryDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Inventory;
+import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ProductService;
@@ -62,7 +63,7 @@ public class InventoryController {
      */
     @PostMapping("/businesses/{id}/inventory")
     public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, PostInventoryDto inventoryDtoRequest) {
-        logger.debug("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
+        logger.info("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalEmail = authentication.getName();
@@ -86,7 +87,7 @@ public class InventoryController {
         }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot create INVENTORY product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
@@ -98,7 +99,7 @@ public class InventoryController {
 
         if (possibleProduct == null) {
             logger.warn("Cannot create inventory item for product that does not exist");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Product with given id does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
         }
 
         Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
@@ -150,7 +151,7 @@ public class InventoryController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot retrieve INVENTORY products. User: {} is not global admin or business admin: {}", user, possibleBusiness);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }

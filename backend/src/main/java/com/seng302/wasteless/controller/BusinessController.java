@@ -63,7 +63,6 @@ public class BusinessController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
-
         logger.debug("Request to create new business {}", business);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -208,9 +207,8 @@ public class BusinessController {
         logger.debug("Validating user with Email: {}", currentPrincipalEmail);
         User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
 
-        if (!userMakingRequest.getRole().equals(UserRoles.GLOBAL_APPLICATION_ADMIN)
-                && !userMakingRequest.getRole().equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-                && !(possibleBusinessToAddAdminFor.getPrimaryAdministrator().getId().equals(userMakingRequest.getId()))) {
+        if (!userMakingRequest.checkUserGlobalAdmin()
+                && !(possibleBusinessToAddAdminFor.checkUserIsPrimaryAdministrator(userMakingRequest))) {
             logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", userMakingRequest, businessId);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
         }
@@ -267,7 +265,7 @@ public class BusinessController {
             logger.warn("User is primary admin");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
         }
-        if (!(possibleBusiness.getPrimaryAdministrator().getId().equals(loggedInUser.getId())) && loggedInUser.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && loggedInUser.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
+        if (!(possibleBusiness.checkUserIsPrimaryAdministrator(possibleUser)) && !loggedInUser.checkUserGlobalAdmin()) {
             logger.warn("You are not a primary business admin");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
         }
