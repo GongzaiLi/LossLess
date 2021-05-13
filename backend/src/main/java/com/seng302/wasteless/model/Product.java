@@ -21,9 +21,13 @@ import java.time.LocalDate;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Product {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @Column(name = "database_id")
+    private Long databaseId;
+
     @JsonView({ProductViews.PostProductRequestView.class})
-    @Id // this field (attribute) is the table primary key
-    @Column(name = "code")
+    @Column(name = "code", unique = true)
     private String id;
 
     @JsonView({ProductViews.PostProductRequestView.class})

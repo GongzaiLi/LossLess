@@ -20,7 +20,11 @@ public class Inventory {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    private String id;
+    private Long id;
+
+    @NotNull
+    @Column
+    private int businessId;
 
     @NotNull(message = "Product Code is Mandatory")
     @ManyToOne
