@@ -43,6 +43,7 @@ Date: 11/5/2021
           </div>
         </template>
       </b-table>
+      <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
     </b-card>
 
     <b-card id="inventory-locked-card" v-if="!canEditInventory">
@@ -67,8 +68,12 @@ Date: 11/5/2021
 
 <script>
 import api from "../../Api";
+import pagination from '../model/Pagination';
 
 export default {
+  components: {
+    pagination
+  },
   data: function () {
     return {
       businessName: "",
@@ -91,7 +96,7 @@ export default {
     this.items = [
       {
         id: 1,
-        productId: 0,
+        productId: "51-BEANS-R-US",
         quantity: 3,
         pricePerItem: 2.00,
         totalPrice: 6,
@@ -101,7 +106,8 @@ export default {
         expires: "2021-05-13",
       },
       {
-        id: 1,
+        id: 2,
+        productId: "51-BEANS-R-NOT-US",
         quantity: 3,
         pricePerItem: 2.00,
         totalPrice: 6,
@@ -111,10 +117,11 @@ export default {
         expires: "2021-05-13",
       },
       {
-        id: 1,
+        id: 3,
+        productId: "51-BEANS",
         quantity: 3,
-        pricePerItem: 2.00,
-        totalPrice: 6,
+        pricePerItem: 3.00,
+        totalPrice: 9,
         manufactured: "2021-05-13",
         sellBy: "2021-05-13",
         bestBefore: "2021-05-13",
@@ -149,6 +156,14 @@ export default {
     },
 
     /**
+     * modify the ID so that it doesn't display the "{businessId}-" at the start
+     * @return string
+     */
+    setId: function (id) {
+      return id.split(/-(.+)/)[1];
+    },
+
+    /**
      * modify the date to day/month/year.
      * @param oldDate
      * @return string
@@ -171,6 +186,9 @@ export default {
         {
           key: 'productId',
           label: 'Product Code',
+          formatter: (value) => {
+            return this.setId(value);
+          },
           sortable: true
         },
         {

@@ -109,6 +109,28 @@ describe('check-getBusiness-API-function', () => {
     });
 });
 
+describe('check-setDate-function', () => {
+    test('set-month-less-then-10-data', () => {
+        const date = "2021-04-14T13:01:58.660Z";
+        expect(wrapper.vm.setDate(date)).toEqual('14/04/2021');
+    });
+
+    test('set-month-more-then-9-data', () => {
+        const date = "2021-10-14T13:01:58.660Z";
+        expect(wrapper.vm.setDate(date)).toEqual('14/10/2021');
+    });
+
+    test('set-day-more-then-9-data', () => {
+        const date = "2021-10-10T13:01:58.660Z";
+        expect(wrapper.vm.setDate(date)).toEqual('10/10/2021');
+    });
+
+    test('set-day-less-then-10-data', () => {
+        const date = "2021-10-02T13:01:58.660Z";
+        expect(wrapper.vm.setDate(date)).toEqual('02/10/2021');
+    });
+});
+
 describe('businessNameIfAdminOfThisBusiness', () => {
 
     it('Works if user admins business', async () => {
