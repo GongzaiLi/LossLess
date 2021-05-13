@@ -28,7 +28,7 @@ public class Inventory {
 
     @NotNull
     @Column
-    private int businessId;
+    private Integer businessId;
 
     @NotNull(message = "Product Code is Mandatory")
     @ManyToOne
