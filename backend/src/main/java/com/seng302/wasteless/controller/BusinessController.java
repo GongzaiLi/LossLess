@@ -265,7 +265,7 @@ public class BusinessController {
             logger.warn("User is primary admin");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
         }
-        if (!(possibleBusiness.checkUserIsPrimaryAdministrator(possibleUser)) && !loggedInUser.checkUserGlobalAdmin()) {
+        if (!(possibleBusiness.checkUserIsPrimaryAdministrator(loggedInUser)) && !loggedInUser.checkUserGlobalAdmin()) {
             logger.warn("You are not a primary business admin");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
         }
