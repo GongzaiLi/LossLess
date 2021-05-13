@@ -5,24 +5,25 @@ Date: 11/5/2021
 <template>
   <div class="overflow-auto">
     <b-card v-if="canEditInventory" style="max-width: 1260px;">
-      <b-card-title>Inventory: {{businessName}}</b-card-title>
+      <b-card-title>Inventory: {{ businessName }}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center" style="padding: 10px">
         <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
       </b-row>
       <b-table
-          striped hovers
-          responsive="lg"
-          no-border-collapse
-          bordered
-          show-empty
-          class="inventory-table"
-          :fields="fields"
-          :items="items"
-          :per-page="perPage"
-          :current-page="currentPage"
-          :busy="tableLoading"
-          ref="inventoryTable"
+        striped hovers
+        responsive="lg"
+        no-border-collapse
+        bordered
+        show-empty
+        class="inventory-table"
+        :fields="fields"
+        :items="items"
+        :per-page="perPage"
+        :current-page="currentPage"
+        :busy="tableLoading"
+        ref="inventoryTable"
+        @row-clicked="openInventoryDetailModal"
       >
         <template #cell(productThumbnail)>
           <b-img v-bind="mainProps" thumbnail fluid rounded="circle" blank-color="#777" alt="Default Image"></b-img>
@@ -50,20 +51,36 @@ Date: 11/5/2021
 
     <b-card id="inventory-locked-card" v-if="!canEditInventory">
       <b-card-title>
-        <b-icon-lock/> Can't edit inventory page
+        <b-icon-lock/>
+        Can't edit inventory page
       </b-card-title>
-      <h6 v-if="businessNameIfAdminOfThisBusiness"><strong>You're an administrator of this business. To edit this inventory, you must be acting as this business.</strong>
-        <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business ('{{businessNameIfAdminOfThisBusiness}}') from the drop-down menu.</h6>
-      <h6 v-else> You are not an administrator of this business. If you need to edit this inventory, contact the administrators of the business. <br>
-        Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
+      <h6 v-if="businessNameIfAdminOfThisBusiness"><strong>You're an administrator of this business. To edit this
+        inventory, you must be acting as this business.</strong>
+        <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business
+        ('{{ businessNameIfAdminOfThisBusiness }}') from the drop-down menu.</h6>
+      <h6 v-else> You are not an administrator of this business. If you need to edit this inventory, contact the
+        administrators of the business. <br>
+        Return to the business profile page
+        <router-link :to="'/businesses/' + $route.params.id">here.</router-link>
+      </h6>
     </b-card>
+
+    <b-modal
+      id="inventory-card" hide-header hide-footer
+      :no-close-on-backdrop="!isInventoryCardReadOnly"
+      :no-close-on-esc="!isInventoryCardReadOnly">
+      <inventory-detail-card :disabled="isInventoryCardReadOnly" :currency="currency"
+                             :inventory="inventoryDisplayedInCard"/>
+      <!--      <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>-->
+    </b-modal>
+
   </div>
 </template>
 
 <style>
 .no-results-overlay {
-  margin-top:7em;
-  margin-bottom:7em;
+  margin-top: 7em;
+  margin-bottom: 7em;
   text-align: center;
 }
 </style>
@@ -71,9 +88,11 @@ Date: 11/5/2021
 <script>
 import api from "../../Api";
 import pagination from '../model/Pagination';
+import InventoryDetailCard from "./InventoryDetailCard";
 
 export default {
   components: {
+    InventoryDetailCard,
     pagination
   },
   data: function () {
@@ -90,7 +109,9 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
-      mainProps: { blank: true, width: 50, height: 50 }
+      mainProps: {blank: true, width: 50, height: 50},
+      isInventoryCardReadOnly: true,
+      inventoryDisplayedInCard: {},
     }
   },
   mounted() {
@@ -131,6 +152,7 @@ export default {
         expires: "2021-05-13",
       },
     ];
+    this.tableLoading = false;
   },
   methods: {
     /**
@@ -142,10 +164,10 @@ export default {
       this.tableLoading = true;
       const getProductsPromise = api.getProducts(businessId);
       const currencyPromise = api.getBusiness(businessId)
-          .then((resp) => {
-            this.businessName = resp.data.name;
-            return api.getUserCurrency(resp.data.address.country);
-          })
+        .then((resp) => {
+          this.businessName = resp.data.name;
+          return api.getUserCurrency(resp.data.address.country);
+        })
       try {
         const [productsResponse, currency] = await Promise.all([getProductsPromise, currencyPromise])
         this.products = productsResponse.data;
@@ -153,7 +175,7 @@ export default {
         if (currency != null) {
           this.currency = currency;
         }
-      } catch(error) {
+      } catch (error) {
         this.$log.debug(error);
       }
     },
@@ -174,9 +196,18 @@ export default {
     setDate: function (oldDate) {
       const date = new Date(oldDate);
       return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-          `${date.getUTCFullYear()}`;
+        `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+        `${date.getUTCFullYear()}`;
     },
+
+    /**
+     * when click the table will show a detail inventory model card.
+     * @param inventory object
+     **/
+    openInventoryDetailModal: function (inventory) {
+      this.inventoryDisplayedInCard = Object.assign({}, inventory);
+      this.$bvModal.show('inventory-card');
+    }
   },
 
   computed: {
@@ -262,15 +293,15 @@ export default {
     /**
      * True if the user can edit this catalogue (ie they are an admin or acting as this business)
      */
-    canEditInventory: function() {
+    canEditInventory: function () {
       return this.$currentUser.role !== 'user' ||
-          (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
+        (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
     },
 
     /**
      * Returns the name of the business if the user is an admin of this business, otherwise returns null
      */
-    businessNameIfAdminOfThisBusiness: function() {
+    businessNameIfAdminOfThisBusiness: function () {
       for (const business of this.$currentUser.businessesAdministered) {
         if (business.id === parseInt(this.$route.params.id)) {
           return business.name;
