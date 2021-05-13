@@ -24,7 +24,9 @@ Date: 11/5/2021
           :busy="tableLoading"
           ref="inventoryTable"
       >
-
+        <template #cell(productThumbnail)>
+          <b-img v-bind="mainProps" thumbnail fluid rounded="circle" blank-color="#777" alt="Default Image"></b-img>
+        </template>
         <template #cell(pricePerItem)="data">
           {{ currency.symbol }}{{ data.item.pricePerItem }}
         </template>
@@ -88,6 +90,7 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
+      mainProps: { blank: true, width: 50, height: 50 }
     }
   },
   mounted() {
@@ -183,6 +186,9 @@ export default {
      */
     fields: function () {
       return [
+        {
+          key: 'productThumbnail',
+        },
         {
           key: 'productId',
           label: 'Product Code',
