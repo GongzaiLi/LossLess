@@ -23,6 +23,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class InventoryController {
      * @return Error code detailing error or 201 create with inventoryItemId
      */
     @PostMapping("/businesses/{id}/inventory")
-    public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, PostInventoryDto inventoryDtoRequest) {
+    public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, @Valid @RequestBody PostInventoryDto inventoryDtoRequest) {
         logger.info("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -103,6 +104,8 @@ public class InventoryController {
         }
 
         Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
+
+        inventory.setBusinessId(businessId);
 
         inventory = inventoryService.createInventory(inventory);
 
@@ -159,7 +162,7 @@ public class InventoryController {
 
 
         logger.debug("Trying to retrieve INVENTORY products for business: {}", possibleBusiness);
-        List<Inventory> inventoryList = inventoryService.getInventory(businessId);
+        List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId);
 
 
         logger.info("INVENTORY Products retrieved: {} for business: {}", inventoryList, possibleBusiness);

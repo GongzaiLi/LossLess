@@ -28,7 +28,6 @@ import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -109,7 +108,7 @@ public class InventoryControllerUnitTest {
 
         Mockito
                 .when(inventoryService.createInventory(any(Inventory.class)))
-                .thenReturn(inventoryItem.setId("2"));
+                .thenReturn(inventoryItem.setId(2L));
 
         Mockito
                 .when(userService.findUserByEmail(anyString()))
@@ -144,7 +143,7 @@ public class InventoryControllerUnitTest {
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("inventoryItemId", is("2")));
+                .andExpect(jsonPath("inventoryItemId", is(2)));
     }
 
     @Test
@@ -190,7 +189,7 @@ public class InventoryControllerUnitTest {
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("inventoryItemId", is("2")));
+                .andExpect(jsonPath("inventoryItemId", is(2)));
     }
 
     @Test
@@ -206,7 +205,7 @@ public class InventoryControllerUnitTest {
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("inventoryItemId", is("2")));
+                .andExpect(jsonPath("inventoryItemId", is(2)));
     }
 
     @Test

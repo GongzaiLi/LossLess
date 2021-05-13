@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
 public class GetInventoryDto {
-    private String id;
+    private Long id;
     private Product product;
     private String description;
     private Integer quantity;
