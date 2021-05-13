@@ -3,10 +3,46 @@ Page that stores table to show the business inventory
 Date: 11/5/2021
 -->
 <template>
-  <div>
-    <b-card v-if="canEditInventory">
+  <div class="overflow-auto">
+    <b-card v-if="canEditInventory" style="max-width: 1260px;">
       <b-card-title>Inventory: {{businessName}}</b-card-title>
       <hr class='m-0'>
+      <b-row align-v="center" style="padding: 10px">
+        <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
+      </b-row>
+      <b-table
+          striped hovers
+          responsive="lg"
+          no-border-collapse
+          bordered
+          show-empty
+          class="inventory-table"
+          :fields="fields"
+          :items="items"
+          :per-page="perPage"
+          :current-page="currentPage"
+          :busy="tableLoading"
+          ref="inventoryTable"
+      >
+
+        <template #cell(pricePerItem)="data">
+          {{ currency.symbol }}{{ data.item.pricePerItem }}
+        </template>
+        <template #cell(totalPrice)="data">
+          {{ currency.symbol }}{{ data.item.totalPrice }}
+        </template>
+
+        <template #empty>
+          <div class="no-results-overlay">
+            <h4>No Product to display</h4>
+          </div>
+        </template>
+        <template #table-busy>
+          <div class="no-results-overlay">
+            <h4>Loading...</h4>
+          </div>
+        </template>
+      </b-table>
     </b-card>
 
     <b-card id="inventory-locked-card" v-if="!canEditInventory">
@@ -21,6 +57,14 @@ Date: 11/5/2021
   </div>
 </template>
 
+<style>
+.no-results-overlay {
+  margin-top:7em;
+  margin-bottom:7em;
+  text-align: center;
+}
+</style>
+
 <script>
 import api from "../../Api";
 
@@ -29,11 +73,54 @@ export default {
     return {
       businessName: "",
       currentUser: {},
+      items: [],
+      products: [],
+      perPage: 10,
+      currentPage: 1,
+      tableLoading: true,
+      currency: {
+        symbol: '$',
+        code: 'USD',
+        name: 'US Dollar',
+      },
     }
   },
   mounted() {
     const businessId = this.$route.params.id
     this.getBusinessInfo(businessId);
+    this.items = [
+      {
+        id: 1,
+        productId: 0,
+        quantity: 3,
+        pricePerItem: 2.00,
+        totalPrice: 6,
+        manufactured: "2021-05-13",
+        sellBy: "2021-05-13",
+        bestBefore: "2021-05-13",
+        expires: "2021-05-13",
+      },
+      {
+        id: 1,
+        quantity: 3,
+        pricePerItem: 2.00,
+        totalPrice: 6,
+        manufactured: "2021-05-13",
+        sellBy: "2021-05-13",
+        bestBefore: "2021-05-13",
+        expires: "2021-05-13",
+      },
+      {
+        id: 1,
+        quantity: 3,
+        pricePerItem: 2.00,
+        totalPrice: 6,
+        manufactured: "2021-05-13",
+        sellBy: "2021-05-13",
+        bestBefore: "2021-05-13",
+        expires: "2021-05-13",
+      },
+    ];
   },
   methods: {
     /**
@@ -42,17 +129,111 @@ export default {
      * @param businessId
      */
     getBusinessInfo: async function (businessId) {
-      api.getBusiness(businessId)
+      this.tableLoading = true;
+      const getProductsPromise = api.getProducts(businessId);
+      const currencyPromise = api.getBusiness(businessId)
           .then((resp) => {
             this.businessName = resp.data.name;
+            return api.getUserCurrency(resp.data.address.country);
           })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
-    }
+      try {
+        const [productsResponse, currency] = await Promise.all([getProductsPromise, currencyPromise])
+        this.products = productsResponse.data;
+        this.tableLoading = false;
+        if (currency != null) {
+          this.currency = currency;
+        }
+      } catch(error) {
+        this.$log.debug(error);
+      }
+    },
+
+    /**
+     * modify the date to day/month/year.
+     * @param oldDate
+     * @return string
+     */
+    setDate: function (oldDate) {
+      const date = new Date(oldDate);
+      return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
+          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+          `${date.getUTCFullYear()}`;
+    },
   },
 
   computed: {
+    /**
+     * set table parameter
+     * @returns object
+     */
+    fields: function () {
+      return [
+        {
+          key: 'productId',
+          label: 'Product Code',
+          sortable: true
+        },
+        {
+          key: 'quantity',
+          label: 'Quantity',
+          sortable: true
+        },
+        {
+          key: 'pricePerItem',
+          label: `Price (${this.currency.code})`,
+          sortable: true
+        },
+        {
+          key: 'totalPrice',
+          label: `Total (${this.currency.code})`,
+          sortable: true
+        },
+        {
+          key: 'manufactured',
+          label: 'Manufacture Date',
+          formatter: (value) => {
+            return this.setDate(value);
+          },
+          thStyle: 'width: 15%',
+          sortable: true
+        },
+        {
+          key: 'sellBy',
+          label: 'Sell by Date',
+          formatter: (value) => {
+            return this.setDate(value);
+          },
+          thStyle: 'width: 15%',
+          sortable: true
+        },
+        {
+          key: 'bestBefore',
+          label: 'Best Before Date',
+          formatter: (value) => {
+            return this.setDate(value);
+          },
+          thStyle: 'width: 15%',
+          sortable: true
+        },
+        {
+          key: 'expires',
+          label: 'Expiry Date',
+          formatter: (value) => {
+            return this.setDate(value);
+          },
+          thStyle: 'width: 15%',
+          sortable: true
+        }
+      ];
+    },
+
+    /**
+     * The totalResults function just computed how many pages in the search table.
+     * @returns number
+     */
+    totalItems: function () {
+      return this.items.length;
+    },
 
     /**
      * True if the user can edit this catalogue (ie they are an admin or acting as this business)
