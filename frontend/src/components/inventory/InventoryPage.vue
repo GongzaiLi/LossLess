@@ -34,7 +34,7 @@ Date: 11/5/2021
 
         <template #empty>
           <div class="no-results-overlay">
-            <h4>No Product to display</h4>
+            <h4>No Inventory to display</h4>
           </div>
         </template>
         <template #table-busy>
