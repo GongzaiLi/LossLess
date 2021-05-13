@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -67,7 +68,8 @@ public class AdminEndpointsIntegrationTest {
 
         userService.createUser(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isOk());
 
         User resultUser = userService.findUserByEmail("Test@Gmail");
@@ -101,7 +103,8 @@ public class AdminEndpointsIntegrationTest {
 
         userService.createUser(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isOk());
 
         User resultUser = userService.findUserByEmail("Test@Gmail");
@@ -112,49 +115,56 @@ public class AdminEndpointsIntegrationTest {
     @Test
     @WithMockCustomUser(email = "test@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenUserToBeMadeAdminNotFound_thenNotAcceptable() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
     @WithMockCustomUser(email = "defaultAdmin@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenUserToBeMadeAdminNotFound_andDGAA_thenNotAcceptable() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
     @WithMockCustomUser(email = "admin@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
     public void whenUserToBeMadeAdminNotFound_andGAA_thenNotAcceptable() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
     @WithMockCustomUser(email = "jeh128@uclive.ac.nz", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
     public void whenUserToMakeAdminFound_andGAA_butRequestToChangeDGAA_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockCustomUser(email = "jeh128@uclive.ac.nz", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenUserToMakeAdminFound_andDGAA_butRequestToChangeDGAA_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockCustomUser(email = "admin@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenTryRevokeUserExists_andUserIsDGAARole_andRequestFromDGAA_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockCustomUser(email = "admin@700", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
     public void whenTryRevokeUserExists_andUserIsDGAARole_andRequestFromGAA_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
@@ -184,7 +194,8 @@ public class AdminEndpointsIntegrationTest {
 
         userService.createUser(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isOk());
 
         User resultUser = userService.findUserByEmail("Test@Gmail");
@@ -218,7 +229,8 @@ public class AdminEndpointsIntegrationTest {
 
         userService.createUser(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin"))
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
+                .with(csrf()))
                 .andExpect(status().isOk());
 
         User resultUser = userService.findUserByEmail("Test@Gmail");

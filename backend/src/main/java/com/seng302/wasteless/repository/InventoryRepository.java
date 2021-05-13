@@ -9,15 +9,14 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.util.List;
 
 /**
- * ProductRepository is a repository interface for Product.
- * Used to declare accessors to JPA objects.
+ * InventoryRepository is a repository interface for Inventory objects.
+ * This declares 'raw' accessors to Inventory JPA objects. Don't use this class to get/update Inventory items. Use the
+ * InventoryService instead as it may have business logic implemented.
  */
 @RepositoryRestResource
 public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
-    Inventory findFirstById(String id);
+    Inventory findFirstById(Long id);
 
-    static List<Inventory> findAllByBusinessId(Integer id) {          // this needs to be implemented
-        return null;
-    }
+    List<Inventory> findAllByBusinessId(Integer id);
 }
