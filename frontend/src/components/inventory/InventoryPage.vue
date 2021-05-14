@@ -146,7 +146,6 @@ export default {
         const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
         this.products = productsResponse.data;
         this.items = inventoryResponse.data;
-        console.log(this.items);
         this.tableLoading = false;
         if (currency != null) {
           this.currency = currency;
@@ -160,8 +159,8 @@ export default {
      * modify the ID so that it doesn't display the "{businessId}-" at the start
      * @return string
      */
-    setId: function (id) {
-      return id.split(/-(.+)/)[1];
+    setId: function (product) {
+      return product.id.split(/-(.+)/)[1];
     },
 
     /**
@@ -170,10 +169,12 @@ export default {
      * @return string
      */
     setDate: function (oldDate) {
-      const date = new Date(oldDate);
-      return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-        `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-        `${date.getUTCFullYear()}`;
+      if (oldDate != null) {
+        const date = new Date(oldDate);
+        return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
+            `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+            `${date.getUTCFullYear()}`;
+      }
     },
 
     /**
@@ -215,14 +216,14 @@ export default {
         {
           key: 'productThumbnail',
         },
-        // {
-        //   key: 'productId',
-        //   label: 'Product Code',
-        //   formatter: (value) => {
-        //     return this.setId(value);
-        //   },
-        //   sortable: true
-        // },
+        {
+          key: 'product',
+          label: 'Product Code',
+          formatter: (value) => {
+            return this.setId(value);
+          },
+          sortable: true
+        },
         {
           key: 'quantity',
           label: 'Quantity',

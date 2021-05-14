@@ -58,7 +58,7 @@ export default {
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
   modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials:true}),
-  createInventory: (id, inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
+  createInventory: (id,inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
   getInventory: (id) => instance.get(`/businesses/${id}/inventory`, {withCredentials: true}),
 
   /**

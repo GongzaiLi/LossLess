@@ -73,35 +73,47 @@ Date: 13/5/2021
           <h6><strong>Manufactured:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-2">
-          <b-form-input :type="(disabled)?'text':'date'" :disabled="disabled" v-model="inventoryInfo.manufactured"/>
+          <b-form-input :type="(disabled)?'text':'date'"
+                        :disabled="disabled"
+                        autocomplete="off"
+                        v-model="inventoryInfo.manufactured"/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Sell By:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-2">
-          <b-form-input :type="(disabled)?'text':'date'" :disabled="disabled" v-model="inventoryInfo.sellBy"/>
+          <b-form-input :type="(disabled)?'text':'date'"
+                        :disabled="disabled"
+                        autocomplete="off"
+                        v-model="inventoryInfo.sellBy"/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Best Before:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-2">
-          <b-form-input :type="(disabled)?'text':'date'" :disabled="disabled" v-model="inventoryInfo.bestBefore"/>
+          <b-form-input :type="(disabled)?'text':'date'"
+                        :disabled="disabled"
+                        autocomplete="off"
+                        v-model="inventoryInfo.bestBefore"/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Expires *:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-2">
-          <b-form-input :type="(disabled)?'text':'date'" :disabled="disabled" v-model="inventoryInfo.expires" required/>
+          <b-form-input :type="(disabled)?'text':'date'"
+                        :disabled="disabled"
+                        autocomplete="off"
+                        v-model="inventoryInfo.expires" required/>
         </b-input-group>
+        <b-alert :show="inventoryCardError ? 120 : 0" variant="danger">{{ inventoryCardError }}</b-alert>
         <hr style="width:100%">
         <b-button v-show="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
       </b-card-body>
     </b-form>
-    <b-alert :show="inventoryCardError ? 120 : 0" variant="danger">{{ inventoryCardError }}</b-alert>
   </b-card>
 </template>
 
@@ -135,16 +147,7 @@ export default {
   data() {
     return {
       mainProps: { blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1' },
-      inventoryInfo: {
-        productId: "WATT-420-BEANS",//
-        quantity: 3,
-        pricePerItem: 2.00,
-        totalPrice: 6,
-        manufactured: "2021-05-13",
-        sellBy: "2021-05-13",
-        bestBefore: "2021-05-13",
-        expires: "2021-05-13"
-      },
+      inventoryInfo: {},
       inventoryCardError: ''
     }
   },
@@ -157,7 +160,8 @@ export default {
      */
     setUpInventoryCard() {
       this.inventoryInfo = this.inventory;
-      if (!this.disabled) {
+      if (this.disabled) {
+        this.inventoryInfo.productId = this.inventoryInfo.product.id.split(/-(.+)/)[1];
         this.inventoryInfo.manufactured = this.setDate(this.inventoryInfo.manufactured);
         this.inventoryInfo.sellBy = this.setDate(this.inventoryInfo.sellBy);
         this.inventoryInfo.bestBefore = this.setDate(this.inventoryInfo.bestBefore);
@@ -169,7 +173,7 @@ export default {
      * set date to a string form.
      **/
     setDate(date) {
-      return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ');
+      if (date != null)  {return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')}
     },
 
     /**
@@ -180,9 +184,12 @@ export default {
         parseFloat((this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2));
     },
 
+    /**
+     * Makes a request to the API to create a inventory with the form input.
+     * Then, will hide the inventory popup
+     */
     async createInventory(event) {
       event.preventDefault();
-      console.log(this.inventoryInfo)
       await api
           .createInventory(this.$route.params.id, this.inventoryInfo)
           .then((createInventoryResponse) => {
@@ -190,9 +197,25 @@ export default {
             this.$bvModal.hide('inventory-card');
           })
           .catch((error) => {
-            this.inventoryCardError = error;
+            this.inventoryCardError = this.getErrorMessageFromApiError(error);
             this.$log.debug(error);
           });
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST and PUT requests for inventory
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        return error.response.data;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
     },
 
     /**
