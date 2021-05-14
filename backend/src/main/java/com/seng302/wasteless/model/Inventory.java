@@ -6,6 +6,7 @@ import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method, excluded to prevent recursive problems
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@Accessors(chain = true) //Allows chaining of getters and setters
 public class Inventory {
 
     @Id // this field (attribute) is the table primary key
@@ -32,9 +34,9 @@ public class Inventory {
 
     @NotNull(message = "Product Code is Mandatory")
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id") //Stored in table as id with reference to product table
     @JsonView(InventoryView.GetInventoryView.class)
-    private Product productId;
+    private Product product;
 
     @Positive
     @Max(1000000000)
