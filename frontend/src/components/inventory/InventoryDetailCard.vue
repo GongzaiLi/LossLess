@@ -152,16 +152,23 @@ export default {
      */
     setUpInventoryCard() {
       this.inventoryInfo = this.inventory;
-      this.inventoryInfo.manufactured = new Date(this.inventoryInfo.manufactured).toUTCString();
-      this.inventoryInfo.sellBy = new Date(this.inventoryInfo.sellBy).toUTCString();
-      this.inventoryInfo.bestBefore = new Date(this.inventoryInfo.bestBefore).toUTCString();
-      this.inventoryInfo.expires = new Date(this.inventoryInfo.expires).toUTCString();
+      this.inventoryInfo.manufactured = this.setDate(this.inventoryInfo.manufactured);
+      this.inventoryInfo.sellBy = this.setDate(this.inventoryInfo.sellBy);
+      this.inventoryInfo.bestBefore = this.setDate(this.inventoryInfo.bestBefore);
+      this.inventoryInfo.expires = this.setDate(this.inventoryInfo.expires);
+    },
+    /**
+     * set date to a string form.
+     **/
+    setDate(date) {
+      return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ');
     },
     /**
      * calculate the Total price when the price prt item or quantity changed
      */
     calculateTotalPrice() {
-      this.inventoryInfo.totalPrice = (this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2);
+      this.inventoryInfo.totalPrice =
+        parseFloat((this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2));
     },
     /**
      * when click Ok button the modal will hide.
