@@ -8,8 +8,8 @@ Date: 13/5/2021
     style="max-width: 550px"
   >
     <b-form @submit="okAction">
+      <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
       <b-card-body>
-        <b-img class="mb-2" center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
         <h6 class="mb-2"><strong>Product Id *:</strong></h6>
         <p :hidden="disabled" style="margin:0">
           Ensure there are no special characters (e.g. "/","?").
@@ -95,14 +95,11 @@ Date: 13/5/2021
         <b-input-group class="mb-2">
           <b-form-input type="text" disabled v-model="inventoryInfo.expires"/>
         </b-input-group>
-
-      </b-card-body>
-
-      <hr style="width:100%">
-      <div>
+        <hr style="width:100%">
         <b-button v-show="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
-      </div>
+
+      </b-card-body>
     </b-form>
   </b-card>
 </template>

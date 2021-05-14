@@ -65,8 +65,8 @@ Date: 19/4/2021
         </b-input-group>
     </b-card-body>
     <hr style="width:100%">
-      <div v-if="!disabled">
-        <b-button style="float: right" variant="primary" type="submit">OK</b-button>
+      <div>
+        <b-button  v-if="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
       </div>
     </b-form>
