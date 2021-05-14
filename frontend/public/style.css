@@ -27,8 +27,8 @@
 
 html,
 body {
-    margin: 5;
-    padding: 5;
+    margin: 5px;
+    padding: 5px;
 }
 
 
@@ -81,14 +81,7 @@ body {
     0 16px 0 -6px #f6f6f6, 0 17px 2px -6px rgba(0, 0, 0, 0.2);
 }
 
-.student-count {
-    float: left;
-    text-align: left;
-}
 
-.student-count strong {
-    font-weight: 300;
-}
 
 .filters {
     margin: 0;

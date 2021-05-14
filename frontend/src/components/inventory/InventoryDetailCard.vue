@@ -9,11 +9,7 @@ Date: 13/5/2021
   >
     <b-form @submit="okAction">
       <b-card-body>
-        <!--        <h6><strong>ID: </strong></h6>-->
-        <!--        <b-input-group class="mb-3">-->
-        <!--          <b-form-input type="number" maxlength="50" disabled v-model="inventoryInfo.id"/>-->
-        <!--        </b-input-group>-->
-
+        <b-img class="mb-2" center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
         <h6 class="mb-2"><strong>Product Id *:</strong></h6>
         <p :hidden="disabled" style="margin:0">
           Ensure there are no special characters (e.g. "/","?").
@@ -134,6 +130,7 @@ export default {
   },
   data() {
     return {
+      mainProps: { blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1' },
       inventoryInfo: {
         productId: "WATT-420-BEANS",//
         quantity: 3,
