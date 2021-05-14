@@ -85,7 +85,7 @@ Date: 15/4/2021
 
 </template>
 
-<style>
+<style scoped>
 .no-results-overlay {
   margin-top: 7em;
   margin-bottom: 7em;
@@ -99,7 +99,6 @@ h2 {
 .catalogue-table td {
   cursor: pointer;
 }
-
 </style>
 
 <script>
