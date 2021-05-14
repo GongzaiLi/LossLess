@@ -31,6 +31,16 @@ public class InventoryService {
     }
 
     /**
+     * Returns the Inventory item with the given product id
+     *
+     * @param prodId        The product id of the Inventory item to be found
+     * @return          The found Inventory item, if any, otherwise null
+     */
+    public Inventory findInventoryByProductId(String prodId) {
+        return inventoryRepository.findFirstByProduct(prodId);
+    }
+
+    /**
      * Given an Inventory object, 'creates' it by saving and persisting it in the database.
      * @param inventory The inventory item to create
      * @return The created inventory item. The returned item should have a valid database id you can get with .getId()
