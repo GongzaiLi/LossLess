@@ -14,8 +14,8 @@ Date: 13/5/2021
       <b-card-body>
         <h6 class="mb-2"><strong>Product Id *:</strong></h6>
         <p :hidden="disabled" style="margin:0">
-          Input a valid Product Code/ID.</p>
-          Please check your product code in your catalogue.<br>
+          Input a valid Product Code/ID.<br>
+          Please check your product code in your catalogue.</p>
         <b-input-group class="mb-2">
           <b-form-input
             type="text" maxlength="50"
