@@ -190,7 +190,6 @@ export default {
      */
     async createInventory(event) {
       event.preventDefault();
-      this.inventoryInfo.productId = this.$route.params.id + "-" + this.inventoryInfo.productId
       await api
           .createInventory(this.$route.params.id, this.inventoryInfo)
           .then((createInventoryResponse) => {
