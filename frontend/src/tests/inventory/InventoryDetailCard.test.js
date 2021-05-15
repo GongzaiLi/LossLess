@@ -1,10 +1,36 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import InventoryDetailCard from "../../components/inventory/InventoryDetailCard";
+import Api from "../../Api";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let wrapper;
+
+const $route = {
+  params: {
+    id: 0
+  }
+};
+
+const $log = {
+  debug() {
+  }
+};
+
+const $currentUser = {
+  role: 'user',
+  currentlyActingAs: {
+    id: 0
+  },
+  businessesAdministered: [
+    {id: 0, name: "blah"},
+    {id: 1, name: "blah1"},
+    {id: 2, name: "blah2"}
+  ]
+};
+
+jest.mock('../../Api');
 
 beforeEach(() => {
 
@@ -30,7 +56,7 @@ beforeEach(() => {
         bestBefore: "2021-05-14",
         expires: "2021-05-14"
   }},
-    mocks: {},
+    mocks: {$route, $log, $currentUser},
     stubs: {},
     methods: {},
   });
@@ -95,4 +121,52 @@ describe('check calculateTotalPrice function', () => {
     expect(wrapper.vm.inventoryInfo.totalPrice).toBe(102.1);
   })
 
+})
+
+describe('Testing api put/post request and the response method with errors', () => {
+
+  it('Succesfully creates a product ', async () => {
+    Api.createInventory.mockResolvedValue({response: {status: 200}});
+
+    const mockEvent = {preventDefault: jest.fn()}
+    await wrapper.vm.createInventory(mockEvent);
+
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+
+  it("400 given Product ID doesn't exist", async () => {
+    Api.createInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+
+    const mockEvent = {preventDefault: jest.fn()}
+    await wrapper.vm.createInventory(mockEvent);
+
+    expect(wrapper.vm.inventoryCardError).toBe("Product with given id does not exist");
+  });
+
+  it('403 forbidden test', async () => {
+    Api.createInventory.mockRejectedValue({response: {status: 403}});
+
+    const mockEvent = {preventDefault: jest.fn()}
+    await wrapper.vm.createInventory(mockEvent);
+
+    expect(wrapper.vm.inventoryCardError).toBe("Forbidden. You are not an authorized administrator");
+  });
+
+  it('No internet test', async () => {
+    Api.createInventory.mockRejectedValue({request: {path: 'blah'}});
+
+    const mockEvent = {preventDefault: jest.fn()}
+    await wrapper.vm.createInventory(mockEvent);
+
+    expect(wrapper.vm.inventoryCardError).toBe("No Internet Connectivity");
+  });
+
+  it('500 server error', async () => {
+    Api.createInventory.mockRejectedValue({response: {status: 500}});
+
+    const mockEvent = {preventDefault: jest.fn()}
+    await wrapper.vm.createInventory(mockEvent);
+
+    expect(wrapper.vm.inventoryCardError).toBe("Server error");
+  });
 })

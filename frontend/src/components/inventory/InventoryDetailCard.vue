@@ -8,14 +8,14 @@ Date: 13/5/2021
     style="max-width: 550px"
   >
     <b-form @submit="createInventory">
-      <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
+      <div :hidden="!disabled">
+        <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
+      </div>
       <b-card-body>
         <h6 class="mb-2"><strong>Product Id *:</strong></h6>
         <p :hidden="disabled" style="margin:0">
-          Ensure there are no special characters (e.g. "/","?").
-          <br>
-          This will be automatically changed into the correct format.</p>
-
+          Input a valid Product Code/ID.</p>
+          Please check your product code in your catalogue.<br>
         <b-input-group class="mb-2">
           <b-form-input
             type="text" maxlength="50"
@@ -148,7 +148,7 @@ export default {
     return {
       mainProps: { blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1' },
       inventoryInfo: {},
-      inventoryCardError: ''
+      inventoryCardError: ""
     }
   },
   mounted() {
@@ -190,6 +190,7 @@ export default {
      */
     async createInventory(event) {
       event.preventDefault();
+      this.inventoryInfo.productId = this.$route.params.id + "-" + this.inventoryInfo.productId
       await api
           .createInventory(this.$route.params.id, this.inventoryInfo)
           .then((createInventoryResponse) => {
@@ -222,6 +223,7 @@ export default {
      * when click Cancel button the modal will hide.
      */
     cancelAction() {
+      this.inventoryCardError = "";
       this.$bvModal.hide('inventory-card');
     }
   }
