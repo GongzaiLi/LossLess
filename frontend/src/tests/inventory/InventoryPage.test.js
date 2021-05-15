@@ -2,6 +2,7 @@ import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import InventoryPage from '../../components/inventory/InventoryPage';
 import Api from "../../Api";
+import InventoryDetailCard from "../../components/inventory/InventoryDetailCard";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -71,6 +72,24 @@ describe('check-getBusiness-API-function', () => {
                 created: "2021-04-14T13:01:58.660Z"
             }]
         };
+        const inventoryResponse = {
+            data: [{
+                product: {
+                    id: "WATT-420-BEANS",
+                    name: "Watties Baked Beans - 420g can",
+                    description: "Baked Beans as they should be.",
+                    recommendedRetailPrice: 2.2,
+                    created: "2021-04-14T13:01:58.660Z"
+                },
+                quantity: 4,
+                pricePerItem: 6.5,
+                totalPrice: 21.99,
+                manufactured: "2021-05-14",
+                sellBy: "2021-05-14",
+                bestBefore: "2021-05-14",
+                expires: "2021-05-14"
+            }]
+        }
         const businessResponse = {
             data: {
                 "id": 100,
@@ -95,8 +114,10 @@ describe('check-getBusiness-API-function', () => {
             code: 'NZD',
             name: 'New Zealand Dollar'
         };
+
         Api.getProducts.mockResolvedValue(productsResponse);
         Api.getBusiness.mockResolvedValue(businessResponse);
+        Api.getInventory.mockResolvedValue(inventoryResponse)
 
         const userCurrencyMock = jest.fn();
         userCurrencyMock.mockResolvedValue(mockCurrencyData);
@@ -196,3 +217,43 @@ describe('Testing currently acting as watcher ', () => {
     });
 
 });
+
+describe('check-modal-inventory-card-page', () => {
+    test('check-inventory-detail-card-component-exists', async () => {
+        const inventoryResponse = {
+            data: [{
+                product: {
+                    id: "WATT-420-BEANS",
+                    name: "Watties Baked Beans - 420g can",
+                    description: "Baked Beans as they should be.",
+                    recommendedRetailPrice: 2.2,
+                    created: "2021-04-14T13:01:58.660Z"
+                },
+                quantity: 4,
+                pricePerItem: 6.5,
+                totalPrice: 21.99,
+                manufactured: "2021-05-14",
+                sellBy: "2021-05-14",
+                bestBefore: "2021-05-14",
+                expires: "2021-05-14"
+            }]
+        };
+        Api.getProducts.mockResolvedValue(inventoryResponse);
+        await wrapper.vm.getBusinessInfo(0);
+        await wrapper.vm.openInventoryDetailModal(inventoryResponse.data[0]);
+
+        await wrapper.vm.$forceUpdate();
+
+        expect(wrapper.find(InventoryDetailCard).exists()).toBeTruthy()
+    });
+
+    test('check-inventory-detail-card-component-exists-when-click-create-button', async () => {
+        await wrapper.vm.openCreateInventoryModal();
+
+        await wrapper.vm.$forceUpdate();
+
+        expect(wrapper.find(InventoryDetailCard).exists()).toBeTruthy()
+    });
+
+})
+

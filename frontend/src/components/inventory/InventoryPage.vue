@@ -7,8 +7,16 @@ Date: 11/5/2021
     <b-card v-if="canEditInventory" style="max-width: 1260px;">
       <b-card-title>Inventory: {{ businessName }}</b-card-title>
       <hr class='m-0'>
-      <b-row align-v="center" style="padding: 10px">
-        <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
+      <b-row align-v="center">
+        <b-col md="8"><h6 class="ml-2">Click on an inventory to view more details</h6></b-col>
+        <b-col md="4">
+          <b-form-group>
+            <b-button @click="openCreateInventoryModal" class="float-right">
+              <b-icon-plus-square-fill/>
+              Create
+            </b-button>
+          </b-form-group>
+        </b-col>
       </b-row>
       <b-table
         striped hovers
@@ -70,8 +78,8 @@ Date: 11/5/2021
       :no-close-on-backdrop="!isInventoryCardReadOnly"
       :no-close-on-esc="!isInventoryCardReadOnly">
       <inventory-detail-card :disabled="isInventoryCardReadOnly" :currency="currency"
-                             :inventory="inventoryDisplayedInCard"/>
-      <!--      <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>-->
+                             :inventory="inventoryDisplayedInCard" :edit-modal="editInventoryItem"
+                             :set-up-inventory-page="setUpInventoryPage"/>
     </b-modal>
 
   </div>
@@ -112,49 +120,21 @@ export default {
       mainProps: {blank: true, width: 50, height: 50},
       isInventoryCardReadOnly: true,
       inventoryDisplayedInCard: {},
+      editInventoryItem: false,
     }
   },
   mounted() {
-    const businessId = this.$route.params.id
-    this.getBusinessInfo(businessId);
-    this.items = [
-      {
-        id: 1,
-        productId: "51-BEANS-R-US",
-        quantity: 3,
-        pricePerItem: 2.00,
-        totalPrice: 6,
-        manufactured: "2021-05-13",
-        sellBy: "2021-05-13",
-        bestBefore: "2021-05-13",
-        expires: "2021-05-13",
-      },
-      {
-        id: 2,
-        productId: "51-BEANS-R-NOT-US",
-        quantity: 3,
-        pricePerItem: 2.00,
-        totalPrice: 6,
-        manufactured: "2021-05-13",
-        sellBy: "2021-05-13",
-        bestBefore: "2021-05-13",
-        expires: "2021-05-13",
-      },
-      {
-        id: 3,
-        productId: "51-BEANS",
-        quantity: 3,
-        pricePerItem: 3.00,
-        totalPrice: 9,
-        manufactured: "2021-05-13",
-        sellBy: "2021-05-13",
-        bestBefore: "2021-05-13",
-        expires: "2021-05-13",
-      },
-    ];
-    this.tableLoading = false;
+    this.setUpInventoryPage();
   },
   methods: {
+    /**
+     * init the data which is from the inventory table
+     **/
+    setUpInventoryPage() {
+      const businessId = this.$route.params.id
+      this.getBusinessInfo(businessId);
+      this.tableLoading = false;
+    },
     /**
      * this is a get api to get the name of the business
      * NOTE!! Best to add currency stuff here as well similar to the products
@@ -162,15 +142,17 @@ export default {
      */
     getBusinessInfo: async function (businessId) {
       this.tableLoading = true;
-      const getProductsPromise = api.getProducts(businessId);
+      const getProductsPromise = api.getProducts(businessId)
+      const getInventoryPromise = api.getInventory(businessId)
       const currencyPromise = api.getBusiness(businessId)
         .then((resp) => {
           this.businessName = resp.data.name;
           return api.getUserCurrency(resp.data.address.country);
         })
       try {
-        const [productsResponse, currency] = await Promise.all([getProductsPromise, currencyPromise])
+        const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
         this.products = productsResponse.data;
+        this.items = inventoryResponse.data;
         this.tableLoading = false;
         if (currency != null) {
           this.currency = currency;
@@ -184,8 +166,8 @@ export default {
      * modify the ID so that it doesn't display the "{businessId}-" at the start
      * @return string
      */
-    setId: function (id) {
-      return id.split(/-(.+)/)[1];
+    setId: function (product) {
+      return product.id.split(/-(.+)/)[1];
     },
 
     /**
@@ -194,10 +176,12 @@ export default {
      * @return string
      */
     setDate: function (oldDate) {
-      const date = new Date(oldDate);
-      return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-        `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-        `${date.getUTCFullYear()}`;
+      if (oldDate != null) {
+        const date = new Date(oldDate);
+        return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
+          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+          `${date.getUTCFullYear()}`;
+      }
     },
 
     /**
@@ -205,7 +189,26 @@ export default {
      * @param inventory object
      **/
     openInventoryDetailModal: function (inventory) {
+      this.isInventoryCardReadOnly = true;
       this.inventoryDisplayedInCard = Object.assign({}, inventory);
+      this.$bvModal.show('inventory-card');
+    },
+
+    /**
+     *
+     **/
+    openCreateInventoryModal: function () {
+      this.isInventoryCardReadOnly = false;
+      this.inventoryDisplayedInCard = {
+        productId: '',
+        quantity: 0,
+        pricePerItem: 0,
+        totalPrice: 0,
+        manufactured: null,
+        sellBy: null,
+        bestBefore: null,
+        expires: null,
+      }
       this.$bvModal.show('inventory-card');
     }
   },
@@ -221,7 +224,7 @@ export default {
           key: 'productThumbnail',
         },
         {
-          key: 'productId',
+          key: 'product',
           label: 'Product Code',
           formatter: (value) => {
             return this.setId(value);
