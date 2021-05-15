@@ -142,7 +142,11 @@ export default {
     editModal: {
       type: Boolean,
       default: false
+    },
+    setUpInventoryPage: {
+      type: Function,
     }
+
   },
   data() {
     return {
@@ -195,6 +199,7 @@ export default {
           .then((createInventoryResponse) => {
             this.$log.debug("Inventory Created", createInventoryResponse);
             this.$bvModal.hide('inventory-card');
+            this.setUpInventoryPage();
           })
           .catch((error) => {
             this.inventoryCardError = this.getErrorMessageFromApiError(error);

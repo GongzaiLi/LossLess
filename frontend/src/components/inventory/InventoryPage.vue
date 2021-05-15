@@ -78,7 +78,8 @@ Date: 11/5/2021
       :no-close-on-backdrop="!isInventoryCardReadOnly"
       :no-close-on-esc="!isInventoryCardReadOnly">
       <inventory-detail-card :disabled="isInventoryCardReadOnly" :currency="currency"
-                             :inventory="inventoryDisplayedInCard" :edit-modal="editInventoryItem"/>
+                             :inventory="inventoryDisplayedInCard" :edit-modal="editInventoryItem"
+                             :set-up-inventory-page="setUpInventoryPage"/>
     </b-modal>
 
   </div>
@@ -123,11 +124,14 @@ export default {
     }
   },
   mounted() {
-    const businessId = this.$route.params.id
-    this.getBusinessInfo(businessId);
-    this.tableLoading = false;
+    this.setUpInventoryPage();
   },
   methods: {
+    setUpInventoryPage() {
+      const businessId = this.$route.params.id
+      this.getBusinessInfo(businessId);
+      this.tableLoading = false;
+    },
     /**
      * this is a get api to get the name of the business
      * NOTE!! Best to add currency stuff here as well similar to the products
@@ -172,8 +176,8 @@ export default {
       if (oldDate != null) {
         const date = new Date(oldDate);
         return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-            `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-            `${date.getUTCFullYear()}`;
+          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
+          `${date.getUTCFullYear()}`;
       }
     },
 
