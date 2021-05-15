@@ -127,6 +127,9 @@ export default {
     this.setUpInventoryPage();
   },
   methods: {
+    /**
+     * init the data which is from the inventory table
+     **/
     setUpInventoryPage() {
       const businessId = this.$route.params.id
       this.getBusinessInfo(businessId);
