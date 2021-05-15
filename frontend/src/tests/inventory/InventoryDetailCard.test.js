@@ -40,26 +40,30 @@ beforeEach(() => {
 
   wrapper = shallowMount(InventoryDetailCard, {
     localVue,
-    propsData: {inventory: {
-    product: {
-      id: "WATT-420-BEANS",
+    propsData: {
+      inventory: {
+        product: {
+          id: "WATT-420-BEANS",
           name: "Watties Baked Beans - 420g can",
           description: "Baked Beans as they should be.",
           recommendedRetailPrice: 2.2,
           created: "2021-04-14T13:01:58.660Z"
-    },
-    quantity: 4,
+        },
+        quantity: 4,
         pricePerItem: 6.5,
         totalPrice: 21.99,
         manufactured: "2021-05-14",
         sellBy: "2021-05-14",
         bestBefore: "2021-05-14",
         expires: "2021-05-14"
-  }},
+      },
+      setUpInventoryPage: () => {},
+    },
     mocks: {$route, $log, $currentUser},
     stubs: {},
     methods: {},
   });
+
 
 });
 
@@ -74,7 +78,6 @@ describe('check setDate function', () => {
     expect(wrapper.vm.setDate(date)).toStrictEqual('Thu, 13 May 2021');
   })
 })
-
 
 
 describe('check calculateTotalPrice function', () => {
@@ -125,11 +128,13 @@ describe('check calculateTotalPrice function', () => {
 
 describe('Testing api put/post request and the response method with errors', () => {
 
+
   it('Succesfully creates a product ', async () => {
     Api.createInventory.mockResolvedValue({response: {status: 200}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.createInventory(mockEvent);
+
 
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
