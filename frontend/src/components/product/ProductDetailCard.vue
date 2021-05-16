@@ -40,7 +40,7 @@ Date: 19/4/2021
           <template #prepend>
             <b-input-group-text >{{currency.symbol}}</b-input-group-text>
           </template>
-          <b-form-input type="number" step=".01" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
+          <b-form-input type="number" max="9999999999999.99" step=".01" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
           <template #append>
             <b-input-group-text >{{currency.code}}</b-input-group-text>
           </template>
