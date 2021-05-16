@@ -115,6 +115,7 @@ public class UserController {
         logger.info("Successfully registered user: {}", user.getId());
 
         logger.debug("Authenticating user: {}", user.getId());
+
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 tempEmail, tempPassword);
         Authentication auth = authenticationManager.authenticate(token);

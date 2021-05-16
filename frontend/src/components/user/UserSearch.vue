@@ -4,7 +4,7 @@ Author: Caleb Sim, Gongzai Li
 Date: 7/3/2021
 -->
 <template>
-  <div>
+  <b-card style="max-width: 1200px">
     <h2 v-bind:hidden=isMakeAdmin>Search For a User</h2>
     <b-row style="height: 50px">
       <b-col cols="7">
@@ -36,10 +36,10 @@ Date: 7/3/2021
       </b-col>
     </b-row>
     <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage" v-show="items.length"/>
-  </div>
+  </b-card>
 </template>
 
-<style>
+<style scoped>
 .no-results-overlay {
   margin-top:7em;
   margin-bottom:7em;
