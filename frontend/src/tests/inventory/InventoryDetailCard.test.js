@@ -175,3 +175,12 @@ describe('Testing api put/post request and the response method with errors', () 
     expect(wrapper.vm.inventoryCardError).toBe("Server error");
   });
 })
+
+
+describe('select-product-modal', () => {
+  test('selectProduct works', () => {
+    wrapper.vm.selectProduct({id: 'ABC'});
+
+    expect(wrapper.vm.inventoryInfo.productId).toBe('ABC')
+  });
+})

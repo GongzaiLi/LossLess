@@ -177,7 +177,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 
 .no-results-overlay {
   margin-top: 7em;

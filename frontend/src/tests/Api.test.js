@@ -47,7 +47,18 @@ describe("Get user's country", () => {
   test('when garbage data', async () => {
     returnedData = [{"currencies":[{"code":"(none)","name":null,"symbol":null}]}];
 
-    const currency = await Api.getUserCurrency('zimbabwe');
+    const currency = await Api.getUserCurrency('zambia');
     expect(currency).toEqual(null);
+  });
+
+  test('caches results', async () => {
+    global.fetch = jest.fn();
+    const returnedData = [{"currencies":[{"code":"EUR","name":"Euro","symbol":"€"}]}];
+    global.fetch.mockResolvedValueOnce({ok: true, json: async () => returnedData})
+
+    const firstReturned = await Api.getUserCurrency('Belarus');
+    const secondReturned = await Api.getUserCurrency('Belarus');
+    expect(firstReturned).toEqual(secondReturned);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 })

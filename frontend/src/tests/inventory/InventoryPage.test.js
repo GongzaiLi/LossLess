@@ -124,7 +124,7 @@ describe('check-getBusiness-API-function', () => {
         Api.getUserCurrency = userCurrencyMock;
 
         await wrapper.vm.getBusinessInfo(0);
-        expect(wrapper.vm.businessName).toEqual(businessResponse.data.name);
+        expect(wrapper.vm.business.name).toEqual(businessResponse.data.name);
         expect(wrapper.vm.currency).toEqual(mockCurrencyData);
         expect(userCurrencyMock).toHaveBeenCalledWith('New Zealand');
     });

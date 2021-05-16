@@ -5,7 +5,7 @@ Date: 11/5/2021
 <template>
   <div class="overflow-auto">
     <b-card v-if="canEditInventory" style="max-width: 1260px;">
-      <b-card-title>Inventory: {{ businessName }}</b-card-title>
+      <b-card-title>Inventory: {{ business.name }}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center">
         <b-col md="8"><h6 class="ml-2">Click on an inventory to view more details</h6></b-col>
@@ -33,8 +33,8 @@ Date: 11/5/2021
         ref="inventoryTable"
         @row-clicked="openInventoryDetailModal"
       >
-        <template #cell(productThumbnail)>
-          <b-img v-bind="mainProps" thumbnail fluid rounded="circle" blank-color="#777" alt="Default Image"></b-img>
+        <template #cell(productThumbnail) class="thumbnail-row">
+          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777" alt="Default Image"></b-img>
         </template>
         <template #cell(pricePerItem)="data">
           {{ currency.symbol }}{{ data.item.pricePerItem }}
@@ -79,7 +79,8 @@ Date: 11/5/2021
       :no-close-on-esc="!isInventoryCardReadOnly">
       <inventory-detail-card :disabled="isInventoryCardReadOnly" :currency="currency"
                              :inventory="inventoryDisplayedInCard" :edit-modal="editInventoryItem"
-                             :set-up-inventory-page="setUpInventoryPage"/>
+                             :set-up-inventory-page="setUpInventoryPage"
+                             :current-business="business"/>
     </b-modal>
 
   </div>
@@ -90,6 +91,9 @@ Date: 11/5/2021
   margin-top: 7em;
   margin-bottom: 7em;
   text-align: center;
+}
+.thumbnail-row {
+  padding: 0 0 0 0.5rem !important;
 }
 </style>
 
@@ -105,7 +109,7 @@ export default {
   },
   data: function () {
     return {
-      businessName: "",
+      business: {},
       currentUser: {},
       items: [],
       products: [],
@@ -146,7 +150,7 @@ export default {
       const getInventoryPromise = api.getInventory(businessId)
       const currencyPromise = api.getBusiness(businessId)
         .then((resp) => {
-          this.businessName = resp.data.name;
+          this.business = resp.data;
           return api.getUserCurrency(resp.data.address.country);
         })
       try {
@@ -222,6 +226,8 @@ export default {
       return [
         {
           key: 'productThumbnail',
+          tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
+          thStyle: 'width: 60px',
         },
         {
           key: 'product',
