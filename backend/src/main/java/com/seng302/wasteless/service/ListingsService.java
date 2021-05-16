@@ -10,4 +10,8 @@ public class ListingsService {
     public Listings createListing(Listings listingItem) {
         return listingItem;
     }
+
+    public Listings findByBusinessId(int anyInt) {
+        return new Listings();
+    }
 }
