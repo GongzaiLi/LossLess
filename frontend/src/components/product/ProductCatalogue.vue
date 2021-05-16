@@ -6,7 +6,7 @@ Date: 15/4/2021
 <template>
   <div>
     <b-card v-if="canEditCatalogue">
-      <b-card-title v-if="!tableLoading">Product Catalogue: {{businessName}}</b-card-title>
+      <b-card-title>Product Catalogue: {{businessName}}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center">
         <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
@@ -19,44 +19,11 @@ Date: 15/4/2021
           </b-form-group>
         </b-col>
       </b-row>
-      <b-table
-        striped hovers
-        responsive
-        no-border-collapse
-        bordered
-        show-empty
-        @row-clicked="tableRowClick"
-        class="catalogue-table"
-        :fields="fields"
-        :items="items"
-        :per-page="perPage"
-        :current-page="currentPage"
-        :busy="tableLoading"
-        ref="productCatalogueTable"
-      >
 
-        <template v-slot:cell(actions)="products">
-          <b-button id="edit-button" @click="openEditProductCard(products.item)" size="sm">
-            Edit
-          </b-button>
-        </template>
-
-        <template #cell(recommendedRetailPrice)="data">
-          {{ currency.symbol }}{{ data.item.recommendedRetailPrice }}
-        </template>
-
-        <template #empty>
-          <div class="no-results-overlay">
-            <h4>No Product to display</h4>
-          </div>
-        </template>
-        <template #table-busy>
-          <div class="no-results-overlay">
-            <h4>Loading...</h4>
-          </div>
-        </template>
-      </b-table>
-      <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+      <products-table ref="productTable" :editable="true"
+                      v-on:productClicked="showProductDetails"
+                      v-on:editProductClicked="openEditProductCard">
+      </products-table>
 
       <b-modal id="product-card" hide-header hide-footer
                :no-close-on-backdrop="!isProductCardReadOnly" :no-close-on-esc="!isProductCardReadOnly"
@@ -81,23 +48,12 @@ Date: 15/4/2021
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
     </b-card>
   </div>
-
-
 </template>
 
-<style>
-.no-results-overlay {
-  margin-top: 7em;
-  margin-bottom: 7em;
-  text-align: center;
-}
+<style scoped>
 
 h2 {
   text-align: center;
-}
-
-.catalogue-table td {
-  cursor: pointer;
 }
 
 </style>
@@ -105,13 +61,14 @@ h2 {
 <script>
 import api from "../../Api";
 import productDetailCard from './ProductDetailCard';
-import pagination from '../model/Pagination';
+import ProductsTable from "./ProductsTable";
+import Api from "../../Api";
 
 
 export default {
   components: {
-    productDetailCard,
-    pagination
+    ProductsTable,
+    productDetailCard
   },
   data: function () {
     return {
@@ -128,46 +85,19 @@ export default {
       items: [],
       perPage: 10,
       currentPage: 1,
-      tableLoading: true,
       oldProductId: 0,
-      currentUser: {},
     }
   },
   mounted() {
     const businessId = this.$route.params.id;
-    this.getProducts(businessId);//this.getProducts(this.$route.params.id);
+    this.refreshTable(businessId);
   },
   methods: {
-    /**
-     * this is a get api which can take Specific business product data keep in the items and then show in the table
-     * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
-     * @param businessId
-     */
-    getProducts: async function (businessId) {
-      // We need to make 3 asynchronous requests: Get all business products,
-      // get the current business's address, and get the currency using that address.
-      this.tableLoading = true;
-      const getProductsPromise = api.getProducts(businessId);  // Promise for getting products
-      const getCurrencyPromise = // Promise for getting the company address, and then the currency data
-          api.getBusiness(businessId)
-              .then((resp) => {
-                this.businessName = resp.data.name;
-                return api.getUserCurrency(resp.data.address.country);
-              })
-
-      try {
-        const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
-
-        this.items = productsResponse.data;
-        this.tableLoading = false;
-        if(currency != null){
-          this.currency = currency;
-        }
-      } catch(error) {
-        this.$log.debug(error);
-      }
+    refreshTable: async function(businessId) {
+      const curBusiness = (await Api.getBusiness(businessId)).data;
+      this.businessName = curBusiness.name;
+      await this.$refs.productTable.getProducts(curBusiness);
     },
-
     /**
      * modify the ID so that it doesn't display the "{businessId}-" at the start
      * @return string
@@ -177,36 +107,10 @@ export default {
     },
 
     /**
-     * modify the description only keep 20 characters and then add ...
-     * @param description
-     * @return string
-     */
-    setDescription: function (description) {
-      if (description === "" || description.length <= 10) {
-        const trimmedDescription = description.trim();
-        return trimmedDescription;
-      }
-      const showTenWordDescription = description.slice(0, 10).trim();
-      return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
-    },
-
-    /**
-     * modify the date to day/month/year.
-     * @param created
-     * @return string
-     */
-    setCreated: function (created) {
-      const date = new Date(created);
-      return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-          `${date.getUTCFullYear()}`;
-    },
-
-    /**
      * when click the table will show a new model card.
      * @param product object
      */
-    tableRowClick(product) {
+    showProductDetails(product) {
       this.isProductCardReadOnly = true;
 
       this.productDisplayedInCard = Object.assign({}, product);
@@ -317,70 +221,11 @@ export default {
      */
     refreshProducts: function () {
       this.productCardError = "";
-      this.getProducts(this.$route.params.id);
+      this.refreshTable(this.$route.params.id);
     },
   },
 
   computed: {
-
-    /**
-     * set table parameter
-     * @returns object
-     */
-    fields: function () {
-      return [
-        {
-          key: 'id',
-          label: 'ID',
-          formatter: (value) => {
-            return this.setId(value);
-          },
-          sortable: true
-        },
-        {
-          key: 'name',
-          label: 'Name',
-          sortable: true
-        },
-        {
-          key: 'description',
-          label: 'Description',
-          formatter: (value) => {
-            return this.setDescription(value);
-          },
-          sortable: true
-        },
-        {
-          key: 'manufacturer',
-          label: 'Manufacturer',
-          sortable: true
-        },
-        {
-          key: 'recommendedRetailPrice',
-          label: `RRP (${this.currency.code})`,
-          sortable: true
-        },
-        {
-          key: 'created',
-          label: 'Created',
-          formatter: (value) => {
-            return this.setCreated(value);
-          },
-          sortable: true
-        },
-        {
-          key: 'actions',
-          label: 'Action'
-        }];
-    },
-
-    /**
-     * The totalResults function just computed how many pages in the search table.
-     * @returns number
-     */
-    totalItems: function () {
-      return this.items.length;
-    },
 
     /**
      * True if the user can edit this catalogue (ie they are an admin or acting as this business)
@@ -411,7 +256,7 @@ export default {
     $currentUser: {
       handler() {
         if (this.canEditCatalogue) {
-          this.getProducts(this.$route.params.id);
+          this.refreshTable(this.$route.params.id);
         }
       },
       deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)
@@ -425,7 +270,7 @@ export default {
     $route(to, _from) {
       const id = to.params.id;
       if (this.canEditCatalogue) {
-        this.getProducts(id);
+        this.refreshTable(id);
       }
     },
   }
