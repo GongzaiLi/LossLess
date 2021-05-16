@@ -128,5 +128,14 @@ public class User {
     public void addPrimaryBusiness(Business business) {
         this.businessesPrimarilyAdministered.add(business);
     }
+
+    /**
+     * Check if a user is a global admin or default global admin
+     * @return true if global admin, false otherwise
+     */
+    public boolean checkUserGlobalAdmin() {
+        return this.role == UserRoles.GLOBAL_APPLICATION_ADMIN ||
+                this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
+    }
 }
 

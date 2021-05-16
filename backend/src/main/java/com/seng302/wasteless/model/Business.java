@@ -71,4 +71,29 @@ public class Business {
     }
 
     public void removeAdministrator(User user) {this.administrators.remove(user);}
+
+    /**
+     * Check if the given user is an administrator of this business
+     * @param user The user to check administrative status of
+     * @return true if user admin, false otherwise
+     */
+    public boolean checkUserIsAdministrator(User user) {
+        for (User administrator: administrators) {
+            if (user.getId().equals(administrator.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the given user is the primary administrator of this business
+     * @param user The user to check primary administrative status of
+     * @return true if user primary admin, false otherwise
+     */
+    public boolean checkUserIsPrimaryAdministrator(User user) {
+        return primaryAdministrator.getId().equals(user.getId());
+    }
+
+
 }

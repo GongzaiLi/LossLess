@@ -1,6 +1,7 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.InventoryView;
 import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,34 +23,38 @@ import java.time.LocalDate;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Product {
 
-    @JsonView({ProductViews.PostProductRequestView.class})
-    @Id // this field (attribute) is the table primary key
-    @Column(name = "code")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @Column(name = "database_id")
+    private Long databaseId;
+
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @Column(name = "code", unique = true)
     @Size(min = 0, max = 60)//Slightly higher than other maxes as business id is added as prefix to this
     private String id;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
     @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
     @Size(min = 0, max = 50)
     private String name;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
     @Column(name = "description")
     @Size(min = 0, max = 250)
     private String description;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
     @Column(name = "manufacturer")
     @Size(min = 0, max = 50)
     private String manufacturer;
 
     @PositiveOrZero
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
     @Column(name = "created")
     private LocalDate created;
 
