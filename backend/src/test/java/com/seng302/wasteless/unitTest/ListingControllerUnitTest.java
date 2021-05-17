@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(InventoryController.class)
 @AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
-public class ListingsControllerUnitTest {
+public class ListingControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;

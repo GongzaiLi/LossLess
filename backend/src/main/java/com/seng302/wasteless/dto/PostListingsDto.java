@@ -19,9 +19,9 @@ import java.time.LocalDate;
 @ToString // generate a toString method
 public class PostListingsDto {
 
-   
 
-    @NotBlank(message = "Inventory item ID is Mandatory")
+    @NotNull(message = "Inventory item ID is Mandatory")
+//    @NotBlank(message = "Inventory item ID is Mandatory")
     private Integer inventoryItemId;
 
     @Positive

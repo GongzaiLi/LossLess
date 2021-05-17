@@ -23,7 +23,7 @@ import javax.validation.Valid;
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
  */
 @RestController
-public class ListingsController {
+public class ListingController {
     private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
 
 
@@ -34,7 +34,7 @@ public class ListingsController {
 
 
     @Autowired
-    public ListingsController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService) {
+    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService) {
         this.businessService = businessService;
         this.userService = userService;
         this.inventoryService = inventoryService;

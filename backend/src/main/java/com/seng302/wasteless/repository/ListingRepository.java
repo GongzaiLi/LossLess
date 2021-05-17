@@ -16,6 +16,7 @@ import java.util.List;
  */
 @RepositoryRestResource
 public interface ListingRepository extends JpaRepository<Listing, Integer> {
+
     Listing findFirstById(Integer id);
 
     List<Listing> findAllByBusinessId(Integer id);
