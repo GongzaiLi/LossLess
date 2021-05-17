@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -19,12 +20,17 @@ import java.time.LocalDate;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method, excluded to prevent recursive problems
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@Accessors(chain = true) //Allows chaining of getters and setters
 public class Listing {
 
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotNull
+    @Column
+    private Integer businessId;
 
     @NotNull(message = "Inventory id is Mandatory")
     @ManyToOne
@@ -55,7 +61,6 @@ public class Listing {
     @FutureOrPresent
     @Column(name = "closes")
     private LocalDate closes;
-
 
 
 }

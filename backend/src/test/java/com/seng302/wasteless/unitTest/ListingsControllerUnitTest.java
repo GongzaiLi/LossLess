@@ -91,8 +91,8 @@ public class ListingsControllerUnitTest {
 
         LocalDate closes = inventoryItemForListing.getExpires();
 
-        Listings listing = new Listings();
-        listing.setInventoryItemId((long) 1)
+        Listing listing = new Listing();
+        listing.setInventory(inventoryItemForListing)
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
@@ -121,7 +121,7 @@ public class ListingsControllerUnitTest {
 
         Mockito
                 .when(inventoryService.createInventory(any(Inventory.class)))
-                .thenReturn(inventoryItemForListing.setId(2L));
+                .thenReturn(inventoryItemForListing.setId(2));
 
         Mockito
                 .when(userService.findUserByEmail(anyString()))
@@ -131,9 +131,9 @@ public class ListingsControllerUnitTest {
                 .when(businessService.findBusinessById(anyInt()))
                 .thenReturn(business);
 
-        Mockito
-                .when(listingsService.findByBusinessId(anyInt()))
-                .thenReturn(listing.setId(1));
+//        Mockito
+//                .when(listingsService.findByBusinessId(anyInt()))
+//                .thenReturn(listing.setId(1));
 
         doReturn(product).when(productService).findProductById(anyString());
 

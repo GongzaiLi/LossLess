@@ -1,8 +1,6 @@
 package com.seng302.wasteless.controller;
 
-import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.PostListingsDto;
-import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
@@ -99,7 +97,7 @@ public class ListingsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory with given id does not exist");
         }
 
-        Listings listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
+        Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
         listing.setBusinessId(businessId);
 

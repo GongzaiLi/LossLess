@@ -1,17 +1,16 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
-import com.seng302.wasteless.model.Listings;
+import com.seng302.wasteless.model.Listing;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ListingsService {
 
-    public Listings createListing(Listings listingItem) {
+    public Listing createListing(Listing listingItem) {
         return listingItem;
     }
 
-    public Listings findByBusinessId(int anyInt) {
-        return new Listings();
+    public Listing findByBusinessId(int anyInt) {
+        return new Listing();
     }
 }

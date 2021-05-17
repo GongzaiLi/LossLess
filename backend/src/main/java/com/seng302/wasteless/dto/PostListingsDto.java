@@ -22,7 +22,7 @@ public class PostListingsDto {
    
 
     @NotBlank(message = "Inventory item ID is Mandatory")
-    private Long inventoryItemId;
+    private Integer inventoryItemId;
 
     @Positive
     @Max(1000000000)            //max = inventoryItem.quantity()

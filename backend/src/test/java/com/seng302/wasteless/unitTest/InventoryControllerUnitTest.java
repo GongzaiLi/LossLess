@@ -109,7 +109,7 @@ public class InventoryControllerUnitTest {
 
         Mockito
                 .when(inventoryService.createInventory(any(Inventory.class)))
-                .thenReturn(inventoryItem.setId(2L));
+                .thenReturn(inventoryItem.setId(2));
 
         Mockito
                 .when(userService.findUserByEmail(anyString()))
