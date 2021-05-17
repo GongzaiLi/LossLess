@@ -23,7 +23,7 @@ Date: 13/5/2021
               placeholder="PRODUCT-ID"
               v-model="inventoryInfo.productId"
               autofocus required/>
-            <b-input-group-append>
+            <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectProductModal">Select Product</b-button>
             </b-input-group-append>
           </b-input-group>
