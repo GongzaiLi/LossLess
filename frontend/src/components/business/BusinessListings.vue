@@ -3,27 +3,31 @@ Listings Page
 -->
 <template>
   <b-container>
-    <div class="card-columns">
-    <b-card  v-for="(listing) in cards" :key="listing"
+    <b-row>
+      <b-col  v-for="(listing) in cards" :key="listing" lg="4">
+    <b-card
       img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
       img-alt="Image"
       img-top
-      tag="article"
-      style="max-width: 20rem;"
-      class="mb-2"
+      style="min-width: 15rem;"
       >
       <b-card-title>{{listing.product.name}}</b-card-title>
       <b-card-sub-title>{{listing.product.manufacturer}}</b-card-sub-title>
       <b-card-text>
 
-        <span>Some</span><br>
-        quick example text to build on the card title and make up the bulk of the card's content.
+        <span>{{ listing.product.description }}</span><br>
+        <b-list-group flush>
+          <b-list-group-item>Cras justo odio</b-list-group-item>
+          <b-list-group-item>Dapibus ac facilisis in</b-list-group-item>
+          <b-list-group-item>Vestibulum at eros</b-list-group-item>
+        </b-list-group>
       </b-card-text>
 
-      <b-button href="#" variant="primary">Go somewhere</b-button>
+      <b-button href="#" variant="primary" disabled>Purchase</b-button>
 
     </b-card>
-    </div>
+      </b-col>
+    </b-row>
 
 
 
@@ -36,7 +40,8 @@ Listings Page
   margin-left: auto;
   margin-right: auto;
 }
-.card-columns{
+.card-columns {
+  display: block;
   column-count: 3;
 }
 
@@ -56,10 +61,10 @@ export default {
     return {
       cards:[
         {
-          "id": 101,
+          "id": 100,
           "product": {
-            "id": "WATT-420-BEANS",
-            "name": "Watties Baked Beans - 420g can",
+            "id": "1WATT-420-BEANS1",
+            "name": "1Watties Baked Beans - 420g can",
             "description": "Baked Beans as they should be.",
             "manufacturer": "Heinz Wattie's Limited",
             "recommendedRetailPrice": 2.2,
@@ -83,8 +88,8 @@ export default {
         {
           "id": 101,
           "product": {
-            "id": "WATT-420-BEANS",
-            "name": "Watties Baked Beans - 420g can",
+            "id": "2WATT-420-BEANS2",
+            "name": "2Watties Baked Beans - 420g can",
             "description": "Baked Beans as they should be.",
             "manufacturer": "Heinz Wattie's Limited",
             "recommendedRetailPrice": 2.2,
@@ -106,10 +111,10 @@ export default {
           "expires": "2021-05-17"
         },
         {
-          "id": 101,
+          "id": 102,
           "product": {
-            "id": "WATT-420-BEANS",
-            "name": "Watties Baked Beans - 420g can",
+            "id": "WATT-420-BEANS3",
+            "name": "3Watties Baked Beans - 420g can",
             "description": "Baked Beans as they should be.",
             "manufacturer": "Heinz Wattie's Limited",
             "recommendedRetailPrice": 2.2,
@@ -130,6 +135,106 @@ export default {
           "bestBefore": "2021-05-17",
           "expires": "2021-05-17"
         },
+        {
+          "id": 103,
+          "product": {
+            "id": "WATT-420-BEANS4",
+            "name": "4Watties Baked Beans - 420g can",
+            "description": "Baked Beans as they should be.",
+            "manufacturer": "Heinz Wattie's Limited",
+            "recommendedRetailPrice": 2.2,
+            "created": "2021-05-17T02:11:58.602Z",
+            "images": [
+              {
+                "id": 1234,
+                "filename": "/media/images/23987192387509-123908794328.png",
+                "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+              }
+            ]
+          },
+          "quantity": 4,
+          "pricePerItem": 6.5,
+          "totalPrice": 21.99,
+          "manufactured": "2021-05-17",
+          "sellBy": "2021-05-17",
+          "bestBefore": "2021-05-17",
+          "expires": "2021-05-17"
+        },
+        {
+          "id": 104,
+          "product": {
+            "id": "WATT-420-BEANS5",
+            "name": "5Watties Baked Beans - 420g can",
+            "description": "Baked Beans as they should be.",
+            "manufacturer": "Heinz Wattie's Limited",
+            "recommendedRetailPrice": 2.2,
+            "created": "2021-05-17T02:11:58.602Z",
+            "images": [
+              {
+                "id": 1234,
+                "filename": "/media/images/23987192387509-123908794328.png",
+                "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+              }
+            ]
+          },
+          "quantity": 4,
+          "pricePerItem": 6.5,
+          "totalPrice": 21.99,
+          "manufactured": "2021-05-17",
+          "sellBy": "2021-05-17",
+          "bestBefore": "2021-05-17",
+          "expires": "2021-05-17"
+        },
+        {
+          "id": 105,
+          "product": {
+            "id": "WATT-420-BEANS",
+            "name": "6Watties Baked Beans - 420g can",
+            "description": "Baked Beans as they should be.",
+            "manufacturer": "Heinz Wattie's Limited",
+            "recommendedRetailPrice": 2.2,
+            "created": "2021-05-17T02:11:58.602Z",
+            "images": [
+              {
+                "id": 1234,
+                "filename": "/media/images/23987192387509-123908794328.png",
+                "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+              }
+            ]
+          },
+          "quantity": 4,
+          "pricePerItem": 6.5,
+          "totalPrice": 21.99,
+          "manufactured": "2021-05-17",
+          "sellBy": "2021-05-17",
+          "bestBefore": "2021-05-17",
+          "expires": "2021-05-17"
+        },
+        {
+          "id": 106,
+          "product": {
+            "id": "WATT-420-BEANS",
+            "name": "7Watties Baked Beans - 420g can",
+            "description": "Baked Beans as they should be.",
+            "manufacturer": "Heinz Wattie's Limited",
+            "recommendedRetailPrice": 2.2,
+            "created": "2021-05-17T02:11:58.602Z",
+            "images": [
+              {
+                "id": 1234,
+                "filename": "/media/images/23987192387509-123908794328.png",
+                "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+              }
+            ]
+          },
+          "quantity": 4,
+          "pricePerItem": 6.5,
+          "totalPrice": 21.99,
+          "manufactured": "2021-05-17",
+          "sellBy": "2021-05-17",
+          "bestBefore": "2021-05-17",
+          "expires": "2021-05-17"
+        }
       ]
     }
   },
