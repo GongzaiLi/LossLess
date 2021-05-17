@@ -109,7 +109,7 @@ public class InventoryControllerUnitTest {
 
         Mockito
                 .when(inventoryService.createInventory(any(Inventory.class)))
-                .thenReturn(inventoryItem.setId(2L));
+                .thenReturn(inventoryItem.setId(2));
 
         Mockito
                 .when(userService.findUserByEmail(anyString()))
@@ -131,7 +131,7 @@ public class InventoryControllerUnitTest {
         doReturn(true).when(user).checkUserGlobalAdmin();
 
         Mockito
-                .when(PostInventoryDtoMapper.postInventoryDtoToEntityMapper(any(PostInventoryDto.class)))
+                .when(PostInventoryDtoMapper.postInventoryDtoToEntityMapper(any(PostInventoryDto.class), any(Inventory.class)))
                 .thenReturn(inventoryItem);
 
         List<Inventory> inventories = new ArrayList<>();

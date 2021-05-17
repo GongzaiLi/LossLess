@@ -102,8 +102,8 @@ public class InventoryController {
             logger.warn("Cannot create inventory item for product that does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
         }
-
-        Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
+        Inventory inventory = new Inventory();
+        inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest, inventory);
 
         inventory.setBusinessId(businessId);
 
@@ -177,17 +177,15 @@ public class InventoryController {
      * @param itemId the id of the inventory item to be updated
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
-    @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId]")
-    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") String itemId) {
+    @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId}")
+    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") Integer itemId, @Valid @RequestBody PostInventoryDto editedInventoryItem) {
 
         logger.debug("Request to update inventory product");
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalEmail = authentication.getName();
 
         logger.debug("Validating user with Email: {}", currentPrincipalEmail);
         User user = userService.findUserByEmail(currentPrincipalEmail);
-
         if (user == null) {
             logger.warn("Cannot Update INVENTORY product with ID {}. Access token invalid for user with Email: {}", itemId, currentPrincipalEmail);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
@@ -198,7 +196,6 @@ public class InventoryController {
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
         if (possibleBusiness == null) {
             logger.warn("Cannot Update INVENTORY product with ID {}. Business ID: {} does not exist.", itemId, businessId);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
@@ -207,29 +204,45 @@ public class InventoryController {
 
 
         if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot Update INVENTORY product with ID {}. User: {} is not global admin or business admin: {}", itemId ,user, possibleBusiness);
+            logger.warn("Cannot Update INVENTORY product. User: {} is not global admin or business admin: {}" ,user, possibleBusiness);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
         logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", itemId, businessId);
-        Product possibleProduct = productService.findProductById(itemId);
-
+        Product possibleProduct = productService.findProductById(editedInventoryItem.getProductId());
         if (possibleProduct == null) {
             logger.warn("Cannot update inventory item for product that does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
         }
 
         logger.info("Check if inventory item with id ` {} ` exists on for business with id ` {} ` ", itemId, businessId);
-        Inventory inventoryItem = inventoryService.findInventoryByProductId(itemId);
-
+        Inventory inventoryItem = inventoryService.findInventoryById(itemId);
+        logger.info(inventoryItem);
         if (inventoryItem == null) {
             logger.warn("Cannot update inventory item for item that does not exist in the inventory");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item with given id does not exist");
         }
+        if (!inventoryItem.getBusinessId().equals(businessId)){
+            logger.warn("Cannot update inventory item for item that does not belong to current business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item with given id does not exist for Current Business");
+        }
+
+        logger.info("Creating new Inventory Item and setting data.");
+        inventoryItem = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(editedInventoryItem, inventoryItem);
+        inventoryItem.setBusinessId(businessId);
+        inventoryItem.setQuantity(editedInventoryItem.getQuantity());
+        inventoryItem.setPricePerItem(editedInventoryItem.getPricePerItem());
+        inventoryItem.setTotalPrice(editedInventoryItem.getTotalPrice());
+        inventoryItem.setManufactured(editedInventoryItem.getManufactured());
+        inventoryItem.setSellBy(editedInventoryItem.getSellBy());
+        inventoryItem.setBestBefore(editedInventoryItem.getBestBefore());
+        inventoryItem.setExpires(editedInventoryItem.getExpires());
+
+
 
         logger.debug("Trying to Update INVENTORY product with ID {} for business: {}", itemId, possibleBusiness);
-        //List<Inventory> inventoryList = inventoryService.updateInventory();
+        inventoryService.updateInventory(inventoryItem);
 
 
         logger.info("INVENTORY Product updated with ID {} for business: {}", itemId, possibleBusiness);
