@@ -36,6 +36,8 @@ jest.mock('../../Api');
 
 beforeEach(() => {
 
+  Api.getBusiness.mockResolvedValue({data: {name: "Blah"}});
+
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
@@ -69,8 +71,6 @@ describe('check-model-product-card-page', () => {
       }]
     };
     Api.getProducts.mockResolvedValue(response);
-
-    Api.getBusiness.mockResolvedValue({data: {name: "Blah"}});
 
     await wrapper.vm.refreshTable(0);
     await wrapper.vm.openEditProductCard(response.data[0]);

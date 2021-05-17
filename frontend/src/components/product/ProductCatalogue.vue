@@ -96,7 +96,10 @@ export default {
     refreshTable: async function(businessId) {
       const curBusiness = (await Api.getBusiness(businessId)).data;
       this.businessName = curBusiness.name;
-      await this.$refs.productTable.getProducts(curBusiness);
+
+      if (this.$refs.productTable.getProducts) {  // If you don't have permission to access the table the table component won't render
+        await this.$refs.productTable.getProducts(curBusiness); // Only load products if the table component has rendered
+      }
     },
     /**
      * modify the ID so that it doesn't display the "{businessId}-" at the start
