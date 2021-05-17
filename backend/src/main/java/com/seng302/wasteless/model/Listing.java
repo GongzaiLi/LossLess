@@ -2,6 +2,7 @@ package com.seng302.wasteless.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.ListingViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -26,6 +27,7 @@ public class Listing {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(ListingViews.GetListingView.class)
     private Integer id;
 
     @NotNull
@@ -35,6 +37,7 @@ public class Listing {
     @NotNull(message = "Inventory id is Mandatory")
     @ManyToOne
     @JoinColumn(name = "inventory_id")
+    @JsonView(ListingViews.GetListingView.class)
     private Inventory inventory;
 
 
@@ -42,24 +45,29 @@ public class Listing {
     @Max(1000000000)
     @NotNull(message = "Quantity is Mandatory")
     @Column(name = "quantity")
+    @JsonView(ListingViews.GetListingView.class)
     private int quantity;
 
     @PositiveOrZero
     @Max(1000000000)
     @NotNull(message = "Price is Mandatory")
     @Column(name = "price")
+    @JsonView(ListingViews.GetListingView.class)
     private double price;
 
     @Column(name = "moreInfo")
+    @JsonView(ListingViews.GetListingView.class)
     private String moreInfo;
 
     @PastOrPresent
     @Column(name = "created")
+    @JsonView(ListingViews.GetListingView.class)
     private  LocalDate created;
 
 
     @FutureOrPresent
     @Column(name = "closes")
+    @JsonView(ListingViews.GetListingView.class)
     private LocalDate closes;
 
 
