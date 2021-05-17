@@ -43,6 +43,8 @@ const instance = axios.create({
   headers: {'X-Business-Acting-As': businessActingAsId}
 });
 
+let currencyCache = {};
+
 export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
   register: (registerData) => instance.post('users', registerData, {withCredentials: true}),
@@ -70,6 +72,10 @@ export default {
    * @returns {Promise<any>} Promise that resolves to the currency data object
    */
   getUserCurrency: (countryName) => {
+    if (countryName in currencyCache) {
+      return Promise.resolve(currencyCache[countryName]);
+    }
+
     return fetch(`https://restcountries.eu/rest/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
       .then(resp => resp.json())
       .then(data => {
@@ -80,10 +86,10 @@ export default {
         if (!currency.code || !currency.name || !currency.symbol) { // Sometimes we get garbage data like {"code":"(none)","name":null,"symbol":null}
           return null;
         } else {
+          currencyCache[countryName] = currency;
           return currency;
         }
       })
-
   }
 }
 
