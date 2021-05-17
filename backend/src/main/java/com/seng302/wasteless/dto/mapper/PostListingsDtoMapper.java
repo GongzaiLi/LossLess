@@ -8,6 +8,8 @@ import com.seng302.wasteless.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+
 @Component
 public class PostListingsDtoMapper {
 
@@ -22,16 +24,26 @@ public class PostListingsDtoMapper {
 
         Inventory inventory = inventoryService.findInventoryById(listingsDto.getInventoryItemId());
 
+        Double listingPrice = listingsDto.getPrice();
+        Double itemPrice = inventory.getPricePerItem();
+        if (itemPrice != null && listingsDto.getQuantity() < inventory.getQuantity()) {
+            listingPrice = itemPrice * listingsDto.getQuantity();
+        }
+
+        LocalDate closeDate = listingsDto.getCloses();
+        if (closeDate == null) {
+            closeDate = inventory.getExpires();   //backlog says product expiry date. wtf do they want?
+        }
+
 
         Listing listing = new Listing();
         listing.setInventory(inventory);
         listing.setQuantity(listingsDto.getQuantity());
-        listing.setPrice(listingsDto.getPrice());
+        listing.setPrice(listingPrice);
         listing.setMoreInfo(listingsDto.getMoreInfo());
         listing.setCreated(listingsDto.getCreated());
-        listing.setCloses(listingsDto.getCloses());
+        listing.setCloses(closeDate);
 
-        ;
 
         return listing;
     }
