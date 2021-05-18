@@ -61,6 +61,9 @@ public class InventoryControllerUnitTest {
 
     private User user;
 
+    private Inventory inventoryItem;
+
+
     @BeforeAll
     static void beforeAll() {
         //This line is important, do not remove
@@ -77,7 +80,7 @@ public class InventoryControllerUnitTest {
 
         LocalDate today = LocalDate.now();
 
-        Inventory inventoryItem = new Inventory();
+        this.inventoryItem = new Inventory();
         inventoryItem.setExpires(today.plusMonths(2))
                 .setTotalPrice(50)
                 .setPricePerItem(10)
@@ -85,7 +88,8 @@ public class InventoryControllerUnitTest {
                 .setQuantity(5)
                 .setManufactured(today.minusMonths(1))
                 .setBestBefore(today.plusMonths(1))
-                .setProduct(productForInventory);
+                .setProduct(productForInventory)
+                .setBusinessId(1);
 
         user = mock(User.class);
         user.setId(1);
@@ -98,10 +102,6 @@ public class InventoryControllerUnitTest {
         business.setAdministrators(new ArrayList<>());
         business.setName("Jimmy's clown store");
 
-        Product product = new Product();
-        product.setId("Clown-Shows");
-        product.setBusinessId(1);
-        product.setName("Clown Shows");
 
         Mockito
                 .when(authentication.getName())
@@ -119,10 +119,10 @@ public class InventoryControllerUnitTest {
                 .when(businessService.findBusinessById(anyInt()))
                 .thenReturn(business);
 
-        doReturn(product).when(productService).findProductById(anyString());
+        doReturn(productForInventory).when(productService).findProductById(anyString());
 
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
-        doReturn(product).when(productService).findProductById(null);
+        doReturn(productForInventory).when(productService).findProductById(null);
 
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
 
@@ -429,11 +429,14 @@ public class InventoryControllerUnitTest {
     public void whenPutRequestToModifyInventory_andValidRequest_then200Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
 
+        Mockito.
+                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -472,6 +475,9 @@ public class InventoryControllerUnitTest {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         doReturn(false).when(user).checkUserGlobalAdmin();
 
+        Mockito.
+                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
+
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
@@ -485,6 +491,9 @@ public class InventoryControllerUnitTest {
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
 
         doReturn(false).when(business).checkUserIsAdministrator(user);
+
+        Mockito.
+                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
@@ -606,6 +615,33 @@ public class InventoryControllerUnitTest {
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPutRequestToModifyInventory_andInvalidRequest_wrongBusiness_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+
+        inventoryItem.setBusinessId(2);
+        Mockito.
+                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPutRequestToModifyInventory_andInvalidRequest_productNotExist_then200Response() throws Exception {
+        String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+
+        Mockito.
+                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
 
