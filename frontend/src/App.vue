@@ -54,4 +54,14 @@ export default app;
 [v-cloak] {
   display: none;
 }
+
+body {
+  max-width: 1260px !important;
+}
+
+.card {
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+}
 </style>

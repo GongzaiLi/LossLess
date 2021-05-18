@@ -35,14 +35,14 @@ Date: 26/3/2021
           </strong>
           <div class="input-group mb-xl-5">
 
-            <select v-model="businessType" required>
+            <b-select v-model="businessType" required>
               <option disabled value=""> Choose ...</option>
               <option> Accommodation and Food Services</option>
               <option> Retail Trade</option>
               <option> Charitable organisation</option>
               <option> Non-profit organisation</option>
 
-            </select>
+            </b-select>
 
           </div>
 
