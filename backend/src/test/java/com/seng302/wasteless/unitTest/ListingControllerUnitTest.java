@@ -1,16 +1,19 @@
 package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.InventoryController;
+import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(InventoryController.class)
+@WebMvcTest(ListingController.class)
 @AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
 public class ListingControllerUnitTest {
 
@@ -63,10 +66,20 @@ public class ListingControllerUnitTest {
 
     private User user;
 
+
     @BeforeAll
     static void beforeAll() {
-        //This line is important, do not remove
+        //This line is important, do not remove'
+        mockStatic(PostInventoryDtoMapper.class);
         mockStatic(PostListingsDtoMapper.class);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        //This line is important, do not remove
+
+        mockStatic(PostInventoryDtoMapper.class).close();
+        mockStatic(PostListingsDtoMapper.class).close();
     }
 
     @BeforeEach
@@ -124,6 +137,10 @@ public class ListingControllerUnitTest {
                 .thenReturn(inventoryItemForListing.setId(2));
 
         Mockito
+                .when(inventoryService.findInventoryById(anyInt()))
+                .thenReturn(inventoryItemForListing.setId(2));
+
+        Mockito
                 .when(userService.findUserByEmail(anyString()))
                 .thenReturn(user);
 
@@ -131,19 +148,23 @@ public class ListingControllerUnitTest {
                 .when(businessService.findBusinessById(anyInt()))
                 .thenReturn(business);
 
+        Mockito
+                .when(listingsService.createListing(any(Listing.class)))
+                .thenReturn(listing.setId(1));
+
 //        Mockito
-//                .when(listingsService.findByBusinessId(anyInt()))
-//                .thenReturn(listing.setId(1));
+//                .when(productService.findProductById(anyString()))
+//                .thenReturn(productForInventory);
 
         doReturn(product).when(productService).findProductById(anyString());
 
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
         doReturn(product).when(productService).findProductById(null);
 
+
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
-
+        doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
-
         doReturn(true).when(user).checkUserGlobalAdmin();
 
 
@@ -166,20 +187,82 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andValidRequest_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+    public void whenPostRequestToCreateListing_andNotLoggedIn_then401Response() throws Exception {       //NOT WORKING YET
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
+        Mockito
+                .when(userService.findUserByEmail(anyString()))
+                .thenReturn(null);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("inventoryItemId", is(2)));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPostRequestToCreateListing_andInvalidBusinessID_then406Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        doReturn(null).when(businessService).findBusinessById(2);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/2/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
+        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
+        doReturn(false).when(business).checkUserIsAdministrator(user);
+        doReturn(false).when(user).checkUserGlobalAdmin();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPostRequestToCreateListing_andLoggedInUser_andNotBusinessAdmin_butAppAdmin_then201Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
+        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
+        doReturn(true).when(user).checkUserGlobalAdmin();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPostRequestToCreateListing_andValidUserAndValidBusiness_butInvalidInventory_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        doReturn(null).when(inventoryService).findInventoryById(1);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     public void whenPostRequestToCreateListing_andValidRequest_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": \"WATT-420-BEANS\", \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2020-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -187,6 +270,46 @@ public class ListingControllerUnitTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("listingId", is(1)));
     }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    public void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    public void whenPostRequestToCreateListing_andClosesOfNotTypeDate_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+
+    //ISSUE: Number as string work but they shouldnt.
+    //Add test for validating type of Inventory ID, Quantity, Price, More info,
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    public void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
 

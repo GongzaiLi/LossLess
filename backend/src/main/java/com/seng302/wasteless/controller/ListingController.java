@@ -89,7 +89,7 @@ public class ListingController {
         logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
 
-        logger.info("Retrieving inventory with id ` {} ` from business with id ` {} ` ", listingsDtoRequest.getInventoryItemId(), businessId);
+        logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest.getInventoryItemId(), businessId);
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
         if (possibleInventoryItem == null) {

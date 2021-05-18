@@ -3,11 +3,13 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
+import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,6 +67,12 @@ public class InventoryControllerUnitTest {
     static void beforeAll() {
         //This line is important, do not remove
         mockStatic(PostInventoryDtoMapper.class);
+    }
+
+    @AfterAll
+    static void afterAll() {
+        //This line is important, do not remove
+        mockStatic(PostInventoryDtoMapper.class).close();
     }
 
     @BeforeEach
