@@ -39,3 +39,6 @@ bin/
 
 ### Jest ###
 coverage/
+
+### Logging ###
+/backend/spring.log
