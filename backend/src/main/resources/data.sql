@@ -313,8 +313,8 @@ INSERT INTO Product(business_id,created,description,manufacturer,name,recommende
 INSERT INTO Product(business_id,created,description,manufacturer,name,recommended_retail_price,code) VALUES (1,'2017-08-08','A treat that never ends','The Chocolate Factory','Ever-Lasting Gobstopper',8.99,'1-WONKA-ELG');
 
 
-INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',2.5,5,'2021-05-26',12.5,'1-WONKA-DARK');
-INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',2.5,2,'2021-05-26',5,'1-WONKA-MILK');
-INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',2.5,8,'2021-05-26',20,'1-WONKA-WHITE');
-INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',3.5,10,'2021-05-26',35,'1-WONKA-EXPLODE');
-INSERT INTO Inventory(best_before,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27','2022-05-27','2021-03-01',9.5,3,'2021-05-26',28.5,'1-WONKA-ELG');
+INSERT INTO Inventory(best_before,businessid,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27',1,'2022-05-27','2021-03-01',2.5,5,'2021-05-26',12.5,49);
+INSERT INTO Inventory(best_before,businessid,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27',1,'2022-05-27','2021-03-01',2.5,2,'2021-05-26',5,50);
+INSERT INTO Inventory(best_before,businessid,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27',1,'2022-05-27','2021-03-01',2.5,8,'2021-05-26',20,51);
+INSERT INTO Inventory(best_before,businessid,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27',1,'2022-05-27','2021-03-01',3.5,10,'2021-05-26',35,52);
+INSERT INTO Inventory(best_before,businessid,expires,manufactured,price_per_item,quantity,sell_by,total_price,product_id) VALUES ('2021-05-27',1,'2022-05-27','2021-03-01',9.5,3,'2021-05-26',28.5,53);
