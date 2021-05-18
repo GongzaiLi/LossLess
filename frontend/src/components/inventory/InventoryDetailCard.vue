@@ -7,7 +7,7 @@ Date: 13/5/2021
     <b-card
       class="profile-card shadow"
     >
-      <b-form @submit="okAction">
+      <b-form @submit.prevent="okAction">
         <div :hidden="!disabled">
           <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
         </div>
@@ -30,12 +30,12 @@ Date: 13/5/2021
 
           <h6><strong>Quantity *:</strong></h6>
           <b-input-group class="mb-2">
-            <b-form-input type="number" maxlength="50" :disabled="disabled" v-model="inventoryInfo.quantity"
+            <b-form-input type="number" min='1' max='1000000000' maxlength="50" :disabled="disabled" v-model="inventoryInfo.quantity"
                           @input="calculateTotalPrice" required/>
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Price Per Item:</strong></h6>
+            <h6><strong>Price Per Item: *</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <template #prepend>
@@ -47,6 +47,7 @@ Date: 13/5/2021
               :disabled="disabled"
               @input="calculateTotalPrice"
               v-model="inventoryInfo.pricePerItem"
+              required
             />
             <template #append>
               <b-input-group-text>{{ currency.code }}</b-input-group-text>
@@ -54,7 +55,7 @@ Date: 13/5/2021
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Total Price:</strong></h6>
+            <h6><strong>Total Price: *</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <template #prepend>
@@ -65,6 +66,7 @@ Date: 13/5/2021
               step=".01" min=0 placeholder=0
               :disabled="disabled"
               v-model="inventoryInfo.totalPrice"
+              required
             />
             <template #append>
               <b-input-group-text>{{ currency.code }}</b-input-group-text>
@@ -215,20 +217,21 @@ export default {
      * calculate the Total price when the price prt item or quantity changed
      */
     calculateTotalPrice() {
-      this.inventoryInfo.totalPrice =
-        parseFloat((this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2));
+      const calculatedPrice = (this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2);
+      this.inventoryInfo.totalPrice = Math.max(calculatedPrice, 0);   // Make sure the total price doesn't go to negatives (eg. if the user enters a negative quantity) 
     },
 
     /**
      * Makes a request to the API to create a inventory with the form input.
      * Then, will hide the inventory popup
      */
-    async createInventory(event) {
-      event.preventDefault();
+    async createInventory() {
       await api
         .createInventory(this.$route.params.id, this.inventoryInfo)
         .then((createInventoryResponse) => {
           this.$log.debug("Inventory Created", createInventoryResponse);
+          this.$bvModal.hide('inventory-card');
+          this.setUpInventoryPage();// update the table
         })
         .catch((error) => {
           this.inventoryCardError = this.getErrorMessageFromApiError(error);
@@ -288,8 +291,6 @@ export default {
       } else {
         await this.createInventory();
       }
-      this.$bvModal.hide('inventory-card');
-      this.setUpInventoryPage();// update the table
     },
 
     /**
@@ -297,6 +298,9 @@ export default {
      * @return {Promise<void>}
      */
     editInventory: async function () {
+      
+      this.$bvModal.hide('inventory-card');
+      this.setUpInventoryPage();// update the table
       //todo edit the inventory api in here...................
     }
   }

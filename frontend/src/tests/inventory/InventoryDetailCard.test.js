@@ -124,6 +124,19 @@ describe('check calculateTotalPrice function', () => {
     expect(wrapper.vm.inventoryInfo.totalPrice).toBe(102.1);
   })
 
+  test('check calculateTotalPrice function with -10.21 price Per Item and 10 quantity', () => {
+    wrapper.vm.inventoryInfo.pricePerItem = -10.21;
+    wrapper.vm.inventoryInfo.quantity = 10;
+    wrapper.vm.calculateTotalPrice();
+    expect(wrapper.vm.inventoryInfo.totalPrice).toBe(0);
+  })
+
+  test('check calculateTotalPrice function with 10 price Per Item and -10 quantity', () => {
+    wrapper.vm.inventoryInfo.pricePerItem = 10;
+    wrapper.vm.inventoryInfo.quantity = -10;
+    wrapper.vm.calculateTotalPrice();
+    expect(wrapper.vm.inventoryInfo.totalPrice).toBe(0);
+  })
 })
 
 describe('Testing api put/post request and the response method with errors', () => {
