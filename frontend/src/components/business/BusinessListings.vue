@@ -2,8 +2,8 @@
 Listings Page
 -->
 <template>
-    <b-row>
-      <b-col  v-for="(listing,index) in cards" :key="index" lg="4"  class="mb-4">
+    <b-row cols-lg="3" cols-xl="4">
+      <b-col  v-for="(listing,index) in cards" :key="index" class="mb-4">
     <b-card
       img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
       img-alt="Image"
