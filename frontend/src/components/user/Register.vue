@@ -223,7 +223,6 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      console.log(registerData, 1111111111111111);
 
 
       await api
