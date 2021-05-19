@@ -188,7 +188,7 @@ describe('CreateBusiness HTML testing', () => {
 
   test('Business Type label renders', () => {
     const type = "Business Type *";
-    expect(wrapper.findAll("strong").at(8).text()).toEqual(type);
+    expect(wrapper.findAll("strong").at(9).text()).toEqual(type);
   });
 
   test('business types in drop down has default value Choose ...', () => {
