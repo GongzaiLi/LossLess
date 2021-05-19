@@ -190,6 +190,54 @@ describe('Testing api put/post request and the response method with errors', () 
 })
 
 
+describe('Editing products', () => {
+
+
+  it('Succesfully edits a product ', async () => {
+    Api.modifyInventory.mockResolvedValue({response: {status: 200}});
+
+    wrapper.vm.$bvModal.hide = jest.fn();
+
+    await wrapper.vm.editInventory();
+
+    expect(wrapper.vm.inventoryCardError).toBe("");
+    expect(wrapper.vm.$bvModal.hide).toHaveBeenCalled();
+  });
+
+  it("Displays errors if exist", async () => {
+    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+
+    await wrapper.vm.editInventory();
+
+    expect(wrapper.vm.inventoryCardError).toBe("Product with given id does not exist");
+  });
+})
+
+
+describe('Editing products', () => {
+
+
+  it('Succesfully edits a product ', async () => {
+    Api.modifyInventory.mockResolvedValue({response: {status: 200}});
+
+    wrapper.vm.$bvModal.hide = jest.fn();
+
+    await wrapper.vm.editInventory();
+
+    expect(wrapper.vm.inventoryCardError).toBe("");
+    expect(wrapper.vm.$bvModal.hide).toHaveBeenCalled();
+  });
+
+  it("Displays errors if exist", async () => {
+    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+
+    await wrapper.vm.editInventory();
+
+    expect(wrapper.vm.inventoryCardError).toBe("Product with given id does not exist");
+  });
+})
+
+
 describe('select-product-modal', () => {
   test('selectProduct works', () => {
     wrapper.vm.selectProduct({id: 'ABC'});
