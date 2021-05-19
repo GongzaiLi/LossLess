@@ -7,9 +7,9 @@ import makeAdminModal from "../../components/business/MakeAdminModal";
 
 
 let userData = {
-  id: 1,
-  currentlyActingAs: null,
-}
+    id: 1,
+    currentlyActingAs: null,
+  }
 ;
 
 const mockUserAuthPlugin = function install(Vue) {
@@ -36,7 +36,6 @@ const $log = {
 };
 
 config.showDeprecationWarnings = false;  //to disable deprecation warnings
-
 
 
 beforeEach(() => {
@@ -85,6 +84,7 @@ test('get-normal-data', async () => {
       address: {
         streetNumber: "3/24",
         streetName: "Ilam Road",
+        suburb: "a suburb",
         city: "Christchurch",
         region: "Canterbury",
         country: "New Zealand",
@@ -104,6 +104,7 @@ test('get-address', async () => {
   const address = {
     streetNumber: "3/24",
     streetName: "Ilam Road",
+    suburb: "a suburb",
     city: "Christchurch",
     region: "Canterbury",
     country: "New Zealand",
@@ -112,7 +113,7 @@ test('get-address', async () => {
 
   wrapper.vm.businessData.address = address;
   await wrapper.vm.$nextTick();
-  expect(wrapper.vm.getAddress).toEqual("3/24 Ilam Road Christchurch Canterbury New Zealand 90210");
+  expect(wrapper.vm.getAddress).toEqual("3/24 Ilam Road, a suburb Christchurch Canterbury New Zealand 90210");
 });
 
 test('check-can-revoke-admin-invalid-returns-false', async () => {
@@ -138,6 +139,7 @@ test('check-can-revoke-admin-invalid-returns-false', async () => {
         homeAddress: {
           streetNumber: "3/24",
           streetName: "Ilam Road",
+          suburb: "a suburb",
           city: "Christchurch",
           region: "Canterbury",
           country: "New Zealand",
@@ -162,6 +164,7 @@ test('check-can-revoke-admin-invalid-returns-false', async () => {
         homeAddress: {
           streetNumber: "3/24",
           streetName: "Ilam Road",
+          suburb: "a suburb",
           city: "Christchurch",
           region: "Canterbury",
           country: "New Zealand",
@@ -177,6 +180,7 @@ test('check-can-revoke-admin-invalid-returns-false', async () => {
     address: {
       streetNumber: "3/24",
       streetName: "Ilam Road",
+      suburb: "a suburb",
       city: "Christchurch",
       region: "Canterbury",
       country: "New Zealand",
@@ -225,6 +229,7 @@ test('check-can-revoke-admin-invalid-as-user-is-user-returns-false', async () =>
         homeAddress: {
           streetNumber: "3/24",
           streetName: "Ilam Road",
+          suburb: "a suburb",
           city: "Christchurch",
           region: "Canterbury",
           country: "New Zealand",
@@ -249,6 +254,7 @@ test('check-can-revoke-admin-invalid-as-user-is-user-returns-false', async () =>
         homeAddress: {
           streetNumber: "3/24",
           streetName: "Ilam Road",
+          suburb: "a suburb",
           city: "Christchurch",
           region: "Canterbury",
           country: "New Zealand",
@@ -264,6 +270,7 @@ test('check-can-revoke-admin-invalid-as-user-is-user-returns-false', async () =>
     address: {
       streetNumber: "3/24",
       streetName: "Ilam Road",
+      suburb: "a suburb",
       city: "Christchurch",
       region: "Canterbury",
       country: "New Zealand",
@@ -312,6 +319,7 @@ test('check-can-revoke-admin-valid-returns-true', async () => {
         homeAddress: {
           streetNumber: "3/24",
           streetName: "Ilam Road",
+          suburb: "a suburb",
           city: "Christchurch",
           region: "Canterbury",
           country: "New Zealand",
@@ -336,6 +344,7 @@ test('check-can-revoke-admin-valid-returns-true', async () => {
         homeAddress: {
           streetNumber: "3/24",
           streetName: "Ilam Road",
+          suburb: "a suburb",
           city: "Christchurch",
           region: "Canterbury",
           country: "New Zealand",
@@ -351,6 +360,7 @@ test('check-can-revoke-admin-valid-returns-true', async () => {
     address: {
       streetNumber: "3/24",
       streetName: "Ilam Road",
+      suburb: "a suburb",
       city: "Christchurch",
       region: "Canterbury",
       country: "New Zealand",
@@ -409,6 +419,7 @@ test('business-found', async () => {
       address: {
         streetNumber: "3/24",
         streetName: "Ilam Road",
+        suburb: "a suburb",
         city: "Christchurch",
         region: "Canterbury",
         country: "New Zealand",
@@ -453,12 +464,13 @@ test('business-found-in-html', async () => {
           dateOfBirth: '2000-10-10',
           phoneNumber: '0271234567',
           homeAddress: {
-              streetNumber: "3/24",
-              streetName: "Ilam Road",
-              city: "Christchurch",
-              region: "Canterbury",
-              country: "New Zealand",
-              postcode: "90210"
+            streetNumber: "3/24",
+            streetName: "Ilam Road",
+            suburb: "a suburb",
+            city: "Christchurch",
+            region: "Canterbury",
+            country: "New Zealand",
+            postcode: "90210"
           },
           created: '',
           role: '',
@@ -479,6 +491,7 @@ test('business-found-in-html', async () => {
           homeAddress: {
             streetNumber: "3/24",
             streetName: "Ilam Road",
+            suburb: "a suburb",
             city: "Christchurch",
             region: "Canterbury",
             country: "New Zealand",
@@ -494,6 +507,7 @@ test('business-found-in-html', async () => {
       address: {
         streetNumber: "3/24",
         streetName: "Ilam Road",
+        suburb: "a suburb",
         city: "Christchurch",
         region: "Canterbury",
         country: "New Zealand",
@@ -538,6 +552,7 @@ test('business-administrators-table-correct-data', async () => {
           homeAddress: {
             streetNumber: "3/24",
             streetName: "Ilam Road",
+            suburb: "a suburb",
             city: "Christchurch",
             region: "Canterbury",
             country: "New Zealand",
@@ -562,6 +577,7 @@ test('business-administrators-table-correct-data', async () => {
           homeAddress: {
             streetNumber: "3/24",
             streetName: "Ilam Road",
+            suburb: "a suburb",
             city: "Christchurch",
             region: "Canterbury",
             country: "New Zealand",
@@ -577,6 +593,7 @@ test('business-administrators-table-correct-data', async () => {
       address: {
         streetNumber: "3/24",
         streetName: "Ilam Road",
+        suburb: "a suburb",
         city: "Christchurch",
         region: "Canterbury",
         country: "New Zealand",
@@ -620,7 +637,7 @@ describe('check-modal-Make-Admin-Modal', () => {
 });
 
 it('400 error test', async () => {
-  Api.makeBusinessAdmin.mockRejectedValue({response : {status: 400, data: "User with ID does not exist"}});
+  Api.makeBusinessAdmin.mockRejectedValue({response: {status: 400, data: "User with ID does not exist"}});
 
   await wrapper.vm.makeAdminHandler(1);
 
@@ -628,7 +645,7 @@ it('400 error test', async () => {
 });
 
 it('403 error test', async () => {
-  Api.makeBusinessAdmin.mockRejectedValue({response : {status: 403}});
+  Api.makeBusinessAdmin.mockRejectedValue({response: {status: 403}});
 
   await wrapper.vm.makeAdminHandler(1);
 
@@ -644,7 +661,7 @@ it('no internet test', async () => {
 });
 
 it('other error test', async () => {
-  Api.makeBusinessAdmin.mockRejectedValue({response : {status: 500}});
+  Api.makeBusinessAdmin.mockRejectedValue({response: {status: 500}});
 
   await wrapper.vm.makeAdminHandler(1);
 

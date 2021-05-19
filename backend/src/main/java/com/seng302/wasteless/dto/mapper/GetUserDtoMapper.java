@@ -81,6 +81,7 @@ public class GetUserDtoMapper {
             JSONObject fullAddress = new JSONObject();
             fullAddress.put("streetNumber", user.getHomeAddress().getStreetNumber());
             fullAddress.put("streetName", user.getHomeAddress().getStreetName());
+            fullAddress.put("suburb", user.getHomeAddress().getSuburb());
             fullAddress.put("city", user.getHomeAddress().getCity());
             fullAddress.put("region", user.getHomeAddress().getRegion());
             fullAddress.put("country", user.getHomeAddress().getCountry());

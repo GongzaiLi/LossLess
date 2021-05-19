@@ -53,6 +53,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -75,6 +76,7 @@ public class CatalogueControllerIntegrationTest {
 
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -101,6 +103,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -124,6 +127,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -145,6 +149,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business2", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -167,6 +172,7 @@ public class CatalogueControllerIntegrationTest {
 
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -194,6 +200,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -215,6 +222,7 @@ public class CatalogueControllerIntegrationTest {
 
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -238,6 +246,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -263,6 +272,7 @@ public class CatalogueControllerIntegrationTest {
 
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -295,6 +305,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -314,6 +325,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -336,6 +348,7 @@ public class CatalogueControllerIntegrationTest {
 
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -369,6 +382,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -391,6 +405,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -413,6 +428,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -440,6 +456,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -467,6 +484,7 @@ public class CatalogueControllerIntegrationTest {
         Business business = new Business();
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -497,6 +515,7 @@ public class CatalogueControllerIntegrationTest {
         Business business = new Business();
         business.setName("New Business");
         business.setAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -527,6 +546,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -550,6 +570,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -571,6 +592,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -592,6 +614,7 @@ public class CatalogueControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +

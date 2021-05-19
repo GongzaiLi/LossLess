@@ -74,7 +74,7 @@ beforeEach(() => {
     localVue,
     propsData: {},
     mocks: {$route, $router, $currentUser},
-    stubs: {},
+    stubs: ['router-link'],
     methods: {},
     computed: {},
   })

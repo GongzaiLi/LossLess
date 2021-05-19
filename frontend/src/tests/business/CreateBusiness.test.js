@@ -111,6 +111,7 @@ describe('Testing api post request and the response method with errors', () => {
     "homeAddress": {
       "streetNumber": "3/24",
       "streetName": "Ilam Road",
+      "suburb": "a suburb",
       "city": "Christchurch",
       "region": "Canterbury",
       "country": "New Zealand",
