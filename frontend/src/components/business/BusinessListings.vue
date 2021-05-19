@@ -25,7 +25,7 @@ Listings Page
     </b-row>
 
   <b-row cols-lg="3" cols-xl="4">
-    <b-col  v-for="(listing,index) in cards" :key="index" class="mb-4">
+    <b-col  v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
       <b-card
           img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
           img-alt="Image"
@@ -63,6 +63,7 @@ Listings Page
       </b-card>
     </b-col>
   </b-row>
+    <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="cards.length"/>
 
 
   </div>
@@ -74,11 +75,13 @@ Listings Page
 </style>
 
 <script>
-
+import pagination from "../model/Pagination";
 
 
 export default {
+
   components: {
+    pagination,
   },
   data: function () {
     return {
@@ -314,14 +317,250 @@ export default {
           "created": "2021-07-14T11:44:00Z",
           "closes": "2021-07-21T23:59:00Z"
         },
+
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "2Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 11.99,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-14T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "1Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 17.98,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-15T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "3Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 52.00,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-12T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "5Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 179.99,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-11T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "6Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 1.99,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-09T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "7Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 17.99,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-25T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+          "id": 57,
+          "inventoryItem": {
+            "id": 101,
+            "product": {
+              "id": "WATT-420-BEANS",
+              "name": "Watties Baked Beans - 420g can",
+              "description": "Baked Beans as they should be.",
+              "manufacturer": "Heinz Wattie's Limited",
+              "recommendedRetailPrice": 2.2,
+              "created": "2021-05-17T10:46:27.701Z",
+              "images": [
+                {
+                  "id": 1234,
+                  "filename": "/media/images/23987192387509-123908794328.png",
+                  "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                }
+              ]
+            },
+            "quantity": 4,
+            "pricePerItem": 6.5,
+            "totalPrice": 21.99,
+            "manufactured": "2021-05-17",
+            "sellBy": "2021-05-17",
+            "bestBefore": "2021-05-17",
+            "expires": "2021-05-17"
+          },
+          "quantity": 3,
+          "price": 17.99,
+          "moreInfo": "Seller may be willing to consider near offers",
+          "created": "2021-07-14T11:44:00Z",
+          "closes": "2021-07-21T23:59:00Z"
+        },
       ],
       sortProperty:'name',
-      sortDirection:'asc'
+      sortDirection:'asc',
+      perPage: 8,
+      currentPage: 1,
+      totalResults: 0,
     }
   },
 
   mounted() {
     this.sortListings();
+    this.totalResults=this.cards.length
   },
 
   methods: {
@@ -369,7 +608,11 @@ export default {
     },
     sortListings(){
       this.cards.sort(this.compare)
-    }
+    },
+    splitListings(){
+      return this.cards.slice((this.currentPage-1)*this.perPage,this.perPage*this.currentPage);
+    },
+
 
   },
 
