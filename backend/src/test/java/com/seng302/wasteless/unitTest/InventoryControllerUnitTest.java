@@ -69,11 +69,6 @@ public class InventoryControllerUnitTest {
         mockStatic(PostInventoryDtoMapper.class);
     }
 
-    @AfterAll
-    static void afterAll() {
-        //This line is important, do not remove
-        mockStatic(PostInventoryDtoMapper.class).close();
-    }
 
     @BeforeEach
     void setUp() {

@@ -70,16 +70,7 @@ public class ListingControllerUnitTest {
     @BeforeAll
     static void beforeAll() {
         //This line is important, do not remove'
-        mockStatic(PostInventoryDtoMapper.class);
         mockStatic(PostListingsDtoMapper.class);
-    }
-
-    @AfterAll
-    static void afterAll() {
-        //This line is important, do not remove
-
-        mockStatic(PostInventoryDtoMapper.class).close();
-        mockStatic(PostListingsDtoMapper.class).close();
     }
 
     @BeforeEach
@@ -166,12 +157,6 @@ public class ListingControllerUnitTest {
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
         doReturn(true).when(user).checkUserGlobalAdmin();
-
-
-
-        Mockito
-                .when(PostInventoryDtoMapper.postInventoryDtoToEntityMapper(any(PostInventoryDto.class)))
-                .thenReturn(inventoryItemForListing);
 
         Mockito
                 .when(PostListingsDtoMapper.postListingsDto(any(PostListingsDto.class)))
