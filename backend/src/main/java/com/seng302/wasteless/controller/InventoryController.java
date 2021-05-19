@@ -102,6 +102,10 @@ public class InventoryController {
             logger.warn("Cannot create inventory item for product that does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
         }
+        if (!possibleProduct.getBusinessId().equals(businessId)){
+            logger.warn("Cannot update inventory item for product that does not belong to current business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
+        }
         Inventory inventory = new Inventory();
         inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest, inventory);
 
@@ -214,6 +218,10 @@ public class InventoryController {
         if (possibleProduct == null) {
             logger.warn("Cannot update inventory item for product that does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
+        }
+        if (!possibleProduct.getBusinessId().equals(businessId)){
+            logger.warn("Cannot update inventory item for product that does not belong to current business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
         }
 
         logger.info("Check if inventory item with id ` {} ` exists on for business with id ` {} ` ", itemId, businessId);
