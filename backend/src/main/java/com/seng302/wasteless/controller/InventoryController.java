@@ -175,14 +175,14 @@ public class InventoryController {
     }
 
     /**
-     * Handle get request to /businesses/{businessId}/inventory/{inventoryItemId] endpoint for updating a product in a business's inventory
+     * Handle put request to /businesses/{businessId}/inventory/{inventoryItemId] endpoint for updating a product in a business's inventory
      *
      * @param businessId The id of the business to get
      * @param itemId the id of the inventory item to be updated
-     * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
+     * @return Http Status 200  if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId}")
-    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") Integer itemId, @Valid @RequestBody PostInventoryDto editedInventoryItem) {
+    public ResponseEntity<Object> putBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") Integer itemId, @Valid @RequestBody PostInventoryDto editedInventoryItem) {
 
         logger.debug("Request to update inventory product");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -257,7 +257,6 @@ public class InventoryController {
         return ResponseEntity.status(HttpStatus.OK).build();
 
     }
-
 
 
     /**
