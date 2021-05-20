@@ -284,8 +284,8 @@ export default {
      */
     getAddress: function () {
       const address = this.userData.homeAddress;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}` +
-        ` ${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     },
     /**
      * Returns the full name of the user, in the format:

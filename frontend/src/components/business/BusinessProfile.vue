@@ -390,8 +390,8 @@ export default {
      */
     getAddress: function () {
       const address = this.businessData.address;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}` +
-        ` ${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     },
 
 

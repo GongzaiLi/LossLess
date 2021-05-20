@@ -113,7 +113,7 @@ test('get-address', async () => {
 
   wrapper.vm.businessData.address = address;
   await wrapper.vm.$nextTick();
-  expect(wrapper.vm.getAddress).toEqual("3/24 Ilam Road, a suburb Christchurch Canterbury New Zealand 90210");
+  expect(wrapper.vm.getAddress).toEqual("3/24 Ilam Road, a suburb, Christchurch Canterbury New Zealand 90210");
 });
 
 test('check-can-revoke-admin-invalid-returns-false', async () => {
