@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
+import javax.validation.ConstraintViolationException;
 
 /**
  * ProductController is used for mapping all Restful API requests starting with the address
@@ -270,6 +271,25 @@ public class CatalogueController {
 //            logger.error(errorMessage); it doesnt work I am not sure why
             errors.put(fieldName, errorMessage);
         });
+        return errors;
+    }
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Map<String, String> handleValidationExceptions(
+            ConstraintViolationException exception) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        String constraintName = exception.getConstraintViolations().toString();
+        String errorMsg = exception.getMessage();
+
+        errors.put(constraintName, errorMsg);
         return errors;
     }
 }
