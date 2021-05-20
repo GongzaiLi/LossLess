@@ -63,6 +63,8 @@ public class InventoryControllerUnitTest {
 
     private Inventory inventoryItem;
 
+    private Product productForInventory;
+
 
     @BeforeAll
     static void beforeAll() {
@@ -73,7 +75,7 @@ public class InventoryControllerUnitTest {
     @BeforeEach
     void setUp() {
 
-        Product productForInventory = new Product();
+        productForInventory = new Product();
         productForInventory.setId("Clown-Shows");
         productForInventory.setBusinessId(1);
         productForInventory.setName("Clown Shows");
@@ -118,6 +120,10 @@ public class InventoryControllerUnitTest {
         Mockito
                 .when(businessService.findBusinessById(anyInt()))
                 .thenReturn(business);
+
+        Mockito.
+                when(inventoryService.findInventoryById(anyInt()))
+                .thenReturn(inventoryItem);
 
         doReturn(productForInventory).when(productService).findProductById(anyString());
 
@@ -240,6 +246,19 @@ public class InventoryControllerUnitTest {
         doReturn(null).when(productService).findProductById(null);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPostRequestToCreateInventory_andInvalidRequest_productExistsForOtherBusiness_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+        productForInventory.setBusinessId(5);
+        doReturn(productForInventory).when(productService).findProductById(anyString());
+
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
@@ -475,8 +494,7 @@ public class InventoryControllerUnitTest {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         doReturn(false).when(user).checkUserGlobalAdmin();
 
-        Mockito.
-                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
+
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
@@ -492,8 +510,7 @@ public class InventoryControllerUnitTest {
 
         doReturn(false).when(business).checkUserIsAdministrator(user);
 
-        Mockito.
-                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
+
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
@@ -623,8 +640,7 @@ public class InventoryControllerUnitTest {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
 
         inventoryItem.setBusinessId(2);
-        Mockito.
-                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
+
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
@@ -633,16 +649,31 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_productNotExist_then200Response() throws Exception {
+    public void whenPutRequestToModifyInventory_andInvalidRequest_productExistsForOtherBusiness_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+        productForInventory.setBusinessId(5);
+        doReturn(productForInventory).when(productService).findProductById(anyString());
 
-        Mockito.
-                when(inventoryService.findInventoryById(anyInt())).thenReturn(inventoryItem);
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    public void whenPutRequestToModifyInventory_andInvalidRequest_productNotExist_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+        doReturn(null).when(productService).findProductById(anyString());
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
 
 
 }
