@@ -9,7 +9,6 @@ import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
-
 import Marketplace from "@/components/marketplace/Marketplace";
 
 import {getUser} from '@/auth'
@@ -32,7 +31,6 @@ const router = new Router({
         { path: '/businesses/:id/products', name: 'product-catalogue', component: ProductCatalogue},
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
-
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
     ]
 });
