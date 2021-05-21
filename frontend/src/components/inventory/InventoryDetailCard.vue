@@ -223,6 +223,30 @@ export default {
       }
     },
 
+
+    /**
+     * Verify that the dates for inventory items are valid, making sure they are not in the past or future
+     * depending on which date
+     * if invalid return false and raise error flag with error message
+     * else return true
+     **/
+    validInventoryDates(inventoryItem) {
+      let today = new Date();
+      if (inventoryItem.manufactured > today.toJSON().slice(0, 10)) {
+        this.inventoryCardError = "Manufactured date must be in the Past or Today";
+      } else if (inventoryItem.sellBy < today.toJSON().slice(0, 10)) {
+        this.inventoryCardError = "Sell by date must be in the future";
+      } else if (inventoryItem.bestBefore < today.toJSON().slice(0, 10)) {
+        this.inventoryCardError = "Best before date must be in the future";
+      } else if (inventoryItem.expires < today.toJSON().slice(0, 10)) {
+        this.inventoryCardError = "Expiry date must be in the future";
+      } else {
+        return true;
+      }
+      this.showErrorAlert = true
+      return false;
+    },
+
     /**
      * calculate the Total price when the price prt item or quantity changed
      */
@@ -262,10 +286,12 @@ export default {
      * the OkAction will modify the Inventory otherwise Create a Inventory
      */
     okAction: async function () {
-      if (this.editModal) {
-        await this.editInventory();
-      } else {
-        await this.createInventory();
+      if (this.validInventoryDates(this.inventoryInfo)) {
+        if (this.editModal) {
+          await this.editInventory();
+        } else {
+          await this.createInventory();
+        }
       }
     },
 
