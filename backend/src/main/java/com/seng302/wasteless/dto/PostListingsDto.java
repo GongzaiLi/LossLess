@@ -39,11 +39,6 @@ public class PostListingsDto {
     @Column(name = "moreInfo")
     private String moreInfo;
 
-    @PastOrPresent                     // default = inventory item expiry  ONLY present
-    // default = inventory item expiry
-    @Column(name = "created")
-    private LocalDate created;
-
     @Future                     // default = inventory item expiry
     @Column(name = "closes")
     private LocalDate closes;

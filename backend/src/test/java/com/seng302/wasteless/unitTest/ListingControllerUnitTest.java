@@ -26,15 +26,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(ListingController.class)
@@ -66,6 +68,7 @@ public class ListingControllerUnitTest {
 
     private User user;
 
+    private Listing listing;
 
     @BeforeAll
     static void beforeAll() {
@@ -80,23 +83,24 @@ public class ListingControllerUnitTest {
         productForInventory.setBusinessId(1);
         productForInventory.setName("Clown Shows");
 
-        LocalDate today = LocalDate.now();
+        LocalDate expiry = LocalDate.of(2022, Month.JULY, 14);
 
         Inventory inventoryItemForListing = new Inventory();
-        inventoryItemForListing.setExpires(today.plusMonths(2))
+        inventoryItemForListing.setExpires(expiry)
                 .setTotalPrice(50)
                 .setPricePerItem(10)
-                .setSellBy(today.plusMonths(1))
+                .setSellBy(expiry.minusMonths(2))
                 .setQuantity(5)
-                .setManufactured(today.minusMonths(1))
-                .setBestBefore(today.plusMonths(1))
+                .setManufactured(expiry.minusMonths(4))
+                .setBestBefore(expiry.minusMonths(1))
                 .setProduct(productForInventory);
 
 
         LocalDate closes = inventoryItemForListing.getExpires();
 
-        Listing listing = new Listing();
-        listing.setInventory(inventoryItemForListing)
+        listing = new Listing();
+        listing.setInventoryItem(inventoryItemForListing)
+                .setCreated(expiry.minusMonths(3))
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
@@ -291,6 +295,54 @@ public class ListingControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+//
+//    GET LISTINGS ENDPOINT TESTS
+//
+//
 
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    public void whenGetRequestForListingsOfExistingBusiness_andOneListingExists_thenOneListingReturned() throws Exception {
+        Mockito
+                .when(listingsService.findByBusinessId(anyInt()))
+                .thenReturn(Collections.singletonList(listing));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("[0].id", is(1)))
+                .andExpect(jsonPath("[0].quantity", is(3)))
+                .andExpect(jsonPath("[0].price", is(17.99)))
+                .andExpect(jsonPath("[0].moreInfo", is("Seller may be willing to consider near offers")))
+                .andExpect(jsonPath("[0].closes", is("2022-07-14")))
+                .andExpect(jsonPath("[0].created", is("2022-04-14")))
+                .andExpect(jsonPath("[1]").doesNotExist());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    public void whenGetRequestForListingsOfExistingBusiness_andSessionInvalid_thenUnauthorized() throws Exception {
+        Mockito
+                .when(userService.findUserByEmail(anyString()))
+                .thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    public void whenGetRequestForListings_andBusinessNotExists_thenUnacceptable() throws Exception {
+        Mockito
+                .when(businessService.findBusinessById(anyInt()))
+                .thenReturn(null);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
 }
 
