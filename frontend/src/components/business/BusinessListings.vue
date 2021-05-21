@@ -552,7 +552,7 @@ export default {
       ],
       sortProperty:'name',
       sortDirection:'asc',
-      perPage: 8,
+      perPage: 12,
       currentPage: 1,
       totalResults: 0,
     }
