@@ -37,7 +37,7 @@ public class Inventory {
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private Product product;
 
-    @Positive
+    @PositiveOrZero
     @Max(1000000000)
     @NotNull(message = "Product quantity is Mandatory")
     @Column(name = "quantity")

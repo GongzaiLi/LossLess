@@ -128,7 +128,7 @@ public class ListingControllerUnitTest {
                 .thenReturn(inventoryItemForListing.setId(2));
 
         Mockito
-                .when(inventoryService.findInventoryById(anyInt()))
+                .when(inventoryService.findInventoryById(2))
                 .thenReturn(inventoryItemForListing.setId(2));
 
         Mockito
@@ -157,6 +157,7 @@ public class ListingControllerUnitTest {
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
         doReturn(true).when(user).checkUserGlobalAdmin();
+
 
         Mockito
                 .when(PostListingsDtoMapper.postListingsDto(any(PostListingsDto.class)))
@@ -277,11 +278,6 @@ public class ListingControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
-
-
-    //ISSUE: Number as string work but they shouldnt.
-    //Add test for validating type of Inventory ID, Quantity, Price, More info,
 
 
     @Test

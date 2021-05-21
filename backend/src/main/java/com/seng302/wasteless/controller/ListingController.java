@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
@@ -97,9 +98,18 @@ public class ListingController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory with given id does not exist");
         }
 
+        Integer availableQuantity = possibleInventoryItem.getQuantity();
+        Integer listingQuantity = listingsDtoRequest.getQuantity();
+
+        if (availableQuantity < listingQuantity) {
+            logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.",listingQuantity, availableQuantity);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Listing quantity greater than available inventory quantity.");
+        }
+
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
         listing.setBusinessId(businessId);
+        listing.setCreated(LocalDate.now());
 
         listing = listingsService.createListing(listing);
 
