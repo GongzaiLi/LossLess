@@ -236,20 +236,17 @@ public class CatalogueController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
         }
 
-        logger.debug("Creating new Product Entity and setting data.");
-        Product newProduct = new Product();
-        newProduct.setId(newProductId);
-        newProduct.setName(editedProduct.getName());
-        newProduct.setDescription(editedProduct.getDescription());
-        newProduct.setManufacturer(editedProduct.getManufacturer());
-        newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
-        newProduct.setBusinessId(oldProduct.getBusinessId());
-        newProduct.setCreated(oldProduct.getCreated());
+        logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, editedProduct);
 
-        logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, newProduct);
-        productService.updateProduct(oldProduct, newProduct);
+        oldProduct.setId(newProductId);
+        oldProduct.setName(editedProduct.getName());
+        oldProduct.setDescription(editedProduct.getDescription());
+        oldProduct.setManufacturer(editedProduct.getManufacturer());
+        oldProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
 
-        logger.info("Successfully updated old product: {} with new product: {}", oldProduct, newProduct);
+        productService.updateProduct(oldProduct);
+
+        logger.info("Successfully updated old product with data: {}", oldProduct);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
