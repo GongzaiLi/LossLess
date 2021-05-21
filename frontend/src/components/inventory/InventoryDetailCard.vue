@@ -112,7 +112,9 @@ Date: 13/5/2021
                           autocomplete="off"
                           v-model="inventoryInfo.expires" required/>
           </b-input-group>
-          <b-alert :show="inventoryCardError ? 120 : 0" variant="danger">{{ inventoryCardError }}</b-alert>
+          <transition name="fade">
+            <b-alert v-model="showErrorAlert" variant="danger" dismissible>{{ inventoryCardError }}</b-alert>
+          </transition>
           <hr style="width:100%">
           <b-button v-show="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
           <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
@@ -136,6 +138,13 @@ Date: 13/5/2021
 </template>
 
 <style>
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
 
 #select-products > .modal-dialog {
   max-width: 1000px;
@@ -183,7 +192,8 @@ export default {
     return {
       mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
       inventoryInfo: {},
-      inventoryCardError: ""
+      inventoryCardError: "",
+      showErrorAlert: false
     }
   },
   mounted() {
@@ -219,40 +229,6 @@ export default {
     calculateTotalPrice() {
       const calculatedPrice = (this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2);
       this.inventoryInfo.totalPrice = Math.max(calculatedPrice, 0);   // Make sure the total price doesn't go to negatives (eg. if the user enters a negative quantity) 
-    },
-
-    /**
-     * Makes a request to the API to create a inventory with the form input.
-     * Then, will hide the inventory popup
-     */
-    async createInventory() {
-      await api
-        .createInventory(this.$route.params.id, this.inventoryInfo)
-        .then((createInventoryResponse) => {
-          this.$log.debug("Inventory Created", createInventoryResponse);
-          this.$bvModal.hide('inventory-card');
-          this.setUpInventoryPage();// update the table
-        })
-        .catch((error) => {
-          this.inventoryCardError = this.getErrorMessageFromApiError(error);
-          this.$log.debug(error);
-        });
-    },
-
-    /**
-     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
-     * describing that error. Only applies to POST and PUT requests for inventory
-     */
-    getErrorMessageFromApiError(error) {
-      if ((error.response && error.response.status === 400)) {
-        return error.response.data;
-      } else if ((error.response && error.response.status === 403)) {
-        return "Forbidden. You are not an authorized administrator";
-      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
-        return "No Internet Connectivity";
-      } else {
-        return "Server error";
-      }
     },
 
     /**
@@ -294,15 +270,66 @@ export default {
     },
 
     /**
-     * Edit Inventory APi
-     * @return {Promise<void>}
+     * Makes a request to the API to create a inventory with the form input.
+     * Then, will hide the inventory popup
+     */
+    async createInventory() {
+      this.showErrorAlert = false;
+
+      await api
+          .createInventory(this.$route.params.id, this.inventoryInfo)
+          .then((createInventoryResponse) => {
+            this.$log.debug("Inventory Created", createInventoryResponse);
+            this.$bvModal.hide('inventory-card');
+            this.setUpInventoryPage();// update the table
+          })
+          .catch((error) => {
+            this.handleApiError(error);
+          });
+    },
+
+    /**
+     * Sends an API request to modify the inventory data, and closes the modal and refreshes the table is successful
      */
     editInventory: async function () {
-      
-      this.$bvModal.hide('inventory-card');
-      this.setUpInventoryPage();// update the table
-      //todo edit the inventory api in here...................
-    }
+      this.showErrorAlert = false;
+
+      await api
+          .modifyInventory(this.$route.params.id, this.inventoryInfo.id, this.inventoryInfo)
+          .then(() => {
+            this.$bvModal.hide('inventory-card');
+            this.setUpInventoryPage();// update the table
+          })
+          .catch((error) => {
+            this.handleApiError(error);
+          })
+    },
+
+    /**
+     * Call this method when your API call returns an error. Takes an error sent back by an API call,
+     * and displays it (in a user-friendly format) in an alert.
+     */
+    handleApiError(error) {
+      this.inventoryCardError = this.getErrorMessageFromApiError(error);
+      this.showErrorAlert = true;
+      this.$log.debug(error);
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST and PUT requests for inventory
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        return error.response.data;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
+    },
   }
 }
 </script>

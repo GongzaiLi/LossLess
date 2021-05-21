@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Type for Address object for users and buisnesses used by DTOs to return the correct (and correctly formatted) data.
@@ -30,30 +31,36 @@ public class Address {
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "street_number is mandatory")
     @Column(name = "street_number")
+    @Size(min = 0, max = 50)
     private String streetNumber;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "street_name is mandatory")
     @Column(name = "street_name")
+    @Size(min = 0, max = 50)
     private String streetName;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "city is mandatory")
     @Column(name = "city")
+    @Size(min = 0, max = 50)
     private String city;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @Column(name = "region")
+    @Size(min = 0, max = 50)
     private String region;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "country is mandatory")
     @Column(name = "country")
+    @Size(min = 0, max = 50)
     private String country;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "postcode is mandatory")
     @Column(name = "postcode")
+    @Size(min = 0, max = 50)
     private String postcode;
 
     @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})

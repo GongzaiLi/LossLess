@@ -17,11 +17,11 @@ public class PostInventoryDtoMapper {
         PostInventoryDtoMapper.productService = productService;
     }
 
-    public static Inventory postInventoryDtoToEntityMapper(PostInventoryDto inventoryDto) {
+    public static Inventory postInventoryDtoToEntityMapper(PostInventoryDto inventoryDto, Inventory inventory) {
 
         Product product = productService.findProductById(inventoryDto.getProductId());
 
-        return new Inventory().setProduct(product)
+        return inventory.setProduct(product)
         .setExpires(inventoryDto.getExpires())
         .setBestBefore(inventoryDto.getBestBefore())
         .setManufactured(inventoryDto.getManufactured())

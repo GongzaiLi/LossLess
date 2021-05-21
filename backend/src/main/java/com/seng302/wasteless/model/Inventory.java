@@ -26,7 +26,7 @@ public class Inventory {
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     @JsonView(InventoryView.GetInventoryView.class)
-    private Long id;
+    private Integer id;
 
     @NotNull
     @Column
