@@ -38,8 +38,7 @@ public class Listing {
     @ManyToOne
     @JoinColumn(name = "inventory_id")
     @JsonView(ListingViews.GetListingView.class)
-    private Inventory inventory;
-
+    private Inventory inventoryItem;
 
     @Positive
     @Max(1000000000)

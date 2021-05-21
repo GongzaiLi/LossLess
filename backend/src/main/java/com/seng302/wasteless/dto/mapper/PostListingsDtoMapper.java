@@ -37,11 +37,10 @@ public class PostListingsDtoMapper {
 
 
         Listing listing = new Listing();
-        listing.setInventory(inventory);
+        listing.setInventoryItem(inventory);
         listing.setQuantity(listingsDto.getQuantity());
         listing.setPrice(listingPrice);
         listing.setMoreInfo(listingsDto.getMoreInfo());
-        listing.setCreated(listingsDto.getCreated());
         listing.setCloses(closeDate);
 
 

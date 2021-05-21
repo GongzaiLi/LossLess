@@ -2,6 +2,7 @@ package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.ListingViews;
 import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,29 +28,29 @@ public class Product {
     @Column(name = "database_id")
     private Long databaseId;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "code", unique = true)
     private String id;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
     private String name;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "description")
     private String description;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "manufacturer")
     private String manufacturer;
 
     @Positive
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "created")
     private LocalDate created;
 

@@ -6,6 +6,8 @@ import com.seng302.wasteless.repository.ListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ListingsService {
     private final ListingRepository listingRepository;
@@ -24,13 +26,13 @@ public class ListingsService {
     }
 
     /**
-     * Get the entire inventory of items for a given business
+     * Gets all listings for a given business
      *
      * @param id The id of the business
-     * @return A list containing every item in the business' listings.
-     * Returns an empty list if there are no items in the business' listings, or if the business does not exist
+     * @return A list containing every listings in the business.
+     * Returns an empty list if there are no listings in the business, or if the business does not exist
      */
-    public Listing findByBusinessId(int id) {
-        return new Listing();
+    public List<Listing> findByBusinessId(int id) {
+        return listingRepository.findAllByBusinessId(id);
     }
 }
