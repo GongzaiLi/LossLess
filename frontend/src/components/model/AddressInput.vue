@@ -60,10 +60,20 @@ Date: sprint_1
 
       <b-form-group>
         <b-row>
+          <b-col><strong>Suburb</strong></b-col>
           <b-col><strong>City *</strong></b-col>
           <b-col><strong>Region</strong></b-col>
         </b-row>
         <b-row>
+          <b-col>
+            <b-form-input
+              v-model="homeAddress.suburb"
+              maxLength=50
+              placeholder="Suburb"
+              v-bind:value="value"
+              required
+            />
+          </b-col>
           <b-col>
             <b-form-input
               v-model="homeAddress.city"
@@ -160,6 +170,7 @@ export default {
       homeAddress: {
         streetNumber: "",
         streetName: "",
+        suburb: "",
         city: "",
         region: "",
         country: "",
@@ -192,8 +203,9 @@ export default {
 
       if (address.country) {
         addressString = address.country;
-        if (address.county || address.district || address.city) {
-          addressString = (address.county || address.district || address.city) + ', ' + addressString;
+        if (address.county || address.city) {
+          addressString = (address.county ||  address.city) + ', ' + addressString;
+          if (address.district) addressString = address.district + ', ' + addressString;
           if (address.housenumber && address.street) {
             addressString = address.housenumber + ' ' + address.street + ', ' + addressString;
             addressValid = true;
@@ -239,7 +251,8 @@ export default {
     splitAddress(addressObject) {
       this.homeAddress.streetNumber = addressObject.housenumber || '';
       this.homeAddress.streetName = addressObject.street || '';
-      this.homeAddress.city = addressObject.county || addressObject.district || addressObject.city || ''; // order is to give better addresses to southern hemisphere locations
+      this.homeAddress.suburb = addressObject.district || '';
+      this.homeAddress.city = addressObject.county || addressObject.city || ''; // order is to give better addresses to southern hemisphere locations
       this.homeAddress.region = addressObject.state || addressObject.region || "";
       this.homeAddress.country = addressObject.country;
       this.homeAddress.postcode = addressObject.postcode || "";
@@ -282,6 +295,7 @@ export default {
 
       const addressQueryString = this.homeAddress.streetNumber.replace(/\s/gm, " ") + " " +
         this.homeAddress.streetName.replace(/\s/gm, " ") + " " +
+        this.homeAddress.suburb.replace(/\s/gm, " ") + " " +
         this.homeAddress.city.replace(/\s/gm, " ") + " " +
         this.homeAddress.region.replace(/\s/gm, " ") + " " +
         this.homeAddress.country.replace(/\s/gm, " ") + " " +

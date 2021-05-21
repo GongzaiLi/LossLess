@@ -58,6 +58,7 @@ public class AdminEndpointsIntegrationTest {
         Address address = new Address();
         address.setCountry("NZ");
         address.setCity("Christchurch");
+        address.setSuburb("Upper Riccarton");
         address.setStreetNumber("1");
         address.setStreetName("Ilam Rd");
         address.setPostcode("8041");
@@ -93,6 +94,7 @@ public class AdminEndpointsIntegrationTest {
         Address address = new Address();
         address.setCountry("NZ");
         address.setCity("Christchurch");
+        address.setSuburb("Upper Riccarton");
         address.setStreetNumber("1");
         address.setStreetName("Ilam Rd");
         address.setPostcode("8041");
@@ -184,6 +186,7 @@ public class AdminEndpointsIntegrationTest {
         Address address = new Address();
         address.setCountry("NZ");
         address.setCity("Christchurch");
+        address.setSuburb("Upper Riccarton");
         address.setStreetNumber("1");
         address.setStreetName("Ilam Rd");
         address.setPostcode("8041");
@@ -219,6 +222,7 @@ public class AdminEndpointsIntegrationTest {
         Address address = new Address();
         address.setCountry("NZ");
         address.setCity("Christchurch");
+        address.setSuburb("Upper Riccarton");
         address.setStreetNumber("1");
         address.setStreetName("Ilam Rd");
         address.setPostcode("8041");
