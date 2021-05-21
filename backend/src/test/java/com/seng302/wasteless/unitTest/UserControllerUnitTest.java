@@ -42,6 +42,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -58,6 +59,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -74,6 +76,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1@\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -90,6 +93,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"@1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -106,6 +110,7 @@ public class UserControllerUnitTest {
         String user = "{\"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27-10-2000\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -123,6 +128,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -139,6 +145,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -155,6 +162,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -180,6 +188,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -196,6 +205,7 @@ public class UserControllerUnitTest {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -215,6 +225,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"1800-20-10\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -233,6 +244,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -250,6 +262,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -266,6 +279,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"10/27/1000\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +

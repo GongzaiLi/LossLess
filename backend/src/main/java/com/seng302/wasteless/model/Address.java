@@ -63,4 +63,8 @@ public class Address {
     @Size(min = 0, max = 50)
     private String postcode;
 
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
+    @Column(name = "suburb")
+    private String suburb;
+
 }

@@ -50,16 +50,17 @@ public class RegisterFeature {
     public void userIsNotRegisteredAndIsOnTheRegisterPage() {
     }
 
-    @When("User tries to create an account with no first name, last name {string}, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
-    public void userTriesToCreateAnAccountWithNoFirstNameLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9) throws Exception {
+    @When("User tries to create an account with no first name, last name {string}, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  suburb {string},  city {string},  region {string},  postcode {string} and password {string}")
+    public void userTriesToCreateAnAccountWithNoFirstNameLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9, String arg10) throws Exception {
         String user = String.format("{\"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"%s\",\n" +
                 "    \"streetName\": \"%s\",\n" +
+                "    \"suburb\": \"%s\",\n" +
                 "    \"city\": \"%s\",\n" +
                 "    \"region\": \"%s\",\n" +
                 "    \"country\": \"%s\",\n" +
                 "    \"postcode\": \"%s\"\n" +
-                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
@@ -68,16 +69,17 @@ public class RegisterFeature {
     }
 
 
-    @When("User tries to create an account with first name {string}, no last name, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
-    public void userTriesToCreateAnAccountWithFirstNameNoLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9) throws Exception {
+    @When("User tries to create an account with first name {string}, no last name, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  suburb {string}, city {string},  region {string},  postcode {string} and password {string}")
+    public void userTriesToCreateAnAccountWithFirstNameNoLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9, String arg10) throws Exception {
         String user = String.format("{\"firstName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"%s\",\n" +
                 "    \"streetName\": \"%s\",\n" +
+                "    \"suburb\": \"%s\",\n" +
                 "    \"city\": \"%s\",\n" +
                 "    \"region\": \"%s\",\n" +
                 "    \"country\": \"%s\",\n" +
                 "    \"postcode\": \"%s\"\n" +
-                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
@@ -86,17 +88,17 @@ public class RegisterFeature {
     }
 
 
-
-    @When("User tries to create an account with first name {string}, last name {string}, no email, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
-    public void userTriesToCreateAnAccountWithFirstNameLastNameNoEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9) throws Exception {
+    @When("User tries to create an account with first name {string}, last name {string}, no email, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  suburb {string}, city {string},  region {string},  postcode {string} and password {string}")
+    public void userTriesToCreateAnAccountWithFirstNameLastNameNoEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9, String arg10) throws Exception {
         String user = String.format("{\"firstName\" : \"%s\", \"lastName\" : \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"%s\",\n" +
                 "    \"streetName\": \"%s\",\n" +
+                "    \"suburb\": \"%s\",\n" +
                 "    \"city\": \"%s\",\n" +
                 "    \"region\": \"%s\",\n" +
                 "    \"country\": \"%s\",\n" +
                 "    \"postcode\": \"%s\"\n" +
-                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
@@ -104,17 +106,18 @@ public class RegisterFeature {
                 .andExpect(status().isBadRequest());
     }
 
-    @When("User tries to create an account with first name {string}, last name {string}, email {string}, no date of birth, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
-    public void userTriesToCreateAnAccountWithFirstNameLastNameEmailNoDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9) throws Exception {
+    @When("User tries to create an account with first name {string}, last name {string}, email {string}, no date of birth, country {string},  streetNumber {string},  streetName {string},  suburb {string}, city {string},  region {string},  postcode {string} and password {string}")
+    public void userTriesToCreateAnAccountWithFirstNameLastNameEmailNoDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6, String arg7, String arg8, String arg9, String arg10) throws Exception {
 
         String user = String.format("{\"firstName\" : \"%s\", \"lastName\" : \"%s\",\"email\": \"%s\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"%s\",\n" +
                 "    \"streetName\": \"%s\",\n" +
+                "    \"suburb\": \"%s\",\n" +
                 "    \"city\": \"%s\",\n" +
                 "    \"region\": \"%s\",\n" +
                 "    \"country\": \"%s\",\n" +
                 "    \"postcode\": \"%s\"\n" +
-                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+                "  }, \"password\": \"%s\"}", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
@@ -122,8 +125,8 @@ public class RegisterFeature {
                 .andExpect(status().isBadRequest());
     }
 
-    @When("User tries to create an account with first name {string}, last name {string}, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  city {string},  region {string},  postcode {string} and password {string}")
-    public void userTriesToCreateAnAccountWithFirstNameLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String firstName, String lastName, String email, String dateOfBirth, String country, String streetNumber, String streetName, String city, String region, String postcode, String password) throws Exception {
+    @When("User tries to create an account with first name {string}, last name {string}, email {string}, date of birth {string}, country {string},  streetNumber {string},  streetName {string},  suburb {string}, city {string},  region {string},  postcode {string} and password {string}")
+    public void userTriesToCreateAnAccountWithFirstNameLastNameEmailDateOfBirthCountryStreetNumberStreetNameCityRegionPostcodeAndPassword(String firstName, String lastName, String email, String dateOfBirth, String country, String streetNumber, String streetName, String suburb, String city, String region, String postcode, String password) throws Exception {
         String user = String.format("{" +
                 "\"firstName\" : \"%s\", " +
                 "\"lastName\" : \"%s\", " +
@@ -132,11 +135,12 @@ public class RegisterFeature {
                 "\"homeAddress\": {\n" +
                 "\"streetNumber\": \"%s\",\n" +
                 "\"streetName\": \"%s\",\n" +
+                "\"suburb\": \"%s\",\n" +
                 "\"city\": \"%s\",\n" +
                 "\"region\": \"%s\",\n" +
                 "\"country\": \"%s\",\n" +
                 "\"postcode\": \"%s\"\n" +
-                "  }, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, streetNumber, streetName, city, region, country, postcode, password);
+                "  }, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, streetNumber, streetName, suburb, city, region, country, postcode, password);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
@@ -155,6 +159,7 @@ public class RegisterFeature {
                 "\"homeAddress\": {\n" +
                 "\"streetNumber\": \"number\",\n" +
                 "\"streetName\": \"name\",\n" +
+                "\"suburb\": \"suburb\",\n" +
                 "\"city\": \"city\",\n" +
                 "\"region\": \"region\",\n" +
                 "\"country\": \"country\",\n" +
@@ -165,8 +170,6 @@ public class RegisterFeature {
                 .content(user)
                 .contentType(APPLICATION_JSON));
     }
-
-
 
 
     @When("User tries to create an account with first name {string}, last name {string}, email {string}, date of birth {string}, no home address and password {string}")

@@ -75,10 +75,10 @@ test('no-county', async () => {
     country: "New Zealand",
     district: "District 12",
   };
-  expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, District 12, New Zealand");
+  expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, District 12, Gotham City, New Zealand");
 });
 
-test('no-district-or-county', async () => {
+test('no-district', async () => {
   const address = {
     housenumber: "100",
     street: "Sesame Street",
@@ -87,6 +87,18 @@ test('no-district-or-county', async () => {
     country: "New Zealand",
   };
   expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, Gotham City, New Zealand");
+});
+
+test('no-county', async () => {
+  const address = {
+    housenumber: "100",
+    street: "Sesame Street",
+    name: "A name",
+    city: "Gotham City",
+    country: "New Zealand",
+    district: "District 12",
+  };
+  expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, District 12, Gotham City, New Zealand");
 });
 
 test('only-name', async () => {
@@ -134,7 +146,7 @@ test('all-fields', async () => {
     district: "District 12",
     county: "A County",
   };
-  expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, A County, New Zealand");
+  expect(wrapper.vm.getStringFromPhotonAddress(address)).toBe("100 Sesame Street, District 12, A County, New Zealand");
 });
 
 
@@ -143,6 +155,7 @@ test('split-address-city-and-region', async () => {
     housenumber: "100",
     street: "Sesame Street",
     name: "A name",
+    district: "Riccarton",
     city: "Gotham City",
     country: "New Zealand",
     region: "canterbury",
@@ -152,6 +165,7 @@ test('split-address-city-and-region', async () => {
   const expectedAddress = {
     "streetNumber": "100",
     "streetName": "Sesame Street",
+    "suburb": "Riccarton",
     "city": "Gotham City",
     "region": "canterbury",
     "country": "New Zealand",
@@ -168,6 +182,7 @@ test('split-address-name-and-streetname-and-number', async () => {
     housenumber: "100",
     street: "Sesame Street",
     name: "A name",
+    district: "Riccarton",
     city: "Gotham City",
     country: "New Zealand",
     region: "canterbury",
@@ -180,20 +195,22 @@ test('split-address-name-and-streetname-and-number', async () => {
     "city": "Gotham City",
     "region": "canterbury",
     "country": "New Zealand",
+    "suburb": "Riccarton",
     "postcode": "1234"
+
   }
   wrapper.vm.splitAddress(address);
   expect(wrapper.vm.homeAddress).toStrictEqual(expectedAddress);
 
 });
 
-test('split-address-county-district-city', async () => {
+test('split-address-county-suburb-city', async () => {
   const address = {
     housenumber: "100",
     street: "Sesame Street",
     name: "A name",
+    district: "Riccarton",
     county: "a county",
-    district: "a district",
     city: "Gotham City",
     country: "New Zealand",
     region: "canterbury",
@@ -203,6 +220,7 @@ test('split-address-county-district-city', async () => {
   const expectedAddress = {
     "streetNumber": "100",
     "streetName": "Sesame Street",
+    "suburb": "Riccarton",
     "city": "a county",
     "region": "canterbury",
     "country": "New Zealand",
@@ -219,8 +237,8 @@ test('split-address-state-region', async () => {
     housenumber: "100",
     street: "Sesame Street",
     name: "A name",
+    district: "Riccarton",
     county: "a county",
-    district: "a district",
     city: "Gotham City",
     country: "New Zealand",
     region: "canterbury",
@@ -231,6 +249,7 @@ test('split-address-state-region', async () => {
   const expectedAddress = {
     "streetNumber": "100",
     "streetName": "Sesame Street",
+    "suburb": "Riccarton",
     "city": "a county",
     "region": "a state",
     "country": "New Zealand",
@@ -247,6 +266,7 @@ test('select-address-option, 1 address', async () => {
     housenumber: "100",
     street: "Sesame Street",
     name: "A name",
+    district: "Riccarton",
     city: "Gotham City",
     country: "New Zealand",
     region: "canterbury",
@@ -256,6 +276,7 @@ test('select-address-option, 1 address', async () => {
   const address2 = {
     housenumber: "50",
     street: "jacks Street",
+    suburb: "Riccarton",
     name: "bob",
     city: "new york City",
     country: "usa",
@@ -270,7 +291,8 @@ test('select-address-option, 1 address', async () => {
     "city": "Gotham City",
     "region": "canterbury",
     "country": "New Zealand",
-    "postcode": "1234"
+    "postcode": "1234",
+    "suburb": "Riccarton",
   }
   wrapper.vm.addressResults.push(addressString);
   wrapper.vm.addressResults.push(addressString2);
@@ -284,6 +306,7 @@ test('check-clearAddress-is-work', () => {
   const homeAddress = {
     streetNumber: "100",
     streetName: "A name",
+    suburb: "Riccarton",
     city: "A city",
     region: "A region",
     country: "A country",
@@ -292,6 +315,7 @@ test('check-clearAddress-is-work', () => {
   const expectedAddress = {
     streetNumber: "",
     streetName: "",
+    suburb: "",
     city: "",
     region: "",
     country: "",
@@ -308,6 +332,7 @@ describe('regression-testing-for-address-change', () => {
   const homeAddressInit = {
     streetNumber: "98",
     streetName: "Rattray Street",
+    suburb: "Riccarton",
     city: "Christchurch City",
     region: "Canterbury",
     country: "New Zealand",
@@ -318,7 +343,7 @@ describe('regression-testing-for-address-change', () => {
     housenumber: "98",
     street: "Rattray Street",
     county: '',
-    district: '',
+    district: 'Riccarton',
     city: "Christchurch City",
     state: '',
     region: "Canterbury",
@@ -340,6 +365,7 @@ describe('regression-testing-for-address-change', () => {
     const changedAddress = {
       streetNumber: "100",
       streetName: "Rattray Street",
+      suburb: "Riccarton",
       city: "Christchurch City",
       region: "Canterbury",
       country: "New Zealand",
@@ -363,6 +389,7 @@ describe('regression-testing-for-address-change', () => {
     const changedAddress = {
       streetNumber: "98",
       streetName: "a Street",
+      suburb: "Riccarton",
       city: "Christchurch City",
       region: "Canterbury",
       country: "New Zealand",
@@ -386,6 +413,7 @@ describe('regression-testing-for-address-change', () => {
     const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
+      suburb: "Riccarton",
       city: "a City",
       region: "Canterbury",
       country: "New Zealand",
@@ -406,10 +434,37 @@ describe('regression-testing-for-address-change', () => {
 
   });
 
+  test('when-change-suburb', async () => {
+    const changedAddress = {
+      streetNumber: "98",
+      streetName: "Rattray Street",
+      suburb: "a suburb",
+      city: "Christchurch City",
+      region: "Canterbury",
+      country: "New Zealand",
+      postcode: "8041"
+    };
+
+    await wrapper.vm.selectAddressOption(homeAddressFromAPIInit);
+    await wrapper.vm.$nextTick();
+    const [[emittedInit]] = wrapper.emitted().input;
+    expect(emittedInit).toStrictEqual(homeAddressInit);
+
+    wrapper.vm.homeAddress.suburb = 'a suburb';
+
+    await wrapper.vm.onAddressChange();
+    await wrapper.vm.$nextTick();
+    const [[emitted]] = wrapper.emitted().input;
+    expect(emitted).toStrictEqual(changedAddress);
+
+  });
+
+
   test('when-change-region', async () => {
     const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
+      suburb: "Riccarton",
       city: "Christchurch City",
       region: "a region",
       country: "New Zealand",
@@ -434,6 +489,7 @@ describe('regression-testing-for-address-change', () => {
     const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
+      suburb: "Riccarton",
       city: "Christchurch City",
       region: "Canterbury",
       country: "New",
@@ -458,6 +514,7 @@ describe('regression-testing-for-address-change', () => {
     const changedAddress = {
       streetNumber: "98",
       streetName: "Rattray Street",
+      suburb: "Riccarton",
       city: "Christchurch City",
       region: "Canterbury",
       country: "New Zealand",

@@ -181,6 +181,7 @@ export default {
         homeAddress: {
           streetNumber: "",
           streetName: "",
+          suburb: "",
           city: "",
           region: "",
           country: "",
@@ -221,7 +222,7 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
-          console.log(response.data);
+          // console.log(response.data);
           this.userFound = true;
           this.loading = false;
         })
@@ -282,7 +283,9 @@ export default {
      * Combine fields of address
      */
     getAddress: function () {
-      return Object.values(this.userData.homeAddress).join(' ');
+      const address = this.userData.homeAddress;
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     },
     /**
      * Returns the full name of the user, in the format:
@@ -332,7 +335,7 @@ export default {
     adminButtonText: function () {
       if (this.userData.role === 'globalApplicationAdmin') {
         return "Remove Admin";
-      }else {  // Button won't even appear if they are default global admin so this is fine
+      } else {  // Button won't even appear if they are default global admin so this is fine
         return "Make Admin";
       }
     },
