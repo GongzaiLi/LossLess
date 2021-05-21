@@ -19,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-<<<<<<< HEAD
-=======
 import java.util.List;
->>>>>>> 95eea086de10ca62de392fd46c22acd07a1aa4e9
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
