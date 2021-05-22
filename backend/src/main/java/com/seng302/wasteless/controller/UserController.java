@@ -243,39 +243,52 @@ public class UserController {
      * if successful. Returns 406 NOT_ACCEPTABLE status if the user id does not exist.
      * Returns 403 FORBIDDEN if the user making the request is not an admin.
      * @param userId The id of the user to be made an admin
-     * @param authentication Spring Security Authentication object, representing current user and token
      * @return 200 OK, 406 Not Acceptable, 403 Forbidden
      */
     @PutMapping("/users/{id}/makeAdmin")
-    public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
+    public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId) {
 
         logger.debug("Request to make user: {} an application admin", userId);
 
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
 
-        // The Spring Security principal can only be retrieved as an Object and needs to be cast
-        // to the correct UserDetails instance, see:
-        // https://www.baeldung.com/get-user-in-spring-security
-        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
 
         if (possibleUser == null) {
+
             logger.warn("User with ID: {} does not exist", userId);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot change role of a DGAA");
+
+        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+
+            logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to make others admin");
+
+        } else if (possibleUser.checkUserDefaultAdmin()) {
+
+            logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Cannot change role of default application admin");
+
         }
 
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
         logger.debug("Setting role to admin for user: {}", possibleUser.getId());
-        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-        logger.debug("Updating user: {} ith new role", possibleUser.getId());
-        userService.updateUser(possibleUser);
-        logger.info("User: {} successfully made application administrator.", possibleUser.getId());
-        return ResponseEntity.status(HttpStatus.OK).build();
 
+        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+
+        logger.debug("Updating user: {} ith new role", possibleUser.getId());
+
+        userService.updateUser(possibleUser);
+
+        logger.info("User: {} successfully made application administrator.", possibleUser.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
@@ -283,13 +296,12 @@ public class UserController {
      * Endpoint to revoke a specified user's admin role. Sets user role to USER
      * if successful.
      * @param userId The id of the user to be made an admin
-     * @param authentication Spring Security Authentication object, representing current user and token
      * @return 200 OK if successful. 406 NOT_ACCEPTABLE status if the user id does not exist.
      * 403 FORBIDDEN if the user making the request is not an admin. 409 CONFLICT if the admin
      * tries to revoke their own admin status.
      */
     @PutMapping("/users/{id}/revokeAdmin")
-    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
+    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId) {
 
         logger.debug("Request to revoke admin status for  user: {}", userId);
 
@@ -297,21 +309,27 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
 
-        // The Spring Security principal can only be retrieved as an Object and needs to be cast
-        // to the correct UserDetails instance, see:
-        // https://www.baeldung.com/get-user-in-spring-security
-        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
 
         if (possibleUser == null) {
+
             logger.warn("Could not find user with ID: {}", userId);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getId().equals(loggedInUser.getId())) {
+
+        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+
+            logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to revoke others admin");
+
+        } else if (possibleUser.checkUserDefaultAdmin()) {
+
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
+
         }
 
         logger.debug("User: {} found using Id : {}", possibleUser, userId);

@@ -137,5 +137,13 @@ public class User {
         return this.role == UserRoles.GLOBAL_APPLICATION_ADMIN ||
                 this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
     }
+
+    /**
+     * Check if user is default admin
+     * @return true if default admin
+     */
+    public boolean checkUserDefaultAdmin() {
+        return this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
+    }
 }
 
