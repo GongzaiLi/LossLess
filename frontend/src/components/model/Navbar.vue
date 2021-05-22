@@ -30,7 +30,7 @@ Date: sprint_1
           <b-dropdown-item :to="businessInventoryRouteLink">
             <b-icon-box-seam/> Inventory
           </b-dropdown-item>
-          <b-dropdown-item disabled> <!-- Disabled as there is no Sales List page -->
+          <b-dropdown-item :to="businessListingsRouteLink">
             <b-icon-receipt/> Sales List
           </b-dropdown-item>
         </b-nav-item-dropdown>
@@ -127,6 +127,12 @@ export default {
      */
     businessInventoryRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/inventory"
+    },
+    /**
+     * Returns a string constructed to go to the sales page
+     */
+    businessListingsRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/listings"
     },
     /**
      * User friendly display string for the user role to be displayed as a badge.
