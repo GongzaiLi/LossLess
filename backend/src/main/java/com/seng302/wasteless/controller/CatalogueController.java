@@ -7,7 +7,6 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.ProductViews;
-import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,12 +120,8 @@ public class CatalogueController {
         logger.debug("Trying to create Product Entity for product: {}", possibleProduct);
         possibleProduct = productService.createProduct(possibleProduct);
 
-
-        JSONObject responseBody = new JSONObject();
-        responseBody.put("productId", possibleProduct.getId());
-
         logger.info("Successfully created Product Entity: {}", possibleProduct);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
 
 
