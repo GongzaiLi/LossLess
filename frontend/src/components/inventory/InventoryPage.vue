@@ -34,7 +34,13 @@ Date: 11/5/2021
         @row-clicked="openInventoryDetailModal"
       >
         <template #cell(productThumbnail) class="thumbnail-row">
-          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777" alt="Default Image"></b-img>
+          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
+                 alt="Default Image"></b-img>
+        </template>
+        <template v-slot:cell(actions)="product">
+          <b-button id="edit-button" @click="openEditInventoryModal(product.item)" size="sm">
+            Edit
+          </b-button>
         </template>
         <template #cell(pricePerItem)="data">
           {{ currency.symbol }}{{ data.item.pricePerItem }}
@@ -92,6 +98,7 @@ Date: 11/5/2021
   margin-bottom: 7em;
   text-align: center;
 }
+
 .thumbnail-row {
   padding: 0 0 0 0.5rem !important;
 }
@@ -194,15 +201,17 @@ export default {
      **/
     openInventoryDetailModal: function (inventory) {
       this.isInventoryCardReadOnly = true;
+      this.editInventoryItem = false;
       this.inventoryDisplayedInCard = Object.assign({}, inventory);
       this.$bvModal.show('inventory-card');
     },
 
     /**
-     *
+     * when click Create button will show a create inventory model card.
      **/
     openCreateInventoryModal: function () {
       this.isInventoryCardReadOnly = false;
+      this.editInventoryItem = false;
       this.inventoryDisplayedInCard = {
         productId: '',
         quantity: 0,
@@ -213,6 +222,17 @@ export default {
         bestBefore: null,
         expires: null,
       }
+      this.$bvModal.show('inventory-card');
+    },
+
+    /**
+     * when click Edit button in the table will show a edit inventory model card.
+     **/
+    openEditInventoryModal: function (inventory) {
+      this.isInventoryCardReadOnly = false;
+      this.editInventoryItem = true;
+      this.inventoryDisplayedInCard = Object.assign({}, inventory);
+      this.inventoryDisplayedInCard.productId = inventory.product.id;
       this.$bvModal.show('inventory-card');
     }
   },
@@ -287,8 +307,15 @@ export default {
           },
           thStyle: 'width: 15%',
           sortable: true
+        },
+        {
+          key: 'actions',
+          label: 'Action',
+          thStyle: 'width: 8%',
+          sortable: false
         }
-      ];
+      ]
+
     },
 
     /**
