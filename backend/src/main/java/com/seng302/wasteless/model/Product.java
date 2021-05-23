@@ -1,7 +1,8 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.InventoryView;
+import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.ListingViews;
 import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 /**
@@ -28,33 +28,29 @@ public class Product {
     @Column(name = "database_id")
     private Long databaseId;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "code", unique = true)
-    @Size(min = 0, max = 60)//Slightly higher than other maxes as business id is added as prefix to this
     private String id;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
-    @Size(min = 0, max = 50)
     private String name;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "description")
-    @Size(min = 0, max = 250)
     private String description;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "manufacturer")
-    @Size(min = 0, max = 50)
     private String manufacturer;
 
-    @PositiveOrZero
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @Positive
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryView.GetInventoryView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "created")
     private LocalDate created;
 

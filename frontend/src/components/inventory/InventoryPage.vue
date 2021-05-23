@@ -5,19 +5,22 @@ Date: 11/5/2021
 <template>
   <div class="overflow-auto">
     <b-card v-if="canEditInventory" style="max-width: 1260px;">
-      <b-card-title>Inventory: {{ business.name }}</b-card-title>
-      <hr class='m-0'>
-      <b-row align-v="center">
-        <b-col md="8"><h6 class="ml-2">Click on an inventory to view more details</h6></b-col>
-        <b-col md="4">
-          <b-form-group>
-            <b-button @click="openCreateInventoryModal" class="float-right">
-              <b-icon-plus-square-fill/>
-              Create
-            </b-button>
-          </b-form-group>
-        </b-col>
-      </b-row>
+      <template #header>
+        <b-row>
+          <b-col md="8">
+            <h4>Inventory: {{ business.name }}</h4>
+            <h6>Click on a row to view more details</h6>
+          </b-col>
+          <b-col md="4" class="my-auto">
+            <b-form-group class="float-right">
+              <b-button @click="openCreateInventoryModal">
+                <b-icon-plus-square-fill/>
+                Create
+              </b-button>
+            </b-form-group>
+          </b-col>
+        </b-row>
+      </template>
       <b-table
         striped hovers
         responsive="lg"
