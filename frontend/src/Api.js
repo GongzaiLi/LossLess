@@ -63,6 +63,8 @@ export default {
   createInventory: (id,inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
   getInventory: (id) => instance.get(`/businesses/${id}/inventory`, {withCredentials: true}),
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials:true}),
+  createListing: (businessId, listing)=> instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
+
 
   /**
    * Given the name of the user's country, gets currency data for that country.

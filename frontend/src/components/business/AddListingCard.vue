@@ -1,14 +1,19 @@
+<!--
+Page Show create listing card, validate data, send api request to create listing.
+Date: 23/5/2021
+-->
+
 <template>
   <div>
     <b-card
         class="profile-card shadow"
     >
-      <b-form @submit="createListing">
+      <b-form @submit.prevent="createListing">
         <div :hidden="!disabled">
           <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
         </div>
         <b-card-body>
-          <h6 class="mb-2"><strong>Product Id *:</strong></h6>
+          <h6 class="mb-2"><strong>Inventory Item ID *:</strong></h6>
           <p :hidden="disabled" style="margin:0">
             Enter the ID of a product in your inventory, or select a product using the 'Select Product' button.<br></p>
           <b-input-group class="mb-2">
@@ -16,8 +21,8 @@
                 type="text" maxlength="50"
                 pattern="[a-zA-Z0-9\d\-_\s]{0,100}"
                 :disabled="disabled"
-                placeholder="PRODUCT-ID"
-                v-model="listingInfo.productId"
+                placeholder="Inventory-Item-ID"
+                v-model="listingData.inventoryItemId"
                 autofocus required/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectInventoryItemModal">Select Inventory Item</b-button>
@@ -26,28 +31,10 @@
 
           <h6><strong>Quantity *:</strong></h6>
           <b-input-group class="mb-2">
-            <b-form-input type="number" maxlength="50" :disabled="disabled" v-model="listingInfo.quantity"
+            <b-form-input type="number" maxlength="50" :disabled="disabled" v-model="listingData.quantity"
                           @input="calculateTotalPrice" required/>
           </b-input-group>
 
-          <b-input-group>
-            <h6><strong>Price Per Item:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <template #prepend>
-              <b-input-group-text>{{ currency.symbol }}</b-input-group-text>
-            </template>
-            <b-form-input
-                type="number" maxlength="15"
-                step=".01" min=0 placeholder=0
-                :disabled="disabled"
-                @input="calculateTotalPrice"
-                v-model="listingInfo.pricePerItem"
-            />
-            <template #append>
-              <b-input-group-text>{{ currency.code }}</b-input-group-text>
-            </template>
-          </b-input-group>
 
           <b-input-group>
             <h6><strong>Total Price:</strong></h6>
@@ -60,51 +47,22 @@
                 type="number" maxlength="15"
                 step=".01" min=0 placeholder=0
                 :disabled="disabled"
-                v-model="listingInfo.totalPrice"
+                v-model="listingData.price"
             />
             <template #append>
               <b-input-group-text>{{ currency.code }}</b-input-group-text>
             </template>
           </b-input-group>
 
-          <b-input-group>
-            <h6><strong>Manufactured:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
-                          :disabled="disabled"
-                          autocomplete="off"
-                          v-model="listingInfo.manufactured"/>
-          </b-input-group>
 
           <b-input-group>
-            <h6><strong>Sell By:</strong></h6>
+            <h6><strong>Closes:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
-                          v-model="listingInfo.sellBy"/>
-          </b-input-group>
-
-          <b-input-group>
-            <h6><strong>Best Before:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
-                          :disabled="disabled"
-                          autocomplete="off"
-                          v-model="listingInfo.bestBefore"/>
-          </b-input-group>
-
-          <b-input-group>
-            <h6><strong>Expires *:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
-                          :disabled="disabled"
-                          autocomplete="off"
-                          v-model="listingInfo.expires" required/>
+                          v-model="listingData.closes"/>
           </b-input-group>
           <b-alert :show="listingCardError ? 120 : 0" variant="danger">{{ listingCardError }}</b-alert>
           <hr style="width:100%">
@@ -122,18 +80,19 @@
       <div style="text-align: center" class="mb-3">
         <h5>Click on the inventory item you want to create an listing item for</h5>
       </div>
-      <products-table ref="productTable" :editable="false"
-                      v-on:productClicked="selectInventoryItem"
-      ></products-table>
+      <!--      <products-table ref="productTable" :editable="false"-->
+      <!--                      v-on:productClicked="selectInventoryItem"-->
+      <!--      ></products-table>-->
     </b-modal>
   </div>
 </template>
 
 <script>
 
+import api from '../../Api';
 
 export default {
-name: "add-listing-card",
+  name: "add-listing-card",
   //components: {InventoryTable}, (Needs to be moved into it's own component?)
   props: {
     currentBusiness: {
@@ -159,16 +118,23 @@ name: "add-listing-card",
       type: Boolean,
       default: false
     },
-    setUpInventoryPage: {
+    setUpListingPage: {
       type: Function,
     }
 
   },
   data() {
     return {
-      mainProps: { blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1' },
-      listingInfo: {},
-      listingCardError: ""
+      mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
+      listingData: {
+        inventoryItemId: 0,
+        quantity: 0,
+        price: 0,
+        moreInfo: "",
+        closes: null
+      },
+      listingCardError: "",
+      listingId: null
     }
   },
 
@@ -177,17 +143,60 @@ name: "add-listing-card",
   },
 
   methods: {
-    async createListing() {},
-    async getErrorMessageFromApiError() {},
-    setUpListingCard() {},
+
+    /**
+     * Makes a request to the API to create a Listing with the form input.
+     * Then, will hide the create Listing popup
+     */
+    async createListing() {
+      let listingRequest = {
+        inventoryItemId: this.listingData.inventoryItemId,
+        quantity: this.listingData.quantity,
+        price: this.listingData.price,
+        moreInfo: this.listingData.moreInfo,
+        closes: this.listingData.closes || null
+      };
+      // this.listingData = listingRequest;
+      await api.createListing(this.$route.params.id, listingRequest)
+          .then((listingResponse) => {
+            this.$log.debug("Listing Created", listingResponse);
+            this.listingId = listingResponse.data.listingId;
+            this.$bvModal.hide('add-listing-card');
+            // this.setUpListingPage();//todo when create a listing will reload listing page.
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.listingCardError = this.getErrorMessageFromApiError(error);
+          })
+
+    },
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST and PUT requests for Listing
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        return error.response.data;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
+    },
+    setUpListingCard() {
+    },
 
     setDate(date) {
-      if (date != null)  {return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')}
+      if (date != null) {
+        return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')
+      }
     },
 
     calculateTotalPrice() {
-      this.listingInfo.totalPrice =
-          parseFloat((this.listingInfo.pricePerItem * this.listingInfo.quantity).toFixed(2));
+      this.listingData.price =
+          parseFloat((this.inventory.pricePerItem * this.listingData.quantity).toFixed(2));
     },
 
     cancelAction() {
@@ -195,9 +204,13 @@ name: "add-listing-card",
       this.$bvModal.hide('add-listing-card');
     },
 
-    openSelectInventoryItemModal() {},
+    openSelectInventoryItemModal() {
+    },
 
-    selectInventoryItem() {},
+    selectInventoryItem() {
+    },
+
+
   },
 }
 
