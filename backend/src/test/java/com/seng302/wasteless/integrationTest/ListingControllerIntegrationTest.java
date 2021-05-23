@@ -32,6 +32,98 @@ public class ListingControllerIntegrationTest {
     private MockMvc mockMvc;
 
 
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessListings_AndUserIsBusinessAdminAndInventoryIsValid_then201Response() throws Exception {
+
+        createOneBusiness("Business2", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business 2");
+
+        createOneProduct("1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+
+        createOneInventory("1-1", 50, 6.5, 22.99, LocalDate.parse("2020-05-12"), LocalDate.parse("3021-05-12"), LocalDate.parse("3021-05-12"), LocalDate.parse("3021-05-12"));
+
+        String listing = "{\"inventoryItemId\": 1, \"quantity\": 50, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(listing)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessListings_AndUserIsBusinessAdminAndInventoryIsValid_butListingQuantityStaysValid_then201Response() throws Exception {
+
+        createOneBusiness("Business2", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business 2");
+
+        createOneProduct("1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+
+        createOneInventory("1-1", 50, 6.5, 22.99, LocalDate.parse("2020-05-12"), LocalDate.parse("3021-05-12"), LocalDate.parse("3021-05-12"), LocalDate.parse("3021-05-12"));
+
+        String listing = "{\"inventoryItemId\": 1, \"quantity\": 30, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(listing)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+
+        String listing2 = "{\"inventoryItemId\": 1, \"quantity\": 20, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(listing2)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    public void whenPostRequestToBusinessListings_AndUserIsBusinessAdminAndInventoryIsValid_butListingQuantityChangesToInvalid_then400Response() throws Exception {
+
+        createOneBusiness("Business2", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business 2");
+
+        createOneProduct("1", "Chocolate Bar", "Example Product First Edition","example manufacturer", "4.0");
+
+        createOneInventory("1-1", 50, 6.5, 22.99, LocalDate.parse("2020-05-12"), LocalDate.parse("3021-05-12"), LocalDate.parse("3021-05-12"), LocalDate.parse("3021-05-12"));
+
+        String listing = "{\"inventoryItemId\": 1, \"quantity\": 30, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(listing)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+
+        String listing2 = "{\"inventoryItemId\": 1, \"quantity\": 30, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(listing2)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
 
     private void createOneInventory(String id, Integer quantity, Double pricePerItem, Double totalPrice, LocalDate manufactured, LocalDate sellBy, LocalDate bestBefore, LocalDate expires) {
 
