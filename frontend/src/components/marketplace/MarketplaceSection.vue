@@ -30,6 +30,26 @@
              :items="cards"
              :current-page="currentPage"
     >
+      <template v-slot:cell(title)="{ item }">
+        <div v-b-tooltip="item.title">{{shortenText(item.title, 20)}}</div>
+      </template>
+
+      <template v-slot:cell(tags)="{ item }">
+        <div v-b-tooltip="formatTags(item.tags)">{{shortenText(formatTags(item.tags), 20)}}</div>
+      </template>
+
+      <template v-slot:cell(description)="{ item }">
+        <div v-b-tooltip="item.description">{{shortenText(item.description, 20)}}</div>
+      </template>
+
+      <template v-slot:cell(listerName)="{ item }">
+        <div v-b-tooltip="item.listerName">{{shortenText(item.listerName, 15)}}</div>
+      </template>
+
+      <template v-slot:cell(listerLocation)="{ item }">
+        <div v-b-tooltip="item.listerLocation">{{shortenText(item.listerLocation, 25)}}</div>
+      </template>
+
       <template #empty>
         <h3 class="no-results-overlay" >No results to display</h3>
       </template>
@@ -69,6 +89,25 @@ export default {
     rowClickHandler: function (record) {
       console.log("Clicked row: ", record);
     },
+
+
+    /**
+     * Return given in shortened format
+     */
+    shortenText(description, sliceLength) {
+      if (description === "" || description.length <= sliceLength) {
+        return description.trim();
+      }
+      const shortenedText = description.slice(0, sliceLength).trim();
+      return `${shortenedText}${shortenedText.endsWith('.') ? '..' : '...'}`;
+    },
+
+    /**
+     * Return tags in a joined format
+     */
+    formatTags(tags) {
+      return tags.join(", ");
+    }
   },
 
   computed: {
@@ -79,6 +118,8 @@ export default {
     totalItems() {
       return this.cards.length;
     },
+
+
 
     /**
      * Fields of table format
