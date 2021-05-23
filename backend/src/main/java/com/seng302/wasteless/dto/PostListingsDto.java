@@ -33,13 +33,14 @@ public class PostListingsDto {
 
     @PositiveOrZero
     @Max(1000000000)
+    @NotNull(message = "Listing Price is Mandatory")
     @Column(name = "price")
     private double price;
 
     @Column(name = "moreInfo")
     private String moreInfo;
 
-    @Future                     // default = inventory item expiry
+    @Future
     @Column(name = "closes")
     private LocalDate closes;
 }

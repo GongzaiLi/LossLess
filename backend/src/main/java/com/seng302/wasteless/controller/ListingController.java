@@ -110,6 +110,7 @@ public class ListingController {
 
         listing.setBusinessId(businessId);
         listing.setCreated(LocalDate.now());
+        possibleInventoryItem.setQuantity(availableQuantity-listingQuantity);
 
         listing = listingsService.createListing(listing);
 

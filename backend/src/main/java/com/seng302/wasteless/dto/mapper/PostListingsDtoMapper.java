@@ -23,27 +23,12 @@ public class PostListingsDtoMapper {
 
         Inventory inventory = inventoryService.findInventoryById(listingsDto.getInventoryItemId());
 
-
-        LocalDate closeDate = listingsDto.getCloses();
-        if (closeDate == null) {
-            closeDate = inventory.getExpires();
-        }
-
-        Integer availableQuantity = inventory.getQuantity();
-        Integer listingQuantity = listingsDto.getQuantity();
-
-        inventory.setQuantity(availableQuantity-listingQuantity);
-
-
-
        return new Listing()
         .setInventoryItem(inventory)
         .setQuantity(listingsDto.getQuantity())
         .setPrice(listingsDto.getPrice())
         .setMoreInfo(listingsDto.getMoreInfo())
-        .setCloses(closeDate);
-
-
+        .setCloses(listingsDto.getCloses());
 
     }
 
