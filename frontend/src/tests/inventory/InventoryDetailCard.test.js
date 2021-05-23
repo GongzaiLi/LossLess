@@ -274,7 +274,8 @@ describe('sell by date_validation', () => {
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
   test('sell by valid for today', () => {
-    manufacturedDates.sellBy = new Date().toJSON().slice(0, 10);
+    manufacturedDates.sellBy = wrapper.vm.getToday();
+    console.log(manufacturedDates.sellBy);
     expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
@@ -294,7 +295,7 @@ describe('expires date_validation', () => {
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
   test('expires valid for today', () => {
-    manufacturedDates.expires = new Date().toJSON().slice(0, 10);
+    manufacturedDates.expires = wrapper.vm.getToday();
     expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
@@ -314,7 +315,7 @@ describe('best before date_validation', () => {
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
   test('best before valid for today', () => {
-    manufacturedDates.bestBefore = new Date().toJSON().slice(0, 10);
+    manufacturedDates.bestBefore = wrapper.vm.getToday();
     expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
     expect(wrapper.vm.inventoryCardError).toBe("");
   });
@@ -325,4 +326,12 @@ describe('best before date_validation', () => {
     expect(wrapper.vm.inventoryCardError).toBe("Best before date must be in the future");
   });
 
+})
+
+describe('get Today returns today', () => {
+  test("getToday returns today's date", () => {
+    let today = new Date();
+    today.setDate(today.getDate()+1);
+    expect(wrapper.vm.getToday()).toBe(today.toJSON().slice(0, 10));
+  })
 })

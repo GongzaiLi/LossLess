@@ -80,6 +80,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :max="getToday()"
                           v-model="inventoryInfo.manufactured"/>
           </b-input-group>
 
@@ -90,6 +91,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="inventoryInfo.sellBy"/>
           </b-input-group>
 
@@ -100,6 +102,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="inventoryInfo.bestBefore"/>
           </b-input-group>
 
@@ -110,6 +113,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="inventoryInfo.expires" required/>
           </b-input-group>
           <transition name="fade">
@@ -223,6 +227,17 @@ export default {
       }
     },
 
+    /**
+     * get today's date without the time
+     * need to add one to get correct date
+     * @return today's date in format yyyy-mm-dd
+     **/
+    getToday() {
+      let today = new Date();
+      today.setDate(today.getDate()+1);
+      return today.toJSON().slice(0, 10);
+    },
+
 
     /**
      * Verify that the dates for inventory items are valid, making sure they are not in the past or future
@@ -231,14 +246,13 @@ export default {
      * else return true
      **/
     validInventoryDates(inventoryItem) {
-      let today = new Date();
-      if (inventoryItem.manufactured > today.toJSON().slice(0, 10)) {
+      if (inventoryItem.manufactured > this.getToday()) {
         this.inventoryCardError = "Manufactured date must be in the Past or Today";
-      } else if (inventoryItem.sellBy < today.toJSON().slice(0, 10)) {
+      } else if (inventoryItem.sellBy < this.getToday()) {
         this.inventoryCardError = "Sell by date must be in the future";
-      } else if (inventoryItem.bestBefore < today.toJSON().slice(0, 10)) {
+      } else if (inventoryItem.bestBefore <this.getToday()) {
         this.inventoryCardError = "Best before date must be in the future";
-      } else if (inventoryItem.expires < today.toJSON().slice(0, 10)) {
+      } else if (inventoryItem.expires < this.getToday()) {
         this.inventoryCardError = "Expiry date must be in the future";
       } else {
         return true;
