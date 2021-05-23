@@ -154,7 +154,7 @@ export default {
         quantity: this.listingData.quantity,
         price: this.listingData.price,
         moreInfo: this.listingData.moreInfo,
-        closes: this.listingData.closes || null
+        closes: this.listingData.closes || this.inventory.expires
       };
       // this.listingData = listingRequest;
       await api.createListing(this.$route.params.id, listingRequest)
