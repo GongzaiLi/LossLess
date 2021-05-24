@@ -234,7 +234,7 @@ export default {
      **/
     getToday() {
       let today = new Date();
-      today.setDate(today.getDate()+1);
+      today.setDate(today.getDate());
       return today.toJSON().slice(0, 10);
     },
 

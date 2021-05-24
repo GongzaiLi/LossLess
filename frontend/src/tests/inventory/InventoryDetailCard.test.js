@@ -331,7 +331,7 @@ describe('best before date_validation', () => {
 describe('get Today returns today', () => {
   test("getToday returns today's date", () => {
     let today = new Date();
-    today.setDate(today.getDate()+1);
+    today.setDate(today.getDate());
     expect(wrapper.vm.getToday()).toBe(today.toJSON().slice(0, 10));
   })
 })
