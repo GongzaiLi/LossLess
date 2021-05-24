@@ -105,6 +105,7 @@ public class InventoryController {
 
         Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
 
+        inventory.setProduct(possibleProduct);
         inventory.setBusinessId(businessId);
 
         inventory = inventoryService.createInventory(inventory);

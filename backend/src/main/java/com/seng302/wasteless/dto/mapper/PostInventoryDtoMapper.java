@@ -10,18 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostInventoryDtoMapper {
 
-    private static ProductService productService;
-
-    @Autowired
-    public PostInventoryDtoMapper(ProductService productService) {
-        PostInventoryDtoMapper.productService = productService;
-    }
-
     public static Inventory postInventoryDtoToEntityMapper(PostInventoryDto inventoryDto) {
 
-        Product product = productService.findProductById(inventoryDto.getProductId());
-
-        return new Inventory().setProduct(product)
+        return new Inventory()
         .setExpires(inventoryDto.getExpires())
         .setBestBefore(inventoryDto.getBestBefore())
         .setManufactured(inventoryDto.getManufactured())
