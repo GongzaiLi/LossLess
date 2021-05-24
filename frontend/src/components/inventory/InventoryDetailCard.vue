@@ -233,9 +233,9 @@ export default {
      * @return today's date in format yyyy-mm-dd
      **/
     getToday() {
-      let today = new Date();
-      today.setDate(today.getDate());
-      return today.toJSON().slice(0, 10);
+      let date = new Date();
+      let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+      return today;
     },
 
 

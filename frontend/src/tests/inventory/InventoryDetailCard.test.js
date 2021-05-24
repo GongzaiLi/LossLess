@@ -330,8 +330,8 @@ describe('best before date_validation', () => {
 
 describe('get Today returns today', () => {
   test("getToday returns today's date", () => {
-    let today = new Date();
-    today.setDate(today.getDate());
-    expect(wrapper.vm.getToday()).toBe(today.toJSON().slice(0, 10));
+    let date = new Date();
+    let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+    expect(wrapper.vm.getToday()).toBe(today);
   })
 })
