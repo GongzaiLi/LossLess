@@ -7,7 +7,7 @@ import UserSearch from "../components/user/UserSearch";
 import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
-import BusinessListings from "../components/business/BusinessListings";
+import ListingsPage from "../components/listing/ListingsPage";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
@@ -30,7 +30,7 @@ const router = new Router({
         { path: '/users/:id', name: 'user-profile', component: UserProfile},
         { path: '/homePage', name: 'home-page', component: HomePage},
         { path: '/businesses/:id', name: 'business-profile', component: BusinessProfile},
-        { path: '/businesses/:id/listings', name: 'business-listings', component: BusinessListings},
+        { path: '/businesses/:id/listings', name: 'listings-page', component: ListingsPage},
         { path: '/businesses/:id/products', name: 'product-catalogue', component: ProductCatalogue},
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},

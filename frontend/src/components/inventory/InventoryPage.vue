@@ -38,14 +38,14 @@ Date: 11/5/2021
         <router-link :to="'/businesses/' + $route.params.id">here.</router-link>
       </h6>
     </b-card>
-
     <b-modal
       id="inventory-card" hide-header hide-footer
       :no-close-on-backdrop="!isInventoryCardReadOnly"
       :no-close-on-esc="!isInventoryCardReadOnly">
-      <inventory-detail-card :disabled="isInventoryCardReadOnly" :currency="currency"
-                             :inventory="inventoryDisplayedInCard" :edit-modal="editInventoryItem"
-                             :set-up-inventory-page="setUpInventoryPage"
+      <inventory-detail-card :disabled="isInventoryCardReadOnly"
+                             :currency="currency"
+                             :inventory="inventoryDisplayedInCard"
+                             :edit-modal="editInventoryItem"
                              :current-business="business"/>
     </b-modal>
 
@@ -81,27 +81,20 @@ export default {
     }
   },
   mounted() {
-    const businessId = this.$route.params.id
-    this.setUpInventoryPage(businessId);
+    this.getBusinessInfo();
   },
   methods: {
-    /**
-     * init the data which is from the inventory table
-     **/
-    setUpInventoryPage: async function(businessId) {
-      if (this.$refs.inventoryTable.getBusinessInfo) {  // If you don't have permission to access the table the table component won't render
-        await this.$refs.inventoryTable.getBusinessInfo(businessId); // Only load products if the table component has rendered
-      }
-      const businessPromise = api.getBusiness(businessId)
+
+    async getBusinessInfo() {
+      const businessId = this.$route.params.id;
+
+      api.getBusiness(businessId)
           .then((resp) => {
             this.business = resp.data;
             return api.getUserCurrency(resp.data.address.country);
-          })
-      try {
-        await Promise.all([businessPromise])
-      } catch (error) {
+          }).catch((error) => {
         this.$log.debug(error);
-      }
+      })
     },
 
     /**
@@ -178,7 +171,7 @@ export default {
     $currentUser: {
       handler() {
         if (this.canEditInventory) {
-          this.setUpInventoryPage(this.$route.params.id);
+          this.getBusinessInfo();
         }
       },
       deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)

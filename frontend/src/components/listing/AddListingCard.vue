@@ -31,7 +31,7 @@ Date: 23/5/2021
 
           <h6><strong>Quantity *:</strong></h6>
           <b-input-group class="mb-2">
-            <b-form-input type="number" maxlength="50" :disabled="disabled" v-model="listingData.quantity"
+            <b-form-input type="number" maxlength="50" :min="1" :disabled="disabled" v-model="listingData.quantity"
                           @input="calculateTotalPrice" required/>
           </b-input-group>
 
@@ -57,22 +57,11 @@ Date: 23/5/2021
             <h6><strong>More Info:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
-            <b-form-input :type="'text'"
+            <b-form-input type="text"
                           :disabled="disabled"
                           autocomplete="off"
-                          v-model="listingData.closes"/>
+                          v-model="listingData.moreInfo"/>
           </b-input-group>
-
-          <b-input-group>
-            <h6><strong>Closes:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
-                          :disabled="disabled"
-                          autocomplete="off"
-                          v-model="listingData.closes"/>
-          </b-input-group>
-
 
           <b-input-group>
             <h6><strong>Closes:</strong></h6>
@@ -134,10 +123,6 @@ name: "add-listing-card",
       type: Boolean,
       default: true
     },
-    inventory: {
-      type: Object,
-      default: () => ({})
-    },
     currency: {
       type: Object,
       default: () => ({
@@ -156,11 +141,12 @@ name: "add-listing-card",
       mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
       listingData: {
         inventoryItemId: 0,
-        quantity: 0,
+        quantity: 1,
         price: 0,
         moreInfo: "",
         closes: null
       },
+      selectedInventoryItem: null,
       listingCardError: "",
       listingId: null
     }
@@ -177,12 +163,24 @@ name: "add-listing-card",
      * Then, will hide the create Listing popup
      */
     async createListing() {
+
+      if (this.listingData.quantity == null || this.listingData.quantity <= 0) {
+        this.listingCardError = "Quantity must be more than zero"
+        return
+      }
+
+      if (this.listingData.price == null || this.listingData.price < 0) {
+        this.listingCardError = "price must be greater than or equal to zero"
+        return
+      }
+
+
       let listingRequest = {
         inventoryItemId: this.listingData.inventoryItemId,
         quantity: this.listingData.quantity,
         price: this.listingData.price,
         moreInfo: this.listingData.moreInfo,
-        closes: this.listingData.closes || this.inventory.expires
+        closes: this.listingData.closes
       };
       // this.listingData = listingRequest;
       await api.createListing(this.$route.params.id, listingRequest)
@@ -223,8 +221,12 @@ name: "add-listing-card",
     },
 
     calculateTotalPrice() {
-      this.listingData.price =
-          parseFloat((this.inventory.pricePerItem * this.listingData.quantity).toFixed(2));
+      if (this.selectedInventoryItem != null) {
+        this.listingData.price =
+            parseFloat((this.selectedInventoryItem.pricePerItem * this.listingData.quantity).toFixed(2));
+      } else {
+        this.listingData.price = 0.00;
+      }
     },
 
     cancelAction() {
@@ -234,10 +236,15 @@ name: "add-listing-card",
 
     openSelectInventoryItemModal() {
       this.$bvModal.show('select-inventory-item');
-      this.$refs.productTable.getProducts(this.currentBusiness);
+      // this.$refs.inventoryTable.getInventory(this.currentBusiness);
     },
 
-    selectInventoryItem() {},
+    selectInventoryItem(inventory) {
+      this.selectedInventoryItem = inventory;
+      this.listingData.inventoryItemId = inventory.id;
+      this.calculateTotalPrice();
+      this.$bvModal.hide('select-inventory-item');
+    },
   },
 }
 

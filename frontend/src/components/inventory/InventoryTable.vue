@@ -148,6 +148,11 @@ export default {
     },
   },
 
+  mounted() {
+    const businessId = this.$route.params.id;
+    this.getBusinessInfo(businessId);
+  },
+
   computed: {
     /**
      * set table parameter

@@ -78,10 +78,9 @@ Listings Page
         id="add-listing-card" hide-header hide-footer
         :no-close-on-backdrop="!isListingCardReadOnly"
         :no-close-on-esc="!isListingCardReadOnly">
-      <add-listing-card :disabled="isListingCardReadOnly" :currency="currency"
-                             :inventory="listingDisplayedInCard" :edit-modal="editListingItem"
-                             :set-up-inventory-page="setUpListingPage"
-                             :current-business="business"/>
+      <add-listing-card :disabled="isListingCardReadOnly"
+                        :inventory="listingDisplayedInCard"
+                        :current-business="business"/>
     </b-modal>
 
   </div>
