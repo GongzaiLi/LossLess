@@ -31,25 +31,6 @@
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Price Per Item:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <template #prepend>
-              <b-input-group-text>{{ currency.symbol }}</b-input-group-text>
-            </template>
-            <b-form-input
-                type="number" maxlength="15"
-                step=".01" min=0 placeholder=0
-                :disabled="disabled"
-                @input="calculateTotalPrice"
-                v-model="listingInfo.pricePerItem"
-            />
-            <template #append>
-              <b-input-group-text>{{ currency.code }}</b-input-group-text>
-            </template>
-          </b-input-group>
-
-          <b-input-group>
             <h6><strong>Total Price:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
@@ -68,44 +49,26 @@
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Manufactured:</strong></h6>
+            <h6><strong>More Info:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
+            <b-form-input :type="'text'"
                           :disabled="disabled"
                           autocomplete="off"
-                          v-model="listingInfo.manufactured"/>
+                          v-model="listingInfo.closes"/>
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Sell By:</strong></h6>
+            <h6><strong>Closes:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
-                          v-model="listingInfo.sellBy"/>
+                          v-model="listingInfo.closes"/>
           </b-input-group>
 
-          <b-input-group>
-            <h6><strong>Best Before:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
-                          :disabled="disabled"
-                          autocomplete="off"
-                          v-model="listingInfo.bestBefore"/>
-          </b-input-group>
 
-          <b-input-group>
-            <h6><strong>Expires *:</strong></h6>
-          </b-input-group>
-          <b-input-group class="mb-2">
-            <b-form-input :type="(disabled)?'text':'date'"
-                          :disabled="disabled"
-                          autocomplete="off"
-                          v-model="listingInfo.expires" required/>
-          </b-input-group>
           <b-alert :show="listingCardError ? 120 : 0" variant="danger">{{ listingCardError }}</b-alert>
           <hr style="width:100%">
           <b-button v-show="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
@@ -115,26 +78,38 @@
     </b-card>
 
     <b-modal
-        id="select-products" hide-footer title="Select a product"
+        id="select-inventory-item" hide-footer title="Select an inventory item"
         static> <!--We make the modal static so that it is always rendered immediately on page load. If we remove this, the modal will
        only render when opened. This causes issues as the products-table component will only be rendered after the modal opens,
        so we wouldn't be able to call it with $refs-->
       <div style="text-align: center" class="mb-3">
-        <h5>Click on the inventory item you want to create an listing item for</h5>
+        <h5>Click on the inventory item you want to create a listing for</h5>
       </div>
-      <products-table ref="productTable" :editable="false"
-                      v-on:productClicked="selectInventoryItem"
-      ></products-table>
+      <inventory-table ref="inventoryTable" :editable="false"
+                      v-on:inventoryItemClicked="selectInventoryItem"
+      ></inventory-table>
     </b-modal>
   </div>
 </template>
 
+
+<style>
+
+
+#select-inventory-item > .modal-dialog {
+  max-width: 1250px;
+}
+
+</style>
+
 <script>
 
 
+import InventoryTable from "../inventory/InventoryTable";
+
 export default {
 name: "add-listing-card",
-  //components: {InventoryTable}, (Needs to be moved into it's own component?)
+  components: {InventoryTable},
   props: {
     currentBusiness: {
       type: Object,
@@ -159,10 +134,6 @@ name: "add-listing-card",
       type: Boolean,
       default: false
     },
-    setUpInventoryPage: {
-      type: Function,
-    }
-
   },
   data() {
     return {
@@ -195,7 +166,10 @@ name: "add-listing-card",
       this.$bvModal.hide('add-listing-card');
     },
 
-    openSelectInventoryItemModal() {},
+    openSelectInventoryItemModal() {
+      this.$bvModal.show('select-inventory-item');
+      this.$refs.productTable.getProducts(this.currentBusiness);
+    },
 
     selectInventoryItem() {},
   },
@@ -204,6 +178,3 @@ name: "add-listing-card",
 
 </script>
 
-<style scoped>
-
-</style>

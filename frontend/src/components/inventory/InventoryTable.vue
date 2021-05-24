@@ -66,6 +66,7 @@ export default {
   components: {
     pagination,
   },
+  props: ['editable'],
   data: function () {
     return {
       items: [],
@@ -152,7 +153,7 @@ export default {
      * @returns object
      */
     fields: function () {
-      return [
+      let fieldsList = [
         {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
@@ -216,15 +217,15 @@ export default {
           },
           thStyle: 'width: 15%',
           sortable: true
-        },
-        {
+        }];
+      if (this.editable) {
+        fieldsList.push({
           key: 'actions',
           label: 'Action',
-          thStyle: 'width: 8%',
           sortable: false
-        }
-      ]
-
+        })
+      }
+      return fieldsList
     },
 
     /**
