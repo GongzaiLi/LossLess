@@ -3,6 +3,7 @@ import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import { BootstrapVue } from 'bootstrap-vue';
 import homePage from '../../components/user/HomePage';
 import Api from "../../Api";
+import Router from 'vue-router'
 
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -34,6 +35,7 @@ beforeEach(() => {
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
   localVue.use(mockUserAuthPlugin);
+  localVue.use(Router);
 
   Api.getUser.mockRejectedValue(new Error(''));
 

@@ -6,7 +6,7 @@ Date: 3/3/2021
 <template>
   <b-container>
     <b-row class="justify-content-md-center">
-      <b-col class="col-md-7">
+      <b-col md="8" xl="6">
         <b-card class="shadow">
         <h2>Login to Wasteless</h2>
           <b-form @submit="login">
@@ -51,6 +51,8 @@ Date: 3/3/2021
   </b-container>
 
 </template>
+
+
 
 <script>
 import api from "../../Api";

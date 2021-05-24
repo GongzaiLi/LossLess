@@ -1,10 +1,7 @@
 package com.seng302.wasteless.model;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,29 +29,35 @@ public class User {
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
     @JsonView(UserViews.PostUserRequestView.class)
+    @Size(min = 0, max = 50)
     private String firstName;
 
     @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
+    @Size(min = 0, max = 50)
     private String lastName;
 
     @Column(name = "middle_name") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
+    @Size(min = 0, max = 50)
     private String middleName;
 
     @Column(name = "nick_name") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
+    @Size(min = 0, max = 50)
     private String nickname;
 
     @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
+    @Size(min = 0, max = 250)
     private String bio;
 
     @Email
     @NotBlank(message = "email is mandatory")
     @Column(name = "email") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
+    @Size(min = 0, max = 50)
     private String email;
 
     @Past
@@ -66,6 +69,7 @@ public class User {
 
     @Column(name = "phone_number") // map camelcase name (java) to snake case (SQL)
     @JsonView({UserViews.PostUserRequestView.class})
+    @Size(min = 0, max = 50)
     private String phoneNumber;
 
     @JsonView({UserViews.PostUserRequestView.class})
@@ -77,6 +81,7 @@ public class User {
     @NotBlank(message = "password is mandatory")
     @JsonView({UserViews.PostUserRequestView.class})
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
+    @Size(min = 0, max = 100)
     private String password;
 
     @Column(name = "businesses_primarily_administered")
@@ -122,6 +127,23 @@ public class User {
      */
     public void addPrimaryBusiness(Business business) {
         this.businessesPrimarilyAdministered.add(business);
+    }
+
+    /**
+     * Check if a user is a global admin or default global admin
+     * @return true if global admin, false otherwise
+     */
+    public boolean checkUserGlobalAdmin() {
+        return this.role == UserRoles.GLOBAL_APPLICATION_ADMIN ||
+                this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
+    }
+
+    /**
+     * Check if user is default admin
+     * @return true if default admin
+     */
+    public boolean checkUserDefaultAdmin() {
+        return this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
     }
 }
 

@@ -158,6 +158,7 @@ export default {
       "homeAddress": {
         "streetNumber": "",
         "streetName": "",
+        "suburb": "",
         "city": "",
         "region": "",
         "country": "",
@@ -222,7 +223,7 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      //console.log(registerData);
+
 
       await api
         .register(registerData)

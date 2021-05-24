@@ -40,7 +40,7 @@ Date: 19/4/2021
           <template #prepend>
             <b-input-group-text >{{currency.symbol}}</b-input-group-text>
           </template>
-          <b-form-input type="number" maxlength="15" step=".01" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
+          <b-form-input type="number" max="1000000000" step=".01" min=0 v-bind:disabled=disabled v-model="productCard.recommendedRetailPrice" required/>
           <template #append>
             <b-input-group-text >{{currency.code}}</b-input-group-text>
           </template>
@@ -61,12 +61,12 @@ Date: 19/4/2021
           <h6><strong>Description:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-textarea rows="5" type="text" maxlength="255" v-bind:disabled=disabled v-model="productCard.description "/>
+          <b-form-textarea rows="5" type="text" maxlength="250" v-bind:disabled=disabled v-model="productCard.description "/>
         </b-input-group>
     </b-card-body>
     <hr style="width:100%">
-      <div v-if="!disabled">
-        <b-button style="float: right" variant="primary" type="submit">OK</b-button>
+      <div>
+        <b-button  v-if="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
       </div>
     </b-form>

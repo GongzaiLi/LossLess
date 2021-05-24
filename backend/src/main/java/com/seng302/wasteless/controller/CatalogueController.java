@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
+import javax.validation.ConstraintViolationException;
 
 /**
  * ProductController is used for mapping all Restful API requests starting with the address
@@ -235,20 +236,17 @@ public class CatalogueController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
         }
 
-        logger.debug("Creating new Product Entity and setting data.");
-        Product newProduct = new Product();
-        newProduct.setId(newProductId);
-        newProduct.setName(editedProduct.getName());
-        newProduct.setDescription(editedProduct.getDescription());
-        newProduct.setManufacturer(editedProduct.getManufacturer());
-        newProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
-        newProduct.setBusinessId(oldProduct.getBusinessId());
-        newProduct.setCreated(oldProduct.getCreated());
+        logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, editedProduct);
 
-        logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, newProduct);
-        productService.updateProduct(oldProduct, newProduct);
+        oldProduct.setId(newProductId);
+        oldProduct.setName(editedProduct.getName());
+        oldProduct.setDescription(editedProduct.getDescription());
+        oldProduct.setManufacturer(editedProduct.getManufacturer());
+        oldProduct.setRecommendedRetailPrice(editedProduct.getRecommendedRetailPrice());
 
-        logger.info("Successfully updated old product: {} with new product: {}", oldProduct, newProduct);
+        productService.updateProduct(oldProduct);
+
+        logger.info("Successfully updated old product with data: {}", oldProduct);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -270,6 +268,25 @@ public class CatalogueController {
 //            logger.error(errorMessage); it doesnt work I am not sure why
             errors.put(fieldName, errorMessage);
         });
+        return errors;
+    }
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Map<String, String> handleValidationExceptions(
+            ConstraintViolationException exception) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        String constraintName = exception.getConstraintViolations().toString();
+        String errorMsg = exception.getMessage();
+
+        errors.put(constraintName, errorMsg);
         return errors;
     }
 }

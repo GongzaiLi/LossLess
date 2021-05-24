@@ -16,7 +16,7 @@ import java.util.List;
 @RepositoryRestResource
 public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
-    Inventory findFirstById(Long id);
+    Inventory findFirstById(Integer id);
 
     List<Inventory> findAllByBusinessId(Integer id);
 }

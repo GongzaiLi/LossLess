@@ -26,9 +26,10 @@ public class InventoryService {
      * @param id        The id of the Inventory item to be found
      * @return          The found Inventory item, if any, otherwise null
      */
-    public Inventory findInventoryById(Long id) {
+    public Inventory findInventoryById(Integer id) {
         return inventoryRepository.findFirstById(id);
     }
+
 
     /**
      * Given an Inventory object, 'creates' it by saving and persisting it in the database.

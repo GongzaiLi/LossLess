@@ -39,6 +39,7 @@ public class BusinessControllerIntegrationTest {
     String address1 = "{\n" +
             "    \"streetNumber\": \"56\",\n" +
             "    \"streetName\": \"Clyde Road\",\n" +
+            "    \"suburb\": \"Riccarton\",\n" +
             "    \"city\": \"Christchurch\",\n" +
             "    \"region\": \"Canterbury\",\n" +
             "    \"country\": \"New Zealand\",\n" +
@@ -48,6 +49,7 @@ public class BusinessControllerIntegrationTest {
     String homeAddress = "{\n" +
             "    \"streetNumber\": \"3/24\",\n" +
             "    \"streetName\": \"Ilam Road\",\n" +
+            "    \"suburb\": \"Riccarton\",\n" +
             "    \"city\": \"Christchurch\",\n" +
             "    \"region\": \"Canterbury\",\n" +
             "    \"country\": \"New Zealand\",\n" +
@@ -74,6 +76,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -95,6 +98,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -112,6 +116,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -120,6 +125,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business2", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -189,6 +195,7 @@ public class BusinessControllerIntegrationTest {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -217,6 +224,7 @@ public class BusinessControllerIntegrationTest {
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -230,6 +238,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -256,6 +265,7 @@ public class BusinessControllerIntegrationTest {
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -269,6 +279,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -302,6 +313,7 @@ public class BusinessControllerIntegrationTest {
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -315,6 +327,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -340,6 +353,7 @@ public class BusinessControllerIntegrationTest {
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -353,6 +367,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -382,6 +397,7 @@ public class BusinessControllerIntegrationTest {
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -395,6 +411,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -425,6 +442,7 @@ public class BusinessControllerIntegrationTest {
         user.setLastName("Steve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
+                .setSuburb("Riccarton")
                 .setCity("Thames")
                 .setId(1)
                 .setCountry("Nz")
@@ -438,6 +456,7 @@ public class BusinessControllerIntegrationTest {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +

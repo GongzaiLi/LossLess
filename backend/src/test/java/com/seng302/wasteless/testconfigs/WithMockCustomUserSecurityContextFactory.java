@@ -40,6 +40,7 @@ public class WithMockCustomUserSecurityContextFactory
 
         Address address = new Address();
         address.setCountry("NZ");
+        address.setSuburb("Riccarton");
         address.setCity("Christchurch");
         address.setStreetNumber("1");
         address.setStreetName("Ilam Rd");
