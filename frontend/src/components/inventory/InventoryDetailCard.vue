@@ -218,7 +218,6 @@ export default {
         this.inventoryInfo.bestBefore = this.setDate(this.inventoryInfo.bestBefore);
         this.inventoryInfo.expires = this.setDate(this.inventoryInfo.expires);
       }
-      console.log(this.inventoryInfo);
     },
 
     /**
@@ -267,6 +266,9 @@ export default {
     /**
      * Ok action button when edit modal is ture
      * the OkAction will modify the Inventory otherwise Create a Inventory
+     * This also sets the inventory product id to be the 'actual' product id selected.
+     * That is, it sets the productId field of the data to be POSTed to be the id in the
+     * text field, but with the business id prepended to it.
      */
     okAction: async function () {
       this.inventoryInfo.productId = `${this.currentBusiness.id}-${this.inventoryInfo.displayedProductId}`.toUpperCase();

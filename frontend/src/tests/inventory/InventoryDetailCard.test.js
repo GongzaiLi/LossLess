@@ -57,6 +57,9 @@ beforeEach(() => {
         bestBefore: "2021-05-14",
         expires: "2021-05-14"
       },
+      currentBusiness: {
+        id: 0
+      },
       setUpInventoryPage: () => {},
     },
     mocks: {$route, $log, $currentUser},
@@ -240,8 +243,19 @@ describe('Editing products', () => {
 
 describe('select-product-modal', () => {
   test('selectProduct works', () => {
-    wrapper.vm.selectProduct({id: 'ABC'});
+    wrapper.vm.selectProduct({id: '1-ABC'});
 
-    expect(wrapper.vm.inventoryInfo.productId).toBe('ABC')
+    expect(wrapper.vm.inventoryInfo.displayedProductId).toBe('ABC')
+  });
+
+  test('correct product id posted', async () => {
+    let postedData = {}
+    Api.createInventory.mockImplementationOnce(async (_id, data) => {postedData = data; return new Error()});
+
+    wrapper.vm.selectProduct({id: '0-ABC'});
+
+    await wrapper.vm.okAction();
+
+    expect(postedData.productId).toBe('0-ABC');
   });
 })
