@@ -11,7 +11,7 @@ import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
 
-import {getUser} from '@/auth'
+import {getCurrentUser} from '@/auth';
 
 /**
  * This specifies all routing information used by Vue-Router.
@@ -40,8 +40,7 @@ const router = new Router({
  * This applies to all routes except for the login and register routes. 
  */
 router.beforeEach((to, _from, next) => {
-    console.log(to);
-    const currentUser = getUser();
+    const currentUser = getCurrentUser();
     if (!['login', 'register'].includes(to.name) && currentUser == null) {
         next('/login');
     } else {

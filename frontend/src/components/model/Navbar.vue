@@ -81,7 +81,6 @@ Date: sprint_1
 
 <script>
 import {setCurrentlyActingAs} from '../../auth'
-import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -178,7 +177,7 @@ export default {
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
-      Api.setBusinessActingAs(business.id);
+      console.log(this.$currentUser.currentlyActingAs);
     },
     /**
      * Sets the user to act as themselves again. Also sets the API
@@ -186,7 +185,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
-      Api.setBusinessActingAs(null);
+      console.log(this.$currentUser.currentlyActingAs);
     }
   },
 }
