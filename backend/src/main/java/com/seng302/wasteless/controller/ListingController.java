@@ -84,15 +84,17 @@ public class ListingController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot create LISTING. User: {} is not global admin or business admin: {}", user, possibleBusiness);
+            logger.warn("Cannot create LISTING. User: {} is not global admin or business admin: {}", user.getId(), businessId);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
         }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+        logger.info("User: {} validated as global admin or admin of business: {}.", user.getId(), businessId);
 
 
-        logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest.getInventoryItemId(), businessId);
+        logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);
+        logger.info("Retrievrf `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
+        logger.info("Retrievrf `{}` ", possibleInventoryItem);
         if (possibleInventoryItem == null) {
             logger.warn("Cannot create LISTING for inventory that does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory with given id does not exist");
