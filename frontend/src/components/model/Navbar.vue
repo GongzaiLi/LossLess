@@ -17,6 +17,7 @@ Date: sprint_1
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item to="/marketPlace"> Market Place </b-nav-item>
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
             id="business-link-dropdown"
@@ -80,7 +81,6 @@ Date: sprint_1
 
 <script>
 import {setCurrentlyActingAs} from '../../auth'
-import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -183,7 +183,7 @@ export default {
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
-      Api.setBusinessActingAs(business.id);
+      console.log(this.$currentUser.currentlyActingAs);
     },
     /**
      * Sets the user to act as themselves again. Also sets the API
@@ -191,7 +191,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
-      Api.setBusinessActingAs(null);
+      console.log(this.$currentUser.currentlyActingAs);
     }
   },
 }

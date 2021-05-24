@@ -7,7 +7,7 @@ Date: 13/5/2021
     <b-card
       class="profile-card shadow"
     >
-      <b-form @submit="createInventory">
+      <b-form @submit.prevent="okAction">
         <div :hidden="!disabled">
           <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
         </div>
@@ -30,12 +30,12 @@ Date: 13/5/2021
 
           <h6><strong>Quantity *:</strong></h6>
           <b-input-group class="mb-2">
-            <b-form-input type="number" maxlength="50" :disabled="disabled" v-model="inventoryInfo.quantity"
+            <b-form-input type="number" min='1' max='1000000000' maxlength="50" :disabled="disabled" v-model="inventoryInfo.quantity"
                           @input="calculateTotalPrice" required/>
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Price Per Item:</strong></h6>
+            <h6><strong>Price Per Item: *</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <template #prepend>
@@ -47,14 +47,15 @@ Date: 13/5/2021
               :disabled="disabled"
               @input="calculateTotalPrice"
               v-model="inventoryInfo.pricePerItem"
-              />
+              required
+            />
             <template #append>
               <b-input-group-text>{{ currency.code }}</b-input-group-text>
             </template>
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Total Price:</strong></h6>
+            <h6><strong>Total Price: *</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <template #prepend>
@@ -65,7 +66,8 @@ Date: 13/5/2021
               step=".01" min=0 placeholder=0
               :disabled="disabled"
               v-model="inventoryInfo.totalPrice"
-              />
+              required
+            />
             <template #append>
               <b-input-group-text>{{ currency.code }}</b-input-group-text>
             </template>
@@ -110,7 +112,9 @@ Date: 13/5/2021
                           autocomplete="off"
                           v-model="inventoryInfo.expires" required/>
           </b-input-group>
-          <b-alert :show="inventoryCardError ? 120 : 0" variant="danger">{{ inventoryCardError }}</b-alert>
+          <transition name="fade">
+            <b-alert v-model="showErrorAlert" variant="danger" dismissible>{{ inventoryCardError }}</b-alert>
+          </transition>
           <hr style="width:100%">
           <b-button v-show="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
           <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
@@ -135,7 +139,14 @@ Date: 13/5/2021
 
 <style>
 
-#select-products>.modal-dialog {
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+#select-products > .modal-dialog {
   max-width: 1000px;
 }
 
@@ -179,9 +190,10 @@ export default {
   },
   data() {
     return {
-      mainProps: { blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1' },
+      mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
       inventoryInfo: {},
-      inventoryCardError: ""
+      inventoryCardError: "",
+      showErrorAlert: false
     }
   },
   mounted() {
@@ -192,7 +204,7 @@ export default {
      * init the data which is from the inventory table
      */
     setUpInventoryCard() {
-      this.inventoryInfo = this.inventory;
+      this.inventoryInfo = Object.assign({}, this.inventory);
       if (this.disabled) {
         this.inventoryInfo.productId = this.inventoryInfo.product.id.split(/-(.+)/)[1];
         this.inventoryInfo.manufactured = this.setDate(this.inventoryInfo.manufactured);
@@ -206,50 +218,17 @@ export default {
      * set date to a string form.
      **/
     setDate(date) {
-      if (date != null)  {return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')}
+      if (date != null) {
+        return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')
+      }
     },
 
     /**
      * calculate the Total price when the price prt item or quantity changed
      */
     calculateTotalPrice() {
-      this.inventoryInfo.totalPrice =
-        parseFloat((this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2));
-    },
-
-    /**
-     * Makes a request to the API to create a inventory with the form input.
-     * Then, will hide the inventory popup
-     */
-    async createInventory(event) {
-      event.preventDefault();
-      await api
-          .createInventory(this.$route.params.id, this.inventoryInfo)
-          .then((createInventoryResponse) => {
-            this.$log.debug("Inventory Created", createInventoryResponse);
-            this.$bvModal.hide('inventory-card');
-            this.setUpInventoryPage();
-          })
-          .catch((error) => {
-            this.inventoryCardError = this.getErrorMessageFromApiError(error);
-            this.$log.debug(error);
-          });
-    },
-
-    /**
-     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
-     * describing that error. Only applies to POST and PUT requests for inventory
-     */
-    getErrorMessageFromApiError(error) {
-      if ((error.response && error.response.status === 400)) {
-        return error.response.data;
-      } else if ((error.response && error.response.status === 403)) {
-        return "Forbidden. You are not an authorized administrator";
-      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
-        return "No Internet Connectivity";
-      } else {
-        return "Server error";
-      }
+      const calculatedPrice = (this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2);
+      this.inventoryInfo.totalPrice = Math.max(calculatedPrice, 0);   // Make sure the total price doesn't go to negatives (eg. if the user enters a negative quantity) 
     },
 
     /**
@@ -277,6 +256,79 @@ export default {
     selectProduct(product) {
       this.inventoryInfo.productId = product.id;
       this.$bvModal.hide('select-products');
+    },
+    /**
+     * Ok action button when edit modal is ture
+     * the OkAction will modify the Inventory otherwise Create a Inventory
+     */
+    okAction: async function () {
+      if (this.editModal) {
+        await this.editInventory();
+      } else {
+        await this.createInventory();
+      }
+    },
+
+    /**
+     * Makes a request to the API to create a inventory with the form input.
+     * Then, will hide the inventory popup
+     */
+    async createInventory() {
+      this.showErrorAlert = false;
+
+      await api
+          .createInventory(this.$route.params.id, this.inventoryInfo)
+          .then((createInventoryResponse) => {
+            this.$log.debug("Inventory Created", createInventoryResponse);
+            this.$bvModal.hide('inventory-card');
+            this.setUpInventoryPage();// update the table
+          })
+          .catch((error) => {
+            this.handleApiError(error);
+          });
+    },
+
+    /**
+     * Sends an API request to modify the inventory data, and closes the modal and refreshes the table is successful
+     */
+    editInventory: async function () {
+      this.showErrorAlert = false;
+
+      await api
+          .modifyInventory(this.$route.params.id, this.inventoryInfo.id, this.inventoryInfo)
+          .then(() => {
+            this.$bvModal.hide('inventory-card');
+            this.setUpInventoryPage();// update the table
+          })
+          .catch((error) => {
+            this.handleApiError(error);
+          })
+    },
+
+    /**
+     * Call this method when your API call returns an error. Takes an error sent back by an API call,
+     * and displays it (in a user-friendly format) in an alert.
+     */
+    handleApiError(error) {
+      this.inventoryCardError = this.getErrorMessageFromApiError(error);
+      this.showErrorAlert = true;
+      this.$log.debug(error);
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST and PUT requests for inventory
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        return error.response.data;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
     },
   }
 }

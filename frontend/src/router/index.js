@@ -11,7 +11,9 @@ import BusinessListings from "../components/business/BusinessListings";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 
-import {getUser} from '@/auth'
+import Marketplace from "@/components/marketplace/Marketplace";
+
+import {getCurrentUser} from '@/auth';
 
 /**
  * This specifies all routing information used by Vue-Router.
@@ -31,7 +33,8 @@ const router = new Router({
         { path: '/businesses/:id/listings', name: 'business-listings', component: BusinessListings},
         { path: '/businesses/:id/products', name: 'product-catalogue', component: ProductCatalogue},
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
-        { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage}
+        { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
+        { path: '/marketPlace', name: 'market-place', component: Marketplace},
     ]
 });
 
@@ -40,8 +43,7 @@ const router = new Router({
  * This applies to all routes except for the login and register routes. 
  */
 router.beforeEach((to, _from, next) => {
-    console.log(to);
-    const currentUser = getUser();
+    const currentUser = getCurrentUser();
     if (!['login', 'register'].includes(to.name) && currentUser == null) {
         next('/login');
     } else {

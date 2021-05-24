@@ -198,6 +198,7 @@ export default {
         address: {
           streetNumber: "",
           streetName: "",
+          suburb: "",
           city: "",
           region: "",
           country: "",
@@ -217,6 +218,7 @@ export default {
             homeAddress: {
               streetNumber: "",
               streetName: "",
+              suburb: "",
               city: "",
               region: "",
               country: "",
@@ -394,8 +396,11 @@ export default {
      * @return {string}
      */
     getAddress: function () {
-      return Object.values(this.businessData.address).join(' ');
+      const address = this.businessData.address;
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     },
+
 
     /**
      * set table parameter

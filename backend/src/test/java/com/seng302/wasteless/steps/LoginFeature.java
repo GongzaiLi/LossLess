@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 @WebMvcTest(UserController.class)
 @AutoConfigureWebMvc
-@Import(MockitoUserServiceConfig.class)
 public class LoginFeature {
     String homeAddress = "{\n" +
             "    \"streetNumber\": \"3/24\",\n" +

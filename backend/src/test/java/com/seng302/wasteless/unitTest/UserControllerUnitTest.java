@@ -42,6 +42,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -58,6 +59,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -74,6 +76,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"1@\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -90,6 +93,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"@1\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -106,6 +110,7 @@ public class UserControllerUnitTest {
         String user = "{\"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27-10-2000\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -123,6 +128,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -139,6 +145,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -155,6 +162,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -180,6 +188,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -196,6 +205,7 @@ public class UserControllerUnitTest {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -215,6 +225,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"1800-20-10\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -233,6 +244,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -250,6 +262,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \""+minimumDOB+"\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -266,6 +279,7 @@ public class UserControllerUnitTest {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"10/27/1000\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -275,84 +289,6 @@ public class UserControllerUnitTest {
                 .content(user)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void whenNotLoggedInAndTryMakeAdmin_thenUnauthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void whenNotLoggedInAndTryRevokeAdmin_thenUnauthorized() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithUserDetails("user@700")
-    public void whenUserTryMakeAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @WithUserDetails("admin@700")
-    public void whenAdminTryDowngradeDefaultAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @WithUserDetails("admin@700")
-    public void whenAdminTryAddAdminToUser_thenOk() throws Exception {
-        User user = new User();
-        user.setEmail("blah");
-        user.setRole(UserRoles.USER);
-        user = userService.createUser(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + user.getId().toString() + "/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithUserDetails("admin@700")
-    public void whenAdminTryRevokeDefaultAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @WithUserDetails("defaultadmin@700")
-    public void whenDefaultAdminTryRevokeSelf_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/0/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    @WithUserDetails("user@700")
-    public void whenUserTryRevokeAdmin_thenForbidden() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/10000/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @WithUserDetails("defaultadmin@700")
-    public void whenDefaultAdminTryRevokeAdmin_thenOk() throws Exception {
-        User admin = new User();
-        admin.setEmail("blah");
-        admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-        admin = userService.createUser(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/" + admin.getId().toString() + "/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isOk());
     }
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
