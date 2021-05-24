@@ -148,7 +148,7 @@ public class InventoryController {
         logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
 
 
-        logger.debug("Request to get business with ID: {}", businessId);
+        logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         if (possibleBusiness == null) {
@@ -165,7 +165,7 @@ public class InventoryController {
         logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
 
-        logger.debug("Trying to retrieve INVENTORY products for business: {}", possibleBusiness);
+        logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
         List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId);
 
 

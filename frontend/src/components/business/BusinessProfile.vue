@@ -66,16 +66,23 @@ Date: 29/03/2021
             </b-row>
           </h6>
 
-          <h6 v-if="isAdmin">
-            <router-link  :to="{ name: 'product-catalogue', params: { id: businessData.id }}">
-            <b-row>
-              <b-col cols="0" >
-                <b-icon-box-seam></b-icon-box-seam>
-              </b-col>
-              <b-col cols="4"><strong>Product Catalogue</strong></b-col>
-            </b-row>
-            </router-link>
-          </h6>
+          <router-link v-if="isAdmin" :to="{ name: 'product-catalogue', params: { id: businessData.id }}">
+          <b-button type="submit" variant="primary">
+            <b-icon-newspaper/> Product Catalogue
+          </b-button>
+          </router-link>
+          &nbsp;
+          <router-link v-if="isAdmin" :to="{ name: 'inventory-page', params: { id: businessData.id }}">
+            <b-button type="submit" variant="primary">
+              <b-icon-box-seam/> Inventory
+            </b-button>
+          </router-link>
+          &nbsp;
+          <router-link :to="{ name: 'business-listings', params: { id: businessData.id }}">
+            <b-button type="submit" variant="primary">
+              <b-icon-receipt/> Sales List
+            </b-button>
+          </router-link>
 
         </b-container>
       </b-card-body>
