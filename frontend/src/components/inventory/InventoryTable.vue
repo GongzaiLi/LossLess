@@ -91,7 +91,7 @@ export default {
 
     /**
      * this is a get api to get the name of the business
-     * NOTE!! Best to add currency stuff here as well similar to the products
+     * NOTE!! Best to add currency stuff here as well similar to the inventory
      * @param businessId
      */
     getBusinessInfo: async function (businessId) {
@@ -102,7 +102,10 @@ export default {
           .then((resp) => {
             this.business = resp.data;
             return api.getUserCurrency(resp.data.address.country);
+          }, (err) => {
+            this.$log.debug(err)
           })
+
       try {
         const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
         this.products = productsResponse.data;

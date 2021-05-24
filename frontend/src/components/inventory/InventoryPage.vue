@@ -99,7 +99,6 @@ export default {
           })
       try {
         await Promise.all([businessPromise])
-        console.log(this.business)
       } catch (error) {
         this.$log.debug(error);
       }
