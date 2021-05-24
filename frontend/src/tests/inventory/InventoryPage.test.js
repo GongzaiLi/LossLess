@@ -105,7 +105,7 @@ describe('check-modal-inventory-card-page', () => {
         };
         Api.getProducts.mockResolvedValue(inventoryResponse);
         await wrapper.vm.openInventoryDetailModal(inventoryResponse.data[0]);
-
+        await wrapper.vm.setUpInventoryPage(0);
         await wrapper.vm.$forceUpdate();
 
         expect(wrapper.find(InventoryDetailCard).exists()).toBeTruthy()

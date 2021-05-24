@@ -102,8 +102,6 @@ export default {
           .then((resp) => {
             this.business = resp.data;
             return api.getUserCurrency(resp.data.address.country);
-          }, (err) => {
-            this.$log.debug(err)
           })
 
       try {
