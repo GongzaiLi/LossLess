@@ -1,14 +1,11 @@
 package com.seng302.wasteless.dto;
-
-import com.seng302.wasteless.model.Product;
+;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
