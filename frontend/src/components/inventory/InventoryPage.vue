@@ -81,14 +81,14 @@ export default {
     }
   },
   mounted() {
-    this.setUpInventoryPage();
+    const businessId = this.$route.params.id
+    this.setUpInventoryPage(businessId);
   },
   methods: {
     /**
      * init the data which is from the inventory table
      **/
-    async setUpInventoryPage() {
-      const businessId = this.$route.params.id
+    setUpInventoryPage: async function(businessId) {
       if (this.$refs.inventoryTable.getBusinessInfo) {  // If you don't have permission to access the table the table component won't render
         await this.$refs.inventoryTable.getBusinessInfo(businessId); // Only load products if the table component has rendered
       }
@@ -179,7 +179,7 @@ export default {
     $currentUser: {
       handler() {
         if (this.canEditInventory) {
-          this.getBusinessInfo(this.$route.params.id);
+          this.setUpInventoryPage(this.$route.params.id);
         }
       },
       deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)
@@ -193,7 +193,7 @@ export default {
     $route(to, _from) {
       const id = to.params.id;
       if (this.canEditInventory) {
-        this.getBusinessInfo(id);
+        this.setUpInventoryPage(id);
       }
     },
   }
