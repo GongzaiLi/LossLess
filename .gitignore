@@ -8,6 +8,7 @@ dist/
 node_modules/
 src/main/resources/application.properties
 src/test/resources/application.properties
+/frontend/package-lock.json
 
 ### STS ###
 .apt_generated
