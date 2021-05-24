@@ -5,65 +5,22 @@ Date: 11/5/2021
 <template>
   <div class="overflow-auto">
     <b-card v-if="canEditInventory" style="max-width: 1260px;">
-      <template #header>
-        <b-row>
-          <b-col md="8">
-            <h4>Inventory: {{ business.name }}</h4>
-            <h6>Click on a row to view more details</h6>
-          </b-col>
-          <b-col md="4" class="my-auto">
-            <b-form-group class="float-right">
-              <b-button @click="openCreateInventoryModal">
-                <b-icon-plus-square-fill/>
-                Create
-              </b-button>
-            </b-form-group>
-          </b-col>
-        </b-row>
-      </template>
-      <b-table
-        striped hovers
-        responsive="lg"
-        no-border-collapse
-        bordered
-        show-empty
-        class="inventory-table"
-        :fields="fields"
-        :items="items"
-        :per-page="perPage"
-        :current-page="currentPage"
-        :busy="tableLoading"
-        ref="inventoryTable"
-        @row-clicked="openInventoryDetailModal"
-      >
-        <template #cell(productThumbnail) class="thumbnail-row">
-          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
-                 alt="Default Image"></b-img>
-        </template>
-        <template v-slot:cell(actions)="product">
-          <b-button id="edit-button" @click="openEditInventoryModal(product.item)" size="sm">
-            Edit
-          </b-button>
-        </template>
-        <template #cell(pricePerItem)="data">
-          {{ currency.symbol }}{{ data.item.pricePerItem }}
-        </template>
-        <template #cell(totalPrice)="data">
-          {{ currency.symbol }}{{ data.item.totalPrice }}
-        </template>
-
-        <template #empty>
-          <div class="no-results-overlay">
-            <h4>No Inventory to display</h4>
-          </div>
-        </template>
-        <template #table-busy>
-          <div class="no-results-overlay">
-            <h4>Loading...</h4>
-          </div>
-        </template>
-      </b-table>
-      <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+      <b-card-title>Inventory: {{ business.name }}</b-card-title>
+      <hr class='m-0'>
+      <b-row align-v="center">
+        <b-col md="8"><h6 class="ml-2">Click on an inventory to view more details</h6></b-col>
+        <b-col md="4">
+          <b-form-group>
+            <b-button @click="openCreateInventoryModal" class="float-right">
+              <b-icon-plus-square-fill/>
+              Create
+            </b-button>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <inventory-table ref="inventoryTable" :editable="true"
+                       v-on:inventoryItemClicked="openInventoryDetailModal"
+                       v-on:editInventoryItemClicked="openEditInventoryModal"></inventory-table>
     </b-card>
 
     <b-card id="inventory-locked-card" v-if="!canEditInventory">
@@ -96,117 +53,55 @@ Date: 11/5/2021
 </template>
 
 <style>
-.no-results-overlay {
-  margin-top: 7em;
-  margin-bottom: 7em;
-  text-align: center;
-}
 
-.thumbnail-row {
-  padding: 0 0 0 0.5rem !important;
-}
 </style>
 
 <script>
-import api from "../../Api";
-import pagination from '../model/Pagination';
+import InventoryTable from './InventoryTable';
 import InventoryDetailCard from "./InventoryDetailCard";
+import api from "../../Api";
 
 export default {
   components: {
     InventoryDetailCard,
-    pagination
+    InventoryTable
   },
   data: function () {
     return {
       business: {},
       currentUser: {},
-      items: [],
-      products: [],
-      perPage: 10,
-      currentPage: 1,
-      tableLoading: true,
       currency: {
         symbol: '$',
         code: 'USD',
         name: 'US Dollar',
       },
-      mainProps: {blank: true, width: 50, height: 50},
       isInventoryCardReadOnly: true,
       inventoryDisplayedInCard: {},
       editInventoryItem: false,
     }
   },
   mounted() {
-    this.setUpInventoryPage();
+    const businessId = this.$route.params.id
+    this.setUpInventoryPage(businessId);
   },
   methods: {
     /**
      * init the data which is from the inventory table
      **/
-    setUpInventoryPage() {
-      const businessId = this.$route.params.id
-      this.getBusinessInfo(businessId);
-      this.tableLoading = false;
-    },
-    /**
-     * this is a get api to get the name of the business
-     * NOTE!! Best to add currency stuff here as well similar to the products
-     * @param businessId
-     */
-    getBusinessInfo: async function (businessId) {
-      this.tableLoading = true;
-      const getProductsPromise = api.getProducts(businessId)
-      const getInventoryPromise = api.getInventory(businessId)
-      const currencyPromise = api.getBusiness(businessId)
-        .then((resp) => {
-          this.business = resp.data;
-          return api.getUserCurrency(resp.data.address.country);
-        })
+    setUpInventoryPage: async function(businessId) {
+      if (this.$refs.inventoryTable.getBusinessInfo) {  // If you don't have permission to access the table the table component won't render
+        await this.$refs.inventoryTable.getBusinessInfo(businessId); // Only load products if the table component has rendered
+      }
+      const businessPromise = api.getBusiness(businessId)
+          .then((resp) => {
+            this.business = resp.data;
+            return api.getUserCurrency(resp.data.address.country);
+          })
       try {
-        const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
-        this.products = productsResponse.data;
-        this.items = inventoryResponse.data;
-        this.tableLoading = false;
-        if (currency != null) {
-          this.currency = currency;
-        }
+        await Promise.all([businessPromise])
       } catch (error) {
         this.$log.debug(error);
       }
-    },
-
-    /**
-     * modify the ID so that it doesn't display the "{businessId}-" at the start
-     * @return string
-     */
-    setId: function (product) {
-      return product.id.split(/-(.+)/)[1];
-    },
-
-    /**
-     * modify the date to day/month/year.
-     * @param oldDate
-     * @return string
-     */
-    setDate: function (oldDate) {
-      if (oldDate != null) {
-        const date = new Date(oldDate);
-        return `${date.getUTCDate() > 9 ? '' : '0'}${date.getUTCDate()}/` +
-          `${date.getUTCMonth() + 1 > 9 ? '' : '0'}${date.getUTCMonth() + 1}/` +
-          `${date.getUTCFullYear()}`;
-      }
-    },
-
-    /**
-     * when click the table will show a detail inventory model card.
-     * @param inventory object
-     **/
-    openInventoryDetailModal: function (inventory) {
-      this.isInventoryCardReadOnly = true;
-      this.editInventoryItem = false;
-      this.inventoryDisplayedInCard = Object.assign({}, inventory);
-      this.$bvModal.show('inventory-card');
     },
 
     /**
@@ -229,7 +124,18 @@ export default {
     },
 
     /**
-     * when click Edit button in the table will show a edit inventory model card.
+     * when click the table will show a detail inventory model card.
+     * @param inventory object
+     **/
+    openInventoryDetailModal: function (inventory) {
+      this.isInventoryCardReadOnly = true;
+      this.editInventoryItem = false;
+      this.inventoryDisplayedInCard = Object.assign({}, inventory);
+      this.$bvModal.show('inventory-card');
+    },
+
+    /**
+     * when click Edit button in the table will show an edit inventory model card.
      **/
     openEditInventoryModal: function (inventory) {
       this.isInventoryCardReadOnly = false;
@@ -237,97 +143,11 @@ export default {
       this.inventoryDisplayedInCard = Object.assign({}, inventory);
       this.inventoryDisplayedInCard.productId = inventory.product.id;
       this.$bvModal.show('inventory-card');
-    }
+    },
+
   },
 
   computed: {
-    /**
-     * set table parameter
-     * @returns object
-     */
-    fields: function () {
-      return [
-        {
-          key: 'productThumbnail',
-          tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
-          thStyle: 'width: 60px',
-        },
-        {
-          key: 'product',
-          label: 'Product Code',
-          formatter: (value) => {
-            return this.setId(value);
-          },
-          sortable: true
-        },
-        {
-          key: 'quantity',
-          label: 'Quantity',
-          sortable: true
-        },
-        {
-          key: 'pricePerItem',
-          label: `Price (${this.currency.code})`,
-          sortable: true
-        },
-        {
-          key: 'totalPrice',
-          label: `Total (${this.currency.code})`,
-          sortable: true
-        },
-        {
-          key: 'manufactured',
-          label: 'Manufacture Date',
-          formatter: (value) => {
-            return this.setDate(value);
-          },
-          thStyle: 'width: 15%',
-          sortable: true
-        },
-        {
-          key: 'sellBy',
-          label: 'Sell by Date',
-          formatter: (value) => {
-            return this.setDate(value);
-          },
-          thStyle: 'width: 15%',
-          sortable: true
-        },
-        {
-          key: 'bestBefore',
-          label: 'Best Before Date',
-          formatter: (value) => {
-            return this.setDate(value);
-          },
-          thStyle: 'width: 15%',
-          sortable: true
-        },
-        {
-          key: 'expires',
-          label: 'Expiry Date',
-          formatter: (value) => {
-            return this.setDate(value);
-          },
-          thStyle: 'width: 15%',
-          sortable: true
-        },
-        {
-          key: 'actions',
-          label: 'Action',
-          thStyle: 'width: 8%',
-          sortable: false
-        }
-      ]
-
-    },
-
-    /**
-     * The totalResults function just computed how many pages in the search table.
-     * @returns number
-     */
-    totalItems: function () {
-      return this.items.length;
-    },
 
     /**
      * True if the user can edit this catalogue (ie they are an admin or acting as this business)
@@ -358,7 +178,7 @@ export default {
     $currentUser: {
       handler() {
         if (this.canEditInventory) {
-          this.getBusinessInfo(this.$route.params.id);
+          this.setUpInventoryPage(this.$route.params.id);
         }
       },
       deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)
@@ -372,7 +192,7 @@ export default {
     $route(to, _from) {
       const id = to.params.id;
       if (this.canEditInventory) {
-        this.getBusinessInfo(id);
+        this.setUpInventoryPage(id);
       }
     },
   }

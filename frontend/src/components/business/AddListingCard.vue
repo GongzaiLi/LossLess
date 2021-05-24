@@ -35,7 +35,6 @@ Date: 23/5/2021
                           @input="calculateTotalPrice" required/>
           </b-input-group>
 
-
           <b-input-group>
             <h6><strong>Total Price:</strong></h6>
           </b-input-group>
@@ -54,6 +53,15 @@ Date: 23/5/2021
             </template>
           </b-input-group>
 
+          <b-input-group>
+            <h6><strong>More Info:</strong></h6>
+          </b-input-group>
+          <b-input-group class="mb-2">
+            <b-form-input :type="'text'"
+                          :disabled="disabled"
+                          autocomplete="off"
+                          v-model="listingData.closes"/>
+          </b-input-group>
 
           <b-input-group>
             <h6><strong>Closes:</strong></h6>
@@ -64,6 +72,18 @@ Date: 23/5/2021
                           autocomplete="off"
                           v-model="listingData.closes"/>
           </b-input-group>
+
+
+          <b-input-group>
+            <h6><strong>Closes:</strong></h6>
+          </b-input-group>
+          <b-input-group class="mb-2">
+            <b-form-input :type="(disabled)?'text':'date'"
+                          :disabled="disabled"
+                          autocomplete="off"
+                          v-model="listingData.closes"/>
+          </b-input-group>
+
           <b-alert :show="listingCardError ? 120 : 0" variant="danger">{{ listingCardError }}</b-alert>
           <hr style="width:100%">
           <b-button v-show="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
@@ -73,27 +93,39 @@ Date: 23/5/2021
     </b-card>
 
     <b-modal
-        id="select-products" hide-footer title="Select a product"
+        id="select-inventory-item" hide-footer title="Select an inventory item"
         static> <!--We make the modal static so that it is always rendered immediately on page load. If we remove this, the modal will
        only render when opened. This causes issues as the products-table component will only be rendered after the modal opens,
        so we wouldn't be able to call it with $refs-->
       <div style="text-align: center" class="mb-3">
-        <h5>Click on the inventory item you want to create an listing item for</h5>
+        <h5>Click on the inventory item you want to create a listing for</h5>
       </div>
-      <!--      <products-table ref="productTable" :editable="false"-->
-      <!--                      v-on:productClicked="selectInventoryItem"-->
-      <!--      ></products-table>-->
+      <inventory-table ref="inventoryTable" :editable="false"
+                      v-on:inventoryItemClicked="selectInventoryItem"
+      />
     </b-modal>
   </div>
 </template>
+
+
+<style>
+
+
+#select-inventory-item > .modal-dialog {
+  max-width: 1250px;
+}
+
+</style>
 
 <script>
 
 import api from '../../Api';
 
+import InventoryTable from "../inventory/InventoryTable";
+
 export default {
-  name: "add-listing-card",
-  //components: {InventoryTable}, (Needs to be moved into it's own component?)
+name: "add-listing-card",
+  components: {InventoryTable},
   props: {
     currentBusiness: {
       type: Object,
@@ -118,10 +150,6 @@ export default {
       type: Boolean,
       default: false
     },
-    setUpListingPage: {
-      type: Function,
-    }
-
   },
   data() {
     return {
@@ -205,18 +233,13 @@ export default {
     },
 
     openSelectInventoryItemModal() {
+      this.$bvModal.show('select-inventory-item');
+      this.$refs.productTable.getProducts(this.currentBusiness);
     },
 
-    selectInventoryItem() {
-    },
-
-
+    selectInventoryItem() {},
   },
 }
 
 
 </script>
-
-<style scoped>
-
-</style>

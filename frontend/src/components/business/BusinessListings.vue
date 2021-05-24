@@ -95,6 +95,7 @@ Listings Page
 <script>
 import pagination from "../model/Pagination";
 import AddListingCard from "./AddListingCard";
+import api from "../../Api";
 
 
 export default {
@@ -105,6 +106,7 @@ export default {
   },
   data: function () {
     return {
+      business: {},
       listingCardError: "",
       listingDisplayedInCard: {},
       isListingCardReadOnly: true,
@@ -582,11 +584,19 @@ export default {
   },
 
   mounted() {
+    const businessId = this.$route.params.id;
+    this.getBusinessInfo(businessId)
     this.sortListings();
     this.totalResults=this.cards.length
   },
 
   methods: {
+
+    async getBusinessInfo(businessId){
+      this.business = (await api.getBusiness(businessId)).data;
+    },
+
+
     compare( a, b ) {
       let less=1;
       let more=-1;
