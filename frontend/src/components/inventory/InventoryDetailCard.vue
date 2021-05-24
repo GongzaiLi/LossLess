@@ -21,7 +21,7 @@ Date: 13/5/2021
               pattern="[a-zA-Z0-9\d\-_\s]{0,100}"
               :disabled="disabled"
               placeholder="PRODUCT-ID"
-              v-model="inventoryInfo.productId"
+              v-model="inventoryInfo.displayedProductId"
               autofocus required/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectProductModal">Select Product</b-button>
@@ -169,7 +169,6 @@ export default {
     },
     inventory: {
       type: Object,
-      default: () => ({})
     },
     currency: {
       type: Object,
@@ -204,14 +203,22 @@ export default {
      * init the data which is from the inventory table
      */
     setUpInventoryCard() {
-      this.inventoryInfo = Object.assign({}, this.inventory);
+      let inventoryCopy = Object.assign({}, this.inventory);
+      // We have to assign displayedProductId here. If we assign displayedProductId in this.inventoryinfo then it won't be reactive
+      if (inventoryCopy.product) {
+        inventoryCopy.displayedProductId = inventoryCopy.product.id.split(/-(.+)/)[1];
+      } else {
+        inventoryCopy.displayedProductId = inventoryCopy.productId.split(/-(.+)/)[1];
+      }
+      this.inventoryInfo = inventoryCopy;
+
       if (this.disabled) {
-        this.inventoryInfo.productId = this.inventoryInfo.product.id.split(/-(.+)/)[1];
         this.inventoryInfo.manufactured = this.setDate(this.inventoryInfo.manufactured);
         this.inventoryInfo.sellBy = this.setDate(this.inventoryInfo.sellBy);
         this.inventoryInfo.bestBefore = this.setDate(this.inventoryInfo.bestBefore);
         this.inventoryInfo.expires = this.setDate(this.inventoryInfo.expires);
       }
+      console.log(this.inventoryInfo);
     },
 
     /**
@@ -249,12 +256,12 @@ export default {
 
     /**
      * Takes a selected product to be used to create the inventory.
-     * Sets the product id field to the id of the selected product.
+     * Sets the displayed product id field to the id of the selected product.
      * Hides the selected product modal.
      * @param product The selected product to be used to create the inventory.
      */
     selectProduct(product) {
-      this.inventoryInfo.productId = product.id;
+      this.inventoryInfo.displayedProductId = product.id.split(/-(.+)/)[1];
       this.$bvModal.hide('select-products');
     },
     /**
@@ -262,6 +269,8 @@ export default {
      * the OkAction will modify the Inventory otherwise Create a Inventory
      */
     okAction: async function () {
+      this.inventoryInfo.productId = `${this.currentBusiness.id}-${this.inventoryInfo.displayedProductId}`.toUpperCase();
+
       if (this.editModal) {
         await this.editInventory();
       } else {
