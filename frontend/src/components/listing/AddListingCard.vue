@@ -140,7 +140,7 @@ name: "add-listing-card",
     return {
       mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
       listingData: {
-        inventoryItemId: 0,
+        inventoryItemId: '',
         quantity: 1,
         price: 0,
         moreInfo: "",
@@ -241,7 +241,7 @@ name: "add-listing-card",
 
     selectInventoryItem(inventory) {
       this.selectedInventoryItem = inventory;
-      this.listingData.inventoryItemId = inventory.id;
+      this.listingData.inventoryItemId = inventory.product.id;
       this.calculateTotalPrice();
       this.$bvModal.hide('select-inventory-item');
     },
