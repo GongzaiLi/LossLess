@@ -80,6 +80,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :max="getToday()"
                           v-model="inventoryInfo.manufactured"/>
           </b-input-group>
 
@@ -90,6 +91,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="inventoryInfo.sellBy"/>
           </b-input-group>
 
@@ -100,6 +102,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="inventoryInfo.bestBefore"/>
           </b-input-group>
 
@@ -110,6 +113,7 @@ Date: 13/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="inventoryInfo.expires" required/>
           </b-input-group>
           <transition name="fade">
@@ -224,6 +228,40 @@ export default {
     },
 
     /**
+     * get today's date without the time
+     * need to add one to get correct date
+     * @return today's date in format yyyy-mm-dd
+     **/
+    getToday() {
+      let date = new Date();
+      let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+      return today;
+    },
+
+
+    /**
+     * Verify that the dates for inventory items are valid, making sure they are not in the past or future
+     * depending on which date
+     * if invalid return false and raise error flag with error message
+     * else return true
+     **/
+    validInventoryDates(inventoryItem) {
+      if (inventoryItem.manufactured > this.getToday()) {
+        this.inventoryCardError = "Manufactured date must be in the Past or Today";
+      } else if (inventoryItem.sellBy < this.getToday()) {
+        this.inventoryCardError = "Sell by date must be in the future";
+      } else if (inventoryItem.bestBefore <this.getToday()) {
+        this.inventoryCardError = "Best before date must be in the future";
+      } else if (inventoryItem.expires < this.getToday()) {
+        this.inventoryCardError = "Expiry date must be in the future";
+      } else {
+        return true;
+      }
+      this.showErrorAlert = true
+      return false;
+    },
+
+    /**
      * calculate the Total price when the price prt item or quantity changed
      */
     calculateTotalPrice() {
@@ -262,10 +300,12 @@ export default {
      * the OkAction will modify the Inventory otherwise Create a Inventory
      */
     okAction: async function () {
-      if (this.editModal) {
-        await this.editInventory();
-      } else {
-        await this.createInventory();
+      if (this.validInventoryDates(this.inventoryInfo)) {
+        if (this.editModal) {
+          await this.editInventory();
+        } else {
+          await this.createInventory();
+        }
       }
     },
 
