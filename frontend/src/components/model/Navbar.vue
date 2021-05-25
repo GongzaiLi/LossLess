@@ -183,6 +183,7 @@ export default {
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
+      this.$router.push(`/businesses/${business.id}`);
       console.log(this.$currentUser.currentlyActingAs);
     },
     /**
@@ -191,6 +192,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
+      this.$router.push(`/users/${this.$currentUser.id}`);
       console.log(this.$currentUser.currentlyActingAs);
     }
   },
