@@ -10,8 +10,8 @@ Listings Page
         <b-select v-model="sortProperty" value="name">
           <option value="name">Product Name</option>
           <option value="price">Price</option>
-          <option value="closes">Listing Closes</option>
-          <option value="opened">Listing Opens</option>
+          <option value="closing">Listing Closes</option>
+          <option value="created">Listing Opens</option>
         </b-select>
       </b-col>
       <b-col md="auto">
@@ -163,7 +163,10 @@ export default {
 
 
     /**
-     * Takes two inputs and compares them to each other based on the set sorted variables
+     * Takes two inputs and compares them to each other based on the variable sortProperty
+     * @param  {string} a string that is being paired against
+     * @param  {string} b
+     * @return int
      **/
     compare(a, b) {
       let less = 1;

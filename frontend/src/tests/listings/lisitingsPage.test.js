@@ -31,6 +31,50 @@ const $currentUser = {
     ]
 };
 
+const strippedListings = {
+    data: [
+        {
+            "id": 1,
+            "inventoryItem": {
+                "id": 101,
+                "product": {
+                    "name": "Watties Baked Beans - 420g can",
+
+                },
+            },
+            "price": 5.99,
+            "created": "2000-07-14T11:44:00Z",
+            "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+            "id": 2,
+            "inventoryItem": {
+                "id": 102,
+                "product": {
+                    "name": "Baked Beans - 420g can",
+
+                },
+            },
+            "price": 10,
+            "created": "2021-07-14T11:44:00Z",
+            "closes": "2021-07-21T23:59:00Z"
+        },
+        {
+            "id": 3,
+            "inventoryItem": {
+                "id": 103,
+                "product": {
+                    "name": "Turnips",
+
+                },
+            },
+            "price": 999,
+            "created": "2021-08-14T11:44:00Z",
+            "closes": "2022-01-21T23:59:00Z"
+        }
+    ]
+};
+
 jest.mock('../../Api');
 
 beforeEach(() => {
@@ -101,3 +145,109 @@ describe('Testing api get request (get all Listing function)', () => {
 
     })
 })
+
+describe('Check compare Function', () => {
+
+
+    test('compare-names-watties-baked-descending', async () => {
+
+        wrapper.vm.sortProperty = 'name';
+        wrapper.vm.sortDirection = 'desc';
+        expect(wrapper.vm.compare(strippedListings.data[0], strippedListings.data[1])).toBe(-1);
+    });
+    test('compare-prices-cheaper-expensive-ascending', async () => {
+
+        wrapper.vm.sortProperty = 'price';
+        wrapper.vm.sortDirection = 'asc';
+        expect(wrapper.vm.compare(strippedListings.data[0], strippedListings.data[2])).toBe(-1);
+    });
+    test('compare-created-older-newer-descending', async () => {
+
+        wrapper.vm.sortProperty = 'created';
+        wrapper.vm.sortDirection = 'desc';
+        expect(wrapper.vm.compare(strippedListings.data[1], strippedListings.data[2])).toBe(1);
+    });
+
+    test('compare-closing-same-ascending', async () => {
+
+        wrapper.vm.sortProperty = 'closing';
+        wrapper.vm.sortDirection = 'asc';
+        expect(wrapper.vm.compare(strippedListings.data[0], strippedListings.data[1])).toBe(0);
+    });
+})
+
+describe('Check sort Function', () => {
+
+
+        test('compare-names-w-b-t-descending', async () => {
+            Api.getListings.mockResolvedValue(strippedListings);
+            await wrapper.vm.getListings();
+            await wrapper.vm.$forceUpdate();
+
+            wrapper.vm.sortProperty = 'name';
+            wrapper.vm.sortDirection = 'desc';
+
+            await wrapper.vm.sortListings();
+            expect([wrapper.vm.cards[0].id,wrapper.vm.cards[1].id,wrapper.vm.cards[2].id]).toStrictEqual([1,3,2]);
+        });
+        test('compare-price-low-medium-high-descending', async () => {
+            Api.getListings.mockResolvedValue(strippedListings);
+            await wrapper.vm.getListings();
+            await wrapper.vm.$forceUpdate();
+
+            wrapper.vm.sortProperty = 'price';
+            wrapper.vm.sortDirection = 'desc';
+
+            await wrapper.vm.sortListings();
+            expect([wrapper.vm.cards[0].id,wrapper.vm.cards[1].id,wrapper.vm.cards[2].id]).toStrictEqual([3,2,1]);
+        });
+        test('compare-closing-same-same-later-ascending', async () => {
+            Api.getListings.mockResolvedValue(strippedListings);
+            await wrapper.vm.getListings();
+            await wrapper.vm.$forceUpdate();
+
+            wrapper.vm.sortProperty = 'closing';
+            wrapper.vm.sortDirection = 'asc';
+
+            await wrapper.vm.sortListings();
+            expect([wrapper.vm.cards[0].id,wrapper.vm.cards[1].id,wrapper.vm.cards[2].id]).toStrictEqual([2,1,3]);
+        });
+        test('compare-created-early-older-oldest-ascending', async () => {
+            Api.getListings.mockResolvedValue(strippedListings);
+            await wrapper.vm.getListings();
+            await wrapper.vm.$forceUpdate();
+
+            wrapper.vm.sortProperty = 'created';
+            wrapper.vm.sortDirection = 'desc';
+
+            await wrapper.vm.sortListings();
+            expect([wrapper.vm.cards[0].id,wrapper.vm.cards[1].id,wrapper.vm.cards[2].id]).toStrictEqual([3,2,1]);
+        });
+
+}
+)
+
+describe('Check pagination split function', () => {
+
+
+        test('first-page', async () => {
+            Api.getListings.mockResolvedValue(strippedListings);
+            await wrapper.vm.getListings();
+            await wrapper.vm.$forceUpdate();
+            wrapper.vm.currentPage = 1;
+            wrapper.vm.perPage = 2;
+
+            expect( wrapper.vm.splitListings().length).toBe(2);
+        });
+    test('last-page', async () => {
+        Api.getListings.mockResolvedValue(strippedListings);
+        await wrapper.vm.getListings();
+        await wrapper.vm.$forceUpdate();
+        wrapper.vm.currentPage = 3;
+        wrapper.vm.perPage = 1;
+
+        expect( wrapper.vm.splitListings().length).toBe(1);
+    });
+
+    }
+)
