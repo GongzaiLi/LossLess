@@ -92,7 +92,6 @@ public class CreateListingFeature {
     }
 
 
-
     public void theProductWithIdExistsInTheCatalogueForBusiness(int businessId, String productId) {
         if (productService.findProductById(productId) == null) {
             System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -104,8 +103,8 @@ public class CreateListingFeature {
         }
     }
 
-    @Given("User: {string} is logged in")
-    public void userIsLoggedIn(String email) {
+    @Given("The user with email {string} is logged in")
+    public void theUserWithEmailIsLoggedIn(String email) {
         User currentUser = userService.findUserByEmail(email);
 
         if (currentUser == null) {
@@ -126,14 +125,14 @@ public class CreateListingFeature {
 
     }
 
-    @And("User: {string} is an administrator for business {int}")
-    public void userIsAnAdministratorForBusiness(String email, int businessId) {
+    @And("The user with email {string} is an administrator for business {int}")
+    public void theUserWithEmailIsAnAdministratorForBusiness(String email, int businessId) {
         this.businessId = businessId;
         User user = userService.findUserByEmail(email);
 
         Business business = businessService.findBusinessById(businessId);
         if (business == null) {
-            business= new Business();
+            business = new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
             business.setId(businessId);
             business.setAdministrators(Collections.singletonList(user));
@@ -149,8 +148,8 @@ public class CreateListingFeature {
     }
 
 
-    @And("There is an inventory item with an inventory id {int}, productId {string}")
-    public void thereIsAnInventoryItemWithAnInventoryIdProductId(int inventoryId, String productId) {
+    @And("There is an inventory item with an inventory id {int} and productId {string}")
+    public void thereIsAnInventoryItemWithAnInventoryIdAndProductId(int inventoryId, String productId) {
         this.theProductWithIdExistsInTheCatalogueForBusiness(businessId, productId);
         if (inventoryService.findInventoryById(inventoryId) == null) {
             Inventory inventory = new Inventory();
@@ -166,8 +165,8 @@ public class CreateListingFeature {
     }
 
 
-    @When("Create A Listing with full detail: inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, closes {string}")
-    public void createAListingWithFullDetailInventoryItemIdQuantityPriceMoreInfoCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
+    @When("The user creates a listing with the inventory item ID {int}, quantity {int}, price {double}, moreInfo {string}, and closes {string}")
+    public void theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
 
         String jsonInStringForRequestBody = String.format(
                 "{\"inventoryItemId\": %d, \"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", inventoryItemId, quantity, price, moreInfo, closes);
@@ -182,15 +181,14 @@ public class CreateListingFeature {
 
     }
 
-    @Then("The user will be able to see the new Listing")
+    @Then("The user will be able to see the new listing")
     public void theUserWillBeAbleToSeeTheNewListing() throws Exception {
         result.andExpect(status().isCreated());
     }
 
 
-
-    @When("Create A Listing without inventory item Id: quantity {int}, price {double}, moreInfo {string}, closes {string}")
-    public void createAListingWithoutInventoryItemIdQuantityPriceMoreInfoCloses(int quantity, double price, String moreInfo, String closes) throws Exception {
+    @When("The user creates a listing without inventory item ID but has quantity {int}, price {double}, moreInfo {string} and closes {string}")
+    public void theUserCreatesAListingWithoutInventoryItemIDButHasQuantityPriceMoreInfoAndCloses(int quantity, double price, String moreInfo, String closes) throws Exception {
         String jsonInStringForRequestBody = String.format(
                 "{\"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", quantity, price, moreInfo, closes);
 
@@ -201,15 +199,14 @@ public class CreateListingFeature {
                 .with(csrf()));
     }
 
-    @Then("The user will be able to see the bad request")
-    public void theUserWillBeAbleToSeeTheBadRequest() throws Exception {
+    @Then("The user will receive a bad request error")
+    public void theUserWillReceiveABadRequestError() throws Exception {
         result.andExpect(status().is4xxClientError());
     }
 
 
-
-    @When("Create A Listing with not exist inventory item Id: inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, closes {string}")
-    public void createAListingWithNotExistInventoryItemIdInventoryItemIdQuantityPriceMoreInfoCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
+    @When("The user creates a listing with a nonexistent inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, and closes {string}")
+    public void theUserCreatesAListingWithANonexistentInventoryItemIdQuantityPriceMoreInfoAndCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
 
         String jsonInStringForRequestBody = String.format(
                 "{\"inventoryItemId\": %d, \"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", inventoryItemId, quantity, price, moreInfo, closes);
@@ -228,8 +225,8 @@ public class CreateListingFeature {
         result.andExpect(content().string(message));
     }
 
-    @When("Create A Listing without quantity: inventory item Id {int}, price {double}, moreInfo {string}, closes {string}")
-    public void createAListingWithoutQuantityInventoryItemIdPriceMoreInfoCloses(int inventoryItemId, double price, String moreInfo, String closes) throws Exception {
+    @When("The user creates a listing without quantity and inputs inventory item Id {int}, price {double}, moreInfo {string}, and closes {string}")
+    public void theUserCreatesAListingWithoutQuantityAndInputsInventoryItemIdPriceMoreInfoAndCloses(int inventoryItemId, double price, String moreInfo, String closes) throws Exception {
         String jsonInStringForRequestBody = String.format(
                 "{\"inventoryItemId\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", inventoryItemId, price, moreInfo, closes);
 
@@ -241,10 +238,8 @@ public class CreateListingFeature {
     }
 
 
-
-
-    @When("Create A Listing with quantity over the Inventory had: inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, closes {string}")
-    public void createAListingWithQuantityOverTheInventoryHadInventoryItemIdQuantityPriceMoreInfoCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
+    @When("The user creates a listing with quantity over the inventory quantity, inputting inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, closes {string}")
+    public void theUserCreatesAListingWithQuantityOverTheInventoryQuantityInputtingInventoryItemIdQuantityPriceMoreInfoCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
 
         String jsonInStringForRequestBody = String.format(
                 "{\"inventoryItemId\": %d, \"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", inventoryItemId, quantity, price, moreInfo, closes);
@@ -257,20 +252,18 @@ public class CreateListingFeature {
                 .with(csrf()));
     }
 
-    @Then("The user will receive an Listing created successfully message and The Listing ID {string}")
-    public void theUserWillReceiveAnListingCreatedSuccessfullyMessageAndTheListingID(String message) throws Exception {
-
+    @Then("The user will receive a bad request error and a message {string}")
+    public void theUserWillReceiveABadRequestErrorAndAMessage(String message) throws Exception {
         result.andExpect(status().is4xxClientError());
         result.andExpect(content().string(message));
-
     }
 
 
-    @When("Create A Listing without closes: inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}")
-    public void createAListingWithoutClosesInventoryItemIdQuantityPriceMoreInfo(int inventoryItemId, int quantity, double price, String moreInfo) throws Exception {
+    @When("The user creates a Listing with inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, and close date in the past {string}")
+    public void theUserCreatesAListingWithInventoryItemIdQuantityPriceMoreInfoAndCloseDateInThePast(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
 
         String jsonInStringForRequestBody = String.format(
-                "{\"inventoryItemId\": %d, \"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\"}", inventoryItemId, quantity, price, moreInfo);
+                "{\"inventoryItemId\": %d, \"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", inventoryItemId, quantity, price, moreInfo, closes);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/businesses/%d/listings", this.businessId))
                 .content(jsonInStringForRequestBody)
@@ -279,6 +272,16 @@ public class CreateListingFeature {
                 .with(csrf()));
     }
 
+    @When("The user creates a listing with the quantity being zero, inputting inventory item Id {int}, quantity {int}, price {double}, moreInfo {string}, closes {string}")
+    public void theUserCreatesAListingWithTheQuantityBeingZeroInputtingInventoryItemIdQuantityPriceMoreInfoCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
+        String jsonInStringForRequestBody = String.format(
+                "{\"inventoryItemId\": %d, \"quantity\": %d, \"price\": %f, \"moreInfo\": \"%s\", \"closes\": \"%s\"}", inventoryItemId, quantity, price, moreInfo, closes);
 
-
+        result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/businesses/%d/listings", this.businessId))
+                .content(jsonInStringForRequestBody)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
 }
+
