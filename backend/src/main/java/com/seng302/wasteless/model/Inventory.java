@@ -1,7 +1,8 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.InventoryView;
+import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.ListingViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -24,7 +25,6 @@ public class Inventory {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView(InventoryView.GetInventoryView.class)
     private Integer id;
 
     @NotNull
@@ -34,47 +34,47 @@ public class Inventory {
     @NotNull(message = "Product Code is Mandatory")
     @ManyToOne
     @JoinColumn(name = "product_id") //Stored in table as id with reference to product table
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private Product product;
 
-    @Positive
+    @PositiveOrZero
     @Max(1000000000)
     @NotNull(message = "Product quantity is Mandatory")
     @Column(name = "quantity")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private int quantity;
 
     @PositiveOrZero
     @Max(1000000000)
     @Column(name = "price_per_item")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private double pricePerItem;
 
     @PositiveOrZero
     @Max(1000000000)
     @Column(name = "total_price")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private double totalPrice;
 
     @PastOrPresent
     @Column(name = "manufactured")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private LocalDate manufactured;
 
     @FutureOrPresent
     @Column(name = "sell_by")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private LocalDate sellBy;
 
     @FutureOrPresent
     @Column(name = "best_before")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private LocalDate bestBefore;
 
     @FutureOrPresent
     @NotNull(message = "Expiry Date is Mandatory")
     @Column(name = "expires")
-    @JsonView(InventoryView.GetInventoryView.class)
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private LocalDate expires;
 
 }
