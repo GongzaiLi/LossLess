@@ -2,7 +2,7 @@
 Listings Page
 -->
 <template>
-  <div>
+  <b-card>
     <h1 align="middle">{{ business.name }} Listings</h1>
     <b-row align-h="start">
       <h3>Sort by:</h3>
@@ -23,7 +23,7 @@ Listings Page
       <b-col md="auto">
         <b-button @click="sortListings">Sort</b-button>
       </b-col>
-      <b-col md="7" v-if="canEditListings">
+      <b-col v-if="canEditListings">
         <b-form-group>
           <b-button @click="openCreateListingModal" class="float-right">
             <b-icon-plus-square-fill/>
@@ -33,7 +33,7 @@ Listings Page
       </b-col>
     </b-row>
 
-    <b-row cols-lg="3" cols-xl="4">
+    <b-row cols-lg="3" >
       <b-col v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
         <b-card
             img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
@@ -64,7 +64,7 @@ Listings Page
 
               <h3>
                 <b-button href="#" variant="primary" disabled>Purchase</b-button>
-                ${{ listing.price }}
+                {{ currency.symbol }}{{ listing.price }}
               </h3>
               <span v-if="listing.moreInfo">{{ listing.moreInfo }}</span>
             </b-list-group>
@@ -89,7 +89,7 @@ Listings Page
                         :current-business="business"/>
     </b-modal>
 
-  </div>
+  </b-card>
 </template>
 
 <style scoped>
@@ -122,6 +122,14 @@ export default {
       perPage: 12,
       currentPage: 1,
       totalResults: 0,
+      currency: {
+        type: Object,
+        default: () => ({
+          symbol: '$',
+          code: 'USD',
+          name: 'US Dollar'
+        })
+      },
     }
   },
 
@@ -130,6 +138,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Page initilisation function
+     **/
     initListingPage: async function() {
       this.businessId = this.$route.params.id;
       await this.getBusinessInfo(this.businessId);
@@ -137,7 +148,9 @@ export default {
       this.sortListings();
       this.totalResults = this.cards.length
     },
-
+    /**
+     * Api request to get business information
+     **/
     async getBusinessInfo(businessId) {
       await api.getBusiness(businessId)
           .then((response) => {
@@ -149,6 +162,9 @@ export default {
     },
 
 
+    /**
+     * Takes two inputs and compares them to each other based on the set sorted variables
+     **/
     compare(a, b) {
       let less = 1;
       let more = -1;
@@ -188,9 +204,16 @@ export default {
 
       return 0;
     },
+    /**
+     * Sorts all the cards according to the custom sort function compare()
+     **/
     sortListings() {
       this.cards.sort(this.compare)
     },
+
+    /**
+     * Splits all the listings for pagination
+     **/
     splitListings() {
       return this.cards.slice((this.currentPage - 1) * this.perPage, this.perPage * this.currentPage);
     },
