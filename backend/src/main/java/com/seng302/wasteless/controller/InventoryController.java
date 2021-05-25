@@ -237,7 +237,7 @@ public class InventoryController {
         }
 
         logger.info("Creating new Inventory Item and setting data.");
-        inventoryItem = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(editedInventoryItem);
+        inventoryItem.setProduct(possibleProduct);
         inventoryItem.setBusinessId(businessId);
         inventoryItem.setQuantity(editedInventoryItem.getQuantity());
         inventoryItem.setPricePerItem(editedInventoryItem.getPricePerItem());
