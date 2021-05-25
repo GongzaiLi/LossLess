@@ -140,7 +140,7 @@ public class InventoryControllerUnitTest {
         doReturn(true).when(user).checkUserGlobalAdmin();
 
         Mockito
-                .when(PostInventoryDtoMapper.postInventoryDtoToEntityMapper(any(PostInventoryDto.class), any(Inventory.class)))
+                .when(PostInventoryDtoMapper.postInventoryDtoToEntityMapper(any(PostInventoryDto.class)))
                 .thenReturn(inventoryItem);
 
         List<Inventory> inventories = new ArrayList<>();

@@ -45,7 +45,7 @@ public class Product {
     @Column(name = "manufacturer")
     private String manufacturer;
 
-    @Positive
+    @PositiveOrZero
     @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;

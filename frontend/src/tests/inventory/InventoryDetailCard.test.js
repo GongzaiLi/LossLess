@@ -6,6 +6,8 @@ import Api from "../../Api";
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let wrapper;
+let manufacturedDates;
+
 
 const $route = {
   params: {
@@ -37,7 +39,7 @@ beforeEach(() => {
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
-
+  manufacturedDates = {manufactured: "2000-05-22", sellBy: "3021-05-22", bestBefore: "3021-05-22", expires: "3021-05-22"};
   wrapper = shallowMount(InventoryDetailCard, {
     localVue,
     propsData: {
@@ -216,7 +218,6 @@ describe('Editing products', () => {
 
 describe('Editing products', () => {
 
-
   it('Succesfully edits a product ', async () => {
     Api.modifyInventory.mockResolvedValue({response: {status: 200}});
 
@@ -244,4 +245,93 @@ describe('select-product-modal', () => {
 
     expect(wrapper.vm.inventoryInfo.productId).toBe('ABC')
   });
+})
+
+describe('manufactured date_validation', () => {
+  test('manufactured invalid for future', () => {
+    manufacturedDates.manufactured = "3000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
+    expect(wrapper.vm.inventoryCardError).toBe("Manufactured date must be in the Past or Today");
+  });
+  test('manufactured valid for today', () => {
+    manufacturedDates.manufactured = new Date().toJSON().slice(0, 10);
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+
+  test('manufactured valid for past', () => {
+    manufacturedDates.manufactured = "2000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+
+})
+
+describe('sell by date_validation', () => {
+  test('sell by valid for future', () => {
+    manufacturedDates.sellBy = "3000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+  test('sell by valid for today', () => {
+    manufacturedDates.sellBy = wrapper.vm.getToday();
+    console.log(manufacturedDates.sellBy);
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+
+  test('sell by invalid for past', () => {
+    manufacturedDates.sellBy = "2000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
+    expect(wrapper.vm.inventoryCardError).toBe("Sell by date must be in the future");
+  });
+
+})
+
+describe('expires date_validation', () => {
+  test('expires valid for future', () => {
+    manufacturedDates.expires = "3000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+  test('expires valid for today', () => {
+    manufacturedDates.expires = wrapper.vm.getToday();
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+
+  test('expires invalid for past', () => {
+    manufacturedDates.expires = "2000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
+    expect(wrapper.vm.inventoryCardError).toBe("Expiry date must be in the future");
+  });
+
+})
+
+describe('best before date_validation', () => {
+  test('best before valid for future', () => {
+    manufacturedDates.bestBefore = "3000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+  test('best before valid for today', () => {
+    manufacturedDates.bestBefore = wrapper.vm.getToday();
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
+    expect(wrapper.vm.inventoryCardError).toBe("");
+  });
+
+  test('best before valid for past', () => {
+    manufacturedDates.bestBefore = "2000-05-22";
+    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
+    expect(wrapper.vm.inventoryCardError).toBe("Best before date must be in the future");
+  });
+
+})
+
+describe('get Today returns today', () => {
+  test("getToday returns today's date", () => {
+    let date = new Date();
+    let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+    expect(wrapper.vm.getToday()).toBe(today);
+  })
 })
