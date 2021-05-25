@@ -5,7 +5,6 @@ import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.service.AddressService;
-import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;

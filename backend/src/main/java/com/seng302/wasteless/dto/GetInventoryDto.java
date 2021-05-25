@@ -1,7 +1,5 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.Address;
-import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.Product;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +7,6 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
-import java.util.List;
 
 
 /**

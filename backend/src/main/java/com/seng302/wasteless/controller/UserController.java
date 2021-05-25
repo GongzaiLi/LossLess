@@ -9,7 +9,6 @@ import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
 import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.security.CustomUserDetails;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

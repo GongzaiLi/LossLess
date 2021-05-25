@@ -2,7 +2,6 @@ import {createLocalVue, mount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import NavBar from '../../components/model/Navbar'; // name of your Vue component
 import Auth from '../../auth'
-import Api from '../../Api'
 
 let wrapper;
 
@@ -168,10 +167,8 @@ describe('Got to profile', () => {
 
 describe('Act as business', () => {
   test('works on click with single business', async () => {
-    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
     await wrapper.find(".business-name-drop-down a").trigger("click");
     await wrapper.vm.$nextTick();
-    expect(actAsBusiness).toHaveBeenCalledWith(100);
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(0);
     expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.find("#profile-name").text()).toEqual("Lumbridge General Store");
@@ -187,10 +184,8 @@ describe('Act as business', () => {
 
     await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
 
-    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
     await wrapper.find(".user-name-drop-down a").trigger("click");
     await wrapper.vm.$nextTick();
-    expect(actAsBusiness).toHaveBeenCalledWith(null);
     expect(wrapper.findAll(".business-name-drop-down").length).toEqual(1);
     expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
     expect(wrapper.find("#profile-name").text()).toEqual("John");
@@ -204,7 +199,6 @@ describe('Act as business', () => {
 
   test('works on click with multiple business', async () => {
     const prevUser = JSON.parse(JSON.stringify(userData));
-    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
 
     userData.businessesAdministered.push({
       "id": 101,
@@ -218,8 +212,6 @@ describe('Act as business', () => {
 
     await wrapper.findAll(".business-name-drop-down a").at(1).trigger("click");
     await wrapper.vm.$nextTick();
-
-    expect(actAsBusiness).toHaveBeenCalledWith(101);
 
     expect(wrapper.find("#profile-name").text()).toEqual("Another Store Name");
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(1);

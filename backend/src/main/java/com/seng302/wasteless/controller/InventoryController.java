@@ -106,9 +106,9 @@ public class InventoryController {
             logger.warn("Cannot update inventory item for product that does not belong to current business");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
         }
-        Inventory inventory = new Inventory();
-        inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest, inventory);
+        Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
 
+        inventory.setProduct(possibleProduct);
         inventory.setBusinessId(businessId);
 
         inventory = inventoryService.createInventory(inventory);
@@ -148,7 +148,7 @@ public class InventoryController {
         logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
 
 
-        logger.debug("Request to get business with ID: {}", businessId);
+        logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         if (possibleBusiness == null) {
@@ -165,7 +165,7 @@ public class InventoryController {
         logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
 
-        logger.debug("Trying to retrieve INVENTORY products for business: {}", possibleBusiness);
+        logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
         List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId);
 
 
@@ -237,7 +237,7 @@ public class InventoryController {
         }
 
         logger.info("Creating new Inventory Item and setting data.");
-        inventoryItem = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(editedInventoryItem, inventoryItem);
+        inventoryItem.setProduct(possibleProduct);
         inventoryItem.setBusinessId(businessId);
         inventoryItem.setQuantity(editedInventoryItem.getQuantity());
         inventoryItem.setPricePerItem(editedInventoryItem.getPricePerItem());
@@ -273,7 +273,7 @@ public class InventoryController {
             MethodArgumentNotValidException exception) {
         Map<String, String> errors;
         errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error) -> {
+        exception.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
 //            logger.error(errorMessage); it doesnt work I am not sure why
