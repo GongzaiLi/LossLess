@@ -43,7 +43,7 @@ import java.util.Collections;
 
 @WebMvcTest(UserController.class)
 @AutoConfigureWebMvc
-public class CreateInventoryFeature {
+public class CreateAndModifyInventoryFeature {
 
     private MockMvc mockMvc;
 
@@ -67,6 +67,10 @@ public class CreateInventoryFeature {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private InventoryService inventoryService;
+
 
     /**
      * Creates a throwaway address so we can use it for other step definitions.
@@ -170,6 +174,25 @@ public class CreateInventoryFeature {
         }
     }
 
+    @And("The product with id {string} does not exist")
+    public void theProductWithIdDoesNotExist(String productId) {
+        Assertions.assertNull(productService.findProductById(productId));
+    }
+
+    @And("The inventory item with id {int} exists for business {int}")
+    public void theInventoryItemWithIdExistsForBusiness(int id, int businessId) throws Exception {
+        if (inventoryService.findInventoryById(id) == null) {
+            String jsonInStringForRequest = "{\"productId\": \"1-PRODUCT\", \"quantity\": 2, \"expires\": \"2050-01-01\"}";
+
+             mockMvc.perform(MockMvcRequestBuilders.post(String.format("/businesses/%d/inventory", businessId))
+                    .content(jsonInStringForRequest)
+                    .contentType(APPLICATION_JSON)
+                    .with(user(currentUserDetails))
+                    .with(csrf()))
+             .andExpect(status().isCreated());
+        }
+    }
+
     @When("The user accesses the inventory for business {int}")
     public void theUserAccessesTheInventoryForBusiness(int id) throws Exception {
         result = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/businesses/%d/inventory", id))
@@ -184,6 +207,28 @@ public class CreateInventoryFeature {
         System.out.println(businessService.findBusinessById(businessId).getAdministrators());
 
         result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/businesses/%d/inventory", businessId))
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("The user modifies the inventory item with id {int} for business {int} with fields product {string}, quantity {int}, expiry date {string}, best before {string}, sell by {string}, and manufactured {string}")
+    public void theUserModifiesTheInventoryItemWithIdForBusinessWithFieldsProductQuantityExpiryDateBestBeforeSellByAndManufactured(int inventoryId, int businessId, String productId, int quantity, String expiry, String bestBefore, String sellBy, String manufactured) throws Exception {
+        String jsonInStringForRequest = String.format("{\"productId\": \"%s\", \"quantity\": %d, \"pricePerItem\": null, \"totalPrice\": null, \"manufactured\": \"%s\", \"sellBy\": \"%s\",\"bestBefore\": \"%s\",\"expires\": \"%s\"}", productId, quantity, manufactured, bestBefore, sellBy, expiry);
+
+        result = mockMvc.perform(MockMvcRequestBuilders.put(String.format("/businesses/%d/inventory/%d", businessId, inventoryId))
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("The user modifies the inventory item with id {int} for business {int} with no product code")
+    public void theUserModifiesTheInventoryItemWithIdForBusinessWithNoProductCode(int inventoryId, int businessId) throws Exception {
+        String jsonInStringForRequest = "{\"quantity\": 2, \"expires\": \"2050-01-01\"}";
+
+        result = mockMvc.perform(MockMvcRequestBuilders.put(String.format("/businesses/%d/inventory/%d", businessId, inventoryId))
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -208,5 +253,17 @@ public class CreateInventoryFeature {
     @Then("The inventory entry is not created")
     public void theInventoryEntryIsNotCreated() throws Exception {
         result.andExpect(status().is4xxClientError());
+    }
+
+    @Then("The inventory item is modified with the given fields")
+    public void theInventoryItemIsModifiedWithTheGivenFields() throws Exception {
+        result.andExpect(status().isOk());
+    }
+
+    @Then("The inventory item is not modified with an error message of {string}")
+    public void theInventoryItemIsNotModifiedWithAnErrorMessageOf(String message) throws Exception {
+        // Write code here that turns the phrase above into concrete actions
+        result.andExpect(status().is4xxClientError());
+        result.andExpect(content().string(message));
     }
 }
