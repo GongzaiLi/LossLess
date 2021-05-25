@@ -46,25 +46,22 @@ Listings Page
             {{ listing.inventoryItem.product.manufacturer }}
           </b-card-sub-title>
           <b-card-text>
-
             <span>{{ listing.inventoryItem.product.description }}</span><br>
+            <hr>
             <b-list-group flush>
-              <b-list-group-item></b-list-group-item>
               <b-card-text>
                 <span
-                    v-if="listing.inventoryItem.manufactured">Manufactured: {{ listing.inventoryItem.manufactured }}</span><br>
+                    v-if="listing.inventoryItem.manufactured">Manufactured: {{ listing.inventoryItem.manufactured }}<br></span>
                 <span
-                    v-if="listing.inventoryItem.bestBefore">Best before: {{ listing.inventoryItem.manufactured }}</span><br>
-                <span v-if="listing.inventoryItem.sellBy">Sell by: {{ listing.inventoryItem.manufactured }}</span><br>
-                <span v-if="listing.inventoryItem.expires">Expires: {{ listing.inventoryItem.manufactured }}</span><br>
+                    v-if="listing.inventoryItem.bestBefore">Best before: {{ listing.inventoryItem.bestBefore }}<br></span>
+                <span v-if="listing.inventoryItem.sellBy">Sell by: {{ listing.inventoryItem.sellBy }}<br></span>
+                <span v-if="listing.inventoryItem.expires">Expires: {{ listing.inventoryItem.expires }}</span>
               </b-card-text>
             </b-list-group>
+            <hr>
             <b-list-group flush>
-              <b-list-group-item></b-list-group-item>
-
               <h3>
-                <b-button href="#" variant="primary" disabled>Purchase</b-button>
-                {{ currency.symbol }}{{ listing.price }}
+                {{ currency.symbol }}{{ listing.price }} {{currency.code}}
               </h3>
               <span v-if="listing.moreInfo">{{ listing.moreInfo }}</span>
             </b-list-group>
@@ -86,14 +83,18 @@ Listings Page
         :no-close-on-esc="!isListingCardReadOnly">
       <add-listing-card :disabled="isListingCardReadOnly"
                         :inventory="listingDisplayedInCard"
-                        :current-business="business"/>
+                        :current-business="business"
+                        @itemCreated="initListingPage"/>
     </b-modal>
 
   </b-card>
 </template>
 
 <style scoped>
-
+hr {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
 
 </style>
 
@@ -123,12 +124,9 @@ export default {
       currentPage: 1,
       totalResults: 0,
       currency: {
-        type: Object,
-        default: () => ({
-          symbol: '$',
-          code: 'USD',
-          name: 'US Dollar'
-        })
+        symbol: '$',
+        code: 'USD',
+        name: 'US Dollar'
       },
     }
   },
@@ -155,7 +153,9 @@ export default {
       await api.getBusiness(businessId)
           .then((response) => {
             this.business = response.data;
+            return api.getUserCurrency(response.data.address.country);
           })
+          .then(currencyData => this.currency = currencyData)
           .catch((error) => {
             this.$log.debug(error);
           });
