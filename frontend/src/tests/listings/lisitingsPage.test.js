@@ -82,6 +82,12 @@ beforeEach(() => {
     const localVue = createLocalVue()
     localVue.use(BootstrapVue);
     localVue.use(BootstrapVueIcons);
+    Api.getUserCurrency.mockResolvedValue(
+      {
+        symbol: '$',
+          code: 'USD',
+          name: 'US Dollar'
+    });
     Api.getBusiness.mockResolvedValue({data: {"address": {"country": "New Zealand"}}});
     wrapper = shallowMount(ListingPage, {
         localVue,
