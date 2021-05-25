@@ -48,7 +48,7 @@ export default {
   searchUser: (searchParameter) => instance.get(`users/search?searchQuery=${searchParameter}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
-  postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
+  postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
@@ -57,6 +57,7 @@ export default {
   getInventory: (id) => instance.get(`/businesses/${id}/inventory`, {withCredentials: true}),
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials:true}),
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
+  getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials:true}),
 
 
   /**
