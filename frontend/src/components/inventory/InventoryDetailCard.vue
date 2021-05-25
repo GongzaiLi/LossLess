@@ -21,7 +21,7 @@ Date: 13/5/2021
               pattern="[a-zA-Z0-9\d\-_\s]{0,100}"
               :disabled="disabled"
               placeholder="PRODUCT-ID"
-              v-model="inventoryInfo.productId"
+              v-model="inventoryInfo.displayedProductId"
               autofocus required/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectProductModal">Select Product</b-button>
@@ -173,7 +173,6 @@ export default {
     },
     inventory: {
       type: Object,
-      default: () => ({})
     },
     currency: {
       type: Object,
@@ -208,9 +207,16 @@ export default {
      * init the data which is from the inventory table
      */
     setUpInventoryCard() {
-      this.inventoryInfo = Object.assign({}, this.inventory);
+      let inventoryCopy = Object.assign({}, this.inventory);
+      // We have to assign displayedProductId here. If we assign displayedProductId in this.inventoryinfo then it won't be reactive
+      if (inventoryCopy.product) {
+        inventoryCopy.displayedProductId = inventoryCopy.product.id.split(/-(.+)/)[1];
+      } else {
+        inventoryCopy.displayedProductId = inventoryCopy.productId.split(/-(.+)/)[1];
+      }
+      this.inventoryInfo = inventoryCopy;
+
       if (this.disabled) {
-        this.inventoryInfo.productId = this.inventoryInfo.product.id.split(/-(.+)/)[1];
         this.inventoryInfo.manufactured = this.setDate(this.inventoryInfo.manufactured);
         this.inventoryInfo.sellBy = this.setDate(this.inventoryInfo.sellBy);
         this.inventoryInfo.bestBefore = this.setDate(this.inventoryInfo.bestBefore);
@@ -236,29 +242,6 @@ export default {
       let date = new Date();
       let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
       return today;
-    },
-
-
-    /**
-     * Verify that the dates for inventory items are valid, making sure they are not in the past or future
-     * depending on which date
-     * if invalid return false and raise error flag with error message
-     * else return true
-     **/
-    validInventoryDates(inventoryItem) {
-      if (inventoryItem.manufactured > this.getToday()) {
-        this.inventoryCardError = "Manufactured date must be in the Past or Today";
-      } else if (inventoryItem.sellBy < this.getToday()) {
-        this.inventoryCardError = "Sell by date must be in the future";
-      } else if (inventoryItem.bestBefore <this.getToday()) {
-        this.inventoryCardError = "Best before date must be in the future";
-      } else if (inventoryItem.expires < this.getToday()) {
-        this.inventoryCardError = "Expiry date must be in the future";
-      } else {
-        return true;
-      }
-      this.showErrorAlert = true
-      return false;
     },
 
     /**
@@ -287,25 +270,28 @@ export default {
 
     /**
      * Takes a selected product to be used to create the inventory.
-     * Sets the product id field to the id of the selected product.
+     * Sets the displayed product id field to the id of the selected product.
      * Hides the selected product modal.
      * @param product The selected product to be used to create the inventory.
      */
     selectProduct(product) {
-      this.inventoryInfo.productId = product.id;
+      this.inventoryInfo.displayedProductId = product.id.split(/-(.+)/)[1];
       this.$bvModal.hide('select-products');
     },
     /**
      * Ok action button when edit modal is ture
      * the OkAction will modify the Inventory otherwise Create a Inventory
+     * This also sets the inventory product id to be the 'actual' product id selected.
+     * That is, it sets the productId field of the data to be POSTed to be the id in the
+     * text field, but with the business id prepended to it.
      */
     okAction: async function () {
-      if (this.validInventoryDates(this.inventoryInfo)) {
-        if (this.editModal) {
-          await this.editInventory();
-        } else {
-          await this.createInventory();
-        }
+      this.inventoryInfo.productId = `${this.currentBusiness.id}-${this.inventoryInfo.displayedProductId}`.toUpperCase();
+
+      if (this.editModal) {
+        await this.editInventory();
+      } else {
+        await this.createInventory();
       }
     },
 

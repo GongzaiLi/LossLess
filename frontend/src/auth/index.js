@@ -73,7 +73,6 @@ export const getCurrentUser = function () {
  */
 export const setCurrentlyActingAs = function (actingAs) {
     Vue.set(instance.$data.$currentUser, 'currentlyActingAs', actingAs);
-    console.log(instance.$data.$currentUser);
     localStorage.setItem('currentlyActingAsId', actingAs ? JSON.stringify(actingAs.id) : null);
 };
 

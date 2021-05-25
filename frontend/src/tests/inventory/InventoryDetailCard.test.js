@@ -59,6 +59,9 @@ beforeEach(() => {
         bestBefore: "2021-05-14",
         expires: "2021-05-14"
       },
+      currentBusiness: {
+        id: 0
+      },
       setUpInventoryPage: () => {},
     },
     mocks: {$route, $log, $currentUser},
@@ -241,91 +244,21 @@ describe('Editing products', () => {
 
 describe('select-product-modal', () => {
   test('selectProduct works', () => {
-    wrapper.vm.selectProduct({id: 'ABC'});
+    wrapper.vm.selectProduct({id: '1-ABC'});
 
-    expect(wrapper.vm.inventoryInfo.productId).toBe('ABC')
-  });
-})
-
-describe('manufactured date_validation', () => {
-  test('manufactured invalid for future', () => {
-    manufacturedDates.manufactured = "3000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
-    expect(wrapper.vm.inventoryCardError).toBe("Manufactured date must be in the Past or Today");
-  });
-  test('manufactured valid for today', () => {
-    manufacturedDates.manufactured = new Date().toJSON().slice(0, 10);
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
+    expect(wrapper.vm.inventoryInfo.displayedProductId).toBe('ABC')
   });
 
-  test('manufactured valid for past', () => {
-    manufacturedDates.manufactured = "2000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
+  test('correct product id posted', async () => {
+    let postedData = {}
+    Api.createInventory.mockImplementationOnce(async (_id, data) => {postedData = data; return new Error()});
 
-})
+    wrapper.vm.selectProduct({id: '0-ABC'});
 
-describe('sell by date_validation', () => {
-  test('sell by valid for future', () => {
-    manufacturedDates.sellBy = "3000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
-  test('sell by valid for today', () => {
-    manufacturedDates.sellBy = wrapper.vm.getToday();
-    console.log(manufacturedDates.sellBy);
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
+    await wrapper.vm.okAction();
 
-  test('sell by invalid for past', () => {
-    manufacturedDates.sellBy = "2000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
-    expect(wrapper.vm.inventoryCardError).toBe("Sell by date must be in the future");
+    expect(postedData.productId).toBe('0-ABC');
   });
-
-})
-
-describe('expires date_validation', () => {
-  test('expires valid for future', () => {
-    manufacturedDates.expires = "3000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
-  test('expires valid for today', () => {
-    manufacturedDates.expires = wrapper.vm.getToday();
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
-
-  test('expires invalid for past', () => {
-    manufacturedDates.expires = "2000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
-    expect(wrapper.vm.inventoryCardError).toBe("Expiry date must be in the future");
-  });
-
-})
-
-describe('best before date_validation', () => {
-  test('best before valid for future', () => {
-    manufacturedDates.bestBefore = "3000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
-  test('best before valid for today', () => {
-    manufacturedDates.bestBefore = wrapper.vm.getToday();
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(true);
-    expect(wrapper.vm.inventoryCardError).toBe("");
-  });
-
-  test('best before valid for past', () => {
-    manufacturedDates.bestBefore = "2000-05-22";
-    expect(wrapper.vm.validInventoryDates(manufacturedDates)).toBe(false);
-    expect(wrapper.vm.inventoryCardError).toBe("Best before date must be in the future");
-  });
-
 })
 
 describe('get Today returns today', () => {
