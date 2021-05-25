@@ -244,29 +244,6 @@ export default {
       return today;
     },
 
-
-    /**
-     * Verify that the dates for inventory items are valid, making sure they are not in the past or future
-     * depending on which date
-     * if invalid return false and raise error flag with error message
-     * else return true
-     **/
-    validInventoryDates(inventoryItem) {
-      if (inventoryItem.manufactured > this.getToday()) {
-        this.inventoryCardError = "Manufactured date must be in the Past or Today";
-      } else if (inventoryItem.sellBy < this.getToday()) {
-        this.inventoryCardError = "Sell by date must be in the future";
-      } else if (inventoryItem.bestBefore <this.getToday()) {
-        this.inventoryCardError = "Best before date must be in the future";
-      } else if (inventoryItem.expires < this.getToday()) {
-        this.inventoryCardError = "Expiry date must be in the future";
-      } else {
-        return true;
-      }
-      this.showErrorAlert = true
-      return false;
-    },
-
     /**
      * calculate the Total price when the price prt item or quantity changed
      */
@@ -311,12 +288,10 @@ export default {
     okAction: async function () {
       this.inventoryInfo.productId = `${this.currentBusiness.id}-${this.inventoryInfo.displayedProductId}`.toUpperCase();
 
-      if (this.validInventoryDates(this.inventoryInfo)) {
-        if (this.editModal) {
-          await this.editInventory();
-        } else {
-          await this.createInventory();
-        }
+      if (this.editModal) {
+        await this.editInventory();
+      } else {
+        await this.createInventory();
       }
     },
 
