@@ -71,7 +71,6 @@ Date: sprint_1
               maxLength=50
               placeholder="Suburb"
               v-bind:value="value"
-              required
             />
           </b-col>
           <b-col>

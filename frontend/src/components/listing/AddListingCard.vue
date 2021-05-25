@@ -70,6 +70,7 @@ Date: 23/5/2021
             <b-form-input :type="(disabled)?'text':'date'"
                           :disabled="disabled"
                           autocomplete="off"
+                          :min="getToday()"
                           v-model="listingData.closes"/>
           </b-input-group>
 
@@ -219,6 +220,17 @@ name: "add-listing-card",
         return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')
       }
     },
+
+    /**
+     * get today's date without the time
+     * need to add one to get correct date
+     * @return today's date in format yyyy-mm-dd
+     **/
+    getToday() {
+      let date = new Date();
+      return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+    },
+
 
     calculateTotalPrice() {
       if (this.selectedInventoryItem != null) {
