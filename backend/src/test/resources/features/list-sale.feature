@@ -28,7 +28,7 @@ Feature: U22 - List sale
     Then The user will receive a bad request error and a message "Inventory with given id does not exist"
 
 
-  Scenario: User creates a Sale Listing but with an closing date in the past
+  Scenario: User creates a Sale Listing but with a closing date in the past
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
