@@ -92,9 +92,11 @@ export default {
           .then((resp) => {
             this.business = resp.data;
             return api.getUserCurrency(resp.data.address.country);
-          }).catch((error) => {
-        this.$log.debug(error);
-      })
+          })
+          .then(currencyData => this.currency = currencyData)
+          .catch((error) => {
+            this.$log.debug(error);
+          })
     },
 
     /**

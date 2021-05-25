@@ -2,7 +2,7 @@
 Listings Page
 -->
 <template>
-  <div>
+  <b-card>
     <h1 align="middle">{{ business.name }} Listings</h1>
     <b-row align-h="start">
       <h3>Sort by:</h3>
@@ -10,8 +10,8 @@ Listings Page
         <b-select v-model="sortProperty" value="name">
           <option value="name">Product Name</option>
           <option value="price">Price</option>
-          <option value="closes">Listing Closes</option>
-          <option value="opened">Listing Opens</option>
+          <option value="closing">Listing Closes</option>
+          <option value="created">Listing Opens</option>
         </b-select>
       </b-col>
       <b-col md="auto">
@@ -23,7 +23,7 @@ Listings Page
       <b-col md="auto">
         <b-button @click="sortListings">Sort</b-button>
       </b-col>
-      <b-col md="7" v-if="canEditListings">
+      <b-col v-if="canEditListings">
         <b-form-group>
           <b-button @click="openCreateListingModal" class="float-right">
             <b-icon-plus-square-fill/>
@@ -33,7 +33,7 @@ Listings Page
       </b-col>
     </b-row>
 
-    <b-row cols-lg="3" cols-xl="4">
+    <b-row cols-lg="3" >
       <b-col v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
         <b-card
             img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
@@ -46,25 +46,22 @@ Listings Page
             {{ listing.inventoryItem.product.manufacturer }}
           </b-card-sub-title>
           <b-card-text>
-
             <span>{{ listing.inventoryItem.product.description }}</span><br>
+            <hr>
             <b-list-group flush>
-              <b-list-group-item></b-list-group-item>
               <b-card-text>
                 <span
-                    v-if="listing.inventoryItem.manufactured">Manufactured: {{ listing.inventoryItem.manufactured }}</span><br>
+                    v-if="listing.inventoryItem.manufactured">Manufactured: {{ listing.inventoryItem.manufactured }}<br></span>
                 <span
-                    v-if="listing.inventoryItem.bestBefore">Best before: {{ listing.inventoryItem.manufactured }}</span><br>
-                <span v-if="listing.inventoryItem.sellBy">Sell by: {{ listing.inventoryItem.manufactured }}</span><br>
-                <span v-if="listing.inventoryItem.expires">Expires: {{ listing.inventoryItem.manufactured }}</span><br>
+                    v-if="listing.inventoryItem.bestBefore">Best before: {{ listing.inventoryItem.bestBefore }}<br></span>
+                <span v-if="listing.inventoryItem.sellBy">Sell by: {{ listing.inventoryItem.sellBy }}<br></span>
+                <span v-if="listing.inventoryItem.expires">Expires: {{ listing.inventoryItem.expires }}</span>
               </b-card-text>
             </b-list-group>
+            <hr>
             <b-list-group flush>
-              <b-list-group-item></b-list-group-item>
-
               <h3>
-                <b-button href="#" variant="primary" disabled>Purchase</b-button>
-                ${{ listing.price }}
+                {{ currency.symbol }}{{ listing.price }} {{currency.code}}
               </h3>
               <span v-if="listing.moreInfo">{{ listing.moreInfo }}</span>
             </b-list-group>
@@ -86,14 +83,18 @@ Listings Page
         :no-close-on-esc="!isListingCardReadOnly">
       <add-listing-card :disabled="isListingCardReadOnly"
                         :inventory="listingDisplayedInCard"
-                        :current-business="business"/>
+                        :current-business="business"
+                        @itemCreated="initListingPage"/>
     </b-modal>
 
-  </div>
+  </b-card>
 </template>
 
 <style scoped>
-
+hr {
+  margin-top: 0.4rem;
+  margin-bottom: 0.4rem;
+}
 
 </style>
 
@@ -122,6 +123,11 @@ export default {
       perPage: 12,
       currentPage: 1,
       totalResults: 0,
+      currency: {
+        symbol: '$',
+        code: 'USD',
+        name: 'US Dollar'
+      },
     }
   },
 
@@ -130,6 +136,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Page initilisation function
+     **/
     initListingPage: async function() {
       this.businessId = this.$route.params.id;
       await this.getBusinessInfo(this.businessId);
@@ -137,18 +146,28 @@ export default {
       this.sortListings();
       this.totalResults = this.cards.length
     },
-
+    /**
+     * Api request to get business information
+     **/
     async getBusinessInfo(businessId) {
       await api.getBusiness(businessId)
           .then((response) => {
             this.business = response.data;
+            return api.getUserCurrency(response.data.address.country);
           })
+          .then(currencyData => this.currency = currencyData)
           .catch((error) => {
             this.$log.debug(error);
           });
     },
 
 
+    /**
+     * Takes two inputs and compares them to each other based on the variable sortProperty
+     * @param  {string} a string that is being paired against
+     * @param  {string} b
+     * @return int
+     **/
     compare(a, b) {
       let less = 1;
       let more = -1;
@@ -188,9 +207,16 @@ export default {
 
       return 0;
     },
+    /**
+     * Sorts all the cards according to the custom sort function compare()
+     **/
     sortListings() {
       this.cards.sort(this.compare)
     },
+
+    /**
+     * Splits all the listings for pagination
+     **/
     splitListings() {
       return this.cards.slice((this.currentPage - 1) * this.perPage, this.perPage * this.currentPage);
     },

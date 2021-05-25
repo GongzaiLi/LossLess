@@ -189,7 +189,7 @@ name: "add-listing-card",
             this.$log.debug("Listing Created", listingResponse);
             this.listingId = listingResponse.data.listingId;
             this.$bvModal.hide('add-listing-card');
-            // this.setUpListingPage();//todo when create a listing will reload listing page.
+            this.$emit('itemCreated');
           })
           .catch((error) => {
             this.$log.debug(error);

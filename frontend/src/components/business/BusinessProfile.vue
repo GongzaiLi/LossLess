@@ -78,7 +78,7 @@ Date: 29/03/2021
             </b-button>
           </router-link>
           &nbsp;
-          <router-link :to="{ name: 'business-listings', params: { id: businessData.id }}">
+          <router-link :to="{ name: 'listings-page', params: { id: businessData.id }}">
             <b-button type="submit" variant="primary">
               <b-icon-receipt/> Sales List
             </b-button>
