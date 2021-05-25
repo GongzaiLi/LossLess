@@ -2,10 +2,9 @@
 Listings Page
 -->
 <template>
-
   <div>
     <h1 align="middle">Listings</h1>
-    <b-row align-h="end">
+    <b-row align-h="start">
       <h3>Sort by:</h3>
       <b-col md="auto">
     <b-select v-model="sortProperty" value="name">
@@ -21,7 +20,17 @@ Listings Page
       <option value="desc">Desc</option>
     </b-select>
       </b-col>
+      <b-col md="auto">
     <b-button @click="sortListings">Sort</b-button>
+      </b-col>
+      <b-col md="7" v-if="canEditListings">
+        <b-form-group>
+          <b-button @click="openCreateListingModal" class="float-right">
+            <b-icon-plus-square-fill/>
+            Create
+          </b-button>
+        </b-form-group>
+      </b-col>
     </b-row>
 
   <b-row cols-lg="3" cols-xl="4">
@@ -65,6 +74,14 @@ Listings Page
   </b-row>
     <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="cards.length"/>
 
+    <b-modal
+        id="add-listing-card" hide-header hide-footer
+        :no-close-on-backdrop="!isListingCardReadOnly"
+        :no-close-on-esc="!isListingCardReadOnly">
+      <add-listing-card :disabled="isListingCardReadOnly"
+                        :inventory="listingDisplayedInCard"
+                        :current-business="business"/>
+    </b-modal>
 
   </div>
 </template>
@@ -76,15 +93,22 @@ Listings Page
 
 <script>
 import pagination from "../model/Pagination";
+import AddListingCard from "./AddListingCard";
+import api from "../../Api";
 
 
 export default {
 
   components: {
     pagination,
+    AddListingCard,
   },
   data: function () {
     return {
+      business: {},
+      listingCardError: "",
+      listingDisplayedInCard: {},
+      isListingCardReadOnly: true,
       cards:[
         {
           "id": 57,
@@ -559,11 +583,19 @@ export default {
   },
 
   mounted() {
+    const businessId = this.$route.params.id;
+    this.getBusinessInfo(businessId)
     this.sortListings();
     this.totalResults=this.cards.length
   },
 
   methods: {
+
+    async getBusinessInfo(businessId){
+      this.business = (await api.getBusiness(businessId)).data;
+    },
+
+
     compare( a, b ) {
       let less=1;
       let more=-1;
@@ -613,10 +645,50 @@ export default {
       return this.cards.slice((this.currentPage-1)*this.perPage,this.perPage*this.currentPage);
     },
 
-
+    /**
+     *
+     **/
+    openCreateListingModal: function () {
+      this.isListingCardReadOnly = false;
+      this.listingDisplayedInCard = {
+        inventoryItem: '',
+        quantity: 0,
+        price: 0,
+        moreInfo: '',
+        created: '',
+        closes: ''
+      }
+      this.$bvModal.show('add-listing-card');
+    }
   },
 
+  computed: {
+
+    /**
+     * True if the user can edit this catalogue (ie they are an admin or acting as this business)
+     */
+    canEditListings: function () {
+      return this.$currentUser.role !== 'user' ||
+          (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
+    },
+  },
+
+
   watch: {
+
+    /**
+     * Watches the current user data (specifically, who the user is acting as). If this changes to someone without permission
+     * to access the catalogue, then a modal is shown informing them that they will be redirected to the business's home page.
+     */
+    $currentUser: {
+      handler() {
+        if (this.canEditCatalogue) {
+          this.refreshTable(this.$route.params.id);
+        }
+      },
+      deep: true, // So we can watch all the subproperties (eg. currentlyActingAs)
+    },
+
     /**
      * This watches for those routing changes, and will update the profile with the data of the business specified by the new route.
      * See https://router.vuejs.org/guide/essentials/dynamic-matching.html#reacting-to-params-changes for more info

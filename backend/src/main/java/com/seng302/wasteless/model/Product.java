@@ -10,8 +10,8 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
@@ -31,23 +31,19 @@ public class Product {
 
     @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "code", unique = true)
-    @Size(min = 0, max = 60)//Slightly higher than other maxes as business id is added as prefix to this
     private String id;
 
     @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
-    @Size(min = 0, max = 50)
     private String name;
 
     @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "description")
-    @Size(min = 0, max = 250)
     private String description;
 
     @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "manufacturer")
-    @Size(min = 0, max = 50)
     private String manufacturer;
 
     @PositiveOrZero
