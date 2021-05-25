@@ -116,9 +116,12 @@ public class User {
         LocalDate today = LocalDate.now();
 
         LocalDate minimumDOB = today.minusYears(16).plusDays(1);
-        LocalDate maximumDOB = today.minusYears(120);                                   //this is checked twice
+//         LocalDate maximumDOB = today.minusYears(120);
 
-        return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));
+
+        return (this.dateOfBirth.isBefore(minimumDOB));
+
+//         return (this.dateOfBirth.isBefore(minimumDOB) && this.dateOfBirth.isAfter(maximumDOB));  // no such requirement in backlog
     }
     /**
      * Add a business to the list of businessesPrimarilyAdministered.
