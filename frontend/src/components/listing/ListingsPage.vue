@@ -68,7 +68,7 @@ Listings Page
           </b-card-text>
           <b-card-footer>
             Created:{{ listing.created }}<br>
-            Closes:{{ listing.closes }}
+            <span v-if="listing.closes">Closes:{{ listing.closes }}</span>
           </b-card-footer>
 
 

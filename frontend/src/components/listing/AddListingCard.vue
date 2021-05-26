@@ -13,16 +13,16 @@ Date: 23/5/2021
           <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
         </div>
         <b-card-body>
-          <h6 class="mb-2"><strong>Inventory Item ID *:</strong></h6>
+          <h6 class="mb-2"><strong>Inventory Item *:</strong></h6>
           <p :hidden="disabled" style="margin:0">
-            Enter the ID of a product in your inventory, or select a product using the 'Select Product' button.<br></p>
+            Select an inventory entry using the 'Select Product' button.<br></p>
           <b-input-group class="mb-2">
             <b-form-input
                 type="text" maxlength="50"
                 pattern="[a-zA-Z0-9\d\-_\s]{0,100}"
-                :disabled="disabled"
-                placeholder="Inventory-Item-ID"
-                v-model="listingData.inventoryItemId"
+                disabled
+                placeholder="No item selected"
+                :value="selectedInventoryItem ? selectedInventoryItem.product.id:''"
                 autofocus required/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectInventoryItemModal">Select Inventory Item</b-button>
@@ -253,7 +253,7 @@ name: "add-listing-card",
 
     selectInventoryItem(inventory) {
       this.selectedInventoryItem = inventory;
-      this.listingData.inventoryItemId = inventory.product.id;
+      this.listingData.inventoryItemId = inventory.id;
       this.calculateTotalPrice();
       this.$bvModal.hide('select-inventory-item');
     },
