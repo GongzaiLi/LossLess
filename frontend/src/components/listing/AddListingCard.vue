@@ -31,7 +31,7 @@ Date: 23/5/2021
 
           <h6><strong>Quantity *:</strong></h6>
           <b-input-group class="mb-2">
-            <b-form-input type="number" maxlength="50" :min="1" :disabled="disabled" v-model="listingData.quantity"
+            <b-form-input type="number" maxlength="50" max="1000000000" :min="1" :disabled="disabled" v-model="listingData.quantity"
                           @input="calculateTotalPrice" required/>
           </b-input-group>
 
@@ -43,7 +43,7 @@ Date: 23/5/2021
               <b-input-group-text>{{ currency.symbol }}</b-input-group-text>
             </template>
             <b-form-input
-                type="number" maxlength="15"
+                type="number" maxlength="15" max="1000000000"
                 step=".01" min=0 placeholder=0
                 :disabled="disabled"
                 v-model="listingData.price"
@@ -58,6 +58,7 @@ Date: 23/5/2021
           </b-input-group>
           <b-input-group class="mb-2">
             <b-form-input type="text"
+                          maxLength=250
                           :disabled="disabled"
                           autocomplete="off"
                           v-model="listingData.moreInfo"/>
