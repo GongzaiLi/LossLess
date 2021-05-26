@@ -30,7 +30,7 @@ beforeEach(() => {
     wrapper = shallowMount(AddListingCard, {
         localVue,
         propsData: {
-            setUpListingPage: () => {
+            refreshListingCard: () => {
             },
         },
         mocks: {$route, $log},
@@ -41,9 +41,43 @@ afterEach(() => {
     wrapper.destroy();
 });
 
+describe('testing create listing', () => {
+
+    beforeEach(()=> {
+        wrapper.vm.selectedInventoryItem = {expires: "3000-12-12", product: {id: 1}};
+        Api.createListing.mockResolvedValue({response: {status: 201}, data: {listingId: 0}});
+    })
+
+    test('quantity is 0 Error message in listing card error', () => {
+        wrapper.vm.listingData.quantity = 0;
+        wrapper.vm.createListing();
+        expect(wrapper.vm.listingCardError).toBe("Quantity must be more than zero");
+    })
+    test('closes date is null, date is set to expiry date', () => {
+        wrapper.vm.listingData.closes = null;
+        wrapper.vm.createListing();
+        expect(wrapper.vm.listingData.closes).toBe( wrapper.vm.selectedInventoryItem.expires);
+    })
+    test('closes time is null time set to 00:00:00', () => {
+        wrapper.vm.listingData.closesTime = null;
+        wrapper.vm.createListing();
+        expect(wrapper.vm.listingData.closesTime).toBe("00:00:00");
+
+    })
+    test('closes is in past Error message in listing card error', () => {
+        wrapper.vm.listingData.closes = wrapper.vm.getToday();
+        wrapper.vm.listingData.closesTime = "00:00:00";
+        wrapper.vm.createListing();
+        expect(wrapper.vm.listingCardError).toBe("Listing must close in the future, Check the time of closure");
+    })
+})
+
 
 describe('Testing api post request (Create a new Listing function)', () => {
 
+    beforeEach(()=> {
+        wrapper.vm.selectedInventoryItem = {expires: "3000-12-12", product: {id: 1}};
+    })
 
     it('Successfully creates a Listing ', async () => {
         Api.createListing.mockResolvedValue({response: {status: 201}, data: {listingId: 0}});
@@ -83,3 +117,18 @@ describe('Testing api post request (Create a new Listing function)', () => {
         expect(wrapper.vm.listingCardError).toBe("Server error");
     });
 })
+
+describe('Check correct Date and times are returned', () => {
+    test("getToday returns the date of today", () => {
+        let date = new Date();
+        let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+        expect(wrapper.vm.getToday()).toBe(today);
+    });
+    test("getTimeNow returns current time", () => {
+        let date = new Date();
+        let now = date.getHours() + ":" + date.getMinutes();
+        expect(wrapper.vm.getTimeNow()).toBe(now);
+    })
+})
+
+

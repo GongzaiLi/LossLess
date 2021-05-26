@@ -46,7 +46,8 @@ Date: 11/5/2021
                              :currency="currency"
                              :inventory="inventoryDisplayedInCard"
                              :edit-modal="editInventoryItem"
-                             :current-business="business"/>
+                             :current-business="business"
+                             :set-up-inventory-page="refreshTable"/>
     </b-modal>
 
   </div>
@@ -84,10 +85,19 @@ export default {
     this.getBusinessInfo();
   },
   methods: {
+    /**
+     * refresh the inventory table
+     **/
+    refreshTable: async function() {
+      const businessId = this.$route.params.id;
+      await this.$refs.inventoryTable.getBusinessInfo(businessId);
 
+    },
+    /**
+     * call api read the business information
+     **/
     async getBusinessInfo() {
       const businessId = this.$route.params.id;
-
       api.getBusiness(businessId)
           .then((resp) => {
             this.business = resp.data;

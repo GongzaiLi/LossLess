@@ -49,15 +49,17 @@ export const initializeAuth = async function() {
     if (userId) {
         try {
             Vue.set(instance.$data, '$currentUser', (await Api.getUser(userId)).data);
-            setCurrentlyActingAs(null);
         } catch (e) {
             // We were probably logged out, so just leave $currentUser as null
             instance.$data.$currentUser = null;
+            return;
         }
         const actingAsId = getFromLocalStorage('currentlyActingAsId');
         if (actingAsId) {
             const actingAsObject = getBusinessActingAs(instance.$data.$currentUser, actingAsId)
             setCurrentlyActingAs(actingAsObject);
+        } else {
+            setCurrentlyActingAs(null);
         }
     }
 }
