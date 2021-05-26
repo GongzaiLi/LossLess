@@ -42,7 +42,7 @@ Date: 13/5/2021
               <b-input-group-text>{{ currency.symbol }}</b-input-group-text>
             </template>
             <b-form-input
-              type="number" maxlength="15"
+              type="number" maxlength="15" max="1000000000"
               step=".01" min=0 placeholder=0
               :disabled="disabled"
               @input="calculateTotalPrice"
@@ -62,7 +62,7 @@ Date: 13/5/2021
               <b-input-group-text>{{ currency.symbol }}</b-input-group-text>
             </template>
             <b-form-input
-              type="number" maxlength="15"
+              type="number" maxlength="15" max="1000000000"
               step=".01" min=0 placeholder=0
               :disabled="disabled"
               v-model="inventoryInfo.totalPrice"

@@ -5,7 +5,6 @@ import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import com.seng302.wasteless.view.InventoryViews;
 import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -15,11 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
@@ -73,6 +77,8 @@ public class ListingController {
                     "Access token is invalid");
         }
         logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+
+
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -155,4 +161,47 @@ public class ListingController {
         logger.info("{}", listings);
         return ResponseEntity.status(HttpStatus.OK).body(listings);
     }
+
+
+
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException exception) {
+        Map<String, String> errors = new HashMap<>();
+        exception.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+//            logger.error(errorMessage); doesnt work. I am not sure why.
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
+
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Map<String, String> handleValidationExceptions(
+            ConstraintViolationException exception) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        String constraintName = exception.getConstraintViolations().toString();
+        String errorMsg = exception.getMessage();
+
+        errors.put(constraintName, errorMsg);
+        return errors;
+    }
+
 }

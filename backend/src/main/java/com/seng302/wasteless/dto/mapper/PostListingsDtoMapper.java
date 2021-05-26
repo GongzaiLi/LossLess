@@ -7,8 +7,6 @@ import com.seng302.wasteless.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-
 @Component
 public class PostListingsDtoMapper {
 
