@@ -5,7 +5,6 @@ import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import com.seng302.wasteless.view.InventoryViews;
 import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;

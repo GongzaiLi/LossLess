@@ -1,13 +1,15 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.repository.InventoryRepository;
 import com.seng302.wasteless.repository.ListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Listing service applies product logic over the Product JPA repository.
+ */
 @Service
 public class ListingsService {
     private final ListingRepository listingRepository;
