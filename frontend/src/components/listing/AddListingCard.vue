@@ -142,6 +142,9 @@ name: "add-listing-card",
       type: Boolean,
       default: false
     },
+    refreshListingCard: {
+      type: Function
+    }
   },
   data() {
     return {
@@ -160,9 +163,6 @@ name: "add-listing-card",
     }
   },
 
-  mounted() {
-    this.setUpListingCard();
-  },
 
   methods: {
 
@@ -210,6 +210,7 @@ name: "add-listing-card",
             this.listingId = listingResponse.data.listingId;
             this.$bvModal.hide('add-listing-card');
             this.$emit('itemCreated');
+            this.refreshListingCard();
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -232,9 +233,12 @@ name: "add-listing-card",
         return "Server error";
       }
     },
-    setUpListingCard() {
-    },
 
+    /**
+     * converts date to a more readable format if not null
+     * @param date to be displayed
+     * @return date String in readable format
+     **/
     setDate(date) {
       if (date != null) {
         return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')

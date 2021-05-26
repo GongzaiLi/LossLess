@@ -65,14 +65,14 @@ describe('initializeAuth', () => {
     expect(getCurrentUser()).toStrictEqual({id: 1, name: 'blah', businessesAdministered: [{id: 1}], currentlyActingAs: null});
   })
 
-  // test('works when user exists but API fails', async () => {
-  //   localStorage.getItem.mockReturnValueOnce("1");
-  //   Api.getUser.mockRejectedValueOnce(new Error());
-  //
-  //   await initializeAuth();
-  //
-  //   expect(getCurrentUser()).toBe(null);
-  // })
+  test('works when user exists but API fails', async () => {
+    localStorage.getItem.mockReturnValueOnce("1");
+    Api.getUser.mockRejectedValueOnce(new Error());
+
+    await initializeAuth();
+
+    expect(getCurrentUser()).toBe(null);
+  })
 
   test('works when user exists and acting as a business', async () => {
     const userData = {id: 1, name: 'blah', businessesAdministered: [{id: 2}]};

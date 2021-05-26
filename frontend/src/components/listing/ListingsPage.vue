@@ -3,6 +3,7 @@ Listings Page
 -->
 <template>
   <b-card>
+    <b-container>
     <h1 align="middle">{{ business.name }} Listings</h1>
     <b-row align-h="start">
       <h3>Sort by:</h3>
@@ -33,14 +34,13 @@ Listings Page
       </b-col>
     </b-row>
 
-    <b-row cols-lg="3" >
+
+    <b-row cols-lg="3" style="margin-left: -38px">
       <b-col v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
-        <b-card
-            img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
-            img-alt="Image"
-            img-top
-            style="min-width: 17rem; height: 100%"
-        >
+        <b-card style="min-width: 17rem; height: 100%">
+          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
+                 alt="Default Image"></b-img>
+          <hr>
           <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
           <b-card-sub-title v-if="listing.inventoryItem.product.manufacturer">
             {{ listing.inventoryItem.product.manufacturer }}
@@ -70,13 +70,12 @@ Listings Page
             Created:{{ listing.created }}<br>
             <span v-if="listing.closes">Closes:{{ listing.closes }}</span>
           </b-card-footer>
-
-
         </b-card>
       </b-col>
     </b-row>
-    <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="cards.length"/>
 
+    <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="cards.length"/>
+    </b-container>
     <b-modal
         id="add-listing-card" hide-header hide-footer
         :no-close-on-backdrop="!isListingCardReadOnly"
@@ -85,9 +84,9 @@ Listings Page
                         :inventory="listingDisplayedInCard"
                         :current-business="business"
                         :currency="currency"
-                        @itemCreated="initListingPage"/>
+                        @itemCreated="initListingPage"
+                        :refresh-listing-card="initListingPage"/>
     </b-modal>
-
   </b-card>
 </template>
 
@@ -124,6 +123,7 @@ export default {
       perPage: 12,
       currentPage: 1,
       totalResults: 0,
+      mainProps: {blank: true, width: 250, height: 200},
       currency: {
         symbol: '$',
         code: 'USD',

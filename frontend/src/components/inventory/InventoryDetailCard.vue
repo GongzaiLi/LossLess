@@ -293,6 +293,7 @@ export default {
       } else {
         await this.createInventory();
       }
+
     },
 
     /**
@@ -307,7 +308,7 @@ export default {
           .then((createInventoryResponse) => {
             this.$log.debug("Inventory Created", createInventoryResponse);
             this.$bvModal.hide('inventory-card');
-            this.setUpInventoryPage();// update the table
+            this.setUpInventoryPage();
           })
           .catch((error) => {
             this.handleApiError(error);

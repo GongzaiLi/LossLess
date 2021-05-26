@@ -52,6 +52,7 @@ export const initializeAuth = async function() {
         } catch (e) {
             // We were probably logged out, so just leave $currentUser as null
             instance.$data.$currentUser = null;
+            return;
         }
         const actingAsId = getFromLocalStorage('currentlyActingAsId');
         if (actingAsId) {

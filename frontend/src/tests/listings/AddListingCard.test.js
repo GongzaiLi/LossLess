@@ -30,7 +30,7 @@ beforeEach(() => {
     wrapper = shallowMount(AddListingCard, {
         localVue,
         propsData: {
-            setUpListingPage: () => {
+            refreshListingCard: () => {
             },
         },
         mocks: {$route, $log},
