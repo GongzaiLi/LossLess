@@ -51,6 +51,13 @@ the following gitlab CI variables are used instead:
 
 If you do not have these environment variables defined then the application will not start.
 
+## Third Party Dependencies
+### Frontend:
+ - Vue-Router (3.5 or greater)
+ - Bootstrap Vue (2.21 or greater)
+### Backend:
+*None*
+
 ## Contributors
 
 - SENG302 teaching team

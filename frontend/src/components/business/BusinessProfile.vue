@@ -87,6 +87,16 @@ Date: 29/03/2021
         </b-container>
       </b-card-body>
 
+
+      <b-list-group v-if="isAdminOfThisBusiness && !isAdmin" border-variant="secondary">
+        <b-list-group-item>
+          <h6><strong>You're an administrator of this business. To view the business inventory
+            and catalogue, you must first be acting as this business.</strong>
+            <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business
+            ('{{ businessData.name }}') from the drop-down menu.</h6>
+        </b-list-group-item>
+      </b-list-group>
+
       <b-list-group border-variant="secondary" v-if="isAdmin">
         <b-list-group-item>
           <b-card-text style="text-align: justify">
@@ -388,6 +398,18 @@ export default {
     isAdmin: function() {
       return this.$currentUser.role !== 'user' ||
           (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
+    },
+
+    /**
+     * Returns true the user is an admin of this business, otherwise returns false
+     */
+    isAdminOfThisBusiness: function () {
+      for (const business of this.$currentUser.businessesAdministered) {
+        if (business.id === parseInt(this.$route.params.id)) {
+          return true;
+        }
+      }
+      return false;
     },
 
     /**
