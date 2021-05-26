@@ -88,7 +88,7 @@ Date: 29/03/2021
       </b-card-body>
 
 
-      <b-list-group v-if="isAdminOfThisBusiness && !isAdmin" border-variant="secondary" v-show="businessData.description">
+      <b-list-group v-if="isAdminOfThisBusiness && !isAdmin" border-variant="secondary">
         <b-list-group-item>
           <h6><strong>You're an administrator of this business. To view the business inventory
             and catalogue, you must first be acting as this business.</strong>
@@ -404,8 +404,10 @@ export default {
      * Returns true the user is an admin of this business, otherwise returns false
      */
     isAdminOfThisBusiness: function () {
+      console.log(this.$currentUser.businessesAdministered);
       for (const business of this.$currentUser.businessesAdministered) {
         if (business.id === parseInt(this.$route.params.id)) {
+          console.log(business.id);
           return true;
         }
       }
