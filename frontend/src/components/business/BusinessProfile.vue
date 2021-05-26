@@ -404,10 +404,8 @@ export default {
      * Returns true the user is an admin of this business, otherwise returns false
      */
     isAdminOfThisBusiness: function () {
-      console.log(this.$currentUser.businessesAdministered);
       for (const business of this.$currentUser.businessesAdministered) {
         if (business.id === parseInt(this.$route.params.id)) {
-          console.log(business.id);
           return true;
         }
       }

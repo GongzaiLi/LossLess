@@ -9,6 +9,7 @@ import makeAdminModal from "../../components/business/MakeAdminModal";
 let userData = {
     id: 1,
     currentlyActingAs: null,
+  businessesAdministered: [],
   }
 ;
 
