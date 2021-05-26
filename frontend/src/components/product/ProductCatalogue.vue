@@ -73,6 +73,7 @@ export default {
   data: function () {
     return {
       businessName: "",
+      business : {},
       currency: {
         symbol: '$',
         code: 'USD',
@@ -90,9 +91,27 @@ export default {
   },
   mounted() {
     const businessId = this.$route.params.id;
+    this.getBusinessInformation(businessId);
     this.refreshTable(businessId);
   },
   methods: {
+
+    /**
+     * Api request to get business information
+     **/
+    async getBusinessInformation(businessId) {
+      await api.getBusiness(businessId)
+          .then((response) => {
+            this.business = response.data;
+            return api.getUserCurrency(response.data.address.country);
+          })
+          .then(currencyData => this.currency = currencyData)
+          .catch((error) => {
+            this.$log.debug(error);
+          });
+    },
+
+
     refreshTable: async function(businessId) {
       const curBusiness = (await Api.getBusiness(businessId)).data;
       this.businessName = curBusiness.name;

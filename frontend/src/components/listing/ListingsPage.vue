@@ -84,6 +84,7 @@ Listings Page
       <add-listing-card :disabled="isListingCardReadOnly"
                         :inventory="listingDisplayedInCard"
                         :current-business="business"
+                        :currency="currency"
                         @itemCreated="initListingPage"/>
     </b-modal>
 
