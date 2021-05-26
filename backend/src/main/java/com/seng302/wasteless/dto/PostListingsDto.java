@@ -38,6 +38,7 @@ public class PostListingsDto {
     private double price;
 
     @Column(name = "moreInfo")
+    @Size(min = 0, max = 250, message = "Info field is too long")
     private String moreInfo;
 
     @Future
