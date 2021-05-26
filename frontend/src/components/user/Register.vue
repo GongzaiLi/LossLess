@@ -138,7 +138,7 @@ import api from "../../Api";
 import AddressInput from "../model/AddressInput";
 
 const MIN_AGE_YEARS = 13;
-const MAX_AGE_YEARS = 130;
+const MAX_AGE_YEARS = 120;
 const UNIX_EPOCH_YEAR = 1970;
 
 export default {
@@ -238,10 +238,10 @@ export default {
         .catch((error) => {
           this.errors = [];
           this.$log.debug(error);
-          if ((error.response && error.response.status === 400)) {
-            this.errors.push("Registration failed.");
+          if (error.response) {
+            this.errors.push(`Registration failed: ${error.response.data}`);
           } else {
-            this.errors.push(error.message);
+            this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
           }
         });
     },
@@ -279,8 +279,8 @@ export default {
 
       if (yearsSinceBirthDay < MIN_AGE_YEARS) {
         return "You must be at least 13 years old";
-      } else if (yearsSinceBirthDay > MAX_AGE_YEARS) {
-        return "Please enter a valid birthdate"
+      } else if (yearsSinceBirthDay >= MAX_AGE_YEARS) {
+        return "You cannot be older than 120 years"
       }
       return "";
     }
