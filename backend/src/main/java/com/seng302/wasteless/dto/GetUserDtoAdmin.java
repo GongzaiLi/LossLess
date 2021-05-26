@@ -1,9 +1,9 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.BusinessAdministered;
 import com.seng302.wasteless.model.UserRoles;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -17,6 +17,7 @@ import java.util.List;
  * for application admins and when user get their own data.
  * User entities are transformed into GetUserDto via the GetUserDtoMapper
  */
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true) //Allows chaining of getters and setters
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)

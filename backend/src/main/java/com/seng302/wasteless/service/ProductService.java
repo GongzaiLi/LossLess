@@ -1,9 +1,7 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.model.Business;
+
 import com.seng302.wasteless.model.Product;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.repository.BusinessRepository;
 import com.seng302.wasteless.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,11 +45,9 @@ public class ProductService {
     /**
      * Saves the given product object with updated fields in Database
      *
-     * @param oldProduct    The old product object to delete in the DB
      * @param newProduct    The new product object to save in the DB
      */
-    public void updateProduct(Product oldProduct, Product newProduct) {
-        productRepository.delete(oldProduct);
+    public void updateProduct(Product newProduct) {
         productRepository.save(newProduct);
     }
 

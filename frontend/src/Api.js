@@ -29,19 +29,15 @@
  * Declare all available services here
  */
 import axios from 'axios'
-import {getCurrentlyActingAs} from './auth'
-
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
-
-const businessActingAs = getCurrentlyActingAs();
-let businessActingAsId = businessActingAs ? businessActingAs.id : null;
 
 const instance = axios.create({
   baseURL: SERVER_URL,
   timeout: 5000,
-  headers: {'X-Business-Acting-As': businessActingAsId}
 });
+
+let currencyCache = {};
 
 export default {
   login: (loginData) => instance.post('login', loginData, {withCredentials: true}),
@@ -52,12 +48,17 @@ export default {
   searchUser: (searchParameter) => instance.get(`users/search?searchQuery=${searchParameter}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
-  postBusiness: (businessData) => instance.post('businesses', businessData, {withCredentials: true}),
-  setBusinessActingAs: (businessId) => businessActingAsId = businessId,
+  postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
   modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials:true}),
+  createInventory: (id,inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
+  getInventory: (id) => instance.get(`/businesses/${id}/inventory`, {withCredentials: true}),
+  modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials:true}),
+  createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
+  getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials:true}),
+
 
   /**
    * Given the name of the user's country, gets currency data for that country.
@@ -68,6 +69,10 @@ export default {
    * @returns {Promise<any>} Promise that resolves to the currency data object
    */
   getUserCurrency: (countryName) => {
+    if (countryName in currencyCache) {
+      return Promise.resolve(currencyCache[countryName]);
+    }
+
     return fetch(`https://restcountries.eu/rest/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
       .then(resp => resp.json())
       .then(data => {
@@ -78,10 +83,10 @@ export default {
         if (!currency.code || !currency.name || !currency.symbol) { // Sometimes we get garbage data like {"code":"(none)","name":null,"symbol":null}
           return null;
         } else {
+          currencyCache[countryName] = currency;
           return currency;
         }
       })
-
   }
 }
 

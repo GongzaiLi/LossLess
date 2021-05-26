@@ -9,6 +9,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,10 +38,12 @@ public class Business {
     @JsonView({BusinessViews.PostBusinessRequestView.class})
     @NotBlank(message = "name is mandatory")
     @Column(name = "name")
+    @Size(min = 0, max = 50)
     private String name;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
     @Column(name = "description")
+    @Size(min = 0, max = 250)
     private String description;
 
     @JsonView({BusinessViews.PostBusinessRequestView.class})
@@ -68,4 +71,29 @@ public class Business {
     }
 
     public void removeAdministrator(User user) {this.administrators.remove(user);}
+
+    /**
+     * Check if the given user is an administrator of this business
+     * @param user The user to check administrative status of
+     * @return true if user admin, false otherwise
+     */
+    public boolean checkUserIsAdministrator(User user) {
+        for (User administrator: administrators) {
+            if (user.getId().equals(administrator.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the given user is the primary administrator of this business
+     * @param user The user to check primary administrative status of
+     * @return true if user primary admin, false otherwise
+     */
+    public boolean checkUserIsPrimaryAdministrator(User user) {
+        return primaryAdministrator.getId().equals(user.getId());
+    }
+
+
 }

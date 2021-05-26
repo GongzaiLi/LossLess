@@ -16,13 +16,13 @@ Date: 26/3/2021
         <b-form-group
         >
           <strong>Business name *</strong>
-          <b-form-input v-model="name" required placeholder="Business Name" autofocus></b-form-input>
+          <b-form-input v-model="name" required placeholder="Business Name" maxlength="50" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Description</strong>
-          <b-form-textarea v-model="description" placeholder="Description"></b-form-textarea>
+          <b-form-textarea v-model="description" placeholder="Description" maxlength="250"></b-form-textarea>
         </b-form-group>
 
         <b-form-group>
@@ -35,14 +35,14 @@ Date: 26/3/2021
           </strong>
           <div class="input-group mb-xl-5">
 
-            <select v-model="businessType" required>
+            <b-select v-model="businessType" required>
               <option disabled value=""> Choose ...</option>
               <option> Accommodation and Food Services</option>
               <option> Retail Trade</option>
               <option> Charitable organisation</option>
               <option> Non-profit organisation</option>
 
-            </select>
+            </b-select>
 
           </div>
 
@@ -60,6 +60,15 @@ Date: 26/3/2021
         </b-alert>
       </div>
     </b-card>
+
+    <b-card id="create-business-locked-card" v-else-if="this.$currentUser.currentlyActingAs">
+      <b-card-title>
+        <b-icon-lock/> Can't create business while acting as a business
+      </b-card-title>
+      <h6 ><strong>You can't create a business while acting as a business. You must be acting as a user</strong>
+        <br><br>To do so, click your profile picture on top-right of the screen. Then, select your name ('{{$currentUser.firstName}}') from the drop-down menu.</h6>
+    </b-card>
+
     <b-card v-else>
       <b-card-title>
         Not old enough to create a business
@@ -155,8 +164,7 @@ export default {
   computed: {
     canCreateBusiness: function() {
       const monthsAndYearsBetween = getMonthsAndYearsBetween(new Date(this.$currentUser.dateOfBirth), Date.now());
-      console.log(this.$currentUser.dateOfBirth);
-      return monthsAndYearsBetween.years >= MIN_AGE_TO_CREATE_BUSINESS;
+      return monthsAndYearsBetween.years >= MIN_AGE_TO_CREATE_BUSINESS && !this.$currentUser.currentlyActingAs;
     }
   }
 }

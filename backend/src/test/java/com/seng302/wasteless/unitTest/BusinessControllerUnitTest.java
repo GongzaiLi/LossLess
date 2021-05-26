@@ -1,11 +1,10 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.unitTest;
 
 
 import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
-import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockBusinessServiceConfig;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Test;
@@ -19,9 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.LocalDate;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -48,6 +47,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -55,6 +55,7 @@ public class BusinessControllerUnitTest {
                 "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -66,6 +67,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -73,6 +75,7 @@ public class BusinessControllerUnitTest {
                 "  }, \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -85,6 +88,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -92,6 +96,7 @@ public class BusinessControllerUnitTest {
                 "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -103,6 +108,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"name\": \"James's Peanut Store\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -114,6 +120,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -121,6 +128,7 @@ public class BusinessControllerUnitTest {
                 "  }, \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -132,6 +140,7 @@ public class BusinessControllerUnitTest {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -139,6 +148,7 @@ public class BusinessControllerUnitTest {
                 "  }, \"businessType\": \"Accommodation and Food Services\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
+                .with(csrf())
                 .content(business)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -151,6 +161,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -162,6 +173,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -174,6 +186,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/3/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
@@ -186,6 +199,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -197,6 +211,7 @@ public class BusinessControllerUnitTest {
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
+                .with(csrf())
                 .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());

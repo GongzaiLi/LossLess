@@ -2,7 +2,6 @@ import {createLocalVue, mount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import NavBar from '../../components/model/Navbar'; // name of your Vue component
 import Auth from '../../auth'
-import Api from '../../Api'
 
 let wrapper;
 
@@ -11,6 +10,10 @@ const $route = {
   params: {
     id: 0
   }
+}
+
+const $router = {
+  push: jest.fn()
 }
 
 let userData = {
@@ -23,6 +26,7 @@ let userData = {
   "email": "johnsmith99@gmail.com",
   "dateOfBirth": "1999-04-27",
   "phoneNumber": "+64 3 555 0129",
+  currentlyActingAs: null,
   "homeAddress": {
     "streetNumber": "3/24",
     "streetName": "Ilam Road",
@@ -68,8 +72,8 @@ beforeEach(() => {
   wrapper = mount(NavBar, {
     localVue,
     propsData: {},
-    mocks: {$route, $currentUser},
-    stubs: {},
+    mocks: {$route, $router, $currentUser},
+    stubs: ['router-link'],
     methods: {},
     computed: {},
   })
@@ -124,16 +128,53 @@ describe('User Drop Down', () => {
 });
 
 
+describe('User role', () => {
+  test('works for admin', async () => {
+    wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userBadgeRole).toEqual("Site Admin");
+  })
+  test('works for dgaa', async () => {
+    wrapper.vm.$currentUser.role = 'defaultGlobalApplicationAdmin';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userBadgeRole).toEqual("Default Site Admin");
+  })
+  test('works for user', async () => {
+    wrapper.vm.$currentUser.role = 'user';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.userBadgeRole).toEqual("");
+  })
+});
+
+
+describe('Got to profile', () => {
+  test('works when acting as user', async () => {
+    await wrapper.find("#go-to-profile a").trigger("click");
+    await wrapper.vm.$nextTick();
+
+    expect($router.push).toHaveBeenCalledWith({path: '/users/100'});
+  })
+
+  test('works when acting as business', async () => {
+    wrapper.vm.$currentUser.currentlyActingAs = {id: 69};
+    await wrapper.vm.$nextTick();
+    await wrapper.find("#go-to-profile a").trigger("click");
+    await wrapper.vm.$nextTick();
+
+    expect($router.push).toHaveBeenCalledWith({path: '/businesses/69'});
+  })
+});
+
 describe('Act as business', () => {
   test('works on click with single business', async () => {
-    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
     await wrapper.find(".business-name-drop-down a").trigger("click");
     await wrapper.vm.$nextTick();
-    expect(actAsBusiness).toHaveBeenCalledWith(100);
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(0);
     expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.find("#profile-name").text()).toEqual("Lumbridge General Store");
     expect(wrapper.find(".user-name-drop-down").text()).toBe("John");
+
+    expect(wrapper.html()).not.toContain("Create Business");
 
     userData.currentlyActingAs = null;
   })
@@ -143,22 +184,21 @@ describe('Act as business', () => {
 
     await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
 
-    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
     await wrapper.find(".user-name-drop-down a").trigger("click");
     await wrapper.vm.$nextTick();
-    expect(actAsBusiness).toHaveBeenCalledWith(null);
     expect(wrapper.findAll(".business-name-drop-down").length).toEqual(1);
     expect(wrapper.find(".business-name-drop-down").text()).toBe("Lumbridge General Store");
     expect(wrapper.find("#profile-name").text()).toEqual("John");
     expect(wrapper.findAll("hr").length).toEqual(2);
     expect(wrapper.findAll(".user-name-drop-down").length).toBe(0);
 
+    expect(wrapper.html()).toContain("Create Business");
+
     userData.currentlyActingAs = null;
   })
 
   test('works on click with multiple business', async () => {
     const prevUser = JSON.parse(JSON.stringify(userData));
-    const actAsBusiness = jest.spyOn(Api, 'setBusinessActingAs');
 
     userData.businessesAdministered.push({
       "id": 101,
@@ -172,8 +212,6 @@ describe('Act as business', () => {
 
     await wrapper.findAll(".business-name-drop-down a").at(1).trigger("click");
     await wrapper.vm.$nextTick();
-
-    expect(actAsBusiness).toHaveBeenCalledWith(101);
 
     expect(wrapper.find("#profile-name").text()).toEqual("Another Store Name");
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(1);

@@ -1,7 +1,6 @@
-package com.seng302.wasteless;
+package com.seng302.wasteless.integrationTest;
 
 import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +34,7 @@ public class UserControllerIntegrationTests {
     String homeAddress = "{\n" +
             "    \"streetNumber\": \"3/24\",\n" +
             "    \"streetName\": \"Ilam Road\",\n" +
+            "    \"suburb\": \"Riccarton\",\n" +
             "    \"city\": \"Christchurch\",\n" +
             "    \"region\": \"Canterbury\",\n" +
             "    \"country\": \"New Zealand\",\n" +
@@ -153,6 +153,7 @@ public class UserControllerIntegrationTests {
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1238@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -167,6 +168,7 @@ public class UserControllerIntegrationTests {
         String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF7\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -182,6 +184,7 @@ public class UserControllerIntegrationTests {
         String user3 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1236@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -196,6 +199,7 @@ public class UserControllerIntegrationTests {
         String user4 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"12345@efsf\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -300,6 +304,7 @@ public class UserControllerIntegrationTests {
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
@@ -314,6 +319,7 @@ public class UserControllerIntegrationTests {
         String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
                 "    \"city\": \"Christchurch\",\n" +
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +

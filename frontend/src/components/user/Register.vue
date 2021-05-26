@@ -17,37 +17,37 @@ Date: 3/3/2021
         <b-form-group
         >
           <strong>First Name *</strong>
-          <b-form-input v-model="firstName" required placeholder="First Name" autofocus></b-form-input>
+          <b-form-input v-model="firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Last Name *</strong>
-          <b-form-input v-model="lastName" required placeholder="Last Name"></b-form-input>
+          <b-form-input v-model="lastName" maxLength=50 required placeholder="Last Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Middle Name</strong>
-          <b-form-input v-model="middleName" placeholder="Middle Name"></b-form-input>
+          <b-form-input v-model="middleName" maxLength=50 placeholder="Middle Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Nickname</strong>
-          <b-form-input v-model="nickname" placeholder="Nick Name"></b-form-input>
+          <b-form-input v-model="nickname" maxLength=50 placeholder="Nick Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Bio</strong>
-          <b-form-textarea v-model="bio" placeholder="Enter your Bio"></b-form-textarea>
+          <b-form-textarea v-model="bio" maxLength=250 placeholder="Enter your Bio"></b-form-textarea>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Email *</strong>
-          <b-form-input required type="email" v-model="email" placeholder="Email"></b-form-input>
+          <b-form-input required type="email" maxLength=50 v-model="email" placeholder="Email"></b-form-input>
         </b-form-group>
 
         <b-form-group>
@@ -55,6 +55,7 @@ Date: 3/3/2021
           <div class="input-group mb-2 mr-sm-2">
             <b-form-input v-bind:type="passwordType" required
                           v-model=password
+                          maxLength=50
                           class="form-control"
                           placeholder="Password"
                           autocomplete="off"/>
@@ -72,6 +73,7 @@ Date: 3/3/2021
           <div class="input-group mb-2 mr-sm-2">
             <b-form-input v-bind:type="confirmPasswordType" required
                           v-model=confirmPassword
+                          maxLength=50
                           class="form-control"
                           id="confirmPasswordInput"
                           placeholder="Confirm Password"
@@ -107,6 +109,7 @@ Date: 3/3/2021
         >
           <strong>Phone Number</strong>
           <b-form-input v-model="phoneNumber"
+                        maxLength=50
                         placeholder="Phone Number"
                         autocomplete="off"
                         size=30;
@@ -135,7 +138,7 @@ import api from "../../Api";
 import AddressInput from "../model/AddressInput";
 
 const MIN_AGE_YEARS = 13;
-const MAX_AGE_YEARS = 130;
+const MAX_AGE_YEARS = 120;
 const UNIX_EPOCH_YEAR = 1970;
 
 export default {
@@ -155,6 +158,7 @@ export default {
       "homeAddress": {
         "streetNumber": "",
         "streetName": "",
+        "suburb": "",
         "city": "",
         "region": "",
         "country": "",
@@ -219,7 +223,7 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
-      //console.log(registerData);
+
 
       await api
         .register(registerData)
@@ -234,10 +238,10 @@ export default {
         .catch((error) => {
           this.errors = [];
           this.$log.debug(error);
-          if ((error.response && error.response.status === 400)) {
-            this.errors.push("Registration failed.");
+          if (error.response) {
+            this.errors.push(`Registration failed: ${error.response.data}`);
           } else {
-            this.errors.push(error.message);
+            this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
           }
         });
     },
@@ -275,8 +279,8 @@ export default {
 
       if (yearsSinceBirthDay < MIN_AGE_YEARS) {
         return "You must be at least 13 years old";
-      } else if (yearsSinceBirthDay > MAX_AGE_YEARS) {
-        return "Please enter a valid birthdate"
+      } else if (yearsSinceBirthDay >= MAX_AGE_YEARS) {
+        return "You cannot be older than 120 years"
       }
       return "";
     }

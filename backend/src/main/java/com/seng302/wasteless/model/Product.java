@@ -1,6 +1,8 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.ListingViews;
 import com.seng302.wasteless.view.ProductViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +10,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 
 /**
@@ -20,44 +23,47 @@ import java.time.LocalDate;
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class Product {
 
-    @JsonView({ProductViews.PostProductRequestView.class})
-    @Id // this field (attribute) is the table primary key
-    @Column(name = "code")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @Column(name = "database_id")
+    private Long databaseId;
+
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @Column(name = "code", unique = true)
     private String id;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
     private String name;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "description")
     private String description;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "manufacturer")
     private String manufacturer;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @PositiveOrZero
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
 
-    @JsonView({ProductViews.PostProductRequestView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "created")
     private LocalDate created;
 
     @Column(name = "business_id")
     private Integer businessId;
 
-//    @Column(name = "images")
-//    private List images;
 
     /**
      * Formats a code by taking the BusinessId and the Product Object's ID
      * setting it to uppercase and replaces spaces with "-" and replaces
      * and removes alphanumeric
      *
-     * @param businessId
+     * @param businessId Id of business product belongs to
      * @return String that is formatted as the Product Code
      */
     public String createCode(Integer businessId) {

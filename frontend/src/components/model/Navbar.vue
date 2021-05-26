@@ -14,15 +14,31 @@ Date: sprint_1
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
-        <b-nav-item v-on:click="goToProfile">My Profile</b-nav-item>
+        <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
-        <b-nav-item to="/businesses/">Create Business</b-nav-item>
-        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessRouteLink">Product Catalogue</b-nav-item>
+        <b-nav-item to="/marketPlace"> Market Place </b-nav-item>
+        <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
+        <b-nav-item-dropdown
+            v-if="$currentUser.currentlyActingAs"
+            id="business-link-dropdown"
+            text="Product Management"
+            toggle-class="nav-link-custom"
+        >
+          <b-dropdown-item :to="businessProductRouteLink">
+            <b-icon-newspaper/> Product Catalogue
+          </b-dropdown-item>
+          <b-dropdown-item :to="businessInventoryRouteLink">
+            <b-icon-box-seam/> Inventory
+          </b-dropdown-item>
+          <b-dropdown-item :to="businessListingsRouteLink">
+            <b-icon-receipt/> Sales List
+          </b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
-            <b-badge v-if="isActingAsUser">{{getUserBadgeRole()}}</b-badge>
+            <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
             <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
@@ -65,7 +81,6 @@ Date: sprint_1
 
 <script>
 import {setCurrentlyActingAs} from '../../auth'
-import Api from '../../Api'
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -98,12 +113,42 @@ export default {
           (business) => (this.isActingAsUser || business.id !== this.$currentUser.currentlyActingAs.id)
       );
     },
+
     /**
      * Returns a string constructed to go to the product page url
      */
-    businessRouteLink: function() {
+    businessProductRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/products";
-    }
+    },
+
+    /**
+     * Returns a string constructed to go to the inventory page
+     */
+    businessInventoryRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/inventory"
+    },
+    /**
+     * Returns a string constructed to go to the sales page
+     */
+    businessListingsRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/listings"
+    },
+    /**
+     * User friendly display string for the user role to be displayed as a badge.
+     * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
+     * a more user-friendly string to be displayed (eg. 'Site Admin').
+     * Returns empty string if they are a normal user, as they have no role worth displaying
+     */
+    userBadgeRole: function () {
+      switch (this.$currentUser.role) {
+        case 'globalApplicationAdmin':
+          return "Site Admin";
+        case 'defaultGlobalApplicationAdmin':
+          return "Default Site Admin";
+        default:
+          return "";
+      }
+    },
   },
   methods: {
     /**
@@ -132,29 +177,14 @@ export default {
       this.$router.push('/login');
     },
     /**
-     * User friendly display string for the user role to be displayed as a badge.
-     * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
-     * a more user-friendly string to be displayed (eg. 'Site Admin').
-     * Returns empty string if they are a normal user, as they have no role worth displaying
-     */
-    getUserBadgeRole: function () {
-      switch (this.$currentUser.role) {
-        case 'globalApplicationAdmin':
-          return "Site Admin";
-        case 'defaultGlobalApplicationAdmin':
-          return "Default Site Admin";
-        default:
-          return "";
-      }
-    },
-    /**
      * Sets the user to act as the given business. Also sets the API
      * module to send all future requests acting as this business
      * @param business Object representing the business the user will act as
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
-      Api.setBusinessActingAs(business.id);
+      this.$router.push(`/businesses/${business.id}`);
+      console.log(this.$currentUser.currentlyActingAs);
     },
     /**
      * Sets the user to act as themselves again. Also sets the API
@@ -162,7 +192,8 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
-      Api.setBusinessActingAs(null);
+      this.$router.push(`/users/${this.$currentUser.id}`);
+      console.log(this.$currentUser.currentlyActingAs);
     }
   },
 }

@@ -70,6 +70,8 @@ dependencies {
 
     // use spring boot mocking test framework
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-inline:2.7.21'
+
     // Cucumber dependencies
     testImplementation 'io.cucumber:cucumber-java:6.9.1'
     testImplementation 'io.cucumber:cucumber-junit:6.9.1'

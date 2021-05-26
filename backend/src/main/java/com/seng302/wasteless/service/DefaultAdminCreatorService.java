@@ -3,7 +3,6 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;

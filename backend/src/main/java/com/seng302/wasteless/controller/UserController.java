@@ -1,19 +1,14 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.MainApplicationRunner;
 import com.seng302.wasteless.dto.GetUserDto;
+import com.seng302.wasteless.dto.LoginDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
-import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.repository.BusinessRepository;
 import com.seng302.wasteless.service.AddressService;
-import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
-import com.seng302.wasteless.model.Login;
 import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.security.CustomUserDetails;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,7 +38,7 @@ import java.util.*;
 @RestController
 public class UserController {
 
-    private static final Logger logger = LogManager.getLogger(MainApplicationRunner.class.getName());
+    private static final Logger logger = LogManager.getLogger(UserController.class.getName());
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
@@ -103,7 +98,9 @@ public class UserController {
         user.setRole(UserRoles.USER);
 
         logger.debug("Logging in user: {}", user);
-        Login login = new Login(user.getEmail(), user.getPassword());
+        String tempEmail = user.getEmail();
+        String tempPassword = user.getPassword();
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRoles.USER);
 
@@ -117,8 +114,9 @@ public class UserController {
         logger.info("Successfully registered user: {}", user.getId());
 
         logger.debug("Authenticating user: {}", user.getId());
+
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                login.getEmail(), login.getPassword());
+                tempEmail, tempPassword);
         Authentication auth = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
@@ -176,7 +174,7 @@ public class UserController {
     public Map<String, String> handleValidationExceptions(
             MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error) -> {
+        exception.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
 //            logger.error(errorMessage); doesnt work. I am not sure why.
@@ -244,39 +242,52 @@ public class UserController {
      * if successful. Returns 406 NOT_ACCEPTABLE status if the user id does not exist.
      * Returns 403 FORBIDDEN if the user making the request is not an admin.
      * @param userId The id of the user to be made an admin
-     * @param authentication Spring Security Authentication object, representing current user and token
      * @return 200 OK, 406 Not Acceptable, 403 Forbidden
      */
     @PutMapping("/users/{id}/makeAdmin")
-    public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
+    public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId) {
 
         logger.debug("Request to make user: {} an application admin", userId);
 
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
 
-        // The Spring Security principal can only be retrieved as an Object and needs to be cast
-        // to the correct UserDetails instance, see:
-        // https://www.baeldung.com/get-user-in-spring-security
-        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
 
         if (possibleUser == null) {
+
             logger.warn("User with ID: {} does not exist", userId);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot change role of a DGAA");
+
+        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+
+            logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to make others admin");
+
+        } else if (possibleUser.checkUserDefaultAdmin()) {
+
+            logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Cannot change role of default application admin");
+
         }
 
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
         logger.debug("Setting role to admin for user: {}", possibleUser.getId());
-        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-        logger.debug("Updating user: {} ith new role", possibleUser.getId());
-        userService.updateUser(possibleUser);
-        logger.info("User: {} successfully made application administrator.", possibleUser.getId());
-        return ResponseEntity.status(HttpStatus.OK).build();
 
+        possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+
+        logger.debug("Updating user: {} ith new role", possibleUser.getId());
+
+        userService.updateUser(possibleUser);
+
+        logger.info("User: {} successfully made application administrator.", possibleUser.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
@@ -284,13 +295,12 @@ public class UserController {
      * Endpoint to revoke a specified user's admin role. Sets user role to USER
      * if successful.
      * @param userId The id of the user to be made an admin
-     * @param authentication Spring Security Authentication object, representing current user and token
      * @return 200 OK if successful. 406 NOT_ACCEPTABLE status if the user id does not exist.
      * 403 FORBIDDEN if the user making the request is not an admin. 409 CONFLICT if the admin
      * tries to revoke their own admin status.
      */
     @PutMapping("/users/{id}/revokeAdmin")
-    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId, Authentication authentication) {
+    public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId) {
 
         logger.debug("Request to revoke admin status for  user: {}", userId);
 
@@ -298,21 +308,27 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
 
-        // The Spring Security principal can only be retrieved as an Object and needs to be cast
-        // to the correct UserDetails instance, see:
-        // https://www.baeldung.com/get-user-in-spring-security
-        CustomUserDetails loggedInUser = (CustomUserDetails) authentication.getPrincipal();
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
 
         if (possibleUser == null) {
+
             logger.warn("Could not find user with ID: {}", userId);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        } else if (possibleUser.getId().equals(loggedInUser.getId())) {
+
+        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+
+            logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to revoke others admin");
+
+        } else if (possibleUser.checkUserDefaultAdmin()) {
+
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
-        } else if (possibleUser.getRole() == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("User {} tried to make User {} (who is already DGAA) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Cannot revoke DGAA");
+
         }
 
         logger.debug("User: {} found using Id : {}", possibleUser, userId);
@@ -337,9 +353,9 @@ public class UserController {
      * @param login The login object parsed from the request body by spring
      * @return 200 ok for correct login, 400 bad request otherwise
      */
-    @RequestMapping(value = "/login", method = {RequestMethod.POST} )
+    @PostMapping(value = "/login")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> verifyLogin(@Validated @RequestBody Login login) {
+    public ResponseEntity<Object> verifyLogin(@Validated @RequestBody LoginDto login) {
 
         logger.debug("Request to authenticate user login for user with data: {}" , login);
 
@@ -369,7 +385,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.OK).body(responseBody);
 
             } catch (AuthenticationException e) {
-                logger.warn("Login unsuccessful. " + e.getMessage());
+                logger.warn("Login unsuccessful. {}", e.getMessage());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
             }
 

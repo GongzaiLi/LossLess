@@ -66,21 +66,28 @@ Date: 29/03/2021
             </b-row>
           </h6>
 
-          <h6 v-if="$currentUser.currentlyActingAs">
-            <router-link  :to="{ name: 'product-catalogue', params: { id: $currentUser.currentlyActingAs.id }}">
-            <b-row>
-              <b-col cols="0" >
-                <b-icon-box-seam></b-icon-box-seam>
-              </b-col>
-              <b-col cols="4"><strong>Product Catalogue</strong></b-col>
-            </b-row>
-            </router-link>
-          </h6>
+          <router-link v-if="isAdmin" :to="{ name: 'product-catalogue', params: { id: businessData.id }}">
+          <b-button type="submit" variant="primary">
+            <b-icon-newspaper/> Product Catalogue
+          </b-button>
+          </router-link>
+          &nbsp;
+          <router-link v-if="isAdmin" :to="{ name: 'inventory-page', params: { id: businessData.id }}">
+            <b-button type="submit" variant="primary">
+              <b-icon-box-seam/> Inventory
+            </b-button>
+          </router-link>
+          &nbsp;
+          <router-link :to="{ name: 'listings-page', params: { id: businessData.id }}">
+            <b-button type="submit" variant="primary">
+              <b-icon-receipt/> Sales List
+            </b-button>
+          </router-link>
 
         </b-container>
       </b-card-body>
 
-      <b-list-group border-variant="secondary" >
+      <b-list-group border-variant="secondary" v-if="isAdmin">
         <b-list-group-item>
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
@@ -191,6 +198,7 @@ export default {
         address: {
           streetNumber: "",
           streetName: "",
+          suburb: "",
           city: "",
           region: "",
           country: "",
@@ -210,6 +218,7 @@ export default {
             homeAddress: {
               streetNumber: "",
               streetName: "",
+              suburb: "",
               city: "",
               region: "",
               country: "",
@@ -373,6 +382,13 @@ export default {
   },
 
   computed: {
+    /**
+     * True if the user can should be able to see all business information (ie they are an admin or acting as this business)
+     */
+    isAdmin: function() {
+      return this.$currentUser.role !== 'user' ||
+          (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
+    },
 
     /**
      * the street number, street name, city, region,
@@ -380,8 +396,11 @@ export default {
      * @return {string}
      */
     getAddress: function () {
-      return Object.values(this.businessData.address).join(' ');
+      const address = this.businessData.address;
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     },
+
 
     /**
      * set table parameter

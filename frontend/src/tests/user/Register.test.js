@@ -66,16 +66,16 @@ describe('Date Validation', () => {
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("");
   });
 
-  test('Valid if 130 years', async () => {
-    wrapper.vm.dateOfBirth = "04/13/1890";
+  test('Valid if 119 years', async () => {
+    wrapper.vm.dateOfBirth = "04/13/1901";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("");
   });
 
-  test('Invalid if 130 years', async () => {
-    wrapper.vm.dateOfBirth = "04/11/1890";
+  test('Invalid if 120 years', async () => {
+    wrapper.vm.dateOfBirth = "04/11/1900";
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("Please enter a valid birthdate");
+    expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("You cannot be older than 120 years");
   });
 });
 
@@ -103,20 +103,17 @@ describe('Testing-api-post-register', () => {
   });
 
   it('400-error-register-testing', async () => {
-    Api.register.mockRejectedValue({
-      response:
-        {status: 400}
-    });
+    Api.register.mockRejectedValue({response: {
+      data: "Email address already in use",
+      status: 409
+    }});
     await wrapper.vm.register(event);
-    expect(wrapper.vm.errors).toStrictEqual(["Registration failed."]);
+    expect(wrapper.vm.errors).toStrictEqual(["Registration failed: Email address already in use"]);
   });
 
   it('409-error-register-testing', async () => {
-    Api.register.mockRejectedValue({
-      message: "Email address already in use",
-      status: 409
-    });
+    Api.register.mockRejectedValue({});
     await wrapper.vm.register(event);
-    expect(wrapper.vm.errors).toStrictEqual(["Email address already in use"]);
+    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
   });
 });
