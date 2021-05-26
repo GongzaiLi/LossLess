@@ -53,8 +53,8 @@ If you do not have these environment variables defined then the application will
 
 ## Third Party Dependencies
 ### Frontend:
- - Vue-Router
- - Bootstrap Vue
+ - Vue-Router (3.5 or greater)
+ - Bootstrap Vue (2.21 or greater)
 ### Backend:
 *None*
 
