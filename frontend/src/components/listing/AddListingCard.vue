@@ -19,7 +19,6 @@ Date: 23/5/2021
           <b-input-group class="mb-2">
             <b-form-input
                 type="text" maxlength="50"
-                pattern="[a-zA-Z0-9\d\-_\s]{0,100}"
                 disabled
                 placeholder="No item selected"
                 :value="selectedInventoryItem ? selectedInventoryItem.product.id:''"
@@ -57,14 +56,14 @@ Date: 23/5/2021
             <h6><strong>More Info:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
-            <b-form-input type="text"
+            <b-form-textarea type="text"
                           :disabled="disabled"
                           autocomplete="off"
                           v-model="listingData.moreInfo"/>
           </b-input-group>
 
           <b-input-group>
-            <h6><strong>Closes:</strong></h6>
+            <h6><strong>Day Listing Closes:</strong></h6>
           </b-input-group>
           <b-input-group class="mb-2">
             <b-form-input :type="(disabled)?'text':'date'"
@@ -72,6 +71,12 @@ Date: 23/5/2021
                           autocomplete="off"
                           :min="getToday()"
                           v-model="listingData.closes"/>
+          </b-input-group>
+          <b-input-group>
+            <h6><strong>Time Listing Closes:</strong></h6>
+          </b-input-group>
+          <b-input-group class="mb-2">
+            <b-form-timepicker  v-model="listingData.closesTime"/>
           </b-input-group>
 
           <b-alert :show="listingCardError ? 120 : 0" variant="danger">{{ listingCardError }}</b-alert>
@@ -145,7 +150,8 @@ name: "add-listing-card",
         quantity: 1,
         price: 0,
         moreInfo: "",
-        closes: null
+        closes: null,
+        closesTime: null,
       },
       selectedInventoryItem: null,
       listingCardError: "",
@@ -165,25 +171,38 @@ name: "add-listing-card",
      */
     async createListing() {
 
-      if (this.listingData.quantity == null || this.listingData.quantity <= 0) {
+      if (this.listingData.quantity === null || this.listingData.quantity <= 0) {
         this.listingCardError = "Quantity must be more than zero"
         return
       }
 
-      if (this.listingData.price == null || this.listingData.price < 0) {
-        this.listingCardError = "price must be greater than or equal to zero"
-        return
+      if (this.listingData.closes === null) {
+        this.listingData.closes = this.selectedInventoryItem.expires;
       }
 
+      if(this.listingData.closesTime === null) {
+        this.listingData.closesTime = '00:00:00';
+      }
+
+      if (this.listingData.price === null || this.listingData.price < 0) {
+        this.listingCardError = "Price must be greater than or equal to zero"
+        return
+      }
+      if (this.listingData.closes === this.getToday() ) {
+        if (this.listingData.closesTime < this.getTimeNow()) {
+          this.listingCardError = "Listing must close in the future, Check the time of closure";
+          return
+        }
+      }
 
       let listingRequest = {
         inventoryItemId: this.listingData.inventoryItemId,
         quantity: this.listingData.quantity,
         price: this.listingData.price,
         moreInfo: this.listingData.moreInfo,
-        closes: this.listingData.closes
+        closes: this.listingData.closes + "T" + this.listingData.closesTime + "Z"
       };
-      // this.listingData = listingRequest;
+
       await api.createListing(this.$route.params.id, listingRequest)
           .then((listingResponse) => {
             this.$log.debug("Listing Created", listingResponse);
@@ -231,6 +250,14 @@ name: "add-listing-card",
       return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
     },
 
+    /**
+     * get the current time
+     * @returns current time in string format hh:mm
+     */
+    getTimeNow() {
+      let date = new Date();
+      return date.getHours() + ":" + date.getMinutes();
+    },
 
     calculateTotalPrice() {
       if (this.selectedInventoryItem != null) {

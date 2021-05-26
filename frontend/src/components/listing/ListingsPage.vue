@@ -39,7 +39,7 @@ Listings Page
             img-src="https://pic.onlinewebfonts.com/svg/img_148071.png"
             img-alt="Image"
             img-top
-            style="min-width: 17rem;"
+            style="min-width: 17rem; height: 100%"
         >
           <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
           <b-card-sub-title v-if="listing.inventoryItem.product.manufacturer">
