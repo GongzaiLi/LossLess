@@ -2,7 +2,10 @@ package com.seng302.wasteless.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
@@ -13,17 +16,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.*;
-import javax.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ProductController is used for mapping all Restful API requests starting with the address
