@@ -64,19 +64,7 @@ public class BusinessController {
 
         logger.debug("Request to create new business {}", business);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        logger.info("User trying to create business is: {}", user);
-
-        if (user == null) {
-            logger.warn("Failed to create Business. Access token invalid for user: {}", user);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Access token valid for user: {}. Creating Business .... ", user);
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Adding business data");
         business.setPrimaryAdministrator(user);
@@ -130,7 +118,6 @@ public class BusinessController {
     @GetMapping("/businesses/{id}")
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
-
         logger.debug("Request to get business with ID: {}", businessId);
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -146,8 +133,6 @@ public class BusinessController {
 
         logger.info("Successfully retrieved formatted business: {}", getBusinessesDto);
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
-
-
     }
 
 

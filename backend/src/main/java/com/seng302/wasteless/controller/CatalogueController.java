@@ -58,20 +58,7 @@ public class CatalogueController {
 
         logger.debug("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
 
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        User user = userService.getCurrentlyLoggedInUser();
 
         if (!possibleProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
@@ -141,23 +128,9 @@ public class CatalogueController {
      */
     @GetMapping("/businesses/{id}/products")
     public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
-
         logger.debug("Request to get business products");
 
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated toke for user: {} with Email: {}.", user, currentPrincipalEmail);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -195,20 +168,9 @@ public class CatalogueController {
      */
     @PutMapping("/businesses/{businessId}/products/{productId}")
     public ResponseEntity<Object> editBusinessProduct(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @Valid @RequestBody Product editedProduct) {
-
         logger.debug("Request to update product with data: {} for business ID: {}", editedProduct, businessId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-        if (user == null) {
-            logger.warn("Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
             logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, businessId);

@@ -65,22 +65,9 @@ public class ListingController {
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
         logger.info("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User user = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
-
-
-
-        logger.debug("Retrieving business with id: {}", businessId);
+        logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         if (possibleBusiness == null) {
@@ -134,19 +121,6 @@ public class ListingController {
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Cannot get LISTINGS for business {}. Access token invalid for user with Email: {}", businessId, currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
