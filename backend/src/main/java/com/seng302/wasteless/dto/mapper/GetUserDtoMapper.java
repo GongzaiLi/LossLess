@@ -25,13 +25,10 @@ public class GetUserDtoMapper {
     private static BusinessService businessService;
     private static UserService userService;
 
-
-
     @Autowired
     public GetUserDtoMapper(BusinessService businessService, UserService userService) {
         GetUserDtoMapper.businessService = businessService;
         GetUserDtoMapper.userService = userService;
-
     }
 
     public static GetUserDto toGetUserDto(User user) {
