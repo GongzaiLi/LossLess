@@ -158,6 +158,14 @@ public class CreateListingFeature {
         }
     }
 
+    @Given("The user with email {string} is not an administrator for business {int}")
+    public void theUserWithEmailIsNotAnAdministratorForBusiness(String email, int businessId) {
+        User user = userService.findUserByEmail(email);
+
+        Business business = businessService.findBusinessById(businessId);
+        Assertions.assertFalse(business.checkUserIsAdministrator(user));
+    }
+
 
     @And("There is an inventory item with an inventory id {int} and productId {string}")
     public void thereIsAnInventoryItemWithAnInventoryIdAndProductId(int inventoryId, String productId) {
@@ -183,10 +191,10 @@ public class CreateListingFeature {
         this.price = price;
 
         theUserWithEmailIsLoggedIn("a@a");
+        thereIsAnInventoryItemWithAnInventoryIdAndProductId(inventoryItemId, "B");
         theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(inventoryItemId, quantity, price, moreInfo, closes);
         result.andExpect(status().isCreated());
     }
-
 
     @When("The user creates a listing with the inventory item ID {int}, quantity {int}, price {double}, moreInfo {string}, and closes {string}")
     public void theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
@@ -305,7 +313,7 @@ public class CreateListingFeature {
                 .with(csrf()));
     }
 
-    @Then("Another user with email {string} can see that listing")
+    @Then("The user with email {string} can see that listing")
     public void anotherUserWithEmailCanSeeThatListing(String email) throws Exception {
         theUserWithEmailIsLoggedIn(email);
 

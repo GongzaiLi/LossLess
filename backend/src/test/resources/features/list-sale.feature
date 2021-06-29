@@ -59,6 +59,7 @@ Feature: U22 - List sale
     Then The user will receive a bad request error
 
   Scenario: User can see other business's listings
-    Given The business with id 1 exists
-    And The business with id 1 has a listing with the inventory item ID 1, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
-    Then Another user with email "b@b" can see that listing
+    Given The business with id 2 exists
+    And The business with id 2 has a listing with the inventory item ID 2, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
+    And The user with email "b@b" is not an administrator for business 2
+    Then The user with email "b@b" can see that listing
