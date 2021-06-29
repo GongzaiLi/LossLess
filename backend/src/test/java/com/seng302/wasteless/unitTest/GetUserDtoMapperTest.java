@@ -1,5 +1,6 @@
 package com.seng302.wasteless.unitTest;
 
+import com.seng302.wasteless.dto.GetUserBusinessAdministeredDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
@@ -8,26 +9,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -84,7 +79,7 @@ public class GetUserDtoMapperTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     public void whenGetUserDtoAndSignedInAsRegularUser_thenDtoContainsBusinessesAdministered() {
-        List<BusinessAdministered> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
+        List<GetUserBusinessAdministeredDto> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
         Assertions.assertNotNull(businessesAdministered);
         Assertions.assertEquals(businessesAdministered.size(), 1);
         Assertions.assertEquals(businessesAdministered.get(0).getName(), "Jimmy's clown store");
@@ -95,7 +90,7 @@ public class GetUserDtoMapperTest {
     public void whenGetUserDtoAndSignedInAsAdmin_thenDtoContainsBusinessesAdministered() {
         signedInUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
 
-        List<BusinessAdministered> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
+        List<GetUserBusinessAdministeredDto> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
         Assertions.assertNotNull(businessesAdministered);
         Assertions.assertEquals(businessesAdministered.size(), 1);
         Assertions.assertEquals(businessesAdministered.get(0).getName(), "Jimmy's clown store");
@@ -106,7 +101,7 @@ public class GetUserDtoMapperTest {
     public void whenGetUserDtoAndSignedInAsDGAA_thenDtoContainsBusinessesAdministered() {
         signedInUser.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
 
-        List<BusinessAdministered> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
+        List<GetUserBusinessAdministeredDto> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
         Assertions.assertNotNull(businessesAdministered);
         Assertions.assertEquals(businessesAdministered.size(), 1);
         Assertions.assertEquals(businessesAdministered.get(0).getName(), "Jimmy's clown store");

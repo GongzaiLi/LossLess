@@ -311,7 +311,7 @@ public class CreateListingFeature {
 
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/businesses/%d/listings", this.businessId))
                 .with(user(currentUserDetails))
-                .with(csrf()))1h 15m
+                .with(csrf()))
                 .andExpect(jsonPath("[0].quantity", is(quantity)))
                 .andExpect(jsonPath("[0].price", is(price)))
                 .andExpect(jsonPath("[0].moreInfo", is(moreInfo)));;

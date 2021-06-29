@@ -1,5 +1,6 @@
 package com.seng302.wasteless.dto.mapper;
 
+import com.seng302.wasteless.dto.GetUserBusinessAdministeredDto;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.GetUserDtoAdmin;
 import com.seng302.wasteless.model.*;
@@ -40,9 +41,9 @@ public class GetUserDtoMapper {
         Integer currentUserId = loggedInUser.getId();
 
         List<Business> businesses = businessService.findBusinessesByUserId(user.getId());
-        List<BusinessAdministered> businessesAdministered = new ArrayList<>();
+        List<GetUserBusinessAdministeredDto> businessesAdministered = new ArrayList<>();
         for (Business business : businesses) {  // Could do this with streams and maps but Java is too hecking verbose
-            businessesAdministered.add(new BusinessAdministered(business));
+            businessesAdministered.add(new GetUserBusinessAdministeredDto(business));
         }
 
         JSONObject address = new JSONObject();

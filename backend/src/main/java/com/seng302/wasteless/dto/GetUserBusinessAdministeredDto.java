@@ -1,5 +1,9 @@
-package com.seng302.wasteless.model;
+package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.model.Address;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.BusinessTypes;
+import com.seng302.wasteless.model.User;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -8,12 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Type for BusinessAdministered of businesses, used by DTOs to return the correct (and correctly formatted) data.
+ * 'Partial' DTO representing a business object in the 'businessesAdministered' field of the Get User DTO.
+ * So far this is not used standalone but as part of the GetUserDto. Main difference between this DTO and the
+ * business object is that the administrators is a list of ids, not User objects.
  */
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @ToString // generate a toString method
 @Accessors(chain = true) //Allows chaining of getters and setters
-public class BusinessAdministered {
+public class GetUserBusinessAdministeredDto {
     private int id;
     private List<String> administrators;
     private int primaryAdministratorId;
@@ -29,7 +35,7 @@ public class BusinessAdministered {
      * business's admins.
      * @param business The business to create this data object for.
      */
-    public BusinessAdministered(Business business) {
+    public GetUserBusinessAdministeredDto(Business business) {
         List<String> administrators = new ArrayList<>();
 
         for (User admin : business.getAdministrators()) {

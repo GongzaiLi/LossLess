@@ -1,6 +1,5 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.BusinessAdministered;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -28,5 +27,5 @@ public class GetUserDto {
     private String email;                      //change later
     private JSONObject homeAddress;
     private String created;
-    private List<BusinessAdministered> businessesAdministered;
+    private List<GetUserBusinessAdministeredDto> businessesAdministered;
 }
