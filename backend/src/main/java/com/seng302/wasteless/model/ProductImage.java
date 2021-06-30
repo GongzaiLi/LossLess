@@ -26,7 +26,7 @@ public class ProductImage {
 
     @NotNull(message = "Must have database ID")
     @ManyToOne
-    @JoinColumn(name = "database_id")
+    @JoinColumn(name="productId", referencedColumnName="database_id")
     private Product product;
 
     @NotNull(message = "Must have a filename")
@@ -34,6 +34,6 @@ public class ProductImage {
     private String fileName;
 
     @NotNull(message = "Must have a thumbnail filename")
-    @Column(name = "thumbnailFilename")
+    @Column(name = "thumbnail_Filename")
     private String thumbnailFilename;
 }
