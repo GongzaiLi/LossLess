@@ -12,6 +12,29 @@ Date: 19/4/2021
         @submit="okAction"
     >
     <b-card-body>
+      <b-carousel
+            id="carousel-1"
+            controls
+            indicators
+            class="mb-2"
+            :interval="0"
+        >
+          <b-carousel-slide v-for="image in productCard.images" :key="image.id">
+            <template #img>
+              <div style="position: absolute; width:100%; z-index: 999999"> <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
+                <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image"><b-icon-trash-fill></b-icon-trash-fill></b-button>
+                <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover title="Set as primary image"><b-icon-star></b-icon-star></b-btn>
+              </div>
+              <!-- The classes .d-block and .img-fluid prevent browser default image alignment -->
+              <img
+                  class="d-block img-fluid w-100 rounded"
+                  alt="Product image"
+                  :src="image.filename"
+              >
+            </template>
+          </b-carousel-slide>
+        </b-carousel>
+
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden=disabled style="margin:0">Ensure there are no special characters (e.g. "/","?").
           <br>This will be automatically changed into the correct format.</p>
@@ -87,12 +110,29 @@ export default {
         manufacturer: '',
         recommendedRetailPrice: 0,
         created: '',
-        image: '',
+        images: [],
       },
     }
   },
   mounted() {
     this.productCard = this.product;
+    this.productCard.images = [
+      {
+        "id": 1234,
+        "filename": "https://picsum.photos/1024/480/?image=52",
+        "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+      },
+      {
+        "id": 1235,
+        "filename": "https://picsum.photos/1024/480/?image=54",
+        "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+      },
+      {
+        "id": 1236,
+        "filename": "https://picsum.photos/1024/480/?image=56",
+        "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+      }
+    ]
     // Sometimes the product passed in should not have a 'created' attribute, eg. if it is a new object for creation.
     if (this.productCard.created) {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
