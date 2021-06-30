@@ -14,8 +14,7 @@ Date: 19/4/2021
     <b-card-body>
         <div>
           <h6><strong>Upload Product Images</strong></h6>
-          <b-form-file v-model="productCard.images" multiple accept=".jpg, .png, .gif" plain></b-form-file>
-          <p>Selected files: {{imageNames}}</p>
+          <b-form-file v-model="productCard.images" multiple accept=".jpg, .png, .gif" :file-name-formatter="imageNames"></b-form-file>
         </div>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
@@ -103,13 +102,12 @@ export default {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
     }
   },
-  computed: {
-    imageNames() {
+  methods: {
+    imageNames(files) {
       let imageNames = [];
-      this.productCard.images.forEach((image) => {
+      files.forEach((image) => {
         imageNames.push(image.name);
       })
-      console.log(imageNames);
       return imageNames.toString()
     }
   }
