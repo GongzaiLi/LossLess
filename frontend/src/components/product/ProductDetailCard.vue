@@ -35,8 +35,12 @@ Date: 19/4/2021
           </b-carousel-slide>
         </b-carousel>
 
+        <div>
+          <h6><strong>Upload Product Images</strong></h6>
+          <b-form-file v-model="productCard.images" multiple accept=".jpg, .png, .gif" :file-name-formatter="imageNames"></b-form-file>
+        </div>
         <h6><strong>ID*:</strong></h6>
-        <p v-bind:hidden=disabled style="margin:0">Ensure there are no special characters (e.g. "/","?").
+        <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
           <br>This will be automatically changed into the correct format.</p>
         <b-input-group class="mb-1">
           <b-form-input type="text" maxlength="50" pattern="[a-zA-Z0-9\d\-_\s]{0,100}"  v-bind:disabled=disabled placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
@@ -138,5 +142,14 @@ export default {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
     }
   },
+  methods: {
+    imageNames(files) {
+      let imageNames = [];
+      files.forEach((image) => {
+        imageNames.push(image.name);
+      })
+      return imageNames.toString()
+    }
+  }
 }
 </script>

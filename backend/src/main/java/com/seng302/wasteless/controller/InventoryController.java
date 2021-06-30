@@ -17,8 +17,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -66,18 +64,8 @@ public class InventoryController {
     public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, @Valid @RequestBody PostInventoryDto inventoryDtoRequest) {
         logger.info("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Error, no logged in user making request to post inventory endpoint: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -131,22 +119,9 @@ public class InventoryController {
      */
     @GetMapping("/businesses/{id}/inventory")
     public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId) {
-
         logger.debug("Request to get business INVENTORY products");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Cannot retrieve INVENTORY products. Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -183,20 +158,9 @@ public class InventoryController {
      */
     @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId}")
     public ResponseEntity<Object> putBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") Integer itemId, @Valid @RequestBody PostInventoryDto editedInventoryItem) {
-
         logger.debug("Request to update inventory product");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-        if (user == null) {
-            logger.warn("Cannot Update INVENTORY product with ID {}. Access token invalid for user with Email: {}", itemId, currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
