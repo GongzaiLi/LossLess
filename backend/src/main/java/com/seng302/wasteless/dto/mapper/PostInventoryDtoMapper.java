@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PostInventoryDtoMapper {
 
+
     public static Inventory postInventoryDtoToEntityMapper(PostInventoryDto inventoryDto) {
 
         return new Inventory()

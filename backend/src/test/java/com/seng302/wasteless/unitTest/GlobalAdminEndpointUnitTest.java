@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
-public class GlobalAdminEndpointUnitTest {
+ class GlobalAdminEndpointUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -112,7 +112,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
                 .with(csrf()))
@@ -121,7 +121,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
                 .with(csrf()))
@@ -130,7 +130,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromUser_thenForbidden() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromUser_thenForbidden() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
                 .with(csrf()))
@@ -139,7 +139,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
@@ -148,7 +148,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
@@ -157,7 +157,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromUser_then406Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromUser_then406Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
@@ -166,7 +166,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then406Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then406Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
@@ -175,7 +175,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromGAA_then403Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromGAA_then403Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
@@ -184,7 +184,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -192,7 +192,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
@@ -200,7 +200,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -208,7 +208,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
+     void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -220,7 +220,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then409Response_asAdminCannotRevokeOwnRights() throws Exception {
+     void whenTryRevokeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then409Response_asAdminCannotRevokeOwnRights() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isConflict());
@@ -229,7 +229,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
@@ -237,7 +237,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromDGAA_then200Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromDGAA_then200Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
@@ -245,7 +245,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "default@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
@@ -253,7 +253,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -261,7 +261,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromGAA_then403Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromGAA_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -269,7 +269,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -277,7 +277,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "admin@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
@@ -285,7 +285,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserGAARole_andRequestFromUser_then403Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserGAARole_andRequestFromUser_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -293,7 +293,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromUser_then403Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromUser_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -302,7 +302,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andDoesNotExist_andRequestFromUser_then406Response() throws Exception {
+     void whenTryRevokeUserAdmin_andDoesNotExist_andRequestFromUser_then406Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
@@ -311,7 +311,7 @@ public class GlobalAdminEndpointUnitTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com", password = "pwd")
-    public void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromUser_then403Response() throws Exception {
+     void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromUser_then403Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());

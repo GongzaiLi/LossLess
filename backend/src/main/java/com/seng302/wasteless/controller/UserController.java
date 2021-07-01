@@ -145,7 +145,7 @@ public class UserController {
         logger.debug("Request to search for users with query: {}", searchQuery);
 
         logger.debug("Getting users matching query: {}", searchQuery);
-        LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
         List<GetUserDto> searchResultsDto = new ArrayList<>();
         //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?

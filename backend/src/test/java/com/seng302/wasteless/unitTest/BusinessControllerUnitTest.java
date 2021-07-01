@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusinessController.class)
 @Import({MockUserServiceConfig.class, MockBusinessServiceConfig.class})
-public class BusinessControllerUnitTest {
+ class BusinessControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +43,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
+     void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -63,7 +63,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingName_then400Response() throws Exception {
+     void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingName_then400Response() throws Exception {
         String business = "{\"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -104,7 +104,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPostRequestToBusiness_andInvalidBusiness_dueToAddress_then400Response() throws Exception {
+     void whenPostRequestToBusiness_andInvalidBusiness_dueToAddress_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
@@ -116,7 +116,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingBusinessType_then400Response() throws Exception {
+     void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingBusinessType_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -136,7 +136,7 @@ public class BusinessControllerUnitTest {
 
     @Test
     @WithUserDetails("user@700")
-    public void whenPostRequestToBusiness_andValidBusiness_withMissingDescription_then201Response() throws Exception {
+     void whenPostRequestToBusiness_andValidBusiness_withMissingDescription_then201Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
