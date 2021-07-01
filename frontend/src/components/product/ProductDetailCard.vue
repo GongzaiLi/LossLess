@@ -18,6 +18,8 @@ Date: 19/4/2021
             indicators
             class="mb-2"
             :interval="0"
+            ref="image_carousel"
+            v-model="slideNumber"
         >
           <b-carousel-slide v-for="image in productCard.images" :key="image.id">
             <template #img>
@@ -36,8 +38,9 @@ Date: 19/4/2021
         </b-carousel>
 
         <div>
-          <h6><strong>Upload Product Images</strong></h6>
-          <b-form-file v-model="productCard.images" multiple accept=".jpg, .png, .gif" :file-name-formatter="imageNames"></b-form-file>
+          <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
+          <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker" accept="image/png, image/jpeg, image/gif, image/jpg">
+          <b-button @click="$refs.filepicker.click()">Add a product image</b-button>
         </div>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
@@ -107,6 +110,8 @@ export default {
   props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
   data() {
     return {
+      images: [],
+      slideNumber: 0,
       productCard: {
         id: '',
         name: '',
@@ -120,35 +125,29 @@ export default {
   },
   mounted() {
     this.productCard = this.product;
-    this.productCard.images = [
-      {
-        "id": 1234,
-        "filename": "https://picsum.photos/1024/480/?image=52",
-        "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
-      },
-      {
-        "id": 1235,
-        "filename": "https://picsum.photos/1024/480/?image=54",
-        "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
-      },
-      {
-        "id": 1236,
-        "filename": "https://picsum.photos/1024/480/?image=56",
-        "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
-      }
-    ]
+    this.productCard.images = []
     // Sometimes the product passed in should not have a 'created' attribute, eg. if it is a new object for creation.
     if (this.productCard.created) {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
     }
   },
   methods: {
-    imageNames(files) {
-      let imageNames = [];
-      files.forEach((image) => {
-        imageNames.push(image.name);
-      })
-      return imageNames.toString()
+    async onFileChange(e) {
+      const files = e.target.files;
+      for (let file of files) {
+        let url = URL.createObjectURL(file);
+        this.productCard.images.unshift({
+          "id": url,
+          "filename": url
+        });
+      }
+      await this.$forceUpdate();
+      this.slideNumber = 0;
+    }
+  },
+  computed: {
+    isCreatingProduct() {
+      return !this.productCard.created; // If the product has no created attribute we must be creating a new product
     }
   }
 }
