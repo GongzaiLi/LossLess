@@ -20,11 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -109,15 +111,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
         Mockito
-                .when(authentication.getName())
-                .thenReturn("james@gmail.com");
-
-        Mockito
                 .when(inventoryService.createInventory(any(Inventory.class)))
                 .thenReturn(inventoryItem.setId(2));
 
+//        Mockito
+//                .when(userService.findUserByEmail(anyString()))
+//                .thenReturn(user);
+
         Mockito
-                .when(userService.findUserByEmail(anyString()))
+                .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
         Mockito
@@ -168,8 +170,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoUserMakingRequest_the401Response() throws Exception {
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -284,8 +286,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenGetRequestToInventory_andInvalidRequest_NoUserMakingRequest_then401Response() throws Exception {
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
@@ -465,8 +467,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoUserMakingRequest_the401Response() throws Exception {
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")

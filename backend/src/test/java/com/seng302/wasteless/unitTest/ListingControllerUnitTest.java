@@ -19,11 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -136,7 +138,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(inventoryItemForListing.setId(2));
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
+                .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
         Mockito
@@ -181,8 +183,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -319,18 +321,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(jsonPath("[0].closes", is("2022-07-14")))
                 .andExpect(jsonPath("[0].created", is("2022-04-14")))
                 .andExpect(jsonPath("[1]").doesNotExist());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-     void whenGetRequestForListingsOfExistingBusiness_andSessionInvalid_thenUnauthorized() throws Exception {
-        Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
     }
 
     @Test

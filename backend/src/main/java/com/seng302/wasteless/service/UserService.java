@@ -1,11 +1,19 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -17,6 +25,8 @@ import java.util.regex.Pattern;
  */
 @Service
 public class UserService {
+
+    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
 
     private UserRepository userRepository;
 
@@ -92,6 +102,24 @@ public class UserService {
      */
     public User findUserByEmail(String email) {
         return userRepository.findFirstByEmail(email);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public User getCurrentlyLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User user = findUserByEmail(currentPrincipalEmail);
+        if (user == null) {
+            logger.info("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
+        }
+        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        return user;
     }
 
     /**

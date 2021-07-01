@@ -3,8 +3,14 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
-import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Inventory;
+import com.seng302.wasteless.model.Listing;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.InventoryService;
+import com.seng302.wasteless.service.ListingsService;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -12,8 +18,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -65,22 +69,9 @@ public class ListingController {
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
         logger.info("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User user = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
-
-
-
-        logger.debug("Retrieving business with id: {}", businessId);
+        logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         if (possibleBusiness == null) {
@@ -134,19 +125,6 @@ public class ListingController {
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (user == null) {
-            logger.warn("Cannot get LISTINGS for business {}. Access token invalid for user with Email: {}", businessId, currentPrincipalEmail);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
