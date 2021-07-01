@@ -1,47 +1,43 @@
-<!--
-Page show product detail card
-Author: Gongzai Li
-Date: 19/4/2021
--->
 <template>
   <b-card
     class="profile-card"
-    style="max-width: 550px"
+    style="max-width: 50rem"
   >
+      <b-carousel
+          id="carousel-1"
+          controls
+          indicators
+          class="mb-2"
+          :interval="0"
+          ref="image_carousel"
+          v-model="slideNumber"
+      >
+        <b-carousel-slide v-for="image in productCard.images" :key="image.id">
+          <template #img>
+            <div style="position: absolute; width:100%; z-index: 999999"> <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
+              <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image"><b-icon-trash-fill></b-icon-trash-fill></b-button>
+              <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover title="Set as primary image"><b-icon-star></b-icon-star></b-btn>
+            </div>
+            <!-- The classes .d-block and .img-fluid prevent browser default image alignment -->
+            <img
+                style="height: 15rem; object-fit: cover; width: 100%;"
+                class="d-block img-fluid w-100 rounded"
+                alt="Product image"
+                :src="image.filename"
+            >
+          </template>
+        </b-carousel-slide>
+      </b-carousel>
+
+      <div class="text-center">
+        <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
+        <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker" accept="image/png, image/jpeg, image/gif, image/jpg">
+        <b-button @click="$refs.filepicker.click()">{{productCard.images.length > 0 ? "Add more product images": "Add product images"}}</b-button>
+      </div>
     <b-form
         @submit="okAction"
     >
     <b-card-body>
-      <b-carousel
-            id="carousel-1"
-            controls
-            indicators
-            class="mb-2"
-            :interval="0"
-            ref="image_carousel"
-            v-model="slideNumber"
-        >
-          <b-carousel-slide v-for="image in productCard.images" :key="image.id">
-            <template #img>
-              <div style="position: absolute; width:100%; z-index: 999999"> <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
-                <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image"><b-icon-trash-fill></b-icon-trash-fill></b-button>
-                <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover title="Set as primary image"><b-icon-star></b-icon-star></b-btn>
-              </div>
-              <!-- The classes .d-block and .img-fluid prevent browser default image alignment -->
-              <img
-                  class="d-block img-fluid w-100 rounded"
-                  alt="Product image"
-                  :src="image.filename"
-              >
-            </template>
-          </b-carousel-slide>
-        </b-carousel>
-
-        <div>
-          <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
-          <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker" accept="image/png, image/jpeg, image/gif, image/jpg">
-          <b-button @click="$refs.filepicker.click()">Add a product image</b-button>
-        </div>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
           <br>This will be automatically changed into the correct format.</p>
@@ -103,6 +99,13 @@ Date: 19/4/2021
   </b-card>
 
 </template>
+
+<style>
+.carousel-control-prev, .carousel-control-next {
+  background-color: black;
+  opacity: 0.2 !important;
+}
+</style>
 
 <script>
 export default {
