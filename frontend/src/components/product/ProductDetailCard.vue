@@ -136,13 +136,14 @@ export default {
       const files = e.target.files;
       for (let file of files) {
         let url = URL.createObjectURL(file);
-        this.productCard.images.unshift({
+        this.productCard.images.push({
           "id": url,
           "filename": url
         });
       }
-      await this.$forceUpdate();
-      this.slideNumber = 0;
+      this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
+      await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image
+      this.slideNumber = this.productCard.images.length-1; // Change the displayed image slide to the newly added image
     }
   },
   computed: {
