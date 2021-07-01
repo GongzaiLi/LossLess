@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(ListingController.class)
 @AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
-public class ListingControllerUnitTest {
+ class ListingControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -179,7 +179,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateListing_andNotLoggedIn_then401Response() throws Exception {       //NOT WORKING YET
+     void whenPostRequestToCreateListing_andNotLoggedIn_then401Response() throws Exception {       //NOT WORKING YET
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         Mockito
@@ -195,7 +195,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateListing_andInvalidBusinessID_then406Response() throws Exception {
+     void whenPostRequestToCreateListing_andInvalidBusinessID_then406Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         doReturn(null).when(businessService).findBusinessById(2);
@@ -208,7 +208,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
+     void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
@@ -224,7 +224,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateListing_andLoggedInUser_andNotBusinessAdmin_butAppAdmin_then201Response() throws Exception {
+     void whenPostRequestToCreateListing_andLoggedInUser_andNotBusinessAdmin_butAppAdmin_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
@@ -239,7 +239,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateListing_andValidUserAndValidBusiness_butInvalidInventory_then400Response() throws Exception {
+     void whenPostRequestToCreateListing_andValidUserAndValidBusiness_butInvalidInventory_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         doReturn(null).when(inventoryService).findInventoryById(1);
@@ -253,7 +253,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateListing_andValidRequest_then201Response() throws Exception {
+     void whenPostRequestToCreateListing_andValidRequest_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -265,7 +265,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    public void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
+     void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -276,7 +276,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    public void whenPostRequestToCreateListing_andClosesOfNotTypeDate_then400Response() throws Exception {
+     void whenPostRequestToCreateListing_andClosesOfNotTypeDate_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -288,7 +288,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    public void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
+     void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -304,7 +304,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    public void whenGetRequestForListingsOfExistingBusiness_andOneListingExists_thenOneListingReturned() throws Exception {
+     void whenGetRequestForListingsOfExistingBusiness_andOneListingExists_thenOneListingReturned() throws Exception {
         Mockito
                 .when(listingsService.findByBusinessId(anyInt()))
                 .thenReturn(Collections.singletonList(listing));
@@ -325,7 +325,7 @@ public class ListingControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    public void whenGetRequestForListings_andBusinessNotExists_thenUnacceptable() throws Exception {
+     void whenGetRequestForListings_andBusinessNotExists_thenUnacceptable() throws Exception {
         Mockito
                 .when(businessService.findBusinessById(anyInt()))
                 .thenReturn(null);
