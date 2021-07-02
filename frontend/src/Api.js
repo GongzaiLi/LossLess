@@ -59,6 +59,16 @@ export default {
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
   getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials:true}),
 
+  /**
+   * Sends a POST request to the product images endpoint. The image is sent as multipart/form-data
+   * with the param name "file"
+   */
+  uploadProductImage: (businessId, productId, imageFile) => {
+    let formData = new FormData();
+    formData.append("file", imageFile);
+
+    return instance.post(`/businesses/${businessId}/products/${productId}/images`, imageFile);
+  },
 
   /**
    * Given the name of the user's country, gets currency data for that country.

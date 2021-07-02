@@ -59,11 +59,9 @@ h2 {
 </style>
 
 <script>
-import api from "../../Api";
 import productDetailCard from './ProductDetailCard';
 import ProductsTable from "./ProductsTable";
 import Api from "../../Api";
-
 
 export default {
   components: {
@@ -79,7 +77,7 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
-      productCardAction: () => {},
+      productCardAction: null,
       productCardError: "",
       productDisplayedInCard: {},
       isProductCardReadOnly: true,
@@ -100,10 +98,10 @@ export default {
      * Api request to get business information
      **/
     async getBusinessInformation(businessId) {
-      await api.getBusiness(businessId)
+      await Api.getBusiness(businessId)
           .then((response) => {
             this.business = response.data;
-            return api.getUserCurrency(response.data.address.country);
+            return Api.getUserCurrency(response.data.address.country);
           })
           .then(currencyData => this.currency = currencyData)
           .catch((error) => {
@@ -182,14 +180,22 @@ export default {
 
     /**
      * Makes a request to the API to create a product with the form input.
+     * If successful, it will then upload all the images that the user has set for the product.
      * Then, will hide the product popup and reload the table items if successful.
      */
-    async createProduct(event) {
-      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-      await api
+    async createProduct() {
+      await Api
           .createProduct(this.$route.params.id, this.productDisplayedInCard)
           .then((createProductResponse) => {
             this.$log.debug("Product Created", createProductResponse);
+            this.$log.debug("Uploading images");
+            // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
+            // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
+            return Promise.all(this.productDisplayedInCard.images.map(  // Run all requests to upload product images in parallel for efficiency
+                file => Api.uploadProductImage(this.$route.params.id, createProductResponse.data.productId, file.fileObject))
+            );
+          })
+          .then(() => {
             this.$bvModal.hide('product-card');
             this.refreshProducts();
           })
@@ -203,12 +209,10 @@ export default {
      * button function for ok when clicked calls an API
      * place holder function for API task
      */
-    modifyProduct: async function (event) {
-      event.preventDefault();
-
+    modifyProduct: async function () {
       let editData = this.productDisplayedInCard;
       delete editData["created"];
-      await api
+      await Api
           .modifyProduct(this.$route.params.id, this.oldProductId, editData)
           .then((editProductResponse) => {
             this.$log.debug("Product has been edited",editProductResponse);
