@@ -12,6 +12,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An implementation of Product model.
@@ -57,6 +59,10 @@ public class Product {
     @Column(name = "business_id")
     private Integer businessId;
 
+    @ElementCollection
+    @Column(name = "image_ids")
+    private List<Integer> imageIds;
+
 
     /**
      * Formats a code by taking the BusinessId and the Product Object's ID
@@ -69,6 +75,16 @@ public class Product {
     public String createCode(Integer businessId) {
         return businessId + "-" + this.getId().toUpperCase().replaceAll("\\P{Alnum}+$", "")
                 .replaceAll(" ", "-");
+    }
+
+    /**
+     * Add an image to a product
+     * Never call this directly, only call it from business service.
+     *
+     * @param productImageId Id of the image to add to the product
+     */
+    public void addImage(Integer productImageId) {
+        this.imageIds.add(productImageId);
     }
 
 }

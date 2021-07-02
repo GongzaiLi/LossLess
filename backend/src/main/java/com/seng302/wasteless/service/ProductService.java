@@ -1,7 +1,9 @@
 package com.seng302.wasteless.service;
 
 
+import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,17 @@ public class ProductService {
      * @return A list of business's products, if any, otherwise empty list
      */
     public List<Product> getAllProductsByBusinessId(Integer id) { return  productRepository.findAllByBusinessId(id); }
+
+
+    /**
+     * Add image to a product
+     *
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     */
+    public void addImageToProduct(Product product, Integer productImageId) {
+        product.addImage(productImageId);
+    }
 
 }
 
