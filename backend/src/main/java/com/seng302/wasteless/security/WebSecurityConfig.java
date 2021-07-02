@@ -42,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @return new AppUserDetailsService object.
      */
     @Bean
+    @Override
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
     }
@@ -113,11 +114,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
        http.csrf().disable();// when using the postman.
 
-//                .logout() //Can call '/logout' to log out
-//                .permitAll()
-//                .invalidateHttpSession(true)
-//                .deleteCookies("JSESSIONID")
-//                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
 
 
 

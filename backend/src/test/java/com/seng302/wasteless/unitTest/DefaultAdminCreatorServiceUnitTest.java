@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-public class DefaultAdminCreatorServiceUnitTest {
+ class DefaultAdminCreatorServiceUnitTest {
     DefaultAdminCreatorService creatorService;
 
     @Mock
@@ -32,25 +32,25 @@ public class DefaultAdminCreatorServiceUnitTest {
     private AddressService addressService;
 
     @BeforeEach
-    public void init() throws IOException {
+     void init() throws IOException {
         creatorService = new DefaultAdminCreatorService(userService, addressService);
     }
 
     @Test
-    public void correctFieldsWhenReadConfigFile() {
+     void correctFieldsWhenReadConfigFile() {
         String config = "check-default-admin-period-ms=60\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
 
         ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes()));
 
-        Assertions.assertEquals(ReflectionTestUtils.getField(creatorService, "defaultEmail"), "admin@sengmail.com");
-        Assertions.assertEquals(ReflectionTestUtils.getField(creatorService, "defaultPassword"), "supersecurepassword");
-        Assertions.assertEquals(ReflectionTestUtils.getField(creatorService, "defaultTimeout"), 60);
+        Assertions.assertEquals("admin@sengmail.com", ReflectionTestUtils.getField(creatorService, "defaultEmail"));
+        Assertions.assertEquals("supersecurepassword", ReflectionTestUtils.getField(creatorService, "defaultPassword"));
+        Assertions.assertEquals(60, ReflectionTestUtils.getField(creatorService, "defaultTimeout"));
     }
 
     @Test
-    public void throwsInvalidParameterExceptionWhenPeriodNotANumber() {
+     void throwsInvalidParameterExceptionWhenPeriodNotANumber() {
         String config = "check-default-admin-period-ms=asdf\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
@@ -59,7 +59,7 @@ public class DefaultAdminCreatorServiceUnitTest {
     }
 
     @Test
-    public void throwsInvalidParameterExceptionWhenPeriodIsZero() {
+     void throwsInvalidParameterExceptionWhenPeriodIsZero() {
         String config = "check-default-admin-period-ms=0\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
@@ -68,7 +68,7 @@ public class DefaultAdminCreatorServiceUnitTest {
     }
 
     @Test
-    public void throwsInvalidParameterExceptionWhenPeriodIsNegative() {
+     void throwsInvalidParameterExceptionWhenPeriodIsNegative() {
         String config = "check-default-admin-period-ms=-5\n" +
                 "default-admin-username=admin@sengmail.com\n" +
                 "default-admin-password=supersecurepassword";
@@ -77,7 +77,7 @@ public class DefaultAdminCreatorServiceUnitTest {
     }
 
     @Test
-    public void throwsInvalidParameterExceptionWhenConfigEmpty() {
+     void throwsInvalidParameterExceptionWhenConfigEmpty() {
         String config = "";
 
         assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));

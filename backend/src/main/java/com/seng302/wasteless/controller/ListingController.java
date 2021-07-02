@@ -34,7 +34,7 @@ import java.util.Map;
  */
 @RestController
 public class ListingController {
-    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
+    private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
 
     private final BusinessService businessService;
