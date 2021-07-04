@@ -72,5 +72,17 @@ public class ProductService {
         product.addImage(productImageId);
     }
 
+    /**
+     * Remove an image from a product
+     *
+     * Calling the method in this way allows for mocking during automated testing
+     *
+     */
+    public void removeImageFromProduct(Product product, Integer productImageId) {
+        product.removeImage(productImageId);
+    }
+
+
+
 }
 
