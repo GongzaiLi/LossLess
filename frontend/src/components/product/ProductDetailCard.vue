@@ -8,13 +8,12 @@ Date: 19/4/2021
     class="profile-card"
     style="max-width: 550px"
   >
-    <b-form
-        @submit="okAction"
-    >
+    <div v-if="!productCard.images.length">
+      <b-img :src="require(`./assets/${productCard.defaultImage}`)" fluid-grow></b-img>
+    </div>
+
+    <b-form @submit="okAction" >
     <b-card-body>
-      <div v-if="!productCard.images.length">
-        <b-img :src="require(`./assets/${productCard.defaultImage}`)" fluid-grow></b-img>
-      </div>
         <div>
           <h6><strong>Upload Product Images</strong></h6>
           <b-form-file v-model="productCard.images" multiple accept=".jpg, .png, .gif" :file-name-formatter="imageNames"></b-form-file>
@@ -95,7 +94,7 @@ export default {
         recommendedRetailPrice: 0,
         created: '',
         images: [],
-        defaultImage: 'product_default.jpeg'
+        defaultImage: 'product_default.png'
       },
     }
   },
