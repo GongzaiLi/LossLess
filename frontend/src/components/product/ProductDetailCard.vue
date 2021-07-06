@@ -108,6 +108,8 @@
 </style>
 
 <script>
+import Api from "@/Api";
+
 export default {
   name: "product-detail-card",
   props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
@@ -143,6 +145,22 @@ export default {
      */
     async onFileChange(e) {
       const files = e.target.files;
+      if (this.isCreatingProduct) {
+        this.addImagePreviewsToCarousel(files);
+      } else {
+        await Api.uploadProductImages(this.$route.params.id, this.productCard.id, files)
+        // TODO: refresh the product images if an API call was sent
+      }
+      this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
+      await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image
+      this.slideNumber = this.productCard.images.length-1; // Change the displayed image slide to the newly added image
+    },
+    /**
+     * Given a list of image files, adds each as a preview to the product image carousel. This should be used when creating
+     * the product, so users are able to see and change which images will be created along with their product.
+     * This does not actually upload the files - that should be done when the user creates the product.
+     */
+    addImagePreviewsToCarousel(files) {
       for (let file of files) {
         let url = URL.createObjectURL(file);
         this.productCard.images.push({
@@ -151,10 +169,8 @@ export default {
           fileObject: file
         });
       }
-      this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
-      await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image
-      this.slideNumber = this.productCard.images.length-1; // Change the displayed image slide to the newly added image
-    }
+    },
+
   },
   computed: {
     /**

@@ -191,9 +191,10 @@ export default {
             this.$log.debug("Uploading images");
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
             // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
-            return Promise.all(this.productDisplayedInCard.images.map(  // Run all requests to upload product images in parallel for efficiency
-                file => Api.uploadProductImage(this.$route.params.id, createProductResponse.data.productId, file.fileObject))
-            );
+            // We also need to extract the file objects from the list of images (see addImagePreviewsToCarousel in ProductDetailCard for why)
+            Api.uploadProductImages(this.$route.params.id, createProductResponse.data.productId, this.productDisplayedInCard.images.map(
+                file => file.fileObject
+            ))
           })
           .then(() => {
             this.$bvModal.hide('product-card');
