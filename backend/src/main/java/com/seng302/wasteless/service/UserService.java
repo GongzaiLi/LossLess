@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,7 +139,7 @@ public class UserService {
      * @param searchQuery       The search query
      * @return                  A set of all matching users
      */
-    public LinkedHashSet<User> searchForMatchingUsers(String searchQuery) {
+    public Set<User> searchForMatchingUsers(String searchQuery) {
         // full matches
         LinkedHashSet<User> fullMatches = userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
 
