@@ -37,6 +37,11 @@
     <b-form
         @submit="okAction"
     >
+    <div v-if="!productCard.images.length">
+      <b-img :src="require(`./assets/${productCard.defaultImage}`)" fluid-grow></b-img>
+    </div>
+
+    <b-form @submit="okAction" >
     <b-card-body>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
@@ -123,6 +128,7 @@ export default {
         recommendedRetailPrice: 0,
         created: '',
         images: [],
+        defaultImage: 'product_default.png'
       },
     }
   },
