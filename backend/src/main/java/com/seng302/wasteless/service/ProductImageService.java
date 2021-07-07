@@ -2,6 +2,8 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.repository.ProductImageRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +21,7 @@ import java.util.*;
 public class ProductImageService {
 
     private final ProductImageRepository productImageRepository;
+    private static final Logger logger = LogManager.getLogger(ProductImageService.class.getName());
 
     @Autowired
     public ProductImageService(ProductImageRepository productImageRepository) { this.productImageRepository = productImageRepository; }
@@ -55,7 +58,8 @@ public class ProductImageService {
             file.mkdirs();
             Files.copy(image.getInputStream(), file.getAbsoluteFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
             return true;
-        } catch (IOException e) {
+        } catch (IOException error) {
+            logger.debug("Failed to save image locally: {0}", error);
             return false;
         }
 

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
@@ -73,13 +74,16 @@ public class ImageController {
         }
 
         ProductImage newImage = new ProductImage();
-        String fileType = "";
-        try {
-            fileType = file.getContentType().split("/")[1];
-        } catch (NullPointerException e) {
-            logger.debug("Error with getting file content");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with getting file content");
+
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        if (fileName.isEmpty() || fileName.contains("..")) {
+            logger.debug("Error with Filename contains invalid path sequence {}", fileName);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with Filename contains invalid path sequence");
         }
+
+        String fileType = fileName.split("\\.")[1];
+
         if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(fileType)) {
             logger.warn("Cannot post product image, invalid image type");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Image type");
@@ -94,7 +98,8 @@ public class ImageController {
 
         newImage = productImageService.createProductImage(newImage);
         Product product = productService.findProductById(productId);
-        productService.addImageToProduct(product, newImage.getId());
+
+        productService.addImageToProduct(product, newImage);
         productService.updateProduct(product);
 
         JSONObject responseBody = new JSONObject();
