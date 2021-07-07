@@ -179,4 +179,16 @@ class ImageControllerUnitTest {
     }
 
 
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddProductImage_andEmptyContentType_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", null ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
+                .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+
 }

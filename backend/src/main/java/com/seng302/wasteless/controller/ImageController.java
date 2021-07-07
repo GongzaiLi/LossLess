@@ -11,9 +11,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Arrays;
 
 @RestController
@@ -21,7 +21,7 @@ public class ImageController {
 
     private static final Logger logger = LogManager.getLogger(ImageController.class.getName());
 
-    private  final UserService userService;
+    private final UserService userService;
     private final BusinessService businessService;
     private final ProductImageService productImageService;
     private final ProductService productService;
@@ -63,7 +63,7 @@ public class ImageController {
             logger.warn("Cannot post product image for product that does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
         }
-        if (!possibleProduct.getBusinessId().equals(businessId)){
+        if (!possibleProduct.getBusinessId().equals(businessId)) {
             logger.warn("Cannot post product image for product that does not belong to current business");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
         }
@@ -74,24 +74,28 @@ public class ImageController {
         }
 
         ProductImage newImage = new ProductImage();
+        String imageType;
+        try {
+            String fileContentType = file.getContentType();
+            if (fileContentType != null && fileContentType.contains("/")) {
+                imageType = fileContentType.split("/")[1];
+            } else {
+                logger.debug("Error with image type is null");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with image type is null");
+            }
 
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-        if (fileName.isEmpty() || fileName.contains("..")) {
-            logger.debug("Error with Filename contains invalid path sequence {}", fileName);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with Filename contains invalid path sequence");
+        } catch (NullPointerException e) {
+            logger.debug("Error with getting file content");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with getting file content");
         }
-
-        String fileType = fileName.split("\\.")[1];
-
-        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(fileType)) {
+        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
             logger.warn("Cannot post product image, invalid image type");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Image type");
         }
 
-        newImage = productImageService.createImageFileName(newImage, fileType);
+        newImage = productImageService.createImageFileName(newImage, imageType);
 
-        if (!productImageService.storeImage(newImage.getFileName(), file)) {
+        if (Boolean.FALSE.equals(productImageService.storeImage(newImage.getFileName(), file))) {
             logger.debug("Error with creating directory or saving file {}", file);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error with creating directory");
         }
