@@ -85,11 +85,11 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Image type");
         }
 
-        productImageService.createImageFileName(newImage, fileType);
+        newImage = productImageService.createImageFileName(newImage, fileType);
 
         if (!productImageService.storeImage(newImage.getFileName(), file)) {
             logger.debug("Error with creating directory or saving file {}", file);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Error with creating directory");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error with creating directory");
         }
 
         newImage = productImageService.createProductImage(newImage);

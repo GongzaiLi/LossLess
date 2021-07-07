@@ -34,11 +34,13 @@ public class ProductImageService {
      * Create unique image filename for the database by using UUID which crates unique alphanumeric value by hashing the time
      * @param productImage
      * @param fileType
+     * @return productImage
      */
-    public void createImageFileName(ProductImage productImage, String fileType) {
+    public ProductImage createImageFileName(ProductImage productImage, String fileType) {
         UUID uuid = UUID.randomUUID();
         productImage.setFileName(String.format("/media/images/%s.%s", uuid, fileType));
         productImage.setThumbnailFilename(String.format("/media/images/%s_thumbnail.%s", uuid, fileType));
+        return productImage;
     }
 
     /**
