@@ -8,9 +8,11 @@ Date: 19/4/2021
     class="profile-card"
     style="max-width: 550px"
   >
-    <b-form
-        @submit="okAction"
-    >
+    <div v-if="!productCard.images.length">
+      <b-img :src="require(`./assets/${productCard.defaultImage}`)" fluid-grow></b-img>
+    </div>
+
+    <b-form @submit="okAction" >
     <b-card-body>
         <div>
           <h6><strong>Upload Product Images</strong></h6>
@@ -92,6 +94,7 @@ export default {
         recommendedRetailPrice: 0,
         created: '',
         images: [],
+        defaultImage: 'product_default.png'
       },
     }
   },
