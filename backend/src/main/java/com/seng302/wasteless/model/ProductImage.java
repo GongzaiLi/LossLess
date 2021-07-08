@@ -24,11 +24,6 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
 
-    @NotNull(message = "Must have database ID")
-    @ManyToOne
-    @JoinColumn(name="productId", referencedColumnName="database_id")
-    private Product product;
-
     @NotNull(message = "Must have a filename")
     @Column(name = "fileName")
     private String fileName;
