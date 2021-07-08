@@ -25,7 +25,6 @@ public class ImageController {
     private final BusinessService businessService;
     private final ProductImageService productImageService;
     private final ProductService productService;
-    private final UserService userService;
 
     @Autowired
     public ImageController(BusinessService businessService, ProductService productService, ProductImageService productImageService, UserService userService) {

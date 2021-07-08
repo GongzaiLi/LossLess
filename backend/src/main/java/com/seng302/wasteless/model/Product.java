@@ -94,7 +94,7 @@ public class Product {
      * @param productImageId Id of the image to remove from the product
      */
     public void removeImage(Integer productImageId) {
-        this.imageIds.remove(productImageId);
+        this.images.remove(productImageId);
     }
 
 }

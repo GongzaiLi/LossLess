@@ -81,23 +81,14 @@ public class ProductImageService {
 
     public void deleteImage(ProductImage productImage) { this.productImageRepository.delete(productImage);}
 
-//    public void deleteImageFile(ProductImage productImage) {
-//
-//        String filename = productImage.getFileName();
-//        String thumbnailFilename = productImage.getThumbnailFilename();
-//        //System.out.println(getClass().getClassLoader().getResource("./media/images/test.png").getPath());
-//        System.out.println(Files.exists(Paths.get("./media/images/test.png")));
-////        System.out.println(getClass().getClassLoader().getResource("./media/images/test.png").getPath());
-////        System.out.println(getClass().getClassLoader().getResource(thumbnailFilename).getPath());
-//        try {
-//            Files.delete(Paths.get(getClass().getClassLoader().getResource("test.png").getPath()));
-//        } catch (IOException error) {
-//            logger.debug("File: {} does not exist", filename);
-//        }
-//        try {
-//            Files.delete(Paths.get(thumbnailFilename));
-//        } catch (IOException error) {
-//            logger.debug("File: {} does not exist", thumbnailFilename);
-//        }
-//    }
+   public void deleteImageFile(ProductImage productImage) {
+        try {
+        Files.delete(Paths.get(productImage.getFileName()));
+        //return true;
+    } catch (IOException error) {
+        logger.debug("Failed to delete image locally: {0}", error);
+       // return false;
+    }
+
+   }
 }
