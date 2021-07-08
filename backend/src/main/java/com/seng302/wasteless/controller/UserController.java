@@ -252,13 +252,12 @@ public class UserController {
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
+        User loggedInUser = userService.getUser();
+        if (loggedInUser == null) {
+            logger.warn("Failed to update user, Access token invalid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access token is invalid");
+        } else if (possibleUser == null) {
 
             logger.warn("User with ID: {} does not exist", userId);
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
@@ -308,11 +307,7 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+        User loggedInUser = userService.getUser();
 
         if (possibleUser == null) {
 

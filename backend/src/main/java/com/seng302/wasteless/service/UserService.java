@@ -1,10 +1,17 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
@@ -18,6 +25,8 @@ import java.util.regex.Pattern;
 public class UserService {
 
     private UserRepository userRepository;
+
+    private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -152,6 +161,16 @@ public class UserService {
      */
     public void saveUserChanges(User user) {
         userRepository.save(user);
+    }
+
+
+    public User getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+        logger.info("User Email found is: {}", currentPrincipalEmail);
+        User user = this.findUserByEmail(currentPrincipalEmail);
+        logger.info("User found is: {}", user);
+        return user;
     }
 
 }

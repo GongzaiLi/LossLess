@@ -36,10 +36,7 @@ public class GetUserDtoMapper {
 
     public static GetUserDto toGetUserDto(User user) {
 
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+        User loggedInUser =  userService.getUser();
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
         Integer currentUserId = loggedInUser.getId();
 

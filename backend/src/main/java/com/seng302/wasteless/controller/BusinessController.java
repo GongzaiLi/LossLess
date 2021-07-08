@@ -63,16 +63,9 @@ public class BusinessController {
     public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
         logger.debug("Request to create new business {}", business);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        User user = userService.findUserByEmail(currentPrincipalEmail);
-
-        logger.info("User trying to create business is: {}", user);
-
+        User user = userService.getUser();
         if (user == null) {
-            logger.warn("Failed to create Business. Access token invalid for user: {}", user);
+            logger.warn("Failed to create Business, Access token invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is invalid");
         }
@@ -200,11 +193,7 @@ public class BusinessController {
         logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
 
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
+        User userMakingRequest = userService.getUser();
 
         if (!userMakingRequest.checkUserGlobalAdmin()
                 && !(possibleBusinessToAddAdminFor.checkUserIsPrimaryAdministrator(userMakingRequest))) {
@@ -247,10 +236,7 @@ public class BusinessController {
         User possibleUser = userService.findUserById(requestBody.getUserId());
         logger.info("possible Business{}", possibleBusiness);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+        User loggedInUser = userService.getUser();
 
         if (possibleBusiness == null) {
             logger.warn("Business does not exist.");

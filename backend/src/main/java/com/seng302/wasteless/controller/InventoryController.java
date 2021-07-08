@@ -64,20 +64,16 @@ public class InventoryController {
      */
     @PostMapping("/businesses/{id}/inventory")
     public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, @Valid @RequestBody PostInventoryDto inventoryDtoRequest) {
-        logger.info("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
+        logger.debug("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
+        User user = userService.getUser();
 
         if (user == null) {
-            logger.warn("Error, no logged in user making request to post inventory endpoint: {}", currentPrincipalEmail);
+            logger.warn("Failed to Create inventory item, Access token invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is invalid");
         }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        logger.info("Validated token for user: {}", user);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -134,18 +130,14 @@ public class InventoryController {
 
         logger.debug("Request to get business INVENTORY products");
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
+        User user = userService.getUser();
 
         if (user == null) {
-            logger.warn("Cannot retrieve INVENTORY products. Access token invalid for user with Email: {}", currentPrincipalEmail);
+            logger.warn("Failed to get Inventory items, Access token invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is invalid");
         }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        logger.info("Validated token for user: {}", user);
 
 
         logger.debug("Retrieving business with id: {}", businessId);
@@ -184,18 +176,14 @@ public class InventoryController {
     @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId}")
     public ResponseEntity<Object> putBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") Integer itemId, @Valid @RequestBody PostInventoryDto editedInventoryItem) {
 
-        logger.debug("Request to update inventory product");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User user = userService.findUserByEmail(currentPrincipalEmail);
+        logger.debug("Request to update inventory product with ID {}", itemId);
+        User user = userService.getUser();
         if (user == null) {
-            logger.warn("Cannot Update INVENTORY product with ID {}. Access token invalid for user with Email: {}", itemId, currentPrincipalEmail);
+            logger.warn("Failed to update Inventory Item, Access token invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     "Access token is invalid");
         }
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        logger.info("Validated token for user: {}", user);
 
 
         logger.debug("Request to get business with ID: {}", businessId);
