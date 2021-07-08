@@ -91,10 +91,10 @@ public class Product {
      * Remove an image from a product
      * Never call this directly, only call it from product service.
      *
-     * @param productImageId Id of the image to remove from the product
+     * @param productImage  of the image to remove from the product
      */
-    public void removeImage(Integer productImageId) {
-        this.images.remove(productImageId);
+    public void removeImage(ProductImage productImage) {
+        this.images.remove(productImage);
     }
 
 }

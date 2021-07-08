@@ -79,16 +79,23 @@ public class ProductImageService {
      */
     public ProductImage findImageById(Integer id) { return productImageRepository.findFirstById(id); }
 
-    public void deleteImage(ProductImage productImage) { this.productImageRepository.delete(productImage);}
-
-   public void deleteImageFile(ProductImage productImage) {
-        try {
-        Files.delete(Paths.get(productImage.getFileName()));
-        //return true;
-    } catch (IOException error) {
-        logger.debug("Failed to delete image locally: {0}", error);
-       // return false;
+    public void deleteImage(ProductImage productImage) {
+        this.productImageRepository.delete(productImage);
     }
 
-   }
+    public void deleteImageFile(ProductImage productImage) {
+        try {
+            logger.info("Deleting: {}", productImage.getFileName());
+            Files.delete(Paths.get(".." + productImage.getFileName()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete image locally: {0}", error);
+        }
+        try {
+            logger.info("Deleting: {}", productImage.getThumbnailFilename());
+            Files.delete(Paths.get(".." + productImage.getThumbnailFilename()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete thumbnail image locally: {0}", error);
+        }
+
+    }
 }

@@ -73,12 +73,12 @@ public class ProductService {
 
     /**
      * Remove an image from a product
-     *
      * Calling the method in this way allows for mocking during automated testing
-     *
+     *  @param product Product that image is to be removed from
+     *  @param productImage image that is to be removed from product
      */
-    public void removeImageFromProduct(Product product, Integer productImageId) {
-        product.removeImage(productImageId);
+    public void removeImageFromProduct(Product product, ProductImage productImage) {
+        product.removeImage(productImage);
     }
 
 

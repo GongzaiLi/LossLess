@@ -125,9 +125,20 @@ public class ImageController {
 
         ProductImage image = productImageService.findImageById(imageId);
         Product product = productService.findProductById(productId);
-        productImageService.deleteImage(image);
-        productService.removeImageFromProduct(product, imageId);
+
+        if (product==null){
+            logger.warn("Cannot delete productImage. Product is null");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Product no longer exists");
+        }
+        if (image==null){
+            logger.warn("Cannot delete productImage. image: is null", image, product);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Image no longer exists");
+        }
+
+        productService.removeImageFromProduct(product, image);
         productService.updateProduct(product);
+        productImageService.deleteImage(image);
+        productImageService.deleteImageFile(image);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
