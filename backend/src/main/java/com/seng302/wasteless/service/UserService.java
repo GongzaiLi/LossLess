@@ -1,6 +1,6 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.controller.BusinessController;
+import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
@@ -13,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,9 +26,9 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
 
-    private static final Logger logger = LogManager.getLogger(UserService.class.getName());
+    private UserRepository userRepository;
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -103,6 +105,24 @@ public class UserService {
     }
 
     /**
+     *
+     * @return
+     */
+    public User getCurrentlyLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User user = findUserByEmail(currentPrincipalEmail);
+        if (user == null) {
+            logger.info("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
+        }
+        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        return user;
+    }
+
+    /**
      * Checks whether the user is an admin in the business
      *
      * @param businessId    The business ID
@@ -119,7 +139,7 @@ public class UserService {
      * @param searchQuery       The search query
      * @return                  A set of all matching users
      */
-    public LinkedHashSet<User> searchForMatchingUsers(String searchQuery) {
+    public Set<User> searchForMatchingUsers(String searchQuery) {
         // full matches
         LinkedHashSet<User> fullMatches = userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
 
@@ -161,16 +181,6 @@ public class UserService {
      */
     public void saveUserChanges(User user) {
         userRepository.save(user);
-    }
-
-
-    public User getUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-        logger.info("User Email found is: {}", currentPrincipalEmail);
-        User user = this.findUserByEmail(currentPrincipalEmail);
-        logger.info("User found is: {}", user);
-        return user;
     }
 
 }

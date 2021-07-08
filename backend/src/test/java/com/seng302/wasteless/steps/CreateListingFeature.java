@@ -22,12 +22,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(UserController.class)
@@ -62,6 +63,11 @@ public class CreateListingFeature {
     @Autowired
     private InventoryService inventoryService;
 
+    private String moreInfo;
+
+    private int quantity;
+
+    private double price;
 
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
@@ -94,7 +100,6 @@ public class CreateListingFeature {
 
     public void theProductWithIdExistsInTheCatalogueForBusiness(int businessId, String productId) {
         if (productService.findProductById(productId) == null) {
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++");
             Product product = new Product();
             product.setId(productId);
             product.setBusinessId(businessId);
@@ -125,6 +130,12 @@ public class CreateListingFeature {
 
     }
 
+    @Given("The business with id {int} exists")
+    public void the_business_exists(Integer id) {
+        theUserWithEmailIsLoggedIn("a@a");
+        theUserWithEmailIsAnAdministratorForBusiness("a@a", id);
+    }
+
     @And("The user with email {string} is an administrator for business {int}")
     public void theUserWithEmailIsAnAdministratorForBusiness(String email, int businessId) {
         this.businessId = businessId;
@@ -135,9 +146,9 @@ public class CreateListingFeature {
             business = new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
             business.setId(businessId);
-            business.setAdministrators(Collections.singletonList(user));
             business.setName("Jimmy's clown store");
             business.setAddress(throwawayAddress);
+            business.setAdministrators(Collections.singletonList(user));
             businessService.createBusiness(business);
         }
 
@@ -145,6 +156,14 @@ public class CreateListingFeature {
             user.addPrimaryBusiness(business);
             business.getAdministrators().add(user);
         }
+    }
+
+    @Given("The user with email {string} is not an administrator for business {int}")
+    public void theUserWithEmailIsNotAnAdministratorForBusiness(String email, int businessId) {
+        User user = userService.findUserByEmail(email);
+
+        Business business = businessService.findBusinessById(businessId);
+        Assertions.assertFalse(business.checkUserIsAdministrator(user));
     }
 
 
@@ -164,6 +183,18 @@ public class CreateListingFeature {
         }
     }
 
+    @And("The business with id {int} has a listing with the inventory item ID {int}, quantity {int}, price {double}, moreInfo {string}, and closes {string}")
+    public void theBusinessWithIdHasAListingWithTheInventoryItemIDQuantityPriceMoreInfoAndCloses(int businessId, int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
+        this.businessId = businessId;
+        this.moreInfo = moreInfo;
+        this.quantity = quantity;
+        this.price = price;
+
+        theUserWithEmailIsLoggedIn("a@a");
+        thereIsAnInventoryItemWithAnInventoryIdAndProductId(inventoryItemId, "B");
+        theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(inventoryItemId, quantity, price, moreInfo, closes);
+        result.andExpect(status().isCreated());
+    }
 
     @When("The user creates a listing with the inventory item ID {int}, quantity {int}, price {double}, moreInfo {string}, and closes {string}")
     public void theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
@@ -177,8 +208,6 @@ public class CreateListingFeature {
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
                 .with(csrf()));
-
-
     }
 
     @Then("The user will be able to see the new listing")
@@ -282,6 +311,18 @@ public class CreateListingFeature {
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
                 .with(csrf()));
+    }
+
+    @Then("The user with email {string} can see that listing")
+    public void anotherUserWithEmailCanSeeThatListing(String email) throws Exception {
+        theUserWithEmailIsLoggedIn(email);
+
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/businesses/%d/listings", this.businessId))
+                .with(user(currentUserDetails))
+                .with(csrf()))
+                .andExpect(jsonPath("[0].quantity", is(quantity)))
+                .andExpect(jsonPath("[0].price", is(price)))
+                .andExpect(jsonPath("[0].moreInfo", is(moreInfo)));;
     }
 }
 

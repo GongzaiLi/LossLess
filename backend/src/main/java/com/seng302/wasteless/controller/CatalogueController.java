@@ -2,7 +2,10 @@ package com.seng302.wasteless.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
@@ -13,17 +16,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.*;
-import javax.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ProductController is used for mapping all Restful API requests starting with the address
@@ -58,14 +61,7 @@ public class CatalogueController {
 
         logger.debug("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
 
-        User user = userService.getUser();
-
-        if (user == null) {
-            logger.warn("Failed to create Product, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {}.", user);
+        User user = userService.getCurrentlyLoggedInUser();
 
         if (!possibleProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
@@ -135,18 +131,9 @@ public class CatalogueController {
      */
     @GetMapping("/businesses/{id}/products")
     public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
-
         logger.debug("Request to get business products");
 
-        User user = userService.getUser();
-
-        if (user == null) {
-            logger.warn("Failed to get Product, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated toke for user: {}", user);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -184,16 +171,9 @@ public class CatalogueController {
      */
     @PutMapping("/businesses/{businessId}/products/{productId}")
     public ResponseEntity<Object> editBusinessProduct(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @Valid @RequestBody Product editedProduct) {
-
         logger.debug("Request to update product with data: {} for business ID: {}", editedProduct, businessId);
 
-        User user = userService.getUser();
-        if (user == null) {
-            logger.warn("Failed to update product, Access token invalid");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        logger.info("Validated token for user: {} ", user);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
             logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, businessId);

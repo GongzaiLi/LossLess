@@ -3,8 +3,14 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
-import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Inventory;
+import com.seng302.wasteless.model.Listing;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.InventoryService;
+import com.seng302.wasteless.service.ListingsService;
+import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -12,8 +18,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +34,7 @@ import java.util.Map;
  */
 @RestController
 public class ListingController {
-    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
+    private static final Logger logger = LogManager.getLogger(ListingController.class.getName());
 
 
     private final BusinessService businessService;
@@ -63,19 +67,11 @@ public class ListingController {
      */
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
-        logger.debug("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
+        logger.info("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
 
-        User user = userService.getUser();
-        if (user == null) {
-            logger.warn("Failed tp create listing, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {}", user);
+        User user = userService.getCurrentlyLoggedInUser();
 
-
-
-        logger.debug("Retrieving business with id: {}", businessId);
+        logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         if (possibleBusiness == null) {
@@ -129,15 +125,6 @@ public class ListingController {
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
-
-        User user = userService.getUser();
-
-        if (user == null) {
-            logger.warn("Failed to get listings, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {}", user);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);

@@ -17,8 +17,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -66,14 +64,8 @@ public class InventoryController {
     public ResponseEntity<Object> postBusinessInventoryProducts(@PathVariable("id") Integer businessId, @Valid @RequestBody PostInventoryDto inventoryDtoRequest) {
         logger.debug("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
 
-        User user = userService.getUser();
-
-        if (user == null) {
-            logger.warn("Failed to Create inventory item, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {}", user);
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -127,18 +119,9 @@ public class InventoryController {
      */
     @GetMapping("/businesses/{id}/inventory")
     public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId) {
-
         logger.debug("Request to get business INVENTORY products");
 
-        User user = userService.getUser();
-
-        if (user == null) {
-            logger.warn("Failed to get Inventory items, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {}", user);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -175,16 +158,9 @@ public class InventoryController {
      */
     @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId}")
     public ResponseEntity<Object> putBusinessesInventoryProducts(@PathVariable("businessId") Integer businessId, @PathVariable("inventoryItemId") Integer itemId, @Valid @RequestBody PostInventoryDto editedInventoryItem) {
+        logger.debug("Request to update inventory product");
 
-        logger.debug("Request to update inventory product with ID {}", itemId);
-        User user = userService.getUser();
-        if (user == null) {
-            logger.warn("Failed to update Inventory Item, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Validated token for user: {}", user);
-
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);

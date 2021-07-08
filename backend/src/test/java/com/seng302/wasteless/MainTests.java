@@ -36,7 +36,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * Main test class. Testing overall application sanity
  */
 @SpringBootTest
-public class MainTests {
+class MainTests {
 
   /**
    * This test will simply trigger the bootup of the application. Always true if

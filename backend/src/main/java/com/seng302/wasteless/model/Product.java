@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * An implementation of Product model.
@@ -57,6 +58,15 @@ public class Product {
     @Column(name = "business_id")
     private Integer businessId;
 
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @Column(name = "image_ids")
+    @OneToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
+    private List<ProductImage> images;
+
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @Column(name = "primary_Image")
+    private Integer primaryImageId;
+
 
     /**
      * Formats a code by taking the BusinessId and the Product Object's ID
@@ -69,6 +79,16 @@ public class Product {
     public String createCode(Integer businessId) {
         return businessId + "-" + this.getId().toUpperCase().replaceAll("\\P{Alnum}+$", "")
                 .replaceAll(" ", "-");
+    }
+
+    /**
+     * Add an image to a product
+     * Never call this directly, only call it from business service.
+     *
+     * @param productImage Id of the image to add to the product
+     */
+    public void addImage(ProductImage productImage) {
+        this.images.add(productImage);
     }
 
 }

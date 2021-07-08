@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         locations = "classpath:application-integrationtest.properties"
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
-public class UserControllerIntegrationTests {
+ class UserControllerIntegrationTests {
 
     String homeAddress = "{\n" +
             "    \"streetNumber\": \"3/24\",\n" +
@@ -46,7 +46,7 @@ public class UserControllerIntegrationTests {
     private MockMvc mockMvc;
 
     @Test
-    public void whenLoggingIntoAccountWithIncorrectRequestBody() {
+     void whenLoggingIntoAccountWithIncorrectRequestBody() {
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"username\": \"wrongemail@uclive.ac.nz\", \"pass\" : \"Password123\"}";
 
@@ -62,7 +62,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenLoggingIntoAccountThatDoesNotExist() {
+     void whenLoggingIntoAccountThatDoesNotExist() {
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"email\": \"wrongemail@uclive.ac.nz\", \"password\" : \"Password123\"}";
 
@@ -78,7 +78,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenLoggingIntoAccountWithIncorrectPassword() {
+     void whenLoggingIntoAccountWithIncorrectPassword() {
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"email\": \"ojc31@uclive.ac.nz\", \"password\" : \"wrongPassword\"}";
 
@@ -94,7 +94,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenLoggingIntoAccountWithCorrectPassword() {
+     void whenLoggingIntoAccountWithCorrectPassword() {
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
         String login = "{\"email\": \"ojc31@uclive.ac.nz\", \"password\" : \"Password123\"}";
 
@@ -110,7 +110,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenSearchingForUsers_andOneMatchingUsers_thenCorrectResult() throws Exception {
+     void whenSearchingForUsers_andOneMatchingUsers_thenCorrectResult() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
@@ -124,7 +124,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenSearchingForUsers_andNoMatchingUsers_thenCorrectResult() throws Exception {
+     void whenSearchingForUsers_andNoMatchingUsers_thenCorrectResult() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
@@ -142,7 +142,7 @@ public class UserControllerIntegrationTests {
 
 
     @Test
-    public void whenSearchingForUsers_andMultipleMatchingUsers_byFullMatch_andPartialMatch_thenCorrectOrder() throws Exception {
+     void whenSearchingForUsers_andMultipleMatchingUsers_byFullMatch_andPartialMatch_thenCorrectOrder() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
@@ -227,7 +227,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenGetUserWithIdTwo_andOnlyOneCreatedUser_BesidedDefault_ThenGetCorrectUser() throws Exception {
+     void whenGetUserWithIdTwo_andOnlyOneCreatedUser_BesidedDefault_ThenGetCorrectUser() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
         mockMvc.perform(
@@ -291,13 +291,13 @@ public class UserControllerIntegrationTests {
 
     @Test
     @WithMockCustomUser(email = "test@700", role = UserRoles.GLOBAL_APPLICATION_ADMIN) //fails without this?
-    public void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
+     void whenGetRequestToUsersAndUserExists_thenCorrectResponse() throws Exception {
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
+     void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
@@ -344,7 +344,7 @@ public class UserControllerIntegrationTests {
     }
 
     @Test
-    public void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
+     void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         mockMvc.perform(get("/users/245")

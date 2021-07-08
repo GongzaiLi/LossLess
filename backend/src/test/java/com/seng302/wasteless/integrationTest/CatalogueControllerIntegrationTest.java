@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         locations = "classpath:application-integrationtest.properties"
 )
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // Reset JPA between test
-public class CatalogueControllerIntegrationTest {
+ class CatalogueControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,7 +48,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPostRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
+     void whenPostRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -70,7 +70,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPostRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
+     void whenPostRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
 
         Business business = new Business();
 
@@ -98,7 +98,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPostRequestToBusinessProducts_AndProductAlreadyExists_then400Response() throws Exception {
+     void whenPostRequestToBusinessProducts_AndProductAlreadyExists_then400Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -144,7 +144,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPostRequestToBusinessProducts_AndUserIsBusinessAdminAndProductIsValid_then201Response() throws Exception {
+     void whenPostRequestToBusinessProducts_AndUserIsBusinessAdminAndProductIsValid_then201Response() throws Exception {
 
         createOneBusiness("Business2", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -166,7 +166,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
-    public void whenPostRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductIsValid_then201Response() throws Exception {
+     void whenPostRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductIsValid_then201Response() throws Exception {
 
         Business business = new Business();
 
@@ -195,7 +195,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenGetRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
+     void whenGetRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -216,7 +216,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenGetRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
+     void whenGetRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
 
         Business business = new Business();
 
@@ -241,7 +241,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndProductsExist_then200Response() throws Exception {
+     void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndProductsExist_then200Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -266,7 +266,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
-    public void whenGetRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductsExist_then200Response() throws Exception {
+     void whenGetRequestToBusinessProducts_AndUserIsGlobalAdminButNotBusinessAdminAndProductsExist_then200Response() throws Exception {
 
         Business business = new Business();
 
@@ -300,7 +300,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndNoProductsExist_then200Response() throws Exception {
+     void whenGetRequestToBusinessProducts_AndUserIsBusinessAdminAndNoProductsExist_then200Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -320,7 +320,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndBusinessNotExists_then403Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndBusinessNotExists_then403Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -342,7 +342,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNotAdminToBusiness_then403Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndNotAdminToBusiness_then403Response() throws Exception {
 
         Business business = new Business();
 
@@ -378,7 +378,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndSuccess_then200Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndSuccess_then200Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -401,7 +401,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNameIsTheSame_then200Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndNameIsTheSame_then200Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -424,7 +424,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainChangedProductCode_then200Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainChangedProductCode_then200Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -452,7 +452,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then400Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndNameChanges_thenProductCodeChange_thenPutRequestAgainOnPastCode_then400Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -480,7 +480,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
-    public void whenPutRequestToBusinessProducts_AndIsNotAdminToBusiness_ButIsGlobalAdmin_then200Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndIsNotAdminToBusiness_ButIsGlobalAdmin_then200Response() throws Exception {
         Business business = new Business();
         business.setName("New Business");
         business.setAddress(new Address()
@@ -511,7 +511,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
-    public void whenPutRequestToBusinessProducts_AndIsNotAdminToBusiness_ButIsDGAA_then200Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndIsNotAdminToBusiness_ButIsDGAA_then200Response() throws Exception {
         Business business = new Business();
         business.setName("New Business");
         business.setAddress(new Address()
@@ -542,7 +542,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNameMissing_then400Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndNameMissing_then400Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -566,7 +566,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndNameIsBlank_then400Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndNameIsBlank_then400Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -588,7 +588,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndRecommendedRetailPriceIsLetter_then400Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndRecommendedRetailPriceIsLetter_then400Response() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +
@@ -610,7 +610,7 @@ public class CatalogueControllerIntegrationTest {
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    public void whenPutRequestToBusinessProducts_AndSuccess_AndAllDataUpdates_thenAllChangesShouldBeMade() throws Exception {
+     void whenPutRequestToBusinessProducts_AndSuccess_AndAllDataUpdates_thenAllChangesShouldBeMade() throws Exception {
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
                 "    \"streetName\": \"Clyde Road\",\n" +

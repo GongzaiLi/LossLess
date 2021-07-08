@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
+import com.seng302.wasteless.model.Address;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.AddressService;
-import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
@@ -63,13 +65,8 @@ public class BusinessController {
     public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
 
         logger.debug("Request to create new business {}", business);
-        User user = userService.getUser();
-        if (user == null) {
-            logger.warn("Failed to create Business, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    "Access token is invalid");
-        }
-        logger.info("Access token valid for user: {}. Creating Business .... ", user);
+
+        User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Adding business data");
         business.setPrimaryAdministrator(user);
@@ -123,7 +120,6 @@ public class BusinessController {
     @GetMapping("/businesses/{id}")
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
 
-
         logger.debug("Request to get business with ID: {}", businessId);
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -139,8 +135,6 @@ public class BusinessController {
 
         logger.info("Successfully retrieved formatted business: {}", getBusinessesDto);
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
-
-
     }
 
 
@@ -193,7 +187,7 @@ public class BusinessController {
         logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
 
 
-        User userMakingRequest = userService.getUser();
+        User userMakingRequest = getCurrentlyLoggedInUser();
 
         if (!userMakingRequest.checkUserGlobalAdmin()
                 && !(possibleBusinessToAddAdminFor.checkUserIsPrimaryAdministrator(userMakingRequest))) {
@@ -236,7 +230,7 @@ public class BusinessController {
         User possibleUser = userService.findUserById(requestBody.getUserId());
         logger.info("possible Business{}", possibleBusiness);
 
-        User loggedInUser = userService.getUser();
+        User loggedInUser = getCurrentlyLoggedInUser();
 
         if (possibleBusiness == null) {
             logger.warn("Business does not exist.");

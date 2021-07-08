@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
-import com.seng302.wasteless.model.User;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -145,7 +145,7 @@ public class UserController {
         logger.debug("Request to search for users with query: {}", searchQuery);
 
         logger.debug("Getting users matching query: {}", searchQuery);
-        LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
         List<GetUserDto> searchResultsDto = new ArrayList<>();
         //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?

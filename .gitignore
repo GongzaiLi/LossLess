@@ -43,3 +43,4 @@ coverage/
 
 ### Logging ###
 /backend/spring.log
+*.gz
