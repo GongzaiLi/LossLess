@@ -75,19 +75,15 @@ public class ImageController {
 
         ProductImage newImage = new ProductImage();
         String imageType;
-        try {
-            String fileContentType = file.getContentType();
-            if (fileContentType != null && fileContentType.contains("/")) {
-                imageType = fileContentType.split("/")[1];
-            } else {
-                logger.debug("Error with image type is null");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with image type is null");
-            }
 
-        } catch (NullPointerException e) {
-            logger.debug("Error with getting file content");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with getting file content");
+        String fileContentType = file.getContentType();
+        if (fileContentType != null && fileContentType.contains("/")) {
+            imageType = fileContentType.split("/")[1];
+        } else {
+            logger.debug("Error with image type is null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with image type is null");
         }
+
         if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
             logger.warn("Cannot post product image, invalid image type");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Image type");
