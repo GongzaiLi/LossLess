@@ -1,21 +1,45 @@
-<!--
-Page show product detail card
-Author: Gongzai Li
-Date: 19/4/2021
--->
 <template>
   <b-card
     class="profile-card"
-    style="max-width: 550px"
+    style="max-width: 50rem"
   >
-    <b-form
-        @submit="okAction"
+    <b-carousel
+        id="carousel-1"
+        controls
+        indicators
+        class="mb-2"
+        :interval="0"
+        ref="image_carousel"
+        v-model="slideNumber"
     >
+      <b-carousel-slide v-for="image in productCard.images" :key="image.id">
+        <template #img>
+          <div style="position: absolute; width:100%; z-index: 999999"> <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
+            <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image"><b-icon-trash-fill></b-icon-trash-fill></b-button>
+            <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover title="Set as primary image"><b-icon-star></b-icon-star></b-btn>
+          </div>
+          <!-- The class .d-block prevent browser default image alignment -->
+          <img
+              class="product-image d-block w-100 rounded"
+              alt="Product image"
+              :src="image.filename"
+          >
+        </template>
+      </b-carousel-slide>
+    </b-carousel>
+    <b-input-group>
+      <div v-if="!productCard.images.length">
+        <img class="product-image" :src="require(`/public/product_default.png`)" alt="Product has no image">
+      </div>
+      <div class="w-100">
+        <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
+        <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker" accept="image/png, image/jpeg, image/gif, image/jpg">
+        <b-button class="w-100" id="add-image-btn" @click="$refs.filepicker.click()">{{productCard.images.length > 0 ? "Add more product images": "Add product images"}}</b-button>
+      </div>
+    </b-input-group>
+
+    <b-form @submit="okAction" >
     <b-card-body>
-        <div>
-          <h6><strong>Upload Product Images</strong></h6>
-          <b-form-file v-model="productCard.images" multiple accept=".jpg, .png, .gif" :file-name-formatter="imageNames"></b-form-file>
-        </div>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
           <br>This will be automatically changed into the correct format.</p>
@@ -75,8 +99,25 @@ Date: 19/4/2021
       </div>
     </b-form>
   </b-card>
-
 </template>
+
+<style>
+.carousel-control-prev, .carousel-control-next {
+  background-color: black;
+  opacity: 0.2 !important;
+}
+
+#add-image-btn {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.product-image {
+  height: 15rem;
+  object-fit: cover;
+  width: 100%;
+}
+</style>
 
 <script>
 export default {
@@ -84,6 +125,8 @@ export default {
   props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
   data() {
     return {
+      images: [],
+      slideNumber: 0,
       productCard: {
         id: '',
         name: '',
@@ -97,18 +140,30 @@ export default {
   },
   mounted() {
     this.productCard = this.product;
+    this.productCard.images = []
     // Sometimes the product passed in should not have a 'created' attribute, eg. if it is a new object for creation.
     if (this.productCard.created) {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
     }
   },
   methods: {
-    imageNames(files) {
-      let imageNames = [];
-      files.forEach((image) => {
-        imageNames.push(image.name);
-      })
-      return imageNames.toString()
+    async onFileChange(e) {
+      const files = e.target.files;
+      for (let file of files) {
+        let url = URL.createObjectURL(file);
+        this.productCard.images.push({
+          "id": url,
+          "filename": url
+        });
+      }
+      this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
+      await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image
+      this.slideNumber = this.productCard.images.length-1; // Change the displayed image slide to the newly added image
+    }
+  },
+  computed: {
+    isCreatingProduct() {
+      return !this.productCard.created; // If the product has no created attribute we must be creating a new product
     }
   }
 }

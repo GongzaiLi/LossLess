@@ -1,7 +1,6 @@
 package com.seng302.wasteless.service;
 
 
-import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.repository.ProductRepository;
@@ -64,12 +63,12 @@ public class ProductService {
 
     /**
      * Add image to a product
-     *
      * Calling the method in this way allows for mocking during automated testing
-     *
+     * @param product
+     * @param productImage
      */
-    public void addImageToProduct(Product product, Integer productImageId) {
-        product.addImage(productImageId);
+    public void addImageToProduct(Product product, ProductImage productImage) {
+        product.addImage(productImage);
     }
 
     /**

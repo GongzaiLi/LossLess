@@ -12,7 +12,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,9 +58,10 @@ public class Product {
     @Column(name = "business_id")
     private Integer businessId;
 
-    @ElementCollection
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "image_ids")
-    private List<Integer> imageIds;
+    @OneToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
+    private List<ProductImage> images;
 
 
     /**
@@ -81,10 +81,10 @@ public class Product {
      * Add an image to a product
      * Never call this directly, only call it from product service.
      *
-     * @param productImageId Id of the image to add to the product
+     * @param productImage Id of the image to add to the product
      */
-    public void addImage(Integer productImageId) {
-        this.imageIds.add(productImageId);
+    public void addImage(ProductImage productImage) {
+        this.images.add(productImage);
     }
 
     /**

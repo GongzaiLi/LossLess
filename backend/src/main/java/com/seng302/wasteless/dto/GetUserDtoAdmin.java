@@ -1,6 +1,5 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.BusinessAdministered;
 import com.seng302.wasteless.model.UserRoles;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import net.minidev.json.JSONObject;
-
-import java.util.List;
 
 
 /**
@@ -35,5 +32,4 @@ public class GetUserDtoAdmin extends GetUserDto {
     private JSONObject homeAddress;
     private String created;
     private UserRoles role;
-    private List<BusinessAdministered> businessesAdministered;
 }

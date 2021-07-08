@@ -1,4 +1,5 @@
 package com.seng302.wasteless.dto;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
