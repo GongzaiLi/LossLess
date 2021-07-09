@@ -41,63 +41,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private Authentication authentication;
 
-    private User currentUser;
+    private User user;
+    private User admin;
+    private User defaultAdmin;
 
     @BeforeEach
     void setUp() {
 
-        User user = mock(User.class);
+        user = mock(User.class);
         user.setId(1);
         user.setEmail("user@gmail.com");
         user.setRole(UserRoles.USER);
 
-        User admin = mock(User.class);
+        admin = mock(User.class);
         admin.setId(2);
         admin.setEmail("admin@gmail.com");
         admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
 
-        User admin2 = mock(User.class);
-        admin2.setId(5);
-        admin2.setEmail("admin2@gmail.com");
-        admin2.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
 
-        User defaultAdmin = mock(User.class);
+        defaultAdmin = mock(User.class);
         defaultAdmin.setId(3);
         defaultAdmin.setEmail("default@gmail.com");
         defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
 
         doReturn(false).when(user).checkUserGlobalAdmin();
         doReturn(true).when(admin).checkUserGlobalAdmin();
-        doReturn(true).when(admin2).checkUserGlobalAdmin();
         doReturn(true).when(defaultAdmin).checkUserGlobalAdmin();
 
         doReturn(false).when(user).checkUserDefaultAdmin();
         doReturn(false).when(admin).checkUserDefaultAdmin();
-        doReturn(false).when(admin2).checkUserDefaultAdmin();
         doReturn(true).when(defaultAdmin).checkUserDefaultAdmin();
 
         doReturn(1).when(user).getId();
         doReturn(2).when(admin).getId();
         doReturn(3).when(defaultAdmin).getId();
-        doReturn(5).when(admin2).getId();
 
-        currentUser = user;
-
-        Mockito
-                .when(userService.getCurrentlyLoggedInUser())
-                .thenReturn(currentUser);
-
-        Mockito
-                .when(userService.findUserByEmail("admin@gmail.com"))
-                .thenReturn(admin);
-
-        Mockito
-                .when(userService.findUserByEmail("admin2@gmail.com"))
-                .thenReturn(admin2);
-
-        Mockito
-                .when(userService.findUserByEmail("default@gmail.com"))
-                .thenReturn(defaultAdmin);
 
         Mockito
                 .when(userService.findUserById(1))
@@ -112,116 +90,111 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(defaultAdmin);
     }
 
+    private void login(User currentUser) {
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(currentUser);
+    }
+
     @Test
      void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
-
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
-
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromUser_thenForbidden() throws Exception {
-
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
-
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
-
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromUser_then406Response() throws Exception {
-
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then406Response() throws Exception {
-
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromGAA_then403Response() throws Exception {
-
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
-
-
-
-
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then409Response_asAdminCannotRevokeOwnRights() throws Exception {
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isConflict());
@@ -229,72 +202,72 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromDGAA_then200Response() throws Exception {
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
+        login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromGAA_then403Response() throws Exception {
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "admin@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
+        login(admin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserGAARole_andRequestFromUser_then403Response() throws Exception {
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromUser_then403Response() throws Exception {
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
@@ -302,8 +275,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andDoesNotExist_andRequestFromUser_then406Response() throws Exception {
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
@@ -311,8 +284,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
     @Test
-    @WithMockUser(username = "user@gmail.com", password = "pwd")
      void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromUser_then403Response() throws Exception {
+        login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
