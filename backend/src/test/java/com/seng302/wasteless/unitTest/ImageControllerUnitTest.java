@@ -184,5 +184,4 @@ class ImageControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
-
 }
