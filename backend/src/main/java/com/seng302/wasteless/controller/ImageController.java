@@ -16,6 +16,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
+/**
+ * Controller for dealing with images
+ */
+
 @RestController
 public class ImageController {
 
@@ -34,6 +38,26 @@ public class ImageController {
         this.productImageService = productImageService;
     }
 
+    /**
+     * Upload image
+     * Takes given image and uploads it to given product.
+     *
+     * Saves image to media/images folder in the backend
+     *
+     * Returns:
+     * NOT_ACCEPTABLE 406 If making request doesnt exist
+     * FORBIDDEN 403 If user not allowed to make request (not global admin or business admin)
+     * 400 BAD_REQUEST If invalid image type, product doesnt exist, product doesnt belong to business, or no image
+     * 201 Created If successfully uploaded and saved image
+     * 500 If server error saving image
+     *
+     * If first image uploaded for a given product, sets image as products primary image.
+     *
+     * @param businessId    The Id of the business that has the product to upload the image for
+     * @param productId     The Id of the product to upload the image for
+     * @param file          The image file to upload
+     * @return              Status code dependent on success. 406, 403, 400, 500 errors. 201 Created with image id if success.
+     */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
     public ResponseEntity<Object> postProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @RequestParam("filename") MultipartFile file) {
 
@@ -97,10 +121,25 @@ public class ImageController {
         }
 
         newImage = productImageService.createProductImage(newImage);
+        logger.debug("Created new image entity {}", newImage);
+
         Product product = productService.findProductById(productId);
+        logger.info("Retrieved product with ID: {}", product.getId());
+
 
         productService.addImageToProduct(product, newImage);
         productService.updateProduct(product);
+        logger.info("Added image with ID: {} to product with ID: {}",newImage.getId(), product.getId());
+
+
+        if(product.getPrimaryImageId() == null) {
+            logger.info("No primary image found for product with ID: {} in th database", product.getId());
+            product.setPrimaryImageId(newImage.getId());
+            logger.info("Set image with ID: {} to product with ID: {} in the database",newImage.getId(), product.getId());
+        }
+        productService.updateProduct(product);
+        logger.info("Saved image with ID: {} to product with ID: {} in the database",newImage.getId(), product.getId());
+
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("imageId", newImage.getId());
