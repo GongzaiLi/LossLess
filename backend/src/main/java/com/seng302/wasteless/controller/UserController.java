@@ -253,7 +253,7 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
 
 
-        User loggedInUser = userService.getUser();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
         if (loggedInUser == null) {
             logger.warn("Failed to update user, Access token invalid");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access token is invalid");
@@ -307,7 +307,7 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
-        User loggedInUser = userService.getUser();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
         if (possibleUser == null) {
 

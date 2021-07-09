@@ -1,10 +1,16 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.BusinessRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -13,6 +19,7 @@ import java.util.List;
  */
 @Service
 public class BusinessService {
+    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
 
     private final BusinessRepository businessRepository;
 
@@ -36,10 +43,15 @@ public class BusinessService {
      * Find business by id
      *
      * @param id        The id of the business to find
-     * @return          The found business, if any, or wise null
+     * @return          The found business, if any, or throw ResponseStatusException
      */
     public Business findBusinessById(Integer id) {
-        return businessRepository.findFirstById(id);
+        Business possibleBusiness = businessRepository.findFirstById(id);
+        if (possibleBusiness == null) {
+            logger.warn("Business does not exist.");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist");
+        }
+        return possibleBusiness;
     }
 
 

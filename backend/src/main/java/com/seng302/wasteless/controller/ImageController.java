@@ -44,10 +44,6 @@ public class ImageController {
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        if (possibleBusiness == null) {
-            logger.warn("Cannot post product image. Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {

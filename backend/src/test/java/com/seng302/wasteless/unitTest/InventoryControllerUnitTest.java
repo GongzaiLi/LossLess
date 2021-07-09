@@ -180,21 +180,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoMatchingBusiness_the406Response() throws Exception {
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenReturn(null);
-
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -294,19 +279,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isUnauthorized());
     }
 
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenGetRequestToInventory_andInvalidRequest_BusinessNotFound_then406Response() throws Exception {
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -477,21 +449,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoMatchingBusiness_the406Response() throws Exception {
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenReturn(null);
-
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null

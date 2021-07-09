@@ -123,10 +123,7 @@ public class BusinessController {
         logger.debug("Request to get business with ID: {}", businessId);
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
+
         logger.info("Successfully Retrieved Business: {} using ID: {}", possibleBusiness, businessId);
 
 
@@ -170,10 +167,6 @@ public class BusinessController {
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
 
-        if (possibleBusinessToAddAdminFor == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusinessToAddAdminFor, businessId);
 
 
@@ -187,7 +180,7 @@ public class BusinessController {
         logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
 
 
-        User userMakingRequest = getCurrentlyLoggedInUser();
+        User userMakingRequest = userService.getCurrentlyLoggedInUser();
 
         if (!userMakingRequest.checkUserGlobalAdmin()
                 && !(possibleBusinessToAddAdminFor.checkUserIsPrimaryAdministrator(userMakingRequest))) {
@@ -230,12 +223,8 @@ public class BusinessController {
         User possibleUser = userService.findUserById(requestBody.getUserId());
         logger.info("possible Business{}", possibleBusiness);
 
-        User loggedInUser = getCurrentlyLoggedInUser();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        if (possibleBusiness == null) {
-            logger.warn("Business does not exist.");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
         if (possibleUser == null) {
             logger.warn("User does not exist");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID does not exist");

@@ -41,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private Authentication authentication;
 
+    private User currentUser;
 
     @BeforeEach
     void setUp() {
@@ -80,10 +81,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         doReturn(3).when(defaultAdmin).getId();
         doReturn(5).when(admin2).getId();
 
+        currentUser = user;
 
         Mockito
-                .when(userService.findUserByEmail("user@gmail.com"))
-                .thenReturn(user);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(currentUser);
 
         Mockito
                 .when(userService.findUserByEmail("admin@gmail.com"))
@@ -111,7 +113,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    @WithMockUser(username = "default@gmail.com", password = "pwd")
      void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")

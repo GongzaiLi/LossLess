@@ -105,8 +105,8 @@ public class UserService {
     }
 
     /**
-     *
-     * @return
+     * Get Currently Logged in user by getting the email and searching by email
+     * @return Logged in user or Throw Response Status Exception
      */
     public User getCurrentlyLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -38,7 +38,7 @@ public class GetBusinessesDtoMapper {
 
     public static GetBusinessesDto toGetBusinessesDto(Business business) {
 
-        User loggedInUser = userService.getUser();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
 
         List<User> businessAdministrators = business.getAdministrators();

@@ -34,7 +34,7 @@ public class GetUserDtoMapper {
 
     public static GetUserDto toGetUserDto(User user) {
 
-        User loggedInUser =  getCurrentlyLoggedInUser();
+        User loggedInUser =  userService.getCurrentlyLoggedInUser();
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
         Integer currentUserId = loggedInUser.getId();
 
