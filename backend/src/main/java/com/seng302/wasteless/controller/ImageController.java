@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 /**
@@ -41,22 +42,22 @@ public class ImageController {
     /**
      * Upload image
      * Takes given image and uploads it to given product.
-     *
+     * <p>
      * Saves image to media/images folder in the backend
-     *
+     * <p>
      * Returns:
      * NOT_ACCEPTABLE 406 If making request doesnt exist
      * FORBIDDEN 403 If user not allowed to make request (not global admin or business admin)
      * 400 BAD_REQUEST If invalid image type, product doesnt exist, product doesnt belong to business, or no image
      * 201 Created If successfully uploaded and saved image
      * 500 If server error saving image
-     *
+     * <p>
      * If first image uploaded for a given product, sets image as products primary image.
      *
-     * @param businessId    The Id of the business that has the product to upload the image for
-     * @param productId     The Id of the product to upload the image for
-     * @param file          The image file to upload
-     * @return              Status code dependent on success. 406, 403, 400, 500 errors. 201 Created with image id if success.
+     * @param businessId The Id of the business that has the product to upload the image for
+     * @param productId  The Id of the product to upload the image for
+     * @param file       The image file to upload
+     * @return Status code dependent on success. 406, 403, 400, 500 errors. 201 Created with image id if success.
      */
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
     public ResponseEntity<Object> postProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @RequestParam("filename") MultipartFile file) {
@@ -115,30 +116,35 @@ public class ImageController {
 
         newImage = productImageService.createImageFileName(newImage, imageType);
 
-        if (Boolean.FALSE.equals(productImageService.storeImage(newImage.getFileName(), file))) {
-            logger.debug("Error with creating directory or saving file {}", file);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error with creating directory");
+        productImageService.storeImage(newImage.getFileName(), file);
+
+
+        BufferedImage thumbnail = productImageService.resizeImage(newImage);
+        if (thumbnail == null) {
+            logger.debug("Error resizing image");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resizing file");
         }
 
+        productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
         newImage = productImageService.createProductImage(newImage);
         logger.debug("Created new image entity {}", newImage);
+
 
         Product product = productService.findProductById(productId);
         logger.info("Retrieved product with ID: {}", product.getId());
 
 
         productService.addImageToProduct(product, newImage);
-        productService.updateProduct(product);
-        logger.info("Added image with ID: {} to product with ID: {}",newImage.getId(), product.getId());
 
 
-        if(product.getPrimaryImageId() == null) {
+        if (product.getPrimaryImageId() == null) {
             logger.info("No primary image found for product with ID: {} in th database", product.getId());
             product.setPrimaryImageId(newImage.getId());
-            logger.info("Set image with ID: {} to product with ID: {} in the database",newImage.getId(), product.getId());
+            logger.info("Set image with ID: {} to product with ID: {} in the database", newImage.getId(), product.getId());
         }
+
         productService.updateProduct(product);
-        logger.info("Saved image with ID: {} to product with ID: {} in the database",newImage.getId(), product.getId());
+        logger.info("Saved image with ID: {} to product with ID: {} in the database", newImage.getId(), product.getId());
 
 
         JSONObject responseBody = new JSONObject();
