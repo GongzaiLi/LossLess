@@ -106,7 +106,7 @@ describe('Testing api put/post request and the response method with errors', () 
   });
 
   it('Succesfully creates a product ', async () => {
-    Api.createProduct.mockResolvedValue({response : {status: 201}});
+    Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: 'AAA'}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.createProduct(mockEvent);
