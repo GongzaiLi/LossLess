@@ -5,8 +5,10 @@ import com.seng302.wasteless.repository.ProductImageRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -64,17 +66,20 @@ public class ProductImageService {
      *
      * @param productImagePath path in which file is to be saved to
      * @param image            image to be saved
-     * @return boolean
      */
-    public Boolean storeImage(String productImagePath, MultipartFile image) {
+    public void storeImage(String productImagePath, MultipartFile image) {
         File file = new File("." + productImagePath);
         try {
-            file.mkdirs();
+            if (!file.exists()) file.mkdirs();
             Files.copy(image.getInputStream(), file.getAbsoluteFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
-            return true;
         } catch (IOException error) {
+            try {
+                Files.deleteIfExists(file.getAbsoluteFile().toPath());
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error with creating directory");
+            }
             logger.debug("Failed to save image locally: {0}", error);
-            return false;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error with creating directory");
         }
     }
 
@@ -92,16 +97,22 @@ public class ProductImageService {
         File image = new File("." + productImage.getFileName());
         try {
             BufferedImage originalImage = ImageIO.read(image);
+            if (originalImage == null) {
+                Files.deleteIfExists(image.getAbsoluteFile().toPath());
+                logger.info("Cannot read Corrupt Image File");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot read Corrupt Image File");
+            }
             int height = TARGET_HEIGHT;
-            int width =  originalImage.getWidth() * TARGET_HEIGHT/originalImage.getHeight();
+            int width = originalImage.getWidth() * TARGET_HEIGHT / originalImage.getHeight();
             BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics2D = resizedImage.createGraphics();
             graphics2D.drawImage(originalImage, 0, 0, width, height, null);
             graphics2D.dispose();
             return resizedImage;
+
         } catch (IOException error) {
             logger.debug("Corrupt Image File", error);
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Corrupt Image File");
         }
     }
 
@@ -111,18 +122,21 @@ public class ProductImageService {
      * @param productImagePath The file path that is used to save the image
      * @param imageType        The image type
      * @param image            The image to be saved
-     * @return
      */
-    public Boolean storeThumbnailImage(String productImagePath, String imageType, BufferedImage image) {
+    public void storeThumbnailImage(String productImagePath, String imageType, BufferedImage image) {
         File file = new File("." + productImagePath);
         try {
             FileOutputStream out = new FileOutputStream(file);
             ImageIO.write(image, imageType, out);
             out.close();
-            return true;
         } catch (IOException error) {
+            try {
+                Files.deleteIfExists(file.getAbsoluteFile().toPath());
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save thumbnail image");
+            }
             logger.debug("Failed to save thumbnail image locally: {0}", error);
-            return false;
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save thumbnail image");
         }
     }
 

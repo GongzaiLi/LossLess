@@ -92,10 +92,7 @@ public class ImageController {
 
         newImage = productImageService.createImageFileName(newImage, imageType);
 
-        if (Boolean.FALSE.equals(productImageService.storeImage(newImage.getFileName(), file))) {
-            logger.debug("Error with creating directory or saving file {}", file);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error with creating directory");
-        }
+        productImageService.storeImage(newImage.getFileName(), file);
 
 
         BufferedImage thumbnail = productImageService.resizeImage(newImage);
@@ -104,11 +101,7 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resizing file");
         }
 
-        if (Boolean.FALSE.equals(productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail))) {
-            logger.debug("Error saving file {}", file);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");
-        }
-
+        productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
         newImage = productImageService.createProductImage(newImage);
 
         Product product = productService.findProductById(productId);
