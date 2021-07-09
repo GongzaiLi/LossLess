@@ -105,13 +105,29 @@ public class ListingController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Listing quantity greater than available inventory quantity.");
         }
 
+        Integer remainingQuantity = availableQuantity - listingQuantity;
+
+
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
         listing.setBusinessId(businessId);
         listing.setCreated(LocalDate.now());
-        possibleInventoryItem.setQuantity(availableQuantity-listingQuantity);
+
+        logger.info("Test1");
 
         listing = listingsService.createListing(listing);
+
+        logger.info("Test2");
+
+        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(remainingQuantity, possibleInventoryItem.getId());
+
+        if (updateQuantityResult == 0) {
+            logger.error("No inventory item quantity value was updated when this listing was created.");
+        } else if (updateQuantityResult > 1) {
+            logger.error("More than one inventory item quantity value was updated when this listing was created.");
+        }
+        logger.info("Test3");
+
 
         logger.info("Created new Listing {}", listing);
 
@@ -139,8 +155,6 @@ public class ListingController {
         logger.info("{}", listings);
         return ResponseEntity.status(HttpStatus.OK).body(listings);
     }
-
-
 
     /**
      * Returns a json object of bad field found in the request
