@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 @RestController
@@ -96,7 +97,15 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error with creating directory");
         }
 
+
+        BufferedImage thumbnail = productImageService.resizeImage(newImage);
+        if (Boolean.FALSE.equals(productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail))) {
+            logger.debug("Error saving file {}", file);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");
+        }
+
         newImage = productImageService.createProductImage(newImage);
+
         Product product = productService.findProductById(productId);
 
         productService.addImageToProduct(product, newImage);
