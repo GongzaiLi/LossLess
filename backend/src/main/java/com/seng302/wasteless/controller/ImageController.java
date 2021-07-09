@@ -99,6 +99,11 @@ public class ImageController {
 
 
         BufferedImage thumbnail = productImageService.resizeImage(newImage);
+        if (thumbnail == null) {
+            logger.debug("Error resizing image");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resizing file");
+        }
+
         if (Boolean.FALSE.equals(productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail))) {
             logger.debug("Error saving file {}", file);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file");

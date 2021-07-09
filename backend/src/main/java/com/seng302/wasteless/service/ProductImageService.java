@@ -27,22 +27,27 @@ public class ProductImageService {
     private final ProductImageRepository productImageRepository;
     private static final Logger logger = LogManager.getLogger(ProductImageService.class.getName());
 
-    // Constants for the thumbnail image size
-    private static final int TARGET_WIDTH = 128;
+    //Constant for Thumbnail.
     private static final int TARGET_HEIGHT = 128;
 
     @Autowired
-    public ProductImageService(ProductImageRepository productImageRepository) { this.productImageRepository = productImageRepository; }
+    public ProductImageService(ProductImageRepository productImageRepository) {
+        this.productImageRepository = productImageRepository;
+    }
 
     /**
      * Creates a ProductImage by saving the productImage object and persisting it in the database
+     *
      * @param productImage The ProductImage object to be created.
      * @return The created ProductImage object.
      */
-    public ProductImage createProductImage(ProductImage productImage) {return productImageRepository.save(productImage); }
+    public ProductImage createProductImage(ProductImage productImage) {
+        return productImageRepository.save(productImage);
+    }
 
     /**
      * Create unique image filename for the database by using UUID which crates unique alphanumeric value by hashing the time
+     *
      * @param productImage
      * @param fileType
      * @return productImage
@@ -56,12 +61,13 @@ public class ProductImageService {
 
     /**
      * saves the image into given path and creates directory if it doesnt exist already
+     *
      * @param productImagePath path in which file is to be saved to
-     * @param image image to be saved
+     * @param image            image to be saved
      * @return boolean
      */
     public Boolean storeImage(String productImagePath, MultipartFile image) {
-        File file = new File(".." + productImagePath);
+        File file = new File("." + productImagePath);
         try {
             file.mkdirs();
             Files.copy(image.getInputStream(), file.getAbsoluteFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -73,39 +79,42 @@ public class ProductImageService {
     }
 
     /**
-     * Resizes the original image to the thumbnail target width and target height
+     * Resizes the original image to the thumbnail target height and the width is calculated from the ratio
+     * of the target height and original height and
      * by using Graphics2D library
      * https://www.baeldung.com/java-resize-image#2-imagegetscaledinstance
+     *
      * @param productImage The Product image to be resized
-     * @returnconstant The resized version of the original image
      * @throws IOException
+     * @returnconstant The resized version of the original image
      */
     public BufferedImage resizeImage(ProductImage productImage) {
-        File image = new File(".." + productImage.getFileName());
-        BufferedImage originalImage = null;
-
+        File image = new File("." + productImage.getFileName());
         try {
-            originalImage = ImageIO.read(image);
+            BufferedImage originalImage = ImageIO.read(image);
+            int height = TARGET_HEIGHT;
+            int width =  originalImage.getWidth() * TARGET_HEIGHT/originalImage.getHeight();
+            BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics2D = resizedImage.createGraphics();
+            graphics2D.drawImage(originalImage, 0, 0, width, height, null);
+            graphics2D.dispose();
+            return resizedImage;
         } catch (IOException error) {
-            logger.debug("", error);
+            logger.debug("Corrupt Image File", error);
+            return null;
         }
-
-        BufferedImage resizedImage = new BufferedImage(TARGET_WIDTH, TARGET_HEIGHT, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(originalImage, 0, 0, TARGET_WIDTH, TARGET_HEIGHT, null);
-        graphics2D.dispose();
-        return resizedImage;
     }
 
     /**
      * Saves the thumbnail image into given path.
+     *
      * @param productImagePath The file path that is used to save the image
-     * @param imageType The image type
-     * @param image The image to be saved
+     * @param imageType        The image type
+     * @param image            The image to be saved
      * @return
      */
     public Boolean storeThumbnailImage(String productImagePath, String imageType, BufferedImage image) {
-        File file = new File(".." + productImagePath);
+        File file = new File("." + productImagePath);
         try {
             FileOutputStream out = new FileOutputStream(file);
             ImageIO.write(image, imageType, out);
