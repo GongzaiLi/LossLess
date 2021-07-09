@@ -72,10 +72,10 @@ export default {
       Array.from(images)  // Convert into array. Needed because we might get a FileList which doesn't support .map(). JS is fun sometimes...
       .map(  // Run all requests to upload product images in parallel for efficiency
         imageFile => {
+          // See https://github.com/axios/axios/issues/710 for how this works
           let formData = new FormData();
-          formData.append("file", imageFile);
-
-          return instance.post(`/businesses/${businessId}/products/${productId}/images`, imageFile);
+          formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+          return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
         })
     );
   },

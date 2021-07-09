@@ -79,7 +79,7 @@ export default {
       },
       productCardAction: null,
       productCardError: "",
-      productDisplayedInCard: {},
+      productDisplayedInCard: { images: [] },
       isProductCardReadOnly: true,
       items: [],
       perPage: 10,
@@ -201,6 +201,7 @@ export default {
             this.refreshProducts();
           })
           .catch((error) => {
+            console.log(error);
             this.productCardError = this.getErrorMessageFromApiError(error);
             this.$log.debug(error);
           });

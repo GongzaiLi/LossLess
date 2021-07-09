@@ -120,7 +120,7 @@
 </style>
 
 <script>
-import Api from "@/Api";
+import Api from "../../Api.js";
 
 export default {
   name: "product-detail-card",
@@ -160,7 +160,8 @@ export default {
       if (this.isCreatingProduct) {
         this.addImagePreviewsToCarousel(files);
       } else {
-        await Api.uploadProductImages(this.$route.params.id, this.productCard.id, files)
+        const businessId = this.$route.params.id;
+        await Api.uploadProductImages(businessId, `${businessId}-${this.productCard.id}`, files)
         // TODO: refresh the product images if an API call was sent
       }
       this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
