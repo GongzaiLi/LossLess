@@ -120,28 +120,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-     void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
-        login(defaultAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isNotAcceptable());
-    }
 
-    @Test
-     void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
-        login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isNotAcceptable());
-    }
+
 
     @Test
      void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromUser_then406Response() throws Exception {
         login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
                 .with(csrf()))
-                .andExpect(status().isNotAcceptable());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -217,13 +204,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk());
     }
 
-    @Test
-     void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromDGAA_then406Response() throws Exception {
-        login(defaultAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
      void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
@@ -249,13 +229,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-     void whenTryRevokeUserAdmin_andUserDoesNotExist_andRequestFromGAA_then406Response() throws Exception {
-        login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
      void whenTryRevokeUserAdmin_andUserGAARole_andRequestFromUser_then403Response() throws Exception {
@@ -275,11 +248,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
     @Test
-     void whenTryRevokeUserAdmin_andDoesNotExist_andRequestFromUser_then406Response() throws Exception {
+     void whenTryRevokeUserAdmin_andDoesNotExist_andRequestFromUser_then403Response() throws Exception {
         login(user);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
                 .with(csrf()))
-                .andExpect(status().isNotAcceptable());
+                .andExpect(status().isForbidden());
     }
 
 

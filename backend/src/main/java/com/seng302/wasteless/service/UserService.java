@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
+    private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     private UserRepository userRepository;
 
@@ -91,7 +90,13 @@ public class UserService {
      * @return          The found user, if any, or wise null
      */
     public User findUserById(Integer id) {
-        return userRepository.findFirstById(id);
+
+        User possibleUser = userRepository.findFirstById(id);
+        if (possibleUser == null) {
+            logger.warn("User with ID: {} does not exist", id);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "User does not exist");
+        }
+        return possibleUser;
     }
 
     /**

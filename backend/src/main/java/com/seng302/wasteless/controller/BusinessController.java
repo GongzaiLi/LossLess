@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -173,10 +172,6 @@ public class BusinessController {
         logger.debug("Trying to find user with ID: {}", requestBody.getUserId());
         User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
 
-        if (possibleUserToMakeAdmin == null) {
-            logger.warn("User with ID: {} does not exist", requestBody.getUserId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
-        }
         logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
 
 
@@ -225,10 +220,6 @@ public class BusinessController {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        if (possibleUser == null) {
-            logger.warn("User does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID does not exist");
-        }
         if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
             logger.warn("User is primary admin");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");

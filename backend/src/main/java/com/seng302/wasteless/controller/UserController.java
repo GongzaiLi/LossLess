@@ -220,10 +220,6 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.debug("possible User: {}", possibleUser);
 
-        if (possibleUser == null) {
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
 
         // Not too sure what to do with Response 401 because it's possibly about security but do we need
         // to have U4 for that or is it possible to do without it
@@ -251,18 +247,9 @@ public class UserController {
 
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
-
-
         User loggedInUser = userService.getCurrentlyLoggedInUser();
-        if (loggedInUser == null) {
-            logger.warn("Failed to update user, Access token invalid");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Access token is invalid");
-        } else if (possibleUser == null) {
 
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+         if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to make others admin");
@@ -309,12 +296,7 @@ public class UserController {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        if (possibleUser == null) {
-
-            logger.warn("Could not find user with ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+        if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to revoke others admin");

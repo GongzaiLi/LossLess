@@ -8,7 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,7 +18,7 @@ import java.util.List;
  */
 @Service
 public class BusinessService {
-    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
+    private static final Logger logger = LogManager.getLogger(BusinessService.class.getName());
 
     private final BusinessRepository businessRepository;
 
@@ -48,7 +47,7 @@ public class BusinessService {
     public Business findBusinessById(Integer id) {
         Business possibleBusiness = businessRepository.findFirstById(id);
         if (possibleBusiness == null) {
-            logger.warn("Business does not exist.");
+            logger.warn("Business with id: {} does not exist.", id);
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist");
         }
         return possibleBusiness;
