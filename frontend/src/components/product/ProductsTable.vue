@@ -15,6 +15,14 @@
         :busy="tableLoading"
         ref="productCatalogueTable"
     >
+      <template #cell(image)="products">
+        <div v-if="!products.item.images.length">
+          <img class="product-image-thumbnail" :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image">
+        </div>
+        <div v-if="products.item.images.length">
+          <img class="product-image-thumbnail" :src="getPrimaryImageThumbnail(products.item)">
+        </div>
+      </template>
 
       <template v-slot:cell(actions)="products">
         <b-button id="edit-button" @click="editButtonClicked(products.item)" size="sm">
@@ -40,6 +48,14 @@
     <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
   </div>
 </template>
+
+
+<style>
+.product-image-thumbnail {
+  width: 44px;
+  object-fit: cover;
+}
+</style>
 
 <script>
 import pagination from "../model/Pagination";
@@ -111,7 +127,24 @@ export default {
       }
       const showTenWordDescription = description.slice(0, 10).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
+    },
+
+    /**
+     * Takes a product as input and returns the primary image thumbnail for that product
+     * @param  {product} a product that's image is being requested
+     * @return image
+     **/
+    getPrimaryImageThumbnail: function (product) {
+      console.log(product, 11111);
+      const images = product.images;
+      const primaryImageId = product.primaryImageId;
+      for (const image of images) {
+        if (image.id === primaryImageId) {
+          return api.getImage(image.thumbnailFilename.substr(1));
+        }
+      }
     }
+
   },
 
   computed: {
@@ -122,6 +155,12 @@ export default {
      */
     fields: function () {
       let fieldsList = [
+        {
+          key: 'image',
+          label: '',
+          formatter: 'setImage'
+        },
+
         {
           key: 'id',
           label: 'ID',

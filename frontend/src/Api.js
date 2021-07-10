@@ -58,6 +58,7 @@ export default {
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials:true}),
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
   getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials:true}),
+  getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
 
   /**
    * Uploads one or more image files to a product. For each image, will send a POST request to the product images
