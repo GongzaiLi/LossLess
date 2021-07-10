@@ -169,6 +169,7 @@ public class ImageController {
      * Get any image from the media/images file given its file
      *
      * Removing leading '/' from file path e.g. media/images/a.png
+     * otherwise the image cannot be found
      *
      * @param filename  The name of the file to get
      * @return          The image
