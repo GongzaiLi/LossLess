@@ -16,7 +16,7 @@
         <template #img>
           <div style="position: absolute; width:100%; z-index: 999999">
             <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
-            <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="deleteImage(image.id)">
+            <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog(image.id)">
               <b-icon-trash-fill/>
             </b-button>
             <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover title="Set as primary image">
@@ -109,6 +109,12 @@
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
       </div>
     </b-form>
+
+    <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteImage">
+      <h6>
+        Are you sure you want to <strong>permanently</strong> delete this image?
+      </h6>
+    </b-modal>
   </b-card>
 </template>
 
@@ -138,8 +144,8 @@ export default {
   props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
   data() {
     return {
-      images: [],
       slideNumber: 0,
+      imageIdToDelete: null,
       productCard: {
         id: '',
         name: '',
@@ -197,21 +203,34 @@ export default {
     },
 
     /**
-     * Api request to delete product image
+     * Deletes the image with the id stored in this.imageIdToDelete. Makes an API call if
+     * the product already exists, otherwise will only remove image from list of images to be created.
+     * This should only be called when the user confirms they want to delete the image
      **/
-    deleteImage: async function (imageId) {
+    confirmDeleteImage: async function () {
       const businessId = this.$route.params.id;
-      await Api
-          .deleteImage(businessId, `${businessId}-${this.productCard.id}`, imageId)
-          .then(()=> {
-            // TODO: refresh the product images if an API call was sent
-            this.imageError = '';
-          })
-          .catch((error) => {
-            this.imageError = error.response.statusText;
-            this.$log.debug(error);
-          })
+      if (!this.isCreatingProduct) {  // Only make Api request if the product exists
+        try {
+          await Api.deleteImage(businessId, `${businessId}-${this.productCard.id}`, this.imageIdToDelete)
+        } catch(error) {
+          this.imageError = error.response.statusText;
+          this.$log.debug(error);
+          return;
+        }
+      }
+      this.productCard.images = this.productCard.images.filter(image => image.id !== this.imageIdToDelete);
+      this.imageError = '';
+      this.$forceUpdate(); // For some carousel isn't reactive to the images array, so this forces an update
     },
+
+    /**
+     * Opens the dialog to confirm if the image with given id should be deleted.
+     * Stores the given id in this.imageIdToDelete
+     */
+    openDeleteConfirmDialog: function(imageId) {
+      this.imageIdToDelete = imageId;
+      this.$refs.confirmDeleteImageModal.show();
+    }
 
   },
   computed: {
