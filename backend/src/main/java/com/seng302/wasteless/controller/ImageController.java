@@ -17,8 +17,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
-import javax.validation.ConstraintViolationException;
+
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,7 +40,7 @@ public class ImageController {
     private final ProductImageService productImageService;
     private final ProductService productService;
 
-    private ServletContext servletContext;
+
 
     @Autowired
     public ImageController(BusinessService businessService, ProductService productService, ProductImageService productImageService, UserService userService) {
@@ -234,4 +233,62 @@ public class ImageController {
         errors.put("Error", errorMsg);
         return errors;
     }
+
+    /**
+     * Sets primary image of a product to the chosen imageId by changing the database reference
+     * @param businessId The Id of the business that has the product to change primary image of
+     * @param productId The id of the product  to change primary image of
+     * @param imagedId id of the image that is being set as primary image
+     * @return  Status code dependent on success. 406, 403, 400, 500 errors. 200 returned if successfully set as new primary Id
+     */
+    @PutMapping("/businesses/{businessId}/products/{productId}/images/{imageId}/makeprimary")
+    public ResponseEntity<Object> makeProductPrimaryImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @PathVariable("imageId") Integer imagedId) {
+
+        User user = userService.getCurrentlyLoggedInUser();
+
+        logger.info("Retrieving business with id: {}", businessId);
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+
+        if (possibleBusiness == null) {
+            logger.warn("Cannot post product image. Business ID: {} does not exist.", businessId);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+        }
+        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+
+        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
+            logger.warn("Cannot post product image. User: {} is not global admin or business admin: {}", user.getId(), businessId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+        }
+        logger.info("User: {} validated as global admin or admin of business: {}.", user.getId(), businessId);
+
+        logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", productId, businessId);
+        Product possibleProduct = productService.findProductById(productId);
+
+        if (possibleProduct == null) {
+            logger.warn("Cannot post product image for product that does not exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
+        }
+        if (!possibleProduct.getBusinessId().equals(businessId)) {
+            logger.warn("Cannot post product image for product that does not belong to current business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
+        }
+
+        ProductImage possibleImage = productImageService.findProductImageById(imagedId);
+
+        if (possibleImage == null) {
+            logger.warn("Cannot post product image for product image id that does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Product image with given id does not exist");
+        }
+
+        if (possibleProduct.getImages().stream().noneMatch(image -> image.getId().equals(imagedId))) {
+            logger.warn("Cannot post product image for product image that does not belong to current product");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image id does not exist for Current Product");
+        }
+
+        possibleProduct.setPrimaryImageId(imagedId);
+        productService.updateProduct(possibleProduct);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Primary image successfully updated");
+    }
+
 }

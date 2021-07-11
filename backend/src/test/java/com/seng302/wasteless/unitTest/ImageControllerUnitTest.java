@@ -26,11 +26,13 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -66,6 +68,7 @@ class ImageControllerUnitTest {
     private Product productForImage;
 
     private ProductImage productImage;
+    private ProductImage productImageTwo;
 
 
     @BeforeEach
@@ -79,10 +82,21 @@ class ImageControllerUnitTest {
 
         productImage = new ProductImage();
         productImage.setFileName("test");
-        productImage.setThumbnailFilename("test");
+        productImage.setThumbnailFilename("test_thumbnail");
         productImage.setId(1);
 
+        productImageTwo = new ProductImage();
+        productImageTwo.setFileName("test2");
+        productImageTwo.setThumbnailFilename("test2_thumbnail");
+        productImageTwo.setId(2);
 
+        productForImage.setPrimaryImageId(1);
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+
+
+        productForImage.setImages(productImages);
 
 
         user = mock(User.class);
@@ -120,9 +134,13 @@ class ImageControllerUnitTest {
                 .when(productImageService.createProductImage(any(ProductImage.class)))
                 .thenReturn(productImage);
 
+        Mockito
+                .when(productImageService.findProductImageById(2))
+                .thenReturn(productImageTwo);
 
 
-        doReturn(productForImage).when(productService).findProductById(anyString());
+
+        doReturn(productForImage).when(productService).findProductById(productForImage.getId());
 
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
         doReturn(productForImage).when(productService).findProductById(null);
@@ -183,5 +201,39 @@ class ImageControllerUnitTest {
                 .file(image))
                 .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPutRequestToAddProductPrimaryImage_andValidRequest_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/2/makeprimary")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPutRequestToAddProductPrimaryImage_businessesIdNotFind_then400Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/2/products/1-test-product/images/2/makeprimary")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPutRequestToAddProductPrimaryImage_productCodeNotFind_then400Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/99-test-product/images/2/makeprimary")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPutRequestToAddProductPrimaryImage_productImageIdNotFind_then406Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/999/makeprimary")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
 
 }
