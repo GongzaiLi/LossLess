@@ -12,8 +12,8 @@
     "sonarqube": "node sonarqube-analysis.js"
   },
   "dependencies": {
-    "@babel/runtime": "^7.14.0",
     "@babel/core": "^7.14.0",
+    "@babel/runtime": "^7.14.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",

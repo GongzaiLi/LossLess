@@ -38,7 +38,7 @@
       </div>
     </b-input-group>
 
-    <b-form @submit="okAction" >
+    <b-form @submit.prevent="okAction" >
     <b-card-body>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
@@ -120,6 +120,8 @@
 </style>
 
 <script>
+import Api from "../../Api.js";
+
 export default {
   name: "product-detail-card",
   props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
@@ -147,21 +149,46 @@ export default {
     }
   },
   methods: {
+    /**
+     * Handler for when the file selected by the invisible file input changes (ie whenever the user
+     * selects a file). If we're creating a new product, it will add the image to the list of images to be
+     * uploaded when the product is created. Otherwise, it will simply make the Api call to upload the image
+     * directly. In both cases the selected image is added to the carousel.
+     */
     async onFileChange(e) {
       const files = e.target.files;
-      for (let file of files) {
-        let url = URL.createObjectURL(file);
-        this.productCard.images.push({
-          "id": url,
-          "filename": url
-        });
+      if (this.isCreatingProduct) {
+        this.addImagePreviewsToCarousel(files);
+      } else {
+        const businessId = this.$route.params.id;
+        await Api.uploadProductImages(businessId, `${businessId}-${this.productCard.id}`, files)
+        // TODO: refresh the product images if an API call was sent
       }
       this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
       await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image
       this.slideNumber = this.productCard.images.length-1; // Change the displayed image slide to the newly added image
-    }
+    },
+    /**
+     * Given a list of image files, adds each as a preview to the product image carousel. This should be used when creating
+     * the product, so users are able to see and change which images will be created along with their product.
+     * This does not actually upload the files - that should be done when the user creates the product.
+     */
+    addImagePreviewsToCarousel(files) {
+      for (let file of files) {
+        let url = URL.createObjectURL(file);
+        this.productCard.images.push({
+          "id": url,
+          "filename": url,
+          fileObject: file
+        });
+      }
+    },
+
   },
   computed: {
+    /**
+     * @returns {boolean} True if this component is being used to create a new product, False otherwise.
+     */
     isCreatingProduct() {
       return !this.productCard.created; // If the product has no created attribute we must be creating a new product
     }
