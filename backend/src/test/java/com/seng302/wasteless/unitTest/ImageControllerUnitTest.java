@@ -139,7 +139,6 @@ class ImageControllerUnitTest {
                 .thenReturn(productImageTwo);
 
 
-
         doReturn(productForImage).when(productService).findProductById(productForImage.getId());
 
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
@@ -231,6 +230,38 @@ class ImageControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productImageIdNotFind_then406Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/999/makeprimary")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_andValidRequest_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_businessesIdNotFind_then400Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/2/products/1-test-product/images/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_productCodeNotFind_then400Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/99-test-product/images/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_productImageIdNotFind_then406Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/99")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }

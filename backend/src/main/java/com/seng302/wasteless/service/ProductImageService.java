@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.repository.ProductImageRepository;
 import org.apache.logging.log4j.LogManager;
@@ -21,9 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -131,28 +127,29 @@ public class ProductImageService {
         }
     }
 
-    /**
-     * Find product by product id (code)
-     *
-     * @param id        The id of the image to find
-     * @return          The found product image, if any, otherwise null
-     */
-    public ProductImage findImageById(Integer id) { return productImageRepository.findFirstById(id); }
 
+    /**
+     * delete product image from database
+     * @param productImage
+     */
     public void deleteImage(ProductImage productImage) {
         this.productImageRepository.delete(productImage);
     }
 
+    /**
+     * delete image file and thumbnail from serve
+     * @param productImage
+     */
     public void deleteImageFile(ProductImage productImage) {
         try {
             logger.info("Deleting: {}", productImage.getFileName());
-            Files.delete(Paths.get(".." + productImage.getFileName()));
+            Files.delete(Paths.get("." + productImage.getFileName()));
         } catch (IOException error) {
             logger.debug("Failed to delete image locally: {0}", error);
         }
         try {
             logger.info("Deleting: {}", productImage.getThumbnailFilename());
-            Files.delete(Paths.get(".." + productImage.getThumbnailFilename()));
+            Files.delete(Paths.get("." + productImage.getThumbnailFilename()));
         } catch (IOException error) {
             logger.debug("Failed to delete thumbnail image locally: {0}", error);
         }
