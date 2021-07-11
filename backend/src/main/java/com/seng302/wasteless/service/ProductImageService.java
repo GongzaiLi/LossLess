@@ -61,7 +61,7 @@ public class ProductImageService {
         return productImage;
     }
 
-    /**
+    /**     
      * saves the image into given path and creates directory if it doesnt exist already
      *
      * @param productImagePath path in which file is to be saved to
