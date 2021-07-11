@@ -7,6 +7,7 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductImageService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -90,7 +91,8 @@ class ImageControllerUnitTest {
         productImageTwo.setThumbnailFilename("test2_thumbnail");
         productImageTwo.setId(2);
 
-        productForImage.setPrimaryImageId(1);
+        productForImage.setPrimaryImage(productImage);
+
         List<ProductImage> productImages = new ArrayList<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
@@ -206,33 +208,42 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_andValidRequest_then200Response() throws Exception {
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
+        Assertions.assertNotEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImageTwo.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_businessesIdNotFind_then400Response() throws Exception {
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/2/products/1-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productCodeNotFind_then400Response() throws Exception {
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/99-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productImageIdNotFind_then406Response() throws Exception {
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/999/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
     }
 
 
