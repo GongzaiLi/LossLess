@@ -111,7 +111,7 @@ public class ImageController {
 
         int numProductImages = possibleProduct.getImages().size();
 
-        if (numProductImages >= 10) {
+        if (numProductImages >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot upload product image, limit reached for this product.");
         }
