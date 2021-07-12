@@ -15,15 +15,16 @@
       ref="inventoryTable"
       @row-clicked="tableRowClick"
   >
-    <template #cell(productThumbnail) class="thumbnail-row">
-      <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
-             alt="Default Image"></b-img>
+    <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
+      <b-img thumbnail class="product-image-thumbnail" :src="getThumbnail(data.item.product)" />
     </template>
+
     <template v-slot:cell(actions)="product">
       <b-button id="edit-button" @click="editButtonClicked(product.item)" size="sm">
         Edit
       </b-button>
     </template>
+
     <template #cell(pricePerItem)="data">
       {{ currency.symbol }}{{ data.item.pricePerItem }}
     </template>
@@ -51,6 +52,15 @@
   margin-top: 7em;
   margin-bottom: 7em;
   text-align: center;
+}
+
+.product-image-thumbnail {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  min-height: 50px;
+  max-width: 50px;
+  max-height: 50px;
 }
 
 .thumbnail-row {
@@ -146,6 +156,18 @@ export default {
             `${date.getUTCFullYear()}`;
       }
     },
+
+    /**
+     * Uses the product of the inventory and returns the primary image of the thumbnail for that product
+     * @param  product a product that's image is being requested
+     * @return image
+     **/
+    getThumbnail: function (product) {
+      if (product.primaryImage) {
+        const primaryImageFileName = product.primaryImage.thumbnailFilename;
+        return api.getImage(primaryImageFileName.substr(1));
+      }
+      }
   },
 
   mounted() {
@@ -164,6 +186,7 @@ export default {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
           thStyle: 'width: 60px',
+          label: 'Thumbnail',
         },
         {
           key: 'product',
