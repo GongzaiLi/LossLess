@@ -38,8 +38,15 @@ Listings Page
     <b-row cols-lg="3" style="margin-left: -38px">
       <b-col v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
         <b-card style="min-width: 17rem; height: 100%">
-          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
-                 alt="Default Image"></b-img>
+          <div v-if="listing.inventoryItem.product.images.length">
+            <img class="product-image" :src="getPrimaryImage(listing)" alt="Failed to load image">
+          </div>
+          <div v-if="!listing.inventoryItem.product.images.length">
+            <img class="product-image" :src="require(`/public/product_default.png`)" alt="Product has no image">
+          </div>
+
+<!--          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"-->
+<!--                 alt="Default Image"></b-img>-->
           <hr>
           <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
           <b-card-sub-title v-if="listing.inventoryItem.product.manufacturer">
@@ -124,6 +131,7 @@ export default {
       currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
+      images: [],
       currency: {
         symbol: '$',
         code: 'USD',
@@ -161,6 +169,7 @@ export default {
             this.$log.debug(error);
           });
     },
+
 
 
     /**
@@ -250,6 +259,23 @@ export default {
             this.$log.debug(error);
           })
     },
+
+    /**
+     * Takes a listing as input and returns the primary image for that listing
+     * @param  {listing} a string that's image is being requested
+     * @return image
+     **/
+    getPrimaryImage: function (listing) {
+      const images = listing.inventoryItem.product.images;
+      const primaryImageId = listing.inventoryItem.product.primaryImageId;
+      for (const image of images) {
+        if (image.id === primaryImageId) {
+          return api.getImage(image.fileName.substr(1));
+        }
+      }
+    }
+
+
   },
 
   computed: {
@@ -290,6 +316,7 @@ export default {
       this.launchPage(id);
     },
   },
+
 
 }
 </script>
