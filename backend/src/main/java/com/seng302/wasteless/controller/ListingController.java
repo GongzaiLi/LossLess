@@ -97,6 +97,11 @@ public class ListingController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory with given id does not exist");
         }
 
+        if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
+            logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getBestBefore());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item expiry is in the past.");
+        }
+
         Integer availableQuantity = possibleInventoryItem.getQuantity();
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
@@ -113,11 +118,7 @@ public class ListingController {
         listing.setBusinessId(businessId);
         listing.setCreated(LocalDate.now());
 
-        logger.info("Test1");
-
         listing = listingsService.createListing(listing);
-
-        logger.info("Test2");
 
         Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(remainingQuantity, possibleInventoryItem.getId());
 
@@ -125,8 +126,9 @@ public class ListingController {
             logger.error("No inventory item quantity value was updated when this listing was created.");
         } else if (updateQuantityResult > 1) {
             logger.error("More than one inventory item quantity value was updated when this listing was created.");
+        } else if (updateQuantityResult == 1) {
+            logger.info("Inventory item quantity value was updated when this listing was created.");
         }
-        logger.info("Test3");
 
 
         logger.info("Created new Listing {}", listing);
