@@ -60,6 +60,7 @@ export default {
   getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
+    getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
 
   /**
    * Uploads one or more image files to a product. For each image, will send a POST request to the product images
