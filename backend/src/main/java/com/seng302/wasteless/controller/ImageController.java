@@ -148,9 +148,9 @@ public class ImageController {
         productService.addImageToProduct(product, newImage);
 
 
-        if (product.getPrimaryImageId() == null) {
+        if (product.getPrimaryImage() == null) {
             logger.info("No primary image found for product with ID: {} in th database", product.getId());
-            product.setPrimaryImageId(newImage.getId());
+            product.setPrimaryImage(newImage);
             logger.info("Set image with ID: {} to product with ID: {} in the database", newImage.getId(), product.getId());
         }
 
@@ -315,7 +315,7 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image id does not exist for Current Product");
         }
 
-        possibleProduct.setPrimaryImageId(imagedId);
+        possibleProduct.setPrimaryImage(possibleImage);
         productService.updateProduct(possibleProduct);
 
         return ResponseEntity.status(HttpStatus.OK).body("Primary image successfully updated");

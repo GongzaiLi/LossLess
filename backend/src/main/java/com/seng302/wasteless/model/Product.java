@@ -64,8 +64,10 @@ public class Product {
     private List<ProductImage> images;
 
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
-    @Column(name = "primary_Image")
-    private Integer primaryImageId;
+    @JoinColumn(name = "primary_Image")
+    @OneToOne
+    private ProductImage primaryImage;
+
 
 
     /**
