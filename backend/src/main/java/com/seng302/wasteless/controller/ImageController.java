@@ -182,7 +182,7 @@ public class ImageController {
      * @return Status code dependent on success. 406, 403, 400, 500 errors. 200 OK if deletion was successful.
      */
     @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
-    public ResponseEntity<Object> postProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @PathVariable("imageId") Integer imageId) {
+    public ResponseEntity<Object> deleteProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @PathVariable("imageId") Integer imageId) {
 
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Got User {}", user);
@@ -220,10 +220,10 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image id does not exist for Current Product");
         }
 
-        productService.removeImageFromProduct(product, image);
+        productService.deleteImageRecordFromProductInDB (product, image);
         productService.updatePrimaryImage(product, image);
         productService.updateProduct(product);
-        productImageService.deleteImage(image);
+        productImageService.deleteImageRecordFromDB (image);
         productImageService.deleteImageFile(image);
         return ResponseEntity.status(HttpStatus.OK).body("Image deleted successfully");
     }

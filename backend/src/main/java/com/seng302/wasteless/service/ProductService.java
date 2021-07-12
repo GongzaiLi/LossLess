@@ -77,7 +77,7 @@ public class ProductService {
      *  @param product Product that image is to be removed from
      *  @param productImage image that is to be removed from product
      */
-    public void removeImageFromProduct(Product product, ProductImage productImage) {
+    public void deleteImageRecordFromProductInDB (Product product, ProductImage productImage) {
         product.removeImage(productImage);
     }
 

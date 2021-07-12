@@ -132,7 +132,7 @@ public class ProductImageService {
      * delete product image from database
      * @param productImage
      */
-    public void deleteImage(ProductImage productImage) {
+    public void deleteImageRecordFromDB (ProductImage productImage) {
         this.productImageRepository.delete(productImage);
     }
 
