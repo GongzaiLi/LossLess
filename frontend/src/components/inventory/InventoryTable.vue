@@ -16,7 +16,8 @@
       @row-clicked="tableRowClick"
   >
     <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
-      <b-img thumbnail class="product-image-thumbnail" :src="getThumbnail(data.item.product)" />
+      <b-img v-if="!data.item.product.primaryImage" thumbnail class="product-image-thumbnail" :src="require(`/public/product_default.png`)" alt="Product has no image" />
+      <b-img v-if="data.item.product.primaryImage" thumbnail class="product-image-thumbnail" :src=getThumbnail(data.item.product) />
     </template>
 
     <template v-slot:cell(actions)="product">
@@ -158,16 +159,16 @@ export default {
     },
 
     /**
-     * Uses the product of the inventory and returns the primary image of the thumbnail for that product
+     * Uses the product of the inventory and returns the primary image of the thumbnail for that product.
      * @param  product a product that's image is being requested
-     * @return image
+     * @return string
      **/
     getThumbnail: function (product) {
       if (product.primaryImage) {
         const primaryImageFileName = product.primaryImage.thumbnailFilename;
         return api.getImage(primaryImageFileName.substr(1));
       }
-      }
+    }
   },
 
   mounted() {
