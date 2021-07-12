@@ -109,13 +109,13 @@ export default {
       let items = [];
       let tableHeader = {
         name: '',
-        nickname: '',
+        nickName: '',
         email: '',
         homeAddress: ''
       };
       for (const user of data) {
         tableHeader = user;
-        tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+        tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
@@ -158,7 +158,7 @@ export default {
           sortable: true
         },
         {
-          key: 'nickname',
+          key: 'nickName',
           sortable: true
         },
         {

@@ -12,6 +12,8 @@ const Axios = require('axios');
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
 const MAX_USERS_PER_API_REQUEST = 100;
+const HAS_NICKNAME_PROB = 1/10;
+const HAS_MIDDLE_NAME_PROB = 4/10;
 
 const userBios = require('./bios.json')
 
@@ -59,7 +61,6 @@ function makeEmailsUnique(users) {
   for (let user of users) {
     if (emails.has(user.email)) {
       user.email = id + user.email;
-      console.log(user.email);
       id += 1;
     }
     emails.add(user.email);
@@ -75,13 +76,17 @@ async function getUsers() {
   const apiUsers = await getApiRandomUserInfo(); // Sonarlint says that the await is redundant. Sonarlint is stupid.
   console.log('Got all random users from Api.');
 
+  const names = []; // Collect all names for middle name generation later
   const users = []
 
   for (let user of apiUsers) {
+    names.push(user.name.first);
+    names.push(user.name.last);
+
     users.push({
       firstName: user.name.first,
       lastName: user.name.last,
-      nickName: (Math.random() < 0.1) ? user.login.username: undefined,
+      nickname: (Math.random() < HAS_NICKNAME_PROB) ? user.login.username.replace(/[0-9]/g, ''): undefined,
       bio: userBios[Math.floor(Math.random() * userBios.length)],
       email: user.email.replace('\'', '').replace('..', '.'),  // some data comes back malformed with ' (single quote) characters or .. (double dots), so we remove them here
       dateOfBirth: user.dob.date,
@@ -89,6 +94,13 @@ async function getUsers() {
       password: user.login.password,
       homeAddress: getAddressFromApiUser(user)
     })
+  }
+
+  // Add middle names
+  for (let user of users) {
+    if (Math.random() < HAS_MIDDLE_NAME_PROB) {
+      user.middleName = names[Math.floor(Math.random() * names.length)];
+    }
   }
 
   makeEmailsUnique(users);
