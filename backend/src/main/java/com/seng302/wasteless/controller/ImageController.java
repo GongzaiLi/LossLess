@@ -109,6 +109,13 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Image Received");
         }
 
+        int numProductImages = possibleProduct.getImages().size();
+
+        if (numProductImages >= 10) {
+            logger.warn("Cannot post product image, limit reached for this product.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot upload product image, limit reached for this product.");
+        }
+
         ProductImage newImage = new ProductImage();
         String imageType;
 
