@@ -16,8 +16,8 @@
       @row-clicked="tableRowClick"
   >
     <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
-      <b-img v-if="!data.item.product.primaryImage" thumbnail class="product-image-thumbnail" :src="require(`/public/product_default.png`)" alt="Product has no image" />
-      <b-img v-if="data.item.product.primaryImage" thumbnail class="product-image-thumbnail" :src=getThumbnail(data.item.product) />
+      <b-img v-if="!data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src="require(`/public/product_default.png`)" alt="Product has no image" />
+      <b-img v-if="data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src=getThumbnail(data.item.product) />
     </template>
 
     <template v-slot:cell(actions)="product">
@@ -56,16 +56,13 @@
 }
 
 .product-image-thumbnail {
-  width: 50px;
-  height: 50px;
-  min-width: 50px;
-  min-height: 50px;
-  max-width: 50px;
-  max-height: 50px;
+  height: 66px !important;
+  object-fit: cover;
+  width: 66px;
 }
 
 .thumbnail-row {
-  padding: 0 0 0 0.5rem !important;
+  padding: 0.5rem 0 0.5rem 0 !important;
 }
 </style>
 
@@ -159,7 +156,7 @@ export default {
     },
 
     /**
-     * Uses the product of the inventory and returns the primary image of the thumbnail for that product.
+     * Uses the product of the inventory and returns the thumbnail of the primary image for that product.
      * @param  product a product that's image is being requested
      * @return string
      **/
