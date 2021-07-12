@@ -24,6 +24,7 @@ public class FileUploadSizeExceptionAdvice {
     /**
      * Handles MaxUploadSizeExceededException Exceptions by sending back a 419 PAYLOAD_TOO_LARGE response with a message
      * stating the maximum upload size.
+     * See https://www.baeldung.com/spring-maxuploadsizeexceeded for more details
      * @param exc The MaxUploadSizeExceededException exception thrown.
      * @param response  The HttpServletResponse that will be modified and sent back to the client.
      * @throws IOException If writing to the response fails. This should never happen and would indicate a serious error with Spring Boot
