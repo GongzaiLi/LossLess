@@ -58,10 +58,16 @@ public class Product {
     @Column(name = "business_id")
     private Integer businessId;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "image_ids")
     @OneToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
     private List<ProductImage> images;
+
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JoinColumn(name = "primary_Image")
+    @OneToOne
+    private ProductImage primaryImage;
+
 
 
     /**
