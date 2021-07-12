@@ -88,6 +88,25 @@ describe('Testing delete image when creating product', () => {
 });
 
 
+describe('Testing upload image when product already exists', () => {
+
+  it('Successfully create a product image', async () => {
+    await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
+
+    expect(Api.uploadProductImages).toHaveBeenCalled();
+    expect(wrapper.vm.imageError).toBe("");
+  });
+
+  it('Create a product image but error returned', async () => {
+    Api.uploadProductImages.mockRejectedValue({response: {status: 419, data: "The file that you tried to upload is too large. Files must be 5MB in size or less."}});
+    await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
+
+    expect(wrapper.vm.imageError).toBe("The file that you tried to upload is too large. Files must be 5MB in size or less.");
+  });
+
+});
+
+
 describe('Testing confirmation box', () => {
 
   it('Does not delete a product image when not confirmed', async () => {
