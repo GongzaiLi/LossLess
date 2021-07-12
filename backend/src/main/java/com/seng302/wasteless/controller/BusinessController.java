@@ -177,12 +177,7 @@ public class BusinessController {
 
         User userMakingRequest = userService.getCurrentlyLoggedInUser();
 
-        if (!userMakingRequest.checkUserGlobalAdmin()
-                && !(possibleBusinessToAddAdminFor.checkUserIsPrimaryAdministrator(userMakingRequest))) {
-            logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", userMakingRequest, businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", userMakingRequest, businessId);
+        businessService.checkUserBusinessOrGlobalAdmin(possibleBusinessToAddAdminFor, userMakingRequest);
 
 
         if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
@@ -220,16 +215,15 @@ public class BusinessController {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
+        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, loggedInUser);
+
         if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
             logger.warn("User is primary admin");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
         }
-        if (!(possibleBusiness.checkUserIsPrimaryAdministrator(loggedInUser)) && !loggedInUser.checkUserGlobalAdmin()) {
-            logger.warn("You are not a primary business admin");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
-        }
+
         if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), possibleUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not admin of business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not admin of business");
         }
 
         businessService.removeAdministratorFromBusiness(possibleBusiness, possibleUser);

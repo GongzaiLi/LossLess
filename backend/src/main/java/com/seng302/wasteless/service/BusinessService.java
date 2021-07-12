@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.BusinessRepository;
@@ -89,5 +88,20 @@ public class BusinessService {
      */
     public void saveBusinessChanges(Business business) {
         businessRepository.save(business);
+    }
+
+    /**
+     * Check if given user is admin of given business or if user is global admin
+     * if not throw response status exception Forbidden 403
+     * @param business
+     * @param user
+     */
+    public void checkUserBusinessOrGlobalAdmin(Business business, User user) {
+        if (!(user.checkUserGlobalAdmin() || (business.checkUserIsPrimaryAdministrator(user)))) {
+            logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, business);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request");
+        }
+        logger.info("User: {} validated as global admin or admin of business: {}.", user, business);
+
     }
 }
