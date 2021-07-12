@@ -98,7 +98,7 @@ public class ListingController {
         }
 
         if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
-            logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getBestBefore());
+            logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getExpires());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item expiry is in the past.");
         }
 
