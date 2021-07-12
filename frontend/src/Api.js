@@ -51,15 +51,15 @@ export default {
   postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
-  createProduct: (id,productData) => instance.post(`/businesses/${id}/products`,productData, {withCredentials: true}),
-  modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials:true}),
-  createInventory: (id,inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
+  createProduct: (id, productData) => instance.post(`/businesses/${id}/products`, productData, {withCredentials: true}),
+  modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials: true}),
+  createInventory: (id, inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
   getInventory: (id) => instance.get(`/businesses/${id}/inventory`, {withCredentials: true}),
-  modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials:true}),
+  modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials: true}),
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
-  getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials:true}),
+  getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
-
+  deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
 
   /**
    * Uploads one or more image files to a product. For each image, will send a POST request to the product images
@@ -72,13 +72,13 @@ export default {
   uploadProductImages: (businessId, productId, images) => {
     return Promise.all(
       Array.from(images)  // Convert into array. Needed because we might get a FileList which doesn't support .map(). JS is fun sometimes...
-      .map(  // Run all requests to upload product images in parallel for efficiency
-        imageFile => {
-          // See https://github.com/axios/axios/issues/710 for how this works
-          let formData = new FormData();
-          formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
-          return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
-        })
+        .map(  // Run all requests to upload product images in parallel for efficiency
+          imageFile => {
+            // See https://github.com/axios/axios/issues/710 for how this works
+            let formData = new FormData();
+            formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+            return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
+          })
     );
   },
 

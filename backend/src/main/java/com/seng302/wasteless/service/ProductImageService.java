@@ -38,6 +38,15 @@ public class ProductImageService {
     }
 
     /**
+     * Find product image by id (database_id)
+     * @param imageId  The id of the product image to find
+     * @return The found product image, if any, otherwise null
+     */
+    public ProductImage findProductImageById(Integer imageId) {
+        return productImageRepository.findFirstById(imageId);
+    }
+
+    /**
      * Creates a ProductImage by saving the productImage object and persisting it in the database
      *
      * @param productImage The ProductImage object to be created.
@@ -50,8 +59,8 @@ public class ProductImageService {
     /**
      * Create unique image filename for the database by using UUID which crates unique alphanumeric value by hashing the time
      *
-     * @param productImage
-     * @param fileType
+     * @param productImage product image setting the file name and thumbnail file name
+     * @param fileType image type
      * @return productImage
      */
     public ProductImage createImageFileName(ProductImage productImage, String fileType) {
@@ -61,7 +70,7 @@ public class ProductImageService {
         return productImage;
     }
 
-    /**
+    /**     
      * saves the image into given path and creates directory if it doesnt exist already
      *
      * @param productImagePath path in which file is to be saved to

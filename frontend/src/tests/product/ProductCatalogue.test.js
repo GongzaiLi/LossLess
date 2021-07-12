@@ -96,7 +96,7 @@ describe('check-model-product-card-page', () => {
 describe('Testing api put/post request and the response method with errors', () => {
 
   it('Succesfully edits a product ', async () => {
-    Api.modifyProduct.mockResolvedValue({response : {status: 200}});
+    Api.modifyProduct.mockResolvedValue({response : {status: 201}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.modifyProduct(mockEvent);
@@ -113,6 +113,15 @@ describe('Testing api put/post request and the response method with errors', () 
 
     expect(wrapper.vm.productCardError).toBe("");
     expect(Api.createProduct).toHaveBeenCalled();
+  });
+
+  it('Create product but receives 413 (image) error ', async () => {
+    Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: '51-A'}});
+    Api.uploadProductImages.mockRejectedValue({response : {status: 413, data: "Image larger than 5MB"}});
+
+    await wrapper.vm.createProduct();
+
+    expect(wrapper.vm.productCardError).toBe("Image larger than 5MB");
   });
 
   it('400 error test if Product ID already exists', async () => {
