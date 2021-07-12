@@ -1,3 +1,11 @@
+/**
+ * This script is responsible for generating 10000 random users and 
+ * registering them with a running backend. If it has not been run before 
+ * it depends on the https://randomuser.me Api to get random data. 
+ * Otherwise, it will re-used the preivously generated data (which will be saved 
+ * in a users.json file)
+ */
+
 const fs = require('fs')
 const Axios = require('axios');
 
@@ -7,6 +15,11 @@ const MAX_USERS_PER_API_REQUEST = 100;
 
 const userBios = require('./bios.json')
 
+/**
+ * Uses the https://randomuser.me Api to get 10000 randomly generated users. 
+ * The data will be in their format so it must be first converted to our SENG302
+ * API format
+ */
 async function getApiRandomUserInfo() {
   let users = [];
   for (let i = 0; i < NUM_USERS / MAX_GENERATED_USERS_PER_REQUEST; i++) {
