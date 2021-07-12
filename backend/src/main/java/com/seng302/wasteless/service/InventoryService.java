@@ -2,8 +2,12 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Inventory;
 import com.seng302.wasteless.repository.InventoryRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -13,6 +17,8 @@ import java.util.List;
  */
 @Service
 public class InventoryService {
+
+    private static final Logger logger = LogManager.getLogger(InventoryService.class.getName());
 
     private final InventoryRepository inventoryRepository;
 
@@ -27,7 +33,13 @@ public class InventoryService {
      * @return          The found Inventory item, if any, otherwise null
      */
     public Inventory findInventoryById(Integer id) {
-        return inventoryRepository.findFirstById(id);
+
+        Inventory inventoryItem = inventoryRepository.findFirstById(id);
+        if (inventoryItem == null) {
+            logger.warn("Request Failed, inventory item does not exist in the inventory");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item with given id does not exist");
+        }
+        return inventoryItem;
     }
 
 

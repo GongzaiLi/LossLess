@@ -72,24 +72,12 @@ public class InventoryController {
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot create INVENTORY product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
-
+        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", inventoryDtoRequest.getProductId(), businessId);
         Product possibleProduct = productService.findProductById(inventoryDtoRequest.getProductId());
 
-        if (possibleProduct == null) {
-            logger.warn("Cannot create inventory item for product that does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
-        }
-        if (!possibleProduct.getBusinessId().equals(businessId)){
-            logger.warn("Cannot update inventory item for product that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
-        }
+        productService.checkProductBelongsToBusiness(possibleProduct, businessId);
         Inventory inventory = PostInventoryDtoMapper.postInventoryDtoToEntityMapper(inventoryDtoRequest);
 
         inventory.setProduct(possibleProduct);
@@ -125,11 +113,7 @@ public class InventoryController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot retrieve INVENTORY products. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
 
 
         logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
@@ -160,34 +144,17 @@ public class InventoryController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot Update INVENTORY product. User: {} is not global admin or business admin: {}" ,user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", itemId, businessId);
         Product possibleProduct = productService.findProductById(editedInventoryItem.getProductId());
-        if (possibleProduct == null) {
-            logger.warn("Cannot update inventory item for product that does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
-        }
-        if (!possibleProduct.getBusinessId().equals(businessId)){
-            logger.warn("Cannot update inventory item for product that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
-        }
+
+        productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
         logger.info("Check if inventory item with id ` {} ` exists on for business with id ` {} ` ", itemId, businessId);
         Inventory inventoryItem = inventoryService.findInventoryById(itemId);
-        logger.info(inventoryItem);
-        if (inventoryItem == null) {
-            logger.warn("Cannot update inventory item for item that does not exist in the inventory");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item with given id does not exist");
-        }
-        if (!inventoryItem.getBusinessId().equals(businessId)){
-            logger.warn("Cannot update inventory item for item that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item with given id does not exist for Current Business");
-        }
+
+        productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
         logger.info("Creating new Inventory Item and setting data.");
         inventoryItem.setProduct(possibleProduct);

@@ -46,23 +46,12 @@ public class ImageController {
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot post product image. User: {} is not global admin or business admin: {}", user.getId(), businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user.getId(), businessId);
+        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", productId, businessId);
         Product possibleProduct = productService.findProductById(productId);
 
-        if (possibleProduct == null) {
-            logger.warn("Cannot post product image for product that does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
-        }
-        if (!possibleProduct.getBusinessId().equals(businessId)) {
-            logger.warn("Cannot post product image for product that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
-        }
+        productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
         if (file.isEmpty()) {
             logger.warn("Cannot post product image, no image received");
