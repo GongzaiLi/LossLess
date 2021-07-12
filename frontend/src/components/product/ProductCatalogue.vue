@@ -46,6 +46,14 @@ Date: 15/4/2021
       <h6 v-else> You are not an administrator of this business. If you need to edit this catalogue, contact the administrators of the business. <br>
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
     </b-card>
+
+    <b-modal id="image-error-modal" title="Some images couldn't be uploaded" ok-only>
+      Unfortunately, some images couldn't be uploaded.
+      {{ productCardError }}
+      <br>
+      However, the product has been created successfully. If you would like to add more images to it, you can do so by
+      editing the product.
+    </b-modal>
   </div>
 </template>
 
@@ -191,7 +199,7 @@ export default {
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
             // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
             // We also need to extract the file objects from the list of images (see addImagePreviewsToCarousel in ProductDetailCard for why)
-            Api.uploadProductImages(this.$route.params.id, createProductResponse.data.productId, this.productDisplayedInCard.images.map(
+            return Api.uploadProductImages(this.$route.params.id, createProductResponse.data.productId, this.productDisplayedInCard.images.map(
                 file => file.fileObject
             ))
           })
@@ -200,8 +208,12 @@ export default {
             this.refreshProducts();
           })
           .catch((error) => {
-            console.log(error);
             this.productCardError = this.getErrorMessageFromApiError(error);
+            if (error.response.status === 413) {  // Uploaded images were too large
+              this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
+              this.productCardError = error.response.data;
+              this.$bvModal.show('image-error-modal');
+            }
             this.$log.debug(error);
           });
     },

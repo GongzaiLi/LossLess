@@ -5,12 +5,12 @@
   >
     <b-carousel
         id="carousel-1"
-        controls
+        :controls="productCard.images.length > 1"
         indicators
-        class="mb-2"
         :interval="0"
         ref="image_carousel"
         v-model="slideNumber"
+        v-if="productCard.images.length > 0"
     >
       <b-carousel-slide v-for="image in productCard.images" :key="image.id">
         <template #img>
@@ -40,8 +40,8 @@
         <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
         <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker"
                accept="image/png, image/jpeg, image/gif, image/jpg">
-        <b-button class="w-100" id="add-image-btn" @click="$refs.filepicker.click()">
-          {{ productCard.images.length > 0 ? "Add more product images" : "Add product images" }}
+        <b-button variant="info" class="w-100" id="add-image-btn" @click="$refs.filepicker.click()" :disabled="isUploadingFile">
+          <strong>{{ addImageButtonText }} <b-spinner small v-if="isUploadingFile"/></strong>
         </b-button>
       </div>
     </b-input-group>
@@ -110,6 +110,10 @@
       </div>
     </b-form>
 
+    <b-modal ref="errorModal" size="sm" title="Error" ok-only>
+      {{ imageError }}
+    </b-modal>
+
     <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteImage">
       <h6>
         Are you sure you want to <strong>permanently</strong> delete this image?
@@ -119,9 +123,16 @@
 </template>
 
 <style>
-.carousel-control-prev, .carousel-control-next {
-  background-color: black;
-  opacity: 0.2 !important;
+.carousel-control-prev-icon , .carousel-control-next-icon {
+  background-color: black !important;
+  border-radius: 20%;
+  padding:4px;
+  color: white;
+}
+
+#carousel-1{
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 #add-image-btn {
@@ -144,6 +155,7 @@ export default {
   props: ['product', 'disabled', 'currency', 'okAction', 'cancelAction'],
   data() {
     return {
+      isUploadingFile: false,
       slideNumber: 0,
       imageIdToDelete: null,
       productCard: {
@@ -179,7 +191,14 @@ export default {
         this.addImagePreviewsToCarousel(files);
       } else {
         const businessId = this.$route.params.id;
-        await Api.uploadProductImages(businessId, `${businessId}-${this.productCard.id}`, files)
+        this.isUploadingFile = true;
+        try {
+          await Api.uploadProductImages(businessId, `${businessId}-${this.productCard.id}`, files);
+        } catch (error) {
+          this.imageError = error.response.data;
+          this.$refs.errorModal.show();
+        }
+        this.isUploadingFile = false;
         // TODO: refresh the product images if an API call was sent
       }
       this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
@@ -239,6 +258,20 @@ export default {
      */
     isCreatingProduct() {
       return !this.productCard.created; // If the product has no created attribute we must be creating a new product
+    },
+    /**
+     * @returns {string} The text to be displayed on the button that uploads images.
+     * If we're currently uploading a file, the text displays "Uploading Image(s) ".
+     * Otherwise, it displays a prompt to add product images.
+     */
+    addImageButtonText() {
+      if (this.isUploadingFile) {
+        return "Uploading Image(s) ";
+      } else if (this.productCard.images.length > 0) {
+        return "Add more product images";
+      } else {
+        return "Add product images";
+      }
     }
   }
 }
