@@ -39,7 +39,17 @@ const strippedListings = {
                 "id": 101,
                 "product": {
                     "name": "Watties Baked Beans - 420g can",
-
+                    "primaryImage" : {
+                        "fileName": "media/images/a76ff8d8-e2ec-4fe3-95d7-235ef8e54565.png",
+                        "id": 1
+                    },
+                    "images": [
+                        {
+                            "id": 1234,
+                            "filename": "/media/images/23987192387509-123908794328.png",
+                            "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                        }
+                    ]
                 },
             },
             "price": 5.99,
@@ -52,7 +62,17 @@ const strippedListings = {
                 "id": 102,
                 "product": {
                     "name": "Baked Beans - 420g can",
-
+                    "primaryImage" : {
+                        "fileName": "media/images/a76ff8d8-e2ec-4fe3-95d7-235ef8e54565.png",
+                        "id": 1
+                    },
+                    "images": [
+                        {
+                            "id": 1234,
+                            "filename": "/media/images/23987192387509-123908794328.png",
+                            "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                        }
+                    ]
                 },
             },
             "price": 10,
@@ -65,7 +85,17 @@ const strippedListings = {
                 "id": 103,
                 "product": {
                     "name": "Turnips",
-
+                    "primaryImage" : {
+                        "fileName": "media/images/a76ff8d8-e2ec-4fe3-95d7-235ef8e54565.png",
+                        "id": 1
+                    },
+                    "images": [
+                        {
+                            "id": 1234,
+                            "filename": "/media/images/23987192387509-123908794328.png",
+                            "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
+                        }
+                    ]
                 },
             },
             "price": 999,
@@ -121,7 +151,11 @@ describe('Testing api get request (get all Listing function)', () => {
                                 "filename": "/media/images/23987192387509-123908794328.png",
                                 "thumbnailFilename": "/media/images/23987192387509-123908794328_thumbnail.png"
                             }
-                        ]
+                        ],
+                        "primaryImage" : {
+                            "fileName": "media/images/a76ff8d8-e2ec-4fe3-95d7-235ef8e54565.png",
+                            "id": 1
+                        }
                     },
                     "quantity": 4,
                     "pricePerItem": 6.5,

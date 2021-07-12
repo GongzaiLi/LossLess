@@ -262,17 +262,12 @@ export default {
 
     /**
      * Takes a listing as input and returns the primary image for that listing
-     * @param  {listing} a string that's image is being requested
-     * @return image
+     * @return image      The image of the listing
+     * @param listing     The listing to get the image of
      **/
     getPrimaryImage: function (listing) {
-      const images = listing.inventoryItem.product.images;
-      const primaryImageId = listing.inventoryItem.product.primaryImageId;
-      for (const image of images) {
-        if (image.id === primaryImageId) {
-          return api.getImage(image.fileName.substr(1));
-        }
-      }
+      const primaryImageFileName = listing.inventoryItem.product.primaryImage.fileName;
+      return api.getImage(primaryImageFileName);
     }
 
 
