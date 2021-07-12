@@ -114,11 +114,6 @@ class ImageControllerUnitTest {
         productImagesLimit.add(productImage);
         productImagesLimit.add(productImage);
         productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
 
         productForImageLimit.setImages(productImagesLimit);
 
@@ -130,11 +125,6 @@ class ImageControllerUnitTest {
         productForImageOneSpace.setPrimaryImage(productImage);
 
         List<ProductImage> productImagesOneSpace = new ArrayList<>();
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
         productImagesOneSpace.add(productImage);
         productImagesOneSpace.add(productImage);
         productImagesOneSpace.add(productImage);
