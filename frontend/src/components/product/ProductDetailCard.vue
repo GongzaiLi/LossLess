@@ -27,7 +27,7 @@
           <img
               class="product-image d-block w-100 rounded"
               alt="Product image"
-              :src="image.filename"
+              :src="getURL(image.fileName)"
           >
         </template>
       </b-carousel-slide>
@@ -172,11 +172,14 @@ export default {
   },
   mounted() {
     this.productCard = this.product;
-    this.productCard.images = []
     // Sometimes the product passed in should not have a 'created' attribute, eg. if it is a new object for creation.
     if (this.productCard.created) {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
+    } else {
+      this.productCard.images = [];
     }
+
+    console.log(this.productCard.images);
   },
   methods: {
     /**
@@ -206,6 +209,16 @@ export default {
       this.slideNumber = this.productCard.images.length - 1; // Change the displayed image slide to the newly added image
     },
     /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      if (this.isCreatingProduct) { // Return preview URL if we're creating to product (and so image isn't in the backend yet).
+        return imageFileName;
+      } else {
+        return Api.getImage(imageFileName);
+      }
+    },
+    /**
      * Given a list of image files, adds each as a preview to the product image carousel. This should be used when creating
      * the product, so users are able to see and change which images will be created along with their product.
      * This does not actually upload the files - that should be done when the user creates the product.
@@ -214,8 +227,8 @@ export default {
       for (let file of files) {
         let url = URL.createObjectURL(file);
         this.productCard.images.push({
-          "id": url,
-          "filename": url,
+          id: url,
+          fileName: url,
           fileObject: file
         });
       }
