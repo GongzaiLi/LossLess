@@ -209,23 +209,23 @@ public class BusinessController {
     public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        User possibleUser = userService.findUserById(requestBody.getUserId());
+        User userToRevoke = userService.findUserById(requestBody.getUserId());
         logger.info("possible Business{}", possibleBusiness);
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, loggedInUser);
 
-        if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
+        if (possibleBusiness.getPrimaryAdministrator().equals(userToRevoke)) {
             logger.warn("User is primary admin");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
         }
 
-        if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), possibleUser.getId())) {
+        if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), userToRevoke.getId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not admin of business");
         }
 
-        businessService.removeAdministratorFromBusiness(possibleBusiness, possibleUser);
+        businessService.removeAdministratorFromBusiness(possibleBusiness, userToRevoke);
         businessService.saveBusinessChanges(possibleBusiness);
 
         return ResponseEntity.status(HttpStatus.OK).build();
