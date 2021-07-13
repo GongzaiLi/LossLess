@@ -152,9 +152,74 @@ public class ImageController {
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("imageId", newImage.getId());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
 
     }
+
+    /**
+     * Delete image from product
+     * Removes the referenced image and image thumbnail from the database, from the product, changes the primary image if removed image is
+     * the primary image of the product and deletes the image file from the server
+     * Returns:
+     * NOT_ACCEPTABLE 406 If image doesnt exist
+     * FORBIDDEN 403 If user not allowed to make request (not global admin or business admin)
+     * 400 BAD_REQUEST If invalid image type, product doesnt exist, product doesnt belong to business, or no image
+     * 200 Ok if successfully deleted
+     * 500 If server error deleting image
+     *
+     * @param businessId id of business that own the product
+     * @param productId id of the product that is having an image deleted from
+     * @param imageId id of the image that is being deleted
+     * @return Status code dependent on success. 406, 403, 400, 500 errors. 200 OK if deletion was successful.
+     */
+    @DeleteMapping("/businesses/{businessId}/products/{productId}/images/{imageId}")
+    public ResponseEntity<Object> deleteProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @PathVariable("imageId") Integer imageId) {
+
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
+
+        logger.debug("Retrieving business with id: {}", businessId);
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+
+        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
+            logger.warn("Cannot delete productImage. User: {} is not global admin or business admin: {}", user, possibleBusiness);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+        }
+        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+
+
+        Product product = productService.findProductById(productId);
+
+        if (product==null){
+            logger.warn("Cannot delete productImage. Product is null");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product no longer exists");
+        }
+        if (!product.getBusinessId().equals(businessId)) {
+            logger.warn("Cannot post product image for product that does not belong to current business");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
+        }
+
+        ProductImage image = productImageService.findProductImageById(imageId);
+
+        if (image==null){
+            logger.warn("Cannot delete productImage. image: {}", image);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Image no longer exists");
+        }
+
+        if (product.getImages().stream().noneMatch(possibleImage -> possibleImage.getId().equals(image.getId()))) {
+            logger.warn("Cannot post product image for product image that does not belong to current product");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image id does not exist for Current Product");
+        }
+
+        productService.deleteImageRecordFromProductInDB (product, image);
+        productService.updatePrimaryImage(product, image);
+        productService.updateProduct(product);
+        productImageService.deleteImageRecordFromDB (image);
+        productImageService.deleteImageFile(image);
+        return ResponseEntity.status(HttpStatus.OK).body("Image deleted successfully");
+    }
+
 
     /**
      * Get any image from the media/images file given its file

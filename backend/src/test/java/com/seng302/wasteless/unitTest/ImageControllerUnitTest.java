@@ -172,6 +172,7 @@ class ImageControllerUnitTest {
                 .when(productImageService.findProductImageById(2))
                 .thenReturn(productImageTwo);
 
+        doCallRealMethod().when(productService).deleteImageRecordFromProductInDB(productForImage, productImageTwo);
 
 
         doReturn(productForImage).when(productService).findProductById(productForImage.getId());
@@ -281,6 +282,46 @@ class ImageControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
         Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_andValidRequest_then200Response() throws Exception {
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        Assertions.assertFalse(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_businessesIdNotFind_then400Response() throws Exception {
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/2/products/1-test-product/images/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_productCodeNotFind_then400Response() throws Exception {
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/99-test-product/images/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenDeleteRequestToDeleteProductImage_productImageIdNotFind_then406Response() throws Exception {
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/99")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
     }
 
     @Test

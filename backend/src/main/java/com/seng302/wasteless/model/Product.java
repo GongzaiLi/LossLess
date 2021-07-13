@@ -85,12 +85,22 @@ public class Product {
 
     /**
      * Add an image to a product
-     * Never call this directly, only call it from business service.
+     * Never call this directly, only call it from product service.
      *
      * @param productImage Id of the image to add to the product
      */
     public void addImage(ProductImage productImage) {
         this.images.add(productImage);
+    }
+
+    /**
+     * Remove an image from a product
+     * Never call this directly, only call it from product service.
+     *
+     * @param productImage  of the image to remove from the product
+     */
+    public void removeImage(ProductImage productImage) {
+        this.images.remove(productImage);
     }
 
 }

@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import java.nio.file.Paths;
+
 /**
  * ProductImageService applies product image logic over the ProductImage JPA repository.
  */
@@ -65,8 +67,8 @@ public class ProductImageService {
      */
     public ProductImage createImageFileName(ProductImage productImage, String fileType) {
         UUID uuid = UUID.randomUUID();
-        productImage.setFileName(String.format("/media/images/%s.%s", uuid, fileType));
-        productImage.setThumbnailFilename(String.format("/media/images/%s_thumbnail.%s", uuid, fileType));
+        productImage.setFileName(String.format("media/images/%s.%s", uuid, fileType));
+        productImage.setThumbnailFilename(String.format("media/images/%s_thumbnail.%s", uuid, fileType));
         return productImage;
     }
 
@@ -77,7 +79,7 @@ public class ProductImageService {
      * @param image            image to be saved
      */
     public void storeImage(String productImagePath, MultipartFile image) {
-        File file = new File("." + productImagePath);
+        File file = new File("./" + productImagePath);
         try {
             if (!file.exists()) file.mkdirs();
             Files.copy(image.getInputStream(), file.getAbsoluteFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -103,7 +105,7 @@ public class ProductImageService {
      * @returnconstant The resized version of the original image
      */
     public BufferedImage resizeImage(ProductImage productImage) {
-        File image = new File("." + productImage.getFileName());
+        File image = new File("./" + productImage.getFileName());
         try {
             BufferedImage originalImage = ImageIO.read(image);
             if (originalImage == null) {
@@ -125,6 +127,35 @@ public class ProductImageService {
         }
     }
 
+
+    /**
+     * delete product image from database
+     * @param productImage
+     */
+    public void deleteImageRecordFromDB (ProductImage productImage) {
+        this.productImageRepository.delete(productImage);
+    }
+
+    /**
+     * delete image file and thumbnail from serve
+     * @param productImage
+     */
+    public void deleteImageFile(ProductImage productImage) {
+        try {
+            logger.info("Deleting: {}", productImage.getFileName());
+            Files.delete(Paths.get("./" + productImage.getFileName()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete image locally: {0}", error);
+        }
+        try {
+            logger.info("Deleting: {}", productImage.getThumbnailFilename());
+            Files.delete(Paths.get("./" + productImage.getThumbnailFilename()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete thumbnail image locally: {0}", error);
+        }
+
+    }
+
     /**
      * Saves the thumbnail image into given path.
      *
@@ -133,7 +164,7 @@ public class ProductImageService {
      * @param image            The image to be saved
      */
     public void storeThumbnailImage(String productImagePath, String imageType, BufferedImage image) {
-        File file = new File("." + productImagePath);
+        File file = new File("./" + productImagePath);
         try {
             FileOutputStream out = new FileOutputStream(file);
             ImageIO.write(image, imageType, out);
