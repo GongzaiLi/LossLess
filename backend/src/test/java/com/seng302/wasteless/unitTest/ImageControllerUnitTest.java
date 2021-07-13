@@ -277,5 +277,15 @@ class ImageControllerUnitTest {
                 .andExpect(status().isNotAcceptable());
     }
 
+    @Test
+    void whenDeletedImageIsRemovedFromProduct() throws Exception {
+        Assertions.assertTrue(productForImage.getImages().contains(productImageTwo));
+        //productImageService.deleteImageRecordFromDB(productImageTwo);
+        productService.deleteImageRecordFromProductInDB (productForImage, productImageTwo);
+        //productService.updatePrimaryImage(productForImage, productImageTwo);
+        productService.updateProduct(productForImage);
+        //Assertions.assertFalse(productForImage.getImages().contains(productImageTwo));
+    }
+
 
 }

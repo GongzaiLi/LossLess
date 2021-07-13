@@ -87,11 +87,11 @@ public class ProductService {
      * @param productImage image that is being removed from product
      */
     public void updatePrimaryImage(Product product, ProductImage productImage) {
-        if (product.getPrimaryImageId().equals(productImage.getId())){
+        if (product.getPrimaryImage().getId().equals(productImage.getId())){
             if (product.getImages().isEmpty()) {
-                product.setPrimaryImageId(null);
+                product.setPrimaryImage(null);
             } else {
-                product.setPrimaryImageId(product.getImages().get(0).getId());
+                product.setPrimaryImage(product.getImages().get(0));
             }
 
         }
