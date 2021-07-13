@@ -17,6 +17,7 @@ const HAS_MIDDLE_NAME_PROB = 4/10;
 
 const NUM_BUSINESSES = 100;
 const NUM_BUSINESSTYPES = 4;
+const MAX_BUSSINESSES_PER_USER = 3;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -133,21 +134,16 @@ async function getBusinesses() {
       primaryAdministratorId: null,
       name: businessNames[i],
       description: businessDesc[i],
-      address:  {
-        "streetNumber": "3/24",
-        "streetName": "Ilam Road",
-        "suburb": "Upper Riccarton",
-        "city": "Christchurch",
-        "region": "Canterbury",
-        "country": "New Zealand",
-        "postcode": "90210"
-      },
+      address: null,
       businessType: businessTypes[Math.floor(Math.random() * NUM_BUSINESSTYPES)]
     })
   }
   return businesses;
 }
 
+/**
+ * Uses axios to make a post request to our backend to create a new user.
+ */
 async function registerUser(user) {
   await Axios.post(`http://localhost:9499/users`, user, {
     withCredentials: true,
@@ -157,7 +153,10 @@ async function registerUser(user) {
   });
 }
 
-async function registerUserWithBusinesses(user, business) {
+/**
+ * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
+ */
+async function registerUserWithBusinesses(user, businesses, numBusinesses) {
   const instance = Axios.create({
     baseURL: SERVER_URL,
     timeout: 50000,
@@ -172,7 +171,9 @@ async function registerUserWithBusinesses(user, business) {
 
   instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
-  await registerBusiness(business, instance, response.data.id);
+  for (let i=0; i < numBusinesses; i++) {
+    await registerBusiness(businesses[i], instance, response.data.id, user);
+  }
 }
 
 /**
@@ -180,11 +181,19 @@ async function registerUserWithBusinesses(user, business) {
  * This is done in batches of MAX_USERS_PER_API_REQUEST to maximise efficiency
  */
 async function registerUsers(users, businesses) {
+
+  let businessesRegistered = 0;
+
   for (let i=0; i < users.length / MAX_USERS_PER_API_REQUEST; i++) {
     const promises = []
     for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
-      if (i*MAX_USERS_PER_API_REQUEST+j < NUM_BUSINESSES) {
-        promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses[i*MAX_USERS_PER_API_REQUEST+j]))
+      if (businessesRegistered < NUM_BUSINESSES) {
+        let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
+        if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
+          numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
+        }
+        promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
+        businessesRegistered += numBusinessesForUser;
       } else {
         promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
       }
@@ -199,9 +208,14 @@ async function registerUsers(users, businesses) {
   }
 }
 
-async function registerBusiness(business, instance, userId) {
+/**
+ *  Sets the businesses primary admin id to the user and the address of the business to the user's
+ *  address that has just been registered and makes the post request to our backed to register the business
+ */
+async function registerBusiness(business, instance, userId, user) {
 
   business.primaryAdministratorId = userId
+  business.address = user.homeAddress
 
     await instance
       .post(`http://localhost:9499/businesses`, business, {
