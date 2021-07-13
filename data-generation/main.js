@@ -23,6 +23,7 @@ const businessNames = require('./businessNames.json')
 const businessDesc = require('./businessDescs.json')
 const businessTypes = require('./businessTypes.json')
 
+const SERVER_URL = "http://localhost:9499";
 
 /**
  * Uses the https://randomuser.me Api to get 10000 randomly generated users.
@@ -147,6 +148,33 @@ async function getBusinesses() {
   return businesses;
 }
 
+async function registerUser(user) {
+  await Axios.post(`http://localhost:9499/users`, user, {
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+    }
+  });
+}
+
+async function registerUserWithBusinesses(user, business) {
+  const instance = Axios.create({
+    baseURL: SERVER_URL,
+    timeout: 50000,
+    withCredentials: true
+  });
+
+  const response = await instance.post(`http://localhost:9499/users`, user, {
+    headers: {
+      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+    }
+  });
+
+  instance.defaults.headers.Cookie = response.headers["set-cookie"];
+
+  await registerBusiness(business, instance, response.data.id);
+}
+
 /**
  * Given a list of users in SENG302 API format, registers all of them to the backend.
  * This is done in batches of MAX_USERS_PER_API_REQUEST to maximise efficiency
@@ -155,19 +183,11 @@ async function registerUsers(users, businesses) {
   for (let i=0; i < users.length / MAX_USERS_PER_API_REQUEST; i++) {
     const promises = []
     for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
-      promises.push(
-          Axios
-              .post(`http://localhost:9499/users`, users[i*MAX_USERS_PER_API_REQUEST+j], {
-                headers: {
-                  'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-                }
-              }) .then((response) => {
-                console.log("response is: " + response.headers['Set-Cookie'])
-                  if (i*MAX_USERS_PER_API_REQUEST+j < NUM_BUSINESSES) {
-                    registerBusiness(businesses[i*MAX_USERS_PER_API_REQUEST+j], response.headers['Cookie'], response.data.id)
-                  }
-          })
-      );
+      if (i*MAX_USERS_PER_API_REQUEST+j < NUM_BUSINESSES) {
+        promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses[i*MAX_USERS_PER_API_REQUEST+j]))
+      } else {
+        promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
+      }
     }
     try {
       await Promise.all(promises);
@@ -179,15 +199,14 @@ async function registerUsers(users, businesses) {
   }
 }
 
-async function registerBusiness(business, cookie, userId) {
+async function registerBusiness(business, instance, userId) {
 
   business.primaryAdministratorId = userId
 
-    await Axios
+    await instance
       .post(`http://localhost:9499/businesses`, business, {
         headers: {
           'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-          'Cookie': cookie,
         }
       })
 
