@@ -90,14 +90,9 @@ export default {
         .searchUser(searchParameter)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
-          if (searchParameter.trim().length) {
-            this.items = this.getUserInfoIntoTable(response.data);  //Add functionality to return results based on query
-            this.totalResults = response.data.length;
-            this.resultsReturned = true;
-          } else {
-            this.items = this.getUserInfoIntoTable([]); // if the searchParameter is empty then the response.date will be []
-            this.totalResults = 0;
-          }
+          this.items = this.getUserInfoIntoTable(response.data);  //Add functionality to return results based on query
+          this.totalResults = response.data.length;
+          this.resultsReturned = true;
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -114,13 +109,13 @@ export default {
       let items = [];
       let tableHeader = {
         name: '',
-        nickname: '',
+        nickName: '',
         email: '',
         homeAddress: ''
       };
       for (const user of data) {
         tableHeader = user;
-        tableHeader.name = `${user.firstName} ${user.middleName} ${user.lastName}`;
+        tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
@@ -163,7 +158,7 @@ export default {
           sortable: true
         },
         {
-          key: 'nickname',
+          key: 'nickName',
           sortable: true
         },
         {

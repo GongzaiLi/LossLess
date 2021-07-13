@@ -94,6 +94,13 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Image Received");
         }
 
+        int numProductImages = possibleProduct.getImages().size();
+
+        if (numProductImages >= 5) {
+            logger.warn("Cannot post product image, limit reached for this product.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot upload product image, limit reached for this product.");
+        }
+
         ProductImage newImage = new ProductImage();
         String imageType;
 
@@ -160,7 +167,7 @@ public class ImageController {
      */
     @ResponseBody
     @RequestMapping(value = "/images", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] getImage(@RequestBody String filename) throws IOException {
+    public byte[] getImage(@RequestParam String filename) throws IOException {
         InputStream is = new FileInputStream(filename);
         return IOUtils.toByteArray(is);
     }

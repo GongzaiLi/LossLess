@@ -67,6 +67,8 @@ class ImageControllerUnitTest {
     private User user;
 
     private Product productForImage;
+    private Product productForImageLimit;
+    private Product productForImageOneSpace;
 
     private ProductImage productImage;
     private ProductImage productImageTwo;
@@ -79,7 +81,6 @@ class ImageControllerUnitTest {
         productForImage.setId("1-test-product");
         productForImage.setBusinessId(1);
         productForImage.setName("test-product");
-
 
         productImage = new ProductImage();
         productImage.setFileName("test");
@@ -99,6 +100,37 @@ class ImageControllerUnitTest {
 
 
         productForImage.setImages(productImages);
+
+        productForImageLimit = new Product();
+        productForImageLimit.setId("1-test-product-2");
+        productForImageLimit.setBusinessId(1);
+        productForImageLimit.setName("test-product-2");
+
+        productForImageLimit.setPrimaryImage(productImage);
+
+        List<ProductImage> productImagesLimit = new ArrayList<>();
+        productImagesLimit.add(productImage);
+        productImagesLimit.add(productImage);
+        productImagesLimit.add(productImage);
+        productImagesLimit.add(productImage);
+        productImagesLimit.add(productImage);
+
+        productForImageLimit.setImages(productImagesLimit);
+
+        productForImageOneSpace = new Product();
+        productForImageOneSpace.setId("1-test-product-3");
+        productForImageOneSpace.setBusinessId(1);
+        productForImageOneSpace.setName("test-product-3");
+
+        productForImageOneSpace.setPrimaryImage(productImage);
+
+        List<ProductImage> productImagesOneSpace = new ArrayList<>();
+        productImagesOneSpace.add(productImage);
+        productImagesOneSpace.add(productImage);
+        productImagesOneSpace.add(productImage);
+        productImagesOneSpace.add(productImage);
+
+        productForImageOneSpace.setImages(productImagesOneSpace);
 
 
         user = mock(User.class);
@@ -143,9 +175,14 @@ class ImageControllerUnitTest {
 
 
         doReturn(productForImage).when(productService).findProductById(productForImage.getId());
+        doReturn(productForImageLimit).when(productService).findProductById(productForImageLimit.getId());
+        doReturn(productForImageOneSpace).when(productService).findProductById(productForImageOneSpace.getId());
+
 
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
         doReturn(productForImage).when(productService).findProductById(null);
+        doReturn(productForImageLimit).when(productService).findProductById(null);
+        doReturn(productForImageOneSpace).when(productService).findProductById(null);
 
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
 
@@ -244,6 +281,28 @@ class ImageControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
         Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddProductImage_andLimitAlreadyMet_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product-2/images")
+                .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddProductImage_andOneImageCapacityLeft_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product-3/images")
+                .file(image))
+                .andExpect(status().isCreated());
     }
 
 

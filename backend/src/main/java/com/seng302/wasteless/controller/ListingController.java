@@ -83,6 +83,12 @@ public class ListingController {
         logger.info("Retrievrf `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
+
+        if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
+            logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getExpires());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item expiry is in the past.");
+        }
+
         Integer availableQuantity = possibleInventoryItem.getQuantity();
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
@@ -91,13 +97,26 @@ public class ListingController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
+        Integer remainingQuantity = availableQuantity - listingQuantity;
+
+
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
         listing.setBusinessId(businessId);
         listing.setCreated(LocalDate.now());
-        possibleInventoryItem.setQuantity(availableQuantity-listingQuantity);
 
         listing = listingsService.createListing(listing);
+
+        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(remainingQuantity, possibleInventoryItem.getId());
+
+        if (updateQuantityResult == 0) {
+            logger.error("No inventory item quantity value was updated when this listing was created.");
+        } else if (updateQuantityResult > 1) {
+            logger.error("More than one inventory item quantity value was updated when this listing was created.");
+        } else if (updateQuantityResult == 1) {
+            logger.info("Inventory item quantity value was updated when this listing was created.");
+        }
+
 
         logger.info("Created new Listing {}", listing);
 
@@ -121,8 +140,6 @@ public class ListingController {
         logger.info("{}", listings);
         return ResponseEntity.status(HttpStatus.OK).body(listings);
     }
-
-
 
     /**
      * Returns a json object of bad field found in the request

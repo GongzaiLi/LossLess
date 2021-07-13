@@ -115,7 +115,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
        mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=James")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=1&count=0")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].id", is(2)))
@@ -129,7 +129,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Steve")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Steve&offset=1&count=0")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -212,7 +212,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=James")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=1&count=0")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].id", is(2)))
@@ -332,7 +332,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=1&count=0")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].id", is(2)))

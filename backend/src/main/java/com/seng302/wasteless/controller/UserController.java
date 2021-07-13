@@ -140,7 +140,7 @@ public class UserController {
      * @return              A list of matching results
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset") Integer offset, @RequestParam(value = "count") Integer count) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
 

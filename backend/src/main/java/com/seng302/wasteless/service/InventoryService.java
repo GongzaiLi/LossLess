@@ -70,4 +70,14 @@ public class InventoryService {
      * Returns an empty list if there are no items in the business' inventory, or if the business does not exist
      */
     public List<Inventory> getInventoryFromBusinessId(Integer id) { return  inventoryRepository.findAllByBusinessId(id); }
+
+    /**
+     * Updates the quantity column of the inventory table in the database using a custom sql set statement.
+     *
+     * @param newQuantity The new quantity remaining for the inventory item
+     * @param inventoryId The inventory id of the inventory item
+     * @return            Returns the updated inventory item entity
+     */
+    public Integer updateInventoryItemQuantity(Integer newQuantity, Integer inventoryId) { return inventoryRepository.updateInventoryQuantity(newQuantity, inventoryId); }
+
 }

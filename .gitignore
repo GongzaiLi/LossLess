@@ -44,3 +44,6 @@ coverage/
 ### Logging ###
 /backend/spring.log
 *.gz
+
+### Data generation ###
+/data-generation/users.json
