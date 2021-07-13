@@ -15,15 +15,17 @@
       ref="inventoryTable"
       @row-clicked="tableRowClick"
   >
-    <template #cell(productThumbnail) class="thumbnail-row">
-      <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
-             alt="Default Image"></b-img>
+    <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
+      <b-img v-if="!data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src="require(`/public/product_default.png`)" alt="Product has no image" />
+      <b-img v-if="data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src=getThumbnail(data.item.product) />
     </template>
+
     <template v-slot:cell(actions)="product">
       <b-button id="edit-button" @click="editButtonClicked(product.item)" size="sm">
         Edit
       </b-button>
     </template>
+
     <template #cell(pricePerItem)="data">
       {{ currency.symbol }}{{ data.item.pricePerItem }}
     </template>
@@ -53,8 +55,14 @@
   text-align: center;
 }
 
+.product-image-thumbnail {
+  height: 66px !important;
+  object-fit: cover;
+  width: 66px;
+}
+
 .thumbnail-row {
-  padding: 0 0 0 0.5rem !important;
+  padding: 0.5rem 0 0.5rem 0 !important;
 }
 </style>
 
@@ -146,6 +154,18 @@ export default {
             `${date.getUTCFullYear()}`;
       }
     },
+
+    /**
+     * Uses the product of the inventory and returns the thumbnail of the primary image for that product.
+     * @param  product a product that's image is being requested
+     * @return string
+     **/
+    getThumbnail: function (product) {
+      if (product.primaryImage) {
+        const primaryImageFileName = product.primaryImage.thumbnailFilename;
+        return api.getImage(primaryImageFileName.substr(1));
+      }
+    }
   },
 
   mounted() {
@@ -164,6 +184,7 @@ export default {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
           thStyle: 'width: 60px',
+          label: 'Thumbnail',
         },
         {
           key: 'product',
