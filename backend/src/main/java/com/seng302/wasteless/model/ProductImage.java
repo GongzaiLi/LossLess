@@ -1,6 +1,9 @@
 package com.seng302.wasteless.model;
 
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.ListingViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,13 +25,16 @@ public class ProductImage {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private Integer id;
 
     @NotNull(message = "Must have a filename")
     @Column(name = "fileName")
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private String fileName;
 
     @NotNull(message = "Must have a thumbnail filename")
     @Column(name = "thumbnail_Filename")
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private String thumbnailFilename;
 }
