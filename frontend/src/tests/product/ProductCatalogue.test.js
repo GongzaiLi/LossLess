@@ -117,8 +117,9 @@ describe('Testing api put/post request and the response method with errors', () 
 
   it('Create product but receives 413 (image) error ', async () => {
     Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: '51-A'}});
-    Api.uploadProductImages.mockRejectedValue({response : {status: 413, data: "Image larger than 5MB"}});
+    Api.uploadProductImage.mockRejectedValue({response : {status: 413, data: "Image larger than 5MB"}});
 
+    wrapper.vm.productDisplayedInCard.images = [{filename: 'blah'}];
     await wrapper.vm.createProduct();
 
     expect(wrapper.vm.productCardError).toBe("Image larger than 5MB");
