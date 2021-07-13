@@ -182,7 +182,7 @@ public class ImageController {
      */
     @ResponseBody
     @RequestMapping(value = "/images", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] getImage(@RequestBody String filename) throws IOException {
+    public byte[] getImage(@RequestParam String filename) throws IOException {
         InputStream is = new FileInputStream(filename);
         return IOUtils.toByteArray(is);
     }
