@@ -1,19 +1,14 @@
 package com.seng302.wasteless.unitTest;
 
-import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.controller.ListingController;
-import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.PostListingsDto;
-import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -28,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -246,7 +240,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
-        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business,user);
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business,user);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)

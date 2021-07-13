@@ -3,18 +3,15 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
-import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -213,7 +210,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
 
-        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business, user);
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -280,7 +277,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenGetRequestToInventory_andInvalidRequest_UserNotBusinessAdminOrDGAA_then403Response() throws Exception {
 
-         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business, user);
+         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
@@ -476,7 +473,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPutRequestToModifyInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
 
-         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business, user);
+         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
          String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")

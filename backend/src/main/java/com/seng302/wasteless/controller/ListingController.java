@@ -76,7 +76,7 @@ public class ListingController {
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
 
         logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);

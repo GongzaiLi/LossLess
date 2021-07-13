@@ -72,7 +72,7 @@ public class CatalogueController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness,user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
         logger.debug("Trying to create product: {} for business: {}", possibleProduct, possibleBusiness);
 
@@ -124,7 +124,7 @@ public class CatalogueController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
 
         logger.debug("Trying to retrieve products for business: {}", possibleBusiness);
@@ -155,7 +155,7 @@ public class CatalogueController {
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.debug("Trying to find product with ID: {} in the catalogue", productId);
         Product oldProduct = productService.findProductById(productId);

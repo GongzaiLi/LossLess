@@ -82,7 +82,7 @@ public class ImageController {
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", productId, businessId);
         Product possibleProduct = productService.findProductById(productId);

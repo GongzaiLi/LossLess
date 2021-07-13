@@ -72,7 +72,7 @@ public class InventoryController {
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", inventoryDtoRequest.getProductId(), businessId);
         Product possibleProduct = productService.findProductById(inventoryDtoRequest.getProductId());
@@ -115,7 +115,7 @@ public class InventoryController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
 
         logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
@@ -146,7 +146,7 @@ public class InventoryController {
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", itemId, businessId);
         Product possibleProduct = productService.findProductById(editedInventoryItem.getProductId());

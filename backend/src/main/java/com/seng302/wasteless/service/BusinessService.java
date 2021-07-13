@@ -93,10 +93,10 @@ public class BusinessService {
     /**
      * Check if given user is admin of given business or if user is global admin
      * if not throw response status exception Forbidden 403
-     * @param business
-     * @param user
+     * @param business business user may be admin of
+     * @param user user to check admin privileges of
      */
-    public void checkUserBusinessOrGlobalAdmin(Business business, User user) {
+    public void checkUserAdminOfBusinessOrGAA(Business business, User user) {
         if (!(user.checkUserGlobalAdmin() || (business.checkUserIsPrimaryAdministrator(user)))) {
             logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, business);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request");

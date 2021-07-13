@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -177,7 +176,7 @@ public class BusinessController {
 
         User userMakingRequest = userService.getCurrentlyLoggedInUser();
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusinessToAddAdminFor, userMakingRequest);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusinessToAddAdminFor, userMakingRequest);
 
 
         if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
@@ -215,7 +214,7 @@ public class BusinessController {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, loggedInUser);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, loggedInUser);
 
         if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
             logger.warn("User is primary admin");
