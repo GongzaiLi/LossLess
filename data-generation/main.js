@@ -16,6 +16,9 @@ const HAS_NICKNAME_PROB = 1/10;
 const HAS_MIDDLE_NAME_PROB = 4/10;
 
 const userBios = require('./bios.json')
+//const businessNames = require('./businessNames.json')
+//const businessDesc = require('./businessDescs.json')
+
 
 /**
  * Uses the https://randomuser.me Api to get 10000 randomly generated users. 
