@@ -30,6 +30,23 @@ public class ProductService {
 
 
     /**
+     * Check if the product id in use if so throw a response status exception
+     * @param id The id of the product to find
+     *
+     */
+    public Boolean checkIfProductIdNotInUse(String id) {
+        Product product = productRepository.findFirstById(id);
+        if (product != null) {
+            logger.warn("Product ID already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product ID provided already exists.");
+        }
+        logger.info("Product ID: {} generated", id);
+        return true;
+    }
+
+
+
+    /**
      * Find product by product id (code)
      *
      * @param id        The id of the product to find
