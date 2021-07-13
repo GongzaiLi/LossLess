@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+import java.nio.file.Paths;
+
 /**
  * ProductImageService applies product image logic over the ProductImage JPA repository.
  */
@@ -123,6 +125,35 @@ public class ProductImageService {
             logger.debug("Corrupt Image File", error);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Corrupt Image File");
         }
+    }
+
+
+    /**
+     * delete product image from database
+     * @param productImage
+     */
+    public void deleteImageRecordFromDB (ProductImage productImage) {
+        this.productImageRepository.delete(productImage);
+    }
+
+    /**
+     * delete image file and thumbnail from serve
+     * @param productImage
+     */
+    public void deleteImageFile(ProductImage productImage) {
+        try {
+            logger.info("Deleting: {}", productImage.getFileName());
+            Files.delete(Paths.get("./" + productImage.getFileName()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete image locally: {0}", error);
+        }
+        try {
+            logger.info("Deleting: {}", productImage.getThumbnailFilename());
+            Files.delete(Paths.get("./" + productImage.getThumbnailFilename()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete thumbnail image locally: {0}", error);
+        }
+
     }
 
     /**
