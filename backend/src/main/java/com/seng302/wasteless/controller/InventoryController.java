@@ -106,6 +106,8 @@ public class InventoryController {
         logger.debug("Request to get business INVENTORY products");
 
         User user = userService.getCurrentlyLoggedInUser();
+        System.out.println("GOT USER IN CONTROLLER");
+        System.out.println(user.toString());
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);

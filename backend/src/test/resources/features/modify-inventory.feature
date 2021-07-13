@@ -25,4 +25,4 @@ Feature: Modify Inventory
     And The inventory item with id 1 exists for business 1
     And The product with id "2-PRODUCT" does not exist
     When The user modifies the inventory item with id 1 for business 1 with no product code
-    Then The inventory item is not modified with an error message of "{\"productId\":\"Product Code is Mandatory\"}"
+    Then The inventory item is not modified with a bad request error

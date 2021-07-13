@@ -213,11 +213,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
 
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
-
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-
-        doReturn(false).when(user).checkUserGlobalAdmin();
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business, user);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -230,10 +226,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoMatchingProduct_the400Response() throws Exception {
 
-        doReturn(null).when(productService).findProductById(anyString());
-
+         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(anyString());
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
-        doReturn(null).when(productService).findProductById(null);
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(null);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -248,8 +243,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         productForInventory.setBusinessId(5);
         doReturn(productForInventory).when(productService).findProductById(anyString());
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business")).when(productService).checkProductBelongsToBusiness(productForInventory, 1);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
+         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -284,11 +280,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenGetRequestToInventory_andInvalidRequest_UserNotBusinessAdminOrDGAA_then403Response() throws Exception {
 
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
-
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-
-        doReturn(false).when(user).checkUserGlobalAdmin();
+         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business, user);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
@@ -484,13 +476,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPutRequestToModifyInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
 
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
+         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business, user);
 
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-
-        doReturn(false).when(user).checkUserGlobalAdmin();
-
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
@@ -501,10 +489,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoMatchingProduct_the400Response() throws Exception {
 
-        doReturn(null).when(productService).findProductById(anyString());
-
+         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(anyString());
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
-        doReturn(null).when(productService).findProductById(null);
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(null);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -602,11 +589,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
 
         inventoryItem.setBusinessId(2);
-
+        doThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist")).when(businessService).findBusinessById(1);
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotAcceptable());
     }
 
     @Test
@@ -615,8 +602,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         productForInventory.setBusinessId(5);
         doReturn(productForInventory).when(productService).findProductById(anyString());
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business")).when(productService).checkProductBelongsToBusiness(productForInventory, 1);
+         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -627,7 +614,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPutRequestToModifyInventory_andInvalidRequest_productNotExist_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
-        doReturn(null).when(productService).findProductById(anyString());
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(anyString());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)

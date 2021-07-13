@@ -34,13 +34,14 @@ public class ProductService {
      * @param id The id of the product to find
      *
      */
-    public void checkIfProductIdNotInUse(String id) {
+    public Boolean checkIfProductIdNotInUse(String id) {
         Product product = productRepository.findFirstById(id);
         if (product != null) {
             logger.warn("Product ID already exists");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product ID provided already exists.");
         }
         logger.info("Product ID: {} generated", id);
+        return true;
     }
 
     /**
@@ -53,7 +54,7 @@ public class ProductService {
         Product product = productRepository.findFirstById(id);
         if (product == null) {
             logger.warn("Product with id: {} Not Found", id);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given id does not exist");
         }
         logger.info("Product with ID: {} Found", id);
         return product;

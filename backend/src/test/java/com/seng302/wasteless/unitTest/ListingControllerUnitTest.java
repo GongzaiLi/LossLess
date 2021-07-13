@@ -200,10 +200,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-        doReturn(false).when(user).checkUserGlobalAdmin();
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserBusinessOrGlobalAdmin(business,user);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -231,7 +228,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenPostRequestToCreateListing_andValidUserAndValidBusiness_butInvalidInventory_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
-        doReturn(null).when(inventoryService).findInventoryById(1);
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item with given id does not exist")).when(inventoryService).findInventoryById(1);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)

@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
@@ -120,9 +119,10 @@ public class UserService {
         logger.debug("Validating user with Email: {}", currentPrincipalEmail);
         User user = findUserByEmail(currentPrincipalEmail);
         if (user == null) {
-            logger.info("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
+            logger.info("Access token invalid for user with Email: {}", currentPrincipalEmail);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
         }
+
         logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
         return user;
     }

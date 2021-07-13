@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -73,7 +74,6 @@ public class ListingController {
 
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserBusinessOrGlobalAdmin(possibleBusiness, user);
@@ -88,7 +88,7 @@ public class ListingController {
 
         if (availableQuantity < listingQuantity) {
             logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.",listingQuantity, availableQuantity);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Listing quantity greater than available inventory quantity.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);

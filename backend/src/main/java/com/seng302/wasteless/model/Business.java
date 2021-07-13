@@ -92,6 +92,11 @@ public class Business {
      * @return true if user primary admin, false otherwise
      */
     public boolean checkUserIsPrimaryAdministrator(User user) {
+        System.out.println("USER IN BUSINESS");
+        System.out.println(user.toString());
+        System.out.println("PRIMARY ADMIN");
+
+        System.out.println(primaryAdministrator.toString());
         return primaryAdministrator.getId().equals(user.getId());
     }
 
