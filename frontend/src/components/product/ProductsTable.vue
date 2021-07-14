@@ -15,12 +15,12 @@
         :busy="tableLoading"
         ref="productCatalogueTable"
     >
-      <template #cell(image)="products">
+      <template #cell(thumbnail)="products">
         <div v-if="!products.item.images.length">
           <img class="product-image-thumbnail" :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image">
         </div>
         <div v-if="products.item.images.length">
-          <img class="product-image-thumbnail" :src="getPrimaryImageThumbnail(products.item)">
+          <img class="product-image-thumbnail" :src="getThumbnail(products.item)" alt="Failed to load image">
         </div>
       </template>
 
@@ -52,7 +52,7 @@
 
 <style>
 .product-image-thumbnail {
-  width: 44px;
+  width: 66px;
   object-fit: cover;
 }
 </style>
@@ -131,20 +131,13 @@ export default {
 
     /**
      * Takes a product as input and returns the primary image thumbnail for that product
-     * @param  {product} a product that's image is being requested
-     * @return image
+     * @param product   The product that's thumbnail is being requested
+     * @return image    The primary image thumbnail
      **/
-    getPrimaryImageThumbnail: function (product) {
-      console.log(product, 11111);
-      const images = product.images;
-      const primaryImageId = product.primaryImageId;
-      for (const image of images) {
-        if (image.id === primaryImageId) {
-          return api.getImage(image.thumbnailFilename.substr(1));
-        }
-      }
+    getThumbnail: function (product) {
+      const primaryImageFileName = product.primaryImage.thumbnailFilename;
+      return api.getImage(primaryImageFileName);
     }
-
   },
 
   computed: {
@@ -156,9 +149,8 @@ export default {
     fields: function () {
       let fieldsList = [
         {
-          key: 'image',
+          key: 'thumbnail',
           label: '',
-          formatter: 'setImage'
         },
 
         {
