@@ -1,5 +1,5 @@
 <template>
-  <b-card
+  <div
       class="profile-card"
       style="max-width: 50rem"
   >
@@ -14,29 +14,40 @@
     >
       <b-carousel-slide v-for="image in productCard.images" :key="image.id">
         <template #img>
-          <div style="position: absolute; width:100%; z-index: 999999">
+          <div style="position: absolute; width:100%; z-index: 999999" v-if="!disabled">
             <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
             <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog(image.id)">
               <b-icon-trash-fill/>
             </b-button>
-            <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover title="Set as primary image">
-              <b-icon-star></b-icon-star>
+            <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover class="make-primary-btn"
+                   :title="image.id === productCard.primaryImage.id ? 'This is the primary image': 'Set as primary image'"
+                   :disabled="image.id === productCard.primaryImage.id"
+                   @click="setPrimaryImage(image)">
+              <b-icon-star v-if="image.id !== productCard.primaryImage.id"></b-icon-star>
+              <b-icon-star-fill variant="warning" v-else></b-icon-star-fill>
+            </b-btn>
+          </div>
+          <div style="position: absolute; width:100%; z-index: 999999" v-else>
+            <b-btn class="make-primary-btn" disabled v-if="image.id === productCard.primaryImage.id" variant="primary" size="sm" style="float: right;" v-b-tooltip.hover
+                   :title="'This is the primary image'">
+              <b-icon-star-fill variant="warning"></b-icon-star-fill>
             </b-btn>
           </div>
           <!-- The class .d-block prevent browser default image alignment -->
           <img
               class="product-image d-block w-100 rounded"
               alt="Product image"
-              :src="image.filename"
+              :src="getURL(image.fileName)"
           >
         </template>
       </b-carousel-slide>
     </b-carousel>
+
     <b-input-group>
       <div v-if="!productCard.images.length">
         <img class="product-image" src="../../../public/product_default.png" alt="Product has no image">
       </div>
-      <div class="w-100">
+      <div class="w-100" v-if="!disabled">
         <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
         <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker"
                accept="image/png, image/jpeg, image/gif, image/jpg">
@@ -44,9 +55,12 @@
           <strong>{{ addImageButtonText }} <b-spinner small v-if="isUploadingFile"/></strong>
         </b-button>
       </div>
+      <h6 class="w-100 text-center" v-else>To edit or delete product images, edit the product.</h6>
     </b-input-group>
-
-    <b-form @submit.prevent="okAction">
+    <br>
+    <b-card>
+      <b-card-title class="text-center">Product Attributes</b-card-title>
+      <b-form @submit.prevent="okAction">
       <b-card-body>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
@@ -103,12 +117,12 @@
                            v-model="productCard.description "/>
         </b-input-group>
       </b-card-body>
-      <hr style="width:100%">
       <div>
-        <b-button v-if="!disabled" style="float: right" variant="primary" type="submit">OK</b-button>
+        <b-button v-if="!disabled" style="float: right" variant="primary" type="submit">Apply</b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
       </div>
     </b-form>
+    </b-card>
 
     <b-modal ref="errorModal" size="sm" title="Error" ok-only>
       {{ imageError }}
@@ -119,10 +133,13 @@
         Are you sure you want to <strong>permanently</strong> delete this image?
       </h6>
     </b-modal>
-  </b-card>
+  </div>
 </template>
 
 <style>
+.make-primary-btn.disabled {
+  opacity: 1 !important;
+}
 .carousel-control-prev-icon , .carousel-control-next-icon {
   background-color: black !important;
   border-radius: 20%;
@@ -172,11 +189,13 @@ export default {
   },
   mounted() {
     this.productCard = this.product;
-    this.productCard.images = []
     // Sometimes the product passed in should not have a 'created' attribute, eg. if it is a new object for creation.
     if (this.productCard.created) {
       this.productCard.created = new Date(this.productCard.created).toUTCString();
+    } else {
+      this.productCard.images = [];
     }
+
   },
   methods: {
     /**
@@ -193,17 +212,30 @@ export default {
         const businessId = this.$route.params.id;
         this.isUploadingFile = true;
         try {
-          await Api.uploadProductImages(businessId, `${businessId}-${this.productCard.id}`, files);
+          for (const file of files) {
+            await Api.uploadProductImage(businessId, `${businessId}-${this.productCard.id}`, file);
+          }
         } catch (error) {
           this.imageError = error.response.data.message;
           this.$refs.errorModal.show();
         }
+        this.$emit('imageChange');
         this.isUploadingFile = false;
         // TODO: refresh the product images if an API call was sent
       }
       this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
       await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image
       this.slideNumber = this.productCard.images.length - 1; // Change the displayed image slide to the newly added image
+    },
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      if (this.isCreatingProduct) { // Return preview URL if we're creating to product (and so image isn't in the backend yet).
+        return imageFileName;
+      } else {
+        return Api.getImage(imageFileName);
+      }
     },
     /**
      * Given a list of image files, adds each as a preview to the product image carousel. This should be used when creating
@@ -214,10 +246,13 @@ export default {
       for (let file of files) {
         let url = URL.createObjectURL(file);
         this.productCard.images.push({
-          "id": url,
-          "filename": url,
+          id: url,
+          fileName: url,
           fileObject: file
         });
+      }
+      if (!this.productCard.primaryImage) {
+        this.productCard.primaryImage = this.productCard.images[0];
       }
     },
 
@@ -230,7 +265,8 @@ export default {
       const businessId = this.$route.params.id;
       if (!this.isCreatingProduct) {  // Only make Api request if the product exists
         try {
-          await Api.deleteImage(businessId, `${businessId}-${this.productCard.id}`, this.imageIdToDelete)
+          await Api.deleteImage(businessId, `${businessId}-${this.productCard.id}`, this.imageIdToDelete);
+          this.$emit('imageChange');
         } catch(error) {
           this.imageError = error.response.statusText;
           this.$log.debug(error);
@@ -249,8 +285,22 @@ export default {
     openDeleteConfirmDialog: function(imageId) {
       this.imageIdToDelete = imageId;
       this.$refs.confirmDeleteImageModal.show();
-    }
+    },
 
+    /**
+     * Sets this image to be the primary image. Will send the API request if the product already exists.
+     * In either case will set the primaryImage field to the new primary image, as we can't realy refresh
+     * the product form the API.
+     */
+    setPrimaryImage(image) {
+      const businessId = this.$route.params.id;
+      if (!this.isCreatingProduct) {
+        Api.setPrimaryImage(businessId, `${businessId}-${this.productCard.id}`, image.id);
+        this.$emit('imageChange');
+      }
+      this.productCard.primaryImage = image;
+      this.$forceUpdate(); // For some carousel isn't reactive to the images array, so this forces an update
+    }
   },
   computed: {
     /**

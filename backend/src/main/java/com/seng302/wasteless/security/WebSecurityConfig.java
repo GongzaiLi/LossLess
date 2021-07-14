@@ -95,7 +95,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
 //                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 //                    .ignoringAntMatchers(publicRoutes)
-     //           .and()
                 .authorizeRequests()
                     .antMatchers(publicRoutes).permitAll()
                     .antMatchers("/users/{\\d+}/makeAdmin", "/users/{\\d+}/revokeAdmin")

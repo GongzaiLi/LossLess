@@ -32,6 +32,7 @@ Date: 15/4/2021
                              :currency="currency"
                              :okAction="productCardAction"
                              :cancelAction="closeProductCardModal"
+                             @imageChange="refreshProducts"
         />
         <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
@@ -193,15 +194,18 @@ export default {
     async createProduct() {
       await Api
           .createProduct(this.$route.params.id, this.productDisplayedInCard)
-          .then((createProductResponse) => {
+          .then(async (createProductResponse) => {
             this.$log.debug("Product Created", createProductResponse);
             this.$log.debug("Uploading images");
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
             // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
             // We also need to extract the file objects from the list of images (see addImagePreviewsToCarousel in ProductDetailCard for why)
-            return Api.uploadProductImages(this.$route.params.id, createProductResponse.data.productId, this.productDisplayedInCard.images.map(
-                file => file.fileObject
-            ))
+            for (let image of this.productDisplayedInCard.images) {
+              let resp = await Api.uploadProductImage(this.$route.params.id, createProductResponse.data.productId, image.fileObject);
+              if (image.id === this.productDisplayedInCard.primaryImage.id) {
+                await Api.setPrimaryImage(this.$route.params.id, createProductResponse.data.productId, resp.data.imageId);
+              }
+            }
           })
           .then(() => {
             this.$bvModal.hide('product-card');
