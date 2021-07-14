@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * UserSearchDtoMapper is used to transform a search query into a UserSearchDto object.
+ * Transforms the set from the search to a list then applies an offset and count to the search to work with pagination
+ * then returns a UserSearchDto object containing the reduced list and the number of total results for the search query
+ */
 @Component
 public class UserSearchDtoMapper {
     private static UserService userService;
