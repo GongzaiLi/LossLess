@@ -64,12 +64,40 @@ public class ProductService {
     /**
      * Add image to a product
      * Calling the method in this way allows for mocking during automated testing
-     * @param product
-     * @param productImage
+     * @param product Product that image is to be added to
+     * @param productImage image that is to be added to product
      */
     public void addImageToProduct(Product product, ProductImage productImage) {
         product.addImage(productImage);
     }
+
+    /**
+     * Remove an image from a product
+     * Calling the method in this way allows for mocking during automated testing
+     *  @param product Product that image is to be removed from
+     *  @param productImage image that is to be removed from product
+     */
+    public void deleteImageRecordFromProductInDB (Product product, ProductImage productImage) {
+        product.removeImage(productImage);
+    }
+
+    /**
+     * update the primary image for product to first image list or null for empty
+     * @param product Product that image is being removed from
+     * @param productImage image that is being removed from product
+     */
+    public void updatePrimaryImage(Product product, ProductImage productImage) {
+        if (product.getPrimaryImage().getId().equals(productImage.getId())){
+            if (product.getImages().isEmpty()) {
+                product.setPrimaryImage(null);
+            } else {
+                product.setPrimaryImage(product.getImages().get(0));
+            }
+
+        }
+    }
+
+
 
 }
 
