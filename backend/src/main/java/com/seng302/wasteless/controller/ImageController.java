@@ -1,5 +1,6 @@
 package com.seng302.wasteless.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.ProductImage;
@@ -8,6 +9,7 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductImageService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -164,11 +166,7 @@ public class ImageController {
         productService.updateProduct(product);
         logger.info("Saved image with ID: {} to product with ID: {} in the database", newImage.getId(), product.getId());
 
-
-        JSONObject responseBody = new JSONObject();
-        responseBody.put("imageId", newImage.getId());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
 
     }
 

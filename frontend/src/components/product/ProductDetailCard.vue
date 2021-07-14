@@ -3,62 +3,66 @@
       class="profile-card"
       style="max-width: 50rem"
   >
-    <b-carousel
-        id="carousel-1"
-        :controls="productCard.images.length > 1"
-        indicators
-        :interval="0"
-        ref="image_carousel"
-        v-model="slideNumber"
-        v-if="productCard.images.length > 0"
-    >
-      <b-carousel-slide v-for="image in productCard.images" :key="image.id">
-        <template #img>
-          <div style="position: absolute; width:100%; z-index: 999999" v-if="!disabled">
-            <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
-            <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog(image.id)">
-              <b-icon-trash-fill/>
-            </b-button>
-            <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover class="make-primary-btn"
-                   :title="image.id === productCard.primaryImage.id ? 'This is the primary image': 'Set as primary image'"
-                   :disabled="image.id === productCard.primaryImage.id"
-                   @click="setPrimaryImage(image)">
-              <b-icon-star v-if="image.id !== productCard.primaryImage.id"></b-icon-star>
-              <b-icon-star-fill variant="warning" v-else></b-icon-star-fill>
-            </b-btn>
-          </div>
-          <div style="position: absolute; width:100%; z-index: 999999" v-else>
-            <b-btn class="make-primary-btn" disabled v-if="image.id === productCard.primaryImage.id" variant="primary" size="sm" style="float: right;" v-b-tooltip.hover
-                   :title="'This is the primary image'">
-              <b-icon-star-fill variant="warning"></b-icon-star-fill>
-            </b-btn>
-          </div>
-          <!-- The class .d-block prevent browser default image alignment -->
-          <img
-              class="product-image d-block w-100 rounded"
-              alt="Product image"
-              :src="getURL(image.fileName)"
-          >
-        </template>
-      </b-carousel-slide>
-    </b-carousel>
+    <div id="image-section" class="shadow">
+      <b-carousel
+          id="carousel-1"
+          :controls="productCard.images.length > 1"
+          indicators
+          :interval="0"
+          ref="image_carousel"
+          v-model="slideNumber"
+          v-if="productCard.images.length > 0"
+      >
+        <b-carousel-slide v-for="image in productCard.images" :key="image.id">
+          <template #img>
+            <div style="position: absolute; width:100%; z-index: 999999" v-if="!disabled">
+              <!--We need a huge z-index to make sure the buttons appear over the left/right controls-->
+              <b-button variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog(image.id)">
+                <b-icon-trash-fill/>
+              </b-button>
+              <b-btn variant="primary" size="sm" style="float: right;" v-b-tooltip.hover class="make-primary-btn"
+                     :title="image.id === productCard.primaryImage.id ? 'This is the primary image': 'Set as primary image'"
+                     :disabled="image.id === productCard.primaryImage.id"
+                     @click="setPrimaryImage(image)">
+                <b-icon-star v-if="image.id !== productCard.primaryImage.id"></b-icon-star>
+                <b-icon-star-fill variant="warning" v-else></b-icon-star-fill>
+              </b-btn>
+            </div>
+            <div style="position: absolute; width:100%; z-index: 999999" v-else>
+              <b-btn class="make-primary-btn" disabled v-if="image.id === productCard.primaryImage.id" variant="primary" size="sm" style="float: right;" v-b-tooltip.hover
+                     :title="'This is the primary image'">
+                <b-icon-star-fill variant="warning"></b-icon-star-fill>
+              </b-btn>
+            </div>
+            <!-- The class .d-block prevent browser default image alignment -->
+            <img
+                class="product-image d-block w-100 rounded"
+                alt="Product image"
+                :src="getURL(image.fileName)"
+            >
+          </template>
+        </b-carousel-slide>
+      </b-carousel>
 
-    <b-input-group>
-      <div v-if="!productCard.images.length">
-        <img class="product-image" src="../../../public/product_default.png" alt="Product has no image">
-      </div>
-      <div class="w-100" v-if="!disabled">
-        <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
-        <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker"
-               accept="image/png, image/jpeg, image/gif, image/jpg">
-        <b-button variant="info" class="w-100" id="add-image-btn" @click="$refs.filepicker.click()" :disabled="isUploadingFile">
-          <strong>{{ addImageButtonText }} <b-spinner small v-if="isUploadingFile"/></strong>
+      <b-input-group>
+        <div v-if="!productCard.images.length">
+          <img class="product-image" src="../../../public/product_default.png" alt="Product has no image">
+        </div>
+        <div class="w-100" v-if="!disabled">
+          <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
+          <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker"
+                 accept="image/png, image/jpeg, image/gif, image/jpg">
+          <b-button variant="info" class="w-100 add-image-btn" @click="$refs.filepicker.click()" :disabled="isUploadingFile">
+            <strong>{{ addImageButtonText }} <b-spinner small v-if="isUploadingFile"/></strong>
+          </b-button>
+        </div>
+        <b-button variant="info" v-else disabled class="add-image-btn w-100">
+          <strong>To edit or delete product images, edit the product.</strong>
         </b-button>
-      </div>
-      <h6 class="w-100 text-center" v-else>To edit or delete product images, edit the product.</h6>
-    </b-input-group>
+      </b-input-group>
+    </div>
     <br>
-    <b-card>
+    <b-card class="shadow">
       <b-card-title class="text-center">Product Attributes</b-card-title>
       <b-form @submit.prevent="okAction">
       <b-card-body>
@@ -152,9 +156,9 @@
   border-bottom-right-radius: 0;
 }
 
-#add-image-btn {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+.add-image-btn {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
 }
 
 .product-image {
@@ -213,7 +217,9 @@ export default {
         this.isUploadingFile = true;
         try {
           for (const file of files) {
-            await Api.uploadProductImage(businessId, `${businessId}-${this.productCard.id}`, file);
+            this.productCard.images.push(
+                (await Api.uploadProductImage(businessId, `${businessId}-${this.productCard.id}`, file)).data
+            );
           }
         } catch (error) {
           this.imageError = error.response.data;
@@ -221,7 +227,6 @@ export default {
         }
         this.$emit('imageChange');
         this.isUploadingFile = false;
-        // TODO: refresh the product images if an API call was sent
       }
       this.$forceUpdate(); // For some reason pushing to the images array doesn't update the gallery, so this forces and update
       await this.$nextTick(); // Wait for the gallery to render with the added image, so we can switch to that image

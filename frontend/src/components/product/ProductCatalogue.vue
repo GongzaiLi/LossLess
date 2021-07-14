@@ -4,7 +4,7 @@ Date: 15/4/2021
 -->
 <template>
   <div>
-    <b-card v-if="canEditCatalogue">
+    <b-card v-if="canEditCatalogue" class="shadow">
       <b-card-title>Product Catalogue: {{businessName}}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center">
@@ -48,9 +48,8 @@ Date: 15/4/2021
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
     </b-card>
 
-    <b-modal id="image-error-modal" title="Some images couldn't be uploaded" ok-only>
-      Unfortunately, some images couldn't be uploaded.
-      {{ productCardError }}
+    <b-modal id="image-error-modal" title="Unfortunately, some images couldn't be uploaded." ok-only>
+      {{ imageError }}
       <br>
       However, the product has been created successfully. If you would like to add more images to it, you can do so by
       editing the product.
@@ -87,6 +86,7 @@ export default {
       },
       productCardAction: null,
       productCardError: "",
+      imageError: "",
       productDisplayedInCard: { images: [] },
       isProductCardReadOnly: true,
       items: [],
@@ -196,6 +196,8 @@ export default {
           .createProduct(this.$route.params.id, this.productDisplayedInCard)
           .then(async (createProductResponse) => {
             this.$log.debug("Product Created", createProductResponse);
+            this.refreshProducts(); // Product has been created, so refresh the table of products
+
             this.$log.debug("Uploading images");
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
             // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
@@ -209,13 +211,13 @@ export default {
           })
           .then(() => {
             this.$bvModal.hide('product-card');
-            this.refreshProducts();
           })
           .catch((error) => {
             this.productCardError = this.getErrorMessageFromApiError(error);
             if (error.response.status === 413) {  // Uploaded images were too large
               this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
-              this.productCardError = error.response.data;
+              this.imageError = error.response.data;
+              this.productCardError = '';
               this.$bvModal.show('image-error-modal');
             }
             this.$log.debug(error);
