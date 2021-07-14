@@ -3,7 +3,9 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
@@ -140,24 +142,19 @@ public class UserController {
      * @return              A list of matching results
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset") Integer offset, @RequestParam(value = "count") Integer count) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset", required = false) Integer offset, @RequestParam(value = "count", required = false) Integer count) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
+        logger.info("Received count:{} offset:{}", count, offset);
+        offset = offset == null ? 0 : offset;
+        count = count == null ? 10 : count;
+        logger.info("Using count:{} offset:{}", count, offset);
 
         logger.debug("Getting users matching query: {}", searchQuery);
-        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
 
-        List<GetUserDto> searchResultsDto = new ArrayList<>();
-        //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?
+        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset);
 
-        logger.debug("Adding all matched users to list");
-        for (User user : searchResults) {
-            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
-        }
-
-        logger.info("User matching the query: {} are: {}", searchQuery, searchResultsDto);
-
-        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
+        return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
 
 
     }
