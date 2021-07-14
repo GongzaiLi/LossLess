@@ -92,10 +92,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         String[] publicRoutes = {"/login", "/users", "/h2/**"};
         http
                 .cors()
-                .and().csrf()
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    .ignoringAntMatchers(publicRoutes)
-                .and()
+                .and().csrf().disable()
+//                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                    .ignoringAntMatchers(publicRoutes)
                 .authorizeRequests()
                     .antMatchers(publicRoutes).permitAll()
                     .antMatchers("/users/{\\d+}/makeAdmin", "/users/{\\d+}/revokeAdmin")
