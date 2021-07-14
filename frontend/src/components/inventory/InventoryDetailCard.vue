@@ -8,7 +8,7 @@ Date: 13/5/2021
       class="profile-card shadow"
     >
       <b-form @submit.prevent="okAction">
-        <div :hidden="!disabled" v-if="!loadingData">
+        <div :hidden="!disabled" v-if="!loadingData && inventoryInfo.product">
           <b-carousel
               v-if="inventoryInfo.product.images.length && !loadingData"
               id="carousel-1"
@@ -30,11 +30,6 @@ Date: 13/5/2021
           </b-carousel>
           <b-img class="product-image d-block w-100 rounded" v-else center :src="require(`/public/product_default.png`)" alt="Product has no image"/>
         </div>
-
-        <!--        <div :hidden="!disabled" v-if="!loadingData">-->
-<!--          <b-img class="detail_card_image" v-if="!inventoryInfo.product.primaryImage" center :src="require(`/public/product_default.png`)" alt="Product has no image" rounded="circle"/>-->
-<!--          <b-img class="detail_card_image" v-else center :src="getPrimaryImage()" alt="Default Image" rounded="circle"/>-->
-<!--        </div>-->
 
         <b-card-body>
           <h6 class="mb-2"><strong>Product Id *:</strong></h6>
@@ -386,17 +381,6 @@ export default {
         return "No Internet Connectivity";
       } else {
         return "Server error";
-      }
-    },
-
-    /**
-     * Uses the product of the inventory and returns the primary image of the thumbnail for that product.
-     * @return string
-     **/
-    getPrimaryImage: function () {
-      if (this.inventoryInfo.product.primaryImage) {
-        const primaryImageFileName = this.inventoryInfo.product.primaryImage.fileName;
-        return api.getImage(primaryImageFileName);
       }
     },
 
