@@ -396,7 +396,7 @@ export default {
     getPrimaryImage: function () {
       if (this.inventoryInfo.product.primaryImage) {
         const primaryImageFileName = this.inventoryInfo.product.primaryImage.fileName;
-        return api.getImage(primaryImageFileName.substr(1));
+        return api.getImage(primaryImageFileName);
       }
     },
 
@@ -406,7 +406,7 @@ export default {
      * @return string
      **/
     getImage: function (imageFileName) {
-      return api.getImage(imageFileName.substr(1));
+      return api.getImage(imageFileName);
     },
   }
 }
