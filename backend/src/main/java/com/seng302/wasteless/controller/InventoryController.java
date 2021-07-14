@@ -118,8 +118,9 @@ public class InventoryController {
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/inventory")
-    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId) {
+    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
         logger.debug("Request to get business INVENTORY products");
+        logger.debug("Received count:{} offset:{}", count, offset);
 
         User user = userService.getCurrentlyLoggedInUser();
 

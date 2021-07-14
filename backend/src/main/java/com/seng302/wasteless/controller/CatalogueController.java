@@ -130,8 +130,9 @@ public class CatalogueController {
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/products")
-    public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
         logger.debug("Request to get business products");
+        logger.debug("Received count:{} offset:{}", count, offset);
 
         User user = userService.getCurrentlyLoggedInUser();
 

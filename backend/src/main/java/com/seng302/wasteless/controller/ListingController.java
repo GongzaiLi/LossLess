@@ -141,8 +141,9 @@ public class ListingController {
 
     @GetMapping("/businesses/{id}/listings")
     @JsonView(ListingViews.GetListingView.class)
-    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId) {
+    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
+        logger.debug("Received count:{} offset:{}", count, offset);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
