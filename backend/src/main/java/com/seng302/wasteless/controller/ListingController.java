@@ -139,6 +139,13 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
+    /**
+     * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
+     * @param businessId The id of the business to get
+     * @param offset value of the offset from the start of the results query. Used for pagination
+     * @param count number of results to be returned
+     * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
+     */
     @GetMapping("/businesses/{id}/listings")
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {

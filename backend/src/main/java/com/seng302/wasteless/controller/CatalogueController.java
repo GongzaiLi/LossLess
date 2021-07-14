@@ -127,6 +127,8 @@ public class CatalogueController {
      * Handle get request to /businesses/{id}/products endpoint for retrieving all products in a business's catalogue
      *
      * @param businessId The id of the business to get
+     * @param offset value of the offset from the start of the results query. Used for pagination
+     * @param count number of results to be returned
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/products")
