@@ -97,6 +97,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setBestBefore(expiry.minusMonths(1))
                 .setProduct(productForInventory);
 
+        Inventory inventoryItemForListing2 = new Inventory();
+        inventoryItemForListing2.setExpires(expiry)
+                .setTotalPrice(50)
+                .setPricePerItem(10)
+                .setSellBy(expiry.minusMonths(2))
+                .setQuantity(5)
+                .setManufactured(expiry.minusMonths(4))
+                .setBestBefore(expiry.minusYears(3))
+                .setProduct(productForInventory);
+
+        Inventory inventoryItemForListing3 = new Inventory();
+        inventoryItemForListing3.setExpires(expiry)
+                .setTotalPrice(50)
+                .setPricePerItem(10)
+                .setSellBy(expiry.minusYears(3))
+                .setQuantity(5)
+                .setManufactured(expiry.minusMonths(4))
+                .setBestBefore(expiry.minusMonths(1))
+                .setProduct(productForInventory);
+
+        Inventory inventoryItemForListing4 = new Inventory();
+        inventoryItemForListing4.setExpires(expiry.minusYears(3))
+                .setTotalPrice(50)
+                .setPricePerItem(10)
+                .setSellBy(expiry.minusMonths(2))
+                .setQuantity(5)
+                .setManufactured(expiry.minusMonths(4))
+                .setBestBefore(expiry.minusMonths(1))
+                .setProduct(productForInventory);
+
 
         LocalDate closes = inventoryItemForListing.getExpires();
 
@@ -138,6 +168,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(inventoryItemForListing.setId(2));
 
         Mockito
+                .when(inventoryService.findInventoryById(3))
+                .thenReturn(inventoryItemForListing2.setId(2));
+
+        Mockito
+                .when(inventoryService.findInventoryById(4))
+                .thenReturn(inventoryItemForListing3.setId(2));
+
+        Mockito
+                .when(inventoryService.findInventoryById(5))
+                .thenReturn(inventoryItemForListing4.setId(2));
+
+        Mockito
                 .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
@@ -149,9 +191,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .when(listingsService.createListing(any(Listing.class)))
                 .thenReturn(listing.setId(1));
 
-//        Mockito
-//                .when(productService.findProductById(anyString()))
-//                .thenReturn(productForInventory);
+        Mockito
+                .when(productService.findProductById(anyString()))
+                .thenReturn(productForInventory);
 
         doReturn(product).when(productService).findProductById(anyString());
 
@@ -171,6 +213,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         List<Inventory> inventories = new ArrayList<>();
         inventories.add(inventoryItemForListing);
+        inventories.add(inventoryItemForListing2);
+        inventories.add(inventoryItemForListing3);
+        inventories.add(inventoryItemForListing4);
+
 
         Mockito
                 .when(inventoryService.getInventoryFromBusinessId(anyInt()))
@@ -261,6 +307,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("listingId", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToCreateListing_andValidRequest_inventoryItemBestBeforeInPast_then201Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("listingId", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToCreateListing_andValidRequest_inventoryItemSellByInPast_then201Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("listingId", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToCreateListing_andValidRequest_inventoryItemExpiryInPast_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"inventoryItemId\": 5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

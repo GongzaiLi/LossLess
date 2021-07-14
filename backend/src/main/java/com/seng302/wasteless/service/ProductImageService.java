@@ -18,7 +18,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.UUID;
+
+import java.nio.file.Paths;
 
 /**
  * ProductImageService applies product image logic over the ProductImage JPA repository.
@@ -38,6 +40,15 @@ public class ProductImageService {
     }
 
     /**
+     * Find product image by id (database_id)
+     * @param imageId  The id of the product image to find
+     * @return The found product image, if any, otherwise null
+     */
+    public ProductImage findProductImageById(Integer imageId) {
+        return productImageRepository.findFirstById(imageId);
+    }
+
+    /**
      * Creates a ProductImage by saving the productImage object and persisting it in the database
      *
      * @param productImage The ProductImage object to be created.
@@ -50,25 +61,25 @@ public class ProductImageService {
     /**
      * Create unique image filename for the database by using UUID which crates unique alphanumeric value by hashing the time
      *
-     * @param productImage
-     * @param fileType
+     * @param productImage product image setting the file name and thumbnail file name
+     * @param fileType image type
      * @return productImage
      */
     public ProductImage createImageFileName(ProductImage productImage, String fileType) {
         UUID uuid = UUID.randomUUID();
-        productImage.setFileName(String.format("/media/images/%s.%s", uuid, fileType));
-        productImage.setThumbnailFilename(String.format("/media/images/%s_thumbnail.%s", uuid, fileType));
+        productImage.setFileName(String.format("media/images/%s.%s", uuid, fileType));
+        productImage.setThumbnailFilename(String.format("media/images/%s_thumbnail.%s", uuid, fileType));
         return productImage;
     }
 
-    /**
+    /**     
      * saves the image into given path and creates directory if it doesnt exist already
      *
      * @param productImagePath path in which file is to be saved to
      * @param image            image to be saved
      */
     public void storeImage(String productImagePath, MultipartFile image) {
-        File file = new File("." + productImagePath);
+        File file = new File("./" + productImagePath);
         try {
             if (!file.exists()) file.mkdirs();
             Files.copy(image.getInputStream(), file.getAbsoluteFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -94,7 +105,7 @@ public class ProductImageService {
      * @returnconstant The resized version of the original image
      */
     public BufferedImage resizeImage(ProductImage productImage) {
-        File image = new File("." + productImage.getFileName());
+        File image = new File("./" + productImage.getFileName());
         try {
             BufferedImage originalImage = ImageIO.read(image);
             if (originalImage == null) {
@@ -116,6 +127,35 @@ public class ProductImageService {
         }
     }
 
+
+    /**
+     * delete product image from database
+     * @param productImage
+     */
+    public void deleteImageRecordFromDB (ProductImage productImage) {
+        this.productImageRepository.delete(productImage);
+    }
+
+    /**
+     * delete image file and thumbnail from serve
+     * @param productImage
+     */
+    public void deleteImageFile(ProductImage productImage) {
+        try {
+            logger.info("Deleting: {}", productImage.getFileName());
+            Files.delete(Paths.get("./" + productImage.getFileName()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete image locally: {0}", error);
+        }
+        try {
+            logger.info("Deleting: {}", productImage.getThumbnailFilename());
+            Files.delete(Paths.get("./" + productImage.getThumbnailFilename()));
+        } catch (IOException error) {
+            logger.debug("Failed to delete thumbnail image locally: {0}", error);
+        }
+
+    }
+
     /**
      * Saves the thumbnail image into given path.
      *
@@ -124,7 +164,7 @@ public class ProductImageService {
      * @param image            The image to be saved
      */
     public void storeThumbnailImage(String productImagePath, String imageType, BufferedImage image) {
-        File file = new File("." + productImagePath);
+        File file = new File("./" + productImagePath);
         try {
             FileOutputStream out = new FileOutputStream(file);
             ImageIO.write(image, imageType, out);

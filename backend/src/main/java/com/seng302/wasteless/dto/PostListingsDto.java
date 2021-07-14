@@ -41,7 +41,7 @@ public class PostListingsDto {
     @Size(min = 0, max = 250, message = "Info field is too long")
     private String moreInfo;
 
-    @Future
+    @Future(message = "The listing close date must be in the future.")
     @Column(name = "closes")
     private LocalDate closes;
 }
