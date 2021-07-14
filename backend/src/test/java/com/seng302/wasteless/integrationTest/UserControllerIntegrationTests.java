@@ -217,12 +217,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("results.[0].id", is(2)))
                 .andExpect(jsonPath("results.[1].id", is(3)))
-                .andExpect(jsonPath("results.[2].id", is(7)))
-                .andExpect(jsonPath("results.[3].id", is(6)))
-                .andExpect(jsonPath("results.[4].id", is(4)))
-                .andExpect(jsonPath("results.[5].id", is(5)))
-                .andExpect(jsonPath("results.[6].id", is(9)))
-                .andExpect(jsonPath("results.[7].id", is(8)));
+                .andExpect(jsonPath("results.[2].id", is(4)))
+                .andExpect(jsonPath("results.[3].id", is(5)))
+                .andExpect(jsonPath("results.[4].id", is(6)))
+                .andExpect(jsonPath("results.[5].id", is(7)))
+                .andExpect(jsonPath("results.[6].id", is(8)))
+                .andExpect(jsonPath("results.[7].id", is(9)));
 
     }
 
@@ -337,8 +337,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("results.[0].id", is(2)))
                 .andExpect(jsonPath("results.[1].id", is(3)))
-                .andExpect(jsonPath("results.[2].id", is(5)))
-                .andExpect(jsonPath("results.[3].id", is(4)));
+                .andExpect(jsonPath("results.[2].id", is(4)))
+                .andExpect(jsonPath("results.[3].id", is(5)));
 
 
     }

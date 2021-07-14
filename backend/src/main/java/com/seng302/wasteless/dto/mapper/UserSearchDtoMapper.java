@@ -23,9 +23,10 @@ public class UserSearchDtoMapper {
     public UserSearchDtoMapper(UserService userService) {
         UserSearchDtoMapper.userService = userService;
     }
+
     public static UserSearchDto toGetUserSearchDto(String searchQuery, Integer count, Integer offset) {
 
-        List<User> searchResults = new ArrayList<>(userService.searchForMatchingUsers(searchQuery));
+        List<User> searchResults = userService.searchForMatchingUsers(searchQuery);
         List<GetUserDto> searchResultsDto = new ArrayList<>();
         int end = offset+count;
         if(offset<searchResults.size()) {
