@@ -115,7 +115,7 @@ public class ProductImageService {
             }
             int height = TARGET_HEIGHT;
             int width = originalImage.getWidth() * TARGET_HEIGHT / originalImage.getHeight();
-            BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage resizedImage = new BufferedImage( width, height, originalImage.getType());
             Graphics2D graphics2D = resizedImage.createGraphics();
             graphics2D.drawImage(originalImage, 0, 0, width, height, null);
             graphics2D.dispose();
