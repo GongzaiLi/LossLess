@@ -21,7 +21,6 @@ const MAX_BUSSINESSES_PER_USER = 3;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
-const businessDesc = require('./businessDescs.json')
 const businessTypes = require('./businessTypes.json')
 
 const SERVER_URL = "http://localhost:9499";
@@ -130,12 +129,17 @@ async function getBusinesses() {
   const businesses = []
 
   for (let i=0; i < NUM_BUSINESSES; i++) {
+
+    const businessTypesHolder = businessTypes[Math.floor(Math.random() * NUM_BUSINESSTYPES)];
+    const desc = businessNames[i] + " is a high quality business in the field of " + businessTypesHolder + ". We " +
+        "have a wide variety of products for you to view and purchase."
+
     businesses.push({
       primaryAdministratorId: null,
       name: businessNames[i],
-      description: businessDesc[i],
+      description: desc,
       address: null,
-      businessType: businessTypes[Math.floor(Math.random() * NUM_BUSINESSTYPES)]
+      businessType: businessTypesHolder
     })
   }
   return businesses;
@@ -216,6 +220,7 @@ async function registerBusiness(business, instance, userId, user) {
 
   business.primaryAdministratorId = userId
   business.address = user.homeAddress
+  business.description += " Our business headquarters are in " + user.homeAddress.city + ", " + user.homeAddress.country + "."
 
     await instance
       .post(`http://localhost:9499/businesses`, business, {
