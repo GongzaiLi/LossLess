@@ -115,12 +115,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
        mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[0].firstName", is("James")))
-                .andExpect(jsonPath("[0].email", is("jeh128@uclive.ac.nz")));
+                .andExpect(jsonPath("results.[0].id", is(2)))
+                .andExpect(jsonPath("results.[0].firstName", is("James")))
+                .andExpect(jsonPath("results.[0].email", is("jeh128@uclive.ac.nz")));
     }
 
     @Test
@@ -129,14 +129,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Steve&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Steve&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String result = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("[]", result);
+        assertEquals("{\"results\":[],\"totalItems\":0}", result);
     }
 
 
@@ -212,17 +212,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[1].id", is(3)))
-                .andExpect(jsonPath("[2].id", is(7)))
-                .andExpect(jsonPath("[3].id", is(6)))
-                .andExpect(jsonPath("[4].id", is(4)))
-                .andExpect(jsonPath("[5].id", is(5)))
-                .andExpect(jsonPath("[6].id", is(9)))
-                .andExpect(jsonPath("[7].id", is(8)));
+                .andExpect(jsonPath("results.[0].id", is(2)))
+                .andExpect(jsonPath("results.[1].id", is(3)))
+                .andExpect(jsonPath("results.[2].id", is(7)))
+                .andExpect(jsonPath("results.[3].id", is(6)))
+                .andExpect(jsonPath("results.[4].id", is(4)))
+                .andExpect(jsonPath("results.[5].id", is(5)))
+                .andExpect(jsonPath("results.[6].id", is(9)))
+                .andExpect(jsonPath("results.[7].id", is(8)));
 
     }
 
@@ -332,13 +332,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[1].id", is(3)))
-                .andExpect(jsonPath("[2].id", is(5)))
-                .andExpect(jsonPath("[3].id", is(4)));
+                .andExpect(jsonPath("results.[0].id", is(2)))
+                .andExpect(jsonPath("results.[1].id", is(3)))
+                .andExpect(jsonPath("results.[2].id", is(5)))
+                .andExpect(jsonPath("results.[3].id", is(4)));
 
 
     }
