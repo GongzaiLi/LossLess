@@ -93,12 +93,12 @@ describe('Testing upload image when product already exists', () => {
   it('Successfully create a product image', async () => {
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
 
-    expect(Api.uploadProductImages).toHaveBeenCalled();
+    expect(Api.uploadProductImage).toHaveBeenCalled();
     expect(wrapper.vm.imageError).toBe("");
   });
 
   it('Create a product image but error returned', async () => {
-    Api.uploadProductImages.mockRejectedValue({response: {status: 419, data: "The file that you tried to upload is too large. Files must be 5MB in size or less."}});
+    Api.uploadProductImage.mockRejectedValue({response: {status: 419, data: "The file that you tried to upload is too large. Files must be 5MB in size or less."}});
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
 
     expect(wrapper.vm.imageError).toBe("The file that you tried to upload is too large. Files must be 5MB in size or less.");
@@ -143,5 +143,24 @@ describe('Testing api call delete image request', () => {
     expect(Api.deleteImage).toHaveBeenCalled();
   });
 
+});
 
+describe('Set primary image', () => {
+
+  it('Successfully sets primary image for product to be created', async () => {
+    wrapper.vm.productCard.created = null;  // So the product 'doesn't exist'
+    await wrapper.vm.setPrimaryImage({id: 'blah', filename: 'blah'});
+
+    expect(Api.setPrimaryImage).not.toHaveBeenCalled();
+    expect(wrapper.emitted()).not.toHaveProperty('imageChange');
+    expect(wrapper.vm.productCard.primaryImage).toStrictEqual({id: 'blah', filename: 'blah'});
+  });
+
+  it('Successfully sets primary image for product that already exists', async () => {
+    await wrapper.vm.setPrimaryImage({id: 'blah', filename: 'blah'});
+
+    expect(Api.setPrimaryImage).toHaveBeenCalled();
+    expect(wrapper.emitted().imageChange).toBeTruthy();
+    expect(wrapper.vm.productCard.primaryImage).toStrictEqual({id: 'blah', filename: 'blah'});
+  });
 });

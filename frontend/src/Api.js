@@ -60,26 +60,20 @@ export default {
   getListings: (businessId) => instance.get(`/businesses/${businessId}/listings`, {withCredentials: true}),
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
+  setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
 
   /**
-   * Uploads one or more image files to a product. For each image, will send a POST request to the product images
-   * endpoint. Each image is sent as multipart/form-data with the param name "file". Multiple POST requests
-   * for multiple images are done in parallel for efficiency
+   * Uploads one image file to a product. Will send a POST request to the product images
+   * endpoint. Each image is sent as multipart/form-data with the param name "file".
    * @param businessId Id of the business that owns the product
    * @param productId Id of existing product images are to be uploaded for
-   * @param images Collection of image file objects to be uploaded. Should be array or convertible into an Array (eg. FileList)
+   * @param imageFile Image file object to be uploaded.
    */
-  uploadProductImages: (businessId, productId, images) => {
-    return Promise.all(
-      Array.from(images)  // Convert into array. Needed because we might get a FileList which doesn't support .map(). JS is fun sometimes...
-        .map(  // Run all requests to upload product images in parallel for efficiency
-          imageFile => {
-            // See https://github.com/axios/axios/issues/710 for how this works
-            let formData = new FormData();
-            formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
-            return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
-          })
-    );
+  uploadProductImage: (businessId, productId, imageFile) => {
+    // See https://github.com/axios/axios/issues/710 for how this works
+    let formData = new FormData();
+    formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+    return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
   },
 
   /**
