@@ -348,7 +348,7 @@ export default {
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors

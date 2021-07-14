@@ -224,8 +224,7 @@ name: "add-listing-card",
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        console.log(error.response, 6767676767676767);
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
@@ -281,7 +280,6 @@ name: "add-listing-card",
 
     openSelectInventoryItemModal() {
       this.$bvModal.show('select-inventory-item');
-      // this.$refs.inventoryTable.getInventory(this.currentBusiness);
     },
 
     selectInventoryItem(inventory) {

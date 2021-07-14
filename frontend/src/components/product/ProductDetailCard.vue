@@ -195,7 +195,7 @@ export default {
         try {
           await Api.uploadProductImages(businessId, `${businessId}-${this.productCard.id}`, files);
         } catch (error) {
-          this.imageError = error.response.data;
+          this.imageError = error.response.data.message;
           this.$refs.errorModal.show();
         }
         this.isUploadingFile = false;
