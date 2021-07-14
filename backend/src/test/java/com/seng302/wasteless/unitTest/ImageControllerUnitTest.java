@@ -81,6 +81,7 @@ class ImageControllerUnitTest {
         productForImage.setId("1-test-product");
         productForImage.setBusinessId(1);
         productForImage.setName("test-product");
+        productForImage.setImages(new ArrayList<>());
 
         productImage = new ProductImage();
         productImage.setFileName("test");
@@ -92,14 +93,7 @@ class ImageControllerUnitTest {
         productImageTwo.setThumbnailFilename("test2_thumbnail");
         productImageTwo.setId(2);
 
-        productForImage.setPrimaryImage(productImage);
 
-        List<ProductImage> productImages = new ArrayList<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-
-
-        productForImage.setImages(productImages);
 
         productForImageLimit = new Product();
         productForImageLimit.setId("1-test-product-2");
@@ -199,8 +193,41 @@ class ImageControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToAddProductImage_andValidRequest_then201Response() throws Exception {
+    void whenPostRequestToAddProductImage_andValidRequest_withTypeIsPNG_then201Response() throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
+                .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddProductImage_andValidRequest_withTypeIsJPEG_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/jpeg" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
+                .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddProductImage_andValidRequest_withTypeIsJPG_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/jpg" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
+                .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddProductImage_andValidRequest_withTypeIsGIF_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/gif" ,"image example".getBytes());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
@@ -246,6 +273,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_andValidRequest_then200Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
@@ -257,6 +290,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_businessesIdNotFind_then400Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/2/products/1-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
@@ -267,6 +306,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productCodeNotFind_then400Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/99-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
@@ -277,6 +322,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productImageIdNotFind_then406Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/999/makeprimary")
                 .contentType(APPLICATION_JSON))
@@ -287,6 +338,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_andValidRequest_then200Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/2")
                 .contentType(APPLICATION_JSON))
@@ -297,6 +354,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_businessesIdNotFind_then400Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/2/products/1-test-product/images/2")
                 .contentType(APPLICATION_JSON))
@@ -307,6 +370,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productCodeNotFind_then400Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/99-test-product/images/2")
                 .contentType(APPLICATION_JSON))
@@ -317,6 +386,12 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productImageIdNotFind_then406Response() throws Exception {
+        List<ProductImage> productImages = new ArrayList<>();
+        productImages.add(productImage);
+        productImages.add(productImageTwo);
+        productForImage.setImages(productImages);
+        productForImage.setPrimaryImage(productImage);
+
         Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/99")
                 .contentType(APPLICATION_JSON))
