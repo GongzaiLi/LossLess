@@ -217,9 +217,11 @@ export default {
         this.isUploadingFile = true;
         try {
           for (const file of files) {
-            this.productCard.images.push(
-                (await Api.uploadProductImage(businessId, `${businessId}-${this.productCard.id}`, file)).data
-            );
+            const image = (await Api.uploadProductImage(businessId, `${businessId}-${this.productCard.id}`, file)).data;
+            this.productCard.images.push(image);
+            if (this.productCard.images.length === 1) {
+              this.productCard.primaryImage = image;
+            }
           }
         } catch (error) {
           this.imageError = error.response.data;
