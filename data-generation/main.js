@@ -21,6 +21,9 @@ const MAX_BUSSINESSES_PER_USER = 3;
 const MAX_PRODUCTS_PER_BUSINESS = 400;
 const MIN_PRODUCTS_PER_BUSINESS = 30;
 const MAX_PRODUCT_PRICE = 50;
+const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
+const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
+const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -182,6 +185,9 @@ async function registerUserWithBusinesses(user, businesses, numBusinesses) {
   for (let i=0; i < numBusinesses; i++) {
     const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
     await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+    //add listings
+
+    console.log(`Registered business with products and inventory (no listings yet). Id: ${businessResponse.data.businessId}`);
 
   }
 }
@@ -214,7 +220,7 @@ async function registerUsers(users, businesses) {
       console.log(e);
       throw e;
     }
-    console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST}`);
+    console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST} users.`);
   }
 }
 
@@ -257,6 +263,52 @@ function createProductObject(name, business) {
 }
 
 /**
+ * Create an inventory item in the SENG302 API format with random dates.
+ */
+function createInventoryObject(product) {
+
+  const now = new Date();
+  const end = new Date(new Date().setDate(new Date().getDate() + 3 * 52 * 7));
+  const lastMonth = new Date(new Date().setDate(new Date().getDate() - 31));
+
+  const manufactured = new Date(lastMonth.getTime() + Math.random() * (now.getTime() - lastMonth.getTime()));
+  const sellBy = new Date(now.getTime() + Math.random() * (end.getTime() - now.getTime()));
+  const bestBefore = new Date(sellBy.getTime() + Math.random() * (end.getTime() - sellBy.getTime()));
+  const expires = new Date(bestBefore.getTime() + Math.random() * (end.getTime() - bestBefore.getTime()));
+  const quantity = Math.floor(Math.random() * (MAX_QUANTITY_PRODUCT_IN_INVENTORY-MIN_QUANTITY_PRODUCT_IN_INVENTORY) +
+      MIN_QUANTITY_PRODUCT_IN_INVENTORY);
+  const totalPrice = quantity * product.recommendedRetailPrice;
+
+  return {
+    productId: product.id,
+    quantity: quantity,
+    pricePerItem: product.recommendedRetailPrice,
+    totalPrice: totalPrice.toFixed(2),
+    manufactured: manufactured,
+    sellBy: sellBy,
+    bestBefore: bestBefore,
+    expires: expires
+  };
+}
+
+
+/**
+ *  Add a random number of products to a business using our backend endpoint
+ */
+async function addInventory(businessId, instance, product) {
+
+  const inventory = createInventoryObject(product);
+
+  await instance
+    .post(`http://localhost:9499/businesses/${businessId}/inventory`, inventory, {
+      headers: {
+        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+      }
+    })
+
+}
+
+/**
  *  Add a random number of products to a business using our backend endpoint
  */
 async function addProduct(businessId, instance, business) {
@@ -270,7 +322,13 @@ async function addProduct(businessId, instance, business) {
           headers: {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
-        })
+        }).then(async (response) => {
+          if (Math.random() < CHANCE_OF_INVENTORY_FOR_PRODUCT) {
+            product.id = response.data.productId
+            await addInventory(businessId, instance, product);
+          }
+        }).catch(err => console.log(err));
+
   }
 }
 
