@@ -205,7 +205,7 @@ export default {
             for (let image of this.productDisplayedInCard.images) {
               let resp = await Api.uploadProductImage(this.$route.params.id, createProductResponse.data.productId, image.fileObject);
               if (image.id === this.productDisplayedInCard.primaryImage.id) {
-                await Api.setPrimaryImage(this.$route.params.id, createProductResponse.data.productId, resp.data.imageId);
+                await Api.setPrimaryImage(this.$route.params.id, createProductResponse.data.productId, resp.data.id);
               }
             }
           })
