@@ -210,6 +210,7 @@ export default {
             }
           })
           .then(() => {
+            this.refreshProducts(); // Refresh the table of products again to get the images
             this.$bvModal.hide('product-card');
           })
           .catch((error) => {
