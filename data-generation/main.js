@@ -244,7 +244,6 @@ async function registerBusiness(business, instance, userId, user) {
 function createProductObject(name, business) {
 
   const productId = name.replace(/\s/g, "-").replace(/\'/g, "").toUpperCase();
-
   const desc = "This is a very tasty product called " + name + ". It is well priced and a high quality is ensured by " +
       business.name + "."
 
@@ -273,9 +272,6 @@ async function addProduct(businessId, instance, business) {
           }
         })
   }
-
-
-
 }
 
 async function main() {
