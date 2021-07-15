@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -63,7 +64,7 @@ public class CatalogueController {
         User user = userService.getCurrentlyLoggedInUser();
 
         if (!possibleProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your product ID must be alphanumeric with dashes or underscores allowed.");
         }
 
         logger.debug("Request to get business with ID: {}", businessId);
@@ -82,7 +83,7 @@ public class CatalogueController {
         productService.checkIfProductIdNotInUse(productId);
 
         if (possibleProduct.getRecommendedRetailPrice() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product RRP can't be negative.");
         }
         LocalDate dateCreated = LocalDate.now();
 
@@ -161,7 +162,7 @@ public class CatalogueController {
         Product oldProduct = productService.findProductById(productId);
 
         if (!oldProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your product ID must be alphanumeric with dashes or underscores allowed.");
         }
         logger.debug("Generating new product ID");
         String newProductId = editedProduct.createCode(businessId);
@@ -171,7 +172,7 @@ public class CatalogueController {
         logger.info("Product ID: {} generated for old product: {}", newProductId, productId);
 
         if (editedProduct.getRecommendedRetailPrice() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product RRP can't be negative.");
         }
 
         logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, editedProduct);

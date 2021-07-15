@@ -158,7 +158,7 @@ describe('Testing api put/post request and the response method with errors', () 
   });
 
   it("400 given Product ID doesn't exist", async () => {
-    Api.createInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+    Api.createInventory.mockRejectedValue({response: {status: 400, data: {message: "Product with given id does not exist"}}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.createInventory(mockEvent);
@@ -210,7 +210,7 @@ describe('Editing products', () => {
   });
 
   it("Displays errors if exist", async () => {
-    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: {message: "Product with given id does not exist"}}});
 
     await wrapper.vm.editInventory();
 
@@ -233,7 +233,7 @@ describe('Editing products', () => {
   });
 
   it("Displays errors if exist", async () => {
-    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: {message: "Product with given id does not exist"}}});
 
     await wrapper.vm.editInventory();
 

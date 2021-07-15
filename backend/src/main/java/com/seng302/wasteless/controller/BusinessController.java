@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -70,7 +71,7 @@ public class BusinessController {
         business.setPrimaryAdministrator(user);
 
         if (!user.checkIsOverSixteen()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Must be 16 to create a business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must be 16 to create a business");
         }
 
         business.setPrimaryAdministrator(user);
@@ -181,7 +182,7 @@ public class BusinessController {
 
         if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
             logger.warn("Cannot process request. User: {} is already an admin of business: {}.", requestBody.getUserId(), businessId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already admin of business");
         }
 
 
@@ -218,11 +219,11 @@ public class BusinessController {
 
         if (possibleBusiness.getPrimaryAdministrator().equals(userToRevoke)) {
             logger.warn("User is primary admin");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is primary admin");
         }
 
         if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), userToRevoke.getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is not admin of business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not admin of business");
         }
 
         businessService.removeAdministratorFromBusiness(possibleBusiness, userToRevoke);
