@@ -122,7 +122,8 @@ describe('Testing api put/post request and the response method with errors', () 
     wrapper.vm.productDisplayedInCard.images = [{filename: 'blah'}];
     await wrapper.vm.createProduct();
 
-    expect(wrapper.vm.productCardError).toBe("Image larger than 5MB");
+    expect(wrapper.vm.productCardError).toBe("");
+    expect(wrapper.vm.imageError).toBe("Image larger than 5MB");
   });
 
   it('400 error test if Product ID already exists', async () => {

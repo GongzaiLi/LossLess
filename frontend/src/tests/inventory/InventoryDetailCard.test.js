@@ -49,7 +49,14 @@ beforeEach(() => {
           name: "Watties Baked Beans - 420g can",
           description: "Baked Beans as they should be.",
           recommendedRetailPrice: 2.2,
-          created: "2021-04-14T13:01:58.660Z"
+          created: "2021-04-14T13:01:58.660Z",
+          images: [
+            {
+              id: 1234,
+              filename: "/media/images/23987192387509-123908794328.png",
+              thumbnailFilename: "/media/images/23987192387509-123908794328_thumbnail.png"
+            }
+          ]
         },
         quantity: 4,
         pricePerItem: 6.5,
