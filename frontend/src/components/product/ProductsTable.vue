@@ -17,10 +17,10 @@
     >
       <template #cell(thumbnail)="products">
         <div v-if="!products.item.images.length">
-          <img class="product-image-thumbnail" :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image">
+          <b-img  class="product-image-thumbnail" thumbnail center :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image"/>
         </div>
         <div v-if="products.item.images.length">
-          <img class="product-image-thumbnail" :src="getThumbnail(products.item)" alt="Failed to load image">
+          <b-img class="product-image-thumbnail" thumbnail center :src="getThumbnail(products.item)" alt="Failed to load image"/>
         </div>
       </template>
 
@@ -51,10 +51,7 @@
 
 
 <style>
-.product-image-thumbnail {
-  width: 66px;
-  object-fit: cover;
-}
+
 </style>
 
 <script>
@@ -150,7 +147,10 @@ export default {
       let fieldsList = [
         {
           key: 'thumbnail',
-          label: '',
+          label: 'Image',
+          tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
+          thStyle: 'width: 88px',
+
         },
 
         {
