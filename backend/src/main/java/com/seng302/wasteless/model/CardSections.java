@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * This enum specifies types for cards and provides functionality
  * for checking to see if a card is of a legal type
  */
-public enum CardTypes {
+public enum CardSections {
     FOR_SALE("For Sale"),
     WANTED("Wanted"),
     EXCHANGE("Exchange");
@@ -19,7 +19,7 @@ public enum CardTypes {
     /**
      * @param text  The text of the enum
      */
-    CardTypes(final String text) {
+    CardSections(final String text) {
         this.text = text;
     }
 

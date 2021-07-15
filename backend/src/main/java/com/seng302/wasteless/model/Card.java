@@ -27,16 +27,15 @@ public class Card {
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     @JsonView(InventoryViews.GetInventoryView.class)
-    private Integer id;
+    private Long id;
 
-    @JoinColumn(name = "creator")
+    @Column(name = "creator_id")
     @NotNull
-    @ManyToOne
-    private User creator;
+    private Integer creatorId;
 
-    @Column(name = "type")
-    @NotNull(message = "cardType is mandatory")
-    private CardTypes cardType;
+    @Column(name = "section")
+    @NotNull(message = "section is mandatory")
+    private CardSections section;
 
     @Column(name = "title")
     @NotNull(message = "Title is mandatory")
@@ -45,8 +44,6 @@ public class Card {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "price")
-    private double price;
 
     @Column(name = "keywords")
     private String keywords;
