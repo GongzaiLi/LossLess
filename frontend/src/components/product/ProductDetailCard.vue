@@ -51,7 +51,7 @@
         <!--Quick and dirty way of having a button that open a file picker. The file input is invisible and button click triggers the file input element-->
         <input @change="onFileChange" multiple type="file" style="display:none" ref="filepicker"
                accept="image/png, image/jpeg, image/gif, image/jpg">
-        <b-button variant="info" class="w-100" id="add-image-btn" @click="$refs.filepicker.click()" :disabled="isUploadingFile">
+        <b-button variant="info" class="w-100" id="add-image-btn" @click="$refs.filepicker.click()" :disabled="isUploadingFile || productCard.images.length >= 5">
           <strong>{{ addImageButtonText }} <b-spinner small v-if="isUploadingFile"/></strong>
         </b-button>
       </div>
@@ -206,6 +206,14 @@ export default {
      */
     async onFileChange(e) {
       const files = e.target.files;
+      console.log(files);
+      console.log(this.productCard.images);
+      if (files.length + this.productCard.images.length > 5) {
+        this.imageError = `Could not upload images. Maximum number of images per product is 5. Please try selecting less images.`;
+        this.$refs.errorModal.show();
+        return;
+      }
+
       if (this.isCreatingProduct) {
         this.addImagePreviewsToCarousel(files);
       } else {
@@ -317,6 +325,8 @@ export default {
     addImageButtonText() {
       if (this.isUploadingFile) {
         return "Uploading Image(s) ";
+      } else if (this.productCard.images.length >= 5) {
+        return "Maximum product images reached";
       } else if (this.productCard.images.length > 0) {
         return "Add more product images";
       } else {
