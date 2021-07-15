@@ -18,10 +18,14 @@ const HAS_MIDDLE_NAME_PROB = 4/10;
 const NUM_BUSINESSES = 100;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
+const MAX_PRODUCTS_PER_BUSINESS = 400;
+const MIN_PRODUCTS_PER_BUSINESS = 30;
+const MAX_PRODUCT_PRICE = 50;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
 const businessTypes = require('./businessTypes.json')
+const productNames = require('./productNames.json')
 
 const SERVER_URL = "http://localhost:9499";
 
@@ -176,7 +180,9 @@ async function registerUserWithBusinesses(user, businesses, numBusinesses) {
   instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
   for (let i=0; i < numBusinesses; i++) {
-    await registerBusiness(businesses[i], instance, response.data.id, user);
+    const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
+    await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+
   }
 }
 
@@ -222,13 +228,50 @@ async function registerBusiness(business, instance, userId, user) {
   business.address = user.homeAddress
   business.description += " Our business headquarters are in " + user.homeAddress.city + ", " + user.homeAddress.country + "."
 
-    await instance
+    return await instance
       .post(`http://localhost:9499/businesses`, business, {
         headers: {
           'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
         }
       })
 
+}
+
+/**
+ * Given a random product name returns the products in our
+ * SENG302 API format
+ */
+function createProductObject(name, business) {
+
+  const productId = name.replace(/\s/g, "-").replace(/\'/g, "").toUpperCase();
+  const desc = "This is a very tasty product called " + name + ". It is well priced and a high quality is ensured by " +
+      business.name + "."
+
+  return {
+    id: productId,
+    name: name,
+    description: desc,
+    manufacturer: business.name,
+    recommendedRetailPrice: (Math.random() * MAX_PRODUCT_PRICE).toFixed(2)
+  };
+}
+
+/**
+ *  Add a random number of products to a business using our backend endpoint
+ */
+async function addProduct(businessId, instance, business) {
+
+  const startIndex = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS-MIN_PRODUCTS_PER_BUSINESS));
+
+  for (let i=startIndex; i < MAX_PRODUCTS_PER_BUSINESS; i++) {
+    const product = createProductObject(productNames[i], business);
+    await instance
+        .post(`http://localhost:9499/businesses/${businessId}/products`, product, {
+          headers: {
+            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+          }
+        })
+  }
 }
 
 async function main() {
