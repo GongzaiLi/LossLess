@@ -91,6 +91,7 @@ describe('Testing delete image when creating product', () => {
 describe('Testing upload image when product already exists', () => {
 
   it('Successfully create a product image', async () => {
+    Api.uploadProductImage.mockResolvedValue({data: {id: 1, filename:'blah'}});
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
 
     expect(Api.uploadProductImage).toHaveBeenCalled();
