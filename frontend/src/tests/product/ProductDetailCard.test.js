@@ -174,7 +174,6 @@ describe ("Max image number validation", () => {
     expect(wrapper.vm.imageError).toStrictEqual("Could not upload images. Maximum number of images per product is 5. Please try selecting less images.");
   })
 
-
   it('Prevents uploading 2 extra images to 4 images', async () => {
     wrapper.vm.productCard.images = [{filename: 'blah', id: 1}, {filename: 'blah2', id: 2}, {filename: 'blah3', id: 3}, {filename: 'blah4', id: 4}]
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah5', id: 5}, {filename: 'blah6', id: 6}]}});
