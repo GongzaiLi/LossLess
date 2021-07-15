@@ -162,8 +162,8 @@ export default {
      **/
     getThumbnail: function (product) {
       if (product.primaryImage) {
-        const primaryImageFileName = product.primaryImage.thumbnailFilename;
-        return api.getImage(primaryImageFileName.substr(1));
+        const thumbnailFilename = product.primaryImage.thumbnailFilename;
+        return api.getImage(thumbnailFilename);
       }
     }
   },
