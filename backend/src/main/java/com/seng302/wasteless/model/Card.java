@@ -26,8 +26,7 @@ public class Card {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView(InventoryViews.GetInventoryView.class)
-    private Long id;
+    private Integer id;
 
     @Column(name = "creator_id")
     @NotNull
@@ -51,4 +50,15 @@ public class Card {
     @Column(name = "created")
     private LocalDate created;
 
+    /**
+     * Check if the given user is the card creator
+     * @param user The user to check if they are the creator
+     * @return true if user is creator, false if user is not creator
+     */
+    public boolean checkUserIsCreator(User user) {
+        if (user.getId().equals(creatorId)) {
+            return true;
+        }
+        return false;
+    }
 }

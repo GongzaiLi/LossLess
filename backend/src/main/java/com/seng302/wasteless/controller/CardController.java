@@ -55,13 +55,13 @@ public class CardController {
     @PostMapping("/cards")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createUser(@Valid @RequestBody Card possibleCard) {
-        logger.debug("Request to create a new card with data Card: {}", possibleCard);
+        logger.info("Request to create a new card with data Card: {}", possibleCard);
 
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Got User {}", user);
 
-        if (!user.checkUserGlobalAdmin() && !user.getId().equals(possibleCard.getCreatorId())) {
-            logger.warn("Cannot create INVENTORY product. User: {} is not global admin or user is not card creator", user);
+        if (!user.checkUserGlobalAdmin() && possibleCard.checkUserIsCreator(user)) {
+            logger.warn("Cannot create Card. User: {} is not global admin or user is not card creator", user);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application");
         }
         logger.info("User: {} validated as global admin.", user);
@@ -69,12 +69,12 @@ public class CardController {
         logger.info("Setting created date");
         possibleCard.setCreated(LocalDate.now());
 
-        cardService.createCard(possibleCard);
+        Card card = cardService.createCard(possibleCard);
 
-        logger.info("Successfully created card: {}", possibleCard.getId());
+        logger.info("Successfully created card: {}", card.getId());
 
         JSONObject responseBody = new JSONObject();
-        responseBody.put("cardId", possibleCard.getId());
+        responseBody.put("cardId", card.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
