@@ -1,5 +1,7 @@
 <template>
   <div>
+    <h1 align="center"><b-icon-shop/> Create Card </h1>
+    <br>
     <b-form>
     <b-input-group>
       <h6><strong>Section*:</strong></h6>
