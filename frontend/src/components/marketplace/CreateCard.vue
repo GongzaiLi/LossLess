@@ -1,5 +1,18 @@
 <template>
   <div>
+
+    <b-input-group-text>
+      <b-container>
+        <h6 align="center"> <strong> Card Info: </strong></h6>
+        <label> Seller Name: {{sellerData.fullName}} </label>
+        <br>
+        <label> Seller Location: {{sellerData.location}} </label>
+        <br>
+        <label> Creation Date: {{createCardForm.dateCreated}} </label>
+      </b-container>
+    </b-input-group-text>
+    <br>
+
     <b-form>
     <b-input-group>
       <h6><strong>Section*:</strong></h6>
@@ -40,19 +53,66 @@
 </template>
 
 <script>
+import api from "@/Api";
+
 export default {
   name: "CreateCard",
   props: ['createAction', 'cancelAction'],
   data() {
     return {
+      sellerData: {
+        fullName: '',
+        location: '',
+      },
       createCardForm: {
         creatorId: '',
         section: '',
         title: '',
         description: "",
-        keywords: []
+        keywords: [],
+        dateCreated: ''
       }
     }
+  },
+  mounted() {
+    const userId = localStorage.getItem("currentUserId")
+    this.setAutofillData(userId);
+
+  },
+  methods: {
+    /**
+     * Gets the user info by making an api request and updates the variables \
+     * with the info.
+     * @param id  The ID of the currently logged in user.
+     */
+    setAutofillData(id) {
+      this.createCardForm.creatorId = id;
+      const currentDate = new Date();
+      this.createCardForm.dateCreated = currentDate.getDate() + "/"
+          + (currentDate.getMonth()+1)  + "/"
+          + currentDate.getFullYear() + " @ "
+          + currentDate.getHours() + ":"
+          + currentDate.getMinutes() + ":"
+          + currentDate.getSeconds();
+      api
+          .getUser(id)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.userData = response.data;
+            this.sellerData.fullName = response.data.firstName + " " + response.data.lastName;
+            if (response.data.homeAddress.suburb) {
+              this.sellerData.location = response.data.homeAddress.suburb + ", ";
+            }
+            if (response.data.homeAddress.city) {
+              this.sellerData.location += response.data.homeAddress.city;
+            }
+            // console.log(response.data);
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          })
+    }
+
   }
 }
 </script>
