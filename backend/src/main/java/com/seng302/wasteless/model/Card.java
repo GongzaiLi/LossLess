@@ -48,9 +48,7 @@ public class Card {
     @Column(name = "keywords")
     private String keywords;
 
-    @Column(name = "creationDate")
-    @PastOrPresent
-    @NotNull
-    private LocalDate creationDate;
+    @Column(name = "created")
+    private LocalDate created;
 
 }
