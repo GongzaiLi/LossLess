@@ -46,7 +46,8 @@ Date: 21/5/21
 
       </b-tabs>
       <b-modal id="create-card" hide-header hide-footer>
-        <CreateCard :okAction="createCard"
+        <CreateCard
+                    @createAction="createCard($event)"
                     :cancelAction="closeCreateCardModal"> </CreateCard>
       </b-modal>
     </b-card>
@@ -54,6 +55,8 @@ Date: 21/5/21
 </template>
 
 <script>
+
+import api from "@/Api";
 
 import MarketplaceSection from "@/components/marketplace/MarketplaceSection";
 import CreateCard from "@/components/marketplace/CreateCard";
@@ -117,12 +120,14 @@ export default {
     pushErrors(error) {
       this.errors.push(error.message);
     },
+
     /**
      * Opens the create card modal when create button pressed.
      */
     openCreateCardModal() {
       this.$bvModal.show('create-card');
     },
+
     /**
      * Closes the create card modal when cancel button pressed.
      */
@@ -130,13 +135,22 @@ export default {
       this.$bvModal.hide('create-card');
     },
 
-
-    createCard() {
-
+    /**
+     * Sends a post request with the card data when create card button is pressed.
+     * @param cardData  The object that contains the card data.
+     */
+    createCard(cardData) {
+      api.createCard(cardData)
+      .then(createCardResponse => {
+        this.$log.debug("Card Created", createCardResponse);
+        this.$bvModal.hide('create-card');
+      })
+      .catch(error => {
+        this.$log.debug(error);
+      })
     }
   },
-  computed: {
-  }
+
 }
 </script>
 

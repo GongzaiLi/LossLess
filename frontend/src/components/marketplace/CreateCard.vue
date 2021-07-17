@@ -45,7 +45,7 @@
     </b-input-group>
 
       <div>
-        <b-button style="float: right" variant="primary" type="submit" @click="createAction"> Create </b-button>
+        <b-button style="float: right" variant="primary" type="submit" @click="createAction" > Create </b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction"> Cancel </b-button>
       </div>
 
@@ -59,7 +59,7 @@ import api from "@/Api";
 
 export default {
   name: "CreateCard",
-  props: ['createAction', 'cancelAction'],
+  props: ['cancelAction',],
   data() {
     return {
       sellerData: {
@@ -113,6 +113,13 @@ export default {
           .catch((error) => {
             this.$log.debug(error);
           })
+    },
+
+    /**
+     *  Passes the card form data to the Marketplace component when create card pressed.
+     */
+    createAction() {
+      this.$emit('createAction',this.createCardForm);
     }
 
   }
