@@ -110,8 +110,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // but Spring Security will return 403 Forbidden. This bit changes the default from 403 to 401
                 .exceptionHandling()
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-
-        http.csrf().disable();
     }
 
 
