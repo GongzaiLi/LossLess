@@ -21,7 +21,7 @@ Date: 23/5/2021
                 type="text" maxlength="50"
                 disabled
                 placeholder="No item selected"
-                :value="selectedInventoryItem ? selectedInventoryItem.product.id:''"
+                :value="selectedInventoryItem ? selectedInventoryItem.product.id.split(/-(.+)/)[1]:''"
                 autofocus required/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectInventoryItemModal">Select Inventory Item</b-button>
