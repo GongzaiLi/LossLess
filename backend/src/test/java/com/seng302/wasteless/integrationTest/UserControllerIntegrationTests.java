@@ -345,6 +345,51 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
+    void whenSearchingForUsers_WithZeroCountAndZeroOffset_ReturnsEmptyListAndTotalResults() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user1)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user2)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=0")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("results", hasSize(0)))
+                .andExpect(jsonPath("totalItems", is(4)));
+
+
+    }
+
+    @Test
     void whenSearchingForUsers_WithCountLessThanTotal_OnlyReturnsCount() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
