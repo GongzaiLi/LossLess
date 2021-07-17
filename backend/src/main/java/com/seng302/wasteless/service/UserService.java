@@ -138,9 +138,7 @@ public class UserService {
      */
     public ArrayList<User> searchForMatchingUsers(String searchQuery) {
 
-        ArrayList<User> results = userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
-
-        return results;
+        return userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
     }
 
     /**

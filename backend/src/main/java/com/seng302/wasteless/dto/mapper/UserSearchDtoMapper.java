@@ -24,7 +24,24 @@ public class UserSearchDtoMapper {
         UserSearchDtoMapper.userService = userService;
     }
 
+    /**
+     * UserSearchDtoMapper is used to transform a search query into a UserSearchDto object.
+     * Transforms the set from the search to a list then applies an offset and count to the search to work with pagination
+     * then returns a UserSearchDto object containing the reduced list and the number of total results for the search query.
+     *
+     * Checks if count or offset are negative, if either are return empty UserSearchDto. These should be validated
+     * before this method. The checks present here are a last line of defense against bad input.
+     *
+     * @param searchQuery       The query string to search for in users
+     * @param offset            The offset of the search (how many results to 'skip'). Should be >= 0
+     * @param count             The number of results to return. Should be >= 0
+     * @return                  List of users who match the search query, maximum length of count, offset by offset.
+     */
     public static UserSearchDto toGetUserSearchDto(String searchQuery, Integer count, Integer offset) {
+
+        if (count < 0 || offset < 0) {
+            return new UserSearchDto();
+        }
 
         List<User> searchResults = userService.searchForMatchingUsers(searchQuery);
         List<GetUserDto> searchResultsDto = new ArrayList<>();
