@@ -1,5 +1,10 @@
 import Api from "../Api";
 
+const USD = {
+  symbol: '$',
+  code: 'USD',
+  name: 'United States Dollar'
+};
 
 describe("Get user's country", () => {
   let returnedData;
@@ -27,14 +32,14 @@ describe("Get user's country", () => {
     returnedData = {"status":404,"message":"Not Found"};
 
     const currency = await Api.getUserCurrency('');
-    expect(currency).toEqual(null);
+    expect(currency).toStrictEqual(USD);
   });
 
   test('when no currencies exist exist', async () => {
     returnedData = [{"currencies":[]}];
 
     const currency = await Api.getUserCurrency('');
-    expect(currency).toEqual(null);
+    expect(currency).toStrictEqual(USD);
   });
 
   test('when many currencies', async () => {
@@ -48,7 +53,7 @@ describe("Get user's country", () => {
     returnedData = [{"currencies":[{"code":"(none)","name":null,"symbol":null}]}];
 
     const currency = await Api.getUserCurrency('zambia');
-    expect(currency).toEqual(null);
+    expect(currency).toStrictEqual(USD);
   });
 
   test('caches results', async () => {
