@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -73,33 +74,19 @@ public class ListingController {
 
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        if (possibleBusiness == null) {
-            logger.warn("Cannot create LISTING. Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot create LISTING. User: {} is not global admin or business admin: {}", user.getId(), businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user.getId(), businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
 
         logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);
         logger.info("Retrievrf `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
-        logger.info("Retrievrf `{}` ", possibleInventoryItem);
-        if (possibleInventoryItem == null) {
-            logger.warn("Cannot create LISTING for inventory that does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory with given id does not exist");
-        }
 
         if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
             logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getExpires());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory item expiry is in the past.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item expiry is in the past.");
         }
 
         Integer availableQuantity = possibleInventoryItem.getQuantity();
@@ -107,7 +94,7 @@ public class ListingController {
 
         if (availableQuantity < listingQuantity) {
             logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.",listingQuantity, availableQuantity);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Listing quantity greater than available inventory quantity.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
         Integer remainingQuantity = availableQuantity - listingQuantity;
@@ -155,10 +142,6 @@ public class ListingController {
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        if (possibleBusiness == null) {
-            logger.warn("Cannot get LISTINGS. Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         List<Listing> listings = listingsService.findByBusinessId(businessId);

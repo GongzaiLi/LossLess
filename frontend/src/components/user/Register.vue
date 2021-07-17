@@ -219,7 +219,6 @@ export default {
      * The parameter event is passed
      */
     async register(event) {
-      //console.log("CLICKED");
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
 
       let registerData = this.getRegisterData();
@@ -239,7 +238,7 @@ export default {
           this.errors = [];
           this.$log.debug(error);
           if (error.response) {
-            this.errors.push(`Registration failed: ${error.response.data}`);
+            this.errors.push(`Registration failed: ${error.response.data.message}`);
           } else {
             this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
           }

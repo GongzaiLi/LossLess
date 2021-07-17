@@ -25,7 +25,7 @@ Feature: U22 - List sale
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
     When The user creates a listing with a nonexistent inventory item Id 999, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
-    Then The user will receive a bad request error and a message "Inventory with given id does not exist"
+    Then The user will receive a bad request error and a message "Inventory item with given id does not exist"
 
 
   Scenario: User creates a Sale Listing but with a closing date in the past

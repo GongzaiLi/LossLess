@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import com.seng302.wasteless.testconfigs.WithMockCustomUserSecurityContextFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -127,6 +130,8 @@ public class CreateAndModifyInventoryFeature {
             userService.createUser(currentUser);
         }
 
+        Business business = new Business();
+
         currentUserDetails = new CustomUserDetails(currentUser);
     }
 
@@ -137,15 +142,17 @@ public class CreateAndModifyInventoryFeature {
     @And("The user {string} is an administrator for business {int}")
     public void theUserIsAnAdministratorForBusiness(String email, int id) {
         User user = userService.findUserByEmail(email);
-
-        Business business = businessService.findBusinessById(id);
-        if (business == null) {
+        Business business;
+        try {
+            business = businessService.findBusinessById(id);
+        } catch (ResponseStatusException e) {
             business= new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
             business.setId(id);
             business.setAdministrators(Collections.singletonList(user));
             business.setName("Jimmy's clown store");
             business.setAddress(throwawayAddress);
+            business.setPrimaryAdministrator(user);
 
             businessService.createBusiness(business);
         }
@@ -165,23 +172,33 @@ public class CreateAndModifyInventoryFeature {
 
     @And("The product with id {string} exists in the catalogue for business {int}")
     public void theProductWithIdExistsInTheCatalogueForBusiness(String productId, int businessId) {
-        if (productService.findProductById(productId) == null) {
+        try {
+            productService.checkIfProductIdNotInUse(productId);
+            productService.checkIfProductIdNotInUse(productId);
             Product product = new Product();
             product.setId(productId);
             product.setBusinessId(businessId);
             product.setName("Blah");
             productService.createProduct(product);
+        } catch (ResponseStatusException e) {
+
         }
     }
 
     @And("The product with id {string} does not exist")
     public void theProductWithIdDoesNotExist(String productId) {
-        Assertions.assertNull(productService.findProductById(productId));
+        try {
+            productService.findProductById(productId);
+            assert false;
+        } catch (ResponseStatusException e) {
+            assert true;
+        }
     }
 
     @And("The inventory item with id {int} exists for business {int}")
     public void theInventoryItemWithIdExistsForBusiness(int id, int businessId) throws Exception {
-        if (inventoryService.findInventoryById(id) == null) {
+        try {
+            inventoryService.findInventoryById(id);
             String jsonInStringForRequest = "{\"productId\": \"1-PRODUCT\", \"quantity\": 2, \"expires\": \"2050-01-01\"}";
 
              mockMvc.perform(MockMvcRequestBuilders.post(String.format("/businesses/%d/inventory", businessId))
@@ -190,6 +207,8 @@ public class CreateAndModifyInventoryFeature {
                     .with(user(currentUserDetails))
                     .with(csrf()))
              .andExpect(status().isCreated());
+        } catch (ResponseStatusException e) {
+
         }
     }
 
@@ -260,10 +279,16 @@ public class CreateAndModifyInventoryFeature {
         result.andExpect(status().isOk());
     }
 
+    @Then("The inventory item is not modified with a bad request error")
+    public void theInventoryItemIsNotModifiedWithABadRequestError() throws Exception {
+        // Write code here that turns the phrase above into concrete actions
+        result.andExpect(status().isBadRequest());
+    }
+
     @Then("The inventory item is not modified with an error message of {string}")
     public void theInventoryItemIsNotModifiedWithAnErrorMessageOf(String message) throws Exception {
         // Write code here that turns the phrase above into concrete actions
         result.andExpect(status().is4xxClientError());
-        result.andExpect(content().string(message));
+        result.andExpect(result -> Assertions.assertEquals(message, result.getResponse().getErrorMessage()));
     }
 }

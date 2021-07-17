@@ -224,7 +224,7 @@ export default {
             }
           }
         } catch (error) {
-          this.imageError = error.response.data;
+          this.imageError = error.response.data.message;
           this.$refs.errorModal.show();
         }
         this.$emit('imageChange');

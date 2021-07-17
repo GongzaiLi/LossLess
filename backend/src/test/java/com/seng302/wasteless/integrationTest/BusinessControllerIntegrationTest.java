@@ -10,18 +10,22 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -432,44 +436,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         assertFalse(businessAfter.getAdministrators().contains(user));
     }
 
-    @Test
-    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-    void whenPutRequestToBusinessRevokeAdmin_andUserIsNotAdmin_then403Request() throws Exception {
-        User user = new User();
-        user.setEmail("jabob@gmail.com");
-        user.setFirstName("Jacob");
-        user.setPassword("Steve");
-        user.setLastName("Steve");
-        user.setDateOfBirth(LocalDate.now().minusYears(20));
-        user.setHomeAddress(new Address()
-                .setSuburb("Riccarton")
-                .setCity("Thames")
-                .setId(1)
-                .setCountry("Nz")
-                .setPostcode("3500")
-                .setRegion("Waikato")
-                .setStreetName("Queen Street")
-                .setStreetNumber("30"));
-
-        userService.createUser(user);
-
-        createOneBusiness("Business", "{\n" +
-                "    \"streetNumber\": \"56\",\n" +
-                "    \"streetName\": \"Clyde Road\",\n" +
-                "    \"suburb\": \"Riccarton\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"8041\"\n" +
-                "  }", "Non-profit organisation", "I am a business");
-
-        String request = "{\"userId\": \"3\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/removeAdministrator")
-                .content(request)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
     private void createOneBusiness(String name, String address, String businessType, String description) {
         String business = String.format("{\"name\": \"%s\", \"address\" : %s, \"businessType\": \"%s\", \"description\": \"%s\"}", name, address, businessType, description);
 

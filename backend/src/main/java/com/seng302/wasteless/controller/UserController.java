@@ -25,6 +25,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -75,19 +76,19 @@ public class UserController {
 
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to create user with already used email");
         }
         logger.info("Email validated for user: {}", user);
 
         //check the email validation
         if (!userService.checkEmailValid(user.getEmail())) {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email address is invalid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
         }
         logger.debug("Validated date for user: {}", user);
 
@@ -220,10 +221,6 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.debug("possible User: {}", possibleUser);
 
-        if (possibleUser == null) {
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
 
         // Not too sure what to do with Response 401 because it's possibly about security but do we need
         // to have U4 for that or is it possible to do without it
@@ -251,27 +248,17 @@ public class UserController {
 
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
-
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+         if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to make others admin");
+             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
 
         } else if (possibleUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Cannot change role of default application admin");
+             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
 
         }
 
@@ -308,26 +295,17 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
-
-            logger.warn("Could not find user with ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+        if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to revoke others admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to revoke others admin");
 
         } else if (possibleUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own admin rights");
 
         }
 
@@ -363,7 +341,7 @@ public class UserController {
         User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to log into an account with an email " +
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have tried to log into an account with an email " +
                     "that is not registered.");
         } else {
             logger.debug("User: {} found using data : {}", savedUser, login);
@@ -386,7 +364,7 @@ public class UserController {
 
             } catch (AuthenticationException e) {
                 logger.warn("Login unsuccessful. {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
 
 
