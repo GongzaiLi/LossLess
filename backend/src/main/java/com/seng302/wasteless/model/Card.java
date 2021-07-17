@@ -2,7 +2,7 @@ package com.seng302.wasteless.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.CardViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 /**
@@ -28,9 +27,10 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
     private Integer id;
 
-    @Column(name = "creator_id")
-    @NotNull
-    private Integer creatorId;
+    @ManyToOne
+    @JsonView(CardViews.GetCardView.class)
+    @JoinColumn(name = "creator_id")
+    private User creator;
 
     @Column(name = "section")
     @NotNull(message = "section is mandatory")
@@ -43,8 +43,8 @@ public class Card {
     @Column(name = "description")
     private String description;
 
-
     @Column(name = "keywords")
+    @NotNull(message = "Keyword is mandatory")
     private String keywords;
 
     @Column(name = "created")
@@ -56,9 +56,6 @@ public class Card {
      * @return true if user is creator, false if user is not creator
      */
     public boolean checkUserIsCreator(User user) {
-        if (user.getId().equals(creatorId)) {
-            return true;
-        }
-        return false;
+        return user.getId().equals(creator.getId());
     }
 }

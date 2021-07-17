@@ -1,8 +1,9 @@
 package com.seng302.wasteless.controller;
 
+import com.seng302.wasteless.dto.PostCardDto;
+import com.seng302.wasteless.dto.mapper.PostCardDtoMapper;
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
 import net.minidev.json.JSONObject;
@@ -28,13 +29,11 @@ public class CardController {
 
 
     private final UserService userService;
-    private final BusinessService businessService;
     private final CardService cardService;
 
     @Autowired
-    public CardController(UserService userService, BusinessService businessService, CardService cardService) {
+    public CardController(UserService userService, CardService cardService) {
         this.userService = userService;
-        this.businessService = businessService;
         this.cardService = cardService;
     }
 
@@ -49,27 +48,37 @@ public class CardController {
      * 403 FORBIDDEN If user not allowed to make request (not global admin or not the Card Creator).
      * 201 Created If successfully created card.
      *
-     * @param possibleCard Inventory Object
+     * @param cardDtoRequest Dto containing information needed to create a Card
      * @return Status code dependent on success. 400, 401, 403 errors. 201 Created with card id if success.
      */
     @PostMapping("/cards")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createUser(@Valid @RequestBody Card possibleCard) {
-        logger.info("Request to create a new card with data Card: {}", possibleCard);
+    public ResponseEntity<Object> createUser(@Valid @RequestBody PostCardDto cardDtoRequest) {
+        logger.info("Request to create a new card with data Card: {}", cardDtoRequest);
 
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Got User {}", user);
 
-        if (!user.checkUserGlobalAdmin() && possibleCard.checkUserIsCreator(user)) {
-            logger.warn("Cannot create Card. User: {} is not global admin or user is not card creator", user);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application");
+        logger.info("Check if user with id ` {} ` exists", cardDtoRequest.getCreatorId());
+        User possibleUser = userService.findUserById(cardDtoRequest.getCreatorId());
+
+        if (possibleUser == null) {
+            logger.warn("Can't create card as user doesn't exist");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with given id does not exist");
         }
-        logger.info("User: {} validated as global admin.", user);
+
+        Card card = PostCardDtoMapper.postCardDtoToEntityMapper(cardDtoRequest);
 
         logger.info("Setting created date");
-        possibleCard.setCreated(LocalDate.now());
+        card.setCreated(LocalDate.now());
+        card.setCreator(possibleUser);
 
-        Card card = cardService.createCard(possibleCard);
+        if (!user.checkUserGlobalAdmin() && !card.checkUserIsCreator(user)) {
+            logger.warn("Cannot create Card. User is not global admin or user is not card creator", user);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or card creator");
+        }
+
+        card = cardService.createCard(card);
 
         logger.info("Successfully created card: {}", card.getId());
 

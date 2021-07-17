@@ -56,20 +56,27 @@ public class CardControllerUnitTest {
 
     private Card card;
 
+    private User userForCard;
+
     private Card mockedCard;
 
     @BeforeEach
     void setUp() {
+        userForCard = new User();
+        userForCard.setId(1);
+        userForCard.setEmail("demo@gmail.com");
+        userForCard.setRole(UserRoles.USER);
+
         card = new Card();
         card.setId(1);
-        card.setCreatorId(1);
+        card.setCreator(userForCard);
         card.setSection(CardSections.FOR_SALE);
         card.setTitle("Sale");
         card.setKeywords("Blah, Blah, Blah");
 
         mockedCard = mock(Card.class);
         mockedCard.setId(1);
-        mockedCard.setCreatorId(1);
+        mockedCard.setCreator(userForCard);
         mockedCard.setSection(CardSections.FOR_SALE);
         mockedCard.setTitle("Sale");
         mockedCard.setKeywords("Blah, Blah, Blah");
@@ -91,14 +98,15 @@ public class CardControllerUnitTest {
                 .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
+        doReturn(userForCard).when(userService).findUserById(any(Integer.class));
         doReturn(true).when(mockedCard).checkUserIsCreator(user);
         doReturn(true).when(user).checkUserGlobalAdmin();
+
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToAddCard_andValidRequest_then201Response() throws Exception {
-        doReturn(false).when(user).checkUserGlobalAdmin();
         String jsonInStringForRequest = "{\"creatorId\": 1, \"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": \"blah, blah\"}";
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -113,6 +121,7 @@ public class CardControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToAddCard_andGlobalAdmin_andValidRequest_then201Response() throws Exception {
         doReturn(true).when(user).checkUserGlobalAdmin();
+
         String jsonInStringForRequest = "{\"creatorId\": 1, \"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": \"blah, blah\"}";
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
