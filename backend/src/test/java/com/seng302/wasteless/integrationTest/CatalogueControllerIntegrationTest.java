@@ -566,6 +566,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(jsonPath("$[0].recommendedRetailPrice", is(2.0)));
     }
 
+    @Test
 
     private void createOneBusiness(String name, String address, String businessType, String description) {
         String business = String.format("{\"name\": \"%s\", \"address\" : %s, \"businessType\": \"%s\", \"description\": \"%s\"}", name, address, businessType, description);
