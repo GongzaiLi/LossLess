@@ -206,12 +206,12 @@ export default {
      * Handler for when the file selected by the invisible file input changes (ie whenever the user
      * selects a file). If we're creating a new product, it will add the image to the list of images to be
      * uploaded when the product is created. Otherwise, it will simply make the Api call to upload the image
-     * directly. In both cases the selected image is added to the carousel.
+     * directly. In both cases the selected image is added to the carousel. As we have a maximum of 5 images for
+     * a product, we prevent image uploads if the current number of images plus the number selected in the file
+     * selector exceeds our maximum of 5.
      */
     async onFileChange(e) {
       const files = e.target.files;
-      console.log(files);
-      console.log(this.productCard.images);
       if (files.length + this.productCard.images.length > 5) {
         this.imageError = `Could not upload images. Maximum number of images per product is 5. Please try selecting less images.`;
         this.$refs.errorModal.show();
@@ -327,6 +327,8 @@ export default {
     /**
      * @returns {string} The text to be displayed on the button that uploads images.
      * If we're currently uploading a file, the text displays "Uploading Image(s) ".
+     * If we currently have 5 or more images, we have reach the maximum, so inform user that
+     * maximum has been reached.
      * Otherwise, it displays a prompt to add product images.
      */
     addImageButtonText() {
