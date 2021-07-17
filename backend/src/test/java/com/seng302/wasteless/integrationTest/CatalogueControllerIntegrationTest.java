@@ -6,19 +6,24 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,6 +49,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Autowired
     private UserService userService;
 
+    private User user;
+
+
+    @BeforeEach
+    void setup() {
+       user = mock(User.class);
+       user.setId(1);
+       user.setEmail("james@gmail.com");
+       user.setRole(UserRoles.USER);
+
+    }
 
 
     @Test
@@ -68,33 +84,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isNotAcceptable());
     }
 
-    @Test
-    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-     void whenPostRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
-
-        Business business = new Business();
-
-        business.setName("New Business");
-        business.setAddress(new Address()
-                .setSuburb("Riccarton")
-                .setCity("Thames")
-                .setId(1)
-                .setCountry("Nz")
-                .setPostcode("3500")
-                .setRegion("Waikato")
-                .setStreetName("Queen Street")
-                .setStreetNumber("30"));
-        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
-
-        businessService.createBusiness(business);
-
-        String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"ToBeIgnored\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
-                .content(product)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
@@ -214,30 +203,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isNotAcceptable());
     }
 
-    @Test
-    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-     void whenGetRequestToBusinessProducts_AndNotAdminOfBusinessOrGlobalAdmin_then403Response() throws Exception {
-
-        Business business = new Business();
-
-        business.setName("New Business");
-        business.setAddress(new Address()
-                .setSuburb("Riccarton")
-                .setCity("Thames")
-                .setId(1)
-                .setCountry("Nz")
-                .setPostcode("3500")
-                .setRegion("Waikato")
-                .setStreetName("Queen Street")
-                .setStreetNumber("30"));
-        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
-
-        businessService.createBusiness(business);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
@@ -320,7 +285,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-     void whenPutRequestToBusinessProducts_AndBusinessNotExists_then403Response() throws Exception {
+     void whenPutRequestToBusinessProducts_AndBusinessNotExists_then406Response() throws Exception {
 
         createOneBusiness("Business", "{\n" +
                 "    \"streetNumber\": \"56\",\n" +
@@ -333,48 +298,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "  }", "Non-profit organisation", "I am a business");
 
         String product = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
-
+//         doThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist")).when(businessService).findBusinessById(1);
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/99/products/1")
                 .content(product)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isNotAcceptable());
     }
 
-    @Test
-    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-     void whenPutRequestToBusinessProducts_AndNotAdminToBusiness_then403Response() throws Exception {
-
-        Business business = new Business();
-
-        business.setName("New Business");
-        business.setAddress(new Address()
-                .setSuburb("Riccarton")
-                .setCity("Thames")
-                .setId(1)
-                .setCountry("Nz")
-                .setPostcode("3500")
-                .setRegion("Waikato")
-                .setStreetName("Queen Street")
-                .setStreetNumber("30"));
-        business.setBusinessType(BusinessTypes.NON_PROFIT_ORGANISATION);
-
-        businessService.createBusiness(business);
-
-        Product product = new Product();
-
-        product.setName("Kit Kat");
-        product.setId("1");
-        product.setBusinessId(business.getId());
-
-        productService.createProduct(product);
-
-        String editProduct = "{\"name\": \"Chocolate Bar\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT1\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1")
-                .content(editProduct)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)

@@ -4,7 +4,7 @@ Date: 15/4/2021
 -->
 <template>
   <div>
-    <b-card v-if="canEditCatalogue">
+    <b-card v-if="canEditCatalogue" class="shadow">
       <b-card-title>Product Catalogue: {{businessName}}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center">
@@ -32,6 +32,7 @@ Date: 15/4/2021
                              :currency="currency"
                              :okAction="productCardAction"
                              :cancelAction="closeProductCardModal"
+                             @imageChange="refreshProducts"
         />
         <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
@@ -47,9 +48,8 @@ Date: 15/4/2021
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
     </b-card>
 
-    <b-modal id="image-error-modal" title="Some images couldn't be uploaded" ok-only>
-      Unfortunately, some images couldn't be uploaded.
-      {{ productCardError }}
+    <b-modal id="image-error-modal" title="Unfortunately, some images couldn't be uploaded." ok-only>
+      {{ imageError }}
       <br>
       However, the product has been created successfully. If you would like to add more images to it, you can do so by
       editing the product.
@@ -86,6 +86,7 @@ export default {
       },
       productCardAction: null,
       productCardError: "",
+      imageError: "",
       productDisplayedInCard: { images: [] },
       isProductCardReadOnly: true,
       items: [],
@@ -193,25 +194,31 @@ export default {
     async createProduct() {
       await Api
           .createProduct(this.$route.params.id, this.productDisplayedInCard)
-          .then((createProductResponse) => {
+          .then(async (createProductResponse) => {
             this.$log.debug("Product Created", createProductResponse);
+            this.refreshProducts(); // Product has been created, so refresh the table of products
+
             this.$log.debug("Uploading images");
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
             // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
             // We also need to extract the file objects from the list of images (see addImagePreviewsToCarousel in ProductDetailCard for why)
-            return Api.uploadProductImages(this.$route.params.id, createProductResponse.data.productId, this.productDisplayedInCard.images.map(
-                file => file.fileObject
-            ))
+            for (let image of this.productDisplayedInCard.images) {
+              let resp = await Api.uploadProductImage(this.$route.params.id, createProductResponse.data.productId, image.fileObject);
+              if (image.id === this.productDisplayedInCard.primaryImage.id) {
+                await Api.setPrimaryImage(this.$route.params.id, createProductResponse.data.productId, resp.data.id);
+              }
+            }
           })
           .then(() => {
+            this.refreshProducts(); // Refresh the table of products again to get the images
             this.$bvModal.hide('product-card');
-            this.refreshProducts();
           })
           .catch((error) => {
             this.productCardError = this.getErrorMessageFromApiError(error);
             if (error.response.status === 413) {  // Uploaded images were too large
               this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
-              this.productCardError = error.response.data;
+              this.imageError = error.response.data.message;
+              this.productCardError = '';
               this.$bvModal.show('image-error-modal');
             }
             this.$log.debug(error);
@@ -244,7 +251,7 @@ export default {
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors

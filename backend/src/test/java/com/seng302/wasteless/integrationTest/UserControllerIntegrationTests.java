@@ -560,15 +560,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-     void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
-
-        mockMvc.perform(get("/users/245")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
-
 
     private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": %s, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);

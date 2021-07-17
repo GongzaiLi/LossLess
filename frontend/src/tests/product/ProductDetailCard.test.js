@@ -91,14 +91,15 @@ describe('Testing delete image when creating product', () => {
 describe('Testing upload image when product already exists', () => {
 
   it('Successfully create a product image', async () => {
+    Api.uploadProductImage.mockResolvedValue({data: {id: 1, filename:'blah'}});
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
 
-    expect(Api.uploadProductImages).toHaveBeenCalled();
+    expect(Api.uploadProductImage).toHaveBeenCalled();
     expect(wrapper.vm.imageError).toBe("");
   });
 
   it('Create a product image but error returned', async () => {
-    Api.uploadProductImages.mockRejectedValue({response: {status: 419, data: "The file that you tried to upload is too large. Files must be 5MB in size or less."}});
+    Api.uploadProductImage.mockRejectedValue({response: {status: 419, data: {message: "The file that you tried to upload is too large. Files must be 5MB in size or less."}}});
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
 
     expect(wrapper.vm.imageError).toBe("The file that you tried to upload is too large. Files must be 5MB in size or less.");
@@ -143,5 +144,40 @@ describe('Testing api call delete image request', () => {
     expect(Api.deleteImage).toHaveBeenCalled();
   });
 
-
 });
+
+describe('Set primary image', () => {
+
+  it('Successfully sets primary image for product to be created', async () => {
+    wrapper.vm.productCard.created = null;  // So the product 'doesn't exist'
+    await wrapper.vm.setPrimaryImage({id: 'blah', filename: 'blah'});
+
+    expect(Api.setPrimaryImage).not.toHaveBeenCalled();
+    expect(wrapper.emitted()).not.toHaveProperty('imageChange');
+    expect(wrapper.vm.productCard.primaryImage).toStrictEqual({id: 'blah', filename: 'blah'});
+  });
+
+  it('Successfully sets primary image for product that already exists', async () => {
+    await wrapper.vm.setPrimaryImage({id: 'blah', filename: 'blah'});
+
+    expect(Api.setPrimaryImage).toHaveBeenCalled();
+    expect(wrapper.emitted().imageChange).toBeTruthy();
+    expect(wrapper.vm.productCard.primaryImage).toStrictEqual({id: 'blah', filename: 'blah'});
+  });
+});
+
+describe ("Max image number validation", () => {
+  it('Prevents uploading 1 extra image to 5 images',  async() => {
+    wrapper.vm.productCard.images = [{filename: 'blah', id: 1}, {filename: 'blah2', id: 2}, {filename: 'blah3', id: 3}, {filename: 'blah4', id: 4}, {filename: 'blah5', id: 5}]
+    await wrapper.vm.onFileChange({target: {files: [{filename: 'blah6', id: 6}]}});
+
+    expect(wrapper.vm.imageError).toStrictEqual("Could not upload images. Maximum number of images per product is 5. Please try selecting less images.");
+  })
+
+  it('Prevents uploading 2 extra images to 4 images', async () => {
+    wrapper.vm.productCard.images = [{filename: 'blah', id: 1}, {filename: 'blah2', id: 2}, {filename: 'blah3', id: 3}, {filename: 'blah4', id: 4}]
+    await wrapper.vm.onFileChange({target: {files: [{filename: 'blah5', id: 5}, {filename: 'blah6', id: 6}]}});
+
+    expect(wrapper.vm.imageError).toStrictEqual("Could not upload images. Maximum number of images per product is 5. Please try selecting less images.");
+  })
+})

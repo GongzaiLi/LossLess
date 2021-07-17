@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -99,12 +100,15 @@ public class CreateListingFeature {
 
 
     public void theProductWithIdExistsInTheCatalogueForBusiness(int businessId, String productId) {
-        if (productService.findProductById(productId) == null) {
+        try {
+            productService.checkIfProductIdNotInUse(productId);
             Product product = new Product();
             product.setId(productId);
             product.setBusinessId(businessId);
             product.setName("Blah");
             productService.createProduct(product);
+        } catch(ResponseStatusException e) {
+
         }
     }
 
@@ -141,14 +145,18 @@ public class CreateListingFeature {
         this.businessId = businessId;
         User user = userService.findUserByEmail(email);
 
-        Business business = businessService.findBusinessById(businessId);
-        if (business == null) {
+        Business business;
+        try {
+            business = businessService.findBusinessById(businessId);
+
+        } catch (ResponseStatusException e) {
             business = new Business();
             business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
             business.setId(businessId);
             business.setName("Jimmy's clown store");
             business.setAddress(throwawayAddress);
             business.setAdministrators(Collections.singletonList(user));
+            business.setPrimaryAdministrator(user);
             businessService.createBusiness(business);
         }
 
@@ -170,7 +178,10 @@ public class CreateListingFeature {
     @And("There is an inventory item with an inventory id {int} and productId {string}")
     public void thereIsAnInventoryItemWithAnInventoryIdAndProductId(int inventoryId, String productId) {
         this.theProductWithIdExistsInTheCatalogueForBusiness(businessId, productId);
-        if (inventoryService.findInventoryById(inventoryId) == null) {
+        try {
+            inventoryService.findInventoryById(inventoryId);
+
+        } catch (ResponseStatusException e) {
             Inventory inventory = new Inventory();
             inventory.setId(inventoryId);
             inventory.setBusinessId(businessId);
@@ -284,7 +295,7 @@ public class CreateListingFeature {
     @Then("The user will receive a bad request error and a message {string}")
     public void theUserWillReceiveABadRequestErrorAndAMessage(String message) throws Exception {
         result.andExpect(status().is4xxClientError());
-        result.andExpect(content().string(message));
+        result.andExpect(result -> Assertions.assertEquals(message, result.getResponse().getErrorMessage()));
     }
 
 
@@ -322,7 +333,7 @@ public class CreateListingFeature {
                 .with(csrf()))
                 .andExpect(jsonPath("[0].quantity", is(quantity)))
                 .andExpect(jsonPath("[0].price", is(price)))
-                .andExpect(jsonPath("[0].moreInfo", is(moreInfo)));;
+                .andExpect(jsonPath("[0].moreInfo", is(moreInfo)));
     }
 }
 

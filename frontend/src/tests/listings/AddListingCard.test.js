@@ -87,7 +87,7 @@ describe('Testing api post request (Create a new Listing function)', () => {
 
     it('400 given Inventory ID does not exist', async () => {
         Api.createListing.mockRejectedValue({
-            response: {status: 400, data: "Inventory with given id does not exist"},
+            response: {status: 400, data:  {message: "Inventory with given id does not exist"}},
         });
         await wrapper.vm.createListing();
         expect(wrapper.vm.listingCardError).toBe("Inventory with given id does not exist");

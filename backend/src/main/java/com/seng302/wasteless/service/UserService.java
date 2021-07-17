@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
@@ -89,7 +88,13 @@ public class UserService {
      * @return          The found user, if any, or wise null
      */
     public User findUserById(Integer id) {
-        return userRepository.findFirstById(id);
+
+        User possibleUser = userRepository.findFirstById(id);
+        if (possibleUser == null) {
+            logger.warn("User with ID: {} does not exist", id);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "User does not exist");
+        }
+        return possibleUser;
     }
 
     /**
@@ -103,8 +108,8 @@ public class UserService {
     }
 
     /**
-     *
-     * @return
+     * Get Currently Logged in user by getting the email and searching by email
+     * @return Logged in user or Throw Response Status Exception
      */
     public User getCurrentlyLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -113,9 +118,10 @@ public class UserService {
         logger.debug("Validating user with Email: {}", currentPrincipalEmail);
         User user = findUserByEmail(currentPrincipalEmail);
         if (user == null) {
-            logger.info("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
+            logger.info("Access token invalid for user with Email: {}", currentPrincipalEmail);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
         }
+
         logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
         return user;
     }
