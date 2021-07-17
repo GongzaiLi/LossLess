@@ -165,3 +165,19 @@ describe('Set primary image', () => {
     expect(wrapper.vm.productCard.primaryImage).toStrictEqual({id: 'blah', filename: 'blah'});
   });
 });
+
+describe ("Max image number validation", () => {
+  it('Prevents uploading 1 extra image to 5 images',  async() => {
+    wrapper.vm.productCard.images = [{filename: 'blah', id: 1}, {filename: 'blah2', id: 2}, {filename: 'blah3', id: 3}, {filename: 'blah4', id: 4}, {filename: 'blah5', id: 5}]
+    await wrapper.vm.onFileChange({target: {files: [{filename: 'blah6', id: 6}]}});
+
+    expect(wrapper.vm.imageError).toStrictEqual("Could not upload images. Maximum number of images per product is 5. Please try selecting less images.");
+  })
+
+  it('Prevents uploading 2 extra images to 4 images', async () => {
+    wrapper.vm.productCard.images = [{filename: 'blah', id: 1}, {filename: 'blah2', id: 2}, {filename: 'blah3', id: 3}, {filename: 'blah4', id: 4}]
+    await wrapper.vm.onFileChange({target: {files: [{filename: 'blah5', id: 5}, {filename: 'blah6', id: 6}]}});
+
+    expect(wrapper.vm.imageError).toStrictEqual("Could not upload images. Maximum number of images per product is 5. Please try selecting less images.");
+  })
+})
