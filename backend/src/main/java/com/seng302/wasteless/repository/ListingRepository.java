@@ -4,6 +4,8 @@ package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.Listing;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
@@ -19,5 +21,10 @@ public interface ListingRepository extends JpaRepository<Listing, Integer> {
     Listing findFirstById(Integer id);
 
     List<Listing> findAllByBusinessId(Integer id);
+
+    @Query(value = "select * from Listing where businessid = :businessId offset :offsetNumber rows fetch next :countNumber rows only", nativeQuery = true)
+    List<Listing> findCountListingsWithOffsetByBusiness(@Param("businessId") Integer businessId, @Param("offsetNumber") Integer offset, @Param("countNumber") Integer count);
+
+    Integer countListingByBusinessId(Integer id);
 
 }

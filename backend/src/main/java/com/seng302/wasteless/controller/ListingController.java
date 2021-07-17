@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.Business;
@@ -135,18 +136,31 @@ public class ListingController {
      */
     @GetMapping("/businesses/{id}/listings")
     @JsonView(ListingViews.GetListingView.class)
-    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
+    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, @RequestParam(required = false, defaultValue = "0") Integer offset, @RequestParam(required = false, defaultValue = "10") Integer count) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
         logger.debug("Received count:{} offset:{}", count, offset);
+
+        if (count < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be positive if provided.");
+        } else if (offset < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
+        }
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        List<Listing> listings = listingsService.findByBusinessId(businessId);
-        logger.info("{}", listings);
-        return ResponseEntity.status(HttpStatus.OK).body(listings);
+        List<Listing> listings = listingsService.findCountByBusinessIdFromOffset(businessId, offset, count);
+
+        Integer totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+
+        GetListingDto getListingDto = new GetListingDto()
+                .setListings(listings)
+                .setTotalItems(totalItems);
+
+        logger.info("{}", getListingDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 
     /**
