@@ -83,6 +83,8 @@ export default {
      * Given a business's id, fills/updates the product table with the products of the business's catalogue.
      * This will also make network requests to a currency api in order to get the currency of the business.
      *
+     * Uses perPage and currentPage to determine the correct subset of products to retrieve for the table.
+     *
      * This component will not load items when mounted so you have to call this manually.
      * This saves us having to pass in a business id prop.
      */
