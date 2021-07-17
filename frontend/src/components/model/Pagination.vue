@@ -1,7 +1,22 @@
 <template>
-  <b-row>
+  <b-row style="padding-top: 15px">
     <b-col>
-      <b-pagination v-model="currentPage" :total-rows="totalItems" :per-page="perPage" @page-click="pageChange"/>
+      <b-pagination
+          v-model="currentPage"
+          :total-rows="totalItems"
+          :per-page="perPage"
+          @page-click="pageChange"
+          first-text="First"
+          prev-text="Prev"
+          next-text="Next"
+          last-text="Last"
+      />
+    </b-col>
+    <b-col style=" margin-top: -20px" md="2">
+      <div>
+        Jump to page:
+      </div>
+      <b-form-select v-model="currentPage" :options="jumpToPagesOptions" size="sm-1" @change="pageChange"></b-form-select>
     </b-col>
     <b-col style="text-align: right; margin-top: 6px">
       Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalItems }} results.
@@ -28,6 +43,15 @@ export default {
     }
   },
   computed: {
+
+    /**
+     * Computes an array of page numbers for the jump to selector
+     * @returns array
+     */
+    jumpToPagesOptions: function () {
+      return Array.from({length: Math.ceil(this.totalItems/this.perPage)}, (_, i) => i + 1)
+    },
+
     /**
      * Computes the min range of product displaying on the table at the current page.
      * @returns number
