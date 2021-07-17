@@ -104,6 +104,10 @@ export default {
 
     },
 
+    /**
+     * the function is search users the using api to find the user of the current page
+     * @returns [] or [users]
+     */
     myProvider: async function (ctx) {
       if(this.totalResults) {
         try {
