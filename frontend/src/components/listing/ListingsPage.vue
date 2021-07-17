@@ -36,7 +36,7 @@ Listings Page
 
 
     <b-row cols-lg="3" style="margin-left: -38px">
-      <b-col v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
+      <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
         <b-card style="min-width: 17rem; height: 100%">
           <div v-if="listing.inventoryItem.product.images.length">
             <img class="product-image" :src="getPrimaryImage(listing)" alt="Failed to load image">
@@ -127,7 +127,7 @@ export default {
       cards: [],
       sortProperty: 'name',
       sortDirection: 'asc',
-      perPage: 12,
+      perPage: 2,
       currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
@@ -153,7 +153,6 @@ export default {
       await this.getBusinessInfo(this.businessId);
       await this.getListings();
       this.sortListings();
-      this.totalResults = this.cards.length
     },
     /**
      * Api request to get business information
@@ -225,13 +224,6 @@ export default {
     },
 
     /**
-     * Splits all the listings for pagination
-     **/
-    splitListings() {
-      return this.cards.slice((this.currentPage - 1) * this.perPage, this.perPage * this.currentPage);
-    },
-
-    /**
      * open listing modal
      **/
     openCreateListingModal: function () {
@@ -250,10 +242,11 @@ export default {
      * read all the listing in for the corresponding business
      **/
     getListings: async function () {
-      await api.getListings(this.businessId)
+      await api.getListings(this.businessId, this.perPage, this.perPage * (this.currentPage - 1))
           .then((response) => {
             this.$log.debug("Listing Data", response);
-            this.cards = response.data;
+            this.totalResults = response.data.totalItems;
+            this.cards = response.data.listings;
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -310,6 +303,15 @@ export default {
       const id = to.params.id;
       this.launchPage(id);
     },
+
+    '$data.currentPage': {
+      handler: function() {
+        this.getListings(this.business);
+      },
+      deep: true
+    }
+
+
   },
 
 
