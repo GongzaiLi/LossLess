@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -225,8 +226,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].name", is("Chocolate Bar")))
-                .andExpect(jsonPath("$[0].description", is("Example Product First Edition")));
+                .andExpect(jsonPath("products[0].name", is("Chocolate Bar")))
+                .andExpect(jsonPath("products[0].description", is("Example Product First Edition")));
     }
 
     @Test
@@ -257,10 +258,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(content()
                         .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].name", is("Chocolate Bar")))
-                .andExpect(jsonPath("$[0].description", is("Example Product First Edition")))
-                .andExpect(jsonPath("$[1].name", is("Juice")))
-                .andExpect(jsonPath("$[1].description", is("Example Product Second Edition")));
+                .andExpect(jsonPath("products[0].name", is("Chocolate Bar")))
+                .andExpect(jsonPath("products[0].description", is("Example Product First Edition")))
+                .andExpect(jsonPath("products[1].name", is("Juice")))
+                .andExpect(jsonPath("products[1].description", is("Example Product Second Edition")));
     }
 
     @Test
@@ -280,7 +281,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("[]"));
+                .andExpect(content().string("{\"products\":[],\"totalItems\":0}"));
     }
 
     @Test
@@ -560,13 +561,129 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id", is("1-KIT-KAT")))
-                .andExpect(jsonPath("$[0].name", is("Kit Kat")))
-                .andExpect(jsonPath("$[0].description", is("Example Product")))
-                .andExpect(jsonPath("$[0].recommendedRetailPrice", is(2.0)));
+                .andExpect(jsonPath("products[0].id", is("1-KIT-KAT")))
+                .andExpect(jsonPath("products[0].name", is("Kit Kat")))
+                .andExpect(jsonPath("products[0].description", is("Example Product")))
+                .andExpect(jsonPath("products[0].recommendedRetailPrice", is(2.0)));
     }
 
     @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    void whenGetRequestToBusinessProducts_withOffsetOfZero_andCountOfOne_thenCorrectResultsReturned() throws Exception {
+       createOneBusiness("Business", "{\n" +
+               "    \"streetNumber\": \"56\",\n" +
+               "    \"streetName\": \"Clyde Road\",\n" +
+               "    \"suburb\": \"Riccarton\",\n" +
+               "    \"city\": \"Christchurch\",\n" +
+               "    \"region\": \"Canterbury\",\n" +
+               "    \"country\": \"New Zealand\",\n" +
+               "    \"postcode\": \"8041\"\n" +
+               "  }", "Non-profit organisation", "I am a business");
+       createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+       createOneProduct("chocolate-bar2", "Chocolate Bar2", "Example Product First Edition", "example manufacturer", "4.0");
+       createOneProduct("chocolate-bar3", "Chocolate Bar3", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+       mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?offset=0&count=1")
+               .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("products[0].id", is("1-CHOCOLATE-BAR")))
+               .andExpect(jsonPath("products[0].name", is("Chocolate Bar")))
+               .andExpect(jsonPath("products[0].description", is("Example Product First Edition")))
+               .andExpect(jsonPath("products[0].recommendedRetailPrice", is(4.0)))
+               .andExpect(jsonPath("products", hasSize(1)));
+    }
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_thenCorrectTotalCount() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar2", "Chocolate Bar2", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar3", "Chocolate Bar3", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?offset=0&count=1")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("totalItems", is(3)));
+   }
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_withOffsetOfTwo_andCountOfTwo_thenCorrectResultsReturned() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar2", "Chocolate Bar2", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar3", "Chocolate Bar3", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?offset=2&count=2")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("products[0].id", is("1-CHOCOLATE-BAR3")))
+              .andExpect(jsonPath("products[0].name", is("Chocolate Bar3")))
+              .andExpect(jsonPath("products[0].description", is("Example Product First Edition")))
+              .andExpect(jsonPath("products[0].recommendedRetailPrice", is(4.0)))
+              .andExpect(jsonPath("products", hasSize(1)));
+   }
+
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_withNegativeOffset_then400BadRequest() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?offset=-1&count=2")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isBadRequest());
+   }
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_withNegativeCount_then400BadRequest() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?offset=1&count=-2")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isBadRequest());
+   }
 
     private void createOneBusiness(String name, String address, String businessType, String description) {
         String business = String.format("{\"name\": \"%s\", \"address\" : %s, \"businessType\": \"%s\", \"description\": \"%s\"}", name, address, businessType, description);
