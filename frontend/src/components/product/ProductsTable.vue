@@ -74,6 +74,7 @@ export default {
       },
       tableLoading: true,
       items: [],
+      totalItems: 0,
       perPage: 10,
       currentPage: 1,
       currentUser: {},
@@ -95,7 +96,8 @@ export default {
       try {
         const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
 
-        this.items = productsResponse.data;
+        this.items = productsResponse.data.products;
+        this.totalItems = productsResponse.data.totalItems;
         this.tableLoading = false;
         if(currency != null){
           this.currency = currency;
@@ -197,13 +199,6 @@ export default {
       return fieldsList;
     },
 
-    /**
-     * The totalResults function just computed how many pages in the search table.
-     * @returns number
-     */
-    totalItems: function () {
-      return this.items.length;
-    },
   }
 }
 </script>
