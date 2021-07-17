@@ -79,7 +79,6 @@ export default {
     return {
       items: [],
       business: {},
-      products: [],
       perPage: 10,
       currentPage: 1,
       tableLoading: true,
@@ -104,7 +103,6 @@ export default {
      */
     getBusinessInfo: async function (businessId) {
       this.tableLoading = true;
-      const getProductsPromise = api.getProducts(businessId)
       const getInventoryPromise = api.getInventory(businessId)
       const currencyPromise = api.getBusiness(businessId)
           .then((resp) => {
@@ -113,8 +111,7 @@ export default {
           })
 
       try {
-        const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
-        this.products = productsResponse.data;
+        const [currency, inventoryResponse] = await Promise.all([currencyPromise, getInventoryPromise])
         this.items = inventoryResponse.data;
         this.tableLoading = false;
         if (currency != null) {

@@ -11,8 +11,6 @@
         :fields="fields"
         :items="items"
         :per-page="perPage"
-        :current-page="currentPage"
-        :busy="tableLoading"
         ref="productCatalogueTable"
     >
       <template #cell(thumbnail)="products">
@@ -45,7 +43,7 @@
         </div>
       </template>
     </b-table>
-    <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+    <pagination v-if="totalItems>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
   </div>
 </template>
 
@@ -72,12 +70,12 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
-      tableLoading: true,
       items: [],
       totalItems: 0,
       perPage: 10,
       currentPage: 1,
       currentUser: {},
+      business: null
     }
   },
   methods: {
@@ -89,8 +87,10 @@ export default {
      * This saves us having to pass in a business id prop.
      */
     getProducts: async function (business) {
-      this.tableLoading = true;
-      const getProductsPromise = api.getProducts(business.id);  // Promise for getting products
+      this.business = business;
+
+
+      const getProductsPromise = api.getProducts(business.id, this.perPage, this.perPage * (this.currentPage - 1));  // Promise for getting products
       const getCurrencyPromise = api.getUserCurrency(business.address.country); // Promise for getting the currency data
 
       try {
@@ -98,7 +98,10 @@ export default {
 
         this.items = productsResponse.data.products;
         this.totalItems = productsResponse.data.totalItems;
-        this.tableLoading = false;
+
+        this.$refs.productCatalogueTable.refresh();
+
+
         if(currency != null){
           this.currency = currency;
         }
@@ -199,6 +202,19 @@ export default {
       return fieldsList;
     },
 
+  },
+
+
+  watch: {
+    /**
+     * Watch for current page change, refresh products when it happens.
+     */
+    '$data.currentPage': {
+      handler: function() {
+        this.getProducts(this.business);
+      },
+      deep: true
+    }
   }
 }
 </script>
