@@ -130,7 +130,9 @@ public class CardController {
 
         logger.info("Successfully found card: {}", card.getId());
 
-        return ResponseEntity.status(HttpStatus.OK).body(card);
+        GetCardDto cardDTO = new GetCardDto(card);
+
+        return ResponseEntity.status(HttpStatus.OK).body(cardDTO);
     }
 
     // Commented out code as this is for the S302T700-172 Validation
