@@ -15,10 +15,10 @@
     >
       <template #cell(thumbnail)="products">
         <div v-if="!products.item.images.length">
-          <b-img  class="product-image-thumbnail" thumbnail center :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image"/>
+          <b-img  class="product-image-thumbnail" center :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image"/>
         </div>
         <div v-if="products.item.images.length">
-          <b-img class="product-image-thumbnail" thumbnail center :src="getThumbnail(products.item)" alt="Failed to load image"/>
+          <img class="product-image-thumbnail" center :src="getThumbnail(products.item)" alt="Failed to load image"/>
         </div>
       </template>
 
@@ -156,8 +156,6 @@ export default {
           key: 'thumbnail',
           label: 'Image',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
-          thStyle: 'width: 88px',
-
         },
 
         {

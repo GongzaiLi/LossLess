@@ -16,8 +16,8 @@
       @row-clicked="tableRowClick"
   >
     <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
-      <b-img v-if="!data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src="require(`/public/product_default.png`)" alt="Product has no image" />
-      <b-img v-if="data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src=getThumbnail(data.item.product) />
+      <b-img v-if="!data.item.product.primaryImage" center class="product-image-thumbnail" :src="require(`/public/product_default.png`)" alt="Product has no image" />
+      <b-img v-if="data.item.product.primaryImage" center class="product-image-thumbnail" :src=getThumbnail(data.item.product) />
     </template>
 
     <template v-slot:cell(actions)="product">
@@ -56,13 +56,16 @@
 }
 
 .product-image-thumbnail {
-  height: 66px !important;
+  height: 60px !important;
   object-fit: cover;
-  width: 66px;
+  max-width: 80px;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
 }
 
 .thumbnail-row {
-  padding: 0.5rem 0 0.5rem 0 !important;
+  padding: 0 !important;
+  max-width: 60px;
 }
 </style>
 
@@ -180,7 +183,6 @@ export default {
         {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
-          thStyle: 'width: 60px',
           label: 'Thumbnail',
         },
         {
