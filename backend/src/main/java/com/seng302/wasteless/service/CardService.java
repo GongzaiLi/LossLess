@@ -19,6 +19,8 @@ public class CardService {
     @Autowired
     public CardService(CardRepository cardRepository) { this.cardRepository = cardRepository; }
 
+
+
     /**
      * Creates a Card by saving the card object and persisting it in the database
      * @param card The Card object to be created.
@@ -34,5 +36,19 @@ public class CardService {
     public List<Card> findBySection(CardSections section) {
         return cardRepository.findBySection(section);
     }
+
+    /**
+     * Returns the first card found with the given ID. Will always be correct card as the id is unique
+     * @param cardId The id as an integer of the card being requested
+     * @return Will return the card object that with the requested id. returns null if none found.
+     */
+    public Card findById(Integer cardId) {return cardRepository.findFirstById(cardId);}
+
+    /**
+     * Deletes the database entry of the card that is passed to this method
+     * @param card The card to be deleted from the database
+     */
+    public void deleteCard(Card card) {cardRepository.delete(card);}
+
 }
 
