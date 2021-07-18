@@ -1,6 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Card;
+import com.seng302.wasteless.model.CardSections;
 import com.seng302.wasteless.repository.CardRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 /**
  * CardService applies card logic over the card JPA repository.
@@ -42,6 +45,15 @@ public class CardService {
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card with given ID does not exist");
         }
         return possibleCard;
+    }
+
+    /**
+     * Returns all cards that belong to the given CardSections.
+     * @param section The section the card belongs to.
+     * @return A (possibly empty) list of all cards that belong to the given section
+     */
+    public List<Card> findBySection(CardSections section) {
+        return cardRepository.findBySection(section);
     }
 }
 
