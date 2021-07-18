@@ -45,7 +45,6 @@ public class CardController {
      * Returns:
      * 400 BAD_REQUEST If invalid section, invalid creatorId or invalid title.
      * 401 UNAUTHORIZED If no user is logged on.
-     * 403 FORBIDDEN If user not allowed to make request (not global admin or not the Card Creator).
      * 201 Created If successfully created card.
      *
      * @param cardDtoRequest Dto containing information needed to create a Card
@@ -59,24 +58,13 @@ public class CardController {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Got User {}", user);
 
-        logger.info("Check if user with id ` {} ` exists", cardDtoRequest.getCreatorId());
-        User possibleUser = userService.findUserById(cardDtoRequest.getCreatorId());
-
-        if (possibleUser == null) {
-            logger.warn("Can't create card as user doesn't exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with given id does not exist");
-        }
-
         Card card = PostCardDtoMapper.postCardDtoToEntityMapper(cardDtoRequest);
 
         logger.info("Setting created date");
         card.setCreated(LocalDate.now());
-        card.setCreator(possibleUser);
 
-        if (!user.checkUserGlobalAdmin() && !card.checkUserIsCreator(user)) {
-            logger.warn("Cannot create Card. User is not global admin or user is not card creator", user);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or card creator");
-        }
+        logger.info("Setting card creator");
+        card.setCreator(user);
 
         card = cardService.createCard(card);
 

@@ -99,8 +99,6 @@ public class CardControllerUnitTest {
                 .thenReturn(user);
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
-        doReturn(true).when(mockedCard).checkUserIsCreator(user);
-        doReturn(true).when(user).checkUserGlobalAdmin();
 
     }
 
@@ -117,18 +115,4 @@ public class CardControllerUnitTest {
                 .andExpect(jsonPath("cardId", is(2)));
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenPostRequestToAddCard_andGlobalAdmin_andValidRequest_then201Response() throws Exception {
-        doReturn(true).when(user).checkUserGlobalAdmin();
-
-        String jsonInStringForRequest = "{\"creatorId\": 1, \"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": \"blah, blah\"}";
-
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("cardId", is(2)));
-    }
 }

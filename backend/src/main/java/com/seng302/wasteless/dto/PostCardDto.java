@@ -19,10 +19,6 @@ import javax.validation.constraints.*;
 @ToString // generate a toString method
 public class PostCardDto {
 
-    @NotNull(message = "Creator ID is Mandatory")
-    @Positive
-    private Integer creatorId;
-
     @Column(name = "section")
     @NotNull(message = "section is mandatory")
     private CardSections section;

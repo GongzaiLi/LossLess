@@ -49,13 +49,4 @@ public class Card {
 
     @Column(name = "created")
     private LocalDate created;
-
-    /**
-     * Check if the given user is the card creator
-     * @param user The user to check if they are the creator
-     * @return true if user is creator, false if user is not creator
-     */
-    public boolean checkUserIsCreator(User user) {
-        return user.getId().equals(creator.getId());
-    }
 }
