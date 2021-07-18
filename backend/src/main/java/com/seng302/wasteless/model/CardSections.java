@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * for checking to see if a card is of a legal type
  */
 public enum CardSections {
-    FOR_SALE("For Sale"),
+    FOR_SALE("ForSale"),
     WANTED("Wanted"),
     EXCHANGE("Exchange");
 

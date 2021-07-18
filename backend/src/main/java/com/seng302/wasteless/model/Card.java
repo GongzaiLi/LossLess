@@ -2,7 +2,7 @@ package com.seng302.wasteless.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.CardViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 /**
@@ -26,12 +25,12 @@ public class Card {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView(InventoryViews.GetInventoryView.class)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "creator_id")
-    @NotNull
-    private Integer creatorId;
+    @ManyToOne
+    @JsonView(CardViews.GetCardView.class)
+    @JoinColumn(name = "creator_id")
+    private User creator;
 
     @Column(name = "section")
     @NotNull(message = "section is mandatory")
@@ -44,13 +43,10 @@ public class Card {
     @Column(name = "description")
     private String description;
 
-
     @Column(name = "keywords")
+    @NotNull(message = "Keyword is mandatory")
     private String keywords;
 
-    @Column(name = "creationDate")
-    @PastOrPresent
-    @NotNull
-    private LocalDate creationDate;
-
+    @Column(name = "created")
+    private LocalDate created;
 }
