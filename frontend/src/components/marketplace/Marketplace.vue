@@ -9,10 +9,6 @@ Date: 21/5/21
   <div>
     <b-card class="shadow">
       <h1><b-icon-shop/> Market Place </h1>
-      <b-button @click="openCreateCardModal" class="float-right">
-        <b-icon-plus-square-fill animation="fade"/>
-        Create
-      </b-button>
       <b-input-group>
         <b-form-text style="margin-right: 7px">
           Table View
@@ -45,10 +41,6 @@ Date: 21/5/21
         </b-tab>
 
       </b-tabs>
-      <b-modal id="create-card" hide-header hide-footer>
-        <CreateCard :okAction="createCard"
-                    :cancelAction="closeCreateCardModal"> </CreateCard>
-      </b-modal>
     </b-card>
   </div>
 </template>
@@ -56,10 +48,8 @@ Date: 21/5/21
 <script>
 
 import MarketplaceSection from "@/components/marketplace/MarketplaceSection";
-import CreateCard from "@/components/marketplace/CreateCard";
-
 export default {
-  components: { MarketplaceSection, CreateCard },
+  components: {MarketplaceSection},
   data: function () {
     return {
       errors: [],
@@ -117,23 +107,6 @@ export default {
     pushErrors(error) {
       this.errors.push(error.message);
     },
-    /**
-     * Opens the create card modal when create button pressed.
-     */
-    openCreateCardModal() {
-      this.$bvModal.show('create-card');
-    },
-    /**
-     * Closes the create card modal when cancel button pressed.
-     */
-    closeCreateCardModal() {
-      this.$bvModal.hide('create-card');
-    },
-
-
-    createCard() {
-
-    }
   },
   computed: {
   }
