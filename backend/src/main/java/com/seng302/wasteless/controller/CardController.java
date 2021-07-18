@@ -12,13 +12,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * CardController is used for mapping all Restful API requests starting with the address "/cards".
@@ -52,7 +53,7 @@ public class CardController {
      */
     @PostMapping("/cards")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createUser(@Valid @RequestBody PostCardDto cardDtoRequest) {
+    public ResponseEntity<Object> createCard(@Valid @RequestBody PostCardDto cardDtoRequest) {
         logger.info("Request to create a new card with data Card: {}", cardDtoRequest);
 
         User user = userService.getCurrentlyLoggedInUser();
@@ -75,5 +76,27 @@ public class CardController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
+
+    // Commented out code as this is for the S302T700-172 Validation
+//    /**
+//     * Returns a json object of bad field found in the request
+//     *
+//     * @param exception The exception thrown by Spring when it detects invalid data
+//     * @return Map of field name that had the error and a message describing the error.
+//     */
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    @ExceptionHandler(MethodArgumentNotValidException.class)
+//    public Map<String, String> handleValidationExceptions(
+//            MethodArgumentNotValidException exception) {
+//        Map<String, String> errors;
+//        errors = new HashMap<>();
+//        exception.getBindingResult().getAllErrors().forEach(error -> {
+//            String fieldName = ((FieldError) error).getField();
+//            String errorMessage = error.getDefaultMessage();
+////            logger.error(errorMessage); it doesnt work I am not sure why
+//            errors.put(fieldName, errorMessage);
+//        });
+//        return errors;
+//    }
 
 }

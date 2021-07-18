@@ -7,7 +7,9 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.validation.constraints.*;
+import java.util.List;
 
 /**
  * Dto for post card endpoint.
@@ -30,7 +32,9 @@ public class PostCardDto {
     @Column(name = "description")
     private String description;
 
+    @ElementCollection
     @Column(name = "keywords")
     @NotNull(message = "Keyword is mandatory")
-    private String keywords;
+    @Size (min = 1, max = 5)
+    private List<String> keywords;
 }

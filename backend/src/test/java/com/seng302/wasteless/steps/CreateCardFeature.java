@@ -103,9 +103,9 @@ public class CreateCardFeature {
         currentUserDetails = new CustomUserDetails(currentUser);
     }
 
-    @When("I create a card with creatorId {int}, section {string}, title {string}, keywords {string}")
-    public void iCreateACardWithCreatorIdSectionTitleKeywords(int creatorId, String section, String title, String keywords) throws Exception {
-        String jsonInStringForRequest = String.format("{\"creatorId\": %d, \"section\": \"%s\", \"title\": \"%s\", \"keywords\": \"%s\"}", creatorId, section, title, keywords);
+    @When("I create a card with creatorId {int}, section {string}, title {string}, keywords {string}, {string}")
+    public void iCreateACardWithCreatorIdSectionTitleKeywords(int creatorId, String section, String title, String keyword1, String keyword2) throws Exception {
+        String jsonInStringForRequest = String.format("{\"creatorId\": %d, \"section\": \"%s\", \"title\": \"%s\", \"keywords\": [\"%s\", \"%s\"]}", creatorId, section, title, keyword1, keyword2);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/cards"))
                 .content(jsonInStringForRequest)
