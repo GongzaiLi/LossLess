@@ -1,11 +1,11 @@
 <template>
   <div v-if="isCardFormat">
     <b-container>
-      <b-row v-for="i in Math.ceil(cards.length / cardsPerRow)" v-bind:key="i">
-        <b-col :cols="12/cardsPerRow" v-for="(cardInfo, index) in cards.slice((i - 1) * cardsPerRow, i * cardsPerRow)" v-bind:key="index">
+      <b-row cols-lg="3" >
+        <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
           <marketplace-card
               :card-info="cardInfo"
-              style="margin-top: 10px"
+              style="margin-top: 10px; min-width: 250px; max-width: 400px"
           />
         </b-col>
       </b-row>
