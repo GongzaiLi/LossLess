@@ -45,6 +45,10 @@ Date: 21/5/21
         </b-tab>
 
       </b-tabs>
+      <b-modal id="view-card" hide-header hide-footer>
+        <MarketplaceCardFull :close-full-view-card="closeViewCardModal">  </MarketplaceCardFull>
+      </b-modal>
+
       <b-modal id="create-card" hide-header hide-footer>
         <CreateCard :okAction="createCard"
                     :cancelAction="closeCreateCardModal"> </CreateCard>
@@ -56,10 +60,12 @@ Date: 21/5/21
 <script>
 
 import MarketplaceSection from "@/components/marketplace/MarketplaceSection";
+import MarketplaceCardFull from "@/components/marketplace/MarketplaceCardFull";
+
 import CreateCard from "@/components/marketplace/CreateCard";
 
 export default {
-  components: { MarketplaceSection, CreateCard },
+  components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
   data: function () {
     return {
       errors: [],
@@ -109,6 +115,10 @@ export default {
       }
     }
   },
+  mounted() {
+    this.openViewCardModal();
+
+  },
   methods: {
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
@@ -117,6 +127,19 @@ export default {
     pushErrors(error) {
       this.errors.push(error.message);
     },
+    /**
+     * Opens the create card modal when create button pressed.
+     */
+    openViewCardModal() {
+      this.$bvModal.show('view-card');
+    },
+    /**
+     * Closes the create card modal when cancel button pressed.
+     */
+    closeViewCardModal() {
+      this.$bvModal.hide('view-card');
+    },
+
     /**
      * Opens the create card modal when create button pressed.
      */
