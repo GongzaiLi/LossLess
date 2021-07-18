@@ -94,6 +94,9 @@ public class CardController {
         logger.info("Setting created date");
         card.setCreated(LocalDate.now());
 
+        logger.info("Setting card expiring date");
+        card.setDisplayPeriodEnd(LocalDate.now().plusWeeks(2));
+
         logger.info("Setting card creator");
         card.setCreator(user);
 
@@ -105,6 +108,35 @@ public class CardController {
         responseBody.put("cardId", card.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+    }
+
+    /**
+     * Handle get request to /cards/{id}/expiring endpoint for getting a users expiring cards.
+     * Request are validated for create fields by Spring, if bad then returns 400 with map of errors
+     *
+     * Returns:
+     * 400 BAD_REQUEST If invalid section, invalid creatorId or invalid title.
+     * 401 UNAUTHORIZED If no user is logged on.
+     * 200 If successfully got list of expiring cards.
+     *
+     * @return Status code dependent on success. 400, 401, 403 errors. 200 List of cards.
+     */
+    @GetMapping("cards/{id}/expiring")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> getExpiringCards(@PathVariable("id") Integer userId) {
+        logger.info("Request to get a user's expiring cards with user id: {}", userId);
+
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
+
+        if (!userId.equals(user.getId())) {
+            logger.info("User ({}) tried to access the expiring cards of another user ({}).", user.getId(), userId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You cannot view the expiring cards of another user.");
+        }
+
+        //todo get list of expiring cards
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("hold");
     }
 
     // Commented out code as this is for the S302T700-172 Validation
