@@ -72,7 +72,7 @@ public class GetUserDtoMapperTest {
                 .thenReturn("eric@gmail.com");
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
+                .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(signedInUser);
     }
 

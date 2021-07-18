@@ -17,11 +17,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -72,7 +71,7 @@ public class BusinessController {
         business.setPrimaryAdministrator(user);
 
         if (!user.checkIsOverSixteen()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Must be 16 to create a business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must be 16 to create a business");
         }
 
         business.setPrimaryAdministrator(user);
@@ -123,10 +122,7 @@ public class BusinessController {
         logger.debug("Request to get business with ID: {}", businessId);
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
+
         logger.info("Successfully Retrieved Business: {} using ID: {}", possibleBusiness, businessId);
 
 
@@ -170,40 +166,23 @@ public class BusinessController {
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
 
-        if (possibleBusinessToAddAdminFor == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusinessToAddAdminFor, businessId);
 
 
         logger.debug("Trying to find user with ID: {}", requestBody.getUserId());
         User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
 
-        if (possibleUserToMakeAdmin == null) {
-            logger.warn("User with ID: {} does not exist", requestBody.getUserId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist");
-        }
         logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
 
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User userMakingRequest = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User userMakingRequest = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (!userMakingRequest.checkUserGlobalAdmin()
-                && !(possibleBusinessToAddAdminFor.checkUserIsPrimaryAdministrator(userMakingRequest))) {
-            logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", userMakingRequest, businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", userMakingRequest, businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusinessToAddAdminFor, userMakingRequest);
 
 
         if (userService.checkUserAdminsBusiness(possibleBusinessToAddAdminFor.getId(), possibleUserToMakeAdmin.getId())) {
             logger.warn("Cannot process request. User: {} is already an admin of business: {}.", requestBody.getUserId(), businessId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already admin of business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already admin of business");
         }
 
 
@@ -231,35 +210,23 @@ public class BusinessController {
     public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer businessId, @RequestBody PutBusinessesAdminDto requestBody) {
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        User possibleUser = userService.findUserById(requestBody.getUserId());
+        User userToRevoke = userService.findUserById(requestBody.getUserId());
         logger.info("possible Business{}", possibleBusiness);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, loggedInUser);
 
-        if (possibleBusiness == null) {
-            logger.warn("Business does not exist.");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
-        if (possibleUser == null) {
-            logger.warn("User does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User with ID does not exist");
-        }
-        if (possibleBusiness.getPrimaryAdministrator().equals(possibleUser)) {
+        if (possibleBusiness.getPrimaryAdministrator().equals(userToRevoke)) {
             logger.warn("User is primary admin");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is primary admin");
-        }
-        if (!(possibleBusiness.checkUserIsPrimaryAdministrator(loggedInUser)) && !loggedInUser.checkUserGlobalAdmin()) {
-            logger.warn("You are not a primary business admin");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
-        }
-        if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), possibleUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not admin of business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is primary admin");
         }
 
-        businessService.removeAdministratorFromBusiness(possibleBusiness, possibleUser);
+        if (!userService.checkUserAdminsBusiness(possibleBusiness.getId(), userToRevoke.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not admin of business");
+        }
+
+        businessService.removeAdministratorFromBusiness(possibleBusiness, userToRevoke);
         businessService.saveBusinessChanges(possibleBusiness);
 
         return ResponseEntity.status(HttpStatus.OK).build();

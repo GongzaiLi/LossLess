@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -64,42 +64,26 @@ public class CatalogueController {
         User user = userService.getCurrentlyLoggedInUser();
 
         if (!possibleProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your product ID must be alphanumeric with dashes or underscores allowed.");
         }
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("Cannot create product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
+
         logger.debug("Trying to create product: {} for business: {}", possibleProduct, possibleBusiness);
 
         logger.debug("Generating product ID");
         String productId = possibleProduct.createCode(businessId);
 
-        if (productService.findProductById(productId) != null) {
-            logger.warn("Product ID not generated. ID already exists");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
-        }
-        logger.info("Product ID: {} generated for product: {}", productId, possibleProduct);
-
-
-        if (productService.findProductById(productId) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
-        }
+        productService.checkIfProductIdNotInUse(productId);
 
         if (possibleProduct.getRecommendedRetailPrice() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product RRP can't be negative.");
         }
         LocalDate dateCreated = LocalDate.now();
 
@@ -127,29 +111,24 @@ public class CatalogueController {
      * Handle get request to /businesses/{id}/products endpoint for retrieving all products in a business's catalogue
      *
      * @param businessId The id of the business to get
+     * @param offset value of the offset from the start of the results query. Used for pagination
+     * @param count number of results to be returned
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/products")
-    public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusinessesProducts(@PathVariable("id") Integer businessId, HttpServletRequest request, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
         logger.debug("Request to get business products");
+        logger.debug("Received count:{} offset:{}", count, offset);
 
         User user = userService.getCurrentlyLoggedInUser();
 
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        if (possibleBusiness == null) {
-            logger.warn("Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
 
-        if (!possibleBusiness.getAdministrators().contains(user) && user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN) {
-            logger.warn("Cannot create product. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
 
         logger.debug("Trying to retrieve products for business: {}", possibleBusiness);
@@ -175,34 +154,28 @@ public class CatalogueController {
 
         User user = userService.getCurrentlyLoggedInUser();
 
-        if (user.getRole() != UserRoles.GLOBAL_APPLICATION_ADMIN && user.getRole() != UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN && !userService.checkUserAdminsBusiness(businessId, user.getId())) {
-            logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, businessId);
+        logger.debug("Request to get business with ID: {}", businessId);
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+
+        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.debug("Trying to find product with ID: {} in the catalogue", productId);
         Product oldProduct = productService.findProductById(productId);
 
-        if (oldProduct == null) {
-            logger.warn("Could not find product with ID: {}", productId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product does not exist.");
-        }
-        logger.info("Found product: {} using ID: {}", oldProduct, productId);
-
         if (!oldProduct.getId().matches("^[a-zA-Z0-9-_]*$")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your product ID must be alphanumeric with dashes or underscores allowed.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your product ID must be alphanumeric with dashes or underscores allowed.");
         }
         logger.debug("Generating new product ID");
         String newProductId = editedProduct.createCode(businessId);
-        if (!oldProduct.getId().equals(newProductId) && productService.findProductById(newProductId) != null) {
-            logger.warn("Product ID already exists. Not updating.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product ID provided already exists.");
+        if (!oldProduct.getId().equals(newProductId)) {
+            productService.checkIfProductIdNotInUse(newProductId);
         }
         logger.info("Product ID: {} generated for old product: {}", newProductId, productId);
 
         if (editedProduct.getRecommendedRetailPrice() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product RRP can't be negative.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product RRP can't be negative.");
         }
 
         logger.debug("Trying to update product: {} for business: {} with new data: {}", oldProduct, businessId, editedProduct);

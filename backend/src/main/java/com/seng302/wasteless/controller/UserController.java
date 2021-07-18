@@ -3,7 +3,9 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
@@ -25,6 +27,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -75,19 +78,19 @@ public class UserController {
 
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to create user with already used email");
         }
         logger.info("Email validated for user: {}", user);
 
         //check the email validation
         if (!userService.checkEmailValid(user.getEmail())) {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email address is invalid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
         }
         logger.debug("Validated date for user: {}", user);
 
@@ -134,30 +137,36 @@ public class UserController {
 
     /**
      * Search for users by a search query.
-     * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
      *
-     * @param searchQuery   The query to search by
-     * @return              A list of matching results
+     * Searches first, last, middle, and nicknames for partial or full matches with the query, case insensitive.
+     *
+     * Takes a search query, offset, and count. Returns upto 'count' matching results, offset by the offset.
+     *
+     * Default values: offset is 0 and count is 10.
+     *
+     * @param searchQuery       The query string to search for in users
+     * @param offset            The offset of the search (how many results to 'skip')
+     * @param count             The number of results to return
+     * @return                  List of users who match the search query, maximum length of count, offset by offset.
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset") Integer offset, @RequestParam(value = "count") Integer count) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset, @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
+        logger.info("Received count:{} offset:{}", count, offset);
+        logger.info("Using count:{} offset:{}", count, offset);
 
-        logger.debug("Getting users matching query: {}", searchQuery);
-        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
-
-        List<GetUserDto> searchResultsDto = new ArrayList<>();
-        //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?
-
-        logger.debug("Adding all matched users to list");
-        for (User user : searchResults) {
-            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+        if (count < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be positive if provided.");
+        } else if (offset < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
         }
 
-        logger.info("User matching the query: {} are: {}", searchQuery, searchResultsDto);
+        logger.debug("Getting users matching query: {}", searchQuery);
 
-        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
+        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
 
 
     }
@@ -220,10 +229,6 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.debug("possible User: {}", possibleUser);
 
-        if (possibleUser == null) {
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
 
         // Not too sure what to do with Response 401 because it's possibly about security but do we need
         // to have U4 for that or is it possible to do without it
@@ -251,27 +256,17 @@ public class UserController {
 
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
-
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+         if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to make others admin");
+             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
 
         } else if (possibleUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Cannot change role of default application admin");
+             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
 
         }
 
@@ -308,26 +303,17 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
-
-            logger.warn("Could not find user with ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+        if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to revoke others admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to revoke others admin");
 
         } else if (possibleUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own admin rights");
 
         }
 
@@ -363,7 +349,7 @@ public class UserController {
         User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to log into an account with an email " +
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have tried to log into an account with an email " +
                     "that is not registered.");
         } else {
             logger.debug("User: {} found using data : {}", savedUser, login);
@@ -386,7 +372,7 @@ public class UserController {
 
             } catch (AuthenticationException e) {
                 logger.warn("Login unsuccessful. {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
 
 

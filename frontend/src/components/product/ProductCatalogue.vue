@@ -217,7 +217,7 @@ export default {
             this.productCardError = this.getErrorMessageFromApiError(error);
             if (error.response.status === 413) {  // Uploaded images were too large
               this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
-              this.imageError = error.response.data;
+              this.imageError = error.response.data.message;
               this.productCardError = '';
               this.$bvModal.show('image-error-modal');
             }
@@ -251,7 +251,7 @@ export default {
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors

@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
@@ -9,14 +8,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +23,7 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    private static final Logger logger = LogManager.getLogger(InventoryController.class.getName());
+    private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     private UserRepository userRepository;
 
@@ -91,7 +88,13 @@ public class UserService {
      * @return          The found user, if any, or wise null
      */
     public User findUserById(Integer id) {
-        return userRepository.findFirstById(id);
+
+        User possibleUser = userRepository.findFirstById(id);
+        if (possibleUser == null) {
+            logger.warn("User with ID: {} does not exist", id);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "User does not exist");
+        }
+        return possibleUser;
     }
 
     /**
@@ -105,8 +108,8 @@ public class UserService {
     }
 
     /**
-     *
-     * @return
+     * Get Currently Logged in user by getting the email and searching by email
+     * @return Logged in user or Throw Response Status Exception
      */
     public User getCurrentlyLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -115,9 +118,10 @@ public class UserService {
         logger.debug("Validating user with Email: {}", currentPrincipalEmail);
         User user = findUserByEmail(currentPrincipalEmail);
         if (user == null) {
-            logger.info("Cannot create LISTING. Access token invalid for user with Email: {}", currentPrincipalEmail);
+            logger.info("Access token invalid for user with Email: {}", currentPrincipalEmail);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
         }
+
         logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
         return user;
     }
@@ -134,31 +138,13 @@ public class UserService {
 
     /**
      * Search for users by a search query.
-     *      * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
      *
      * @param searchQuery       The search query
-     * @return                  A set of all matching users
+     * @return                  A ArrayList of all matching users
      */
-    public Set<User> searchForMatchingUsers(String searchQuery) {
-        // full matches
-        LinkedHashSet<User> fullMatches = userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+    public ArrayList<User> searchForMatchingUsers(String searchQuery) {
 
-        // partial matches
-        LinkedHashSet<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
-        LinkedHashSet<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
-        LinkedHashSet<User> nicknamePartialMatches = userRepository.findAllByNicknameContainsAndNicknameNot(searchQuery, searchQuery);
-        LinkedHashSet<User> middleNamePartialMatches = userRepository.findAllByMiddleNameContainsAndMiddleNameNot(searchQuery, searchQuery);
-
-        // combine matches
-
-        LinkedHashSet<User> combinedResults = new LinkedHashSet<>();
-        combinedResults.addAll(fullMatches);
-        combinedResults.addAll(firstNamePartialMatches);
-        combinedResults.addAll(lastNamePartialMatches);
-        combinedResults.addAll(nicknamePartialMatches);
-        combinedResults.addAll(middleNamePartialMatches);
-
-        return combinedResults;
+        return userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
     }
 
     /**

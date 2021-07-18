@@ -638,7 +638,7 @@ describe('check-modal-Make-Admin-Modal', () => {
 });
 
 it('400 error test', async () => {
-  Api.makeBusinessAdmin.mockRejectedValue({response: {status: 400, data: "User with ID does not exist"}});
+  Api.makeBusinessAdmin.mockRejectedValue({response: {status: 400, data: {message: "User with ID does not exist"}}});
 
   await wrapper.vm.makeAdminHandler(1);
 
