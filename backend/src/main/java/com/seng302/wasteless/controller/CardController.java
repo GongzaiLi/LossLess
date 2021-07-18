@@ -1,8 +1,10 @@
 package com.seng302.wasteless.controller;
 
+import com.seng302.wasteless.dto.GetCardDto;
 import com.seng302.wasteless.dto.PostCardDto;
 import com.seng302.wasteless.dto.mapper.PostCardDtoMapper;
 import com.seng302.wasteless.model.Card;
+import com.seng302.wasteless.model.CardSections;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
@@ -12,14 +14,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CardController is used for mapping all Restful API requests starting with the address "/cards".
@@ -36,6 +37,35 @@ public class CardController {
     public CardController(UserService userService, CardService cardService) {
         this.userService = userService;
         this.cardService = cardService;
+    }
+
+    /**
+     * Handles requests for GET card endpoint. Returns a list of cards in the section given.
+     * Throws a 400 error if the section given is not one of the predefined ones ('ForSale', 'Wanted', or 'Exchange').
+     * @param section The section for which cards will be retrieved from. This should be in the query parameter named 'section
+     * @return A 200 response with the list of cards in the given section
+     */
+    @GetMapping("/cards")
+    public ResponseEntity<Object> getCards(@RequestParam String section) {
+        logger.info("GET /cards, section={}", section);
+
+        // Get CardSections enum value with text equal to request param
+        CardSections cardSection = null;
+        for (CardSections cardSectionValue : CardSections.values()) {
+            if (cardSectionValue.toString().equals(section)) {
+                cardSection = cardSectionValue;
+            }
+        }
+
+        if (cardSection == null) {
+            logger.warn("Tried to get cards with bad section '{}'", section);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'");
+        }
+
+        List<Card> cards = cardService.findBySection(cardSection);
+        List<GetCardDto> cardDTOs = cards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
+
+        return ResponseEntity.status(HttpStatus.OK).body(cardDTOs);
     }
 
     /**
