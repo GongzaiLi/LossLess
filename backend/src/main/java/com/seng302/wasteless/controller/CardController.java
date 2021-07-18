@@ -12,10 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -74,6 +71,32 @@ public class CardController {
         responseBody.put("cardId", card.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+    }
+
+    /**
+     * Handle get request to /cards/{id} endpoint for getting a specific card.
+     * Returns:
+     * 400 BAD_REQUEST id not integer.
+     * 401 UNAUTHORIZED If no user is logged on.
+     * 200 OK If successfully retrieved card.
+     *
+     * @param cardId id of the card trying to be retrieved
+     * @return Status code dependent on success. 400, 401, 406 errors. 200 OK with card id if success.
+     */
+    @GetMapping("/cards/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> createUser(@PathVariable("id") Integer cardId) {
+        logger.info("Request to get card with id: {}", cardId);
+
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
+
+        logger.info("Retrieving Card");
+        Card card = cardService.findCardById(cardId);
+
+        logger.info("Successfully found card: {}", card.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(card);
     }
 
 }
