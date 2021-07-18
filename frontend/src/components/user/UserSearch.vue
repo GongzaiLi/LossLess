@@ -36,7 +36,7 @@ Date: 7/3/2021
         </b-table>
       </b-col>
     </b-row>
-    <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="totalResults"/>
+    <pagination ref="tablePag" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="totalResults"/>
   </b-card>
 </template>
 
@@ -85,6 +85,7 @@ export default {
     },
     /**
      * the function is search a user id the using api to find the user's detail
+     * this is used to make the initial search from the search bar, and resets the table to the first page
      * @param searchParameter id user is id or name other details
      */
     displayResults: function (searchParameter) {
@@ -96,6 +97,8 @@ export default {
           this.setQuery=this.searchQuery;
           this.$refs.searchTable.refresh();
           this.currentPage=1;
+          this.$refs.tablePag.currentPage=1;
+
         })
         .catch((error) => {
           this.$log.debug(error);
@@ -105,7 +108,8 @@ export default {
     },
 
     /**
-     * the function is search users the using api to find the user of the current page
+     * the function sends a new api call when the page is changed to get a new table back with the correct amount of
+     * users with the offset and count
      * @returns [] or [users]
      */
     myProvider: async function (ctx) {
@@ -115,11 +119,11 @@ export default {
               .searchUser(this.searchQuery, ctx.perPage, ctx.perPage * (ctx.currentPage - 1))
           return this.getUserInfoIntoTable(response.data.results);
         } catch (error) {
-          console.log("error")
+          this.$log.debug(error);
+          this.error = "Failed to load user data";
           return []
         }
       }
-      console.log("no search q")
       return [];
 },
 
