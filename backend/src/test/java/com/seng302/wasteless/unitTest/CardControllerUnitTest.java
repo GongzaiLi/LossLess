@@ -21,6 +21,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -60,6 +63,8 @@ public class CardControllerUnitTest {
 
     private Card mockedCard;
 
+    private List<String> keywords;
+
     @BeforeEach
     void setUp() {
         userForCard = new User();
@@ -67,19 +72,23 @@ public class CardControllerUnitTest {
         userForCard.setEmail("demo@gmail.com");
         userForCard.setRole(UserRoles.USER);
 
+        keywords = new ArrayList<>();
+        keywords.add("Vehicle");
+        keywords.add("Car");
+
         card = new Card();
         card.setId(1);
         card.setCreator(userForCard);
         card.setSection(CardSections.FOR_SALE);
         card.setTitle("Sale");
-        card.setKeywords("Blah, Blah, Blah");
+        card.setKeywords(keywords);
 
         mockedCard = mock(Card.class);
         mockedCard.setId(1);
         mockedCard.setCreator(userForCard);
         mockedCard.setSection(CardSections.FOR_SALE);
         mockedCard.setTitle("Sale");
-        mockedCard.setKeywords("Blah, Blah, Blah");
+        mockedCard.setKeywords(keywords);
 
         user = mock(User.class);
         user.setId(1);
@@ -105,7 +114,7 @@ public class CardControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToAddCard_andValidRequest_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"creatorId\": 1, \"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": \"blah, blah\"}";
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"Vehicle\", \"Car\"]}";
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.post("/cards")
@@ -113,6 +122,30 @@ public class CardControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("cardId", is(2)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPostRequestToAddCard_andKeywordsIsLessThan1_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": []}";
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPostRequestToAddCard_andKeywordsIsMoreThan5_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"Vehicle\", \"Car\", \"Vehicle\", \"Car\", \"Vehicle\", \"Car\"]}";
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
 }

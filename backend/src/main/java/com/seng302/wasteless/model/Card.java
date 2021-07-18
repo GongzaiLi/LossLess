@@ -10,7 +10,9 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * An implementation of Card model for marketPlace.
@@ -33,7 +35,7 @@ public class Card {
     private User creator;
 
     @Column(name = "section")
-    @NotNull(message = "section is mandatory")
+    @NotNull(message = "Section is mandatory")
     private CardSections section;
 
     @Column(name = "title")
@@ -43,9 +45,10 @@ public class Card {
     @Column(name = "description")
     private String description;
 
+    @ElementCollection
     @Column(name = "keywords")
     @NotNull(message = "Keyword is mandatory")
-    private String keywords;
+    private List<String> keywords;
 
     @Column(name = "created")
     private LocalDate created;
