@@ -24,6 +24,7 @@ const MAX_PRODUCT_PRICE = 50;
 const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
 const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
+const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -185,9 +186,8 @@ async function registerUserWithBusinesses(user, businesses, numBusinesses) {
   for (let i=0; i < numBusinesses; i++) {
     const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
     await addProduct(businessResponse.data.businessId, instance, businesses[i]);
-    //add listings
 
-    console.log(`Registered business with products and inventory (no listings yet). Id: ${businessResponse.data.businessId}`);
+    console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
 
   }
 }
@@ -299,8 +299,47 @@ async function addInventory(businessId, instance, product) {
 
   const inventory = createInventoryObject(product);
 
-  await instance
+  const inventoryResponse = await instance
     .post(`http://localhost:9499/businesses/${businessId}/inventory`, inventory, {
+      headers: {
+        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+      }
+    })
+  return [inventoryResponse.data.inventoryItemId, inventory];
+
+}
+
+/**
+ * Create an listing item in the SENG302 API format with random dates.
+ */
+function createListingObject(inventory, inventoryItemId) {
+
+  const quantity = Math.floor(Math.random() * (inventory.quantity - MIN_QUANTITY_INVENTORY_IN_LISTING) +
+    MIN_QUANTITY_INVENTORY_IN_LISTING);
+
+  const price = Math.random() * parseFloat(inventory.pricePerItem) + parseFloat(inventory.pricePerItem);
+
+  const discount = Math.floor(Math.random() * 10) * 10; // random number between 0 to 10
+  const moreInfo = discount > 0 ? `${discount}% DISCOUNT` : "No DISCOUNTS!";
+
+  return {
+    inventoryItemId: inventoryItemId,
+    quantity: quantity,
+    price: price.toFixed(2),
+    moreInfo: moreInfo,
+    closes: inventory.expires
+  };
+}
+
+/**
+ *  Add a random number of listing to a business using our backend endpoint
+ */
+async function addListing(businessId, instance, inventory, inventoryItemId) {
+
+  const listing = createListingObject(inventory, inventoryItemId);
+
+  await instance
+    .post(`http://localhost:9499/businesses/${businessId}/listings`, listing, {
       headers: {
         'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
       }
@@ -308,26 +347,33 @@ async function addInventory(businessId, instance, product) {
 
 }
 
+
 /**
  *  Add a random number of products to a business using our backend endpoint
  */
 async function addProduct(businessId, instance, business) {
 
-  const startIndex = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS-MIN_PRODUCTS_PER_BUSINESS));
+  const startIndex = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS - MIN_PRODUCTS_PER_BUSINESS));
 
-  for (let i=startIndex; i < MAX_PRODUCTS_PER_BUSINESS; i++) {
-    const product = createProductObject(productNames[i], business);
-    await instance
+  for (let i = startIndex; i < MAX_PRODUCTS_PER_BUSINESS; i++) {
+    try {
+      const product = createProductObject(productNames[i], business);
+      const productResponse = await instance
         .post(`http://localhost:9499/businesses/${businessId}/products`, product, {
           headers: {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
-        }).then(async (response) => {
-          if (Math.random() < CHANCE_OF_INVENTORY_FOR_PRODUCT) {
-            product.id = response.data.productId
-            await addInventory(businessId, instance, product);
-          }
-        }).catch(err => console.log(err));
+        })
+
+      if (Math.random() < CHANCE_OF_INVENTORY_FOR_PRODUCT) {
+        product.id = productResponse.data.productId
+        const [inventoryItemId, inventory] = await addInventory(businessId, instance, product);
+        await addListing(businessId, instance, inventory, inventoryItemId);
+      }
+
+    } catch (err) {
+      console.log(err)
+    }
 
   }
 }
