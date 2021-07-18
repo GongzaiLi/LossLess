@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 
 /**
  * UserRepository is a repository interface for User.
@@ -22,16 +22,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findFirstByRole(UserRoles roles);
 
-    LinkedHashSet<User> findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nickNameQuery);
-
-    LinkedHashSet<User> findAllByFirstNameContainsAndFirstNameNot(String firstNameQuery, String firstNameNot);
-
-    LinkedHashSet<User> findAllByLastNameContainsAndLastNameNot(String lastNameQuery, String firstNameNot);
-
-    LinkedHashSet<User> findAllByMiddleNameContainsAndMiddleNameNot(String middleNameQuery, String middleNameNot);
-
-    LinkedHashSet<User> findAllByNicknameContainsAndNicknameNot(String nicknameQuery, String nicknameNot);
-
+    ArrayList<User> findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nicknameQuery);
 
     @Query(value = "select * from User where id = (select administrators_id from Business_administrators where business_id = :businessId and administrators_id = :userId)", nativeQuery = true)
     User findUserContainBusinessIdAndContainAdminId(@Param("businessId") Integer businessId, @Param("userId") Integer userId);

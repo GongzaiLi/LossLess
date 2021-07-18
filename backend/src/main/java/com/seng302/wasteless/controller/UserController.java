@@ -3,7 +3,9 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
@@ -135,30 +137,36 @@ public class UserController {
 
     /**
      * Search for users by a search query.
-     * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
      *
-     * @param searchQuery   The query to search by
-     * @return              A list of matching results
+     * Searches first, last, middle, and nicknames for partial or full matches with the query, case insensitive.
+     *
+     * Takes a search query, offset, and count. Returns upto 'count' matching results, offset by the offset.
+     *
+     * Default values: offset is 0 and count is 10.
+     *
+     * @param searchQuery       The query string to search for in users
+     * @param offset            The offset of the search (how many results to 'skip')
+     * @param count             The number of results to return
+     * @return                  List of users who match the search query, maximum length of count, offset by offset.
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset") Integer offset, @RequestParam(value = "count") Integer count) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset, @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
+        logger.info("Received count:{} offset:{}", count, offset);
+        logger.info("Using count:{} offset:{}", count, offset);
 
-        logger.debug("Getting users matching query: {}", searchQuery);
-        Set<User> searchResults = userService.searchForMatchingUsers(searchQuery);
-
-        List<GetUserDto> searchResultsDto = new ArrayList<>();
-        //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?
-
-        logger.debug("Adding all matched users to list");
-        for (User user : searchResults) {
-            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+        if (count < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be positive if provided.");
+        } else if (offset < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
         }
 
-        logger.info("User matching the query: {} are: {}", searchQuery, searchResultsDto);
+        logger.debug("Getting users matching query: {}", searchQuery);
 
-        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
+        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
 
 
     }
