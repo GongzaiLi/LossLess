@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -39,16 +40,18 @@ public class Card {
     private CardSections section;
 
     @Column(name = "title")
+    @Size(min = 1, max = 50)
     @NotNull(message = "Title is mandatory")
     private String title;
 
     @Column(name = "description")
+    @Size(max = 250)
     private String description;
 
     @ElementCollection
     @Column(name = "keywords")
     @NotNull(message = "Keyword is mandatory")
-    private List<String> keywords;
+    private List<@NotBlank @NotNull @Size(max = 10)String> keywords;
 
     @Column(name = "created")
     private LocalDate created;

@@ -55,5 +55,20 @@ public class CardService {
     public List<Card> findBySection(CardSections section) {
         return cardRepository.findBySection(section);
     }
+
+    /**
+     * Returns all cards that belong to the given CardSections.
+     * @param section The section the card belongs to.
+     * @return A (possibly empty) list of all cards that belong to the given section
+     */
+    public void checkValidSection(String section) {
+        logger.info("Checking if valid section");
+        for (CardSections c : CardSections.values()) {
+            if (c.toString().equals(section)) {
+                return;
+            }
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'");
+    }
 }
 
