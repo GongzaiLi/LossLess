@@ -34,20 +34,20 @@
         <div v-b-tooltip="item.title">{{shortenText(item.title, 20)}}</div>
       </template>
 
-      <template v-slot:cell(tags)="{ item }">
-        <div v-b-tooltip="formatTags(item.tags)">{{shortenText(formatTags(item.tags), 20)}}</div>
+      <template v-slot:cell(keywords)="{ item }">
+        <div v-b-tooltip="formatTags(item.keywords)">{{shortenText(formatTags(item.keywords), 20)}}</div>
       </template>
 
       <template v-slot:cell(description)="{ item }">
         <div v-b-tooltip="item.description">{{shortenText(item.description, 20)}}</div>
       </template>
 
-      <template v-slot:cell(listerName)="{ item }">
-        <div v-b-tooltip="item.listerName">{{shortenText(item.listerName, 15)}}</div>
+      <template v-slot:cell(creator)="{ item }">
+        <div v-b-tooltip="item.creator.firstName">{{shortenText(item.creator.firstName + " " + item.creator.lastName, 15)}}</div>
       </template>
 
-      <template v-slot:cell(listerLocation)="{ item }">
-        <div v-b-tooltip="item.listerLocation">{{shortenText(item.listerLocation, 25)}}</div>
+      <template v-slot:cell(location)="{ item }">
+        <div v-b-tooltip="item.creator.homeAddress">{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
       </template>
 
       <template #empty>
@@ -107,6 +107,14 @@ export default {
      */
     formatTags(tags) {
       return tags.join(", ");
+    },
+
+    /**
+     * Combine fields of address
+     */
+    formatAddress: function (address) {
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     }
   },
 
@@ -135,15 +143,15 @@ export default {
           sortable: true,
         },
         {
-          key: 'tags',
+          key: 'keywords',
         },
         {
-          key: 'listerName',
-          label: "Lister",
+          key: 'creator',
+          label: "Creator",
           sortable: true
         },
         {
-          key: 'listerLocation',
+          key: 'location',
           label: "Location",
           sortable: true
         },
