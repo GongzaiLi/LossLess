@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -76,6 +77,7 @@ public class CardExpiryFeature {
                 .build();
     }
 
+    @Transactional
     @Before
     public void createUsers() {
         throwawayAddress = new Address();
@@ -151,6 +153,7 @@ public class CardExpiryFeature {
         Assertions.assertEquals(userId, user.getId());
     }
 
+    @Transactional
     @And("a Card exists with creatorId {int}")
     public void aCardExistsCardIdWithCreatorId(int creatorId) {
         if (cardService.findById(userCardId)==null){
