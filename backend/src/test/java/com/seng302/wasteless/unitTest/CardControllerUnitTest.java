@@ -13,11 +13,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -87,6 +89,13 @@ class CardControllerUnitTest {
                 .when(cardService.findBySection(CardSections.FOR_SALE))
                 .thenReturn(Collections.singletonList(card));
 
+        Mockito
+                .when(cardService.findCardById(1))
+                .thenReturn(card);
+        Mockito
+                .when(cardService.findCardById(5))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card with given ID does not exist"));
+
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
 
         new GetUserDtoMapper(businessService, userService); // This initialises the DTO mapper with our mocked services. The constructor has to be manually called
@@ -145,5 +154,25 @@ class CardControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenGetCardByIdRequestToCards_andValidId_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/cards/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(1)))
+                .andExpect(jsonPath("title", is("Sale")))
+                .andExpect(jsonPath("creator.id", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenGetCardByIdRequestToCards_andIdIsInvalid_then406Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/cards/5")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
 
 }
