@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -134,9 +135,16 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You cannot view the expiring cards of another user.");
         }
 
-        //todo get list of expiring cards
+        List<Card> allCards = cardService.getAllUserCards(user.getId());
+        List<Card> expiredCards = Collections.emptyList();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("hold");
+        for (Card card : allCards) {
+            if (card.getDisplayPeriodEnd().minusWeeks(1).isBefore(LocalDate.now())) {
+                expiredCards.add(card);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(expiredCards);
     }
 
     // Commented out code as this is for the S302T700-172 Validation
