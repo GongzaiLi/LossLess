@@ -14,7 +14,7 @@ import java.util.List;
 @RepositoryRestResource
 public interface CardRepository extends JpaRepository<Card, Integer> {
 
-    Card findFirstById(Long id);
+    Card findFirstById(Integer id);
 
     /**
      * Returns all cards that belong to the given CardSections.
