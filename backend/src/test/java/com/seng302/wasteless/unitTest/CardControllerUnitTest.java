@@ -3,9 +3,11 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.repository.CardRepository;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +62,7 @@ class CardControllerUnitTest {
         userForCard.setDateOfBirth(LocalDate.now());
         userForCard.setHomeAddress(Mockito.mock(Address.class));
 
+
         List<String> keywords = new ArrayList<>();
         keywords.add("Vehicle");
         keywords.add("Car");
@@ -70,6 +73,22 @@ class CardControllerUnitTest {
         card.setSection(CardSections.FOR_SALE);
         card.setTitle("Sale");
         card.setKeywords(keywords);
+
+        User userForCardTwo = new User();
+        userForCardTwo.setId(2);
+        userForCardTwo.setEmail("notDemo@gmail.com");
+        userForCardTwo.setRole(UserRoles.USER);
+        userForCardTwo.setCreated(LocalDate.now());
+        userForCardTwo.setDateOfBirth(LocalDate.now());
+        userForCardTwo.setHomeAddress(Mockito.mock(Address.class));
+
+        Card cardTwo = new Card();
+        cardTwo.setId(2);
+        cardTwo.setCreator(userForCardTwo);
+        cardTwo.setSection(CardSections.FOR_SALE);
+        cardTwo.setTitle("Sale");
+        cardTwo.setKeywords(keywords);
+
 
         Mockito
                 .when(cardService.createCard(any(Card.class)))
@@ -86,6 +105,14 @@ class CardControllerUnitTest {
         Mockito
                 .when(cardService.findBySection(CardSections.FOR_SALE))
                 .thenReturn(Collections.singletonList(card));
+
+        Mockito
+                .when(cardService.findById(1))
+                .thenReturn(card);
+
+        Mockito
+                .when(cardService.findById(2))
+                .thenReturn(cardTwo);
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
 
@@ -144,6 +171,22 @@ class CardControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/cards?section=Invalid")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenDeleteRequestToCards_andCardExistsAndIsNotOwnedByRequester_then403Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/cards/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenDeleteRequestToCards_andCardExistsAndIsOwnedByRequester_then406Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/cards/3")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
     }
 
 }
