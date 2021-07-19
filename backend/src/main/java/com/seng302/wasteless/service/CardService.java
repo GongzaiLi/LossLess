@@ -34,5 +34,13 @@ public class CardService {
     public List<Card> findBySection(CardSections section) {
         return cardRepository.findBySection(section);
     }
+
+
+    /**
+     * Returns all cards that belong to the current user.
+     * @param userId The id of the current user.
+     * @return A (possibly empty) list of all cards that belong to the current user.
+     */
+    public List<Card> getAllUserCards(Integer userId) { return cardRepository.findAllByCreator_Id(userId); }
 }
 
