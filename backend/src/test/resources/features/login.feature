@@ -6,23 +6,23 @@ Feature: Login
   Scenario: Log in with incorrect password
     Given The user with email "johnsmith@email.com" exists and has password "securepassword"
     When The user logs in with user email "johnsmith@email.com" and password "password"
-    Then The user will receive an error message of "Incorrect email or password"
+    Then The user will receive an error
 
 
   Scenario: Log in with nonexistent account
     Given The user with email "fabian@email.com" does not exist
     When The user logs in with user email "fabian@email.com" and password "securepassword"
-    Then The user will receive an error message of "You have tried to log into an account with an email that is not registered."
+    Then The user will receive an error
 
 
   Scenario: Log in without an email
     When The user logs in without an email and with password "securepassword"
-    Then The user will receive an error message of "{\"email\":\"email is mandatory\"}"
+    Then The user will receive an error
 
 
   Scenario: Log in without a password
     When The user logs in with user email "janedoe@email.com" and without a password
-    Then The user will receive an error message of "{\"password\":\"password is mandatory\"}"
+    Then The user will receive an error
 
   Scenario: Log in with correct details
     Given The user with email "janedoe@email.com" exists and has password "securepassword"

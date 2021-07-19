@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.awt.image.BufferedImage;
@@ -82,40 +83,25 @@ public class ImageController {
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        if (possibleBusiness == null) {
-            logger.warn("Cannot post product image. Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
-        }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot post product image. User: {} is not global admin or business admin: {}", user.getId(), businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
-        }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user.getId(), businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", productId, businessId);
         Product possibleProduct = productService.findProductById(productId);
 
-        if (possibleProduct == null) {
-            logger.warn("Cannot post product image for product that does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
-        }
-        if (!possibleProduct.getBusinessId().equals(businessId)) {
-            logger.warn("Cannot post product image for product that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
-        }
+        productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
         if (file.isEmpty()) {
             logger.warn("Cannot post product image, no image received");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No Image Received");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
         }
 
         int numProductImages = possibleProduct.getImages().size();
 
         if (numProductImages >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot upload product image, limit reached for this product.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }
 
         ProductImage newImage = new ProductImage();
@@ -126,12 +112,12 @@ public class ImageController {
             imageType = fileContentType.split("/")[1];
         } else {
             logger.debug("Error with image type is null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error with image type is null");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null");
         }
 
         if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
             logger.warn("Cannot post product image, invalid image type");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Image type");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
         }
 
         newImage = productImageService.createImageFileName(newImage, imageType);
@@ -142,7 +128,7 @@ public class ImageController {
         BufferedImage thumbnail = productImageService.resizeImage(newImage);
         if (thumbnail == null) {
             logger.debug("Error resizing image");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error resizing file");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
         }
 
         productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
@@ -197,7 +183,7 @@ public class ImageController {
 
         if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot delete productImage. User: {} is not global admin or business admin: {}", user, possibleBusiness);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not an admin of the application or this business");
         }
         logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
@@ -206,23 +192,23 @@ public class ImageController {
 
         if (product==null){
             logger.warn("Cannot delete productImage. Product is null");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product no longer exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product no longer exists");
         }
         if (!product.getBusinessId().equals(businessId)) {
             logger.warn("Cannot post product image for product that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
         }
 
         ProductImage image = productImageService.findProductImageById(imageId);
 
         if (image==null){
             logger.warn("Cannot delete productImage. image: {}", image);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Image no longer exists");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Image no longer exists");
         }
 
         if (product.getImages().stream().noneMatch(possibleImage -> possibleImage.getId().equals(image.getId()))) {
             logger.warn("Cannot post product image for product image that does not belong to current product");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image id does not exist for Current Product");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product image id does not exist for Current Product");
         }
 
         productService.deleteImageRecordFromProductInDB (product, image);
@@ -286,13 +272,13 @@ public class ImageController {
 
         if (possibleBusiness == null) {
             logger.warn("Cannot post product image. Business ID: {} does not exist.", businessId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Business does not exist");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business does not exist");
         }
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot post product image. User: {} is not global admin or business admin: {}", user.getId(), businessId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not an admin of the application or this business");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not an admin of the application or this business");
         }
         logger.info("User: {} validated as global admin or admin of business: {}.", user.getId(), businessId);
 
@@ -301,23 +287,23 @@ public class ImageController {
 
         if (possibleProduct == null) {
             logger.warn("Cannot post product image for product that does not exist");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product with given id does not exist");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given id does not exist");
         }
         if (!possibleProduct.getBusinessId().equals(businessId)) {
             logger.warn("Cannot post product image for product that does not belong to current business");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product id does not exist for Current Business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
         }
 
         ProductImage possibleImage = productImageService.findProductImageById(imagedId);
 
         if (possibleImage == null) {
             logger.warn("Cannot post product image for product image id that does not exist");
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Product image with given id does not exist");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Product image with given id does not exist");
         }
 
         if (possibleProduct.getImages().stream().noneMatch(image -> image.getId().equals(imagedId))) {
             logger.warn("Cannot post product image for product image that does not belong to current product");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Product image id does not exist for Current Product");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product image id does not exist for Current Product");
         }
 
         possibleProduct.setPrimaryImage(possibleImage);

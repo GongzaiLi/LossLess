@@ -104,7 +104,7 @@ describe('Testing-api-post-register', () => {
 
   it('400-error-register-testing', async () => {
     Api.register.mockRejectedValue({response: {
-      data: "Email address already in use",
+      data:  {message: "Email address already in use"},
       status: 409
     }});
     await wrapper.vm.register(event);

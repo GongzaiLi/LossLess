@@ -4,8 +4,12 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.repository.ProductRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -14,6 +18,8 @@ import java.util.List;
  */
 @Service
 public class ProductService {
+
+    private static final Logger logger = LogManager.getLogger(ProductService.class.getName());
 
     private final ProductRepository productRepository;
 
@@ -24,13 +30,36 @@ public class ProductService {
 
 
     /**
+     * Check if the product id in use if so throw a response status exception
+     * @param id The id of the product to find
+     *
+     */
+    public Boolean checkIfProductIdNotInUse(String id) {
+        Product product = productRepository.findFirstById(id);
+        if (product != null) {
+            logger.warn("Product ID already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product ID provided already exists.");
+        }
+        logger.info("Product ID: {} generated", id);
+        return true;
+    }
+
+
+
+    /**
      * Find product by product id (code)
      *
      * @param id        The id of the product to find
      * @return          The found product, if any, otherwise null
      */
     public Product findProductById(String id) {
-        return productRepository.findFirstById(id);
+        Product product = productRepository.findFirstById(id);
+        if (product == null) {
+            logger.warn("Product with id: {} Not Found", id);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given id does not exist");
+        }
+        logger.info("Product with ID: {} Found", id);
+        return product;
     }
 
     /**
@@ -69,6 +98,18 @@ public class ProductService {
      */
     public void addImageToProduct(Product product, ProductImage productImage) {
         product.addImage(productImage);
+    }
+
+    /**
+     * Check if product belongs to the business
+     * @param product product to check
+     * @param businessId id of the business the product should belong to
+     */
+    public void checkProductBelongsToBusiness(Product product, Integer businessId) {
+        if (!product.getBusinessId().equals(businessId)) {
+            logger.warn("Request Failed, product does not belong to current business");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
+        }
     }
 
     /**

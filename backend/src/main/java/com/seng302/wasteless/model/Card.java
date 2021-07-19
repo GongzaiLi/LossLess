@@ -2,16 +2,18 @@ package com.seng302.wasteless.model;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.view.InventoryViews;
+import com.seng302.wasteless.view.CardViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * An implementation of Card model for marketPlace.
@@ -26,31 +28,31 @@ public class Card {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView(InventoryViews.GetInventoryView.class)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "creator_id")
-    @NotNull
-    private Integer creatorId;
+    @ManyToOne
+    @JsonView(CardViews.GetCardView.class)
+    @JoinColumn(name = "creator_id")
+    private User creator;
 
     @Column(name = "section")
-    @NotNull(message = "section is mandatory")
+    @NotNull(message = "Section is mandatory")
     private CardSections section;
 
     @Column(name = "title")
+    @Size(min = 1, max = 50)
     @NotNull(message = "Title is mandatory")
     private String title;
 
     @Column(name = "description")
+    @Size(max = 250)
     private String description;
 
-
+    @ElementCollection
     @Column(name = "keywords")
-    private String keywords;
+    @NotNull(message = "Keyword is mandatory")
+    private List<@NotBlank @NotNull @Size(max = 10)String> keywords;
 
-    @Column(name = "creationDate")
-    @PastOrPresent
-    @NotNull
-    private LocalDate creationDate;
-
+    @Column(name = "created")
+    private LocalDate created;
 }

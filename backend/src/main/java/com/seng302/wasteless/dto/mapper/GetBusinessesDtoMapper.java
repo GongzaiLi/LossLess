@@ -38,9 +38,7 @@ public class GetBusinessesDtoMapper {
 
     public static GetBusinessesDto toGetBusinessesDto(Business business) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
 
         List<User> businessAdministrators = business.getAdministrators();

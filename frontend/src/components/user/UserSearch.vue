@@ -18,6 +18,7 @@ Date: 7/3/2021
     <b-row>
       <b-col cols="12">
         <b-table striped hover
+                 ref="searchTable"
          table-class="text-nowrap"
          responsive="lg"
          no-border-collapse
@@ -27,7 +28,7 @@ Date: 7/3/2021
          @row-clicked="rowClickHandler"
          :fields="fields"
          :per-page="perPage"
-         :items="items"
+         :items="myProvider"
          :current-page="currentPage">
          <template #empty>
           <h3 class="no-results-overlay" >No results to display</h3>
@@ -35,7 +36,7 @@ Date: 7/3/2021
         </b-table>
       </b-col>
     </b-row>
-    <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage" v-show="items.length"/>
+    <pagination ref="tablePag" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="totalResults"/>
   </b-card>
 </template>
 
@@ -60,6 +61,7 @@ export default {
   data: function () {
     return {
       searchQuery: "",
+      setQuery:"",
       totalResults: 0,
       perPage: 10,
       currentPage: 1,
@@ -83,6 +85,7 @@ export default {
     },
     /**
      * the function is search a user id the using api to find the user's detail
+     * this is used to make the initial search from the search bar, and resets the table to the first page
      * @param searchParameter id user is id or name other details
      */
     displayResults: function (searchParameter) {
@@ -90,15 +93,39 @@ export default {
         .searchUser(searchParameter)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
-          this.items = this.getUserInfoIntoTable(response.data);  //Add functionality to return results based on query
-          this.totalResults = response.data.length;
-          this.resultsReturned = true;
+          this.totalResults = response.data.totalItems;
+          this.setQuery=this.searchQuery;
+          this.$refs.searchTable.refresh();
+          this.currentPage=1;
+          this.$refs.tablePag.currentPage=1;
+
         })
         .catch((error) => {
           this.$log.debug(error);
           this.error = "Failed to load user data";
         })
+
     },
+
+    /**
+     * the function sends a new api call when the page is changed to get a new table back with the correct amount of
+     * users with the offset and count
+     * @returns [] or [users]
+     */
+    myProvider: async function (ctx) {
+      if(this.totalResults) {
+        try {
+          const response = await api
+              .searchUser(this.searchQuery, ctx.perPage, ctx.perPage * (ctx.currentPage - 1))
+          return this.getUserInfoIntoTable(response.data.results);
+        } catch (error) {
+          this.$log.debug(error);
+          this.error = "Failed to load user data";
+          return []
+        }
+      }
+      return [];
+},
 
     /**
      * The getUserInfoIntoTable function to read the data from the APi response.Date then put a array (item)

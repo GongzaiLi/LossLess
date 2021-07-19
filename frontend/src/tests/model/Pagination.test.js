@@ -181,6 +181,38 @@ describe('check-itemsRangeMax-function', () => {
   });
 });
 
+describe('check-jumpToPagesOptions-function', () => {
+  test('10_total_items-in-10_per_page-for-1-page', async () => {
+    await wrapper.setProps({totalItems: 10, perPage: 10});
+    wrapper.vm.currentPage = 10;
+    expect(wrapper.vm.jumpToPagesOptions).toStrictEqual([1]);
+  });
+
+  test('100_total_items-in-10_per_page-for-10-pages', async () => {
+    await wrapper.setProps({totalItems: 100, perPage: 10});
+    wrapper.vm.currentPage = 10;
+    expect(wrapper.vm.jumpToPagesOptions).toStrictEqual([1,2,3,4,5,6,7,8,9,10]);
+  });
+
+  test('1_total_items-in-100_per_page-for-1-page', async () => {
+    await wrapper.setProps({totalItems: 1, perPage: 100});
+    wrapper.vm.currentPage = 10;
+    expect(wrapper.vm.jumpToPagesOptions).toStrictEqual([1]);
+  });
+
+  test('9_total_items-in-2_per_page-for-1-page', async () => {
+    await wrapper.setProps({totalItems: 9, perPage: 2});
+    wrapper.vm.currentPage = 10;
+    expect(wrapper.vm.jumpToPagesOptions).toStrictEqual([1,2,3,4,5]);
+  });
+
+  test('0_total_items-in-2_per_page-for-0-page', async () => {
+    await wrapper.setProps({totalItems: 0, perPage: 2});
+    wrapper.vm.currentPage = 10;
+    expect(wrapper.vm.jumpToPagesOptions).toStrictEqual([]);
+  });
+})
+
 describe('check-pageChange-function', () => {
   test('when-change-currentPage', async () => {
     expect(wrapper.vm.currentPage).toBe(1);

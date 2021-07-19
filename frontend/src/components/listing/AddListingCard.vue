@@ -21,7 +21,7 @@ Date: 23/5/2021
                 type="text" maxlength="50"
                 disabled
                 placeholder="No item selected"
-                :value="selectedInventoryItem ? selectedInventoryItem.product.id:''"
+                :value="selectedInventoryItem ? selectedInventoryItem.product.id.split(/-(.+)/)[1]:''"
                 autofocus required/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectInventoryItemModal">Select Inventory Item</b-button>
@@ -224,7 +224,7 @@ name: "add-listing-card",
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
@@ -280,7 +280,6 @@ name: "add-listing-card",
 
     openSelectInventoryItemModal() {
       this.$bvModal.show('select-inventory-item');
-      // this.$refs.inventoryTable.getInventory(this.currentBusiness);
     },
 
     selectInventoryItem(inventory) {

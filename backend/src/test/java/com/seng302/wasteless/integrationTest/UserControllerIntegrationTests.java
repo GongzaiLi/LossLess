@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -115,12 +116,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
        mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[0].firstName", is("James")))
-                .andExpect(jsonPath("[0].email", is("jeh128@uclive.ac.nz")));
+                .andExpect(jsonPath("results.[0].id", is(2)))
+                .andExpect(jsonPath("results.[0].firstName", is("James")))
+                .andExpect(jsonPath("results.[0].email", is("jeh128@uclive.ac.nz")));
     }
 
     @Test
@@ -129,14 +130,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Steve&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Steve&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String result = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("[]", result);
+        assertEquals("{\"results\":[],\"totalItems\":0}", result);
     }
 
 
@@ -212,17 +213,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=James&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[1].id", is(3)))
-                .andExpect(jsonPath("[2].id", is(7)))
-                .andExpect(jsonPath("[3].id", is(6)))
-                .andExpect(jsonPath("[4].id", is(4)))
-                .andExpect(jsonPath("[5].id", is(5)))
-                .andExpect(jsonPath("[6].id", is(9)))
-                .andExpect(jsonPath("[7].id", is(8)));
+                .andExpect(jsonPath("results.[0].id", is(2)))
+                .andExpect(jsonPath("results.[1].id", is(3)))
+                .andExpect(jsonPath("results.[2].id", is(4)))
+                .andExpect(jsonPath("results.[3].id", is(5)))
+                .andExpect(jsonPath("results.[4].id", is(6)))
+                .andExpect(jsonPath("results.[5].id", is(7)))
+                .andExpect(jsonPath("results.[6].id", is(8)))
+                .andExpect(jsonPath("results.[7].id", is(9)));
 
     }
 
@@ -332,24 +333,231 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=1&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[1].id", is(3)))
-                .andExpect(jsonPath("[2].id", is(5)))
-                .andExpect(jsonPath("[3].id", is(4)));
+                .andExpect(jsonPath("results.[0].id", is(2)))
+                .andExpect(jsonPath("results.[1].id", is(3)))
+                .andExpect(jsonPath("results.[2].id", is(4)))
+                .andExpect(jsonPath("results.[3].id", is(5)));
 
 
     }
 
     @Test
-     void whenGetRequestToUsersAndUserDoesntExists_thenCorrectResponse() throws Exception{
-        createOneUser("Oliver", "Cranshaw", "ojc31@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
+    void whenSearchingForUsers_WithZeroCountAndZeroOffset_ReturnsEmptyListAndTotalResults() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
-        mockMvc.perform(get("/users/245")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user1)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user2)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=0")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("results", hasSize(0)))
+                .andExpect(jsonPath("totalItems", is(4)));
+
+
+    }
+
+    @Test
+    void whenSearchingForUsers_WithCountLessThanTotal_OnlyReturnsCount() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user1)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user2)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=3")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("results", hasSize(3)));
+    }
+    @Test
+    void whenSearchingForUsers_Withoffset_ReturnsWithOffsetApplies() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user1)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user2)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=4")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("results.[0].id", is(2)));
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=1&count=4")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("results.[0].id", is(3)));
+    }
+
+
+    @Test
+    void whenSearchingForUsers_WithNegativeOffset_returns400BadRequest() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user1)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user2)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=-1&count=4")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenSearchingForUsers_WithNegativeCount_returns400BadRequest() throws Exception {
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+
+        String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user1)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        String user2 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1234@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .content(user2)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=2&count=-4")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
 
