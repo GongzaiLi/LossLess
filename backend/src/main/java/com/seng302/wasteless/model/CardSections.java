@@ -23,6 +23,20 @@ public enum CardSections {
         this.text = text;
     }
 
+    /**
+     * Takes the text value and returns the enum heading
+     * @param text The text value
+     * @return the enum heading e.g FOR_SALE
+     */
+    public static CardSections fromString(String text) {
+        for (CardSections heading : CardSections.values()) {
+            if (heading.text.equalsIgnoreCase(text)) {
+                return heading;
+            }
+        }
+        return null;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Enum#toString()
      */

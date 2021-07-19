@@ -29,6 +29,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -97,6 +98,7 @@ class CardControllerUnitTest {
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card with given ID does not exist"));
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'")).when(cardService).checkValidSection("Invalid");
 
         new GetUserDtoMapper(businessService, userService); // This initialises the DTO mapper with our mocked services. The constructor has to be manually called
     }
@@ -174,5 +176,49 @@ class CardControllerUnitTest {
                 .andExpect(status().isNotAcceptable());
     }
 
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andDescriptionIsMoreThan250_then400Response() throws Exception {
+        String description = "a".repeat(1000);
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"Vehicle\"], \"description\" : \"" + description + "\" }";
 
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andTitleIsMoreThan50_then400Response() throws Exception {
+        String title = "a".repeat(100);
+        String jsonInStringForRequest = String.format("{\"section\": \"ForSale\", \"title\": \"{}\", \"keywords\": [\"Vehicle\"],", title);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andSectionIsInvalid_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"section\": \"Invalid\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"Vehicle\", \"Car\"]}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andKeywordElementIsMoreThan10_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"NiceKnowingThatTheKeyWordCantBeLong\"]}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
