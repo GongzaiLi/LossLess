@@ -171,7 +171,7 @@ async function registerUser(user) {
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
   const instance = Axios.create({
     baseURL: SERVER_URL,
-    timeout: 50000,
+    timeout: 180000,// set 2 mins
     withCredentials: true
   });
 
@@ -267,7 +267,7 @@ function createProductObject(name, business) {
  */
 function createInventoryObject(product) {
 
-  const now = new Date();
+  const now = new Date(new Date().setHours(new Date().getHours() + 1));
   const end = new Date(new Date().setDate(new Date().getDate() + 3 * 52 * 7));
   const lastMonth = new Date(new Date().setDate(new Date().getDate() - 31));
 
