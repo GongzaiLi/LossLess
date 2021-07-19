@@ -127,7 +127,6 @@ export default {
       api.getCardsBySection(section)
           .then((resp) => {
             this.marketplaceCards = resp.data;
-            console.log(this.marketplaceCards);
           })
           .catch((error) => {
             this.$log.debug(error);

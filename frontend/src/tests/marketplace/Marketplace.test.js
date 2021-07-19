@@ -22,12 +22,7 @@ const $currentUser = {
     role: 'user',
     currentlyActingAs: {
         id: 0
-    },
-    businessesAdministered: [
-        {id: 0, name: "blah"},
-        {id: 1, name: "blah1"},
-        {id: 2, name: "blah2"}
-    ]
+    }
 };
 
 
