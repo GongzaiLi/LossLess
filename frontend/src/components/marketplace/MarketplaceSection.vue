@@ -60,7 +60,7 @@
 
 <script>
 import pagination from "../model/Pagination";
-import MarketplaceCard from "@/components/marketplace/MarketplaceCard";
+import MarketplaceCard from "./MarketplaceCard";
 
 export default {
   name: "MarketplaceSection",

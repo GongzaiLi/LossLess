@@ -59,11 +59,11 @@ Date: 21/5/21
 
 <script>
 
-import MarketplaceSection from "@/components/marketplace/MarketplaceSection";
-import MarketplaceCardFull from "@/components/marketplace/MarketplaceCardFull";
+import MarketplaceSection from "./MarketplaceSection";
+import MarketplaceCardFull from "./MarketplaceCardFull";
 import api from "../../Api";
 
-import CreateCard from "@/components/marketplace/CreateCard";
+import CreateCard from "./CreateCard";
 
 export default {
   components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
