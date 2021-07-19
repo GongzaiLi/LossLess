@@ -144,7 +144,9 @@ public class CardController {
             }
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(expiredCards);
+        List<GetCardDto> expiredCardDTOs = expiredCards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(expiredCardDTOs);
     }
 
     // Commented out code as this is for the S302T700-172 Validation
