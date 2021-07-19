@@ -40,7 +40,7 @@ public class Card {
     private CardSections section;
 
     @Column(name = "title")
-    @Size(max = 50)
+    @Size(min = 1, max = 50)
     @NotNull(message = "Title is mandatory")
     private String title;
 
