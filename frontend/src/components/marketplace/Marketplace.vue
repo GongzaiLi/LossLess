@@ -133,7 +133,6 @@ export default {
      * @param cardData  The object that contains the card data.
      */
     createCard(cardData) {
-      console.log("BBBBBBBBBBBBBB")
       api.createCard(cardData)
       .then(createCardResponse => {
         this.$log.debug("Card Created", createCardResponse);
