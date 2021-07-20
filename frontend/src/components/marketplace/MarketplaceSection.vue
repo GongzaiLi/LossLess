@@ -36,19 +36,19 @@
       </template>
 
       <template v-slot:cell(tags)="{ item }">
-        <div>{{shortenText(formatTags(item.tags), 20)}}</div>
+        <div>{{shortenText(formatTags(item.keywords), 20)}}</div>
       </template>
 
       <template v-slot:cell(description)="{ item }">
         <div>{{shortenText(item.description, 20)}}</div>
       </template>
 
-      <template v-slot:cell(listerName)="{ item }">
-        <div>{{shortenText(item.listerName, 15)}}</div>
+      <template v-slot:cell(creator)="{ item }">
+        <div>{{shortenText(item.creator.firstName + " " + item.creator.lastName, 15)}}</div>
       </template>
 
-      <template v-slot:cell(listerLocation)="{ item }">
-        <div>{{shortenText(item.listerLocation, 25)}}</div>
+      <template v-slot:cell(location)="{ item }">
+        <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
       </template>
 
       <template #empty>
@@ -61,7 +61,7 @@
 
 <script>
 import pagination from "../model/Pagination";
-import MarketplaceCard from "@/components/marketplace/MarketplaceCard";
+import MarketplaceCard from "./MarketplaceCard";
 
 export default {
   name: "MarketplaceSection",
@@ -107,6 +107,14 @@ export default {
      */
     formatTags(tags) {
       return tags.join(", ");
+    },
+
+    /**
+     * Combine fields of address
+     */
+    formatAddress: function (address) {
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     }
   },
 
@@ -135,15 +143,15 @@ export default {
           sortable: true,
         },
         {
-          key: 'tags',
+          key: 'keywords',
         },
         {
-          key: 'listerName',
-          label: "Lister",
+          key: 'creator',
+          label: "Creator",
           sortable: true
         },
         {
-          key: 'listerLocation',
+          key: 'location',
           label: "Location",
           sortable: true
         },

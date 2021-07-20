@@ -61,6 +61,7 @@ export default {
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
+  getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
 
   /**
