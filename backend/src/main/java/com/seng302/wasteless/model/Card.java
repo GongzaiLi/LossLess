@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -47,7 +46,6 @@ public class Card {
 
     @ElementCollection
     @Column(name = "keywords")
-    //@NotNull(message = "Keyword is mandatory")
     private List<String> keywords;
 
     @Column(name = "created")
