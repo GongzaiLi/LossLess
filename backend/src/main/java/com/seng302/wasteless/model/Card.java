@@ -50,7 +50,7 @@ public class Card {
 
     @ElementCollection
     @Column(name = "keywords")
-    @NotNull(message = "Keyword is mandatory")
+    //@NotNull(message = "Keyword is mandatory")
     private List<@NotBlank @NotNull @Size(max = 10)String> keywords;
 
     @Column(name = "created")

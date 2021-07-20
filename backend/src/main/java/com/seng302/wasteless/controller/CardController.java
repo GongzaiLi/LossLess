@@ -172,12 +172,12 @@ public class CardController {
 
         if (card==null) {
             logger.warn("Cannot delete card:{} as it no longer exists", id);
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card no longer exists");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Card no longer exists");
         }
 
         if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot delete productImage. User: {} does not own this card and is not global admin", user);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this card");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
         }
         logger.info("User: {} validated as owner of card or global admin.", user);
 
