@@ -10,7 +10,7 @@
           <h6>{{cardInfo.description}}</h6>
         </b-card-text>
         <b-card-text>
-          Tags: {{ formatTags }}
+          Tags: <b-badge v-for="keyword in this.cardInfo.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
         </b-card-text>
         <b-card-text>
           Seller: {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
@@ -50,19 +50,11 @@ export default {
   computed: {
 
     /**
-     * Combine list of keywords into one string
-     */
-    formatTags() {
-      return this.cardInfo.keywords.join(", ");
-    },
-
-    /**
      * Combine fields of address
      */
     formatAddress: function () {
       const address = this.cardInfo.creator.homeAddress;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return `${address.suburb ? address.suburb + ',' : ''} ${address.city}`;
     }
   }
 }

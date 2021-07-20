@@ -35,8 +35,8 @@
         <div>{{shortenText(item.title, 20)}}</div>
       </template>
 
-      <template v-slot:cell(tags)="{ item }">
-        <div>{{shortenText(formatTags(item.keywords), 20)}}</div>
+      <template v-slot:cell(keywords)="{ item }">
+        <div><b-badge v-for="keyword in item.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge></div>
       </template>
 
       <template v-slot:cell(description)="{ item }">
@@ -103,18 +103,10 @@ export default {
     },
 
     /**
-     * Return tags in a joined format
-     */
-    formatTags(tags) {
-      return tags.join(", ");
-    },
-
-    /**
      * Combine fields of address
      */
     formatAddress: function (address) {
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
     }
   },
 

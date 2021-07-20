@@ -83,6 +83,10 @@ export default {
     }
   },
 
+  mounted() {
+    this.getCardsFromSection('ForSale');
+  },
+
   methods: {
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
@@ -92,13 +96,16 @@ export default {
       this.errors.push(error.message);
     },
 
+    /**
+     * opens the Full card modal.
+     */
     openFullCardModal(cardId) {
       this.cardId = cardId;
       this.$bvModal.show('full-card');
     },
 
     /**
-     * Closes the create card modal when cancel button pressed.
+     * Closes the full card modal when cancel button pressed.
      */
     closeFullCardModal() {
       this.$bvModal.hide('full-card');
