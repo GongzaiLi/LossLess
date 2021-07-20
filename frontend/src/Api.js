@@ -34,7 +34,7 @@ const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 5000,
+  timeout: 500000,
 });
 
 let currencyCache = {};

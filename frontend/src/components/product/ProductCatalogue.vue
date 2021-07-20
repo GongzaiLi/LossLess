@@ -196,7 +196,6 @@ export default {
           .createProduct(this.$route.params.id, this.productDisplayedInCard)
           .then(async (createProductResponse) => {
             this.$log.debug("Product Created", createProductResponse);
-            this.refreshProducts(); // Product has been created, so refresh the table of products
 
             this.$log.debug("Uploading images");
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
@@ -216,8 +215,10 @@ export default {
           .catch((error) => {
             this.productCardError = this.getErrorMessageFromApiError(error);
             if (error.response.status === 413) {  // Uploaded images were too large
+              this.refreshProducts(); // Product has been created, so refresh the table of products
               this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
-              this.imageError = error.response.data.message;
+
+              this.imageError = error.response.data;
               this.productCardError = '';
               this.$bvModal.show('image-error-modal');
             }
