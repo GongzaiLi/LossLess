@@ -49,7 +49,8 @@ Date: 21/5/21
 
       <b-modal id="create-card" hide-header hide-footer>
         <CreateCard @createAction="createCard($event)"
-                    :cancelAction="closeCreateCardModal"> </CreateCard>
+                    :cancelAction="closeCreateCardModal"
+                    :showError="error"> </CreateCard>
       </b-modal>
     </b-card>
   </div>
@@ -67,10 +68,13 @@ export default {
   components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
   data: function () {
     return {
-      errors: "",
+      error: "",
       activeTabIndex: 0,
       isCardFormat: true,
       marketplaceCards: [],
+      dismissSecs: 5,
+      dismissCountDown: 0,
+      showDismissibleAlert: false
     }
   },
   methods: {
@@ -129,17 +133,41 @@ export default {
      * @param cardData  The object that contains the card data.
      */
     createCard(cardData) {
+      console.log("BBBBBBBBBBBBBB")
       api.createCard(cardData)
       .then(createCardResponse => {
         this.$log.debug("Card Created", createCardResponse);
         this.$bvModal.hide('create-card');
-        this.errors = '';
+        this.error = '';
       })
       .catch(error => {
         this.$log.debug(error);
-        this.errors = error.response.statusText;
+        this.error = this.getErrorMessageFromApiError(error);
       })
-    }
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST requests for cards
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        let errorMessage = '';
+        Object.keys(error.response.data).forEach(key => {
+          errorMessage += `${key}: ${error.response.data[key]}\n`
+        })
+        return errorMessage;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
+    },
   },
 
 }

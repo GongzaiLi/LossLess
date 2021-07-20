@@ -139,7 +139,31 @@ describe('test-api-request-post-card', () => {
     Api.createCard.mockResolvedValue(response);
     await wrapper.vm.createCard($event);
     expect(Api.createCard).toHaveBeenCalled();
-    expect(wrapper.vm.errors).toBe('');
+    expect(wrapper.vm.error).toBe('');
 
   });
+  // it('should return response with status code 400 and error mesaage', async function () {
+  //   const response = {
+  //     response: {status: 400, data: {
+  //       message: "Bad request"
+  //       }}
+  //   }
+  //   Api.createCard.mockRejectedValue(response);
+  //   await wrapper.vm.createCard($event);
+  //   expect(Api.createCard).toHaveBeenCalled();
+  //
+  //   expect(wrapper.vm.error).toBe('message: Bad request');
+  //
+  // });
+  //
+  // it('should return response with status code 403 and error mesaage', async function () {
+  //   const response = {
+  //     response: {status: 403}
+  //   }
+  //   Api.createCard.mockRejectedValue(response);
+  //   await wrapper.vm.createCard($event);
+  //   expect(Api.createCard).toHaveBeenCalled();
+  //   expect(wrapper.vm.error).toBe("Forbidden. You are not an authorized administrator");
+  //
+  // });
 })

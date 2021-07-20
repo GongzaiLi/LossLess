@@ -15,7 +15,7 @@
     </b-input-group-text>
     <br>
 
-    <b-form>
+    <b-form @submit.prevent="createAction">
       <b-input-group>
         <h6><strong>Section*:</strong></h6>
       </b-input-group>
@@ -46,15 +46,17 @@
       <br>
 
       <b-input-group>
-        <h6><strong>Keywords*:</strong></h6>
+        <h6><strong>Keywords:</strong></h6>
       </b-input-group>
       <b-input-group class="mb-1">
-        <b-form-tags v-model="createCardForm.keywords" required/>
+        <b-form-tags v-model="createCardForm.keywords"/>
       </b-input-group>
       <br>
 
+      <b-alert variant="danger" dismissible :show="showError.length">{{ showError }}</b-alert>
+
       <div>
-        <b-button style="float: right" variant="primary" type="submit" @click="createAction"> Create </b-button>
+        <b-button style="float: right" variant="primary" type="submit"> Create </b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction"> Cancel </b-button>
       </div>
 
@@ -68,7 +70,7 @@ import api from "../../Api";
 
 export default {
   name: "CreateCard",
-  props: ['cancelAction',],
+  props: ['cancelAction', 'showError'],
   data() {
     return {
       cardInfo: {
@@ -82,7 +84,7 @@ export default {
         title: '',
         description: "",
         keywords: [],
-      }
+      },
     }
   },
   mounted() {
@@ -99,7 +101,7 @@ export default {
     setAutofillData(id) {
       this.createCardForm.creatorId = id;
       const currentDate = new Date();
-      this.createCardForm.dateCreated = currentDate.getDate() + "/"
+      this.cardInfo.dateCreated = currentDate.getDate() + "/"
           + (currentDate.getMonth()+1)  + "/"
           + currentDate.getFullYear() + " @ "
           + currentDate.getHours() + ":"
