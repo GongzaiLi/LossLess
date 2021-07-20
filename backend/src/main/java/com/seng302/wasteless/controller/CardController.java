@@ -19,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,6 +118,7 @@ public class CardController {
      * Returns:
      * 400 BAD_REQUEST If invalid section, invalid creatorId or invalid title.
      * 401 UNAUTHORIZED If no user is logged on.
+     * 403 FORBIDDEN If trying to get cards of another user.
      * 200 If successfully got list of expiring cards.
      *
      * @return Status code dependent on success. 400, 401, 403 errors. 200 List of cards.
@@ -136,17 +137,18 @@ public class CardController {
         }
 
         List<Card> allCards = cardService.getAllUserCards(user.getId());
-        List<Card> expiredCards = Collections.emptyList();
+        List<Card> expiredCards = new ArrayList<>();
 
         for (Card card : allCards) {
             if (card.getDisplayPeriodEnd().minusWeeks(1).isBefore(LocalDate.now())) {
                 expiredCards.add(card);
             }
         }
+        logger.info("User's soon to expire cards: {}.", expiredCards);
 
         List<GetCardDto> expiredCardDTOs = expiredCards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(expiredCardDTOs);
+        return ResponseEntity.status(HttpStatus.OK).body(expiredCardDTOs);
     }
 
     // Commented out code as this is for the S302T700-172 Validation

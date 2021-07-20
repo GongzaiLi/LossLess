@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,12 +65,38 @@ class CardControllerUnitTest {
         keywords.add("Vehicle");
         keywords.add("Car");
 
+        LocalDate expiry = LocalDate.of(2021, Month.JULY, 21);
+
         Card card = new Card();
         card.setId(1);
         card.setCreator(userForCard);
         card.setSection(CardSections.FOR_SALE);
         card.setTitle("Sale");
         card.setKeywords(keywords);
+        card.setDisplayPeriodEnd(expiry.plusYears(2));
+
+        Card expiringCard1 = new Card();
+        expiringCard1.setId(2);
+        expiringCard1.setCreator(userForCard);
+        expiringCard1.setSection(CardSections.FOR_SALE);
+        expiringCard1.setTitle("I am expiring");
+        expiringCard1.setKeywords(keywords);
+        expiringCard1.setDisplayPeriodEnd(expiry.minusMonths(1));
+
+        Card expiringCard2 = new Card();
+        expiringCard2.setId(3);
+        expiringCard2.setCreator(userForCard);
+        expiringCard2.setSection(CardSections.FOR_SALE);
+        expiringCard2.setTitle("I am expiring");
+        expiringCard2.setKeywords(keywords);
+        expiringCard2.setDisplayPeriodEnd(expiry.minusMonths(2));
+
+
+        List<Card> userCards = new ArrayList<>();
+        userCards.add(card);
+        userCards.add(expiringCard1);
+        userCards.add(expiringCard2);
+
 
         Mockito
                 .when(cardService.createCard(any(Card.class)))
@@ -86,6 +113,10 @@ class CardControllerUnitTest {
         Mockito
                 .when(cardService.findBySection(CardSections.FOR_SALE))
                 .thenReturn(Collections.singletonList(card));
+
+        Mockito
+                .when(cardService.getAllUserCards(1))
+                .thenReturn(userCards);
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
 
@@ -144,6 +175,20 @@ class CardControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/cards?section=Invalid")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenGetRequestToCardsExpiry_andExpiringCardsExist_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/cards/1/expiring")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].id", is(2)))
+                .andExpect(jsonPath("[0].title", is("I am expiring")))
+                .andExpect(jsonPath("[0].creator.id", is(1)))
+                .andExpect(jsonPath("[1].id", is(3)))
+                .andExpect(jsonPath("[1].title", is("I am expiring")))
+                .andExpect(jsonPath("[1].creator.id", is(1)));
     }
 
 }
