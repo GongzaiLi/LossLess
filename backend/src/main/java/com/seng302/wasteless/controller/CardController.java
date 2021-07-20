@@ -148,5 +148,36 @@ public class CardController {
         });
         return errors;
     }
+    /**
+     * Handle delete request to /cards endpoint for deletion of card.
+     * Request are validated for create fields by Spring, if bad then returns 400 with map of errors
+     *
+     * Returns:
+     * 400 BAD_REQUEST If invalid id, id is not an integer
+     * 401 UNAUTHORIZED If no user is logged on.
+     * 403 FORBIDDEN If user does not own the card and is not a GAA
+     * 406 NOT_ACCEPTABLE If the card already doesn't exist
+     * 200 If successfully deleted card.
+     * @param id The unique id of the card to be deleted.
+     * @return Status code dependent on success. 400, 401, 403, 406 errors. 200 If deleted successfully.
+     */
+    @DeleteMapping("/cards/{id}")
+    public ResponseEntity<Object> deleteCard(@PathVariable Integer id) {
+        logger.info("Request to delete card id: {}", id);
+
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
+
+        Card card = cardService.findCardById(id);
+
+        if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
+            logger.warn("Cannot delete productImage. User: {} does not own this card and is not global admin", user);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
+        }
+        logger.info("User: {} validated as owner of card or global admin.", user);
+
+        cardService.deleteCard(card);
+        return ResponseEntity.status(HttpStatus.OK).body("Card deleted successfully");
+    }
 
 }
