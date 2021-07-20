@@ -29,26 +29,25 @@
         <h6 align="center"> <strong> Seller Info: </strong></h6>
         <label> Seller Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
         <br>
-        <label> Seller Location: {{fullCard.creator.homeAddress.suburb + ","}} {{fullCard.creator.homeAddress.city}}</label>
+        <label> Seller Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
       </b-container>
     </b-input-group-text>
     <br>
 
 
       <div>
-        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCard"> Close </b-button>
+        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
 
-<!--    </b-form>-->
   </div>
 
 </template>
 
 <script>
-
+import api from "../../Api";
 export default {
-  name: "CreateCard",
-  props: ['closeFullViewCard'],
+  name: "full-card",
+  props: ["cardId", 'closeFullViewCardModal'],
   data() {
     return {
       fullCard: {
@@ -107,12 +106,18 @@ export default {
     }
   },
   mounted() {
-
+    this.getCard()
   },
   methods: {
 
     getCard() {
-
+      api.getFullCard(this.cardId)
+        .then((resp) => {
+          this.$log.debug("Data loaded: ", resp.data);
+          this.fullCard = resp.data;
+      }).catch((error) => {
+          this.$log.debug(error);
+      })
     }
 
   }

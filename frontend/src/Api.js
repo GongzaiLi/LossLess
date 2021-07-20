@@ -61,6 +61,7 @@ export default {
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
+  getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images

@@ -27,6 +27,7 @@ Date: 21/5/21
           <marketplace-section
             :cards="marketplaceCards.forSaleCards"
             :is-card-format="isCardFormat"
+            v-on:cardClicked="openFullCardModal"
           />
         </b-tab>
 
@@ -34,6 +35,7 @@ Date: 21/5/21
           <marketplace-section
               :cards="marketplaceCards.wantedCards"
               :is-card-format="isCardFormat"
+              v-on:cardClicked="openFullCardModal"
           />
         </b-tab>
 
@@ -41,12 +43,16 @@ Date: 21/5/21
           <marketplace-section
               :cards="marketplaceCards.exchangeCards"
               :is-card-format="isCardFormat"
+              v-on:cardClicked="openFullCardModal"
           />
         </b-tab>
 
       </b-tabs>
-      <b-modal id="view-card" hide-header hide-footer>
-        <MarketplaceCardFull :close-full-view-card="closeViewCardModal">  </MarketplaceCardFull>
+      <b-modal id="full-card" hide-header hide-footer>
+        <MarketplaceCardFull
+            :closeFullViewCardModal="closeFullCardModal"
+            :cardId = "this.cardId"
+            >  </MarketplaceCardFull>
       </b-modal>
 
       <b-modal id="create-card" hide-header hide-footer>
@@ -69,11 +75,13 @@ export default {
   data: function () {
     return {
       errors: [],
+      cardId: 0,
       activeTabIndex: 0,
       isCardFormat: true,
       marketplaceCards: {
         forSaleCards: [
           {
+            id: 1,
             title: "Clown shoes",
             description: "Giving away premium clown shoes. " +
                 "Purchased them 8 years ago but they dont get " +
@@ -83,6 +91,7 @@ export default {
             listerLocation: "Riccarton, Christchurch"
           },
           {
+            id: 2,
             title: "2002 Toyota Corolla",
             description: "Selling the old beast, 250,000km but goes hard still, looking for $1000 ono",
             tags: ["Car", "Nissan"],
@@ -90,6 +99,7 @@ export default {
             listerLocation: "Epsom, Auckland"
           },
           {
+            id: 3,
             title: "Coconut Water",
             description: "Selling premium coconut water, $5000 a litre",
             tags: ["Water"],
@@ -97,12 +107,14 @@ export default {
             listerLocation: "Christchurch"
           },
           {
+            id: 4,
             title: "Apple Airpods",
             description: "Selling my old apple ear-pods, well worn, $125",
             tags: ["Headphones", "Apple"],
             listerName: "Michael Steven",
             listerLocation: "Kaitaia, Northland"
           }, {
+            id: 5,
             title: "Bunnings Cap",
             description: "Rare bunnings cap, seen some good times so has some damage, looking for $30",
             tags: ["Hat", "Bunnings", "Collectable"],
@@ -115,10 +127,7 @@ export default {
       }
     }
   },
-  mounted() {
-    this.openViewCardModal();
 
-  },
   methods: {
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
@@ -127,17 +136,17 @@ export default {
     pushErrors(error) {
       this.errors.push(error.message);
     },
-    /**
-     * Opens the create card modal when create button pressed.
-     */
-    openViewCardModal() {
-      this.$bvModal.show('view-card');
+
+    openFullCardModal(cardId) {
+      this.cardId = cardId;
+      this.$bvModal.show('full-card');
     },
+
     /**
      * Closes the create card modal when cancel button pressed.
      */
-    closeViewCardModal() {
-      this.$bvModal.hide('view-card');
+    closeFullCardModal() {
+      this.$bvModal.hide('full-card');
     },
 
     /**
@@ -153,10 +162,6 @@ export default {
       this.$bvModal.hide('create-card');
     },
 
-
-    createCard() {
-
-    }
   },
   computed: {
   }

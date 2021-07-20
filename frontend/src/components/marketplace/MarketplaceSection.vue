@@ -6,6 +6,7 @@
           <marketplace-card
               :card-info="cardInfo"
               style="margin-top: 10px; min-width: 250px; max-width: 350px"
+              v-on:cardClicked="cardClickHandler"
           />
         </b-col>
       </b-row>
@@ -23,7 +24,7 @@
              bordered
              stacked="sm"
              show-empty
-             @row-clicked="rowClickHandler"
+             @row-clicked="cardClickHandler"
              class="overflow-auto"
              :fields="fields"
              :per-page="perPage"
@@ -31,23 +32,23 @@
              :current-page="currentPage"
     >
       <template v-slot:cell(title)="{ item }">
-        <div v-b-tooltip="item.title">{{shortenText(item.title, 20)}}</div>
+        <div>{{shortenText(item.title, 20)}}</div>
       </template>
 
       <template v-slot:cell(tags)="{ item }">
-        <div v-b-tooltip="formatTags(item.tags)">{{shortenText(formatTags(item.tags), 20)}}</div>
+        <div>{{shortenText(formatTags(item.tags), 20)}}</div>
       </template>
 
       <template v-slot:cell(description)="{ item }">
-        <div v-b-tooltip="item.description">{{shortenText(item.description, 20)}}</div>
+        <div>{{shortenText(item.description, 20)}}</div>
       </template>
 
       <template v-slot:cell(listerName)="{ item }">
-        <div v-b-tooltip="item.listerName">{{shortenText(item.listerName, 15)}}</div>
+        <div>{{shortenText(item.listerName, 15)}}</div>
       </template>
 
       <template v-slot:cell(listerLocation)="{ item }">
-        <div v-b-tooltip="item.listerLocation">{{shortenText(item.listerLocation, 25)}}</div>
+        <div>{{shortenText(item.listerLocation, 25)}}</div>
       </template>
 
       <template #empty>
@@ -86,10 +87,9 @@ export default {
     /**
      * When called do currently undetermined action
      */
-    rowClickHandler: function (record) {
-      console.log("Clicked row: ", record);
+    cardClickHandler: function (card) {
+      this.$emit('cardClicked', card.id)
     },
-
 
     /**
      * Return given in shortened format
