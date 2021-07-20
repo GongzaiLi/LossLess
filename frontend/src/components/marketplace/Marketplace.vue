@@ -51,6 +51,7 @@ Date: 21/5/21
       <b-modal id="full-card" hide-header hide-footer>
         <MarketplaceCardFull
             :closeFullViewCardModal="closeFullCardModal"
+            :deleteSelectedCard="deleteSelectedCard"
             :cardId = "this.cardId"
             >  </MarketplaceCardFull>
       </b-modal>
@@ -122,6 +123,11 @@ export default {
      */
     closeCreateCardModal() {
       this.$bvModal.hide('create-card');
+    },
+
+    deleteSelectedCard(){
+      api.deleteCard(this.cardId);
+      this.closeFullCardModal();
     },
 
 

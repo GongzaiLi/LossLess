@@ -34,6 +34,7 @@
 
 
       <div>
+        <b-button style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
 
@@ -45,7 +46,7 @@
 import api from "../../Api";
 export default {
   name: "full-card",
-  props: ["cardId", 'closeFullViewCardModal'],
+  props: ["cardId", 'closeFullViewCardModal','deleteSelectedCard'],
   data() {
     return {
       fullCard: {
