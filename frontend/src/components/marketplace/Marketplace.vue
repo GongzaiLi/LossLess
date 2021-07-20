@@ -50,8 +50,7 @@ Date: 21/5/21
       </b-modal>
 
       <b-modal id="create-card" hide-header hide-footer>
-        <CreateCard
-                    @createAction="createCard($event)"
+        <CreateCard @createAction="createCard($event)"
                     :cancelAction="closeCreateCardModal"> </CreateCard>
       </b-modal>
     </b-card>

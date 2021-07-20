@@ -6,11 +6,11 @@
     <b-input-group-text>
       <b-container>
         <h6 align="center"> <strong> Card Info: </strong></h6>
-        <label> Seller Name: {{sellerData.fullName}} </label>
+        <label> Seller Name: {{cardInfo.fullName}} </label>
         <br>
-        <label> Seller Location: {{sellerData.location}} </label>
+        <label> Seller Location: {{cardInfo.location}} </label>
         <br>
-        <label> Creation Date: {{createCardForm.dateCreated}} </label>
+        <label> Creation Date: {{cardInfo.dateCreated}} </label>
       </b-container>
     </b-input-group-text>
     <br>
@@ -41,7 +41,7 @@
         <h6><strong>Description:</strong></h6>
       </b-input-group>
       <b-input-group class="mb-1">
-        <b-form-textarea type="text" maxlength="250" v-model="createCardForm.description" required/>
+        <b-form-textarea type="text" maxlength="250" v-model="createCardForm.description"/>
       </b-input-group>
       <br>
 
@@ -71,9 +71,10 @@ export default {
   props: ['cancelAction',],
   data() {
     return {
-      sellerData: {
+      cardInfo: {
         fullName: '',
         location: '',
+        dateCreated: ''
       },
       createCardForm: {
         creatorId: '',
@@ -81,7 +82,6 @@ export default {
         title: '',
         description: "",
         keywords: [],
-        dateCreated: ''
       }
     }
   },
@@ -110,12 +110,12 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
-            this.sellerData.fullName = response.data.firstName + " " + response.data.lastName;
+            this.cardInfo.fullName = response.data.firstName + " " + response.data.lastName;
             if (response.data.homeAddress.suburb) {
-              this.sellerData.location = response.data.homeAddress.suburb + ", ";
+              this.cardInfo.location = response.data.homeAddress.suburb + ", ";
             }
             if (response.data.homeAddress.city) {
-              this.sellerData.location += response.data.homeAddress.city;
+              this.cardInfo.location += response.data.homeAddress.city;
             }
             // console.log(response.data);
           })
