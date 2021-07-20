@@ -103,9 +103,9 @@ public class CreateCardFeature {
         currentUserDetails = new CustomUserDetails(currentUser);
     }
 
-    @When("I create a card with creatorId {int}, section {string}, title {string}, keywords {string}, {string}")
-    public void iCreateACardWithCreatorIdSectionTitleKeywords(int creatorId, String section, String title, String keyword1, String keyword2) throws Exception {
-        String jsonInStringForRequest = String.format("{\"creatorId\": %d, \"section\": \"%s\", \"title\": \"%s\", \"keywords\": [\"%s\", \"%s\"]}", creatorId, section, title, keyword1, keyword2);
+    @When("I create a card with section {string}, title {string}, keywords {string}, {string}")
+    public void iCreateACardWithSectionTitleKeywords(String section, String title, String keyword1, String keyword2) throws Exception {
+        String jsonInStringForRequest = String.format("{\"section\": \"%s\", \"title\": \"%s\", \"keywords\": [\"%s\", \"%s\"]}", section, title, keyword1, keyword2);
 
         result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/cards"))
                 .content(jsonInStringForRequest)
@@ -117,5 +117,43 @@ public class CreateCardFeature {
     @Then("The card is created")
     public void theCardIsCreated() throws Exception {
         result.andExpect(status().isCreated());
+    }
+
+    @When("I try to create a card with section {string}, title {string}, keywords {string}")
+    public void iTryToCreateACardWithSectionTitleKeywords(String section, String title, String keywords) throws Exception {
+        String jsonInStringForRequest = String.format("{\"section\": \"%s\", \"title\": \"%s\", \"keywords\": [\"%s\"]}", section, title, keywords);
+
+        result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/cards"))
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @Then("The card is not created")
+    public void theCardIsNotCreated() throws Exception {
+        result.andExpect(status().isBadRequest());
+    }
+
+    @When("I try to create a card with section {string}, and a long title {string}, keywords {string}")
+    public void iTryToCreateACardWithSectionAndALongTitleKeywords(String section, String title, String keywords) throws Exception {
+        String jsonInStringForRequest = String.format("{\"section\": \"%s\", \"title\": \"%s\", \"keywords\": [\"%s\"]}", section, title, keywords);
+
+        result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/cards"))
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I try to create a card with section {string}, title {string}, and too many keywords {string}, {string}, {string}, {string}, {string}, {string}")
+    public void iTryToCreateACardWithSectionTitleAndTooManyKeywords(String section, String title, String keyword1, String keyword2, String keyword3, String keyword4, String keyword5, String keyword6) throws Exception {
+        String jsonInStringForRequest = String.format("{\"section\": \"%s\", \"title\": \"%s\", \"keywords\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"]}", section, title, keyword1, keyword2, keyword3, keyword4, keyword5, keyword6);
+
+        result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/cards"))
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
     }
 }

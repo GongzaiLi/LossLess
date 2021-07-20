@@ -61,6 +61,7 @@ export default {
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
+  getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
@@ -80,7 +81,7 @@ export default {
    * Given the name of the user's country, gets currency data for that country.
    * Uses the restcountries API. Currency data is a JS object in the format:
    * {"code":"<code>","name":"<name>","symbol":"<symbol>"}.
-   * Returns null if there are no results for the user's country.
+   * Defaults to data for USD if there are no results for the user's country.
    * @param countryName Name of the country to be queried
    * @returns {Promise<any>} Promise that resolves to the currency data object
    */
@@ -89,15 +90,21 @@ export default {
       return Promise.resolve(currencyCache[countryName]);
     }
 
+    const USD = {
+      symbol: '$',
+      code: 'USD',
+      name: 'United States Dollar'
+    };
+
     return fetch(`https://restcountries.eu/rest/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 404 || !data[0].currencies || data[0].currencies.length === 0) {
-          return null;
+          return USD;
         }
         const currency = data[0].currencies[0];
         if (!currency.code || !currency.name || !currency.symbol) { // Sometimes we get garbage data like {"code":"(none)","name":null,"symbol":null}
-          return null;
+          return USD;
         } else {
           currencyCache[countryName] = currency;
           return currency;

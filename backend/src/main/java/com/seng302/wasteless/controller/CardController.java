@@ -14,12 +14,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,18 +51,8 @@ public class CardController {
     public ResponseEntity<Object> getCards(@RequestParam String section) {
         logger.info("GET /cards, section={}", section);
 
-        // Get CardSections enum value with text equal to request param
-        CardSections cardSection = null;
-        for (CardSections cardSectionValue : CardSections.values()) {
-            if (cardSectionValue.toString().equals(section)) {
-                cardSection = cardSectionValue;
-            }
-        }
-
-        if (cardSection == null) {
-            logger.warn("Tried to get cards with bad section '{}'", section);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'");
-        }
+        cardService.checkValidSection(section);
+        CardSections cardSection = CardSections.fromString(section);
 
         List<Card> cards = cardService.findBySection(cardSection);
         List<GetCardDto> cardDTOs = cards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
@@ -89,6 +81,8 @@ public class CardController {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Got User {}", user);
 
+        cardService.checkValidSection(cardDtoRequest.getSection());
+
         Card card = PostCardDtoMapper.postCardDtoToEntityMapper(cardDtoRequest);
 
         logger.info("Setting created date");
@@ -107,6 +101,53 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
+    /**
+     * Handle get request to /cards/{id} endpoint for getting a specific card.
+     * Returns:
+     * 400 BAD_REQUEST id not integer.
+     * 401 UNAUTHORIZED If no user is logged on.
+     * 200 OK If successfully retrieved card.
+     *
+     * @param cardId id of the card trying to be retrieved
+     * @return Status code dependent on success. 400, 401, 406 errors. 200 OK with card id if success.
+     */
+    @GetMapping("/cards/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> createUser(@PathVariable("id") Integer cardId) {
+        logger.info("Request to get card with id: {}", cardId);
+
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
+
+        logger.info("Retrieving Card");
+        Card card = cardService.findCardById(cardId);
+
+        logger.info("Successfully found card: {}", card.getId());
+
+        GetCardDto cardDTO = new GetCardDto(card);
+
+        return ResponseEntity.status(HttpStatus.OK).body(cardDTO);
+    }
+
+    /**
+     * Returns a json object of bad field found in the request
+     *
+     * @param exception The exception thrown by Spring when it detects invalid data
+     * @return Map of field name that had the error and a message describing the error.
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException exception) {
+        Map<String, String> errors;
+        errors = new HashMap<>();
+        exception.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
     /**
      * Handle delete request to /cards endpoint for deletion of card.
      * Request are validated for create fields by Spring, if bad then returns 400 with map of errors
@@ -143,27 +184,5 @@ public class CardController {
         cardService.deleteCard(card);
         return ResponseEntity.status(HttpStatus.OK).body("Card deleted successfully");
     }
-
-    // Commented out code as this is for the S302T700-172 Validation
-//    /**
-//     * Returns a json object of bad field found in the request
-//     *
-//     * @param exception The exception thrown by Spring when it detects invalid data
-//     * @return Map of field name that had the error and a message describing the error.
-//     */
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public Map<String, String> handleValidationExceptions(
-//            MethodArgumentNotValidException exception) {
-//        Map<String, String> errors;
-//        errors = new HashMap<>();
-//        exception.getBindingResult().getAllErrors().forEach(error -> {
-//            String fieldName = ((FieldError) error).getField();
-//            String errorMessage = error.getDefaultMessage();
-////            logger.error(errorMessage); it doesnt work I am not sure why
-//            errors.put(fieldName, errorMessage);
-//        });
-//        return errors;
-//    }
 
 }

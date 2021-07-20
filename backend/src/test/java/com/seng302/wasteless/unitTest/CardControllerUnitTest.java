@@ -15,11 +15,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,7 +64,6 @@ class CardControllerUnitTest {
         userForCard.setCreated(LocalDate.now());
         userForCard.setDateOfBirth(LocalDate.now());
         userForCard.setHomeAddress(Mockito.mock(Address.class));
-
 
         List<String> keywords = new ArrayList<>();
         keywords.add("Vehicle");
@@ -107,14 +109,18 @@ class CardControllerUnitTest {
                 .thenReturn(Collections.singletonList(card));
 
         Mockito
-                .when(cardService.findById(1))
+                .when(cardService.findCardById(1))
                 .thenReturn(card);
+        Mockito
+                .when(cardService.findCardById(5))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card with given ID does not exist"));
 
         Mockito
                 .when(cardService.findById(2))
                 .thenReturn(cardTwo);
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'")).when(cardService).checkValidSection("Invalid");
 
         new GetUserDtoMapper(businessService, userService); // This initialises the DTO mapper with our mocked services. The constructor has to be manually called
     }
@@ -173,6 +179,70 @@ class CardControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenGetCardByIdRequestToCards_andValidId_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/cards/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(1)))
+                .andExpect(jsonPath("title", is("Sale")))
+                .andExpect(jsonPath("creator.id", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenGetCardByIdRequestToCards_andIdIsInvalid_then406Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/cards/5")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andDescriptionIsMoreThan250_then400Response() throws Exception {
+        String description = "a".repeat(1000);
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"Vehicle\"], \"description\" : \"" + description + "\" }";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andTitleIsMoreThan50_then400Response() throws Exception {
+        String title = "a".repeat(100);
+        String jsonInStringForRequest = String.format("{\"section\": \"ForSale\", \"title\": \"{}\", \"keywords\": [\"Vehicle\"],", title);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andSectionIsInvalid_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"section\": \"Invalid\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"Vehicle\", \"Car\"]}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPostCard_andKeywordElementIsMoreThan10_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": [\"NiceKnowingThatTheKeyWordCantBeLong\"]}";
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/cards")
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
     @Test
     @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
     void whenDeleteRequestToCards_andCardExistsAndIsNotOwnedByRequester_then403Response() throws Exception {

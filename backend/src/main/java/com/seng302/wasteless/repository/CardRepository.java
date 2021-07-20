@@ -14,7 +14,7 @@ import java.util.List;
 @RepositoryRestResource
 public interface CardRepository extends JpaRepository<Card, Integer> {
 
-    /**
+     /**
      * Returns the first card found with the given ID. Will always be correct card as the id is unique
      * @param cardId The id as an integer of the card being requested
      * @return Will return the card object that with the requested id. returns null if none found.
