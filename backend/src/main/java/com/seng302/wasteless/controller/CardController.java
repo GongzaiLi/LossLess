@@ -168,12 +168,7 @@ public class CardController {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Got User {}", user);
 
-        Card card = cardService.findById(id);
-
-        if (card==null) {
-            logger.warn("Cannot delete card:{} as it no longer exists", id);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Card no longer exists");
-        }
+        Card card = cardService.findCardById(id);
 
         if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot delete productImage. User: {} does not own this card and is not global admin", user);

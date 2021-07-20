@@ -166,8 +166,8 @@ public class CardExpiryFeature {
         Assertions.assertEquals(userId, user.getId());
     }
 
-    @When("I delete a card the card as admin")
-    public void iDeleteACardTheCardAsAdmin() throws Exception {
+    @When("I delete the card as admin")
+    public void iDeleteTheCardAsAdmin() throws Exception {
         String url = "/cards/"+userCardId;
         result = mockMvc.perform(MockMvcRequestBuilders.delete(url)
                 .contentType(APPLICATION_JSON)

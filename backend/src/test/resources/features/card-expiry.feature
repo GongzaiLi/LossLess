@@ -16,5 +16,5 @@ Feature: UCM5 - Card Expiry
   Scenario: AC1 - As an Gaa i can delete a card that is not mine
     Given I am logged in as the GAA "admin@test.com" with UserId 3
     And a Card exists with creatorId 2
-    When I delete a card the card as admin
+    When I delete the card as admin
     Then The users card is deleted
