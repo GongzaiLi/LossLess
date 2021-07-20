@@ -16,6 +16,9 @@
         <b-card-text>
           Location: {{ formatAddress }}
         </b-card-text>
+        <b-card-text>
+          Created: {{  formatCreated }}
+        </b-card-text>
       </b-card-body>
     </b-card>
 </template>
@@ -29,9 +32,6 @@ export default {
     return {
       formattedTags: ""
     }
-  },
-  methods: {
-
   },
   computed: {
 
@@ -49,6 +49,13 @@ export default {
       const address = this.cardInfo.creator.homeAddress;
       return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
           `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+    },
+
+    /**
+     * format created date
+     */
+    formatCreated: function () {
+      return new Date(this.cardInfo.created).toUTCString().split(" ").slice(0, 4).join(" ");
     }
   }
 }

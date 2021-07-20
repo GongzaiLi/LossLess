@@ -76,8 +76,7 @@ export default {
     }
   },
   mounted() {
-    // this.openViewCardModal();
-
+    this.getCardsFromSection('ForSale');
   },
   methods: {
     /**
@@ -114,9 +113,7 @@ export default {
     },
 
 
-    createCard() {
 
-    },
 
     /**
      * Sends an API request to get all cards determined by the current tab the user is on.

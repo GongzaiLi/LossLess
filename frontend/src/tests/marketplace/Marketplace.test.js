@@ -34,6 +34,7 @@ beforeEach(() => {
     localVue.use(BootstrapVue);
     localVue.use(BootstrapVueIcons);
 
+    Api.getCardsBySection.mockResolvedValue(null);
     wrapper = shallowMount(Marketplace, {
         localVue,
         propsData: {},
