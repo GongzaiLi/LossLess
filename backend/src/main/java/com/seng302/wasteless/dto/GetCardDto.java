@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ public class GetCardDto {
     private String title;
     private String description;
     private List<String> keywords;
-    private LocalDate created;
+    private LocalDateTime created;
 
     /**
      * Creates a new DTO from a Card entity
