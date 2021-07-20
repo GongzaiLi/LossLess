@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import api from "@/Api";
+import api from "../../Api";
 
 export default {
   name: "CreateCard",
@@ -117,7 +117,6 @@ export default {
             if (response.data.homeAddress.city) {
               this.cardInfo.location += response.data.homeAddress.city;
             }
-            // console.log(response.data);
           })
           .catch((error) => {
             this.$log.debug(error);

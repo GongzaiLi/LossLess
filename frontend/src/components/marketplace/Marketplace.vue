@@ -67,15 +67,11 @@ export default {
   components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
   data: function () {
     return {
-      errors: [],
+      errors: "",
       activeTabIndex: 0,
       isCardFormat: true,
       marketplaceCards: [],
     }
-  },
-  mounted() {
-    // this.openViewCardModal();
-
   },
   methods: {
     /**
@@ -137,9 +133,11 @@ export default {
       .then(createCardResponse => {
         this.$log.debug("Card Created", createCardResponse);
         this.$bvModal.hide('create-card');
+        this.errors = '';
       })
       .catch(error => {
         this.$log.debug(error);
+        this.errors = error.response.statusText;
       })
     }
   },
