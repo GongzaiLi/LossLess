@@ -54,7 +54,7 @@ export default {
      */
     formatAddress: function () {
       const address = this.cardInfo.creator.homeAddress;
-      return `${address.suburb ? address.suburb + ',' : ''} ${address.city}`;
+      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
     }
   }
 }

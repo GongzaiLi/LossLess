@@ -67,7 +67,15 @@ describe ("format-address", () => {
         expect(wrapper.vm.formatAddress).toStrictEqual("Upper Riccarton, Christchurch");
     })
     it('null suburb',  async() => {
-
+        cardInfo.creator.homeAddress = {
+            streetNumber: "3/24",
+            streetName: "Ilam Road",
+            suburb: null,
+            city: "Christchurch",
+            region: "Canterbury",
+            country: "New Zealand",
+            postcode: "90210"
+        }
         expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch");
     })
 })
