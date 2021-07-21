@@ -137,7 +137,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         String result = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("{\"results\":[],\"totalItems\":3}", result);
+        assertEquals("{\"results\":[],\"totalItems\":0}", result);
     }
 
 
@@ -384,7 +384,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("results", hasSize(1)))
-                .andExpect(jsonPath("totalItems", is(5)));
+                .andExpect(jsonPath("totalItems", is(4)));
 
 
     }

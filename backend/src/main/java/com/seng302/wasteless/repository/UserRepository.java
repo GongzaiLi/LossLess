@@ -23,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findFirstByRole(UserRoles roles);
 
+    Integer countAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nicknameQuery);
+
     ArrayList<User> findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nicknameQuery, Pageable pageable);
 
     @Query(value = "select * from User where id = (select administrators_id from Business_administrators where business_id = :businessId and administrators_id = :userId)", nativeQuery = true)

@@ -164,11 +164,11 @@ public class UserService {
     }
 
     /**
-     * Calculates the total count of users.
+     * Calculates the total count of users matching searchQuery.
      * @return the total count of users.
      */
-    public Long getTotalUsersCount() {
-        return userRepository.count();
+    public Integer getTotalUsersCountMatchingQuery(String searchQuery) {
+        return userRepository.countAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
     }
 
     /**

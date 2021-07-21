@@ -50,7 +50,7 @@ public class UserSearchDtoMapper {
             return new UserSearchDto();
         }
 
-        Long totalItems = userService.getTotalUsersCount();
+        Integer totalItems = userService.getTotalUsersCountMatchingQuery(searchQuery);
 
         List<User> searchResults = userService.searchForMatchingUsers(
                 searchQuery,

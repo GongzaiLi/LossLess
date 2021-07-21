@@ -168,16 +168,20 @@ public class UserController {
         try {
             sortType = UserSearchSortTypes.valueOf(sortBy);
         } catch (IllegalArgumentException e) {
+            logger.info("Invalid value for sortBy. Value was {}", sortBy);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortBy. Acceptable values are: NAME, NICKNAME, EMAIL, ROLE, NONE");
         }
 
         if (!sortDirection.equals("ASC") && !sortDirection.equals("DESC")) {
+            logger.info("Invalid value for sortDirection. Value was {}", sortDirection);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortDirection. Acceptable values are: ASC, DESC");
         }
 
         if (count < 1) {
+            logger.info("Count must be great than or equal to one. Value was {}", count);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be great than or equal to one.");
         } else if (offset < 0) {
+            logger.info("Offset must be great than or equal to one. Value was {}", offset);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
         }
 
