@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class CardController {
         card.setCreated(LocalDateTime.now());
 
         logger.info("Setting card expiring date");
-        card.setDisplayPeriodEnd(LocalDate.now().plusWeeks(2));
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
 
         logger.info("Setting card creator");
         card.setCreator(user);
@@ -133,7 +134,7 @@ public class CardController {
         List<Card> expiredCards = new ArrayList<>();
 
         for (Card card : allCards) {
-            if (card.getDisplayPeriodEnd().minusWeeks(1).isBefore(LocalDate.now())) {
+            if (card.getDisplayPeriodEnd().minusWeeks(1).isBefore(LocalDateTime.now())) {
                 expiredCards.add(card);
             }
         }
