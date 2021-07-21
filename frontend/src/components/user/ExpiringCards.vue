@@ -116,7 +116,7 @@ export default {
 
   computed: {
     /**
-     * The rows function just computed how many pages in the search table.
+     * The rows function just computed how many expiring cards the user has.
      * @returns {number}
      */
     totalItems() {

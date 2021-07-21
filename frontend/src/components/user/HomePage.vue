@@ -51,14 +51,13 @@ export default {
       errors: [],
       activeTabIndex: 0,
       isCardFormat: false,
-      expiringCards: "",
+      expiringCards: [],
     }
   },
 
   mounted() {
     const userId = this.$currentUser.id;
     this.getUserInfo(userId);
-    this.getUserExpiredCards(userId);
   },
 
   methods: {
@@ -73,6 +72,7 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
+            this.getUserExpiredCards(id);
           })
           .catch((error) => {
             this.$log.debug(error);
