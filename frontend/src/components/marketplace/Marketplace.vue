@@ -9,6 +9,10 @@ Date: 21/5/21
   <div>
     <b-card class="shadow">
       <h1><b-icon-shop/> Market Place </h1>
+      <b-button @click="openCreateCardModal" class="float-right">
+        <b-icon-plus-square-fill animation="fade"/>
+        Create
+      </b-button>
       <b-input-group>
         <b-form-text style="margin-right: 7px">
           Table View
@@ -19,85 +23,61 @@ Date: 21/5/21
         </b-form-text>
       </b-input-group>
       <b-tabs v-model=activeTabIndex align="center" fill>
-        <b-tab title="For Sale">
+        <b-tab title="For Sale" @click="getCardsFromSection(`ForSale`)">
           <marketplace-section
-            :cards="marketplaceCards.forSaleCards"
+            :cards="marketplaceCards"
             :is-card-format="isCardFormat"
           />
         </b-tab>
 
-        <b-tab title="Wanted">
+        <b-tab title="Wanted" @click="getCardsFromSection(`Wanted`)">
           <marketplace-section
-              :cards="marketplaceCards.wantedCards"
+              :cards="marketplaceCards"
               :is-card-format="isCardFormat"
           />
         </b-tab>
 
-        <b-tab title="Exchange">
+        <b-tab title="Exchange" @click="getCardsFromSection(`Exchange`)">
           <marketplace-section
-              :cards="marketplaceCards.exchangeCards"
+              :cards="marketplaceCards"
               :is-card-format="isCardFormat"
           />
         </b-tab>
 
       </b-tabs>
+      <b-modal id="view-card" hide-header hide-footer>
+        <MarketplaceCardFull :close-full-view-card="closeViewCardModal">  </MarketplaceCardFull>
+      </b-modal>
+
+      <b-modal id="create-card" hide-header hide-footer>
+        <CreateCard :okAction="createCard"
+                    :cancelAction="closeCreateCardModal"> </CreateCard>
+      </b-modal>
     </b-card>
   </div>
 </template>
 
 <script>
 
-import MarketplaceSection from "@/components/marketplace/MarketplaceSection";
+import MarketplaceSection from "./MarketplaceSection";
+import MarketplaceCardFull from "./MarketplaceCardFull";
+import api from "../../Api";
+
+import CreateCard from "./CreateCard";
+
 export default {
-  components: {MarketplaceSection},
+  components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
   data: function () {
     return {
       errors: [],
       activeTabIndex: 0,
       isCardFormat: true,
-      marketplaceCards: {
-        forSaleCards: [
-          {
-            title: "Clown shoes",
-            description: "Giving away premium clown shoes. " +
-                "Purchased them 8 years ago but they dont get " +
-                "used anymore since my wife left me. Pick up riccarton",
-            tags: ["Free", "Dress up", "Footwear"],
-            listerName: "James Harris",
-            listerLocation: "Riccarton, Christchurch"
-          },
-          {
-            title: "2002 Toyota Corolla",
-            description: "Selling the old beast, 250,000km but goes hard still, looking for $1000 ono",
-            tags: ["Car", "Nissan"],
-            listerName: "Scooter Hartley",
-            listerLocation: "Epsom, Auckland"
-          },
-          {
-            title: "Coconut Water",
-            description: "Selling premium coconut water, $5000 a litre",
-            tags: ["Water"],
-            listerName: "Fabian Gilson",
-            listerLocation: "Christchurch"
-          },
-          {
-            title: "Apple Airpods",
-            description: "Selling my old apple ear-pods, well worn, $125",
-            tags: ["Headphones", "Apple"],
-            listerName: "Michael Steven",
-            listerLocation: "Kaitaia, Northland"
-          }, {
-            title: "Bunnings Cap",
-            description: "Rare bunnings cap, seen some good times so has some damage, looking for $30",
-            tags: ["Hat", "Bunnings", "Collectable"],
-            listerName: "Ricky Ponting",
-            listerLocation: "Island Bay, Wellington"
-          },
-        ],
-        wantedCards: [],
-        exchangeCards: [],
-      }
+      marketplaceCards: [],
     }
+  },
+  mounted() {
+    // this.openViewCardModal();
+
   },
   methods: {
     /**
@@ -106,6 +86,51 @@ export default {
      */
     pushErrors(error) {
       this.errors.push(error.message);
+    },
+    /**
+     * Opens the create card modal when create button pressed.
+     */
+    openViewCardModal() {
+      this.$bvModal.show('view-card');
+    },
+    /**
+     * Closes the create card modal when cancel button pressed.
+     */
+    closeViewCardModal() {
+      this.$bvModal.hide('view-card');
+    },
+
+    /**
+     * Opens the create card modal when create button pressed.
+     */
+    openCreateCardModal() {
+      this.$bvModal.show('create-card');
+    },
+    /**
+     * Closes the create card modal when cancel button pressed.
+     */
+    closeCreateCardModal() {
+      this.$bvModal.hide('create-card');
+    },
+
+
+    createCard() {
+
+    },
+
+    /**
+     * Sends an API request to get all cards determined by the current tab the user is on.
+     * Uses section to differentiate the tabs
+     * @param section This is the section of the tab to grab all cards from
+     */
+    getCardsFromSection(section) {
+      api.getCardsBySection(section)
+          .then((resp) => {
+            this.marketplaceCards = resp.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          })
     },
   },
   computed: {

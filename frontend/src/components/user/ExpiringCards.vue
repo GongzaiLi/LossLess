@@ -42,10 +42,6 @@
         <div v-b-tooltip="item.description">{{shortenText(item.description, 20)}}</div>
       </template>
 
-      <template v-slot:cell(creator)="{ item }">
-        <div v-b-tooltip="item.creator.firstName">{{shortenText(item.creator.firstName + " " + item.creator.lastName, 15)}}</div>
-      </template>
-
       <template v-slot:cell(location)="{ item }">
         <div v-b-tooltip="item.creator.homeAddress">{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
       </template>
@@ -60,17 +56,17 @@
 
 <script>
 import pagination from "../model/Pagination";
-import MarketplaceCard from "./MarketplaceCard";
+import MarketplaceCard from "../marketplace/MarketplaceCard";
 
 export default {
-  name: "MarketplaceSection",
+  name: "ExpiringCards",
   components: {pagination, MarketplaceCard},
   props: ["cards", "isCardFormat"],
   data: function () {
     return {
       errors: [],
       cardsPerRow: 3, //Change this to change how many marketplace cards appear in each row.
-      perPage: 10,
+      perPage: 5,
       currentPage: 1,
     }
   },
@@ -127,8 +123,6 @@ export default {
       return this.cards.length;
     },
 
-
-
     /**
      * Fields of table format
      */
@@ -144,11 +138,6 @@ export default {
         },
         {
           key: 'keywords',
-        },
-        {
-          key: 'creator',
-          label: "Creator",
-          sortable: true
         },
         {
           key: 'location',

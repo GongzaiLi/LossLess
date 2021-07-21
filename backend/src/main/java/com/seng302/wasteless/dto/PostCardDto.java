@@ -23,18 +23,20 @@ public class PostCardDto {
 
     @Column(name = "section")
     @NotNull(message = "section is mandatory")
-    private CardSections section;
+    private String section;
 
     @Column(name = "title")
+    @Size(min = 1, max = 50)
     @NotNull(message = "Title is mandatory")
     private String title;
 
     @Column(name = "description")
+    @Size(max = 250)
     private String description;
 
     @ElementCollection
     @Column(name = "keywords")
     @NotNull(message = "Keyword is mandatory")
     @Size (min = 1, max = 5)
-    private List<String> keywords;
+    private List<@NotBlank @NotNull @Size(max = 10) String> keywords;
 }

@@ -11,8 +11,10 @@
           Tags: {{ formatTags }}
         </b-card-text>
         <b-card-text>
-          Seller: {{cardInfo.listerName}}
-          {{cardInfo.listerLocation}}
+          Seller: {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
+        </b-card-text>
+        <b-card-text>
+          Location: {{ formatAddress }}
         </b-card-text>
       </b-card-body>
     </b-card>
@@ -32,8 +34,21 @@ export default {
 
   },
   computed: {
+
+    /**
+     * Combine list of keywords into one string
+     */
     formatTags() {
-      return this.cardInfo.tags.join(", ");
+      return this.cardInfo.keywords.join(", ");
+    },
+
+    /**
+     * Combine fields of address
+     */
+    formatAddress: function () {
+      const address = this.cardInfo.creator.homeAddress;
+      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
+          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     }
   }
 }

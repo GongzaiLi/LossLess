@@ -3,9 +3,11 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.repository.CardRepository;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -13,11 +15,13 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -28,6 +32,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -98,6 +103,22 @@ class CardControllerUnitTest {
         userCards.add(expiringCard2);
 
 
+        User userForCardTwo = new User();
+        userForCardTwo.setId(2);
+        userForCardTwo.setEmail("notDemo@gmail.com");
+        userForCardTwo.setRole(UserRoles.USER);
+        userForCardTwo.setCreated(LocalDate.now());
+        userForCardTwo.setDateOfBirth(LocalDate.now());
+        userForCardTwo.setHomeAddress(Mockito.mock(Address.class));
+
+        Card cardTwo = new Card();
+        cardTwo.setId(2);
+        cardTwo.setCreator(userForCardTwo);
+        cardTwo.setSection(CardSections.FOR_SALE);
+        cardTwo.setTitle("Sale");
+        cardTwo.setKeywords(keywords);
+
+
         Mockito
                 .when(cardService.createCard(any(Card.class)))
                 .thenReturn(card);
@@ -115,10 +136,22 @@ class CardControllerUnitTest {
                 .thenReturn(Collections.singletonList(card));
 
         Mockito
+                .when(cardService.findCardById(1))
+                .thenReturn(card);
+        Mockito
+                .when(cardService.findCardById(5))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card with given ID does not exist"));
+
+        Mockito
+                .when(cardService.findById(2))
+                .thenReturn(cardTwo);
+
+        Mockito
                 .when(cardService.getAllUserCards(1))
                 .thenReturn(userCards);
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'")).when(cardService).checkValidSection("Invalid");
 
         new GetUserDtoMapper(businessService, userService); // This initialises the DTO mapper with our mocked services. The constructor has to be manually called
     }
