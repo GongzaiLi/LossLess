@@ -4,7 +4,7 @@ import { BootstrapVue } from 'bootstrap-vue';
 import homePage from '../../components/user/HomePage';
 import Api from "../../Api";
 import Router from 'vue-router'
-import ExpiringCards from "../../components/user/ExpiringCards";
+import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
 
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -190,14 +190,14 @@ describe('check-table-interaction-functionality', () => {
   test('check-shortened-description-view', async () => {
     const description = "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar.";
 
-    const shortenedDescription = ExpiringCards.methods.shortenText(description, 20);
+    const shortenedDescription = MarketplaceSection.methods.shortenText(description, 20);
     expect(shortenedDescription).toEqual("Beige, suitable for...");
   })
 
   test('check-format-tags-view', async () => {
     const tags = ["tag1", "tag2", "tag3"];
 
-    const tagFormat = ExpiringCards.methods.formatTags(tags);
+    const tagFormat = MarketplaceSection.methods.formatTags(tags);
     expect(tagFormat).toEqual("tag1, tag2, tag3");
   })
 
@@ -212,7 +212,7 @@ describe('check-table-interaction-functionality', () => {
       "postcode": "90210"
     }
 
-    const addressFormat = ExpiringCards.methods.formatAddress(address);
+    const addressFormat = MarketplaceSection.methods.formatAddress(address);
     expect(addressFormat).toEqual("3/24 Ilam Road, Upper Riccarton, Christchurch Canterbury New Zealand 90210");
   })
 
@@ -225,7 +225,7 @@ describe('check-that-expired-table-only-shows-when-necessary', () => {
     wrapper.vm.expiringCards = [];
     await wrapper.vm.$forceUpdate();
 
-    expect(wrapper.find(ExpiringCards).exists()).toBeFalsy();
+    expect(wrapper.find(MarketplaceSection).exists()).toBeFalsy();
   })
 
 });

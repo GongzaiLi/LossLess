@@ -20,9 +20,11 @@
           Card View
         </b-form-text>
       </b-input-group>
-      <expiring-cards
+      <marketplace-section
           :cards="expiringCards"
           :is-card-format="isCardFormat"
+          :cardsPerRow:="3"
+          :perPage="5"
       />
       </b-card>
   </b-card>
@@ -30,10 +32,10 @@
 
 <script>
 import api from "../../Api";
-import ExpiringCards from "./ExpiringCards";
+import MarketplaceSection from "../marketplace/MarketplaceSection";
 
 export default {
-  components: {ExpiringCards},
+  components: {MarketplaceSection},
   data: function () {
     return {
       userData: {
