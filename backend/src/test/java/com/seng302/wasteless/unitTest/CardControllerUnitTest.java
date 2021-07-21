@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +71,7 @@ class CardControllerUnitTest {
         keywords.add("Vehicle");
         keywords.add("Car");
 
-        LocalDate expiry = LocalDate.of(2021, Month.JULY, 21);
+        LocalDateTime expiry = LocalDateTime.of(2021, Month.JULY, 21, 0, 0, 0);
 
         Card card = new Card();
         card.setId(1);
