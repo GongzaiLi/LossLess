@@ -19,5 +19,5 @@ import java.util.List;
 @ToString // generate a toString method
 public class UserSearchDto {
     private List<GetUserDto> results;
-    private Integer totalItems;
+    private Long totalItems;
 }

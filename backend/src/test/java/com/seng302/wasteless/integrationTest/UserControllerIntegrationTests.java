@@ -137,7 +137,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         String result = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("{\"results\":[],\"totalItems\":0}", result);
+        assertEquals("{\"results\":[],\"totalItems\":3}", result);
     }
 
 
@@ -345,7 +345,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    void whenSearchingForUsers_WithZeroCountAndZeroOffset_ReturnsEmptyListAndTotalResults() throws Exception {
+    void whenSearchingForUsers_WithOneCountAndZeroOffset_ReturnsTotalResults() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
         createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
 
@@ -380,11 +380,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=0")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("results", hasSize(0)))
-                .andExpect(jsonPath("totalItems", is(4)));
+                .andExpect(jsonPath("results", hasSize(1)))
+                .andExpect(jsonPath("totalItems", is(5)));
 
 
     }
@@ -471,10 +471,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("results.[0].id", is(2)));
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=1&count=4")
+                MockMvcRequestBuilders.get("/users/search?searchQuery=Jam&offset=0&count=4")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("results.[0].id", is(3)));
+                .andExpect(jsonPath("results.[0].id", is(2)));
     }
 
 
