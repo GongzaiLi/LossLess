@@ -12,7 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -53,8 +53,5 @@ public class Card {
     private List<@NotBlank @NotNull @Size(max = 10)String> keywords;
 
     @Column(name = "created")
-    private LocalDate created;
-
-    @Column(name = "displayPeriodEnd")
-    private LocalDate displayPeriodEnd;
+    private LocalDateTime created;
 }

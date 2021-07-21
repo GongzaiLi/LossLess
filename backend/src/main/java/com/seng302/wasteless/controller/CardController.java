@@ -18,8 +18,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +86,7 @@ public class CardController {
         Card card = PostCardDtoMapper.postCardDtoToEntityMapper(cardDtoRequest);
 
         logger.info("Setting created date");
-        card.setCreated(LocalDate.now());
+        card.setCreated(LocalDateTime.now());
 
         logger.info("Setting card expiring date");
         card.setDisplayPeriodEnd(LocalDate.now().plusWeeks(2));
