@@ -25,6 +25,9 @@ Date: 21/5/21
           <marketplace-section
             :cards="marketplaceCards"
             :is-card-format="isCardFormat"
+            v-on:cardClicked="openFullCardModal"
+            :cardsPerRow:="3"
+            :perPage="10"
           />
         </b-tab>
 
@@ -32,6 +35,9 @@ Date: 21/5/21
           <marketplace-section
               :cards="marketplaceCards"
               :is-card-format="isCardFormat"
+              v-on:cardClicked="openFullCardModal"
+              :cardsPerRow:="3"
+              :perPage="10"
           />
         </b-tab>
 
@@ -39,12 +45,18 @@ Date: 21/5/21
           <marketplace-section
               :cards="marketplaceCards"
               :is-card-format="isCardFormat"
+              v-on:cardClicked="openFullCardModal"
+              :cardsPerRow:="3"
+              :perPage="10"
           />
         </b-tab>
 
       </b-tabs>
-      <b-modal id="view-card" hide-header hide-footer>
-        <MarketplaceCardFull :close-full-view-card="closeViewCardModal">  </MarketplaceCardFull>
+      <b-modal id="full-card" hide-header hide-footer>
+        <MarketplaceCardFull
+            :closeFullViewCardModal="closeFullCardModal"
+            :cardId = "this.cardId"
+            >  </MarketplaceCardFull>
       </b-modal>
 
       <b-modal id="create-card" hide-header hide-footer>
@@ -69,6 +81,7 @@ export default {
   data: function () {
     return {
       error: "",
+      cardId: 0,
       activeTabIndex: 0,
       isCardFormat: true,
       marketplaceCards: [],
@@ -77,6 +90,11 @@ export default {
       showDismissibleAlert: false
     }
   },
+
+  mounted() {
+    this.getCardsFromSection('ForSale');
+  },
+
   methods: {
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
@@ -87,16 +105,18 @@ export default {
     },
 
     /**
-     * Opens the create card modal when create button pressed.
+     * opens the Full card modal.
      */
-    openViewCardModal() {
-      this.$bvModal.show('view-card');
+    openFullCardModal(cardId) {
+      this.cardId = cardId;
+      this.$bvModal.show('full-card');
     },
+
     /**
-     * Closes the create card modal when cancel button pressed.
+     * Closes the full card modal when cancel button pressed.
      */
-    closeViewCardModal() {
-      this.$bvModal.hide('view-card');
+    closeFullCardModal() {
+      this.$bvModal.hide('full-card');
     },
 
     /**

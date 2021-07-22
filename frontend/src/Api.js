@@ -34,7 +34,7 @@ const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 5000,
+  timeout: 500000,
 });
 
 let currencyCache = {};
@@ -45,7 +45,7 @@ export default {
   getUser: (id) => instance.get(`users/${id}`, {withCredentials: true}),
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
-  searchUser: (searchParameter, count=10, offset=0) => instance.get(`users/search?searchQuery=${searchParameter}&count=${count}&offset=${offset}`, {withCredentials: true}),
+  searchUser: (searchParameter, count=10, offset=0, sortBy="NAME", sortDirection="ASC") => instance.get(`users/search?searchQuery=${searchParameter}&count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
@@ -63,6 +63,8 @@ export default {
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
   createCard: (cardData) => instance.post("/cards", cardData, {withCredentials: true}),
   getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
+  getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
+  getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images

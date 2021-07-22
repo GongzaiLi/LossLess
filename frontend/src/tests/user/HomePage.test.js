@@ -4,6 +4,7 @@ import { BootstrapVue } from 'bootstrap-vue';
 import homePage from '../../components/user/HomePage';
 import Api from "../../Api";
 import Router from 'vue-router'
+import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
 
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -109,5 +110,94 @@ describe('check-getUserInfo-API-function', () => {
     expect(wrapper.vm.userData).toEqual(response.data);
   });
 });
+
+describe('check-api-request-get-expired-cards', () => {
+  test('check-api-request-get-expired-cards-call-sets-wrapper-expiredCards-to-api-response', async () => {
+    const request = 1;
+    const response = {
+      data: [
+        {
+          "id": 10,
+          "creator": {
+            "id": 20,
+            "firstName": "Jane",
+            "lastName": "Doe",
+            "middleName": "Hector",
+            "nickname": "Jonny",
+            "bio": "Likes long walks on the beach",
+            "email": "janedoe@gmail.com",
+            "dateOfBirth": "1999-04-27",
+            "phoneNumber": "+64 3 555 0129",
+            "homeAddress": {
+              "streetNumber": "3/24",
+              "streetName": "Ilam Road",
+              "suburb": "Upper Riccarton",
+              "city": "Christchurch",
+              "region": "Canterbury",
+              "country": "New Zealand",
+              "postcode": "90210"
+            },
+            "created": "2020-07-14T14:32:00Z",
+            "role": "user",
+            "businessesAdministered": [
+              {
+                "id": 100,
+                "administrators": [
+                  "string"
+                ],
+                "primaryAdministratorId": 20,
+                "name": "Lumbridge General Store",
+                "description": "A one-stop shop for all your adventuring needs",
+                "address": {
+                  "streetNumber": "3/24",
+                  "streetName": "Ilam Road",
+                  "suburb": "Upper Riccarton",
+                  "city": "Christchurch",
+                  "region": "Canterbury",
+                  "country": "New Zealand",
+                  "postcode": "90210"
+                },
+                "businessType": "Accommodation and Food Services",
+                "created": "2020-07-14T14:52:00Z"
+              }
+            ]
+          },
+          "section": "ForSale",
+          "created": "2021-07-15T05:10:00Z",
+          "displayPeriodEnd": "2021-07-29T05:10:00Z",
+          "title": "1982 Lada Samara",
+          "description": "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar.",
+          "keywords": [
+            {
+              "id": 600,
+              "name": "Vehicle",
+              "created": "2021-07-15T05:10:00Z"
+            }
+          ]
+        }
+      ]
+    };
+    Api.getExpiringCards.mockResolvedValue(response);
+    await wrapper.vm.getUserExpiredCards(request);
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.vm.expiringCards.length).toBe(1);
+    expect(wrapper.vm.expiringCards[0]).toBe(response.data[0]);
+  })
+});
+
+
+describe('check-that-expired-table-only-shows-when-necessary', () => {
+  test('check-table-not-shown-with-zero-expired-cards', async () => {
+
+
+    wrapper.vm.expiringCards = [];
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(MarketplaceSection).exists()).toBeFalsy();
+  })
+
+});
+
 
 
