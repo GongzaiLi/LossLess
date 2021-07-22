@@ -5,6 +5,7 @@
         class="marketplace-card"
     >
       <h5 class="card-title single-line-clamped">{{cardInfo.title}}</h5>
+      <p class="sub-title">Ends: {{ formatExpiry }}</p>
       <hr>
       <b-card-text>
         <p class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
@@ -18,7 +19,6 @@
         <br>
         <b-icon-house-door-fill/> {{ formatAddress }}
       </b-card-text>
-      Created: {{ formatCreated }}
     </b-card>
 </template>
 
@@ -48,6 +48,12 @@ This clamps to one line with ellipsis when overflowed
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+p.sub-title {
+  font-style: italic;
+  color: grey;
+  font-size: 13px;
+}
 </style>
 
 <script>
@@ -76,10 +82,10 @@ export default {
     },
 
     /**
-     * format created date
+     * format Expiry date
      */
-    formatCreated: function () {
-      return new Date(this.cardInfo.created).toUTCString().split(" ").slice(0, 4).join(" ");
+    formatExpiry: function () {
+      return new Date(this.cardInfo.displayPeriodEnd).toUTCString().split(" ").slice(0, 4).join(" ");
     }
   }
 }

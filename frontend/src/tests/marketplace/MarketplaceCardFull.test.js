@@ -33,7 +33,7 @@ const response = {
         "id": 500,
         "creator": {
             "id": 100,
-            "firstName": "John",
+            "firstName": "",
             "lastName": "Smith",
             "middleName": "Hector",
             "nickname": "Jonny",
@@ -52,6 +52,7 @@ const response = {
             },
             "created": "2020-07-14T14:32:00Z",
             "role": "user",
+            "suburb": "",
             "businessesAdministered": [
                 {
                     "id": 100,
@@ -86,7 +87,7 @@ const response = {
                 "name": "Vehicle",
                 "created": "2021-07-15T05:10:00Z"
             }
-        ]
+        ],
     }
 };
 

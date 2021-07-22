@@ -43,6 +43,7 @@ beforeEach(() => {
         },
         keywords: [],
         created: "",
+        displayPeriodEnd: "",
     };
 
     const localVue = createLocalVue()
@@ -81,10 +82,10 @@ describe ("format-address", () => {
     })
 })
 
-describe ("format-created-date", () => {
-    it('check-format-created-date',  async() => {
-        cardInfo.created = "2021-07-21";
+describe ("format-expiry-date", () => {
+    it('check-format-expiry-date',  async() => {
+        cardInfo.displayPeriodEnd = "2021-07-21";
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.formatCreated).toStrictEqual("Wed, 21 Jul 2021")
+        expect(wrapper.vm.formatExpiry).toStrictEqual("Wed, 21 Jul 2021")
     })
 })

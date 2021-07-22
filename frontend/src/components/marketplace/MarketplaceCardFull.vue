@@ -3,7 +3,7 @@
     <div>
       <h1 align="left"><strong> {{fullCard.title}} </strong></h1>
       <b-container>
-        <h6 align="left"> Listed On {{fullCard.created}}</h6>
+        <h6 aligh="Left"> Card Ends: {{formatExpiry}}</h6>
       </b-container>
       <br>
 
@@ -32,8 +32,7 @@
         </b-container>
       </b-input-group-text>
       <br>
-
-
+      <h6 align="left"> Listed On {{fullCard.created}}</h6>
       <div>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
@@ -68,13 +67,22 @@ export default {
     getCard() {
       api.getFullCard(this.cardId)
         .then((resp) => {
-          this.$log.debug("Data loaded: ", resp.data);
+          this.$log.info("Data loaded: ", resp.data);
           this.fullCard = resp.data;
       }).catch((error) => {
           this.$log.debug(error);
       })
     }
 
+  },
+
+  computed: {
+    /**
+     * format Expiry date
+     */
+    formatExpiry: function () {
+      return new Date(this.fullCard.displayPeriodEnd).toUTCString().split(" ").slice(0, 5).join(" ");
+    }
   }
 }
 </script>
