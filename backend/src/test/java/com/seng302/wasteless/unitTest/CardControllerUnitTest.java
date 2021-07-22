@@ -24,6 +24,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -69,12 +71,38 @@ class CardControllerUnitTest {
         keywords.add("Vehicle");
         keywords.add("Car");
 
+        LocalDateTime expiry = LocalDateTime.of(2021, Month.JULY, 21, 0, 0, 0);
+
         Card card = new Card();
         card.setId(1);
         card.setCreator(userForCard);
         card.setSection(CardSections.FOR_SALE);
         card.setTitle("Sale");
         card.setKeywords(keywords);
+        card.setDisplayPeriodEnd(expiry.plusYears(2));
+
+        Card expiringCard1 = new Card();
+        expiringCard1.setId(2);
+        expiringCard1.setCreator(userForCard);
+        expiringCard1.setSection(CardSections.FOR_SALE);
+        expiringCard1.setTitle("I am expiring");
+        expiringCard1.setKeywords(keywords);
+        expiringCard1.setDisplayPeriodEnd(expiry.minusMonths(1));
+
+        Card expiringCard2 = new Card();
+        expiringCard2.setId(3);
+        expiringCard2.setCreator(userForCard);
+        expiringCard2.setSection(CardSections.FOR_SALE);
+        expiringCard2.setTitle("I am expiring");
+        expiringCard2.setKeywords(keywords);
+        expiringCard2.setDisplayPeriodEnd(expiry.minusMonths(2));
+
+
+        List<Card> userCards = new ArrayList<>();
+        userCards.add(card);
+        userCards.add(expiringCard1);
+        userCards.add(expiringCard2);
+
 
         User userForCardTwo = new User();
         userForCardTwo.setId(2);
@@ -118,6 +146,10 @@ class CardControllerUnitTest {
         Mockito
                 .when(cardService.findById(2))
                 .thenReturn(cardTwo);
+
+        Mockito
+                .when(cardService.getAllUserCards(1))
+                .thenReturn(userCards);
 
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'")).when(cardService).checkValidSection("Invalid");
@@ -178,5 +210,32 @@ class CardControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenGetRequestToCardsExpiry_andExpiringCardsExist_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/cards/1/expiring")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].id", is(2)))
+                .andExpect(jsonPath("[0].title", is("I am expiring")))
+                .andExpect(jsonPath("[0].creator.id", is(1)))
+                .andExpect(jsonPath("[1].id", is(3)))
+                .andExpect(jsonPath("[1].title", is("I am expiring")))
+                .andExpect(jsonPath("[1].creator.id", is(1)));
+    }
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPutRequestToCard_then200ResponseAndExpiryIsChanged() throws Exception {
+        Card card = cardService.findCardById(1);
+        LocalDateTime expiry = card.getDisplayPeriodEnd();
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/1/extenddisplayperiod")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        card = cardService.findCardById(1);
+        Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
+    }
+
+
 
 }

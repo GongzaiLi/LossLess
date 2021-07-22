@@ -27,4 +27,11 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
      * @return A (possibly empty) list of all cards that belong to the given section
      */
     List<Card> findBySection(CardSections section);
+
+    /**
+     * Returns all cards that belong to the current user.
+     * @param userId The id of the current user.
+     * @return A (possibly empty) list of all cards that belong to the current user.
+     */
+    List<Card> findAllByCreator_IdOrderByDisplayPeriodEnd(Integer userId);
 }
