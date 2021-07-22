@@ -130,7 +130,9 @@ export default {
       this.$bvModal.hide('create-card');
     },
 
+    createCard(){
 
+    },
 
 
     /**
