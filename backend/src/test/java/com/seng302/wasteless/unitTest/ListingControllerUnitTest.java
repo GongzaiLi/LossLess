@@ -399,7 +399,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
      void whenGetRequestForListingsOfExistingBusiness_andOneListingExists_thenOneListingReturned() throws Exception {
         Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 0, 10))
+                .when(listingsService.findCountByBusinessIdFromOffset(1, 0, 10, GetListingsSortTypes.NAME, "ASC"))
                 .thenReturn(Collections.singletonList(listing));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
@@ -421,7 +421,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenGetRequestForListingsOfExistingBusiness_andListingExists_andCountOfOne_thenOneListingReturned() throws Exception {
         Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 0, 1))
+                .when(listingsService.findCountByBusinessIdFromOffset(1, 0, 1, GetListingsSortTypes.NAME, "ASC"))
                 .thenReturn(listingList.subList(0, 1));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?offset=0&count=1")
@@ -440,7 +440,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenGetRequestForListingsOfExistingBusiness_andListingExists_andCountOfTwo_andOffsetOfOne_thenCorrectListingsReturned() throws Exception {
         Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 1, 2))
+                .when(listingsService.findCountByBusinessIdFromOffset(1, 1, 2, GetListingsSortTypes.NAME, "ASC"))
                 .thenReturn(listingList.subList(1,3));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?offset=1&count=2")
@@ -458,7 +458,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenGetRequestForListingsOfExistingBusiness_andListingExists_andCountOfZero_thenNoListingsReturned() throws Exception {
         Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 1, 0))
+                .when(listingsService.findCountByBusinessIdFromOffset(1, 1, 0, GetListingsSortTypes.NAME, "ASC"))
                 .thenReturn(new ArrayList<>());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?count=0")
