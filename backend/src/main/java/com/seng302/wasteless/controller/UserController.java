@@ -213,29 +213,32 @@ public class UserController {
     }
 
     /**
-     *  Uses a Get Request to grab the user with the specified ID
-     *  Returns either an unacceptable response if ID doesnt exist,
-     *  a body showing the details of the user if it does exist
-     *  and unauthorized if a user hasn't logged in
+     * Uses a Get Request to grab the user with the specified ID
+     * Returns either an unacceptable response if ID doesnt exist,
+     * a body showing the details of the user if it does exist
+     * and unauthorized if a user hasn't logged in
+     * <p>
+     * Will also set the Cards Deleted flag in the user to FALSE if it's TRUE and
+     * the user is getting their own account. This prevents the user from getting
+     * the cards deleted notification twice
      *
      * @param userId The userID integer
-     * @return              200 okay with user, 401 unauthorised, 406 not acceptable
+     * @return 200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
-
         logger.debug("Request to get a user ith ID: {}", userId);
 
-        User possibleUser = userService.findUserById(userId);
-        logger.debug("possible User: {}", possibleUser);
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
+        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(userToGet);
 
-        // Not too sure what to do with Response 401 because it's possibly about security but do we need
-        // to have U4 for that or is it possible to do without it
-
-        logger.info("Account: {} retrieved successfully using ID: {}", possibleUser, userId);
-
-        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+        if (userId.equals(userService.getCurrentlyLoggedInUser().getId()) && userToGet.getHasCardsDeleted()) {
+            // Set Cards Deleted flag to false, so next time they don't get another notification
+            userToGet.setHasCardsDeleted(false);
+            userService.saveUserChanges(userToGet);
+        }
 
         return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
 
