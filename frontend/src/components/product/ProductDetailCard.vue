@@ -64,7 +64,7 @@
     <br>
     <b-card class="shadow">
       <b-card-title class="text-center">Product Attributes</b-card-title>
-      <b-form @submit.prevent="okAction">
+      <b-form @submit.prevent="okButtonPressed">
       <b-card-body>
         <h6><strong>ID*:</strong></h6>
         <p v-bind:hidden="disabled" style="margin:0">Ensure there are no special characters (e.g. "/","?").
@@ -122,7 +122,10 @@
         </b-input-group>
       </b-card-body>
       <div>
-        <b-button v-if="!disabled" style="float: right" variant="primary" type="submit">Apply</b-button>
+        <b-button v-if="!disabled" style="float: right" variant="primary" type="submit">{{
+            isWaitingProductCreation ? "Applying..." : "Apply"
+          }}
+          <b-spinner small v-if="isWaitingProductCreation"/></b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction">Cancel</b-button>
       </div>
     </b-form>
@@ -177,6 +180,7 @@ export default {
   data() {
     return {
       isUploadingFile: false,
+      isWaitingProductCreation: false,
       slideNumber: 0,
       imageIdToDelete: null,
       productCard: {
@@ -232,7 +236,7 @@ export default {
             }
           }
         } catch (error) {
-          this.imageError = error.response.data.message;
+          this.imageError = error.response.data.message ? error.response.data.message : error.response.data;  // Due to limitations in the backend, some error messages gets sent back in data not data.message
           this.$refs.errorModal.show();
         }
         this.$emit('imageChange');
@@ -315,7 +319,21 @@ export default {
       }
       this.productCard.primaryImage = image;
       this.$forceUpdate(); // For some carousel isn't reactive to the images array, so this forces an update
-    }
+    },
+    /**
+     * Method that handles pressing the OK/Apply button. Calls the okAction prop, but also shows a loading
+     * spinner (if more than 0.6 seconds of time has passed while waiting for okAction to resolve)
+     */
+    async okButtonPressed() {
+      // Waits 1 second before showing timer
+      // See https://stackoverflow.com/questions/14404901/wait-before-showing-a-loading-spinner
+      const timer = setTimeout(() => this.isWaitingProductCreation = true, 600);
+
+      await this.okAction();
+      clearTimeout(timer);
+      this.isWaitingProductCreation = false;
+    },
+
   },
   computed: {
     /**
