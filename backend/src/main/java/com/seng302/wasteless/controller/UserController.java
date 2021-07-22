@@ -29,7 +29,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -218,9 +217,6 @@ public class UserController {
      * a body showing the details of the user if it does exist
      * and unauthorized if a user hasn't logged in
      * <p>
-     * Will also set the Cards Deleted flag in the user to FALSE if it's TRUE and
-     * the user is getting their own account. This prevents the user from getting
-     * the cards deleted notification twice
      *
      * @param userId The userID integer
      * @return 200 okay with user, 401 unauthorised, 406 not acceptable
@@ -234,14 +230,56 @@ public class UserController {
 
         GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(userToGet);
 
-        if (userId.equals(userService.getCurrentlyLoggedInUser().getId()) && userToGet.getHasCardsDeleted()) {
-            // Set Cards Deleted flag to false, so next time they don't get another notification
-            userToGet.setHasCardsDeleted(false);
-            userService.saveUserChanges(userToGet);
-        }
-
         return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
 
+    }
+
+    /**
+     * Endpoint to GET whether the user should receive a notification for
+     * cards that have expired
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @GetMapping("/users/{id}/hasCardsExpired")
+    public ResponseEntity<Object> getUserHasCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to get a user cards expired ith ID: {}", userId);
+
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
+            return ResponseEntity.status(HttpStatus.OK).body(userToGet.getHasCardsDeleted());
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
+    }
+
+    /**
+     * Clears the card expiry notification for the user.
+     * DOes this by setting the Cards Deleted flag in the user to FALSE. This prevents the user
+     * from getting that notification again (until more cards expire)
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @PutMapping("/users/{id}/clearHasCardsExpired")
+    public ResponseEntity<Object> putClearCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to clear a user cards expired ith ID: {}", userId);
+
+        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
+            User userToGet = userService.findUserById(userId);
+            logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+            userToGet.setHasCardsDeleted(false);
+            userService.saveUserChanges(userToGet);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
     }
 
 
