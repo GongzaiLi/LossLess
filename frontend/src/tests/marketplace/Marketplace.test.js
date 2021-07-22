@@ -100,6 +100,7 @@ beforeEach(() => {
     Api.getCardsBySection.mockResolvedValue(null);
 
 
+    Api.getCardsBySection.mockResolvedValue(null);
     wrapper = shallowMount(Marketplace, {
         localVue,
         propsData: {},
