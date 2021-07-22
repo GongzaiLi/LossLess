@@ -6,6 +6,9 @@
         no-border-collapse
         bordered
         show-empty
+        no-local-sorting
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
         @row-clicked="tableRowClick"
         class="catalogue-table"
         :fields="fields"
@@ -70,6 +73,8 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
+      sortDesc: false,
+      sortBy: "",
       items: [],
       totalItems: 0,
       perPage: 10,
@@ -91,8 +96,42 @@ export default {
     getProducts: async function (business) {
       this.business = business;
 
+      let sortDirectionString = "ASC"
+      if (this.sortDesc) {
+        sortDirectionString = "DESC"
+      }
 
-      const getProductsPromise = api.getProducts(business.id, this.perPage, this.perPage * (this.currentPage - 1));  // Promise for getting products
+      let sortByParam;
+      switch (this.sortBy) {
+        case "id":
+          sortByParam = "ID";
+          break;
+
+        case "name":
+          sortByParam = "NAME";
+          break;
+
+        case "description":
+          sortByParam = "DESCRIPTION";
+          break;
+
+        case "manufacturer":
+          sortByParam = "MANUFACTURER";
+          break;
+
+        case "recommendedRetailPrice":
+          sortByParam = "RRP";
+          break;
+
+        case "created":
+          sortByParam = "CREATED";
+          break;
+
+        default:
+          sortByParam = "ID";
+      }
+
+      const getProductsPromise = api.getProducts(business.id, this.perPage, this.currentPage - 1, sortByParam, sortDirectionString);  // Promise for getting products
       const getCurrencyPromise = api.getUserCurrency(business.address.country); // Promise for getting the currency data
 
       try {
@@ -210,6 +249,24 @@ export default {
      * Watch for current page change, refresh products when it happens.
      */
     '$data.currentPage': {
+      handler: function() {
+        this.getProducts(this.business);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortBy change, refresh products when it happens.
+     */
+    '$data.sortBy': {
+      handler: function() {
+        this.getProducts(this.business);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortDesc change, refresh products when it happens.
+     */
+    '$data.sortDesc': {
       handler: function() {
         this.getProducts(this.business);
       },

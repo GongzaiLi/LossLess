@@ -66,7 +66,7 @@ export default {
       searchQuery: "",
       setQuery:"",
       totalResults: 0,
-      sortDesc: "",
+      sortDesc: false,
       sortBy: "",
       perPage: 10,
       currentPage: 1,
