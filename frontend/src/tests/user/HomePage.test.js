@@ -186,37 +186,6 @@ describe('check-api-request-get-expired-cards', () => {
   })
 });
 
-describe('check-table-interaction-functionality', () => {
-  test('check-shortened-description-view', async () => {
-    const description = "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar.";
-
-    const shortenedDescription = MarketplaceSection.methods.shortenText(description, 20);
-    expect(shortenedDescription).toEqual("Beige, suitable for...");
-  })
-
-  test('check-format-tags-view', async () => {
-    const tags = ["tag1", "tag2", "tag3"];
-
-    const tagFormat = MarketplaceSection.methods.formatTags(tags);
-    expect(tagFormat).toEqual("tag1, tag2, tag3");
-  })
-
-  test('check-format-address-view', async () => {
-    const address = {
-      "streetNumber": "3/24",
-      "streetName": "Ilam Road",
-      "suburb": "Upper Riccarton",
-      "city": "Christchurch",
-      "region": "Canterbury",
-      "country": "New Zealand",
-      "postcode": "90210"
-    }
-
-    const addressFormat = MarketplaceSection.methods.formatAddress(address);
-    expect(addressFormat).toEqual("3/24 Ilam Road, Upper Riccarton, Christchurch Canterbury New Zealand 90210");
-  })
-
-});
 
 describe('check-that-expired-table-only-shows-when-necessary', () => {
   test('check-table-not-shown-with-zero-expired-cards', async () => {

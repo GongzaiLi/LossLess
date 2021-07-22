@@ -61,10 +61,21 @@ afterEach(() => {
     wrapper.destroy();
 });
 
-describe ("format-tag", () => {
-    it('check-format-tag-joins-a-list',  async() => {
-        cardInfo.keywords = ["key1", "key2", "key3"]
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.formatTags).toStrictEqual("key1, key2, key3")
+describe ("format-address", () => {
+    it('normal address, no nulls',  async() => {
+
+        expect(wrapper.vm.formatAddress).toStrictEqual("Upper Riccarton, Christchurch");
+    })
+    it('null suburb',  async() => {
+        cardInfo.creator.homeAddress = {
+            streetNumber: "3/24",
+            streetName: "Ilam Road",
+            suburb: null,
+            city: "Christchurch",
+            region: "Canterbury",
+            country: "New Zealand",
+            postcode: "90210"
+        }
+        expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch");
     })
 })
