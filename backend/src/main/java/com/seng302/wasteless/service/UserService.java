@@ -126,7 +126,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
         }
 
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        logger.debug("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
         return user;
     }
 
