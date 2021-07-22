@@ -12,6 +12,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -32,6 +33,8 @@ import java.util.stream.Collectors;
 public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
 
+    @Value("${max-display-period-seconds}")
+    private Integer maxDisplayPeriodSeconds;
 
     private final UserService userService;
     private final CardService cardService;
@@ -90,7 +93,7 @@ public class CardController {
         card.setCreated(LocalDateTime.now());
 
         logger.info("Setting card expiring date");
-        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusSeconds(maxDisplayPeriodSeconds));
 
         logger.info("Setting card creator");
         card.setCreator(user);
