@@ -9,7 +9,7 @@
       <h4>Profile page</h4>
     </router-link>
 
-    <b-card style="margin-top: 30px" v-if="expiringCardsExist" class="shadow">
+    <b-card style="margin-top: 30px" v-if="expiringCardsExist && !$currentUser.currentlyActingAs" class="shadow">
       <h1><b-icon-clock/> Your Cards Closing Soon </h1>
       <b-input-group>
         <b-form-text style="margin-right: 7px">
@@ -25,6 +25,7 @@
           :is-card-format="isCardFormat"
           :cardsPerRow:="3"
           :perPage="5"
+          :refresh="getUserExpiredCards"
       />
       </b-card>
   </b-card>

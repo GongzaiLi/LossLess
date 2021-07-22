@@ -50,24 +50,36 @@
         <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
       </template>
 
+      <template v-slot:cell(actions)="{ item }">
+        <div v-if="item.creator.id === $currentUser.id"><b-button @click="openExtendConfirmDialog(item.id)" size="sm" style="margin-top: -10px; margin-bottom: -8px"> Extend <b-icon-alarm/></b-button></div>
+      </template>
+
       <template #empty>
         <h3 class="no-results-overlay" >No results to display</h3>
       </template>
     </b-table>
     <pagination :per-page="perPage" :total-items="totalItems" v-model="currentPage" v-show="cards.length"/>
+
+    <b-modal ref="confirmExtendCardModal" size="sm" title="Extend Expiry" ok-variant="success" ok-title="Extend" @ok="confirmExtendExpiry">
+      <h6>
+        Are you sure you want to <strong>extend</strong> this card's expiry?
+      </h6>
+    </b-modal>
   </div>
 </template>
 
 <script>
 import pagination from "../model/Pagination";
 import MarketplaceCard from "./MarketplaceCard";
+import api from "../../Api";
 
 export default {
   name: "MarketplaceSection",
   components: {pagination, MarketplaceCard},
-  props: ["cards", "isCardFormat", "cardsPerRow", "perPage"],
+  props: ["cards", "isCardFormat", "cardsPerRow", "perPage", "refresh"],
   data: function () {
     return {
+      cardToBeExtended: "",
       errors: [],
       currentPage: 1,
     }
@@ -104,7 +116,30 @@ export default {
      */
     formatAddress: function (address) {
       return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
+    },
+
+    /**
+     * Opens the dialog to confirm if the card with given id should be extended.
+     */
+    openExtendConfirmDialog: function(cardId) {
+      this.cardToBeExtended = cardId;
+      this.$refs.confirmExtendCardModal.show();
+    },
+
+    /**
+     * Sends an api request with the card's id that is to have it's expiry extended.
+     */
+    confirmExtendExpiry: function() {
+      api
+          .extendCardExpiry(this.cardToBeExtended)
+          .then(() => {
+            this.refresh(this.$currentUser.id);
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          })
     }
+
   },
 
   computed: {
@@ -144,7 +179,12 @@ export default {
           label: "Location",
           sortable: true
         },
-      ];
+        {
+          key: 'actions',
+          label: "Actions",
+        },
+      ]
+
     }
   }
 }
