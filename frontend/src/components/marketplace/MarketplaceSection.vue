@@ -1,11 +1,11 @@
 <template>
   <div v-if="isCardFormat">
     <b-container>
-      <b-row v-for="i in Math.ceil(cards.length / cardsPerRow)" v-bind:key="i">
-        <b-col :cols="12/cardsPerRow" v-for="(cardInfo, index) in cards.slice((i - 1) * cardsPerRow, i * cardsPerRow)" v-bind:key="index">
+      <b-row cols-lg="3">
+        <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
           <marketplace-card
               :card-info="cardInfo"
-              style="margin-top: 10px"
+              v-on:cardClicked="cardClickHandler"
           />
         </b-col>
       </b-row>
@@ -23,7 +23,7 @@
              bordered
              stacked="sm"
              show-empty
-             @row-clicked="rowClickHandler"
+             @row-clicked="cardClickHandler"
              class="overflow-auto"
              :fields="fields"
              :per-page="perPage"
@@ -31,23 +31,23 @@
              :current-page="currentPage"
     >
       <template v-slot:cell(title)="{ item }">
-        <div v-b-tooltip="item.title">{{shortenText(item.title, 20)}}</div>
+        <div>{{shortenText(item.title, 20)}}</div>
       </template>
 
-      <template v-slot:cell(tags)="{ item }">
-        <div v-b-tooltip="formatTags(item.tags)">{{shortenText(formatTags(item.tags), 20)}}</div>
+      <template v-slot:cell(keywords)="{ item }">
+        <div><b-badge v-for="keyword in item.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge></div>
       </template>
 
       <template v-slot:cell(description)="{ item }">
-        <div v-b-tooltip="item.description">{{shortenText(item.description, 20)}}</div>
+        <div>{{shortenText(item.description, 20)}}</div>
       </template>
 
-      <template v-slot:cell(listerName)="{ item }">
-        <div v-b-tooltip="item.listerName">{{shortenText(item.listerName, 15)}}</div>
+      <template v-slot:cell(creator)="{ item }">
+        <div>{{shortenText(item.creator.firstName + " " + item.creator.lastName, 15)}}</div>
       </template>
 
-      <template v-slot:cell(listerLocation)="{ item }">
-        <div v-b-tooltip="item.listerLocation">{{shortenText(item.listerLocation, 25)}}</div>
+      <template v-slot:cell(location)="{ item }">
+        <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
       </template>
 
       <template #empty>
@@ -60,17 +60,15 @@
 
 <script>
 import pagination from "../model/Pagination";
-import MarketplaceCard from "@/components/marketplace/MarketplaceCard";
+import MarketplaceCard from "./MarketplaceCard";
 
 export default {
   name: "MarketplaceSection",
   components: {pagination, MarketplaceCard},
-  props: ["cards", "isCardFormat"],
+  props: ["cards", "isCardFormat", "cardsPerRow", "perPage"],
   data: function () {
     return {
       errors: [],
-      cardsPerRow: 3, //Change this to change how many marketplace cards appear in each row.
-      perPage: 10,
       currentPage: 1,
     }
   },
@@ -86,10 +84,9 @@ export default {
     /**
      * When called do currently undetermined action
      */
-    rowClickHandler: function (record) {
-      console.log("Clicked row: ", record);
+    cardClickHandler: function (card) {
+      this.$emit('cardClicked', card.id)
     },
-
 
     /**
      * Return given in shortened format
@@ -103,10 +100,10 @@ export default {
     },
 
     /**
-     * Return tags in a joined format
+     * Combine fields of address
      */
-    formatTags(tags) {
-      return tags.join(", ");
+    formatAddress: function (address) {
+      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
     }
   },
 
@@ -135,15 +132,15 @@ export default {
           sortable: true,
         },
         {
-          key: 'tags',
+          key: 'keywords',
         },
         {
-          key: 'listerName',
-          label: "Lister",
+          key: 'creator',
+          label: "Creator",
           sortable: true
         },
         {
-          key: 'listerLocation',
+          key: 'location',
           label: "Location",
           sortable: true
         },
