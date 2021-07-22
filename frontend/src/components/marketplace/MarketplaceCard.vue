@@ -4,17 +4,18 @@
         @click="this.cardClicked"
         class="marketplace-card"
     >
-      <h4 class="card-title single-line-clamped">{{cardInfo.title}}</h4>
+      <h5 class="card-title single-line-clamped">{{cardInfo.title}}</h5>
+      <hr>
       <b-card-text>
         <p class="single-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
       </b-card-text>
-      <b-card-text>
+      <hr>
+      <b-card-text class="single-line-clamped">
         Tags: <b-badge v-for="keyword in this.cardInfo.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
       </b-card-text>
       <b-card-text>
         Seller: {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
-      </b-card-text>
-      <b-card-text>
+        <br>
         Location: {{ formatAddress }}
       </b-card-text>
     </b-card>
