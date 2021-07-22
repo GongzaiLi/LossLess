@@ -23,6 +23,9 @@ Date: 7/3/2021
          responsive="lg"
          no-border-collapse
          bordered
+         no-local-sorting
+         :sort-by.sync="sortBy"
+         :sort-desc.sync="sortDesc"
          stacked="sm"
          show-empty
          @row-clicked="rowClickHandler"
@@ -63,6 +66,8 @@ export default {
       searchQuery: "",
       setQuery:"",
       totalResults: 0,
+      sortDesc: "",
+      sortBy: "",
       perPage: 10,
       currentPage: 1,
       items: [],
@@ -115,8 +120,35 @@ export default {
     myProvider: async function (ctx) {
       if(this.totalResults) {
         try {
+
+          let sortDirectionString = "ASC"
+          if (this.sortDesc) {
+            sortDirectionString = "DESC"
+          }
+
+          let sortByParam;
+          switch (this.sortBy) {
+            case "name":
+              sortByParam = "NAME";
+              break;
+            case "nickName":
+              sortByParam = "NICKNAME";
+              break;
+
+            case "email":
+              sortByParam = "EMAIL";
+              break;
+
+            case "role":
+              sortByParam = "ROLE";
+              break;
+
+            default:
+              sortByParam = "NONE";
+          }
+
           const response = await api
-              .searchUser(this.searchQuery, ctx.perPage, ctx.perPage * (ctx.currentPage - 1))
+              .searchUser(this.searchQuery, ctx.perPage, ctx.currentPage - 1, sortByParam, sortDirectionString)
           return this.getUserInfoIntoTable(response.data.results);
         } catch (error) {
           this.$log.debug(error);
@@ -193,7 +225,7 @@ export default {
           sortable: true
         },{
           key: 'location',
-          sortable: true
+          sortable: false
         },
       ];
       if (this.$currentUser && this.$currentUser.role !== 'user') {
