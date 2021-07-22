@@ -18,6 +18,7 @@
         <br>
         <b-icon-house-door-fill/> {{ formatAddress }}
       </b-card-text>
+      Created: {{ formatCreated }}
     </b-card>
 </template>
 
@@ -25,10 +26,12 @@
 .marketplace-card {
   cursor: pointer;
 }
+
 .marketplace-card:hover {
   -webkit-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
 }
+
 /*
 This clamps to one line with ellipsis when overflowed
 */
@@ -37,6 +40,7 @@ This clamps to one line with ellipsis when overflowed
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
 .dual-line-clamped {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -69,6 +73,13 @@ export default {
     formatAddress: function () {
       const address = this.cardInfo.creator.homeAddress;
       return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
+    },
+
+    /**
+     * format created date
+     */
+    formatCreated: function () {
+      return new Date(this.cardInfo.created).toUTCString().split(" ").slice(0, 4).join(" ");
     }
   }
 }

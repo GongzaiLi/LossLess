@@ -224,5 +224,18 @@ class CardControllerUnitTest {
                 .andExpect(jsonPath("[1].title", is("I am expiring")))
                 .andExpect(jsonPath("[1].creator.id", is(1)));
     }
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPutRequestToCard_then200ResponseAndExpiryIsChanged() throws Exception {
+        Card card = cardService.findCardById(1);
+        LocalDateTime expiry = card.getDisplayPeriodEnd();
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/1/extenddisplayperiod")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        card = cardService.findCardById(1);
+        Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
+    }
+
+
 
 }

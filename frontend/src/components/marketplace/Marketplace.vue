@@ -130,6 +130,10 @@ export default {
       this.$bvModal.hide('create-card');
     },
 
+    createCard(){
+
+    },
+
 
     /**
      * Sends an API request to get all cards determined by the current tab the user is on.
