@@ -64,6 +64,7 @@ export default {
   createCard: (cardData) => instance.post("/cards", cardData, {withCredentials: true}),
   getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
+  deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
 
   /**
