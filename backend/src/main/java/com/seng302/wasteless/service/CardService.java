@@ -56,6 +56,28 @@ public class CardService {
         return cardRepository.findBySection(section);
     }
 
+
+    /**
+     * Returns all cards that belong to the current user.
+     * @param userId The id of the current user.
+     * @return A (possibly empty) list of all cards that belong to the current user.
+     */
+    public List<Card> getAllUserCards(Integer userId) { return cardRepository.findAllByCreator_IdOrderByDisplayPeriodEnd(userId); }
+
+    /**
+     * Returns the first card found with the given ID. Will always be correct card as the id is unique
+     * @param cardId The id as an integer of the card being requested
+     * @return Will return the card object that with the requested id. returns null if none found.
+     */
+    public Card findById(Integer cardId) {return cardRepository.findFirstById(cardId);}
+
+    /**
+     * Deletes the database entry of the card that is passed to this method
+     * @param card The card to be deleted from the database
+     */
+    public void deleteCard(Card card) {cardRepository.delete(card);}
+
+
     /**
      * Returns all cards that belong to the given CardSections.
      * @param section The section the card belongs to.

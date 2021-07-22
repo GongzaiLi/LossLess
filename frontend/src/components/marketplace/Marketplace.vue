@@ -28,6 +28,8 @@ Date: 21/5/21
             :cards="marketplaceCards"
             :is-card-format="isCardFormat"
             v-on:cardClicked="openFullCardModal"
+            :cardsPerRow:="3"
+            :perPage="10"
           />
         </b-tab>
 
@@ -36,6 +38,8 @@ Date: 21/5/21
               :cards="marketplaceCards"
               :is-card-format="isCardFormat"
               v-on:cardClicked="openFullCardModal"
+              :cardsPerRow:="3"
+              :perPage="10"
           />
         </b-tab>
 
@@ -44,6 +48,8 @@ Date: 21/5/21
               :cards="marketplaceCards"
               :is-card-format="isCardFormat"
               v-on:cardClicked="openFullCardModal"
+              :cardsPerRow:="3"
+              :perPage="10"
           />
         </b-tab>
 

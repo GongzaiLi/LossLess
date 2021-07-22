@@ -34,7 +34,7 @@ const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
 const instance = axios.create({
   baseURL: SERVER_URL,
-  timeout: 5000,
+  timeout: 500000,
 });
 
 let currencyCache = {};
@@ -63,6 +63,7 @@ export default {
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
   getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
+  getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
