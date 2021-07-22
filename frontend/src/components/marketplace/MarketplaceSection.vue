@@ -1,11 +1,10 @@
 <template>
   <div v-if="isCardFormat">
     <b-container>
-      <b-row cols-lg="3" >
+      <b-row cols-lg="3">
         <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
           <marketplace-card
               :card-info="cardInfo"
-              style="margin-top: 10px; min-width: 250px; max-width: 350px"
           />
         </b-col>
       </b-row>
@@ -65,12 +64,10 @@ import MarketplaceCard from "./MarketplaceCard";
 export default {
   name: "MarketplaceSection",
   components: {pagination, MarketplaceCard},
-  props: ["cards", "isCardFormat"],
+  props: ["cards", "isCardFormat", "cardsPerRow", "perPage"],
   data: function () {
     return {
       errors: [],
-      cardsPerRow: 3, //Change this to change how many marketplace cards appear in each row.
-      perPage: 10,
       currentPage: 1,
     }
   },

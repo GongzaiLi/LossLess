@@ -54,4 +54,8 @@ public class Card {
 
     @Column(name = "created")
     private LocalDateTime created;
+
+    @Column(name = "displayPeriodEnd")
+    private LocalDateTime displayPeriodEnd;
+
 }
