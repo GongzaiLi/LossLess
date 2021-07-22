@@ -12,8 +12,8 @@ const Axios = require('axios');
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
 const MAX_USERS_PER_API_REQUEST = 100;
-const HAS_NICKNAME_PROB = 1/10;
-const HAS_MIDDLE_NAME_PROB = 4/10;
+const HAS_NICKNAME_PROB = 1 / 10;
+const HAS_MIDDLE_NAME_PROB = 4 / 10;
 
 const NUM_BUSINESSES = 100;
 const NUM_BUSINESSTYPES = 4;
@@ -25,11 +25,13 @@ const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
 const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
+const MAX_CARD_PER_USER = 5;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
 const businessTypes = require('./businessTypes.json')
 const productNames = require('./productNames.json')
+const cardData = require('./cardData.json')
 
 const SERVER_URL = "http://localhost:9499";
 
@@ -157,39 +159,34 @@ async function getBusinesses() {
  * Uses axios to make a post request to our backend to create a new user.
  */
 async function registerUser(user) {
-  await Axios.post(`http://localhost:9499/users`, user, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-    }
-  });
+    const instance = Axios.create({
+        baseURL: SERVER_URL,
+        timeout: 180000,// set 2 mins
+        withCredentials: true
+    });
+
+    const response = await instance.post(`http://localhost:9499/users`, user, {
+        headers: {
+            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+        }
+    });
+    instance.defaults.headers.Cookie = response.headers["set-cookie"];
+
+    await addCard(instance);
+    return [response, instance];
 }
 
 /**
  * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
  */
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
-  const instance = Axios.create({
-    baseURL: SERVER_URL,
-    timeout: 180000,// set 2 mins
-    withCredentials: true
-  });
-
-  const response = await instance.post(`http://localhost:9499/users`, user, {
-    headers: {
-      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+    const [response, instance] = await registerUser(user);
+    for (let i = 0; i < numBusinesses; i++) {
+        const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
+        await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+        console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
     }
-  });
 
-  instance.defaults.headers.Cookie = response.headers["set-cookie"];
-
-  for (let i=0; i < numBusinesses; i++) {
-    const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
-    await addProduct(businessResponse.data.businessId, instance, businesses[i]);
-
-    console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
-
-  }
 }
 
 /**
@@ -376,6 +373,45 @@ async function addProduct(businessId, instance, business) {
     }
 
   }
+}
+
+/**
+ *  Creates a card object with the random sample data.
+ * @returns A card Object with the fields and data.
+ */
+function createCardObject() {
+
+    const sections = ["ForSale", "Wanted", "Exchange"];
+    const section = sections[Math.floor(Math.random() * sections.length)];
+    const title = productNames[Math.floor(Math.random() * productNames.length)];
+    const card = cardData[Math.floor(Math.random() * cardData.length)];
+
+    return {
+        section: section,
+        title: title,
+        description: card.description,
+        keywords: card.keywords,
+    };
+}
+
+
+/**
+ *  Populates the database with the sample card data for different users.
+ * @param instance An instance of axios
+ * @returns {Promise<void>}
+ */
+async function addCard(instance) {
+
+    for (let i = 0; i < Math.floor(Math.random() * MAX_CARD_PER_USER); i++) {
+        const card = createCardObject();
+        await instance.post(`http://localhost:9499/cards`, card, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+            }
+        });
+    }
+
 }
 
 async function main() {

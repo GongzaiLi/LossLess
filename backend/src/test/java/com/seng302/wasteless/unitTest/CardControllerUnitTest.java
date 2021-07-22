@@ -139,13 +139,13 @@ class CardControllerUnitTest {
 
     @Test
     @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
-    void whenPostRequestToAddCard_andKeywordsIsLessThan1_then400Response() throws Exception {
+    void whenPostRequestToAddCard_andKeywordsIsLessThan1_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": []}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/cards")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isCreated());
     }
 
     @Test
