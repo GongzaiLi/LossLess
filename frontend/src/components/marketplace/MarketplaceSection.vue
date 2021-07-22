@@ -1,11 +1,10 @@
 <template>
   <div v-if="isCardFormat">
     <b-container>
-      <b-row cols-lg="3" >
+      <b-row cols-lg="3">
         <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
           <marketplace-card
               :card-info="cardInfo"
-              style="margin-top: 10px; min-width: 250px; max-width: 350px"
           />
         </b-col>
       </b-row>

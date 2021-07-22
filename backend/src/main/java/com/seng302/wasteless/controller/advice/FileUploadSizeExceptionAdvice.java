@@ -36,6 +36,6 @@ public class FileUploadSizeExceptionAdvice {
     {
         logger.warn("Tried to upload file that was too large: {}", exc.getLocalizedMessage());
         response.setStatus(HttpStatus.PAYLOAD_TOO_LARGE.value());
-        response.getWriter().write("The file that you tried to upload is too large. Files must be 5MB in size or less.");
+        response.getWriter().write("The file that you tried to upload is too large. Files must be less than 1MB in size.");
     }
 }
