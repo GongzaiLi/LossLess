@@ -35,7 +35,7 @@ Listings Page
     </b-row>
 
 
-    <b-row cols-lg="3" style="margin-left: -38px">
+    <b-row cols-lg="3" cols-md="3" style="margin-left: -38px">
       <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
         <b-card style="min-width: 17rem; height: 100%">
           <div v-if="listing.inventoryItem.product.images.length">

@@ -3,13 +3,13 @@ package com.seng302.wasteless.dto.mapper;
 import com.seng302.wasteless.dto.GetUserBusinessAdministeredDto;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.GetUserDtoAdmin;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class GetUserDtoMapper {
 
     public static GetUserDto toGetUserDto(User user) {
 
-        User loggedInUser =  userService.getCurrentlyLoggedInUser();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
         Integer currentUserId = loggedInUser.getId();
 
