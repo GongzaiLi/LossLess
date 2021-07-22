@@ -3,8 +3,11 @@ package com.seng302.wasteless.dto.mapper;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -32,28 +35,37 @@ public class UserSearchDtoMapper {
      * Checks if count or offset are negative, if either are return empty UserSearchDto. These should be validated
      * before this method. The checks present here are a last line of defense against bad input.
      *
+     * Sorts by the sortBy column
+     *
      * @param searchQuery       The query string to search for in users
      * @param offset            The offset of the search (how many results to 'skip'). Should be >= 0
      * @param count             The number of results to return. Should be >= 0
+     * @param sortBy            The column to sort by.
+     * @param sortDirection     One of two string values ASC or DESC
      * @return                  List of users who match the search query, maximum length of count, offset by offset.
      */
-    public static UserSearchDto toGetUserSearchDto(String searchQuery, Integer count, Integer offset) {
+    public static UserSearchDto toGetUserSearchDto(String searchQuery, Integer count, Integer offset, UserSearchSortTypes sortBy, String sortDirection) {
 
         if (count < 0 || offset < 0) {
             return new UserSearchDto();
         }
 
-        List<User> searchResults = userService.searchForMatchingUsers(searchQuery);
+        Integer totalItems = userService.getTotalUsersCountMatchingQuery(searchQuery);
+
+        List<User> searchResults = userService.searchForMatchingUsers(
+                searchQuery,
+                count,
+                offset,
+                sortBy,
+                sortDirection
+        );
+
         List<GetUserDto> searchResultsDto = new ArrayList<>();
-        int end = offset+count;
-        if(offset<searchResults.size()) {
-            if (end>searchResults.size()){end=searchResults.size();}
-            for (User user : searchResults.subList(offset,end)) {
-                searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
-            }
-        }
+
+        searchResults.forEach((user) -> searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user)));
+
         return new UserSearchDto()
                 .setResults(searchResultsDto)
-                .setTotalItems(searchResults.size());
+                .setTotalItems(totalItems);
     }
 }

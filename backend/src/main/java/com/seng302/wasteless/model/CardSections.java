@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * for checking to see if a card is of a legal type
  */
 public enum CardSections {
-    FOR_SALE("For Sale"),
+    FOR_SALE("ForSale"),
     WANTED("Wanted"),
     EXCHANGE("Exchange");
 
@@ -21,6 +21,20 @@ public enum CardSections {
      */
     CardSections(final String text) {
         this.text = text;
+    }
+
+    /**
+     * Takes the text value and returns the enum heading
+     * @param text The text value
+     * @return the enum heading e.g FOR_SALE
+     */
+    public static CardSections fromString(String text) {
+        for (CardSections heading : CardSections.values()) {
+            if (heading.text.equalsIgnoreCase(text)) {
+                return heading;
+            }
+        }
+        return null;
     }
 
     /* (non-Javadoc)
