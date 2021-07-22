@@ -7,16 +7,16 @@
       <h5 class="card-title single-line-clamped">{{cardInfo.title}}</h5>
       <hr>
       <b-card-text>
-        <p class="single-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+        <p class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
       </b-card-text>
       <hr>
       <b-card-text class="single-line-clamped">
         Tags: <b-badge v-for="keyword in this.cardInfo.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
       </b-card-text>
       <b-card-text>
-        Seller: {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
+        <b-icon-person-fill/> {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
         <br>
-        Location: {{ formatAddress }}
+        <b-icon-house-door-fill/> {{ formatAddress }}
       </b-card-text>
     </b-card>
 </template>
@@ -36,6 +36,13 @@ This clamps to one line with ellipsis when overflowed
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.dual-line-clamped {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 </style>
 
