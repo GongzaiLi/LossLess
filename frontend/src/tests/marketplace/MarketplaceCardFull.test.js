@@ -131,11 +131,8 @@ afterEach(() => {
 describe('check-api-request-get-full-card', () => {
     test('check-api-request-get-full-card-call-sets-wrapper-marketplaceCards-to-api-response', async () => {
 
-
         Api.getFullCard.mockResolvedValue(response);
-
         await wrapper.vm.getCard();
-
         expect(wrapper.vm.fullCard).toBe(response.data);
     })
 });

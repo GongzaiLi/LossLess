@@ -68,7 +68,7 @@ export default {
     getCard() {
       api.getFullCard(this.cardId)
         .then((resp) => {
-          this.$log.info("Data loaded: ", resp.data);
+          this.$log.debug("Data loaded: ", resp.data);
           this.fullCard = resp.data;
       }).catch((error) => {
           this.$log.debug(error);
@@ -89,7 +89,7 @@ export default {
      * @returns {boolean}
      */
     canDelete: function(){
-      return(this.fullCard.creator.id==this.$currentUser.id || this.$currentUser.role!='user');
+      return(this.fullCard.creator.id===this.$currentUser.id || this.$currentUser.role!=='user');
     }
   }
 }
