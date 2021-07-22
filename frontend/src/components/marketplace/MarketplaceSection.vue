@@ -64,12 +64,10 @@ import MarketplaceCard from "./MarketplaceCard";
 export default {
   name: "MarketplaceSection",
   components: {pagination, MarketplaceCard},
-  props: ["cards", "isCardFormat"],
+  props: ["cards", "isCardFormat", "cardsPerRow", "perPage"],
   data: function () {
     return {
       errors: [],
-      cardsPerRow: 3, //Change this to change how many marketplace cards appear in each row.
-      perPage: 10,
       currentPage: 1,
     }
   },
