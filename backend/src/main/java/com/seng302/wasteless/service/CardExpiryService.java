@@ -1,6 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Card;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.CardRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 public class CardExpiryService {
     private final CardService cardService;
     private final CardRepository cardRepository;
+    private final UserService userService;
 
     private final Logger logger = LoggerFactory.getLogger(CardExpiryService.class.getName());
 
@@ -33,9 +35,10 @@ public class CardExpiryService {
     private Integer notificationWaitPeriodSeconds;
 
     @Autowired
-    public CardExpiryService(CardService cardService, CardRepository cardRepository) {
+    public CardExpiryService(CardService cardService, CardRepository cardRepository, UserService userService) {
         this.cardService = cardService;
         this.cardRepository = cardRepository;
+        this.userService = userService;
     }
 
     /**
@@ -55,6 +58,11 @@ public class CardExpiryService {
 
         for (Card card : expiredCards) {
             logger.warn("Deleting expired card id={}, created={}, title={}, creator={}", card.getId(), card.getCreated(), card.getTitle(), card.getCreator());
+
+            User cardCreator = card.getCreator();
+            cardCreator.setHasCardsDeleted(true);
+            userService.saveUserChanges(cardCreator);
+
             cardService.deleteCard(card);
         }
     }
