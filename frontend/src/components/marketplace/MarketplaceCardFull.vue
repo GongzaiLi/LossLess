@@ -34,6 +34,7 @@
       <br>
       <h6 align="left"> Listed On {{fullCard.created}}</h6>
       <div>
+        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
 
@@ -45,7 +46,7 @@
 import api from "../../Api";
 export default {
   name: "full-card",
-  props: ["cardId", 'closeFullViewCardModal'],
+  props: ["cardId", 'closeFullViewCardModal','deleteSelectedCard'],
   data() {
     return {
       fullCard: {
@@ -82,6 +83,13 @@ export default {
      */
     formatExpiry: function () {
       return new Date(this.fullCard.displayPeriodEnd).toUTCString().split(" ").slice(0, 5).join(" ");
+    },
+    /**
+     * Returns true if user is creator of the card or an Application admin
+     * @returns {boolean}
+     */
+    canDelete: function(){
+      return(this.fullCard.creator.id==this.$currentUser.id || this.$currentUser.role!='user');
     }
   }
 }
