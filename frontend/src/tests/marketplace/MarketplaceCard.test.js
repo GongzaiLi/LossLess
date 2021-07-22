@@ -41,7 +41,8 @@ beforeEach(() => {
                     postcode: "90210"
             },
         },
-        keywords: []
+        keywords: [],
+        created: "",
     };
 
     const localVue = createLocalVue()
@@ -77,5 +78,13 @@ describe ("format-address", () => {
             postcode: "90210"
         }
         expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch");
+    })
+})
+
+describe ("format-created-date", () => {
+    it('check-format-created-date',  async() => {
+        cardInfo.created = "2021-07-21";
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.formatCreated).toStrictEqual("Wed, 21 Jul 2021")
     })
 })
