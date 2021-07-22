@@ -109,7 +109,7 @@ beforeEach(() => {
 
   Api.getCardsBySection.mockResolvedValue(null);
 
-  wrapper = mount(Marketplace, {
+  wrapper = shallowMount(Marketplace, {
     localVue,
     propsData: {},
     mocks: {$route, $log, $currentUser, $event},

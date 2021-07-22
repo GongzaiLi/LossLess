@@ -1,16 +1,19 @@
 <template>
   <div>
-    <h1 align="center"><b-icon-shop/> Create Card </h1>
+    <h1 align="center">
+      <b-icon-shop/>
+      Create Card
+    </h1>
     <br>
 
     <b-input-group-text>
       <b-container>
-        <h6 align="center"> <strong> Card Info: </strong></h6>
-        <label> Seller Name: {{cardInfo.fullName}} </label>
+        <h6 align="center"><strong> Card Info: </strong></h6>
+        <label> Seller Name: {{ cardInfo.fullName }} </label>
         <br>
-        <label> Seller Location: {{cardInfo.location}} </label>
+        <label> Seller Location: {{ cardInfo.location }} </label>
         <br>
-        <label> Creation Date: {{cardInfo.dateCreated}} </label>
+        <label> Creation Date: {{ cardInfo.dateCreated }} </label>
       </b-container>
     </b-input-group-text>
     <br>
@@ -22,9 +25,9 @@
       <b-input-group class="mb-1">
         <b-select v-model="createCardForm.section" required>
           <option disabled value=""> Choose ...</option>
-          <option value="ForSale"> For Sale </option>
-          <option value="Wanted"> Wanted </option>
-          <option value="Exchange"> Exchange </option>
+          <option value="ForSale"> For Sale</option>
+          <option value="Wanted"> Wanted</option>
+          <option value="Exchange"> Exchange</option>
         </b-select>
       </b-input-group>
       <br>
@@ -49,15 +52,16 @@
         <h6><strong>Keywords:</strong></h6>
       </b-input-group>
       <b-input-group class="mb-1">
-        <b-form-tags v-model="createCardForm.keywords"/>
+        <b-form-tags input-id="keyword-name" v-model="createCardForm.keywords" name="blah" :tag-validator="tagValidator"
+                     :limit=5 :required="tagRequired"/>
       </b-input-group>
       <br>
 
       <b-alert variant="danger" dismissible :show="showError.length">{{ showError }}</b-alert>
 
       <div>
-        <b-button style="float: right" variant="primary" type="submit"> Create </b-button>
-        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction"> Cancel </b-button>
+        <b-button style="float: right" variant="primary" type="submit"> Create</b-button>
+        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="cancelAction"> Cancel</b-button>
       </div>
 
     </b-form>
@@ -73,13 +77,13 @@ export default {
   props: ['cancelAction', 'showError'],
   data() {
     return {
+      tagRequired: false,
       cardInfo: {
         fullName: '',
         location: '',
         dateCreated: ''
       },
       createCardForm: {
-        creatorId: '',
         section: '',
         title: '',
         description: "",
@@ -88,11 +92,24 @@ export default {
     }
   },
   mounted() {
-    const userId = localStorage.getItem("currentUserId")
+    const userId = this.$currentUser.id;
     this.setAutofillData(userId);
-
   },
   methods: {
+
+    /**
+     *  Validates the maximum length of each tag to be at most 10 characters and the maximum number of tags to be
+     *  at most 5 before being added to the keywords field.
+     *
+     */
+    tagValidator(tag) {
+      let tagsInvalid = tag.length > 10;
+      this.tagRequired = tagsInvalid;
+      const tagInput = document.getElementById('keyword-name');
+      tagInput.setCustomValidity(tagsInvalid ? "The keyword can be at most 10 characters" : "");
+      return !tagsInvalid;
+    },
+
     /**
      * Gets the user info by making an api request and updates the variables \
      * with the info.
@@ -102,7 +119,7 @@ export default {
       this.createCardForm.creatorId = id;
       const currentDate = new Date();
       this.cardInfo.dateCreated = currentDate.getDate() + "/"
-          + (currentDate.getMonth()+1)  + "/"
+          + (currentDate.getMonth() + 1) + "/"
           + currentDate.getFullYear() + " @ "
           + currentDate.getHours() + ":"
           + currentDate.getMinutes() + ":"
@@ -129,10 +146,10 @@ export default {
      *  Passes the card form data to the Marketplace component when create card pressed.
      */
     createAction() {
-      this.$emit('createAction',this.createCardForm);
+      this.$emit('createAction', this.createCardForm);
     }
 
-  }
+  },
 }
 </script>
 

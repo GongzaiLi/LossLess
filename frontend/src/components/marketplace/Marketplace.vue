@@ -158,6 +158,7 @@ export default {
         this.$log.debug("Card Created", createCardResponse);
         this.$bvModal.hide('create-card');
         this.error = '';
+        this.getCardsFromSection(cardData.section);
       })
       .catch(error => {
         this.$log.debug(error);
