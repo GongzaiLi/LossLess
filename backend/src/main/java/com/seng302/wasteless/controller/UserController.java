@@ -79,13 +79,13 @@ public class UserController {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to create user with already used email");
         }
-        logger.info("Email validated for user: {}", user);
 
         //check the email validation
         if (!userService.checkEmailValid(user.getEmail())) {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
+        logger.info("Email validated for user: {}", user);
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
@@ -249,9 +249,11 @@ public class UserController {
         User userToGet = userService.findUserById(userId);
         logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
-        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
+        Integer loggedInUserId = userService.getCurrentlyLoggedInUser().getId();
+        if (userId.equals(loggedInUserId)) {
             return ResponseEntity.status(HttpStatus.OK).body(userToGet.getHasCardsDeleted());
         } else {
+            logger.warn("User {} tried to get 'has cards expired' for user {}", loggedInUserId, userId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
         }
     }
