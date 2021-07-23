@@ -158,8 +158,7 @@ Date: sprint_1
 
 <script>
 import {setCurrentlyActingAs} from '../../auth'
-import api from "@/Api";
-
+import api from "../../Api"
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
