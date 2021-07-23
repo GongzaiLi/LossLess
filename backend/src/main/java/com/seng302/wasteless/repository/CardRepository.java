@@ -2,6 +2,8 @@ package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.CardSections;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -23,15 +25,25 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
     /**
      * Returns all cards that belong to the given CardSections.
+     *
      * @param section The section the card belongs to.
      * @return A (possibly empty) list of all cards that belong to the given section
      */
-    List<Card> findBySection(CardSections section);
+    List<Card> findBySection(CardSections section, Pageable pageable);
 
     /**
      * Returns all cards that belong to the current user.
+     *
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
     List<Card> findAllByCreator_IdOrderByDisplayPeriodEnd(Integer userId);
+
+    /**
+     * Returns the total number of cards in the repository that are in the given section.
+     *
+     * @param section The marketplace section in which to count cards
+     * @return The total number of cards in the given section.
+     */
+    Integer countCardBySection(CardSections section);
 }

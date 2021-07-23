@@ -12,11 +12,14 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,17 +48,18 @@ public class CardController {
     /**
      * Handles requests for GET card endpoint. Returns a list of cards in the section given.
      * Throws a 400 error if the section given is not one of the predefined ones ('ForSale', 'Wanted', or 'Exchange').
+     *
      * @param section The section for which cards will be retrieved from. This should be in the query parameter named 'section
      * @return A 200 response with the list of cards in the given section
      */
     @GetMapping("/cards")
-    public ResponseEntity<Object> getCards(@RequestParam String section) {
+    public ResponseEntity<Object> getCards(@RequestParam String section, Pageable p) {
         logger.info("GET /cards, section={}", section);
 
         cardService.checkValidSection(section);
         CardSections cardSection = CardSections.fromString(section);
 
-        List<Card> cards = cardService.findBySection(cardSection);
+        List<Card> cards = cardService.findBySection(cardSection, p);
         List<GetCardDto> cardDTOs = cards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
 
         return ResponseEntity.status(HttpStatus.OK).body(cardDTOs);
