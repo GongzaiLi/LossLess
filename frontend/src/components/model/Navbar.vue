@@ -18,6 +18,22 @@ Date: sprint_1
         <b-nav-item to="/users/search">User Search</b-nav-item>
         <b-nav-item to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
+
+        <div class="icon" id="bell" @click="click"> <img src="https://i.imgur.com/AC7dgLA.png" alt=""> </div>
+        <div class="notifications" id="box">
+          <h2>Notifications - <span> {{notifications.length}}</span></h2>
+
+          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id">
+            <div class="text">
+              <h4> Marketplace Card: {{notification.title}}</h4>
+              <h4> expires within 24 hours</h4>
+            </div>
+          </div>
+
+
+        </div>
+
+
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
             id="business-link-dropdown"
@@ -79,8 +95,71 @@ Date: sprint_1
   </b-navbar>
 </template>
 
+<style>
+
+.icon img {
+  cursor: pointer;
+  display: inline;
+  width: 26px;
+  margin-top: 4px;
+}
+
+.icon:hover {
+  opacity: .7
+}
+
+.notifications {
+  width: 300px;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  top: 63px;
+  right: 62px;
+  border-radius: 5px 0 5px 5px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+}
+
+.notifications h2 {
+  font-size: 14px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  color: #999
+}
+
+.notifications h2 span {
+  color: #f00
+}
+
+.notifications-item {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding: 6px 9px;
+  margin-bottom: 0;
+  cursor: pointer
+}
+
+.notifications-item:hover {
+  background-color: #eee
+}
+
+.notifications-item .text h4 {
+  color: #777;
+  font-size: 16px;
+  margin-top: 3px
+}
+
+.notifications-item .text p {
+  color: #aaa;
+  font-size: 12px
+}
+
+</style>
+
 <script>
 import {setCurrentlyActingAs} from '../../auth'
+import api from "@/Api";
+
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -89,6 +168,17 @@ import {setCurrentlyActingAs} from '../../auth'
  */
 export default {
   name: "Navbar.vue",
+  data() {
+    return {
+      showNotifications: false,
+      cards: [],
+      notifications: []
+    }
+  },
+  mounted() {
+    this.getCards('Wanted')
+
+  },
   computed: {
     isActingAsUser: function() {
       return this.$currentUser.currentlyActingAs == null;
@@ -151,6 +241,33 @@ export default {
     },
   },
   methods: {
+    getCards(section) {
+      api.getCardsBySection(section)
+          .then((res) => {
+            this.cards = res.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
+
+    },
+
+    click() {
+      console.log(this.cards)
+      // var color = $(this).text();
+      if(this.showNotifications){
+
+        document.getElementById("box").style.height='0px';
+        document.getElementById("box").style.opacity='0';
+        this.showNotifications = false;
+      } else {
+        document.getElementById("box").style.height='auto';
+        document.getElementById("box").style.opacity='1';
+
+        this.showNotifications = true;
+      }
+
+    },
     /**
      * Redirects to the profile of the account the user is acting as.
      * This will be the either the use profile if they are not acting as anyone,
@@ -194,5 +311,22 @@ export default {
       this.$router.push(`/users/${this.$currentUser.id}`);
     }
   },
+  watch: {
+    cards: function (cards) {
+      for (const card of cards) {
+        const date = card.displayPeriodEnd.split("T")[0]
+        const time = card.displayPeriodEnd.split("T")[1]
+        const cardExpires =  new Date(parseInt(date.split("-")[0]), parseInt(date.split("-")[1]), parseInt(date.split("-")[2]), parseInt(time.split(":")[0]), parseInt(time.split(":")[1]), parseFloat(time.split(":")[2]))
+        const currentDate =  new Date();
+        const currentAfterADay = currentDate.setDate(currentDate.getDate() + 1);
+
+        if (cardExpires < currentAfterADay && cardExpires > currentDate) {
+          this.notifications.push(card)
+        } else {
+          this.notifications.push(card) //this is incorrect. Only here to check the functionality.
+        }
+      }
+    },
+  }
 }
 </script>
