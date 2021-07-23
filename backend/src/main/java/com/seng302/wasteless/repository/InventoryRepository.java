@@ -2,6 +2,7 @@ package com.seng302.wasteless.repository;
 
 
 import com.seng302.wasteless.model.Inventory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
     Inventory findFirstById(Integer id);
 
-    List<Inventory> findAllByBusinessId(Integer id);
+    List<Inventory> findAllByBusinessId(Integer id, Pageable pageable);
 
     @Modifying
     @Transactional

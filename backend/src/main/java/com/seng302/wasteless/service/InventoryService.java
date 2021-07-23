@@ -5,6 +5,7 @@ import com.seng302.wasteless.repository.InventoryRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,7 +70,7 @@ public class InventoryService {
      * @return A list containing every item in the business' inventory.
      * Returns an empty list if there are no items in the business' inventory, or if the business does not exist
      */
-    public List<Inventory> getInventoryFromBusinessId(Integer id) { return  inventoryRepository.findAllByBusinessId(id); }
+    public List<Inventory> getInventoryFromBusinessId(Integer id, Pageable pageable) { return  inventoryRepository.findAllByBusinessId(id, pageable); }
 
     /**
      * Updates the quantity column of the inventory table in the database using a custom sql set statement.

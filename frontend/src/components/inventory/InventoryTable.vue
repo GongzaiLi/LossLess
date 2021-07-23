@@ -6,12 +6,13 @@
       no-border-collapse
       bordered
       show-empty
+      no-local-sorting
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
       class="inventory-table"
       :fields="fields"
       :items="items"
       :per-page="perPage"
-      :current-page="currentPage"
-      :busy="tableLoading"
       ref="inventoryTable"
       @row-clicked="tableRowClick"
   >
@@ -44,7 +45,7 @@
       </div>
     </template>
   </b-table>
-  <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+  <pagination v-if="totalItems>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 </div>
 </template>
 
@@ -82,9 +83,11 @@ export default {
     return {
       items: [],
       business: {},
-      perPage: 10,
+      perPage: 2,
       currentPage: 1,
-      tableLoading: true,
+      sortDesc: false,
+      sortBy: "",
+      totalItems: 0,
       currency: {
         symbol: '$',
         code: 'USD',
@@ -105,8 +108,52 @@ export default {
      * @param businessId
      */
     getBusinessInfo: async function (businessId) {
-      this.tableLoading = true;
-      const getInventoryPromise = api.getInventory(businessId)
+      console.log("HERERERER", this.sortBy);
+      let sortDirectionString = "ASC"
+      if (this.sortDesc) {
+        sortDirectionString = "DESC"
+      }
+
+      let sortByParam;
+
+      switch (this.sortBy) {
+        case "product":
+          sortByParam = "product";
+          break;
+
+        case "quantity":
+          sortByParam = "quantity";
+          break;
+
+        case "pricePerItem":
+          sortByParam = "pricePerItem";
+          break;
+
+        case "totalPrice":
+          sortByParam = "totalPrice";
+          break;
+
+        case "manufactured":
+          sortByParam = "manufactured";
+          break;
+
+        case "sellBy":
+          sortByParam = "sellBy";
+          break;
+
+        case "bestBefore":
+          sortByParam = "bestBefore";
+          break;
+
+        case "expires":
+          sortByParam = "expires";
+          break;
+
+        default:
+          sortByParam = "id";
+      }
+
+      const getInventoryPromise = api.getInventory(businessId, this.perPage, this.currentPage-1, sortByParam, sortDirectionString);
       const currencyPromise = api.getBusiness(businessId)
           .then((resp) => {
             this.business = resp.data;
@@ -115,8 +162,11 @@ export default {
 
       try {
         const [currency, inventoryResponse] = await Promise.all([currencyPromise, getInventoryPromise])
+        console.log(inventoryResponse, "HERERRERER");
         this.items = inventoryResponse.data;
-        this.tableLoading = false;
+
+        this.totalItems = inventoryResponse.data.totalItems;
+        this.$refs.inventoryTable.refresh();
         if (currency != null) {
           this.currency = currency;
         }
@@ -253,16 +303,36 @@ export default {
       }
       return fieldsList
     },
-
-    /**
-     * The totalResults function just computed how many pages in the search table.
-     * @returns number
-     */
-    totalItems: function () {
-      return this.items.length;
-    },
-
   },
+  watch: {
+    /**
+     * Watch for current page change, refresh inventory when it happens
+     */
+    '$data.currentPage': {
+      handler: function () {
+        this.getBusinessInfo(this.business.id);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortBy change, refresh inventory when it happens.
+     */
+    '$data.sortBy': {
+      handler: function () {
+        this.getBusinessInfo(this.business.id);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortDesc change, refresh inventory when it happens.
+     */
+    '$data.sortDesc': {
+      handler: function () {
+        this.getBusinessInfo(this.business.id);
+      },
+      deep: true
+    },
+  }
 }
 </script>
 

@@ -146,7 +146,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         inventories.add(inventoryItem);
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt()))
+                .when(inventoryService.getInventoryFromBusinessId(anyInt(), any()))
                 .thenReturn(inventories);
     }
 
@@ -314,7 +314,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      void whenGetRequestToInventory_andValidRequest_BusinessHasNoInventory_then200Response_BodyEmptyList() throws Exception {
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt()))
+                .when(inventoryService.getInventoryFromBusinessId(anyInt(), any()))
                 .thenReturn(new ArrayList<>());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
