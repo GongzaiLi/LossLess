@@ -16,13 +16,11 @@ beforeEach(() => {
 describe('getFromLocalStorage', () => {
 
   test('works when item exists', () => {
-    console.log(localStorage.getItem);
     localStorage.getItem.mockReturnValueOnce("42069");
     expect(getFromLocalStorage('yee')).toBe(42069);
   })
 
   test('works when item doesn\'t exist', () => {
-    console.log(localStorage.getItem);
     localStorage.getItem.mockReturnValueOnce(undefined);
     expect(getFromLocalStorage('yee')).toBe(null);
   })

@@ -8,21 +8,21 @@ Listings Page
     <b-row align-h="start">
       <h3>Sort by:</h3>
       <b-col md="auto">
-        <b-select v-model="sortProperty" value="name">
-          <option value="name">Product Name</option>
-          <option value="price">Price</option>
-          <option value="closing">Listing Closes</option>
-          <option value="created">Listing Opens</option>
+        <b-select v-model="sortProperty" value="NAME">
+          <option value="NAME">Product Name</option>
+          <option value="PRICE">Price</option>
+          <option value="CLOSES">Listing Closes</option>
+          <option value="CREATED">Listing Opens</option>
         </b-select>
       </b-col>
       <b-col md="auto">
-        <b-select v-model="sortDirection" value="asc">
-          <option value="asc">Asc</option>
-          <option value="desc">Desc</option>
+        <b-select v-model="sortDirection" value="ASC">
+          <option value="ASC">Asc</option>
+          <option value="DESC">Desc</option>
         </b-select>
       </b-col>
       <b-col md="auto">
-        <b-button @click="sortListings">Sort</b-button>
+        <b-button @click="getListings">Sort</b-button>
       </b-col>
       <b-col v-if="canEditListings">
         <b-form-group>
@@ -36,7 +36,7 @@ Listings Page
 
 
     <b-row cols-lg="3" cols-md="3" style="margin-left: -38px">
-      <b-col v-for="(listing,index) in splitListings()" :key="index" class="mb-4">
+      <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
         <b-card style="min-width: 17rem; height: 100%">
           <div v-if="listing.inventoryItem.product.images.length">
             <img class="product-image" :src="getPrimaryImage(listing)" alt="Failed to load image">
@@ -125,8 +125,8 @@ export default {
       listingDisplayedInCard: {},
       isListingCardReadOnly: true,
       cards: [],
-      sortProperty: 'name',
-      sortDirection: 'asc',
+      sortProperty: 'NAME',
+      sortDirection: 'ASC',
       perPage: 12,
       currentPage: 1,
       totalResults: 0,
@@ -152,8 +152,6 @@ export default {
       this.businessId = this.$route.params.id;
       await this.getBusinessInfo(this.businessId);
       await this.getListings();
-      this.sortListings();
-      this.totalResults = this.cards.length
     },
     /**
      * Api request to get business information
@@ -170,66 +168,6 @@ export default {
           });
     },
 
-
-
-    /**
-     * Takes two inputs and compares them to each other based on the variable sortProperty
-     * @param  {string} a string that is being paired against
-     * @param  {string} b
-     * @return int
-     **/
-    compare(a, b) {
-      let less = 1;
-      let more = -1;
-      if (this.sortDirection === 'asc') {
-        less = -1;
-        more = 1;
-      }
-      if (this.sortProperty === 'name') {
-        if (a.inventoryItem.product.name < b.inventoryItem.product.name) {
-          return less;
-        }
-        if (a.inventoryItem.product.name > b.inventoryItem.product.name) {
-          return more;
-        }
-      } else if (this.sortProperty === 'created') {
-        if (a.created < b.created) {
-          return less;
-        }
-        if (a.created > b.created) {
-          return more;
-        }
-      } else if (this.sortProperty === 'closing') {
-        if (a.closes < b.closes) {
-          return less;
-        }
-        if (a.closes > b.closes) {
-          return more;
-        }
-      } else if (this.sortProperty === 'price') {
-        if (a.price < b.price) {
-          return less;
-        }
-        if (a.price > b.price) {
-          return more;
-        }
-      }
-
-      return 0;
-    },
-    /**
-     * Sorts all the cards according to the custom sort function compare()
-     **/
-    sortListings() {
-      this.cards.sort(this.compare)
-    },
-
-    /**
-     * Splits all the listings for pagination
-     **/
-    splitListings() {
-      return this.cards.slice((this.currentPage - 1) * this.perPage, this.perPage * this.currentPage);
-    },
 
     /**
      * open listing modal
@@ -250,10 +188,11 @@ export default {
      * read all the listing in for the corresponding business
      **/
     getListings: async function () {
-      await api.getListings(this.businessId)
+      await api.getListings(this.businessId, this.perPage, this.currentPage - 1, this.sortProperty, this.sortDirection)
           .then((response) => {
             this.$log.debug("Listing Data", response);
-            this.cards = response.data;
+            this.totalResults = response.data.totalItems;
+            this.cards = response.data.listings;
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -310,6 +249,15 @@ export default {
       const id = to.params.id;
       this.launchPage(id);
     },
+
+    '$data.currentPage': {
+      handler: function() {
+        this.getListings(this.business);
+      },
+      deep: true
+    }
+
+
   },
 
 

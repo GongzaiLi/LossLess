@@ -16,7 +16,7 @@ Date: sprint_1
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
-        <b-nav-item to="/marketPlace"> Market Place </b-nav-item>
+        <b-nav-item to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
@@ -184,7 +184,6 @@ export default {
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
       this.$router.push(`/businesses/${business.id}`);
-      console.log(this.$currentUser.currentlyActingAs);
     },
     /**
      * Sets the user to act as themselves again. Also sets the API
@@ -193,7 +192,6 @@ export default {
     actAsUser() {
       setCurrentlyActingAs(null);
       this.$router.push(`/users/${this.$currentUser.id}`);
-      console.log(this.$currentUser.currentlyActingAs);
     }
   },
 }
