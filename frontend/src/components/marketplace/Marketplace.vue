@@ -57,6 +57,7 @@ Date: 21/5/21
             :closeFullViewCardModal="closeFullCardModal"
             :deleteSelectedCard="deleteSelectedCard"
             :cardId = "this.cardId"
+            v-on:extendCard="extendExpiry"
             >  </MarketplaceCardFull>
       </b-modal>
 
@@ -195,6 +196,19 @@ export default {
         return "Server error";
       }
     },
+
+    /**
+     * Sends an API request to extend a card determined by the cardId
+     */
+    extendExpiry: function() {
+      api
+          .extendCardExpiry(this.cardId)
+          .catch((error) => {
+            this.$log.debug(error);
+          })
+      this.closeFullCardModal();
+    }
+
   },
 
 }

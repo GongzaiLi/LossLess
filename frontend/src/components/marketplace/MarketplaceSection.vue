@@ -51,7 +51,16 @@
       </template>
 
       <template v-slot:cell(actions)="{ item }">
-        <div v-if="item.creator.id === $currentUser.id"><b-button @click="openExtendConfirmDialog(item.id)" size="sm" style="margin-top: -10px; margin-bottom: -8px"> Extend <b-icon-alarm/></b-button></div>
+        <div v-if="item.creator.id === $currentUser.id">
+          <b-button
+              variant="success"
+              @click="openExtendConfirmDialog(item.id)"
+              size="sm"
+              v-b-tooltip.hover title="Extend Card Expiry"
+              style="margin-top: -10px; margin-bottom: -8px">
+            <b-icon-alarm/>
+          </b-button>
+        </div>
       </template>
 
       <template #empty>
@@ -76,7 +85,7 @@ import api from "../../Api";
 export default {
   name: "MarketplaceSection",
   components: {pagination, MarketplaceCard},
-  props: ["cards", "isCardFormat", "cardsPerRow", "perPage", "refresh"],
+  props: ["cards", "isCardFormat", "cardsPerRow", "perPage"],
   data: function () {
     return {
       cardToBeExtended: "",
@@ -133,7 +142,7 @@ export default {
       api
           .extendCardExpiry(this.cardToBeExtended)
           .then(() => {
-            this.refresh(this.$currentUser.id);
+            this.$emit("refreshPage")
           })
           .catch((error) => {
             this.$log.debug(error);

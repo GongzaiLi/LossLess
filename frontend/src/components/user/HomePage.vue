@@ -25,7 +25,7 @@
           :is-card-format="isCardFormat"
           :cardsPerRow:="3"
           :perPage="5"
-          :refresh="getUserExpiredCards"
+          v-on:refreshPage="getUserExpiredCards"
       />
       </b-card>
   </b-card>
@@ -75,7 +75,7 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
-            this.getUserExpiredCards(id);
+            this.getUserExpiredCards();
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -87,9 +87,9 @@ export default {
      * The function id means user's id, if the server finds
      * the user's expiring cards will response the data and keep the data into this.expiringCards
      */
-    getUserExpiredCards: function (id) {
+    getUserExpiredCards: function () {
       api
-          .getExpiringCards(id)
+          .getExpiringCards(this.$currentUser.id)
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.expiringCards = response.data;

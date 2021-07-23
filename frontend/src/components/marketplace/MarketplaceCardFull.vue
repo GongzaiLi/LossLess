@@ -34,9 +34,16 @@
       </b-input-group-text>
       <br>
       <div>
-        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
+        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
+        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="success" @click="openExtendConfirmDialog"> Extend <b-icon-alarm/></b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
+
+      <b-modal ref="confirmExtendCardModal" size="sm" title="Extend Expiry" ok-variant="success" ok-title="Extend" @ok="confirmExtendExpiry">
+        <h6>
+          Are you sure you want to <strong>extend</strong> this card's expiry?
+        </h6>
+      </b-modal>
 
     </div>
   </b-card>
@@ -73,6 +80,22 @@ export default {
       }).catch((error) => {
           this.$log.debug(error);
       })
+    },
+
+    /**
+     * Opens the dialog to confirm if the card can be extended
+     */
+    openExtendConfirmDialog: function() {
+      this.$refs.confirmExtendCardModal.show();
+    },
+
+
+    /**
+     * Emits an event `extendCard` to extend a card
+     * that is listened to inside the marketplace
+     */
+    confirmExtendExpiry() {
+      this.$emit('extendCard')
     }
 
   },
@@ -96,7 +119,7 @@ export default {
      * Returns true if user is creator of the card or an Application admin
      * @returns {boolean}
      */
-    canDelete: function(){
+    canDeleteOrExtend: function(){
       return(this.fullCard.creator.id===this.$currentUser.id || this.$currentUser.role!=='user');
     }
   }
