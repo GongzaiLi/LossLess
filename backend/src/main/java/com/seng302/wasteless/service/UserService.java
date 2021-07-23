@@ -3,10 +3,14 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -122,7 +126,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
         }
 
-        logger.info("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        logger.debug("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
         return user;
     }
 
@@ -137,14 +141,34 @@ public class UserService {
 
 
     /**
-     * Search for users by a search query.
+     *  Search for users by a search query. Returns upto count results. Starts at 'page' offset. Sorts by sortBy.
+     *  Sort direction sortDirection
      *
-     * @param searchQuery       The search query
-     * @return                  A ArrayList of all matching users
+     * @param searchQuery   The query to search for
+     * @param count         The number of results to return
+     * @param offset        The offset to start from
+     * @param sortBy        The column to sort by
+     * @param sortDirection The direction to sort by (ASC, DESC)
+     * @return  An array of users matching the search params
      */
-    public ArrayList<User> searchForMatchingUsers(String searchQuery) {
+    public ArrayList<User> searchForMatchingUsers(String searchQuery, Integer count, Integer offset, UserSearchSortTypes sortBy, String sortDirection) {
 
-        return userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
+        Pageable pageable = PageRequest.of(
+                offset,
+                count,
+                sortDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortBy.toString()
+        );
+
+        return userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery, pageable);
+    }
+
+    /**
+     * Calculates the total count of users matching searchQuery.
+     * @return the total count of users.
+     */
+    public Integer getTotalUsersCountMatchingQuery(String searchQuery) {
+        return userRepository.countAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
     }
 
     /**

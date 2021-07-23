@@ -93,7 +93,6 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.expiringCards = response.data;
-            console.log(response.data)
           })
           .catch((error) => {
             this.$log.debug(error);

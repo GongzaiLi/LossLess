@@ -5,18 +5,19 @@
         class="marketplace-card"
     >
       <h5 class="card-title single-line-clamped">{{cardInfo.title}}</h5>
+      <p class="sub-title">Ends: {{ formatExpiry }}</p>
       <hr>
       <b-card-text>
-        <p class="single-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+        <p class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
       </b-card-text>
       <hr>
       <b-card-text class="single-line-clamped">
         Tags: <b-badge v-for="keyword in this.cardInfo.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
       </b-card-text>
       <b-card-text>
-        Seller: {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
+        <b-icon-person-fill/> {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
         <br>
-        Location: {{ formatAddress }}
+        <b-icon-house-door-fill/> {{ formatAddress }}
       </b-card-text>
     </b-card>
 </template>
@@ -25,10 +26,12 @@
 .marketplace-card {
   cursor: pointer;
 }
+
 .marketplace-card:hover {
   -webkit-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
 }
+
 /*
 This clamps to one line with ellipsis when overflowed
 */
@@ -36,6 +39,20 @@ This clamps to one line with ellipsis when overflowed
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.dual-line-clamped {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+p.sub-title {
+  font-style: italic;
+  color: grey;
+  font-size: 13px;
 }
 </style>
 
@@ -62,6 +79,13 @@ export default {
     formatAddress: function () {
       const address = this.cardInfo.creator.homeAddress;
       return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
+    },
+
+    /**
+     * format Expiry date
+     */
+    formatExpiry: function () {
+      return new Date(this.cardInfo.displayPeriodEnd).toUTCString().split(" ").slice(0, 4).join(" ");
     }
   }
 }

@@ -1,12 +1,10 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.Inventory;
-import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ListingsService;
@@ -131,22 +129,58 @@ public class ListingController {
      * @param businessId The id of the business to get
      * @param offset value of the offset from the start of the results query. Used for pagination
      * @param count number of results to be returned
+     * @param sortBy the column to sort by
+     * @param sortDirection the direction to sort
      * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/listings")
     @JsonView(ListingViews.GetListingView.class)
-    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
+    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId,
+                                                        @RequestParam(required = false, defaultValue = "0") Integer offset,
+                                                        @RequestParam(required = false, defaultValue = "10") Integer count,
+                                                        @RequestParam(value = "sortBy", required = false, defaultValue = "NAME") String sortBy,
+                                                        @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") String sortDirection
+
+    ) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
-        logger.debug("Received count:{} offset:{}", count, offset);
+        logger.info("Request with params count:{} offset:{} sortBy:{} sortDirection: {}", count, offset, sortBy, sortDirection);
+        GetListingsSortTypes sortType;
+
+
+        if (count < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be positive if provided.");
+        } else if (offset < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
+        }
+
+        try {
+            sortType = GetListingsSortTypes.valueOf(sortBy);
+        } catch (IllegalArgumentException e) {
+            logger.info("Invalid value for sortBy. Value was {}", sortBy);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortBy. Acceptable values are: NAME, PRICE, CREATED, CLOSES");
+        }
+
+        if (!sortDirection.equals("ASC") && !sortDirection.equals("DESC")) {
+            logger.info("Invalid value for sortDirection. Value was {}", sortDirection);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortDirection. Acceptable values are: ASC, DESC");
+        }
+
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        List<Listing> listings = listingsService.findByBusinessId(businessId);
-        logger.info("{}", listings);
-        return ResponseEntity.status(HttpStatus.OK).body(listings);
+        List<Listing> listings = listingsService.findCountByBusinessIdFromOffset(businessId, offset, count, sortType, sortDirection);
+
+        Integer totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+
+        GetListingDto getListingDto = new GetListingDto()
+                .setListings(listings)
+                .setTotalItems(totalItems);
+
+        logger.info("{}", getListingDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 
     /**
