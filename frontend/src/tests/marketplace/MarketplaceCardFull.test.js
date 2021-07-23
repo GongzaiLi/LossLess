@@ -118,7 +118,7 @@ beforeEach(() => {
 
     wrapper = shallowMount(MarketplaceCardFull, {
         localVue,
-        propsData: {closeFullViewCardModal: ()=>{}, cardId: 500},
+        propsData: {closeFullViewCardModal: ()=>{}, cardId: 500, deleteSelectedCard: ()=>{}},
         mocks: {$route, $log, $currentUser},
         methods: {},
     });

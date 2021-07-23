@@ -1,6 +1,6 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 
-import { BootstrapVue } from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import homePage from '../../components/user/HomePage';
 import Api from "../../Api";
 import Router from 'vue-router'
@@ -35,6 +35,7 @@ const $log = {
 beforeEach(() => {
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
+  localVue.use(BootstrapVueIcons);
   localVue.use(mockUserAuthPlugin);
   localVue.use(Router);
 
