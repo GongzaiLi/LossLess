@@ -1,8 +1,9 @@
 <template>
   <b-card>
     <div>
-      <h1 align="left"><strong> {{fullCard.title}} </strong></h1>
+      <h1 align="left"><strong> {{fullCard.title}}  </strong></h1>
       <b-container>
+        <h6 aligh="left"> Card Listed On: {{formatCreated}} </h6>
         <h6 aligh="Left"> Card Ends: {{formatExpiry}}</h6>
       </b-container>
       <br>
@@ -32,7 +33,6 @@
         </b-container>
       </b-input-group-text>
       <br>
-      <h6 align="left"> Listed On {{fullCard.created}}</h6>
       <div>
         <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
@@ -84,6 +84,14 @@ export default {
     formatExpiry: function () {
       return new Date(this.fullCard.displayPeriodEnd).toUTCString().split(" ").slice(0, 5).join(" ");
     },
+
+    /**
+     * format Created date
+     */
+    formatCreated: function() {
+      return new Date(this.fullCard.created).toUTCString().split(" ").slice(0, 5).join(" ");
+    },
+
     /**
      * Returns true if user is creator of the card or an Application admin
      * @returns {boolean}

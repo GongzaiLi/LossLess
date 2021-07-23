@@ -106,7 +106,9 @@ beforeEach(() => {
                 postcode: "90210"
             },
         },
-        keywords: []
+        keywords: [],
+        created: "",
+        displayPeriodEnd: "",
     };
 
     const localVue = createLocalVue()

@@ -8,7 +8,7 @@ Date: 21/5/21
 <template>
   <div>
     <b-card class="shadow">
-      <h1><b-icon-shop/> Market Place </h1>
+      <h1><b-icon-shop/> Marketplace </h1>
       <b-button @click="openCreateCardModal" class="float-right">
         <b-icon-plus-square-fill animation="fade"/>
         Create
