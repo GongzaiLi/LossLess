@@ -47,7 +47,7 @@ export default {
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
   searchUser: (searchParameter, count=10, offset=0, sortBy="NAME", sortDirection="ASC") => instance.get(`users/search?searchQuery=${searchParameter}&count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
-  getProducts: (id) => instance.get(`/businesses/${id}/products`, {withCredentials: true}),
+  getProducts: (id, count, offset, sortBy="ID", sortDirection="ASC") => instance.get(`/businesses/${id}/products?count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),

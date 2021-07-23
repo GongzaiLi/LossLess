@@ -1,12 +1,16 @@
 package com.seng302.wasteless.service;
 
 
+import com.seng302.wasteless.model.GetProductSortTypes;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.repository.ProductRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -82,12 +86,33 @@ public class ProductService {
     }
 
     /**
-     * Get all the products for a chosen business
+     * Get the count of products of a business
+     *
+     * @param id   The id of the business to get the prouct count of
+     * @return     The product count
+     */
+    public Integer getTotalProductsCountByBusinessId(Integer id) {
+        return productRepository.countProductByBusinessId(id);
+    }
+
+    /**
+     * Get count number of products for a chosen business. Starting at offset.
+     * Sorted by sortBy and sortDirection
      *
      * @param id The id of a business
      * @return A list of business's products, if any, otherwise empty list
      */
-    public List<Product> getAllProductsByBusinessId(Integer id) { return  productRepository.findAllByBusinessId(id); }
+    public List<Product> getCountProductsByBusinessIdFromOffset(Integer id, Integer offset, Integer count, GetProductSortTypes sortBy, String sortDirection) {
+
+        Pageable pageable = PageRequest.of(
+                offset,
+                count,
+                sortDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortBy.toString()
+        );
+
+        return  productRepository.findAllByBusinessId(id, pageable);
+    }
 
 
     /**

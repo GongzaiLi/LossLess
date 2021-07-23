@@ -16,8 +16,8 @@
       @row-clicked="tableRowClick"
   >
     <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
-      <b-img v-if="!data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src="require(`/public/product_default.png`)" alt="Product has no image" />
-      <b-img v-if="data.item.product.primaryImage" center thumbnail class="product-image-thumbnail d-block w-44 rounded" :src=getThumbnail(data.item.product) />
+      <b-img v-if="!data.item.product.primaryImage" center class="product-image-thumbnail" :src="require(`/public/product_default.png`)" alt="Product has no image" />
+      <b-img v-if="data.item.product.primaryImage" center class="product-image-thumbnail" :src=getThumbnail(data.item.product) />
     </template>
 
     <template v-slot:cell(actions)="product">
@@ -56,13 +56,16 @@
 }
 
 .product-image-thumbnail {
-  height: 66px !important;
+  height: 60px !important;
   object-fit: cover;
-  width: 66px;
+  max-width: 80px;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
 }
 
 .thumbnail-row {
-  padding: 0.5rem 0 0.5rem 0 !important;
+  padding: 0 !important;
+  max-width: 60px;
 }
 </style>
 
@@ -79,7 +82,6 @@ export default {
     return {
       items: [],
       business: {},
-      products: [],
       perPage: 10,
       currentPage: 1,
       tableLoading: true,
@@ -104,7 +106,6 @@ export default {
      */
     getBusinessInfo: async function (businessId) {
       this.tableLoading = true;
-      const getProductsPromise = api.getProducts(businessId)
       const getInventoryPromise = api.getInventory(businessId)
       const currencyPromise = api.getBusiness(businessId)
           .then((resp) => {
@@ -113,8 +114,7 @@ export default {
           })
 
       try {
-        const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
-        this.products = productsResponse.data;
+        const [currency, inventoryResponse] = await Promise.all([currencyPromise, getInventoryPromise])
         this.items = inventoryResponse.data;
         this.tableLoading = false;
         if (currency != null) {
@@ -183,7 +183,6 @@ export default {
         {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
-          thStyle: 'width: 60px',
           label: 'Thumbnail',
         },
         {
