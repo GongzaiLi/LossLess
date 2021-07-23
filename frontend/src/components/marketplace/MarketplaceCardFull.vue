@@ -33,11 +33,16 @@
       </b-input-group-text>
       <br>
 
-
       <div>
-        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
+        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
+
+      <b-modal ref="confirmDeleteCardModal" size="sm" title="Delete Card" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteCard">
+        <h6>
+          Are you sure you want to <strong>permanently</strong> delete this card?
+        </h6>
+      </b-modal>
 
     </div>
   </b-card>
@@ -47,7 +52,7 @@
 import api from "../../Api";
 export default {
   name: "full-card",
-  props: ["cardId", 'closeFullViewCardModal','deleteSelectedCard'],
+  props: ["cardId", 'closeFullViewCardModal'],
   data() {
     return {
       fullCard: {
@@ -58,7 +63,7 @@ export default {
           }
 
         }
-      }
+      },
     }
   },
   mounted() {
@@ -66,6 +71,9 @@ export default {
   },
   methods: {
 
+    /**
+     * A
+     */
     getCard() {
       api.getFullCard(this.cardId)
         .then((resp) => {
@@ -74,6 +82,22 @@ export default {
       }).catch((error) => {
           this.$log.debug(error);
       })
+    },
+
+    /**
+     * Opens the dialog to confirm if the image with given id should be deleted.
+     * Stores the given id in this.imageIdToDelete
+     */
+    openDeleteConfirmDialog: function() {
+      this.$refs.confirmDeleteCardModal.show();
+    },
+
+    /**
+     * Emits an event `deleteCard` to delete a card
+     * that is listened to inside the marketplace
+     */
+    confirmDeleteCard() {
+      this.$emit('deleteCard')
     }
 
 
@@ -84,7 +108,7 @@ export default {
      * @returns {boolean}
      */
     canDelete: function(){
-      return(this.fullCard.creator.id==this.$currentUser.id || this.$currentUser.role!='user');
+      return(this.fullCard.creator.id===this.$currentUser.id || this.$currentUser.role!=='user');
     }
   }
 }

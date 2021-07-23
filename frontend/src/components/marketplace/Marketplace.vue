@@ -28,6 +28,7 @@ Date: 21/5/21
             :cards="marketplaceCards"
             :is-card-format="isCardFormat"
             v-on:cardClicked="openFullCardModal"
+            v-on:deleteCard="deleteSelectedCard"
             :cardsPerRow:="3"
             :perPage="10"
           />
@@ -57,9 +58,9 @@ Date: 21/5/21
       <b-modal id="full-card" hide-header hide-footer>
         <MarketplaceCardFull
             :closeFullViewCardModal="closeFullCardModal"
-            :deleteSelectedCard="deleteSelectedCard"
             :cardId = "this.cardId"
-            >  </MarketplaceCardFull>
+            v-on:deleteCard="deleteSelectedCard">
+        </MarketplaceCardFull>
       </b-modal>
 
       <b-modal id="create-card" hide-header hide-footer>
@@ -131,11 +132,18 @@ export default {
       this.$bvModal.hide('create-card');
     },
 
+    /**
+     * Sends an API request to delete a card determined given the cardId
+     * and deletes the card from the marketplaceCards list using filter
+     */
     deleteSelectedCard(){
-      api.deleteCard(this.cardId);
+      api.deleteCard(this.cardId)
+          .catch((error) => {
+        this.$log.debug(error);
+      });
       this.closeFullCardModal();
+      this.marketplaceCards = this.marketplaceCards.filter(card => card.id != this.cardId);
     },
-
 
     /**
      * Sends an API request to get all cards determined by the current tab the user is on.
