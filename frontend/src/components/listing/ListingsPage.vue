@@ -127,7 +127,7 @@ export default {
       cards: [],
       sortProperty: 'NAME',
       sortDirection: 'ASC',
-      perPage: 2,
+      perPage: 12,
       currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
