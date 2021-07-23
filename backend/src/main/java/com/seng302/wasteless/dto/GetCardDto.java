@@ -25,6 +25,7 @@ public class GetCardDto {
     private String description;
     private List<String> keywords;
     private LocalDateTime created;
+    private LocalDateTime displayPeriodEnd;
 
     /**
      * Creates a new DTO from a Card entity
@@ -38,5 +39,6 @@ public class GetCardDto {
         setDescription(card.getDescription());
         setKeywords(card.getKeywords());
         setCreated(card.getCreated());
+        setDisplayPeriodEnd(card.getDisplayPeriodEnd());
     }
 }
