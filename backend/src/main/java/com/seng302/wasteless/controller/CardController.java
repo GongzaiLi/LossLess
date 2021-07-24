@@ -218,13 +218,48 @@ public class CardController {
         Card card = cardService.findCardById(id);
 
         if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot delete productImage. User: {} does not own this card and is not global admin", user);
+            logger.warn("Cannot delete card. User: {} does not own this card and is not global admin", user);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
         }
         logger.info("User: {} validated as owner of card or global admin.", user);
 
         cardService.deleteCard(card);
         return ResponseEntity.status(HttpStatus.OK).body("Card deleted successfully");
+    }
+
+    /**
+     * Handle extend put request to /cards endpoint for extension of card expiry.
+     * Request are validated for create fields by Spring, if bad then returns 400 with map of errors
+     *
+     * Returns:
+     * 400 BAD_REQUEST If invalid id, id is not an integer
+     * 401 UNAUTHORIZED If no user is logged on.
+     * 403 FORBIDDEN If user does not own the card and is not a GAA
+     * 406 NOT_ACCEPTABLE If the card doesn't exist
+     * 200 If successfully extended card.
+     * @param id The unique id of the card to be extended.
+     * @return Status code dependent on success. 400, 401, 403, 406 errors. 200 If extended successfully.
+     */
+    @PutMapping("/cards/{id}/extenddisplayperiod")
+    public ResponseEntity<Object> extendCard(@PathVariable Integer id) {
+        logger.info("Request to extend card id: {}", id);
+
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Got User {}", user);
+
+        Card card = cardService.findCardById(id);
+
+        if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
+            logger.warn("Cannot extend card. User: {} does not own this card and is not global admin", user);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
+        }
+        logger.info("User: {} validated as owner of card or global admin.", user);
+
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
+        logger.info("User: {} Extended card: {} by two weeks.", user, card);
+
+        cardService.createCard(card);
+        return ResponseEntity.status(HttpStatus.OK).body("End of display period successfully extended by two weeks");
     }
 
 }

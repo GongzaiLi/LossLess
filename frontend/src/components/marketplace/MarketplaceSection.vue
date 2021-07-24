@@ -5,6 +5,7 @@
         <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
           <marketplace-card
               :card-info="cardInfo"
+              v-on:cardClicked="cardClickHandler"
           />
         </b-col>
       </b-row>
@@ -22,7 +23,7 @@
              bordered
              stacked="sm"
              show-empty
-             @row-clicked="rowClickHandler"
+             @row-clicked="cardClickHandler"
              class="overflow-auto"
              :fields="fields"
              :per-page="perPage"
@@ -30,23 +31,23 @@
              :current-page="currentPage"
     >
       <template v-slot:cell(title)="{ item }">
-        <div v-b-tooltip="item.title">{{shortenText(item.title, 20)}}</div>
+        <div>{{shortenText(item.title, 20)}}</div>
       </template>
 
       <template v-slot:cell(keywords)="{ item }">
-        <div v-b-tooltip="formatTags(item.keywords)">{{shortenText(formatTags(item.keywords), 20)}}</div>
+        <div><b-badge v-for="keyword in item.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge></div>
       </template>
 
       <template v-slot:cell(description)="{ item }">
-        <div v-b-tooltip="item.description">{{shortenText(item.description, 20)}}</div>
+        <div>{{shortenText(item.description, 20)}}</div>
       </template>
 
       <template v-slot:cell(creator)="{ item }">
-        <div v-b-tooltip="item.creator.firstName">{{shortenText(item.creator.firstName + " " + item.creator.lastName, 15)}}</div>
+        <div>{{shortenText(item.creator.firstName + " " + item.creator.lastName, 15)}}</div>
       </template>
 
       <template v-slot:cell(location)="{ item }">
-        <div v-b-tooltip="item.creator.homeAddress">{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
+        <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
       </template>
 
       <template #empty>
@@ -83,10 +84,9 @@ export default {
     /**
      * When called do currently undetermined action
      */
-    rowClickHandler: function (record) {
-      console.log("Clicked row: ", record);
+    cardClickHandler: function (card) {
+      this.$emit('cardClicked', card.id)
     },
-
 
     /**
      * Return given in shortened format
@@ -100,18 +100,10 @@ export default {
     },
 
     /**
-     * Return tags in a joined format
-     */
-    formatTags(tags) {
-      return tags.join(", ");
-    },
-
-    /**
      * Combine fields of address
      */
     formatAddress: function (address) {
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
     }
   },
 

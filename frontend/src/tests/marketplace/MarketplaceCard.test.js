@@ -41,7 +41,9 @@ beforeEach(() => {
                     postcode: "90210"
             },
         },
-        keywords: []
+        keywords: [],
+        created: "",
+        displayPeriodEnd: "",
     };
 
     const localVue = createLocalVue()
@@ -61,10 +63,29 @@ afterEach(() => {
     wrapper.destroy();
 });
 
-describe ("format-tag", () => {
-    it('check-format-tag-joins-a-list',  async() => {
-        cardInfo.keywords = ["key1", "key2", "key3"]
+describe ("format-address", () => {
+    it('normal address, no nulls',  async() => {
+
+        expect(wrapper.vm.formatAddress).toStrictEqual("Upper Riccarton, Christchurch");
+    })
+    it('null suburb',  async() => {
+        cardInfo.creator.homeAddress = {
+            streetNumber: "3/24",
+            streetName: "Ilam Road",
+            suburb: null,
+            city: "Christchurch",
+            region: "Canterbury",
+            country: "New Zealand",
+            postcode: "90210"
+        }
+        expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch");
+    })
+})
+
+describe ("format-expiry-date", () => {
+    it('check-format-expiry-date',  async() => {
+        cardInfo.displayPeriodEnd = "2021-07-21";
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.formatTags).toStrictEqual("key1, key2, key3")
+        expect(wrapper.vm.formatExpiry).toStrictEqual("Wed, 21 Jul 2021")
     })
 })

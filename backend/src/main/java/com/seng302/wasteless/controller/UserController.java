@@ -8,6 +8,7 @@ import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
@@ -140,30 +141,52 @@ public class UserController {
      * Searches first, last, middle, and nicknames for partial or full matches with the query, case insensitive.
      *
      * Takes a search query, offset, and count. Returns upto 'count' matching results, offset by the offset.
+     * Sorted by sortBy, Sort direction by sortDirection
      *
-     * Default values: offset is 0 and count is 10.
+     * Default values: offset is 0, count is 10, sortBy is ID, sortDirection is ASC
      *
      * @param searchQuery       The query string to search for in users
-     * @param offset            The offset of the search (how many results to 'skip')
+     * @param offset            The offset of the search (how many pages of results to 'skip')
      * @param count             The number of results to return
+     * @param sortBy            The field (if any) to sort by
      * @return                  List of users who match the search query, maximum length of count, offset by offset.
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset, @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery,
+                                               @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                               @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
+                                               @RequestParam(value = "sortBy", required = false, defaultValue = "NONE") String sortBy,
+                                               @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") String sortDirection
+                                               ) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
         logger.info("Received count:{} offset:{}", count, offset);
-        logger.info("Using count:{} offset:{}", count, offset);
+        logger.info("Using count:{} offset:{} sortBy:{}", count, offset, sortBy);
+        UserSearchSortTypes sortType;
 
-        if (count < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be positive if provided.");
+        try {
+            sortType = UserSearchSortTypes.valueOf(sortBy);
+        } catch (IllegalArgumentException e) {
+            logger.info("Invalid value for sortBy. Value was {}", sortBy);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortBy. Acceptable values are: NAME, NICKNAME, EMAIL, ROLE, NONE");
+        }
+
+        if (!sortDirection.equals("ASC") && !sortDirection.equals("DESC")) {
+            logger.info("Invalid value for sortDirection. Value was {}", sortDirection);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortDirection. Acceptable values are: ASC, DESC");
+        }
+
+        if (count < 1) {
+            logger.info("Count must be great than or equal to one. Value was {}", count);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be great than or equal to one.");
         } else if (offset < 0) {
+            logger.info("Offset must be great than or equal to one. Value was {}", offset);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
         }
 
         logger.debug("Getting users matching query: {}", searchQuery);
 
-        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset);
+        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset, sortType, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
 
