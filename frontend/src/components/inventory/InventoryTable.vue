@@ -83,7 +83,7 @@ export default {
     return {
       items: [],
       business: {},
-      perPage: 2,
+      perPage: 10,
       currentPage: 1,
       sortDesc: false,
       sortBy: "",
@@ -108,7 +108,6 @@ export default {
      * @param businessId
      */
     getBusinessInfo: async function (businessId) {
-      console.log("HERERERER", this.sortBy);
       let sortDirectionString = "ASC"
       if (this.sortDesc) {
         sortDirectionString = "DESC"
@@ -159,17 +158,17 @@ export default {
             this.business = resp.data;
             return api.getUserCurrency(resp.data.address.country);
           })
-
       try {
         const [currency, inventoryResponse] = await Promise.all([currencyPromise, getInventoryPromise])
-        console.log(inventoryResponse, "HERERRERER");
-        this.items = inventoryResponse.data;
+
+        this.items = inventoryResponse.data.inventory;
 
         this.totalItems = inventoryResponse.data.totalItems;
-        this.$refs.inventoryTable.refresh();
+
         if (currency != null) {
           this.currency = currency;
         }
+        this.$refs.inventoryTable.refresh();
       } catch (error) {
         this.$log.debug(error);
       }

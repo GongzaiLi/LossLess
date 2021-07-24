@@ -255,8 +255,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[0].quantity", is(5)));
+                .andExpect(jsonPath("inventory[0].id", is(2)))
+                .andExpect(jsonPath("inventory[0].quantity", is(5)));
     }
 
     @Test

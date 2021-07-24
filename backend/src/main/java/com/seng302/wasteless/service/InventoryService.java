@@ -81,4 +81,15 @@ public class InventoryService {
      */
     public Integer updateInventoryItemQuantity(Integer newQuantity, Integer inventoryId) { return inventoryRepository.updateInventoryQuantity(newQuantity, inventoryId); }
 
+    /**
+     * Get the count of inventory items of a business
+     *
+     * @param id   The id of the business to get the inventory count of
+     * @return     Amount of inventory items in database for that business
+     */
+    public Integer getTotalInventoryCountByBusinessId(Integer id) {
+        return inventoryRepository.countInventoryByBusinessId(id);
+    }
+
+
 }

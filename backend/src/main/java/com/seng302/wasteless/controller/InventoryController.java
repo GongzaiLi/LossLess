@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 
+import com.seng302.wasteless.dto.GetInventoryDto;
 import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.model.Business;
@@ -122,9 +123,15 @@ public class InventoryController {
         logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
         List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId, pageable);
 
+        Integer totalItems = inventoryService.getTotalInventoryCountByBusinessId(businessId);
+
+        GetInventoryDto getInventoryDto = new GetInventoryDto()
+                .setInventory(inventoryList)
+                .setTotalItems(totalItems);
+
 
         logger.info("INVENTORY Products retrieved: {} for business: {}", inventoryList, possibleBusiness);
-        return ResponseEntity.status(HttpStatus.OK).body(inventoryList);
+        return ResponseEntity.status(HttpStatus.OK).body(getInventoryDto);
 
     }
 
