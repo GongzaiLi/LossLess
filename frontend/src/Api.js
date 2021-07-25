@@ -62,7 +62,7 @@ export default {
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
   createCard: (cardData) => instance.post("/cards", cardData, {withCredentials: true}),
-  getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
+  getCardsBySection: (section, currentPage, perPage) => instance.get(`/cards?section=${section}&page=${currentPage}&size=${perPage}`, {withCredentials: true}),
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),

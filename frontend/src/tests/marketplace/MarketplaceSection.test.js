@@ -1,6 +1,7 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import MarketplaceSection from '../../components/marketplace/MarketplaceSection';
+import Api from '../../Api'
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -29,6 +30,11 @@ let cardInfo;
 jest.mock('../../Api');
 
 beforeEach(() => {
+    Api.getCardsBySection.mockResolvedValue({data: {
+        results: [{id: 1}],
+        totalItems: 1
+    }})
+
     cardInfo = [{
         creator: {
             homeAddress: {
@@ -50,7 +56,7 @@ beforeEach(() => {
 
     wrapper = shallowMount(MarketplaceSection, {
         localVue,
-        propsData: {cards:cardInfo},
+        propsData: {section: "ForSale", perPage: 10},
         mocks: {$route, $log, $currentUser},
         methods: {},
     });
@@ -129,8 +135,15 @@ describe ("format-address", () => {
     })
 })
 
-describe ("number_of_cards", () => {
-    it('1 card',  async() => {
-        expect(wrapper.vm.totalItems).toStrictEqual(1);
+describe ("Page Change handler", () => {
+    it('causes page refresh when page changed to 2',  async() => {
+        Api.getCardsBySection.mockResolvedValue({data: {
+            results: [{id: 1}],
+            totalItems: 11
+        }});
+        await wrapper.vm.pageChanged(2);
+
+        expect(Api.getCardsBySection).toHaveBeenCalledWith("ForSale", 1, 10);
+        expect(wrapper.vm.totalItems).toBe(11);
     })
 })

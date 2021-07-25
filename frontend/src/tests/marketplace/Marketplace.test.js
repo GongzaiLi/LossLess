@@ -122,18 +122,6 @@ afterEach(() => {
   wrapper.destroy();
 });
 
-describe('check-api-request-get-all-cards-by-section', () => {
-  test('check-api-request-get-all-cards-by-section-call-sets-wrapper-marketplaceCards-to-api-response', async () => {
-    const request = "Wanted";
-
-    Api.getCardsBySection.mockResolvedValue(response);
-
-    await wrapper.vm.getCardsFromSection(request);
-
-    expect(wrapper.vm.marketplaceCards).toBe(response.data);
-  })
-});
-
 describe('test-api-request-post-card', () => {
   it('should return response with status code 201 and card id', async function () {
     const response = {
