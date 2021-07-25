@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.GetCardDto;
+import com.seng302.wasteless.dto.GetCardsDto;
 import com.seng302.wasteless.dto.PostCardDto;
 import com.seng302.wasteless.dto.mapper.PostCardDtoMapper;
 import com.seng302.wasteless.model.Card;
@@ -12,8 +13,8 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -59,10 +60,11 @@ public class CardController {
         cardService.checkValidSection(section);
         CardSections cardSection = CardSections.fromString(section);
 
-        List<Card> cards = cardService.findBySection(cardSection, p);
-        List<GetCardDto> cardDTOs = cards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
+        Page<Card> cards = cardService.findBySection(cardSection, p);
 
-        return ResponseEntity.status(HttpStatus.OK).body(cardDTOs);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new GetCardsDto(cards.getContent(), cards.getTotalElements()));
     }
 
     /**
@@ -84,7 +86,6 @@ public class CardController {
         logger.info("Request to create a new card with data Card: {}", cardDtoRequest);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         cardService.checkValidSection(cardDtoRequest.getSection());
 
@@ -127,7 +128,6 @@ public class CardController {
         logger.info("Request to get a user's expiring cards with user id: {}", userId);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         if (!userId.equals(user.getId())) {
             logger.info("User ({}) tried to access the expiring cards of another user ({}).", user.getId(), userId);
@@ -165,7 +165,6 @@ public class CardController {
         logger.info("Request to get card with id: {}", cardId);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         logger.info("Retrieving Card");
         Card card = cardService.findCardById(cardId);
@@ -214,7 +213,6 @@ public class CardController {
         logger.info("Request to delete card id: {}", id);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         Card card = cardService.findCardById(id);
 
@@ -246,7 +244,6 @@ public class CardController {
         logger.info("Request to extend card id: {}", id);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         Card card = cardService.findCardById(id);
 

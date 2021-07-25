@@ -3,7 +3,6 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.repository.CardRepository;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
@@ -15,6 +14,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -135,7 +135,7 @@ class CardControllerUnitTest {
 
         Mockito
                 .when(cardService.findBySection(eq(CardSections.FOR_SALE), any(Pageable.class)))
-                .thenReturn(Collections.singletonList(card));
+                .thenReturn(new PageImpl<>(Collections.singletonList(card)));
 
         Mockito
                 .when(cardService.findCardById(1))
@@ -198,10 +198,10 @@ class CardControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/cards?section=ForSale")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(1)))
-                .andExpect(jsonPath("[0].title", is("Sale")))
-                .andExpect(jsonPath("[0].creator.id", is(1)))
-                .andExpect(jsonPath("[1]").doesNotExist());
+                .andExpect(jsonPath("$.results[0].id", is(1)))
+                .andExpect(jsonPath("$.results[0].creator.id", is(1)))
+                .andExpect(jsonPath("$.totalItems", is(1)))
+                .andExpect(jsonPath("$.results[1]").doesNotExist());
     }
 
     @Test
