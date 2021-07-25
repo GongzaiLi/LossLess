@@ -73,7 +73,8 @@ export default {
   methods: {
 
     /**
-     * A
+     * Calls the API request to get the full details of a card
+     * determined by the given cardId.
      */
     getCard() {
       api.getFullCard(this.cardId)
