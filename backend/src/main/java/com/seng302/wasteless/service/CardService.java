@@ -2,14 +2,12 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.CardSections;
-import com.seng302.wasteless.model.GetProductSortTypes;
 import com.seng302.wasteless.repository.CardRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -57,7 +55,7 @@ public class CardService {
      * @param section The section the card belongs to.
      * @return A (possibly empty) list of all cards that belong to the given section
      */
-    public List<Card> findBySection(CardSections section, Pageable pageable) {
+    public Page<Card> findBySection(CardSections section, Pageable pageable) {
         return cardRepository.findBySection(section, pageable);
     }
 
