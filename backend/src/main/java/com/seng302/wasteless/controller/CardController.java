@@ -255,7 +255,7 @@ public class CardController {
         }
         logger.info("User: {} validated as owner of card or global admin.", user);
 
-        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusSeconds(maxDisplayPeriodSeconds));
         logger.info("User: {} Extended card: {} by two weeks.", user, card);
 
         cardService.createCard(card);
