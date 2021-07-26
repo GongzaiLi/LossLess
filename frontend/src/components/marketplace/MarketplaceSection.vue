@@ -1,7 +1,17 @@
 <template>
-  <div>
+  <div class="p-3 marketplace-section">
+
     <div v-if="isCardFormat">
-      <b-container>
+      <b-row class="pb-2">
+        <b-col md="2"><h3 class="float-right">Sort By:</h3></b-col>
+        <b-col md="2">
+          <b-form-select v-model="sortBy" :options="sortByOptions" id="marketplaceSortBySelect"></b-form-select>
+        </b-col>
+        <b-col md="2">
+          <b-form-select v-model="sortOrder" :options="sortOrderOptions" id="marketplaceSortOrderSelect"></b-form-select>
+        </b-col>
+        <b-col md="2"><b-button @click="refreshData">Sort</b-button></b-col>
+      </b-row>
         <b-row cols-lg="4">
           <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
             <marketplace-card
@@ -10,7 +20,6 @@
             />
           </b-col>
         </b-row>
-      </b-container>
       <div v-if="cards.length === 0">
         <h3> No cards to display </h3>
       </div>
@@ -58,6 +67,17 @@
   </div>
 </template>
 
+<style scoped>
+.marketplace-section {
+  border-bottom: 1px solid #dee2e6;
+  border-left: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+</style>
+
 <script>
 import pagination from "../model/Pagination";
 import MarketplaceCard from "./MarketplaceCard";
@@ -72,6 +92,17 @@ export default {
   },
   data: function () {
     return {
+      sortBy: "created",
+      sortByOptions: [
+        { value: 'created', text: 'Date created' },
+        { value: 'title', text: 'Title' },
+        { value: 'location', text: 'Location'},
+      ],
+      sortOrder: "asc",
+      sortOrderOptions: [
+        { value: 'asc', text: 'Ascending' },
+        { value: 'desc', text: 'Descending' },
+      ],
       currentPage: 1,
       cards: [],
       totalItems: 0,
@@ -82,7 +113,6 @@ export default {
         },
         {
           key: 'description',
-          sortable: true,
         },
         {
           key: 'keywords',
@@ -90,7 +120,6 @@ export default {
         {
           key: 'creator',
           label: "Creator",
-          sortable: true
         },
         {
           key: 'location',
@@ -137,8 +166,7 @@ export default {
     },
 
     async refreshData() {
-      console.log("refreshed");
-      const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage);
+      const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
       this.cards = resp.data.results;
       this.totalItems = resp.data.totalItems;
     }
