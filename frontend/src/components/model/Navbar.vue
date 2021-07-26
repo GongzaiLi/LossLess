@@ -43,7 +43,7 @@ Date: sprint_1
         <div class="icon mr-1" id="bell" @click="bellIconPressed">
           <b-icon v-if="!numberOfNotifications" icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem;"></b-icon>
           <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
-          <span pill v-if="numberOfNotifications" style="position: absolute;">{{numberOfNotifications}}</span>
+          <span v-if="numberOfNotifications" style="position: absolute;">{{numberOfNotifications}}</span>
         </div>
         <div class="notifications" id="box">
           <h2>Notifications - <span> {{numberOfNotifications}}</span></h2>
@@ -225,6 +225,7 @@ export default {
     isActingAsUser: function() {
       return this.$currentUser.currentlyActingAs == null;
     },
+
     /**
      * The name to be displayed in the profile area. It is either the first name of the user,
      * or the name of whichever business the user is acting as.
@@ -236,6 +237,7 @@ export default {
         return this.$currentUser.currentlyActingAs.name;
       }
     },
+
     /**
      * The businesses to show in the dropdown for the profile name. Contains
      * all businesses the user can act as, except for the business the user is acting as currently
@@ -259,12 +261,14 @@ export default {
     businessInventoryRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/inventory"
     },
+
     /**
      * Returns a string constructed to go to the sales page
      */
     businessListingsRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/listings"
     },
+
     /**
      * User friendly display string for the user role to be displayed as a badge.
      * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
@@ -281,14 +285,24 @@ export default {
           return "";
       }
     },
+
+    /**
+     * Checks if there are notifications about expiring or expired cards.
+     * @return The number of total notifications
+     */
     numberOfNotifications: function () {
       if (this.numExpiredCards){
         return this.notifications.length+1;
       }
       return this.notifications.length;
     },
+
+    /**
+     * Checks the number of expired cards
+     * @return The appropriate notification message based on number of cards
+     */
     expiredText: function (){
-      if (this.numExpiredCards==1){
+      if (this.numExpiredCards === 1){
         return " of your cards has expired and been deleted"
       }
       return " of your cards have expired and been deleted"
@@ -309,7 +323,7 @@ export default {
     },
 
     /**
-     * Gets all the expired cards from for the current user.
+     * Gets all the expired cards for the current user.
      */
     getExpiredCards(userId) {
       api.getHasCardsExpired(userId)
@@ -329,7 +343,6 @@ export default {
       }).catch((error) => {
         this.$log.debug(error);
       });
-
     },
 
     /**
@@ -345,8 +358,8 @@ export default {
         document.getElementById("box").style.opacity='1';
         this.showNotifications = true;
       }
-
     },
+
     /**
      * Redirects to the profile of the account the user is acting as.
      * This will be the either the use profile if they are not acting as anyone,
@@ -364,6 +377,7 @@ export default {
         this.$router.push({path: pathToGoTo});
       }
     },
+
     /**
      * Logs out the current user and redirects to the login page.
      * Currently does nothing with managing cookies, this needs to be implemented later.
@@ -372,6 +386,7 @@ export default {
       this.$currentUser = null;
       this.$router.push('/login');
     },
+
     /**
      * Logs out the current user and redirects to the login page.
      * Currently does nothing with managing cookies, this needs to be implemented later.
@@ -380,8 +395,8 @@ export default {
       if (this.$route.fullPath !== '/homepage') {
         this.$router.push('/homepage');
       }
-
     },
+
     /**
      * Sets the user to act as the given business. Also sets the API
      * module to send all future requests acting as this business
@@ -391,6 +406,7 @@ export default {
       setCurrentlyActingAs(business);
       this.$router.push(`/businesses/${business.id}`);
     },
+
     /**
      * Sets the user to act as themselves again. Also sets the API
      * module to revert to sending all requests as the normal user
@@ -413,22 +429,17 @@ export default {
             const cardExpires = new Date(parseInt(date.split("-")[0]), parseInt(date.split("-")[1]) - 1, parseInt(date.split("-")[2]), parseInt(time.split(":")[0]), parseInt(time.split(":")[1]), parseFloat(time.split(":")[2]))
             const currentDate = new Date();
             const currentAfterADay = currentDate.setDate(currentDate.getDate() + 1);
-
             if (cardExpires < currentAfterADay) {
               this.notifications.push(card)
-              console.log("Added")
-            } else {
-              console.log("none Added")
             }
           }
-
         }
       }
     },
   },
 
   created() {
-    this.interval = setInterval(() => this.updateNotifications(), 1000);
+    this.interval = setInterval(() => this.updateNotifications(), 300000);
   },
 }
 </script>
