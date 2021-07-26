@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 
+import com.seng302.wasteless.dto.GetInventoryDto;
 import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
 import com.seng302.wasteless.model.Business;
@@ -15,6 +16,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -104,13 +106,10 @@ public class InventoryController {
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/inventory")
-    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
+    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, Pageable pageable){
         logger.debug("Request to get business INVENTORY products");
-        logger.debug("Received count:{} offset:{}", count, offset);
 
         User user = userService.getCurrentlyLoggedInUser();
-        System.out.println("GOT USER IN CONTROLLER");
-        System.out.println(user.toString());
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -122,11 +121,17 @@ public class InventoryController {
 
 
         logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
-        List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId);
+        List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId, pageable);
+
+        Integer totalItems = inventoryService.getTotalInventoryCountByBusinessId(businessId);
+
+        GetInventoryDto getInventoryDto = new GetInventoryDto()
+                .setInventory(inventoryList)
+                .setTotalItems(totalItems);
 
 
         logger.info("INVENTORY Products retrieved: {} for business: {}", inventoryList, possibleBusiness);
-        return ResponseEntity.status(HttpStatus.OK).body(inventoryList);
+        return ResponseEntity.status(HttpStatus.OK).body(getInventoryDto);
 
     }
 
