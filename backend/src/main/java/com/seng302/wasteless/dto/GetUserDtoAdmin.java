@@ -32,4 +32,5 @@ public class GetUserDtoAdmin extends GetUserDto {
     private JSONObject homeAddress;
     private String created;
     private UserRoles role;
+    private Integer hasCardsDeleted;
 }
