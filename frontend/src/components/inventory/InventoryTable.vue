@@ -13,6 +13,7 @@
       :fields="fields"
       :items="items"
       :per-page="perPage"
+      :busy="tableLoading"
       ref="inventoryTable"
       @row-clicked="tableRowClick"
   >
@@ -88,6 +89,7 @@ export default {
       sortDesc: false,
       sortBy: "",
       totalItems: 0,
+      tableLoading: true,
       currency: {
         symbol: '$',
         code: 'USD',
@@ -107,49 +109,15 @@ export default {
      * NOTE!! Best to add currency stuff here as well similar to the inventory
      * @param businessId
      */
-    getBusinessInfo: async function (businessId) {
+    getInventoryInfo: async function (businessId) {
       let sortDirectionString = "ASC"
       if (this.sortDesc) {
         sortDirectionString = "DESC"
       }
 
-      let sortByParam;
-
-      switch (this.sortBy) {
-        case "product":
-          sortByParam = "product";
-          break;
-
-        case "quantity":
-          sortByParam = "quantity";
-          break;
-
-        case "pricePerItem":
-          sortByParam = "pricePerItem";
-          break;
-
-        case "totalPrice":
-          sortByParam = "totalPrice";
-          break;
-
-        case "manufactured":
-          sortByParam = "manufactured";
-          break;
-
-        case "sellBy":
-          sortByParam = "sellBy";
-          break;
-
-        case "bestBefore":
-          sortByParam = "bestBefore";
-          break;
-
-        case "expires":
-          sortByParam = "expires";
-          break;
-
-        default:
-          sortByParam = "id";
+      let sortByParam = this.sortBy;
+      if (sortByParam === "product") {
+        sortByParam = "product.id";
       }
 
       const getInventoryPromise = api.getInventory(businessId, this.perPage, this.currentPage-1, sortByParam, sortDirectionString);
@@ -165,7 +133,7 @@ export default {
 
         this.totalItems = inventoryResponse.data.totalItems;
 
-        if (currency != null) {
+        if (currency !== null) {
           this.currency = currency;
         }
         this.$refs.inventoryTable.refresh();
@@ -217,9 +185,10 @@ export default {
     }
   },
 
-  mounted() {
+  async mounted() {
     const businessId = this.$route.params.id;
-    this.getBusinessInfo(businessId);
+    await this.getInventoryInfo(businessId);
+    this.tableLoading = false;
   },
 
   computed: {
@@ -309,7 +278,7 @@ export default {
      */
     '$data.currentPage': {
       handler: function () {
-        this.getBusinessInfo(this.business.id);
+        this.getInventoryInfo(this.business.id);
       },
       deep: true
     },
@@ -318,7 +287,7 @@ export default {
      */
     '$data.sortBy': {
       handler: function () {
-        this.getBusinessInfo(this.business.id);
+        this.getInventoryInfo(this.business.id);
       },
       deep: true
     },
@@ -327,7 +296,7 @@ export default {
      */
     '$data.sortDesc': {
       handler: function () {
-        this.getBusinessInfo(this.business.id);
+        this.getInventoryInfo(this.business.id);
       },
       deep: true
     },
