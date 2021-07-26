@@ -2,6 +2,7 @@ Feature: U16 - Product Images
 
   Background: As a business administrator, I need to be able to associate images with them.
     Given We are logged in as the user "a@a", and The user is an administrator for business 1
+    And A product with id: "THE-OG-BLACK-WATER", name: "Black Water No Sugar" exists in the catalogue for business 1
     And A product with id: "1-Back-Water", name: "Back Water" exists in the catalogue for business 1
 
   Scenario: AC1 - Upload an image for the product with a wrong type
@@ -10,13 +11,13 @@ Feature: U16 - Product Images
     Then The user will be able to see having 0 images from the product.
     And The user will get an error message "Invalid Image type"
 
-  Scenario: AC1,2,3 - Upload an image and a thumbnail for the product with a correct type
+  Scenario: AC1,2 - Upload an image for the product with a correct type
     Given There are 0 images of the product with id: "1-Back-Water"
     When Upload an image with a name: "1.png" in the product with id: "1-Back-Water"
     Then The user will be able to see having 1 image with the id 1 from the product.
     And The current primary image is this product's image id: 1
 
-  Scenario: AC1,2,3 - Upload another 4 images and thumbnails of different correct types of the product
+  Scenario: AC1 - Upload another 4 images of different correct types of the product
     Given There is 1 image of the product with id: "1-Back-Water"
     When Upload four images with name: "2.png", "3.jpeg", "4.jpg", "5.gif" in the product with id: "1-Back-Water"
     Then The user will be able to see having 5 images with the id 2, 3, 4, 5 from the product.
@@ -33,6 +34,11 @@ Feature: U16 - Product Images
     And The product with id: "1-Back-Water" and the current primary image with id: 1
     When Set the image with id: 5 is a new primary image of the product with id: "1-Back-Water"
     Then The current primary image is this product's image id: 5
+
+  Scenario: AC3 - A thumbnail of the primary image is created automatically
+    Given There are 0 images of the product with id: "THE-OG-BLACK-WATER"
+    When Upload an image with a name: "1.png" in the product with id: "THE-OG-BLACK-WATER"
+    Then The thumbnail of the image is created
 
   Scenario: AC4 - Delete a product's image
     Given There are 5 images of the product with id: "1-Back-Water"

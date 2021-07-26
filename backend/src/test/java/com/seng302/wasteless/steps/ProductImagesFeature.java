@@ -25,10 +25,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalDate;
 import java.util.*;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(UserController.class)
@@ -175,13 +177,12 @@ public class ProductImagesFeature {
 
     @Given("There are {int} images of the product with id: {string}")
     public void there_are_images_of_the_product_with_id(Integer imageSize, String productId) {
-        Assertions.assertEquals(productId, product.getId());
+        var product = productService.findProductById(productId);
         Assertions.assertEquals(imageSize, product.getImages().size());
     }
 
     @When("Upload an image with a name: {string} in the product with id: {string}")
     public void upload_an_image_with_a_name_in_the_product_with_id(String imageName, String productId) throws Exception {
-        Assertions.assertEquals(productId, product.getId());
         String imageType;
         if (Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageName.split("\\.")[1])) {
             imageType = "image/" + imageName.split("\\.")[1];
@@ -309,6 +310,14 @@ public class ProductImagesFeature {
         product = productService.findProductById(productId);
 
         Assertions.assertTrue(product.getImages().stream().noneMatch(image -> image.getId().equals(imageId)));
+    }
+
+    // AC3 - A thumbnail of the primary image is created automatically.
+
+    @Then("The thumbnail of the image is created")
+    public void theThumbnailOfTheImageIsCreated() throws Exception {
+        responseResult
+                .andExpect(jsonPath("thumbnailFilename").exists());
     }
 
 
