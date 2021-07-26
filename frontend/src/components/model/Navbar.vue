@@ -39,13 +39,21 @@ Date: sprint_1
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
-        <div class="icon" id="bell" @click="bellIconPressed">
-          <img src="https://i.imgur.com/AC7dgLA.png" alt=""><span v-if="notifications.length">{{notifications.length}}</span>
-        </div>
 
+        <div class="icon mr-1" id="bell" @click="bellIconPressed">
+          <b-icon v-if="!numberOfNotifications" icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem;"></b-icon>
+          <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
+          <span pill v-if="numberOfNotifications" style="position: absolute;">{{numberOfNotifications}}</span>
+        </div>
         <div class="notifications" id="box">
-          <h2>Notifications - <span> {{notifications.length}}</span></h2>
-          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id">
+          <h2>Notifications - <span> {{numberOfNotifications}}</span></h2>
+          <div v-if="numExpiredCards" class="expired-notifications-item" @click="clearExpiredCards">
+            <div class="text">
+              <h4> Marketplace Card Expired:</h4>
+              <h4> {{ numExpiredCards}} {{ expiredText }}</h4>
+            </div>
+          </div>
+          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id"  @click="goToHomePage">
             <div class="text">
               <h4> Marketplace Card: {{notification.title}}</h4>
               <h4> expires within 24 hours</h4>
@@ -101,11 +109,14 @@ Date: sprint_1
 
 <style>
 
-.icon img {
+.icon  {
   cursor: pointer;
   display: inline;
   width: 26px;
   margin-top: 4px;
+}
+.iconBell  {
+  font-size: 2rem;
 }
 
 .icon span {
@@ -162,6 +173,29 @@ Date: sprint_1
   font-size: 12px
 }
 
+
+.expired-notifications-item {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  padding: 6px 9px;
+  margin-bottom: 0;
+  cursor: pointer
+}
+
+.expired-notifications-item .text h4 {
+  color: orangered;
+  font-size: 16px;
+  margin-top: 3px
+}
+
+.expired-notifications-item .text p {
+  color: #aaa;
+  font-size: 12px
+}
+
+.expired-notifications-item:hover {
+  background-color: #eee
+}
 </style>
 
 <script>
@@ -179,11 +213,13 @@ export default {
     return {
       showNotifications: false,
       cards: [],
-      notifications: []
+      notifications: [],
+      numExpiredCards:0
     }
   },
   mounted() {
      this.getCards(this.$currentUser.id);
+    this.getExpiredCards(this.$currentUser.id)
   },
   computed: {
     isActingAsUser: function() {
@@ -245,6 +281,18 @@ export default {
           return "";
       }
     },
+    numberOfNotifications: function () {
+      if (this.numExpiredCards){
+        return this.notifications.length+1;
+      }
+      return this.notifications.length;
+    },
+    expiredText: function (){
+      if (this.numExpiredCards==1){
+        return " of your cards has expired and been deleted"
+      }
+      return " of your cards have expired and been deleted"
+    }
   },
   methods: {
     /**
@@ -258,6 +306,30 @@ export default {
           .catch((error) => {
             this.$log.debug(error);
           });
+    },
+
+    /**
+     * Gets all the expired cards from for the current user.
+     */
+    getExpiredCards(userId) {
+      api.getHasCardsExpired(userId)
+          .then((res) => {
+            this.numExpiredCards = res.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
+    },
+    /**
+     * Gets all the expired cards from for the current user.
+     */
+    clearExpiredCards() {
+      api.clearHasCardsExpired(this.$currentUser.id).then(() => {
+        this.numExpiredCards=0
+      }).catch((error) => {
+        this.$log.debug(error);
+      });
+
     },
 
     /**
@@ -301,6 +373,16 @@ export default {
       this.$router.push('/login');
     },
     /**
+     * Logs out the current user and redirects to the login page.
+     * Currently does nothing with managing cookies, this needs to be implemented later.
+     */
+    goToHomePage() {
+      if (this.$route.fullPath !== '/homepage') {
+        this.$router.push('/homepage');
+      }
+
+    },
+    /**
      * Sets the user to act as the given business. Also sets the API
      * module to send all future requests acting as this business
      * @param business Object representing the business the user will act as
@@ -337,7 +419,6 @@ export default {
               console.log("Added")
             } else {
               console.log("none Added")
-
             }
           }
 
