@@ -31,7 +31,7 @@ const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
 const businessTypes = require('./businessTypes.json')
 const productNames = require('./productNames.json')
-const cardData = require('./cardData.json')
+const cardDes = require('./cardDescription.json')
 
 const SERVER_URL = "http://localhost:9499";
 
@@ -384,13 +384,14 @@ function createCardObject() {
     const sections = ["ForSale", "Wanted", "Exchange"];
     const section = sections[Math.floor(Math.random() * sections.length)];
     const title = productNames[Math.floor(Math.random() * productNames.length)];
-    const card = cardData[Math.floor(Math.random() * cardData.length)];
+    const description = cardDes[Math.floor(Math.random() * cardDes.length)]
+    const keywords = ["food", "hungry", "delicious", "yummy", "fresh"]
 
     return {
         section: section,
         title: title,
-        description: card.description,
-        keywords: card.keywords,
+        description: description,
+        keywords: keywords.slice(0, Math.floor(Math.random() * keywords.length)),
     };
 }
 
