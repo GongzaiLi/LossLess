@@ -19,20 +19,6 @@ Date: sprint_1
         <b-nav-item to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
 
-        <div class="icon" id="bell" @click="click"> <img src="https://i.imgur.com/AC7dgLA.png" alt=""> </div>
-        <div class="notifications" id="box">
-          <h2>Notifications - <span> {{notifications.length}}</span></h2>
-
-          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id">
-            <div class="text">
-              <h4> Marketplace Card: {{notification.title}}</h4>
-              <h4> expires within 24 hours</h4>
-            </div>
-          </div>
-
-
-        </div>
-
 
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
@@ -51,7 +37,25 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+
       <b-navbar-nav class="ml-auto">
+        <div class="icon" id="bell" @click="bellIconPressed">
+          <img src="https://i.imgur.com/AC7dgLA.png" alt=""><span v-if="notifications.length">{{notifications.length}}</span>
+        </div>
+
+        <div class="notifications" id="box">
+          <h2>Notifications - <span> {{notifications.length}}</span></h2>
+          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id">
+            <div class="text">
+              <h4> Marketplace Card: {{notification.title}}</h4>
+              <h4> expires within 24 hours</h4>
+            </div>
+          </div>
+        </div>
+      </b-navbar-nav>
+
+
+      <b-navbar-nav class="dropdown-menu-end">
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
@@ -102,6 +106,10 @@ Date: sprint_1
   display: inline;
   width: 26px;
   margin-top: 4px;
+}
+
+.icon span {
+  color: #f00
 }
 
 .icon:hover {
@@ -175,8 +183,7 @@ export default {
     }
   },
   mounted() {
-    this.getCards('Wanted')
-
+     this.getCards(this.$currentUser.id);
   },
   computed: {
     isActingAsUser: function() {
@@ -240,29 +247,30 @@ export default {
     },
   },
   methods: {
-    getCards(section) {
-      api.getCardsBySection(section)
+    /**
+     * Gets all the expiring cards from for the current user.
+     */
+    getCards(userId) {
+      api.getExpiringCards(userId)
           .then((res) => {
             this.cards = res.data;
           })
           .catch((error) => {
             this.$log.debug(error);
           });
-
     },
 
-    click() {
-      console.log(this.cards)
-      // var color = $(this).text();
-      if(this.showNotifications){
-
+    /**
+     *  Triggers when the notification icon is pressed to display the notifications.
+     */
+    bellIconPressed() {
+      if(this.showNotifications) {
         document.getElementById("box").style.height='0px';
         document.getElementById("box").style.opacity='0';
         this.showNotifications = false;
       } else {
         document.getElementById("box").style.height='auto';
         document.getElementById("box").style.opacity='1';
-
         this.showNotifications = true;
       }
 
@@ -308,24 +316,38 @@ export default {
     actAsUser() {
       setCurrentlyActingAs(null);
       this.$router.push(`/users/${this.$currentUser.id}`);
-    }
-  },
-  watch: {
-    cards: function (cards) {
-      for (const card of cards) {
-        const date = card.displayPeriodEnd.split("T")[0]
-        const time = card.displayPeriodEnd.split("T")[1]
-        const cardExpires =  new Date(parseInt(date.split("-")[0]), parseInt(date.split("-")[1]), parseInt(date.split("-")[2]), parseInt(time.split(":")[0]), parseInt(time.split(":")[1]), parseFloat(time.split(":")[2]))
-        const currentDate =  new Date();
-        const currentAfterADay = currentDate.setDate(currentDate.getDate() + 1);
+    },
 
-        if (cardExpires < currentAfterADay && cardExpires > currentDate) {
-          this.notifications.push(card)
-        } else {
-          this.notifications.push(card) //this is incorrect. Only here to check the functionality.
+    /**
+     *  Adds a notification about a card that expires within next 24 hours.
+     *  This is done by adding the expiring card to the list of notifications.
+     */
+    updateNotifications() {
+      if (this.notifications.length < this.cards.length) {
+        for (const card of this.cards) {
+          if (!this.notifications.includes(card)) {
+            const date = card.displayPeriodEnd.split("T")[0]
+            const time = card.displayPeriodEnd.split("T")[1]
+            const cardExpires = new Date(parseInt(date.split("-")[0]), parseInt(date.split("-")[1]) - 1, parseInt(date.split("-")[2]), parseInt(time.split(":")[0]), parseInt(time.split(":")[1]), parseFloat(time.split(":")[2]))
+            const currentDate = new Date();
+            const currentAfterADay = currentDate.setDate(currentDate.getDate() + 1);
+
+            if (cardExpires < currentAfterADay) {
+              this.notifications.push(card)
+              console.log("Added")
+            } else {
+              console.log("none Added")
+
+            }
+          }
+
         }
       }
     },
-  }
+  },
+
+  created() {
+    this.interval = setInterval(() => this.updateNotifications(), 1000);
+  },
 }
 </script>

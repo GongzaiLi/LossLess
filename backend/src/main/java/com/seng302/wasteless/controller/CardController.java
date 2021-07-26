@@ -90,7 +90,7 @@ public class CardController {
         card.setCreated(LocalDateTime.now());
 
         logger.info("Setting card expiring date");
-        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusDays(1).plusSeconds(30));  //change this back after task is done
 
         logger.info("Setting card creator");
         card.setCreator(user);
