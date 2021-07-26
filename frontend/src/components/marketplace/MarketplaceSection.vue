@@ -33,8 +33,9 @@
                bordered
                stacked="sm"
                show-empty
-               @row-clicked="cardClickHandler"
                class="overflow-auto"
+               @row-clicked="cardClickHandler"
+               @sort-changed="sortingChanged"
                :fields="fields"
                :items="cards"
       >
@@ -165,11 +166,24 @@ export default {
       await this.refreshData();
     },
 
+    /**
+     * Queries for card data from API using the pagination and sorting data fields.
+     */
     async refreshData() {
       const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
       this.cards = resp.data.results;
       this.totalItems = resp.data.totalItems;
-    }
+    },
+
+    /**
+     * Event handler when the sort order is changed in the table.
+     * Will re-fresh data from the API.
+     */
+    async sortingChanged(ctx) {
+      this.sortBy = ctx.sortBy;
+      this.sortOrder = ctx.sortDesc ? 'desc' : 'asc';
+      await this.refreshData();
+    },
   },
 }
 </script>

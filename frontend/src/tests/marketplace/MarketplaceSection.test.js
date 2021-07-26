@@ -147,3 +147,28 @@ describe ("Page Change handler", () => {
         expect(wrapper.vm.totalItems).toBe(11);
     })
 })
+
+describe ("Sort Change handler", () => {
+    Api.getCardsBySection.mockResolvedValue({data: {
+            results: [{id: 1}],
+            totalItems: 11
+    }});
+
+    it('causes page refresh with correct sorting details when sorting ascending',  async() => {
+        await wrapper.vm.sortingChanged({
+            sortBy: 'title',
+            sortDesc: false
+        });
+
+        expect(Api.getCardsBySection).toHaveBeenLastCalledWith("ForSale", 0, 10, "title", "asc");
+    });
+
+    it('causes page refresh with correct sorting details when sorting descending',  async() => {
+        await wrapper.vm.sortingChanged({
+            sortBy: 'location',
+            sortDesc: true
+        });
+
+        expect(Api.getCardsBySection).toHaveBeenLastCalledWith("ForSale", 0, 10, "location", "desc");
+    });
+})
