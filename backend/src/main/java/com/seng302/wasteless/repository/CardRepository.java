@@ -5,6 +5,8 @@ import com.seng302.wasteless.model.CardSections;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -30,8 +32,17 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
     /**
      * Returns all cards that belong to the current user.
+     *
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
     List<Card> findAllByCreator_IdOrderByDisplayPeriodEnd(Integer userId);
+
+    /**
+     * Returns all cards whose display period end datetime is less than the given datetime.
+     *
+     * @param time The datetime to compare.
+     * @return List of all cards whose display period end datetime is less than the given datetime.
+     */
+    List<Card> findAllByDisplayPeriodEndLessThan(LocalDateTime time);
 }

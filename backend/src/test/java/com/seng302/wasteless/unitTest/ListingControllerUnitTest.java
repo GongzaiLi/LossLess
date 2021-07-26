@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -386,103 +387,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-//
-//    GET LISTINGS ENDPOINT TESTS
-//
-//
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-     void whenGetRequestForListingsOfExistingBusiness_andOneListingExists_thenOneListingReturned() throws Exception {
-        Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 0, 10, GetListingsSortTypes.NAME, "ASC"))
-                .thenReturn(Collections.singletonList(listing));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("listings[0].id", is(1)))
-                .andExpect(jsonPath("listings[0].quantity", is(3)))
-                .andExpect(jsonPath("listings[0].price", is(17.99)))
-                .andExpect(jsonPath("listings[0].moreInfo", is("Seller may be willing to consider near offers")))
-                .andExpect(jsonPath("listings[0].closes", is("2022-07-14")))
-                .andExpect(jsonPath("listings[0].created", is("2022-04-14")))
-                .andExpect(jsonPath("listings[1]").doesNotExist());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestForListingsOfExistingBusiness_andListingExists_andCountOfOne_thenOneListingReturned() throws Exception {
-        Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 0, 1, GetListingsSortTypes.NAME, "ASC"))
-                .thenReturn(listingList.subList(0, 1));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?offset=0&count=1")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("listings[0].inventoryItem.product.id", is("Clown-Shows")))
-                .andExpect(jsonPath("listings[1]").doesNotExist())
-                .andExpect(jsonPath("listings[2]").doesNotExist())
-                .andExpect(jsonPath("listings[3]").doesNotExist());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestForListingsOfExistingBusiness_andListingExists_andCountOfTwo_andOffsetOfOne_thenCorrectListingsReturned() throws Exception {
-        Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 1, 2, GetListingsSortTypes.NAME, "ASC"))
-                .thenReturn(listingList.subList(1,3));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?offset=1&count=2")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("listings[0].inventoryItem.product.id", is("Clown-Shows")))
-                .andExpect(jsonPath("listings[1]").exists())
-                .andExpect(jsonPath("listings[3]").doesNotExist());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestForListingsOfExistingBusiness_andListingExists_andCountOfZero_thenNoListingsReturned() throws Exception {
-        Mockito
-                .when(listingsService.findCountByBusinessIdFromOffset(1, 1, 0, GetListingsSortTypes.NAME, "ASC"))
-                .thenReturn(new ArrayList<>());
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?count=0")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("listings[0]").doesNotExist());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestForListingsOfExistingBusiness_andListingExists_andNegativeCount_then400Error() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?count=-1")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestForListingsOfExistingBusiness_andListingExists_andNegativeOffset_then400Error() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings?offset=-1")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
