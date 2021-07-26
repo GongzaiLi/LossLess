@@ -67,7 +67,6 @@
 
 .thumbnail-row {
   padding: 0 !important;
-  max-width: 60px;
 }
 </style>
 
@@ -202,6 +201,7 @@ export default {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
           label: 'Thumbnail',
+          thStyle: 'width: 80px;',
         },
         {
           key: 'product',
