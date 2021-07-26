@@ -4,6 +4,7 @@ import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.service.CardExpiryService;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
 import io.cucumber.java.Before;
@@ -23,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.ElementCollection;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -67,6 +69,9 @@ public class CardExpiryFeature {
 
     @Autowired
     private CardService cardService;
+
+    @Autowired
+    private CardExpiryService cardExpiryService;
 
 
     /**
@@ -245,4 +250,24 @@ public class CardExpiryFeature {
         cardService.createCard(adminCard);
     }
 
+    @Given("I created a card that expired over {int} hours ago")
+    public void iCreatedACardThatExpiredHoursAgo(int hours) {
+        userCard.setDisplayPeriodEnd(LocalDateTime.now().minusHours(hours + 1));
+        cardService.createCard(userCard);
+    }
+
+    @When("The system checks for any expired cards")
+    public void theSystemChecksForAnyExpiredCards() {
+        cardExpiryService.scheduleCheckCardExpiry();
+    }
+
+    @Then("The card is automatically deleted")
+    public void theCardIsAutomaticallyDeleted() {
+        Assertions.assertNull(cardService.findById(userCard.getId()));
+    }
+
+    @Then("I am notified")
+    public void iAmNotified() {
+        Assertions.assertTrue(userService.findUserById(user.getId()).getHasCardsDeleted());
+    }
 }

@@ -30,7 +30,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -81,13 +80,13 @@ public class UserController {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to create user with already used email");
         }
-        logger.info("Email validated for user: {}", user);
 
         //check the email validation
         if (!userService.checkEmailValid(user.getEmail())) {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
+        logger.info("Email validated for user: {}", user);
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
@@ -236,32 +235,76 @@ public class UserController {
     }
 
     /**
-     *  Uses a Get Request to grab the user with the specified ID
-     *  Returns either an unacceptable response if ID doesnt exist,
-     *  a body showing the details of the user if it does exist
-     *  and unauthorized if a user hasn't logged in
+     * Uses a Get Request to grab the user with the specified ID
+     * Returns either an unacceptable response if ID doesnt exist,
+     * a body showing the details of the user if it does exist
+     * and unauthorized if a user hasn't logged in
+     * <p>
      *
      * @param userId The userID integer
-     * @return              200 okay with user, 401 unauthorised, 406 not acceptable
+     * @return 200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
-
         logger.debug("Request to get a user ith ID: {}", userId);
 
-        User possibleUser = userService.findUserById(userId);
-        logger.debug("possible User: {}", possibleUser);
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
-
-        // Not too sure what to do with Response 401 because it's possibly about security but do we need
-        // to have U4 for that or is it possible to do without it
-
-        logger.info("Account: {} retrieved successfully using ID: {}", possibleUser, userId);
-
-        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(userToGet);
 
         return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
 
+    }
+
+    /**
+     * Endpoint to GET whether the user should receive a notification for
+     * cards that have expired
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @GetMapping("/users/{id}/hasCardsExpired")
+    public ResponseEntity<Object> getUserHasCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to get a user cards expired ith ID: {}", userId);
+
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+        Integer loggedInUserId = userService.getCurrentlyLoggedInUser().getId();
+        if (userId.equals(loggedInUserId)) {
+            return ResponseEntity.status(HttpStatus.OK).body(userToGet.getHasCardsDeleted());
+        } else {
+            logger.warn("User {} tried to get 'has cards expired' for user {}", loggedInUserId, userId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
+    }
+
+    /**
+     * Clears the card expiry notification for the user.
+     * DOes this by setting the Cards Deleted flag in the user to FALSE. This prevents the user
+     * from getting that notification again (until more cards expire)
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @PutMapping("/users/{id}/clearHasCardsExpired")
+    public ResponseEntity<Object> putClearCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to clear a user cards expired ith ID: {}", userId);
+
+        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
+            User userToGet = userService.findUserById(userId);
+            logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+            userToGet.setHasCardsDeleted(false);
+            userService.saveUserChanges(userToGet);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
     }
 
 
