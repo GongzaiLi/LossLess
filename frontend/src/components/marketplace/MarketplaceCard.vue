@@ -66,6 +66,11 @@ export default {
     }
   },
   methods: {
+
+    /**
+     * Emits an event 'cardClicked' when the card is clicked
+     * which is listened to by the marketplace.
+     */
     cardClicked() {
       this.$emit('cardClicked', this.cardInfo)
     },

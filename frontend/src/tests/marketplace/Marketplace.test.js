@@ -169,3 +169,11 @@ describe('check-open-Full-Card-modal', () => {
         expect(wrapper.vm.cardId).toBe(cardId);
     })
 });
+
+describe('check-api-request-to-delete-cards', () => {
+    test('check-api-request-to-delete-cards-success', async () => {
+        Api.deleteCard.mockResolvedValue({response: {status: 200}});
+        await wrapper.vm.deleteSelectedCard();
+        expect(Api.deleteCard).toHaveBeenCalled();
+    })
+});
