@@ -60,7 +60,8 @@ public class CardExpiryService {
             logger.warn("Deleting expired card id={}, created={}, title={}, creator={}", card.getId(), card.getCreated(), card.getTitle(), card.getCreator());
 
             User cardCreator = card.getCreator();
-            cardCreator.setHasCardsDeleted(true);
+            Integer deleted = cardCreator.getHasCardsDeleted();
+            cardCreator.setHasCardsDeleted(deleted+1);
             userService.saveUserChanges(cardCreator);
 
             cardService.deleteCard(card);
