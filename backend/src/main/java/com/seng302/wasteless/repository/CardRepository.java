@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,7 +27,6 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
     /**
      * Returns all cards that belong to the given CardSections.
-     *
      * @param section The section the card belongs to.
      * @return A (possibly empty) list of all cards that belong to the given section
      */
@@ -33,7 +34,6 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
     /**
      * Returns all cards that belong to the current user.
-     *
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
@@ -46,4 +46,12 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
      * @return The total number of cards in the given section.
      */
     Integer countCardBySection(CardSections section);
+
+    /**
+     * Returns all cards whose display period end datetime is less than the given datetime.
+     *
+     * @param time The datetime to compare.
+     * @return List of all cards whose display period end datetime is less than the given datetime.
+     */
+    List<Card> findAllByDisplayPeriodEndLessThan(LocalDateTime time);
 }

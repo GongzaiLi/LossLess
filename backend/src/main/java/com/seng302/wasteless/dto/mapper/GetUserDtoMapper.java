@@ -72,6 +72,7 @@ public class GetUserDtoMapper {
                     .setHomeAddress(address)
                     .setCreated(user.getCreated().toString())
                     .setRole(user.getRole())
+                    .setHasCardsDeleted(user.getHasCardsDeleted())
                     .setBusinessesAdministered(businessesAdministered);
         } else {
             return new GetUserDto()

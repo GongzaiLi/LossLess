@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
 public class CardController {
     private static final Logger logger = LogManager.getLogger(CardController.class.getName());
 
+    @Value("${max-display-period-seconds}")
+    private Integer maxDisplayPeriodSeconds;
 
     private final UserService userService;
     private final CardService cardService;
@@ -54,13 +57,13 @@ public class CardController {
      * @return A 200 response with the list of cards in the given section
      */
     @GetMapping("/cards")
-    public ResponseEntity<Object> getCards(@RequestParam String section, Pageable p) {
+    public ResponseEntity<Object> getCards(@RequestParam String section, Pageable pageable) {
         logger.info("GET /cards, section={}", section);
 
         cardService.checkValidSection(section);
         CardSections cardSection = CardSections.fromString(section);
 
-        Page<Card> cards = cardService.findBySection(cardSection, p);
+        Page<Card> cards = cardService.findBySection(cardSection, pageable);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -95,7 +98,7 @@ public class CardController {
         card.setCreated(LocalDateTime.now());
 
         logger.info("Setting card expiring date");
-        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusSeconds(maxDisplayPeriodSeconds));
 
         logger.info("Setting card creator");
         card.setCreator(user);

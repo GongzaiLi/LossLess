@@ -8,11 +8,12 @@ Listings Page
     <b-row align-h="start">
       <h3>Sort by:</h3>
       <b-col md="auto">
-        <b-select v-model="sortProperty" value="NAME">
-          <option value="NAME">Product Name</option>
-          <option value="PRICE">Price</option>
-          <option value="CLOSES">Listing Closes</option>
-          <option value="CREATED">Listing Opens</option>
+        <b-select v-model="sortProperty" value="inventoryItem.product.name">
+          <option value="inventoryItem.product.name">Product Name</option>
+          <option value="price">Price</option>
+          <option value="closes">Listing Closes</option>
+          <option value="created">Listing Opens</option>
+          <option value="quantity">Quantity</option>
         </b-select>
       </b-col>
       <b-col md="auto">
@@ -125,7 +126,7 @@ export default {
       listingDisplayedInCard: {},
       isListingCardReadOnly: true,
       cards: [],
-      sortProperty: 'NAME',
+      sortProperty: 'inventoryItem.product.name',
       sortDirection: 'ASC',
       perPage: 12,
       currentPage: 1,
