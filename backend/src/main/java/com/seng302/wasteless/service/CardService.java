@@ -56,6 +56,14 @@ public class CardService {
         return cardRepository.findBySection(section);
     }
 
+
+    /**
+     * Returns all cards that belong to the current user.
+     * @param userId The id of the current user.
+     * @return A (possibly empty) list of all cards that belong to the current user.
+     */
+    public List<Card> getAllUserCards(Integer userId) { return cardRepository.findAllByCreator_IdOrderByDisplayPeriodEnd(userId); }
+
     /**
      * Returns the first card found with the given ID. Will always be correct card as the id is unique
      * @param cardId The id as an integer of the card being requested

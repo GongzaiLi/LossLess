@@ -1,120 +1,131 @@
 <template>
-  <div>
-    <h1 strong align="left"> {{fullCard.title}} </h1>
-    <b-container>
-        <h6 align="left"> Listed On {{fullCard.created}}</h6>
-    </b-container>
-    <br>
-
-    <b-card no-body>
-      <template #header>
-        <label> {{fullCard.description}}</label>
-      </template>
-    </b-card>
-    <br>
-
-    <b-card no-body>
-      <template #header>
-        Tags:
-        <label v-for="tag in fullCard.keywords" v-bind:key="tag.id">
-          {{tag + ", "}}
-        </label>
-      </template>
-    </b-card>
-    <br>
-
-
-    <b-input-group-text>
+  <b-card>
+    <div>
+      <h1 align="left"><strong> {{fullCard.title}}  </strong></h1>
       <b-container>
-        <h6 align="center"> <strong> Seller Info: </strong></h6>
-        <label> Seller Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
-        <br>
-        <label> Seller Location: {{fullCard.creator.homeAddress.suburb + ","}} {{fullCard.creator.homeAddress.city}}</label>
+        <h6 aligh="left"> Card Listed On: {{formatCreated}} </h6>
+        <h6 aligh="Left"> Card Ends: {{formatExpiry}}</h6>
       </b-container>
-    </b-input-group-text>
-    <br>
+      <br>
 
+      <b-card no-body>
+        <template #header>
+          <b-card-text> {{fullCard.description}}</b-card-text>
+        </template>
+      </b-card>
+      <br>
+
+      <b-card no-body>
+        <template #header>
+          Tags:
+          <b-badge v-for="keyword in fullCard.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
+        </template>
+      </b-card>
+      <br>
+
+
+      <b-input-group-text>
+        <b-container>
+          <h6 align="center"> <strong> Seller Info: </strong></h6>
+          <label> Seller Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
+          <br>
+          <label> Seller Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
+        </b-container>
+      </b-input-group-text>
+      <br>
 
       <div>
-        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCard"> Close </b-button>
+        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
+        <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
 
-<!--    </b-form>-->
-  </div>
+      <b-modal ref="confirmDeleteCardModal" size="sm" title="Delete Card" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteCard">
+        <h6>
+          Are you sure you want to <strong>permanently</strong> delete this card?
+        </h6>
+      </b-modal>
 
+    </div>
+  </b-card>
 </template>
 
 <script>
-
+import api from "../../Api";
 export default {
-  name: "CreateCard",
-  props: ['closeFullViewCard'],
+  name: "full-card",
+  props: ["cardId", 'closeFullViewCardModal'],
   data() {
     return {
       fullCard: {
-      "id": 500,
-        "creator": {
-          "id": 100,
-          "firstName": "John",
-          "lastName": "Smith",
-          "middleName": "Hector",
-          "nickname": "Jonny",
-          "bio": "Likes long walks on the beach",
-          "email": "johnsmith99@gmail.com",
-          "dateOfBirth": "1999-04-27",
-          "phoneNumber": "+64 3 555 0129",
-          "homeAddress": {
-            "streetNumber": "3/24",
-            "streetName": "Ilam Road",
-            "suburb": "Upper Riccarton",
-            "city": "Christchurch",
-            "region": "Canterbury",
-            "country": "New Zealand",
-            "postcode": "90210"
-          },
-          "created": "2020-07-14T14:32:00Z",
-          "role": "user",
-          "businessesAdministered": [
-              {
-                "id": 100,
-                "administrators": [
-                    "string"
-                ],
-                "primaryAdministratorId": 20,
-                "name": "Lumbridge General Store",
-                "description": "A one-stop shop for all your adventuring needs",
-                "address": {
-                  "streetNumber": "3/24",
-                  "streetName": "Ilam Road",
-                  "suburb": "Upper Riccarton",
-                  "city": "Christchurch",
-                  "region": "Canterbury",
-                  "country": "New Zealand",
-                  "postcode": "90210"
-                },
-                "businessType": "Accommodation and Food Services",
-                "created": "2020-07-14T14:52:00Z"
-              }
-              ]
-        },
-        "section": "ForSale",
-        "created": "2021-07-15T05:10:00Z",
-        "displayPeriodEnd": "2021-07-29T05:10:00Z",
-        "title": "1982 Lada Samara",
-        "description": "Beige, suitable for a hen house. Fair condition. Some rust. As is, where is. Will swap for budgerigar.",
-        "keywords": [ "Vehicle", "Sale",]
-      }
+        creator: {
+          firstName: '',
+          homeAddress: {
+            suburb: ""
+          }
+
+        }
+      },
     }
   },
   mounted() {
-
+    this.getCard()
   },
   methods: {
 
+    /**
+     * Calls the API request to get the full details of a card
+     * determined by the given cardId.
+     */
     getCard() {
+      api.getFullCard(this.cardId)
+        .then((resp) => {
+          this.$log.debug("Data loaded: ", resp.data);
+          this.fullCard = resp.data;
+      }).catch((error) => {
+          this.$log.debug(error);
+      })
+    },
 
+    /**
+     * Opens the dialog to confirm if the image with given id should be deleted.
+     * Stores the given id in this.imageIdToDelete
+     */
+    openDeleteConfirmDialog: function() {
+      this.$refs.confirmDeleteCardModal.show();
+    },
+
+    /**
+     * Emits an event `deleteCard` to delete a card
+     * that is listened to inside the marketplace
+     */
+    confirmDeleteCard() {
+      this.$emit('deleteCard')
     }
 
+  },
+
+  computed: {
+    /**
+     * format Expiry date
+     */
+    formatExpiry: function () {
+      return new Date(this.fullCard.displayPeriodEnd).toUTCString().split(" ").slice(0, 5).join(" ");
+    },
+
+    /**
+     * format Created date
+     */
+    formatCreated: function() {
+      return new Date(this.fullCard.created).toUTCString().split(" ").slice(0, 5).join(" ");
+    },
+
+    /**
+     * Returns true if user is creator of the card or an Application admin
+     * @returns {boolean}
+     */
+    canDelete: function(){
+      return(this.fullCard.creator.id===this.$currentUser.id || this.$currentUser.role!=='user');
+    }
   }
 }
 </script>

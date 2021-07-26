@@ -12,7 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -40,7 +40,7 @@ public class Card {
     private CardSections section;
 
     @Column(name = "title")
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 25)
     @NotNull(message = "Title is mandatory")
     private String title;
 
@@ -53,5 +53,9 @@ public class Card {
     private List<@NotBlank @NotNull @Size(max = 10)String> keywords;
 
     @Column(name = "created")
-    private LocalDate created;
+    private LocalDateTime created;
+
+    @Column(name = "displayPeriodEnd")
+    private LocalDateTime displayPeriodEnd;
+
 }

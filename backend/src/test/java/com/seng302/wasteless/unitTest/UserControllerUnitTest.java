@@ -1,17 +1,21 @@
 package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.UserController;
+import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +25,8 @@ import java.time.LocalDate;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -291,7 +297,65 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isBadRequest());
     }
 
-    private void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
+    @Test
+    void whenGetRequestToUserHasCardsExpired_AndUserIsSelf_thenExpiredReturned() throws Exception {
+        User currentUser = userService.findUserById(1);
+        currentUser.setHasCardsDeleted(true);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/hasCardsExpired")
+                .with(user(new CustomUserDetails(currentUser)))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    void whenGetRequestToUserHasCardsExpired_AndUserIsNotSelf_thenForbidden() throws Exception {
+        User currentUser = userService.findUserById(2);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/hasCardsExpired")
+                .with(user(new CustomUserDetails(currentUser)))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void whenPutRequestToClearCardsExpired_AndUserIsNotSelf_thenForbidden() throws Exception {
+        User currentUser = userService.findUserById(2);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
+                .with(user(new CustomUserDetails(currentUser)))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void whenPutRequestToClearCardsExpired_AndUserIsSelf_AndUserHasCardsExpired_thenCardsExpiredCleared() throws Exception {
+        User currentUser = userService.findUserById(1);
+        currentUser.setHasCardsDeleted(true);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
+                .with(user(new CustomUserDetails(currentUser)))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assertions.assertFalse(currentUser.getHasCardsDeleted());
+    }
+
+    @Test
+    void whenPutRequestToClearCardsExpired_AndUserIsSelf_AndUserHasNoCardsExpired_thenCardsExpiredIsNotChanged() throws Exception {
+        User currentUser = userService.findUserById(1);
+        currentUser.setHasCardsDeleted(false);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
+                .with(user(new CustomUserDetails(currentUser)))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assertions.assertFalse(currentUser.getHasCardsDeleted());
+    }
+
+    void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": %s, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
 
         try {

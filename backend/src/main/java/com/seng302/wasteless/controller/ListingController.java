@@ -1,12 +1,10 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.Inventory;
-import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ListingsService;
@@ -16,6 +14,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -129,24 +128,29 @@ public class ListingController {
     /**
      * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
      * @param businessId The id of the business to get
-     * @param offset value of the offset from the start of the results query. Used for pagination
-     * @param count number of results to be returned
+     * @param pageable pagination and sorting params
      * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/listings")
     @JsonView(ListingViews.GetListingView.class)
-    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, @RequestParam(required = false) Integer offset, @RequestParam(required = false) Integer count) {
+    public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, Pageable pageable) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
-        logger.debug("Received count:{} offset:{}", count, offset);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
         logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
-        List<Listing> listings = listingsService.findByBusinessId(businessId);
-        logger.info("{}", listings);
-        return ResponseEntity.status(HttpStatus.OK).body(listings);
+        List<Listing> listings = listingsService.findBusinessListingsWithPageable(businessId, pageable);
+
+        Integer totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+
+        GetListingDto getListingDto = new GetListingDto()
+                .setListings(listings)
+                .setTotalItems(totalItems);
+
+        logger.info("{}", getListingDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 
     /**

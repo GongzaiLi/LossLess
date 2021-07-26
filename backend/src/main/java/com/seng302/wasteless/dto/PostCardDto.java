@@ -25,7 +25,7 @@ public class PostCardDto {
     private String section;
 
     @Column(name = "title")
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 25)
     @NotNull(message = "Title is mandatory")
     private String title;
 

@@ -8,6 +8,7 @@ import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -80,13 +80,13 @@ public class UserController {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to create user with already used email");
         }
-        logger.info("Email validated for user: {}", user);
 
         //check the email validation
         if (!userService.checkEmailValid(user.getEmail())) {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
+        logger.info("Email validated for user: {}", user);
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
@@ -141,30 +141,52 @@ public class UserController {
      * Searches first, last, middle, and nicknames for partial or full matches with the query, case insensitive.
      *
      * Takes a search query, offset, and count. Returns upto 'count' matching results, offset by the offset.
+     * Sorted by sortBy, Sort direction by sortDirection
      *
-     * Default values: offset is 0 and count is 10.
+     * Default values: offset is 0, count is 10, sortBy is ID, sortDirection is ASC
      *
      * @param searchQuery       The query string to search for in users
-     * @param offset            The offset of the search (how many results to 'skip')
+     * @param offset            The offset of the search (how many pages of results to 'skip')
      * @param count             The number of results to return
+     * @param sortBy            The field (if any) to sort by
      * @return                  List of users who match the search query, maximum length of count, offset by offset.
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset, @RequestParam(value = "count", required = false, defaultValue = "10") Integer count) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery,
+                                               @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                               @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
+                                               @RequestParam(value = "sortBy", required = false, defaultValue = "NONE") String sortBy,
+                                               @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") String sortDirection
+                                               ) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
         logger.info("Received count:{} offset:{}", count, offset);
-        logger.info("Using count:{} offset:{}", count, offset);
+        logger.info("Using count:{} offset:{} sortBy:{}", count, offset, sortBy);
+        UserSearchSortTypes sortType;
 
-        if (count < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be positive if provided.");
+        try {
+            sortType = UserSearchSortTypes.valueOf(sortBy);
+        } catch (IllegalArgumentException e) {
+            logger.info("Invalid value for sortBy. Value was {}", sortBy);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortBy. Acceptable values are: NAME, NICKNAME, EMAIL, ROLE, NONE");
+        }
+
+        if (!sortDirection.equals("ASC") && !sortDirection.equals("DESC")) {
+            logger.info("Invalid value for sortDirection. Value was {}", sortDirection);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortDirection. Acceptable values are: ASC, DESC");
+        }
+
+        if (count < 1) {
+            logger.info("Count must be great than or equal to one. Value was {}", count);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be great than or equal to one.");
         } else if (offset < 0) {
+            logger.info("Offset must be great than or equal to one. Value was {}", offset);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
         }
 
         logger.debug("Getting users matching query: {}", searchQuery);
 
-        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset);
+        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset, sortType, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
 
@@ -213,32 +235,76 @@ public class UserController {
     }
 
     /**
-     *  Uses a Get Request to grab the user with the specified ID
-     *  Returns either an unacceptable response if ID doesnt exist,
-     *  a body showing the details of the user if it does exist
-     *  and unauthorized if a user hasn't logged in
+     * Uses a Get Request to grab the user with the specified ID
+     * Returns either an unacceptable response if ID doesnt exist,
+     * a body showing the details of the user if it does exist
+     * and unauthorized if a user hasn't logged in
+     * <p>
      *
      * @param userId The userID integer
-     * @return              200 okay with user, 401 unauthorised, 406 not acceptable
+     * @return 200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
-
         logger.debug("Request to get a user ith ID: {}", userId);
 
-        User possibleUser = userService.findUserById(userId);
-        logger.debug("possible User: {}", possibleUser);
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
-
-        // Not too sure what to do with Response 401 because it's possibly about security but do we need
-        // to have U4 for that or is it possible to do without it
-
-        logger.info("Account: {} retrieved successfully using ID: {}", possibleUser, userId);
-
-        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(userToGet);
 
         return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
 
+    }
+
+    /**
+     * Endpoint to GET whether the user should receive a notification for
+     * cards that have expired
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @GetMapping("/users/{id}/hasCardsExpired")
+    public ResponseEntity<Object> getUserHasCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to get a user cards expired ith ID: {}", userId);
+
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+        Integer loggedInUserId = userService.getCurrentlyLoggedInUser().getId();
+        if (userId.equals(loggedInUserId)) {
+            return ResponseEntity.status(HttpStatus.OK).body(userToGet.getHasCardsDeleted());
+        } else {
+            logger.warn("User {} tried to get 'has cards expired' for user {}", loggedInUserId, userId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
+    }
+
+    /**
+     * Clears the card expiry notification for the user.
+     * DOes this by setting the Cards Deleted flag in the user to FALSE. This prevents the user
+     * from getting that notification again (until more cards expire)
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @PutMapping("/users/{id}/clearHasCardsExpired")
+    public ResponseEntity<Object> putClearCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to clear a user cards expired ith ID: {}", userId);
+
+        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
+            User userToGet = userService.findUserById(userId);
+            logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+            userToGet.setHasCardsDeleted(false);
+            userService.saveUserChanges(userToGet);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
     }
 
 

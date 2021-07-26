@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -65,6 +66,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private User user;
 
     private Listing listing;
+
+    private List<Listing> listingList;
 
     @BeforeAll
     static void beforeAll() {
@@ -131,6 +134,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
                 .setCloses(closes);
+
+
+        listingList = new ArrayList<>();
+        listingList.add(
+                listing = new Listing()
+                        .setInventoryItem(inventoryItemForListing2)
+                .setCreated(expiry.minusMonths(3))
+                .setQuantity(3)
+                .setPrice(17.99)
+                .setMoreInfo("Seller may be willing to consider near offers")
+                .setCloses(closes));
+
+        listingList.add(
+                listing = new Listing()
+                        .setInventoryItem(inventoryItemForListing3)
+                        .setCreated(expiry.minusMonths(3))
+                        .setQuantity(3)
+                        .setPrice(17.99)
+                        .setMoreInfo("Seller may be willing to consider near offers")
+                        .setCloses(closes));
+
+        listingList.add(
+                listing = new Listing()
+                        .setInventoryItem(inventoryItemForListing4)
+                        .setCreated(expiry.minusMonths(3))
+                        .setQuantity(3)
+                        .setPrice(17.99)
+                        .setMoreInfo("Seller may be willing to consider near offers")
+                        .setCloses(closes));
+
 
 
         user = mock(User.class);
@@ -213,7 +246,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt()))
+                .when(inventoryService.getInventoryFromBusinessId(anyInt(), any()))
                 .thenReturn(inventories);
     }
 
@@ -356,32 +389,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-//
-//    GET LISTINGS ENDPOINT TESTS
-//
-//
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-     void whenGetRequestForListingsOfExistingBusiness_andOneListingExists_thenOneListingReturned() throws Exception {
-        Mockito
-                .when(listingsService.findByBusinessId(anyInt()))
-                .thenReturn(Collections.singletonList(listing));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/listings")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content()
-                        .contentTypeCompatibleWith(APPLICATION_JSON))
-                .andExpect(jsonPath("[0].id", is(1)))
-                .andExpect(jsonPath("[0].quantity", is(3)))
-                .andExpect(jsonPath("[0].price", is(17.99)))
-                .andExpect(jsonPath("[0].moreInfo", is("Seller may be willing to consider near offers")))
-                .andExpect(jsonPath("[0].closes", is("2022-07-14")))
-                .andExpect(jsonPath("[0].created", is("2022-04-14")))
-                .andExpect(jsonPath("[1]").doesNotExist());
     }
 
 }
