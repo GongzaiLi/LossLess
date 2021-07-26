@@ -131,8 +131,8 @@
     </b-form>
     </b-card>
 
-    <b-modal ref="errorModal" size="sm" title="Error" ok-only>
-      {{ imageError }}
+    <b-modal ref="errorModal" title="Error" ok-only>
+      <h6>{{ imageError }}</h6>
     </b-modal>
 
     <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteImage">
@@ -236,7 +236,11 @@ export default {
             }
           }
         } catch (error) {
-          this.imageError = error.response.data.message ? error.response.data.message : error.response.data;  // Due to limitations in the backend, some error messages gets sent back in data not data.message
+          if (error.response.status === 413) {
+            this.imageError = "Some images you tried to upload are too large. Images must be less than 1MB in size.";
+          } else {
+            this.imageError = error.response.data.message;
+          }
           this.$refs.errorModal.show();
         }
         this.$emit('imageChange');
