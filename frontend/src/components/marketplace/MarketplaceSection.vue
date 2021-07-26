@@ -137,6 +137,7 @@ export default {
     },
 
     async refreshData() {
+      console.log("refreshed");
       const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage);
       this.cards = resp.data.results;
       this.totalItems = resp.data.totalItems;

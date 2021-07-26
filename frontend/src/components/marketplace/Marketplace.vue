@@ -30,7 +30,6 @@ Date: 21/5/21
             :cards="marketplaceCards"
             :is-card-format="isCardFormat"
             v-on:cardClicked="openFullCardModal"
-            v-on:deleteCard="deleteSelectedCard"
             :cardsPerRow:="3"
             :perPage="8"
             :section="section"
@@ -121,13 +120,10 @@ export default {
      * Sends an API request to delete a card determined given the cardId
      * and deletes the card from the marketplaceCards list using filter
      */
-    deleteSelectedCard(){
-      api.deleteCard(this.cardId)
-          .catch((error) => {
-        this.$log.debug(error);
-      });
+    async deleteSelectedCard(card) {
+      await api.deleteCard(card.id);
       this.closeFullCardModal();
-      this.marketplaceCards = this.marketplaceCards.filter(card => card.id != this.cardId);
+      this.$refs[card.section][0].refreshData();
     },
 
     /**
