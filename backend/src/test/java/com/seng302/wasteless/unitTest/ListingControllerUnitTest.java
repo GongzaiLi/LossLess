@@ -246,7 +246,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt()))
+                .when(inventoryService.getInventoryFromBusinessId(anyInt(), any()))
                 .thenReturn(inventories);
     }
 

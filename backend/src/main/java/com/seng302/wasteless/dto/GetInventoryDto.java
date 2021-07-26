@@ -1,12 +1,12 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.Inventory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
+import java.util.List;
 
 
 /**
@@ -18,16 +18,9 @@ import java.time.LocalDate;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
 public class GetInventoryDto {
-    private Integer id;
-    private Product product;
-    private String description;
-    private Integer quantity;
-    private Double pricePerItem;
-    private Double totalPrice;
-    private LocalDate manufactured;
-    private LocalDate sellBy;
-    private LocalDate bestBefore;
-    private LocalDate expires;
+    private List<Inventory> inventory;
+
+    private Integer totalItems;
 
 
 }
