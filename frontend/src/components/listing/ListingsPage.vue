@@ -4,7 +4,7 @@ Listings Page
 <template>
   <b-card>
     <b-container>
-    <h1 align="middle">{{ business.name }} Listings</h1>
+    <h1>{{ business.name }} Listings</h1>
     <b-row align-h="start">
       <h3>Sort by:</h3>
       <b-col md="auto">
@@ -45,9 +45,6 @@ Listings Page
           <div v-if="!listing.inventoryItem.product.images.length">
             <img class="product-image" :src="require(`/public/product_default.png`)" alt="Product has no image">
           </div>
-
-<!--          <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"-->
-<!--                 alt="Default Image"></b-img>-->
           <hr>
           <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
           <b-card-sub-title v-if="listing.inventoryItem.product.manufacturer">
