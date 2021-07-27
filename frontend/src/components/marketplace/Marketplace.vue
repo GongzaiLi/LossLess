@@ -105,7 +105,7 @@ export default {
         // The way this is done is by giving each section component a unique ref, with the same name as the section
         // Then, we just get the component using the ref and call the refresh function
         // Also, you have to index into the ref because... reasons: https://forum.vuejs.org/t/this-refs-theid-returns-an-array/31995/10
-        console.log()
+
         this.$refs[cardData.section][0].refreshData();
       })
       .catch(error => {
