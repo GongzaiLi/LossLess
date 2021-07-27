@@ -107,6 +107,7 @@ public class InventoryController {
      */
     @GetMapping("/businesses/{id}/inventory")
     public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, Pageable pageable, String searchQuery){
+        if (searchQuery == null) searchQuery = "";
         logger.debug("Request to search inventory with query: {}", searchQuery);
 
         User user = userService.getCurrentlyLoggedInUser();
