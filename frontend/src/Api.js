@@ -77,7 +77,7 @@ export default {
   getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
   expiredCardsNumber: (userId) => instance.get(`/users/${userId}/hasCardsExpired`, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null,{withCredentials: true}),
-
+  extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
