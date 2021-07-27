@@ -3,11 +3,21 @@ navbar at the top of screen once logged in to navigate the web app
 Date: sprint_1
 -->
 <template>
-  <b-navbar v-if="!['login', 'register'].includes($route.name)"
+  <b-navbar
     toggleable="lg" type="dark" variant="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand href="#">Wasteless</b-navbar-brand>
+    <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
+
+    <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
+      <template #toast-title>
+        Need Help?
+      </template>
+      This is top <em>left</em> corner of our web app. This is not a menu.
+      <br>
+      If you want to log out, or change who you are acting as,
+      use the menu on the <strong>top <em>right</em></strong> corner <b-icon-arrow-right/>
+    </b-toast>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -41,19 +51,20 @@ Date: sprint_1
       <b-navbar-nav class="ml-auto">
 
         <div class="icon mr-1" id="bell" @click="bellIconPressed">
-          <b-icon v-if="!numberOfNotifications" icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem;"></b-icon>
-          <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
+          <b-icon v-if="numExpiredCards > 0" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem;"></b-icon>
+          <b-icon v-else-if="numberOfNotifications"  icon="bell" class="iconBell" variant="warning" style="font-size:  1.8rem"></b-icon>
+          <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
         </div>
 
         <div class="notifications" id="box">
-          <h2>Notifications - <span> {{numberOfNotifications}}</span></h2>
+          <h2>Notifications: <span> {{numberOfNotifications}}</span></h2>
             <div v-if="numExpiredCards" class="expired-notifications-item" @click="clicked = !clicked">
               <div class="text">
                 <h4> Marketplace Card Expired:</h4>
                 <h4> {{ numExpiredCards}} {{ expiredText }}</h4>
               </div>
               <b-col cols="2">
-                <b-icon v-if="clicked" style="width: 30px; height: 30px; margin-top: 50%"
+                <b-icon style="width: 30px; height: 30px; margin-top: 50%"
                         icon="trash-fill" @click="clearExpiredCards"></b-icon>
               </b-col>
             </div>
@@ -68,9 +79,8 @@ Date: sprint_1
       </b-navbar-nav>
 
       <b-navbar-nav>
-        <span v-if="numberOfNotifications" style="position: absolute;color: red">{{numberOfNotifications}}</span>
+        <span v-if="numberOfNotifications" :style="{position: 'absolute', color: (numExpiredCards > 0) ? 'red' : 'orange'}">{{numberOfNotifications}}</span>
       </b-navbar-nav>
-
 
       <b-navbar-nav class="dropdown-menu-end">
         <b-nav-item-dropdown right>
@@ -225,12 +235,9 @@ export default {
       showNotifications: false,
       cards: [],
       notifications: [],
-      numExpiredCards:0
+      numExpiredCards:0,
+      timer: null,
     }
-  },
-  mounted() {
-    this.getExpiringCards(this.$currentUser.id);
-    this.getExpiredCards(this.$currentUser.id)
   },
   computed: {
     isActingAsUser: function() {
@@ -324,7 +331,7 @@ export default {
      * Gets all the expiring cards from for the current user.
      */
     getExpiringCards(userId) {
-      api.getExpiringCards(userId)
+      return api.getExpiringCards(userId)
           .then((res) => {
             this.cards = res.data;
           })
@@ -337,7 +344,7 @@ export default {
      * Gets all the expired cards for the current user.
      */
     getExpiredCards(userId) {
-      api.expiredCardsNumber(userId)
+      return api.expiredCardsNumber(userId)
           .then((res) => {
             this.numExpiredCards = res.data;
           })
@@ -431,7 +438,10 @@ export default {
      *  Adds a notification about a card that expires within next 24 hours.
      *  This is done by adding the expiring card to the list of notifications.
      */
-    updateNotifications() {
+    async updateNotifications() {
+      await this.getExpiringCards(this.$currentUser.id);
+      await this.getExpiredCards(this.$currentUser.id);
+      console.log(this.cards);
       if (this.notifications.length < this.cards.length) {
         for (const card of this.cards) {
           if (!this.notifications.includes(card)) {
@@ -447,6 +457,14 @@ export default {
         }
       }
     },
+    hoverLogo() {
+      this.timer = setTimeout(() => {this.$bvToast.show('my-toast')}, 10000);
+    },
+    hoverLogoLeave() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+    }
   },
 
   created() {
