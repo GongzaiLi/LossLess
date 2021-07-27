@@ -71,7 +71,7 @@ public class InventoryService {
      * Returns an empty list if there are no items in the business' inventory, or if the business does not exist
      */
     public List<Inventory> searchInventoryFromBusinessId(Integer id, String searchQuery, Pageable pageable) {
-        return  inventoryRepository.findAllByBusinessIdAndProductNameContainsAllIgnoreCase(id, searchQuery, pageable); }
+        return  inventoryRepository.findAllByBusinessIdAndProductIdContainsAllIgnoreCase(id, searchQuery, pageable); }
 
     /**
      * Updates the quantity column of the inventory table in the database using a custom sql set statement.
@@ -89,7 +89,7 @@ public class InventoryService {
      * @return     Amount of inventory items in database for that business
      */
     public Integer getTotalInventoryCountByBusinessId(Integer id, String searchQuery) {
-        return inventoryRepository.countInventoryByBusinessIdAndProductNameContainsAllIgnoreCase(id, searchQuery);
+        return inventoryRepository.countInventoryByBusinessIdAndProductIdContainsAllIgnoreCase(id, searchQuery);
     }
 
 

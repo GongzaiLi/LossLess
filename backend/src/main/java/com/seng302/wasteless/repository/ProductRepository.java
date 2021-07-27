@@ -17,8 +17,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Product findFirstById(String id);
 
-    List<Product> findAllByBusinessIdAndNameContainsAllIgnoreCase(Integer id, String name, Pageable pageable);
+    List<Product> findAllByBusinessIdAndIdContainsAllIgnoreCase(Integer businessId, String productId, Pageable pageable);
 
-    Integer countProductByBusinessIdAndNameContainsAllIgnoreCase(Integer id, String name);
+    Integer countProductByBusinessIdAndIdContainsAllIgnoreCase(Integer businessId, String productId);
 
 }
