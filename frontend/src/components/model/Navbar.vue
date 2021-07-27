@@ -41,7 +41,6 @@ Date: sprint_1
       <b-navbar-nav class="ml-auto">
 
         <div class="icon mr-1" id="bell" @click="bellIconPressed">
-
           <b-icon v-if="!numberOfNotifications" icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem;"></b-icon>
           <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
         </div>
@@ -230,7 +229,7 @@ export default {
     }
   },
   mounted() {
-     this.getCards(this.$currentUser.id);
+    this.getExpiringCards(this.$currentUser.id);
     this.getExpiredCards(this.$currentUser.id)
   },
   computed: {
@@ -313,7 +312,7 @@ export default {
      * Checks the number of expired cards
      * @return The appropriate notification message based on number of cards
      */
-    expiredText: function (){
+    expiredText: function () {
       if (this.numExpiredCards === 1){
         return " of your cards has expired and been deleted"
       }
@@ -324,7 +323,7 @@ export default {
     /**
      * Gets all the expiring cards from for the current user.
      */
-    getCards(userId) {
+    getExpiringCards(userId) {
       api.getExpiringCards(userId)
           .then((res) => {
             this.cards = res.data;
@@ -338,7 +337,7 @@ export default {
      * Gets all the expired cards for the current user.
      */
     getExpiredCards(userId) {
-      api.getHasCardsExpired(userId)
+      api.expiredCardsNumber(userId)
           .then((res) => {
             this.numExpiredCards = res.data;
           })
