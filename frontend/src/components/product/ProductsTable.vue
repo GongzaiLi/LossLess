@@ -4,6 +4,7 @@
         striped hovers
         responsive="true"
         no-border-collapse
+        stacked="sm"
         bordered
         show-empty
         no-local-sorting
@@ -195,6 +196,7 @@ export default {
           key: 'thumbnail',
           label: 'Image',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
+          thStyle: 'min-width: 80px;',
         },
 
         {

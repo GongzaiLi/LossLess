@@ -1,12 +1,9 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.model.GetListingsSortTypes;
 import com.seng302.wasteless.model.Listing;
 import com.seng302.wasteless.repository.ListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,35 +29,15 @@ public class ListingsService {
     }
 
     /**
-     * Gets count listings for a given business starting at offset 'page'
-     *
-     * sorts by sortBy and sortDirection
-     *
-     * Special case where sortBy is NAME, as it needs to be handled in a special way.
+     * Gets listings for a given business using a given pageable
      *
      * @param id The id of the business
      * @
      * @return A list containing matching listings in the business.
      * Returns an empty list if there are no listings in the business, or if the business does not exist
      */
-    public List<Listing> findCountByBusinessIdFromOffset(int id, int offset, int count, GetListingsSortTypes sortBy, String sortDirection) {
-
-        if (GetListingsSortTypes.NAME.equals(sortBy)) {
-            if (sortDirection.equals("DESC")) {
-                return listingRepository.findAllByBusinessIdSortedByProductNameDESC(id, count, offset*count);
-            } else {
-                return listingRepository.findAllByBusinessIdSortedByProductNameASC(id, count, offset*count);
-            }
-        } else {
-            Pageable pageable = PageRequest.of(
-                    offset,
-                    count,
-                    sortDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC,
-                    sortBy.toString()
-            );
-
-            return listingRepository.findAllByBusinessId(id, pageable);
-        }
+    public List<Listing> findBusinessListingsWithPageable(int id, Pageable pageable) {
+        return listingRepository.findAllByBusinessId(id, pageable);
     }
 
     /**

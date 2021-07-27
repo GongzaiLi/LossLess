@@ -66,7 +66,7 @@ afterEach(() => {
 describe ("format-address", () => {
     it('normal address, no nulls',  async() => {
 
-        expect(wrapper.vm.formatAddress).toStrictEqual("Upper Riccarton, Christchurch");
+        expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch (Upper Riccarton)");
     })
     it('null suburb',  async() => {
         cardInfo.creator.homeAddress = {

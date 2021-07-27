@@ -61,7 +61,7 @@ afterEach(() => {
 });
 
 describe('check-getBusiness-API-function', () => {
-    test('get-normal-data', async () => {
+    beforeEach(() => {
         const productsResponse = {
             data: [{
                 id: "WATT-420-BEANS",
@@ -72,22 +72,25 @@ describe('check-getBusiness-API-function', () => {
             }]
         };
         const inventoryResponse = {
-            data: [{
-                product: {
-                    id: "WATT-420-BEANS",
-                    name: "Watties Baked Beans - 420g can",
-                    description: "Baked Beans as they should be.",
-                    recommendedRetailPrice: 2.2,
-                    created: "2021-04-14T13:01:58.660Z"
-                },
-                quantity: 4,
-                pricePerItem: 6.5,
-                totalPrice: 21.99,
-                manufactured: "2021-05-14",
-                sellBy: "2021-05-14",
-                bestBefore: "2021-05-14",
-                expires: "2021-05-14"
-            }]
+            data: {
+                totalItems: 1,
+                inventory: [{
+                    product: {
+                        id: "WATT-420-BEANS",
+                        name: "Watties Baked Beans - 420g can",
+                        description: "Baked Beans as they should be.",
+                        recommendedRetailPrice: 2.2,
+                        created: "2021-04-14T13:01:58.660Z"
+                    },
+                    quantity: 4,
+                    pricePerItem: 6.5,
+                    totalPrice: 21.99,
+                    manufactured: "2021-05-14",
+                    sellBy: "2021-05-14",
+                    bestBefore: "2021-05-14",
+                    expires: "2021-05-14"
+                }]
+            }
         }
         const businessResponse = {
             data: {
@@ -121,11 +124,24 @@ describe('check-getBusiness-API-function', () => {
         const userCurrencyMock = jest.fn();
         userCurrencyMock.mockResolvedValue(mockCurrencyData);
         Api.getUserCurrency = userCurrencyMock;
+    })
 
-        await wrapper.vm.getBusinessInfo(0);
-        expect(wrapper.vm.business.name).toEqual(businessResponse.data.name);
-        expect(wrapper.vm.currency).toEqual(mockCurrencyData);
-        expect(userCurrencyMock).toHaveBeenCalledWith('New Zealand');
+    test('get-normal-data', async () => {
+
+        await wrapper.vm.getInventoryInfo(0);
+        expect(Api.getUserCurrency).toHaveBeenCalledWith('New Zealand');
+        expect(wrapper.vm.business.name).toEqual("Lumbridge General Store");
+        expect(wrapper.vm.currency).toEqual({
+            symbol: '$',
+            code: 'NZD',
+            name: 'New Zealand Dollar'
+        });
+    });
+
+    test('sortby-product-id', async () => {
+        wrapper.vm.sortBy = "product";
+        await wrapper.vm.getInventoryInfo(0);
+        expect(Api.getInventory).toHaveBeenCalledWith(0, 10, 0, "product.id", "ASC");
     });
 });
 

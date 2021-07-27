@@ -5,12 +5,16 @@ Date: 21/5/21
 
 <template>
   <div>
-    <b-card class="shadow">
-      <h1><b-icon-shop/> Marketplace </h1>
-      <b-button @click="openCreateCardModal" class="float-right">
-        <b-icon-plus-square-fill animation="fade"/>
-        Create
-      </b-button>
+    <b-card class="shadow" style="max-width: 85%">
+      <div class="row">
+        <h1 class="col-10"><b-icon-shop/> Marketplace </h1>
+        <div class="col-2">
+          <b-button class="float-right" @click="openCreateCardModal">
+            <b-icon-plus-square-fill animation="fade"/>
+            Create
+          </b-button>
+        </div>
+      </div>
       <b-input-group>
         <b-form-text style="margin-right: 7px">
           Table View
@@ -21,45 +25,16 @@ Date: 21/5/21
         </b-form-text>
       </b-input-group>
       <b-tabs v-model=activeTabIndex align="center" fill>
-        <b-tab title="For Sale" @click="getCardsFromSection(`ForSale`)">
+        <b-tab v-for="[section, sectionName] in sections" :key=section :title=sectionName>
           <marketplace-section
-            :cards="marketplaceCards"
             :is-card-format="isCardFormat"
-            v-on:cardClicked="openFullCardModal"
             :cardsPerRow:="3"
-            :perPage="10"
+            :perPage="8"
+            :section="section"
+            :ref="section"
           />
         </b-tab>
-
-        <b-tab title="Wanted" @click="getCardsFromSection(`Wanted`)">
-          <marketplace-section
-              :cards="marketplaceCards"
-              :is-card-format="isCardFormat"
-              v-on:cardClicked="openFullCardModal"
-              :cardsPerRow:="3"
-              :perPage="10"
-          />
-        </b-tab>
-
-        <b-tab title="Exchange" @click="getCardsFromSection(`Exchange`)">
-          <marketplace-section
-              :cards="marketplaceCards"
-              :is-card-format="isCardFormat"
-              v-on:cardClicked="openFullCardModal"
-              :cardsPerRow:="3"
-              :perPage="10"
-          />
-        </b-tab>
-
       </b-tabs>
-      <b-modal id="full-card" hide-header hide-footer>
-        <MarketplaceCardFull
-            :closeFullViewCardModal="closeFullCardModal"
-            :deleteSelectedCard="deleteSelectedCard"
-            :cardId = "this.cardId"
-            v-on:extendCard="extendExpiry"
-            >  </MarketplaceCardFull>
-      </b-modal>
 
       <b-modal id="create-card" hide-header hide-footer>
         <CreateCard @createAction="createCard($event)"
@@ -73,17 +48,16 @@ Date: 21/5/21
 <script>
 
 import MarketplaceSection from "./MarketplaceSection";
-import MarketplaceCardFull from "./MarketplaceCardFull";
 import api from "../../Api";
 
 import CreateCard from "./CreateCard";
 
 export default {
-  components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
+  components: { MarketplaceSection, CreateCard },
   data: function () {
     return {
+      sections: [['ForSale', 'For Sale'], ['Wanted', 'Wanted'], ['Exchange', 'Exchange']],
       error: "",
-      cardId: 0,
       activeTabIndex: 0,
       isCardFormat: true,
       marketplaceCards: [],
@@ -93,10 +67,6 @@ export default {
     }
   },
 
-  mounted() {
-    this.getCardsFromSection('ForSale');
-  },
-
   methods: {
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
@@ -104,21 +74,6 @@ export default {
      */
     pushErrors(error) {
       this.errors.push(error.message);
-    },
-
-    /**
-     * opens the Full card modal.
-     */
-    openFullCardModal(cardId) {
-      this.cardId = cardId;
-      this.$bvModal.show('full-card');
-    },
-
-    /**
-     * Closes the full card modal when cancel button pressed.
-     */
-    closeFullCardModal() {
-      this.$bvModal.hide('full-card');
     },
 
     /**
@@ -135,27 +90,6 @@ export default {
       this.$bvModal.hide('create-card');
     },
 
-    deleteSelectedCard(){
-      api.deleteCard(this.cardId);
-      this.closeFullCardModal();
-    },
-
-
-    /**
-     * Sends an API request to get all cards determined by the current tab the user is on.
-     * Uses section to differentiate the tabs
-     * @param section This is the section of the tab to grab all cards from
-     */
-    getCardsFromSection(section) {
-      api.getCardsBySection(section)
-          .then((resp) => {
-            this.marketplaceCards = resp.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
-    },
-
     /**
      * Sends a post request with the card data when create card button is pressed.
      * @param cardData  The object that contains the card data.
@@ -166,7 +100,13 @@ export default {
         this.$log.debug("Card Created", createCardResponse);
         this.$bvModal.hide('create-card');
         this.error = '';
-        this.getCardsFromSection(cardData.section);
+
+        // Not the most elegant way to do it, but we have to make the marketplace section refresh
+        // The way this is done is by giving each section component a unique ref, with the same name as the section
+        // Then, we just get the component using the ref and call the refresh function
+        // Also, you have to index into the ref because... reasons: https://forum.vuejs.org/t/this-refs-theid-returns-an-array/31995/10
+        console.log()
+        this.$refs[cardData.section][0].refreshData();
       })
       .catch(error => {
         this.$log.debug(error);
@@ -196,19 +136,6 @@ export default {
         return "Server error";
       }
     },
-
-    /**
-     * Sends an API request to extend a card determined by the cardId
-     */
-    extendExpiry: function() {
-      api
-          .extendCardExpiry(this.cardId)
-          .catch((error) => {
-            this.$log.debug(error);
-          })
-      this.closeFullCardModal();
-    }
-
   },
 
 }
