@@ -91,8 +91,8 @@ public class ProductService {
      * @param id   The id of the business to get the prouct count of
      * @return     The product count
      */
-    public Integer getTotalProductsCountByBusinessId(Integer id) {
-        return productRepository.countProductByBusinessId(id);
+    public Integer getTotalProductsCountByBusinessId(Integer id, String productName) {
+        return productRepository.countProductByBusinessIdAndNameContainsAllIgnoreCase(id, productName);
     }
 
     /**
@@ -102,7 +102,7 @@ public class ProductService {
      * @param id The id of a business
      * @return A list of business's products, if any, otherwise empty list
      */
-    public List<Product> getCountProductsByBusinessIdFromOffset(Integer id, Integer offset, Integer count, GetProductSortTypes sortBy, String sortDirection) {
+    public List<Product> searchCountProductsByBusinessIdFromOffset(Integer id, Integer offset, Integer count, GetProductSortTypes sortBy, String sortDirection, String searchQuery) {
 
         Pageable pageable = PageRequest.of(
                 offset,
@@ -111,7 +111,7 @@ public class ProductService {
                 sortBy.toString()
         );
 
-        return  productRepository.findAllByBusinessId(id, pageable);
+        return  productRepository.findAllByBusinessIdAndNameContainsAllIgnoreCase(id, searchQuery, pageable);
     }
 
 
