@@ -208,10 +208,6 @@ export default {
       this.sortOrder = ctx.sortDesc ? 'desc' : 'asc';
       await this.refreshData();
     },
-
-    /**
-     * Closes the full card modal when cancel button pressed.
-     */
   },
 }
 </script>
