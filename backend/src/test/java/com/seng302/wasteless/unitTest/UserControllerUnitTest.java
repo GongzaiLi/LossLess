@@ -300,7 +300,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void whenGetRequestToUserHasCardsExpired_AndUserIsSelf_thenExpiredReturned() throws Exception {
         User currentUser = userService.findUserById(1);
-        currentUser.setHasCardsDeleted(true);
+        currentUser.setHasCardsDeleted(1);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users/1/hasCardsExpired")
                 .with(user(new CustomUserDetails(currentUser)))
@@ -332,27 +332,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void whenPutRequestToClearCardsExpired_AndUserIsSelf_AndUserHasCardsExpired_thenCardsExpiredCleared() throws Exception {
         User currentUser = userService.findUserById(1);
-        currentUser.setHasCardsDeleted(true);
+        currentUser.setHasCardsDeleted(1);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Assertions.assertFalse(currentUser.getHasCardsDeleted());
+        Assertions.assertEquals(currentUser.getHasCardsDeleted(),0);
     }
 
     @Test
     void whenPutRequestToClearCardsExpired_AndUserIsSelf_AndUserHasNoCardsExpired_thenCardsExpiredIsNotChanged() throws Exception {
         User currentUser = userService.findUserById(1);
-        currentUser.setHasCardsDeleted(false);
+        currentUser.setHasCardsDeleted(0);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Assertions.assertFalse(currentUser.getHasCardsDeleted());
+        Assertions.assertEquals(currentUser.getHasCardsDeleted(),0);
     }
 
     void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
