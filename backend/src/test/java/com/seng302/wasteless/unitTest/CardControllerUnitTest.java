@@ -3,7 +3,6 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.repository.CardRepository;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.UserService;
@@ -15,6 +14,8 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -32,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -135,8 +136,8 @@ class CardControllerUnitTest {
                 .thenReturn(userForCard);
 
         Mockito
-                .when(cardService.findBySection(CardSections.FOR_SALE))
-                .thenReturn(Collections.singletonList(card));
+                .when(cardService.findBySection(eq(CardSections.FOR_SALE), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(card)));
 
         Mockito
                 .when(cardService.findCardById(1))
@@ -173,13 +174,13 @@ class CardControllerUnitTest {
 
     @Test
     @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
-    void whenPostRequestToAddCard_andKeywordsIsLessThan1_then400Response() throws Exception {
+    void whenPostRequestToAddCard_andKeywordsIsLessThan1_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"section\": \"ForSale\", \"title\": \"1982 Lada Samara\", \"keywords\": []}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/cards")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -199,10 +200,10 @@ class CardControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/cards?section=ForSale")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(1)))
-                .andExpect(jsonPath("[0].title", is("Sale")))
-                .andExpect(jsonPath("[0].creator.id", is(1)))
-                .andExpect(jsonPath("[1]").doesNotExist());
+                .andExpect(jsonPath("$.results[0].id", is(1)))
+                .andExpect(jsonPath("$.results[0].creator.id", is(1)))
+                .andExpect(jsonPath("$.totalItems", is(1)))
+                .andExpect(jsonPath("$.results[1]").doesNotExist());
     }
 
     @Test

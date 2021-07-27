@@ -1,6 +1,7 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import MarketplaceSection from '../../components/marketplace/MarketplaceSection';
+import Api from '../../Api'
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -29,6 +30,11 @@ let cardInfo;
 jest.mock('../../Api');
 
 beforeEach(() => {
+    Api.getCardsBySection.mockResolvedValue({data: {
+        results: [{id: 1}],
+        totalItems: 1
+    }})
+
     cardInfo = [{
         creator: {
             homeAddress: {
@@ -50,7 +56,7 @@ beforeEach(() => {
 
     wrapper = shallowMount(MarketplaceSection, {
         localVue,
-        propsData: {cards:cardInfo},
+        propsData: {section: "ForSale", perPage: 10},
         mocks: {$route, $log, $currentUser},
         methods: {},
     });
@@ -129,8 +135,40 @@ describe ("format-address", () => {
     })
 })
 
-describe ("number_of_cards", () => {
-    it('1 card',  async() => {
-        expect(wrapper.vm.totalItems).toStrictEqual(1);
+describe ("Page Change handler", () => {
+    it('causes page refresh when page changed to 2',  async() => {
+        Api.getCardsBySection.mockResolvedValue({data: {
+            results: [{id: 1}],
+            totalItems: 11
+        }});
+        await wrapper.vm.pageChanged(2);
+
+        expect(Api.getCardsBySection).toHaveBeenCalledWith("ForSale", 1, 10, "created", "asc");
+        expect(wrapper.vm.totalItems).toBe(11);
     })
+})
+
+describe ("Sort Change handler", () => {
+    Api.getCardsBySection.mockResolvedValue({data: {
+            results: [{id: 1}],
+            totalItems: 11
+    }});
+
+    it('causes page refresh with correct sorting details when sorting ascending',  async() => {
+        await wrapper.vm.sortingChanged({
+            sortBy: 'title',
+            sortDesc: false
+        });
+
+        expect(Api.getCardsBySection).toHaveBeenLastCalledWith("ForSale", 0, 10, "title", "asc");
+    });
+
+    it('causes page refresh with correct sorting details when sorting descending',  async() => {
+        await wrapper.vm.sortingChanged({
+            sortBy: 'location',
+            sortDesc: true
+        });
+
+        expect(Api.getCardsBySection).toHaveBeenLastCalledWith("ForSale", 0, 10, "location", "desc");
+    });
 })
