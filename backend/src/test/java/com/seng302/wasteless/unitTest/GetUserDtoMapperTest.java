@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-public class GetUserDtoMapperTest {
+class GetUserDtoMapperTest {
 
     @MockBean
     private BusinessService businessService;
@@ -78,32 +78,32 @@ public class GetUserDtoMapperTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetUserDtoAndSignedInAsRegularUser_thenDtoContainsBusinessesAdministered() {
+    void whenGetUserDtoAndSignedInAsRegularUser_thenDtoContainsBusinessesAdministered() {
         List<GetUserBusinessAdministeredDto> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
         Assertions.assertNotNull(businessesAdministered);
-        Assertions.assertEquals(businessesAdministered.size(), 1);
-        Assertions.assertEquals(businessesAdministered.get(0).getName(), "Jimmy's clown store");
+        Assertions.assertEquals(1, businessesAdministered.size());
+        Assertions.assertEquals("Jimmy's clown store", businessesAdministered.get(0).getName());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetUserDtoAndSignedInAsAdmin_thenDtoContainsBusinessesAdministered() {
+    void whenGetUserDtoAndSignedInAsAdmin_thenDtoContainsBusinessesAdministered() {
         signedInUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
 
         List<GetUserBusinessAdministeredDto> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
         Assertions.assertNotNull(businessesAdministered);
-        Assertions.assertEquals(businessesAdministered.size(), 1);
-        Assertions.assertEquals(businessesAdministered.get(0).getName(), "Jimmy's clown store");
+        Assertions.assertEquals(1, businessesAdministered.size());
+        Assertions.assertEquals("Jimmy's clown store", businessesAdministered.get(0).getName());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetUserDtoAndSignedInAsDGAA_thenDtoContainsBusinessesAdministered() {
+    void whenGetUserDtoAndSignedInAsDGAA_thenDtoContainsBusinessesAdministered() {
         signedInUser.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
 
         List<GetUserBusinessAdministeredDto> businessesAdministered = GetUserDtoMapper.toGetUserDto(user).getBusinessesAdministered();
         Assertions.assertNotNull(businessesAdministered);
-        Assertions.assertEquals(businessesAdministered.size(), 1);
-        Assertions.assertEquals(businessesAdministered.get(0).getName(), "Jimmy's clown store");
+        Assertions.assertEquals(1, businessesAdministered.size());
+        Assertions.assertEquals("Jimmy's clown store", businessesAdministered.get(0).getName());
     }
 }

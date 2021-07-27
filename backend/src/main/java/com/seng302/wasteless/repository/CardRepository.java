@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
-    List<Card> findAllByCreator_IdOrderByDisplayPeriodEnd(Integer userId);
+    List<Card> findAllByCreatorIdOrderByDisplayPeriodEnd(Integer userId);
 
     /**
      * Returns the total number of cards in the repository that are in the given section.

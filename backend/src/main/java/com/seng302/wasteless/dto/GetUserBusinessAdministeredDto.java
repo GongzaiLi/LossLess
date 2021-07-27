@@ -36,7 +36,7 @@ public class GetUserBusinessAdministeredDto {
      * @param business The business to create this data object for.
      */
     public GetUserBusinessAdministeredDto(Business business) {
-        List<String> administrators = new ArrayList<>();
+        administrators = new ArrayList<>();
 
         for (User admin : business.getAdministrators()) {
             administrators.add(admin.getId().toString());

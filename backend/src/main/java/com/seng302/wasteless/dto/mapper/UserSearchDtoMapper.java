@@ -6,8 +6,6 @@ import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -62,7 +60,7 @@ public class UserSearchDtoMapper {
 
         List<GetUserDto> searchResultsDto = new ArrayList<>();
 
-        searchResults.forEach((user) -> searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user)));
+        searchResults.forEach(user -> searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user)));
 
         return new UserSearchDto()
                 .setResults(searchResultsDto)
