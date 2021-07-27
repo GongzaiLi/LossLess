@@ -4,6 +4,7 @@
         striped hovers
         responsive="true"
         no-border-collapse
+        stacked="sm"
         bordered
         show-empty
         no-local-sorting
@@ -49,11 +50,6 @@
     <pagination v-if="totalItems>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
   </div>
 </template>
-
-
-<style>
-
-</style>
 
 <script>
 import pagination from "../model/Pagination";
@@ -195,6 +191,7 @@ export default {
           key: 'thumbnail',
           label: 'Image',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
+          thStyle: 'min-width: 80px;',
         },
 
         {

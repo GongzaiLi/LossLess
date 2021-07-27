@@ -8,28 +8,32 @@
 
 const fs = require('fs')
 const Axios = require('axios');
+const FormData = require('form-data');
+
 
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
 const MAX_USERS_PER_API_REQUEST = 100;
-const HAS_NICKNAME_PROB = 1/10;
-const HAS_MIDDLE_NAME_PROB = 4/10;
+const HAS_NICKNAME_PROB = 1 / 10;
+const HAS_MIDDLE_NAME_PROB = 4 / 10;
 
 const NUM_BUSINESSES = 100;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
-const MAX_PRODUCTS_PER_BUSINESS = 400;
-const MIN_PRODUCTS_PER_BUSINESS = 30;
+const MAX_PRODUCTS_PER_BUSINESS = 100;
+const MIN_PRODUCTS_PER_BUSINESS = 20;
 const MAX_PRODUCT_PRICE = 50;
 const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
 const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
+const MAX_CARD_PER_USER = 5;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
 const businessTypes = require('./businessTypes.json')
 const productNames = require('./productNames.json')
+const cardDes = require('./cardDescription.json')
 
 const SERVER_URL = "http://localhost:9499";
 
@@ -157,39 +161,34 @@ async function getBusinesses() {
  * Uses axios to make a post request to our backend to create a new user.
  */
 async function registerUser(user) {
-  await Axios.post(`http://localhost:9499/users`, user, {
-    withCredentials: true,
-    headers: {
-      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-    }
-  });
+    const instance = Axios.create({
+        baseURL: SERVER_URL,
+        timeout: 180000,// set 2 mins
+        withCredentials: true
+    });
+
+    const response = await instance.post(`http://localhost:9499/users`, user, {
+        headers: {
+            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+        }
+    });
+    instance.defaults.headers.Cookie = response.headers["set-cookie"];
+
+    await addCard(instance);
+    return [response, instance];
 }
 
 /**
  * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
  */
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
-  const instance = Axios.create({
-    baseURL: SERVER_URL,
-    timeout: 180000,// set 2 mins
-    withCredentials: true
-  });
-
-  const response = await instance.post(`http://localhost:9499/users`, user, {
-    headers: {
-      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+    const [response, instance] = await registerUser(user);
+    for (let i = 0; i < numBusinesses; i++) {
+        const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
+        await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+        console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
     }
-  });
 
-  instance.defaults.headers.Cookie = response.headers["set-cookie"];
-
-  for (let i=0; i < numBusinesses; i++) {
-    const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
-    await addProduct(businessResponse.data.businessId, instance, businesses[i]);
-
-    console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
-
-  }
 }
 
 /**
@@ -258,7 +257,7 @@ function createProductObject(name, business) {
     name: name,
     description: desc,
     manufacturer: business.name,
-    recommendedRetailPrice: (Math.random() * MAX_PRODUCT_PRICE).toFixed(2)
+    recommendedRetailPrice: (Math.random() * MAX_PRODUCT_PRICE).toFixed(2),
   };
 }
 
@@ -365,8 +364,10 @@ async function addProduct(businessId, instance, business) {
           }
         })
 
+      product.id = productResponse.data.productId;
+      await addProductImages(businessId, instance, product.id);
+
       if (Math.random() < CHANCE_OF_INVENTORY_FOR_PRODUCT) {
-        product.id = productResponse.data.productId
         const [inventoryItemId, inventory] = await addInventory(businessId, instance, product);
         await addListing(businessId, instance, inventory, inventoryItemId);
       }
@@ -376,6 +377,77 @@ async function addProduct(businessId, instance, business) {
     }
 
   }
+}
+
+/**
+ *  Creates a card object with the random sample data.
+ * @returns A card Object with the fields and data.
+ */
+function createCardObject() {
+
+    const sections = ["ForSale", "Wanted", "Exchange"];
+    const section = sections[Math.floor(Math.random() * sections.length)];
+    const title = productNames[Math.floor(Math.random() * productNames.length)];
+    const description = cardDes[Math.floor(Math.random() * cardDes.length)]
+    const keywords = ["food", "hungry", "delicious", "yummy", "fresh"]
+
+    return {
+        section: section,
+        title: title,
+        description: description,
+        keywords: keywords.slice(0, Math.floor(Math.random() * keywords.length)),
+    };
+}
+
+
+/**
+ *  Populates the database with the sample card data for different users.
+ * @param instance An instance of axios
+ * @returns {Promise<void>}
+ */
+async function addCard(instance) {
+
+    for (let i = 0; i < Math.floor(Math.random() * MAX_CARD_PER_USER); i++) {
+        const card = createCardObject();
+        await instance.post(`http://localhost:9499/cards`, card, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+            }
+        });
+    }
+
+}
+
+/**
+ *  Add a random number of images to a product
+ */
+async function addProductImages(businessId, instance, productId) {
+
+  const startImageId = Math.floor(Math.random() * (28) + 1);
+  const numImagesForProduct = Math.floor(Math.random() * (3) + 1);
+
+  let imagePromises = [];
+
+  try {
+    for (let i = 0; i < numImagesForProduct; i++) {
+      imagePromises.push(uploadProductImage(businessId, productId, instance, startImageId + i));
+    }
+    await Promise.all(imagePromises);
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+/**
+ * Uploads an image for a product.
+ */
+async function uploadProductImage (businessId, productId, instance, startImageId) {
+  // See https://github.com/axios/axios/issues/710 for how this works
+  let formData = new FormData();
+  formData.append("filename", fs.createReadStream(`./exampleImages/${startImageId}.jpg`));
+  return instance.post(`http://localhost:9499/businesses/${businessId}/products/${productId}/images`, formData,
+      {headers: formData.getHeaders()});
 }
 
 async function main() {

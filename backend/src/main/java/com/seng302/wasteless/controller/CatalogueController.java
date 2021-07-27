@@ -124,8 +124,13 @@ public class CatalogueController {
                                                         @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                         @RequestParam(required = false, defaultValue = "10") Integer count,
                                                         @RequestParam(value = "sortBy", required = false, defaultValue = "ID") String sortBy,
-                                                        @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") String sortDirection
+                                                        @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") String sortDirection,
+                                                        String searchQuery
     ) {
+
+        if (searchQuery == null) searchQuery = "";
+        logger.debug("Request to search product with query: {}", searchQuery);
+
         logger.debug("Request to get business products");
         logger.info("Request with params count:{} offset:{} sortBy:{} sortDirection: {}", count, offset, sortBy, sortDirection);
         GetProductSortTypes sortType;
@@ -158,10 +163,10 @@ public class CatalogueController {
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         logger.debug("Trying to retrieve products for business: {}", possibleBusiness);
-        List<Product> productList = productService.getCountProductsByBusinessIdFromOffset(businessId, offset, count, sortType, sortDirection);
+        List<Product> productList = productService.searchCountProductsByBusinessIdFromOffset(businessId, offset, count, sortType, sortDirection, searchQuery);
 
         logger.debug("Trying to retrieve total count of products for business: {}", possibleBusiness);
-        Integer totalItems = productService.getTotalProductsCountByBusinessId(businessId);
+        Integer totalItems = productService.getTotalProductsCountByBusinessId(businessId, searchQuery);
 
         GetProductDTO getProductDTO = new GetProductDTO()
                 .setProducts(productList)

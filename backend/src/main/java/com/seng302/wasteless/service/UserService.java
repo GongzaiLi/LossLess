@@ -17,7 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -151,7 +151,7 @@ public class UserService {
      * @param sortDirection The direction to sort by (ASC, DESC)
      * @return  An array of users matching the search params
      */
-    public ArrayList<User> searchForMatchingUsers(String searchQuery, Integer count, Integer offset, UserSearchSortTypes sortBy, String sortDirection) {
+    public List<User> searchForMatchingUsers(String searchQuery, Integer count, Integer offset, UserSearchSortTypes sortBy, String sortDirection) {
 
         Pageable pageable = PageRequest.of(
                 offset,

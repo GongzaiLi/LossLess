@@ -106,8 +106,9 @@ public class InventoryController {
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/inventory")
-    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, Pageable pageable){
-        logger.debug("Request to get business INVENTORY products");
+    public ResponseEntity<Object> getBusinessesInventoryProducts(@PathVariable("id") Integer businessId, Pageable pageable, String searchQuery){
+        if (searchQuery == null) searchQuery = "";
+        logger.debug("Request to search inventory with query: {}", searchQuery);
 
         User user = userService.getCurrentlyLoggedInUser();
 
@@ -121,9 +122,9 @@ public class InventoryController {
 
 
         logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
-        List<Inventory> inventoryList = inventoryService.getInventoryFromBusinessId(businessId, pageable);
+        List<Inventory> inventoryList = inventoryService.searchInventoryFromBusinessId(businessId, searchQuery, pageable);
 
-        Integer totalItems = inventoryService.getTotalInventoryCountByBusinessId(businessId);
+        Integer totalItems = inventoryService.getTotalInventoryCountByBusinessId(businessId, searchQuery);
 
         GetInventoryDto getInventoryDto = new GetInventoryDto()
                 .setInventory(inventoryList)

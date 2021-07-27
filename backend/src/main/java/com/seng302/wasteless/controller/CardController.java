@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.GetCardDto;
+import com.seng302.wasteless.dto.GetCardsDto;
 import com.seng302.wasteless.dto.PostCardDto;
 import com.seng302.wasteless.dto.mapper.PostCardDtoMapper;
 import com.seng302.wasteless.model.Card;
@@ -12,12 +13,15 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,20 +52,22 @@ public class CardController {
     /**
      * Handles requests for GET card endpoint. Returns a list of cards in the section given.
      * Throws a 400 error if the section given is not one of the predefined ones ('ForSale', 'Wanted', or 'Exchange').
+     *
      * @param section The section for which cards will be retrieved from. This should be in the query parameter named 'section
      * @return A 200 response with the list of cards in the given section
      */
     @GetMapping("/cards")
-    public ResponseEntity<Object> getCards(@RequestParam String section) {
+    public ResponseEntity<Object> getCards(@RequestParam String section, Pageable pageable) {
         logger.info("GET /cards, section={}", section);
 
         cardService.checkValidSection(section);
         CardSections cardSection = CardSections.fromString(section);
 
-        List<Card> cards = cardService.findBySection(cardSection);
-        List<GetCardDto> cardDTOs = cards.stream().map(GetCardDto::new).collect(Collectors.toList());   // Make list of DTOs from list of Cards. WHY IS JAVA SO VERBOSE????
+        Page<Card> cards = cardService.findBySection(cardSection, pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(cardDTOs);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new GetCardsDto(cards.getContent(), cards.getTotalElements()));
     }
 
     /**
@@ -83,7 +89,6 @@ public class CardController {
         logger.info("Request to create a new card with data Card: {}", cardDtoRequest);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         cardService.checkValidSection(cardDtoRequest.getSection());
 
@@ -126,7 +131,6 @@ public class CardController {
         logger.info("Request to get a user's expiring cards with user id: {}", userId);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         if (!userId.equals(user.getId())) {
             logger.info("User ({}) tried to access the expiring cards of another user ({}).", user.getId(), userId);
@@ -163,8 +167,7 @@ public class CardController {
     public ResponseEntity<Object> createUser(@PathVariable("id") Integer cardId) {
         logger.info("Request to get card with id: {}", cardId);
 
-        User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
+        userService.getCurrentlyLoggedInUser();
 
         logger.info("Retrieving Card");
         Card card = cardService.findCardById(cardId);
@@ -213,7 +216,6 @@ public class CardController {
         logger.info("Request to delete card id: {}", id);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         Card card = cardService.findCardById(id);
 
@@ -245,7 +247,6 @@ public class CardController {
         logger.info("Request to extend card id: {}", id);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         Card card = cardService.findCardById(id);
 
@@ -255,7 +256,7 @@ public class CardController {
         }
         logger.info("User: {} validated as owner of card or global admin.", user);
 
-        card.setDisplayPeriodEnd(LocalDateTime.now().plusWeeks(2));
+        card.setDisplayPeriodEnd(LocalDateTime.now().plusSeconds(maxDisplayPeriodSeconds));
         logger.info("User: {} Extended card: {} by two weeks.", user, card);
 
         cardService.createCard(card);

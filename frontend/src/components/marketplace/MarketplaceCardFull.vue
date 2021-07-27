@@ -1,10 +1,10 @@
 <template>
   <b-card>
     <div>
-      <h1 align="left"><strong> {{fullCard.title}}  </strong></h1>
+      <h1><strong> {{fullCard.title}}  </strong></h1>
       <b-container>
-        <h6 aligh="left"> Card Listed On: {{formatCreated}} </h6>
-        <h6 aligh="Left"> Card Ends: {{formatExpiry}}</h6>
+        <h6> Card Listed On: {{formatCreated}} </h6>
+        <h6> Card Ends: {{formatExpiry}}</h6>
       </b-container>
       <br>
 
@@ -26,7 +26,7 @@
 
       <b-input-group-text>
         <b-container>
-          <h6 align="center"> <strong> Seller Info: </strong></h6>
+          <h6> <strong> Seller Info: </strong></h6>
           <label> Seller Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
           <br>
           <label> Seller Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
@@ -99,7 +99,7 @@ export default {
      * that is listened to inside the marketplace
      */
     confirmDeleteCard() {
-      this.$emit('deleteCard')
+      this.$emit('deleteCard', this.fullCard);
     }
 
   },
@@ -129,7 +129,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

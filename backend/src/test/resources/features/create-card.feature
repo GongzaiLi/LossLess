@@ -16,7 +16,7 @@ Feature: UCM1 - Card Creation
     When I try to create a card with section "ForSale", and a long title "A very very very very very very very very long title", keywords "Vehicle"
     Then The card is not created
 
-  Scenario: AC3 - I cannot create a card if I input more than 5 keywords
+  Scenario: AC5 - I cannot create a card if I input more than 5 keywords
     Given I am logged in as the user "a@a"
     When I try to create a card with section "ForSale", title "Example", and too many keywords "Vehicle", "Car", "Vintage", "Old", "Priceless", "Sedan"
     Then The card is not created

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -26,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -246,7 +244,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt(), any()))
+                .when(inventoryService.searchInventoryFromBusinessId(anyInt(), any(), any()))
                 .thenReturn(inventories);
     }
 

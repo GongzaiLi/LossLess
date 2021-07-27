@@ -1,6 +1,5 @@
 package com.seng302.wasteless.controller;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.ProductImage;
@@ -9,8 +8,6 @@ import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductImageService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
-import com.seng302.wasteless.view.ListingViews;
-import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -230,7 +227,7 @@ public class ImageController {
      * @return          The image
      */
     @ResponseBody
-    @RequestMapping(value = "/images", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/images", produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getImage(@RequestParam String filename) throws IOException {
         InputStream is = new FileInputStream(filename);
         return IOUtils.toByteArray(is);
