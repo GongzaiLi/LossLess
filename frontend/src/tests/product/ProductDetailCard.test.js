@@ -105,11 +105,11 @@ describe('Testing upload image when product already exists', () => {
     expect(wrapper.vm.imageError).toBe("Max limit of 5 images exceeded.");
   });
 
-  it('Create a product image but 419 error returned', async () => {
-    Api.uploadProductImage.mockRejectedValue({response: {status: 419, data: "The file that you tried to upload is too large. Files must be 5MB in size or less."}});
+  it('Create a product image but 413 error returned', async () => {
+    Api.uploadProductImage.mockRejectedValue({response: {status: 413, data: ""}});
     await wrapper.vm.onFileChange({target: {files: [{filename: 'blah'}]}});
 
-    expect(wrapper.vm.imageError).toBe("The file that you tried to upload is too large. Files must be 5MB in size or less.");
+    expect(wrapper.vm.imageError).toBe("Some images you tried to upload are too large. Images must be less than 1MB in size.");
   });
 
 });
