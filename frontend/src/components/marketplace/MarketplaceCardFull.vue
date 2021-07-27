@@ -1,10 +1,10 @@
 <template>
   <b-card>
     <div>
-      <h1 align="left"><strong> {{fullCard.title}}  </strong></h1>
+      <h1><strong> {{fullCard.title}}  </strong></h1>
       <b-container>
-        <h6 aligh="left"> Card Listed On: {{formatCreated}} </h6>
-        <h6 aligh="Left"> Card Ends: {{formatExpiry}}</h6>
+        <h6> Card Listed On: {{formatCreated}} </h6>
+        <h6> Card Ends: {{formatExpiry}}</h6>
       </b-container>
       <br>
 
@@ -26,7 +26,7 @@
 
       <b-input-group-text>
         <b-container>
-          <h6 align="center"> <strong> Seller Info: </strong></h6>
+          <h6> <strong> Seller Info: </strong></h6>
           <label> Seller Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
           <br>
           <label> Seller Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
@@ -34,10 +34,17 @@
       </b-input-group-text>
       <br>
       <div>
+        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
         <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
         <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="success" @click="openExtendConfirmDialog"> Extend <b-icon-alarm/></b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
+
+      <b-modal ref="confirmDeleteCardModal" size="sm" title="Delete Card" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteCard">
+        <h6>
+          Are you sure you want to <strong>permanently</strong> delete this card?
+        </h6>
+      </b-modal>
 
       <b-modal ref="confirmExtendCardModal" size="sm" title="Extend Expiry" ok-variant="success" ok-title="Extend" @ok="confirmExtendExpiry">
         <h6>
@@ -53,7 +60,7 @@
 import api from "../../Api";
 export default {
   name: "full-card",
-  props: ["cardId", 'closeFullViewCardModal','deleteSelectedCard'],
+  props: ["cardId", 'closeFullViewCardModal'],
   data() {
     return {
       fullCard: {
@@ -64,7 +71,7 @@ export default {
           }
 
         }
-      }
+      },
     }
   },
   mounted() {
@@ -72,6 +79,10 @@ export default {
   },
   methods: {
 
+    /**
+     * Calls the API request to get the full details of a card
+     * determined by the given cardId.
+     */
     getCard() {
       api.getFullCard(this.cardId)
         .then((resp) => {
@@ -80,6 +91,22 @@ export default {
       }).catch((error) => {
           this.$log.debug(error);
       })
+    },
+
+    /**
+     * Opens the dialog to confirm if the image with given id should be deleted.
+     * Stores the given id in this.imageIdToDelete
+     */
+    openDeleteConfirmDialog: function() {
+      this.$refs.confirmDeleteCardModal.show();
+    },
+
+    /**
+     * Emits an event `deleteCard` to delete a card
+     * that is listened to inside the marketplace
+     */
+    confirmDeleteCard() {
+      this.$emit('deleteCard', this.fullCard);
     },
 
     /**

@@ -54,15 +54,24 @@ export default {
   createProduct: (id, productData) => instance.post(`/businesses/${id}/products`, productData, {withCredentials: true}),
   modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials: true}),
   createInventory: (id, inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
-  getInventory: (id) => instance.get(`/businesses/${id}/inventory`, {withCredentials: true}),
+  getInventory: (id, count=10, offset=0, sortBy="id", sortDirection="ASC") => instance.get(`/businesses/${id}/inventory?sort=${sortBy},${sortDirection}&page=${offset}&size=${count}`, {withCredentials: true}),
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials: true}),
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
-  getListings: (businessId, count, offset, sortBy, sortDirection) => instance.get(`/businesses/${businessId}/listings?count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}`, {withCredentials: true}),
+  getListings: (businessId, count, offset, sortBy, sortDirection) => instance.get(`/businesses/${businessId}/listings?size=${count}&page=${offset}&sort=${sortBy},${sortDirection}`, {withCredentials: true}),
   getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
   setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
   createCard: (cardData) => instance.post("/cards", cardData, {withCredentials: true}),
-  getCardsBySection: (section) => instance.get(`/cards?section=${section}`, {withCredentials: true}),
+  getCardsBySection: (section, currentPage, perPage, sortBy, sortOrder) => {
+    let query = `/cards?section=${section}&page=${currentPage}&size=${perPage}`;
+    if (sortBy === "location") {
+      query += `&sort=creator.homeAddress.city,${sortOrder}&sort=creator.homeAddress.suburb,${sortOrder}`;
+    } else {
+      query += `&sort=${sortBy},${sortOrder}`;
+    }
+    query += "&sort=id";
+    return instance.get(query, {withCredentials: true});
+  },
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),

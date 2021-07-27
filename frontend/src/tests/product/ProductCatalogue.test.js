@@ -123,7 +123,18 @@ describe('Testing api put/post request and the response method with errors', () 
     await wrapper.vm.createProduct();
 
     expect(wrapper.vm.productCardError).toBe("");
-    expect(wrapper.vm.imageError).toBe("Image larger than 5MB");
+    expect(wrapper.vm.imageError).toBe("Some images you tried to upload are too large. Images must be less than 1MB in size.");
+  });
+
+  it('Create product but receives 400 image error ', async () => {
+    Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: '51-A'}});
+    Api.uploadProductImage.mockRejectedValue({response : {status: 4400, data: {message: "File corrupted."}}});
+
+    wrapper.vm.productDisplayedInCard.images = [{filename: 'blah'}];
+    await wrapper.vm.createProduct();
+
+    expect(wrapper.vm.productCardError).toBe("");
+    expect(wrapper.vm.imageError).toBe("File corrupted.");
   });
 
   it('400 error test if Product ID already exists', async () => {

@@ -2,7 +2,7 @@
     <b-card
         style="height: 96%"
         @click="this.cardClicked"
-        class="marketplace-card"
+        class="marketplace-card shadow-sm"
     >
       <h5 class="card-title single-line-clamped">{{cardInfo.title}}</h5>
       <p class="sub-title">Ends: {{ formatExpiry }}</p>
@@ -66,6 +66,11 @@ export default {
     }
   },
   methods: {
+
+    /**
+     * Emits an event 'cardClicked' when the card is clicked
+     * which is listened to by the marketplace.
+     */
     cardClicked() {
       this.$emit('cardClicked', this.cardInfo)
     },
@@ -78,7 +83,7 @@ export default {
      */
     formatAddress: function () {
       const address = this.cardInfo.creator.homeAddress;
-      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
+      return address.city + (address.suburb ? ' (' + address.suburb + ')' : '');
     },
 
     /**

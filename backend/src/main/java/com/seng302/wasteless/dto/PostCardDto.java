@@ -1,6 +1,5 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.CardSections;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -37,6 +36,6 @@ public class PostCardDto {
     @ElementCollection
     @Column(name = "keywords")
     @NotNull(message = "Keyword is mandatory")
-    @Size (min = 1, max = 5)
+    @Size (max = 5)
     private List<@NotBlank @NotNull @Size(max = 10) String> keywords;
 }
