@@ -96,17 +96,10 @@ Date: 23/5/2021
        so we wouldn't be able to call it with $refs-->
       <div style="text-align: center" class="mb-3">
         <h5>Click on the inventory item you want to create a listing for</h5>
-        <div style="margin-left: 15%; margin-right: 15%">
-          <b-input-group prepend="Search for inventory item:">
-            <b-form-input></b-form-input>
-            <b-input-group-append>
-              <b-button @click="searchPressed"> Search</b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </div>
       </div>
       <inventory-table ref="inventoryTable" :editable="false"
                       v-on:inventoryItemClicked="selectInventoryItem"
+
       />
     </b-modal>
   </div>
