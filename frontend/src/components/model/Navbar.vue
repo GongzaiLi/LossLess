@@ -7,7 +7,17 @@ Date: sprint_1
     toggleable="lg" type="dark" variant="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand href="#">Wasteless</b-navbar-brand>
+    <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
+
+    <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
+      <template #toast-title>
+        Need Help?
+      </template>
+      This is top <em>left</em> corner of our web app. This is not a menu.
+      <br>
+      If you want to log out, or change who you are acting as,
+      use the menu on the <strong>top <em>right</em></strong> corner <b-icon-arrow-right/>
+    </b-toast>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -89,6 +99,11 @@ import {setCurrentlyActingAs} from '../../auth'
  */
 export default {
   name: "Navbar.vue",
+  data: function () {
+    return {
+      timer: null,
+    }
+  },
   computed: {
     isActingAsUser: function() {
       return this.$currentUser.currentlyActingAs == null;
@@ -192,6 +207,14 @@ export default {
     actAsUser() {
       setCurrentlyActingAs(null);
       this.$router.push(`/users/${this.$currentUser.id}`);
+    },
+    hoverLogo() {
+      this.timer = setTimeout(() => {this.$bvToast.show('my-toast')}, 10000);
+    },
+    hoverLogoLeave() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
     }
   },
 }
