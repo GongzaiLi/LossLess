@@ -113,6 +113,9 @@ deploy-staging-backend:
     - ./gradlew bootJar
     - rm -rf /home/gitlab-runner/staging-backend/ || true
     - mkdir /home/gitlab-runner/staging-backend/
+    - cd ..
+    - cp -r ./data-generation /home/gitlab-runner/staging-backend
+    - cd backend
     - cp -r ./build/libs /home/gitlab-runner/staging-backend
     - cp ../runner/staging-backend.sh /home/gitlab-runner/staging-backend.sh
     - chmod u+x /home/gitlab-runner/staging-backend.sh
