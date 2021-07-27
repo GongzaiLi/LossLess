@@ -41,18 +41,24 @@ Date: sprint_1
       <b-navbar-nav class="ml-auto">
 
         <div class="icon mr-1" id="bell" @click="bellIconPressed">
+
           <b-icon v-if="!numberOfNotifications" icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem;"></b-icon>
           <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
-          <span v-if="numberOfNotifications" style="position: absolute;">{{numberOfNotifications}}</span>
         </div>
+
         <div class="notifications" id="box">
           <h2>Notifications - <span> {{numberOfNotifications}}</span></h2>
-          <div v-if="numExpiredCards" class="expired-notifications-item" @click="clearExpiredCards">
-            <div class="text">
-              <h4> Marketplace Card Expired:</h4>
-              <h4> {{ numExpiredCards}} {{ expiredText }}</h4>
+            <div v-if="numExpiredCards" class="expired-notifications-item" @click="clicked = !clicked">
+              <div class="text">
+                <h4> Marketplace Card Expired:</h4>
+                <h4> {{ numExpiredCards}} {{ expiredText }}</h4>
+              </div>
+              <b-col cols="2">
+                <b-icon v-if="clicked" style="width: 30px; height: 30px; margin-top: 50%"
+                        icon="trash-fill" @click="clearExpiredCards"></b-icon>
+              </b-col>
             </div>
-          </div>
+
           <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id"  @click="goToHomePage">
             <div class="text">
               <h4> Marketplace Card: {{notification.title}}</h4>
@@ -60,6 +66,10 @@ Date: sprint_1
             </div>
           </div>
         </div>
+      </b-navbar-nav>
+
+      <b-navbar-nav>
+        <span v-if="numberOfNotifications" style="position: absolute;color: red">{{numberOfNotifications}}</span>
       </b-navbar-nav>
 
 
@@ -70,7 +80,6 @@ Date: sprint_1
             <em class="ml-2" id="profile-name">{{profileName}}</em>
             <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
-
 
           <div v-if="!isActingAsUser">
             <hr style="margin-top: 0; margin-bottom: 0;">
@@ -194,8 +203,10 @@ Date: sprint_1
 }
 
 .expired-notifications-item:hover {
-  background-color: #eee
+  background-color: #eee;
 }
+
+
 </style>
 
 <script>
@@ -211,6 +222,7 @@ export default {
   name: "Navbar.vue",
   data() {
     return {
+      clicked: false,
       showNotifications: false,
       cards: [],
       notifications: [],
@@ -439,7 +451,8 @@ export default {
   },
 
   created() {
-    this.interval = setInterval(() => this.updateNotifications(), 300000);
+    this.updateNotifications();
+    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 }
 </script>
