@@ -212,9 +212,15 @@ export default {
      * Queries for card data from API using the pagination and sorting data fields.
      */
     async refreshData() {
-      const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
-      this.cards = resp.data.results;
-      this.totalItems = resp.data.totalItems;
+      if (this.section != "homepage") {
+        const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
+        this.cards = resp.data.results;
+        this.totalItems = resp.data.totalItems;
+      } else {
+        const resp = await Api.getExpiringCards(this.$currentUser.id, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder)
+        this.cards = resp.data.results;
+        this.totalItems = resp.data.totalItems;
+      }
     },
 
     /**

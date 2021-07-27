@@ -26,6 +26,7 @@
           :cardsPerRow:="3"
           :perPage="5"
           v-on:refreshPage="getUserExpiredCards"
+          section="homepage"
       />
       </b-card>
   </b-card>
@@ -75,24 +76,6 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
-            this.getUserExpiredCards();
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
-    },
-
-    /**
-     * this is a get api which can take Specific user to and display it's expiring cards
-     * The function id means user's id, if the server finds
-     * the user's expiring cards will response the data and keep the data into this.expiringCards
-     */
-    getUserExpiredCards: function () {
-      api
-          .getExpiringCards(this.$currentUser.id)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.expiringCards = response.data;
           })
           .catch((error) => {
             this.$log.debug(error);

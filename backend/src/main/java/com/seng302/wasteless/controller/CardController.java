@@ -127,7 +127,7 @@ public class CardController {
      */
     @GetMapping("cards/{id}/expiring")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> getExpiringCards(@PathVariable("id") Integer userId) {
+    public ResponseEntity<Object> getExpiringCards(@PathVariable("id") Integer userId, @RequestParam Pageable pageable) {
         logger.info("Request to get a user's expiring cards with user id: {}", userId);
 
         User user = userService.getCurrentlyLoggedInUser();
@@ -137,7 +137,7 @@ public class CardController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You cannot view the expiring cards of another user.");
         }
 
-        List<Card> allCards = cardService.getAllUserCards(user.getId());
+        Page<Card> allCards = cardService.getAllUserCards(user.getId(), pageable);
         List<Card> expiredCards = new ArrayList<>();
 
         for (Card card : allCards) {

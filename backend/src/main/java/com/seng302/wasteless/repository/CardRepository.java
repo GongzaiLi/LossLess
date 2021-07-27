@@ -37,7 +37,7 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
-    List<Card> findAllByCreator_IdOrderByDisplayPeriodEnd(Integer userId);
+    Page<Card> findAllByCreator_IdOrderByDisplayPeriodEnd (Integer userId, Pageable pageable);
 
     /**
      * Returns the total number of cards in the repository that are in the given section.
