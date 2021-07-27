@@ -172,3 +172,13 @@ describe ("Sort Change handler", () => {
         expect(Api.getCardsBySection).toHaveBeenLastCalledWith("ForSale", 0, 10, "location", "desc");
     });
 })
+
+describe('check-open-Full-Card-modal', () => {
+    test('check-cardId-set', async () => {
+        let card = {
+            id: 50
+        }
+        wrapper.vm.cardClickHandler(card);
+        expect(wrapper.vm.cardId).toBe(card.id);
+    })
+});
