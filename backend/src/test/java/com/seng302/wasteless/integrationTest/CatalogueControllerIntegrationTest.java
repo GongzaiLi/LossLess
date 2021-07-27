@@ -619,6 +619,83 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
    @Test
    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_withSearchQueryIsBar2_thenCorrectResultsReturned_andReturnProductNameIncludeBar2() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar1", "Chocolate Bar1", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar2", "Chocolate Bar2", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar3", "Chocolate Bar3", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?searchQuery=Bar2")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("products[0].id", is("1-CHOCOLATE-BAR2")))
+              .andExpect(jsonPath("products[0].name", is("Chocolate Bar2")))
+              .andExpect(jsonPath("products", hasSize(1)));
+   }
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_withSearchQueryIsEmpty_thenCorrectResultsReturned_andReturnAllProducts() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar1", "Chocolate Bar1", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar2", "Chocolate Bar2", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar3", "Chocolate Bar3", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?searchQuery")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("products[0].id", is("1-CHOCOLATE-BAR1")))
+              .andExpect(jsonPath("products[1].id", is("1-CHOCOLATE-BAR2")))
+              .andExpect(jsonPath("products[2].id", is("1-CHOCOLATE-BAR3")))
+              .andExpect(jsonPath("products[0].name", is("Chocolate Bar1")))
+              .andExpect(jsonPath("products[1].name", is("Chocolate Bar2")))
+              .andExpect(jsonPath("products[2].name", is("Chocolate Bar3")))
+              .andExpect(jsonPath("products", hasSize(3)));
+   }
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+   void whenGetRequestToBusinessProducts_withSearchQueryIsAAAAAA_thenCorrectResultsReturned_andReturnEmpty() throws Exception {
+      createOneBusiness("Business", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business");
+      createOneProduct("chocolate-bar1", "Chocolate Bar", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar2", "Chocolate Bar2", "Example Product First Edition", "example manufacturer", "4.0");
+      createOneProduct("chocolate-bar3", "Chocolate Bar3", "Example Product First Edition", "example manufacturer", "4.0");
+
+
+      mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/products?searchQuery=AAAAAA")
+              .contentType(MediaType.APPLICATION_JSON))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("products", hasSize(0)));
+   }
+
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
    void whenGetRequestToBusinessProducts_withOffsetOfZero_andCountOfTwo_thenCorrectResultsReturned() throws Exception {
       createOneBusiness("Business", "{\n" +
               "    \"streetNumber\": \"56\",\n" +
