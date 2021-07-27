@@ -86,10 +86,17 @@ export default {
     },
 
     async checkForExpiringCards () {
-      const resp = await Api.getExpiringCards(this.$currentUser.id)
-      if (resp.data.length > 0) {
-        this.hasExpiredCards = true;
-      }
+      await Api
+        .getExpiringCards(this.$currentUser.id)
+        .then((resp) => {
+          if (resp.data.length > 0) {
+            this.hasExpiredCards = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
     },
 
     checkExpiredCardsExist(cards) {
