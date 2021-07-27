@@ -34,8 +34,7 @@
       </b-input-group-text>
       <br>
       <div>
-        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
-        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger" @click="deleteSelectedCard"> Delete </b-button>
+        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
         <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="success" @click="openExtendConfirmDialog"> Extend <b-icon-alarm/></b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
@@ -58,9 +57,10 @@
 
 <script>
 import api from "../../Api";
+import Api from "../../Api";
 export default {
   name: "full-card",
-  props: ["cardId", 'closeFullViewCardModal'],
+  props: ["cardId"],
   data() {
     return {
       fullCard: {
@@ -102,11 +102,13 @@ export default {
     },
 
     /**
-     * Emits an event `deleteCard` to delete a card
-     * that is listened to inside the marketplace
+     * Sends an API request to delete a card determined given the cardId
+     * and deletes the card from the marketplaceCards list using filter
      */
-    confirmDeleteCard() {
-      this.$emit('deleteCard', this.fullCard);
+    async confirmDeleteCard() {
+      await Api.deleteCard(this.cardId);
+      this.$emit('cardChanged', this.fullCard);
+      this.$emit('closeModal', this.fullCard);
     },
 
     /**
@@ -116,15 +118,18 @@ export default {
       this.$refs.confirmExtendCardModal.show();
     },
 
-
     /**
-     * Emits an event `extendCard` to extend a card
-     * that is listened to inside the marketplace
+     * Sends an api request with the card's id that is to have it's expiry extended.
      */
-    confirmExtendExpiry() {
-      this.$emit('extendCard')
-    }
+    async confirmExtendExpiry() {
+      await Api.extendCardExpiry(this.cardId)
+      this.getCard();
+      this.$emit('cardChanged', this.fullCard);
+    },
 
+    closeFullViewCardModal() {
+      this.$emit('closeModal', this.fullCard);
+    }
   },
 
   computed: {

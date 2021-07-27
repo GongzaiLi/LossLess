@@ -1,5 +1,6 @@
 <template>
-  <b-card border-variant="secondary" header-border-variant="secondary">
+  <div>
+  <b-card class="shadow">
       <h1 v-if="$currentUser.currentlyActingAs">{{$currentUser.currentlyActingAs.name + "'s Home Page"}}</h1>
       <h1 v-else>{{userData.firstName + "'s Home Page"}}</h1>
       <router-link v-if="$currentUser.currentlyActingAs" :to="{ name: 'business-profile', params: { id: $currentUser.currentlyActingAs.id }}">
@@ -8,28 +9,29 @@
     <router-link v-else :to="{ name: 'user-profile', params: { id: $currentUser.id }}">
       <h4>Profile page</h4>
     </router-link>
-
-    <b-card style="margin-top: 30px" v-if="expiringCardsExist && !$currentUser.currentlyActingAs" class="shadow">
-      <h1><b-icon-clock/> Your Cards Closing Soon </h1>
-      <b-input-group>
-        <b-form-text style="margin-right: 7px">
-          Table View
-        </b-form-text>
-        <b-form-checkbox v-model="isCardFormat" switch/>
-        <b-form-text>
-          Card View
-        </b-form-text>
-      </b-input-group>
-      <marketplace-section
-          :cards="expiringCards"
-          :is-card-format="isCardFormat"
-          :cardsPerRow:="3"
-          :perPage="5"
-          v-on:refreshPage="getUserExpiredCards"
-          section="homepage"
-      />
-      </b-card>
   </b-card>
+
+  <b-card style="margin-top: 30px" v-if="hasExpiredCards && !$currentUser.currentlyActingAs" class="shadow">
+    <h1><b-icon-clock/> Your Cards Closing Soon </h1>
+    <b-input-group>
+      <b-form-text style="margin-right: 7px">
+        Table View
+      </b-form-text>
+      <b-form-checkbox v-model="isCardFormat" switch/>
+      <b-form-text>
+        Card View
+      </b-form-text>
+    </b-input-group>
+    <marketplace-section
+        :is-card-format="isCardFormat"
+        :cardsPerRow:="3"
+        :perPage="5"
+        section="homepage"
+        v-on
+
+    />
+  </b-card>
+  </div>
 </template>
 
 <script>
@@ -55,7 +57,7 @@ export default {
       errors: [],
       activeTabIndex: 0,
       isCardFormat: false,
-      expiringCards: [],
+      hasExpiredCards: false,
     }
   },
 
@@ -82,15 +84,6 @@ export default {
           })
     },
   },
-  computed: {
-    /**
-     * The rows function just computed how many pages in the search table.
-     * @returns {boolean}
-     */
-    expiringCardsExist() {
-      return this.expiringCards.length > 0;
-    },
-  }
 }
 </script>
 

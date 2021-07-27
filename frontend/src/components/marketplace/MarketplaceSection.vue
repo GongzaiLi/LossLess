@@ -59,30 +59,19 @@
           <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
         </template>
 
-        <template v-slot:cell(actions)="{ item }">
-          <div v-if="item.creator.id === $currentUser.id">
-            <b-button
-                variant="success"
-                @click="openExtendConfirmDialog(item.id)"
-                size="sm"
-                v-b-tooltip.hover title="Extend Card Expiry"
-                style="margin-top: -10px; margin-bottom: -8px">
-              <b-icon-alarm/>
-            </b-button>
-          </div>
-        </template>
-
         <template #empty>
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
       </b-table>
     </div>
     <pagination @input="pageChanged" :per-page="perPage" :total-items="totalItems" v-show="totalItems > 0"/>
-      <b-modal ref="confirmExtendCardModal" size="sm" title="Extend Expiry" ok-variant="success" ok-title="Extend" @ok="confirmExtendExpiry">
-        <h6>
-          Are you sure you want to <strong>extend</strong> this card's expiry?
-        </h6>
-      </b-modal>
+    <b-modal :id="`full-card-${this.section}`" hide-header hide-footer>
+      <MarketplaceCardFull
+          :cardId = "cardId"
+          v-on:cardChanged="refreshData"
+          v-on:closeModal="closeFullCardModal">
+        >  </MarketplaceCardFull>
+    </b-modal>
   </div>
 </template>
 
@@ -100,11 +89,12 @@
 <script>
 import pagination from "../model/Pagination";
 import MarketplaceCard from "./MarketplaceCard";
+import MarketplaceCardFull from "./MarketplaceCardFull";
 import Api from "../../Api";
 
 export default {
   name: "MarketplaceSection",
-  components: {pagination, MarketplaceCard},
+  components: {pagination, MarketplaceCard, MarketplaceCardFull},
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
     this.refreshData();
@@ -122,7 +112,7 @@ export default {
         { value: 'asc', text: 'Ascending' },
         { value: 'desc', text: 'Descending' },
       ],
-      cardToBeExtended: "",
+      cardId: null,
       errors: [],
       currentPage: 1,
       cards: [],
@@ -155,7 +145,8 @@ export default {
      * When called do currently undetermined action
      */
     cardClickHandler: function (card) {
-      this.$emit('cardClicked', card.id)
+      this.cardId = card.id;
+      this.$bvModal.show(`full-card-${this.section}`);  // Open only our modal
     },
 
     /**
@@ -177,25 +168,10 @@ export default {
     },
 
     /**
-     * Opens the dialog to confirm if the card with given id should be extended.
+     * Closes the full card modal when cancel button pressed.
      */
-    openExtendConfirmDialog: function(cardId) {
-      this.cardToBeExtended = cardId;
-      this.$refs.confirmExtendCardModal.show();
-    },
-
-    /**
-     * Sends an api request with the card's id that is to have it's expiry extended.
-     */
-    confirmExtendExpiry: function() {
-      Api
-          .extendCardExpiry(this.cardToBeExtended)
-          .then(() => {
-            this.$emit("refreshPage")
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
+    closeFullCardModal() {
+      this.$bvModal.hide(`full-card-${this.section}`);
     },
 
     /**
@@ -212,14 +188,13 @@ export default {
      * Queries for card data from API using the pagination and sorting data fields.
      */
     async refreshData() {
-      if (this.section != "homepage") {
+      if (this.section !== "homepage") {
         const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
         this.cards = resp.data.results;
         this.totalItems = resp.data.totalItems;
       } else {
-        const resp = await Api.getExpiringCards(this.$currentUser.id, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder)
-        this.cards = resp.data.results;
-        this.totalItems = resp.data.totalItems;
+        const resp = await Api.getExpiringCards(this.$currentUser.id)
+        this.cards = resp.data;
       }
     },
 

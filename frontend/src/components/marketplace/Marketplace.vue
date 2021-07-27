@@ -29,7 +29,6 @@ Date: 21/5/21
           <marketplace-section
             :cards="marketplaceCards"
             :is-card-format="isCardFormat"
-            v-on:cardClicked="openFullCardModal"
             :cardsPerRow:="3"
             :perPage="8"
             :section="section"
@@ -37,14 +36,6 @@ Date: 21/5/21
           />
         </b-tab>
       </b-tabs>
-      <b-modal id="full-card" hide-header hide-footer>
-        <MarketplaceCardFull
-            :closeFullViewCardModal="closeFullCardModal"
-            :cardId = "this.cardId"
-            v-on:deleteCard="deleteSelectedCard">
-            v-on:extendCard="extendExpiry"
-            >  </MarketplaceCardFull>
-      </b-modal>
 
       <b-modal id="create-card" hide-header hide-footer>
         <CreateCard @createAction="createCard($event)"
@@ -58,18 +49,16 @@ Date: 21/5/21
 <script>
 
 import MarketplaceSection from "./MarketplaceSection";
-import MarketplaceCardFull from "./MarketplaceCardFull";
 import api from "../../Api";
 
 import CreateCard from "./CreateCard";
 
 export default {
-  components: { MarketplaceSection, MarketplaceCardFull, CreateCard },
+  components: { MarketplaceSection, CreateCard },
   data: function () {
     return {
       sections: [['ForSale', 'For Sale'], ['Wanted', 'Wanted'], ['Exchange', 'Exchange']],
       error: "",
-      cardId: 0,
       activeTabIndex: 0,
       isCardFormat: true,
       marketplaceCards: [],
@@ -89,21 +78,6 @@ export default {
     },
 
     /**
-     * opens the Full card modal.
-     */
-    openFullCardModal(cardId) {
-      this.cardId = cardId;
-      this.$bvModal.show('full-card');
-    },
-
-    /**
-     * Closes the full card modal when cancel button pressed.
-     */
-    closeFullCardModal() {
-      this.$bvModal.hide('full-card');
-    },
-
-    /**
      * Opens the create card modal when create button pressed.
      */
     openCreateCardModal() {
@@ -115,16 +89,6 @@ export default {
      */
     closeCreateCardModal() {
       this.$bvModal.hide('create-card');
-    },
-
-    /**
-     * Sends an API request to delete a card determined given the cardId
-     * and deletes the card from the marketplaceCards list using filter
-     */
-    async deleteSelectedCard(card) {
-      await api.deleteCard(card.id);
-      this.closeFullCardModal();
-      this.$refs[card.section][0].refreshData();
     },
 
     /**
@@ -142,6 +106,7 @@ export default {
         // The way this is done is by giving each section component a unique ref, with the same name as the section
         // Then, we just get the component using the ref and call the refresh function
         // Also, you have to index into the ref because... reasons: https://forum.vuejs.org/t/this-refs-theid-returns-an-array/31995/10
+        console.log()
         this.$refs[cardData.section][0].refreshData();
       })
       .catch(error => {
@@ -172,19 +137,6 @@ export default {
         return "Server error";
       }
     },
-
-    /**
-     * Sends an API request to extend a card determined by the cardId
-     */
-    extendExpiry: function() {
-      api
-          .extendCardExpiry(this.cardId)
-          .catch((error) => {
-            this.$log.debug(error);
-          })
-      this.closeFullCardModal();
-    }
-
   },
 
 }

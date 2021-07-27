@@ -66,8 +66,8 @@ public class CardService {
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
-    public Page<Card> getAllUserCards(Integer userId, Pageable pageable) {
-        return cardRepository.findAllByCreator_IdOrderByDisplayPeriodEnd(userId, pageable);
+    public List<Card> getAllUserCards(Integer userId) {
+        return cardRepository.findAllByCreator_IdOrderByDisplayPeriodEnd(userId);
     }
 
     /**
