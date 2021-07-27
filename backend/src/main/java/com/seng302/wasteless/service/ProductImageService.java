@@ -111,7 +111,7 @@ public class ProductImageService {
             if (originalImage == null) {
                 Files.deleteIfExists(image.getAbsoluteFile().toPath());
                 logger.info("Cannot read Corrupt Image File");
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot read Corrupt Image File");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The image file you tried to upload is corrupted.");
             }
             int height = TARGET_HEIGHT;
             int width = originalImage.getWidth() * TARGET_HEIGHT / originalImage.getHeight();
@@ -123,7 +123,7 @@ public class ProductImageService {
 
         } catch (IOException error) {
             logger.debug("Corrupt Image File", error);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Corrupt Image File");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The image file you tried to upload is corrupted.");
         }
     }
 

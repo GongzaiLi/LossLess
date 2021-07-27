@@ -48,9 +48,8 @@ Date: 15/4/2021
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
     </b-card>
 
-    <b-modal id="image-error-modal" title="Unfortunately, some images couldn't be uploaded." ok-only>
-      {{ imageError }}
-      <br>
+    <b-modal id="image-error-modal" title="Some images couldn't be uploaded." ok-only>
+      <h5>{{ imageError }}</h5>
       However, the product has been created successfully. If you would like to add more images to it, you can do so by
       editing the product.
     </b-modal>
@@ -192,11 +191,11 @@ export default {
      * Then, will hide the product popup and reload the table items if successful.
      */
     async createProduct() {
-      await Api
-          .createProduct(this.$route.params.id, this.productDisplayedInCard)
+      let productCreated = false;
+        await Api.createProduct(this.$route.params.id, this.productDisplayedInCard)
           .then(async (createProductResponse) => {
+            productCreated = true;
             this.$log.debug("Product Created", createProductResponse);
-
             this.$log.debug("Uploading images");
             // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
             // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
@@ -213,14 +212,14 @@ export default {
             this.$bvModal.hide('product-card');
           })
           .catch((error) => {
-            this.productCardError = this.getErrorMessageFromApiError(error);
-            if (error.response.status === 413) {  // Uploaded images were too large
-              this.refreshProducts(); // Product has been created, so refresh the table of products
+            console.log(productCreated);
+            if (productCreated) {
+              this.refreshProducts(); // Product has been created, must be image error, so refresh the table of products
               this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
-
-              this.imageError = error.response.data;
-              this.productCardError = '';
+              this.imageError = (error.response.status !== 413) ? error.response.data.message : "Some images you tried to upload are too large. Images must be less than 1MB in size.";
               this.$bvModal.show('image-error-modal');
+            } else {
+              this.productCardError = this.getErrorMessageFromApiError(error);
             }
             this.$log.debug(error);
           });
