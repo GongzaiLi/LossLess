@@ -125,6 +125,7 @@ export default {
       await Api.extendCardExpiry(this.cardId)
       this.getCard();
       this.$emit('cardChanged', this.fullCard);
+      this.$emit('closeModal', this.fullCard);
     },
 
     closeFullViewCardModal() {

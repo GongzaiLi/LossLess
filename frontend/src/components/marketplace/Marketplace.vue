@@ -27,7 +27,6 @@ Date: 21/5/21
       <b-tabs v-model=activeTabIndex align="center" fill>
         <b-tab v-for="[section, sectionName] in sections" :key=section :title=sectionName>
           <marketplace-section
-            :cards="marketplaceCards"
             :is-card-format="isCardFormat"
             :cardsPerRow:="3"
             :perPage="8"

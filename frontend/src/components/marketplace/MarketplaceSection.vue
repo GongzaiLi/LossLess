@@ -195,6 +195,7 @@ export default {
       } else {
         const resp = await Api.getExpiringCards(this.$currentUser.id)
         this.cards = resp.data;
+        this.$emit('cardCountChanged', this.cards);
       }
     },
 
@@ -207,6 +208,10 @@ export default {
       this.sortOrder = ctx.sortDesc ? 'desc' : 'asc';
       await this.refreshData();
     },
+
+    /**
+     * Closes the full card modal when cancel button pressed.
+     */
   },
 }
 </script>

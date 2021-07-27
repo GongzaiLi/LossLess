@@ -27,8 +27,7 @@
         :cardsPerRow:="3"
         :perPage="5"
         section="homepage"
-        v-on
-
+        v-on:cardCountChanged="checkExpiredCardsExist"
     />
   </b-card>
   </div>
@@ -37,6 +36,7 @@
 <script>
 import api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
+import Api from "../../Api";
 
 export default {
   components: {MarketplaceSection},
@@ -78,11 +78,27 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
+            this.checkForExpiringCards();
           })
           .catch((error) => {
             this.$log.debug(error);
           })
     },
+
+    async checkForExpiringCards () {
+      const resp = await Api.getExpiringCards(this.$currentUser.id)
+      if (resp.data.length > 0) {
+        this.hasExpiredCards = true;
+      }
+    },
+
+    checkExpiredCardsExist(cards) {
+      if (cards.length === 0) {
+        this.hasExpiredCards = false;
+      } else {
+        this.hasExpiredCards = true;
+      }
+    }
   },
 }
 </script>
