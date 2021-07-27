@@ -141,7 +141,7 @@ public class CardController {
         List<Card> expiredCards = new ArrayList<>();
 
         for (Card card : allCards) {
-            if (card.getDisplayPeriodEnd().minusWeeks(1).isBefore(LocalDateTime.now())) {
+            if (card.getDisplayPeriodEnd().isBefore(LocalDateTime.now())) {
                 expiredCards.add(card);
             }
         }
