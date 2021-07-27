@@ -21,6 +21,7 @@ import java.util.List;
 @Accessors(chain = true) //Allows chaining of getters and setters
 public class GetUserBusinessAdministeredDto {
     private int id;
+    private List<String> administrators;
     private int primaryAdministratorId;
     private String name;
     private String description;
@@ -35,7 +36,7 @@ public class GetUserBusinessAdministeredDto {
      * @param business The business to create this data object for.
      */
     public GetUserBusinessAdministeredDto(Business business) {
-        List<String> administrators = new ArrayList<>();
+        administrators = new ArrayList<>();
 
         for (User admin : business.getAdministrators()) {
             administrators.add(admin.getId().toString());

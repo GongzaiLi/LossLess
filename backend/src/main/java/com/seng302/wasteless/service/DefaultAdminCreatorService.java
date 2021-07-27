@@ -38,6 +38,7 @@ public class DefaultAdminCreatorService {
 
     private String defaultEmail;
     private String defaultPassword;
+    private Integer defaultTimeout;
 
     private AddressService addressService;
     private UserService userService;
@@ -75,7 +76,6 @@ public class DefaultAdminCreatorService {
      * @throws IOException If reading the config file failed due to an external error, eg. the file was corrupted
      */
     private void readConfigFile(InputStream configFileStream) throws InvalidParameterException, IOException {
-        Integer defaultTimeout;
         Properties defaultProps = new Properties();
         defaultProps.load(configFileStream);
 
