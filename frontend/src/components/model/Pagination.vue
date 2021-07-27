@@ -12,13 +12,17 @@
           last-text="Last"
       />
     </b-col>
-    <b-col style=" margin-top: -20px" md="2">
-      <div>
-        Jump to page:
-      </div>
-      <b-form-select v-model="currentPage" :options="jumpToPagesOptions" size="sm-1" @change="pageChange"></b-form-select>
+    <b-col lg="3">
+      <form @submit.prevent="jumpToPage">
+        <b-input-group prepend="Jump to page">
+          <b-form-input v-model="pageToJumpTo" type="number" min="1" :max="Math.ceil(this.totalItems/this.perPage)"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit" variant="primary">Go</b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </form>
     </b-col>
-    <b-col style="text-align: right; margin-top: 6px">
+    <b-col style="text-align: right;" class="mt-2">
       Displaying {{ itemsRangeMin }} - {{ itemsRangeMax }} of total {{ totalItems }} results.
     </b-col>
   </b-row>
@@ -31,6 +35,7 @@ export default {
   data: function () {
     return {
       currentPage: 1,
+      pageToJumpTo: 1,
     }
   },
   methods: {
@@ -40,6 +45,14 @@ export default {
     pageChange: async function () {
       await this.$forceUpdate();
       this.$emit('input', this.currentPage);
+    },
+    /**
+     * Handler for when the jump to page button is pressed.
+     * Sets the current page as the one to jump to and emits a page changed event.
+     */
+    jumpToPage: function () {
+      this.currentPage = this.pageToJumpTo;
+      this.pageChange();
     }
   },
   computed: {
