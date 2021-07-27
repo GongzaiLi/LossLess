@@ -1,5 +1,6 @@
 <template>
-  <b-card border-variant="secondary" header-border-variant="secondary">
+  <div>
+  <b-card class="shadow">
       <h1 v-if="$currentUser.currentlyActingAs">{{$currentUser.currentlyActingAs.name + "'s Home Page"}}</h1>
       <h1 v-else>{{userData.firstName + "'s Home Page"}}</h1>
       <router-link v-if="$currentUser.currentlyActingAs" :to="{ name: 'business-profile', params: { id: $currentUser.currentlyActingAs.id }}">
@@ -8,31 +9,34 @@
     <router-link v-else :to="{ name: 'user-profile', params: { id: $currentUser.id }}">
       <h4>Profile page</h4>
     </router-link>
-
-    <b-card style="margin-top: 30px" v-if="expiringCardsExist" class="shadow">
-      <h1><b-icon-clock/> Your Cards Closing Soon </h1>
-      <b-input-group>
-        <b-form-text style="margin-right: 7px">
-          Table View
-        </b-form-text>
-        <b-form-checkbox v-model="isCardFormat" switch/>
-        <b-form-text>
-          Card View
-        </b-form-text>
-      </b-input-group>
-      <marketplace-section
-          :cards="expiringCards"
-          :is-card-format="isCardFormat"
-          :cardsPerRow:="3"
-          :perPage="5"
-      />
-      </b-card>
   </b-card>
+
+  <b-card style="margin-top: 30px" v-if="hasExpiredCards && !$currentUser.currentlyActingAs" class="shadow">
+    <h1><b-icon-clock/> Your Cards Closing Soon </h1>
+    <b-input-group>
+      <b-form-text style="margin-right: 7px">
+        Table View
+      </b-form-text>
+      <b-form-checkbox v-model="isCardFormat" switch/>
+      <b-form-text>
+        Card View
+      </b-form-text>
+    </b-input-group>
+    <marketplace-section
+        :is-card-format="isCardFormat"
+        :cardsPerRow:="3"
+        :perPage="5"
+        section="homepage"
+        v-on:cardCountChanged="checkExpiredCardsExist"
+    />
+  </b-card>
+  </div>
 </template>
 
 <script>
 import api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
+import Api from "../../Api";
 
 export default {
   components: {MarketplaceSection},
@@ -53,7 +57,7 @@ export default {
       errors: [],
       activeTabIndex: 0,
       isCardFormat: false,
-      expiringCards: [],
+      hasExpiredCards: false,
     }
   },
 
@@ -74,39 +78,35 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
-            this.getUserExpiredCards(id);
+            this.checkForExpiringCards();
           })
           .catch((error) => {
             this.$log.debug(error);
           })
     },
 
-    /**
-     * this is a get api which can take Specific user to and display it's expiring cards
-     * The function id means user's id, if the server finds
-     * the user's expiring cards will response the data and keep the data into this.expiringCards
-     */
-    getUserExpiredCards: function (id) {
-      api
-          .getExpiringCards(id)
-          .then((response) => {
-            this.$log.debug("Data loaded: ", response.data);
-            this.expiringCards = response.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          })
+    async checkForExpiringCards () {
+      await Api
+        .getExpiringCards(this.$currentUser.id)
+        .then((resp) => {
+          if (resp.data.length > 0) {
+            this.hasExpiredCards = true;
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+
     },
+
+    checkExpiredCardsExist(cards) {
+      if (cards.length === 0) {
+        this.hasExpiredCards = false;
+      } else {
+        this.hasExpiredCards = true;
+      }
+    }
   },
-  computed: {
-    /**
-     * The rows function just computed how many pages in the search table.
-     * @returns {boolean}
-     */
-    expiringCardsExist() {
-      return this.expiringCards.length > 0;
-    },
-  }
 }
 </script>
 

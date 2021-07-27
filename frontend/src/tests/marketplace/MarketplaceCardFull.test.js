@@ -138,3 +138,11 @@ describe('check-api-request-get-full-card', () => {
         expect(wrapper.vm.fullCard).toBe(response.data);
     })
 });
+
+describe('check-api-request-to-delete-cards', () => {
+    test('check-api-request-to-delete-cards-success', async () => {
+        Api.deleteCard.mockResolvedValue({response: {status: 200}});
+        await wrapper.vm.confirmDeleteCard({id: 0, section: 'ForSale'});
+        expect(Api.deleteCard).toHaveBeenCalled();
+    })
+});
