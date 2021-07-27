@@ -306,7 +306,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("true"));
+                .andExpect(content().string("1"));
     }
 
     @Test
