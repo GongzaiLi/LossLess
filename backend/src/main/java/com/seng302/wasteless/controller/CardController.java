@@ -167,7 +167,7 @@ public class CardController {
     public ResponseEntity<Object> createUser(@PathVariable("id") Integer cardId) {
         logger.info("Request to get card with id: {}", cardId);
 
-        User user = userService.getCurrentlyLoggedInUser();
+        userService.getCurrentlyLoggedInUser();
 
         logger.info("Retrieving Card");
         Card card = cardService.findCardById(cardId);

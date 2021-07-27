@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * UserRepository is a repository interface for User.
@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Integer countAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nicknameQuery);
 
-    ArrayList<User> findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nicknameQuery, Pageable pageable);
+    List<User> findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(String firstNameQuery, String lastNameQuery, String middleNameQuery, String nicknameQuery, Pageable pageable);
 
     @Query(value = "select * from User where id = (select administrators_id from Business_administrators where business_id = :businessId and administrators_id = :userId)", nativeQuery = true)
     User findUserContainBusinessIdAndContainAdminId(@Param("businessId") Integer businessId, @Param("userId") Integer userId);

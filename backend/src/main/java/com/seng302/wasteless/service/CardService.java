@@ -67,7 +67,7 @@ public class CardService {
      * @return A (possibly empty) list of all cards that belong to the current user.
      */
     public List<Card> getAllUserCards(Integer userId) {
-        return cardRepository.findAllByCreator_IdOrderByDisplayPeriodEnd(userId);
+        return cardRepository.findAllByCreatorIdOrderByDisplayPeriodEnd(userId);
     }
 
     /**

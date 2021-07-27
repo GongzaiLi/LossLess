@@ -166,12 +166,7 @@ export default {
      */
     getUserInfoIntoTable: function (data) {
       let items = [];
-      let tableHeader = {
-        name: '',
-        nickName: '',
-        email: '',
-        homeAddress: ''
-      };
+      let tableHeader = {};
       for (const user of data) {
         tableHeader = user;
         tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;

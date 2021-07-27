@@ -53,10 +53,6 @@ Date: 11/5/2021
   </div>
 </template>
 
-<style>
-
-</style>
-
 <script>
 import InventoryTable from './InventoryTable';
 import InventoryDetailCard from "./InventoryDetailCard";
