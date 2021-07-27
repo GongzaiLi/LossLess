@@ -112,6 +112,7 @@ Date: 13/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate()"
                           v-model="inventoryInfo.sellBy"/>
           </b-input-group>
 
@@ -123,6 +124,7 @@ Date: 13/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate()"
                           v-model="inventoryInfo.bestBefore"/>
           </b-input-group>
 
@@ -134,6 +136,7 @@ Date: 13/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate()"
                           v-model="inventoryInfo.expires" required/>
           </b-input-group>
           <transition name="fade">
@@ -266,8 +269,15 @@ export default {
      **/
     getToday() {
       let date = new Date();
-      let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
-      return today;
+      return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+    },
+
+    /**
+     * return the maximum date allowed for inputs
+     * valid value on backend is a year with only 4 digits
+     **/
+    getMaxDate() {
+      return "9999-12-31"
     },
 
     /**

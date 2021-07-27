@@ -71,6 +71,7 @@ Date: 23/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate"
                           v-model="listingData.closes"/>
           </b-input-group>
           <b-input-group>
@@ -261,6 +262,14 @@ name: "add-listing-card",
     getToday() {
       let date = new Date();
       return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+    },
+
+    /**
+     * return the maximum date allowed for inputs
+     * valid value on backend is a year with only 4 digits
+     **/
+    getMaxDate() {
+      return "9999-12-31"
     },
 
     /**

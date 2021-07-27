@@ -22,12 +22,12 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
     Inventory findFirstById(Integer id);
 
-    List<Inventory> findAllByBusinessId(Integer id, Pageable pageable);
+    List<Inventory> findAllByBusinessIdAndProductNameContainsAllIgnoreCase(Integer id, String productName, Pageable pageable);
 
     @Modifying
     @Transactional
     @Query(value = "update Inventory set quantity = :newQuantity where id = :inventoryId")
     Integer updateInventoryQuantity(@Param("newQuantity") Integer newQuantity, @Param("inventoryId") Integer inventoryId);
 
-    Integer countInventoryByBusinessId(Integer id);
+    Integer countInventoryByBusinessIdAndProductNameContainsAllIgnoreCase(Integer id,  String productName);
 }

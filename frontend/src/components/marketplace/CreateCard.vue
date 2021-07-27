@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 align="center">
+    <h1 style="text-align:center">
       <b-icon-shop/>
       Create Card
     </h1>
@@ -8,7 +8,7 @@
 
     <b-input-group-text>
       <b-container>
-        <h6 align="center"><strong> Card Info: </strong></h6>
+        <h6 style="text-align:center"><strong> Card Info: </strong></h6>
         <label> Seller Name: {{ cardInfo.fullName }} </label>
         <br>
         <label> Seller Location: {{ cardInfo.location }} </label>
@@ -152,7 +152,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-
-</style>

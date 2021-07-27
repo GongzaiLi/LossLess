@@ -51,11 +51,6 @@
   </div>
 </template>
 
-
-<style>
-
-</style>
-
 <script>
 import pagination from "../model/Pagination";
 import api from "../../Api";
