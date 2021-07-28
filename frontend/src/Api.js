@@ -54,7 +54,7 @@ export default {
   createProduct: (id, productData) => instance.post(`/businesses/${id}/products`, productData, {withCredentials: true}),
   modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials: true}),
   createInventory: (id, inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
-  getInventory: (id, count=10, offset=0, sortBy="id", sortDirection="ASC") => instance.get(`/businesses/${id}/inventory?sort=${sortBy},${sortDirection}&page=${offset}&size=${count}`, {withCredentials: true}),
+  getInventory: (id, count=10, offset=0, sortBy="id", sortDirection="ASC",searchQuery="") => instance.get(`/businesses/${id}/inventory?sort=${sortBy},${sortDirection}&page=${offset}&size=${count}&searchQuery=${searchQuery}`, {withCredentials: true}),
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials: true}),
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
   getListings: (businessId, count, offset, sortBy, sortDirection) => instance.get(`/businesses/${businessId}/listings?size=${count}&page=${offset}&sort=${sortBy},${sortDirection}`, {withCredentials: true}),
@@ -75,6 +75,8 @@ export default {
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
+  expiredCardsNumber: (userId) => instance.get(`/users/${userId}/hasCardsExpired`, {withCredentials: true}),
+  clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null,{withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
 
   /**

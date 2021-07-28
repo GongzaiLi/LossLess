@@ -298,7 +298,7 @@ public class UserController {
             User userToGet = userService.findUserById(userId);
             logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
-            userToGet.setHasCardsDeleted(false);
+            userToGet.setHasCardsDeleted(0);
             userService.saveUserChanges(userToGet);
 
             return ResponseEntity.status(HttpStatus.OK).build();
@@ -312,6 +312,7 @@ public class UserController {
      * Endpoint to make a specified user an admin. Sets user role to GLOBAL_APPLICATION_ADMIN
      * if successful. Returns 406 NOT_ACCEPTABLE status if the user id does not exist.
      * Returns 403 FORBIDDEN if the user making the request is not an admin.
+     *
      * @param userId The id of the user to be made an admin
      * @return 200 OK, 406 Not Acceptable, 403 Forbidden
      */
@@ -355,6 +356,7 @@ public class UserController {
     /**
      * Endpoint to revoke a specified user's admin role. Sets user role to USER
      * if successful.
+     *
      * @param userId The id of the user to be made an admin
      * @return 200 OK if successful. 406 NOT_ACCEPTABLE status if the user id does not exist.
      * 403 FORBIDDEN if the user making the request is not an admin. 409 CONFLICT if the admin

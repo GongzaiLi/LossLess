@@ -254,6 +254,7 @@ public class ImageController {
 
     /**
      * Sets primary image of a product to the chosen imageId by changing the database reference
+     *
      * @param businessId The Id of the business that has the product to change primary image of
      * @param productId The id of the product  to change primary image of
      * @param imagedId id of the image that is being set as primary image

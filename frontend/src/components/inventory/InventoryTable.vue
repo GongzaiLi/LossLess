@@ -1,5 +1,19 @@
 <template>
 <div>
+  <div style="margin-left: 15%; margin-right: 15%">
+    <div>
+      <b-form @submit.prevent="searchClicked">
+        <b-input-group prepend="Filter by product code:">
+          <b-form-input v-model="searchQuery"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit"> Filter </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+    </div>
+
+  </div>
+  <br>
   <b-table
       striped hovers
       responsive="lg"
@@ -81,6 +95,7 @@ export default {
   props: ['editable'],
   data: function () {
     return {
+      searchQuery:'',
       items: [],
       business: {},
       perPage: 10,
@@ -102,6 +117,12 @@ export default {
   },
 
   methods: {
+    /**
+     *  Gets the inventory items based on search query
+     */
+    searchClicked() {
+      this.getInventoryInfo(this.$route.params.id)
+    },
 
     /**
      * this is a get api to get the name of the business
@@ -119,7 +140,7 @@ export default {
         sortByParam = "product.id";
       }
 
-      const getInventoryPromise = api.getInventory(businessId, this.perPage, this.currentPage-1, sortByParam, sortDirectionString);
+      const getInventoryPromise = api.getInventory(businessId, this.perPage, this.currentPage-1, sortByParam, sortDirectionString, this.searchQuery);
       const currencyPromise = api.getBusiness(businessId)
           .then((resp) => {
             this.business = resp.data;

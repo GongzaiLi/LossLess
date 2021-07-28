@@ -141,7 +141,7 @@ describe('check-getBusiness-API-function', () => {
     test('sortby-product-id', async () => {
         wrapper.vm.sortBy = "product";
         await wrapper.vm.getInventoryInfo(0);
-        expect(Api.getInventory).toHaveBeenCalledWith(0, 10, 0, "product.id", "ASC");
+        expect(Api.getInventory).toHaveBeenCalledWith(0, 10, 0, "product.id", "ASC", '');
     });
 });
 
