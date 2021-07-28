@@ -103,19 +103,3 @@ describe('test-api-request-post-card', () => {
 
   });
 })
-
-describe('check-open-Full-Card-modal', () => {
-    test('check-cardId-set', async () => {
-        let cardId = 50
-        wrapper.vm.openFullCardModal(cardId);
-        expect(wrapper.vm.cardId).toBe(cardId);
-    })
-});
-
-describe('check-api-request-to-delete-cards', () => {
-    test('check-api-request-to-delete-cards-success', async () => {
-      Api.deleteCard.mockResolvedValue({response: {status: 200}});
-      await wrapper.vm.deleteSelectedCard({id: 0, section: 'ForSale'});
-      expect(Api.deleteCard).toHaveBeenCalled();
-    })
-});

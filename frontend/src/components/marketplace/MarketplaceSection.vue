@@ -65,6 +65,13 @@
       </b-table>
     </div>
     <pagination @input="pageChanged" :per-page="perPage" :total-items="totalItems" v-show="totalItems > 0"/>
+    <b-modal :id="`full-card-${this.section}`" hide-header hide-footer>
+      <MarketplaceCardFull
+          :cardId = "cardId"
+          v-on:cardChanged="refreshData"
+          v-on:closeModal="closeFullCardModal">
+        >  </MarketplaceCardFull>
+    </b-modal>
   </div>
 </template>
 
@@ -82,11 +89,12 @@
 <script>
 import pagination from "../model/Pagination";
 import MarketplaceCard from "./MarketplaceCard";
+import MarketplaceCardFull from "./MarketplaceCardFull";
 import Api from "../../Api";
 
 export default {
   name: "MarketplaceSection",
-  components: {pagination, MarketplaceCard},
+  components: {pagination, MarketplaceCard, MarketplaceCardFull},
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
     this.refreshData();
@@ -104,6 +112,8 @@ export default {
         { value: 'asc', text: 'Ascending' },
         { value: 'desc', text: 'Descending' },
       ],
+      cardId: null,
+      errors: [],
       currentPage: 1,
       cards: [],
       totalItems: 0,
@@ -135,7 +145,8 @@ export default {
      * When called do currently undetermined action
      */
     cardClickHandler: function (card) {
-      this.$emit('cardClicked', card.id)
+      this.cardId = card.id;
+      this.$bvModal.show(`full-card-${this.section}`);  // Open only our modal
     },
 
     /**
@@ -157,6 +168,13 @@ export default {
     },
 
     /**
+     * Closes the full card modal when cancel button pressed.
+     */
+    closeFullCardModal() {
+      this.$bvModal.hide(`full-card-${this.section}`);
+    },
+
+    /**
      * Handler when the current page is changed, eg. by the Pagination component.
      * Makes an API request to get cards with the new pagination data.
      * @param currentPage The new page the user has changed to (1-indexed)
@@ -170,9 +188,15 @@ export default {
      * Queries for card data from API using the pagination and sorting data fields.
      */
     async refreshData() {
-      const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
-      this.cards = resp.data.results;
-      this.totalItems = resp.data.totalItems;
+      if (this.section !== "homepage") {
+        const resp = await Api.getCardsBySection(this.section, this.currentPage - 1, this.perPage, this.sortBy, this.sortOrder);
+        this.cards = resp.data.results;
+        this.totalItems = resp.data.totalItems;
+      } else {
+        const resp = await Api.getExpiringCards(this.$currentUser.id)
+        this.cards = resp.data;
+        this.$emit('cardCountChanged', this.cards);
+      }
     },
 
     /**

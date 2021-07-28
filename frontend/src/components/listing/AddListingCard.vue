@@ -71,7 +71,7 @@ Date: 23/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
-                          :max="getMaxDate"
+                          :max="getMaxDate()"
                           v-model="listingData.closes"/>
           </b-input-group>
           <b-input-group>

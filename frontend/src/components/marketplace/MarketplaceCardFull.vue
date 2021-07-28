@@ -33,9 +33,9 @@
         </b-container>
       </b-input-group-text>
       <br>
-
       <div>
-        <b-button v-if="canDelete" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
+        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
+        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="success" @click="openExtendConfirmDialog"> Extend <b-icon-alarm/></b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
 
@@ -45,15 +45,22 @@
         </h6>
       </b-modal>
 
+      <b-modal ref="confirmExtendCardModal" size="sm" title="Extend Expiry" ok-variant="success" ok-title="Extend" @ok="confirmExtendExpiry">
+        <h6>
+          Are you sure you want to <strong>extend</strong> this card's expiry?
+        </h6>
+      </b-modal>
+
     </div>
   </b-card>
 </template>
 
 <script>
 import api from "../../Api";
+import Api from "../../Api";
 export default {
   name: "full-card",
-  props: ["cardId", 'closeFullViewCardModal'],
+  props: ["cardId"],
   data() {
     return {
       fullCard: {
@@ -95,13 +102,35 @@ export default {
     },
 
     /**
-     * Emits an event `deleteCard` to delete a card
-     * that is listened to inside the marketplace
+     * Sends an API request to delete a card determined given the cardId
+     * and deletes the card from the marketplaceCards list using filter
      */
-    confirmDeleteCard() {
-      this.$emit('deleteCard', this.fullCard);
-    }
+    async confirmDeleteCard() {
+      await Api.deleteCard(this.cardId);
+      this.$emit('cardChanged', this.fullCard);
+      this.$emit('closeModal', this.fullCard);
+    },
 
+    /**
+     * Opens the dialog to confirm if the card can be extended
+     */
+    openExtendConfirmDialog: function() {
+      this.$refs.confirmExtendCardModal.show();
+    },
+
+    /**
+     * Sends an api request with the card's id that is to have it's expiry extended.
+     */
+    async confirmExtendExpiry() {
+      await Api.extendCardExpiry(this.cardId)
+      this.getCard();
+      this.$emit('cardChanged', this.fullCard);
+      this.$emit('closeModal', this.fullCard);
+    },
+
+    closeFullViewCardModal() {
+      this.$emit('closeModal', this.fullCard);
+    }
   },
 
   computed: {
@@ -123,7 +152,7 @@ export default {
      * Returns true if user is creator of the card or an Application admin
      * @returns {boolean}
      */
-    canDelete: function(){
+    canDeleteOrExtend: function(){
       return(this.fullCard.creator.id===this.$currentUser.id || this.$currentUser.role!=='user');
     }
   }

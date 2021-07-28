@@ -35,6 +35,8 @@ const businessTypes = require('./businessTypes.json')
 const productNames = require('./productNames.json')
 const cardDes = require('./cardDescription.json')
 
+// const SERVER_URL = "https://csse-s302g7.canterbury.ac.nz/test/api";
+// const SERVER_URL = "https://csse-s302g7.canterbury.ac.nz/prod/api";
 const SERVER_URL = "http://localhost:9499";
 
 /**
@@ -167,7 +169,7 @@ async function registerUser(user) {
         withCredentials: true
     });
 
-    const response = await instance.post(`http://localhost:9499/users`, user, {
+    const response = await instance.post(`${SERVER_URL}/users`, user, {
         headers: {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
         }
@@ -186,6 +188,19 @@ async function registerUserWithBusinesses(user, businesses, numBusinesses) {
     for (let i = 0; i < numBusinesses; i++) {
         const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
         await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+
+        let adminIds = [];
+        for (let j = 0; j < Math.min(Math.floor(Math.random() * (6)) + 1, response.data.id - 1); j++) {
+            const id = (Math.floor(Math.random() * (response.data.id)) + 1);
+            if (id !== response.data.id && !adminIds.includes(id)) {
+                adminIds.push(id);
+            }
+        }
+
+        for (const adminId of adminIds) {
+            await makeUserBusinessAdmin(businessResponse.data.businessId, instance, adminId);
+        }
+
         console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
     }
 
@@ -220,6 +235,7 @@ async function registerUsers(users, businesses) {
       throw e;
     }
     console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST} users.`);
+
   }
 }
 
@@ -229,17 +245,34 @@ async function registerUsers(users, businesses) {
  */
 async function registerBusiness(business, instance, userId, user) {
 
-  business.primaryAdministratorId = userId
-  business.address = user.homeAddress
-  business.description += " Our business headquarters are in " + user.homeAddress.city + ", " + user.homeAddress.country + "."
+  business.primaryAdministratorId = userId;
+  business.address = user.homeAddress;
+  business.description += " Our business headquarters are in " + user.homeAddress.city + ", " + user.homeAddress.country + ".";
 
-    return await instance
-      .post(`http://localhost:9499/businesses`, business, {
-        headers: {
-          'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-        }
-      })
+  return await instance
+    .post(`${SERVER_URL}/businesses`, business, {
+      headers: {
+        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+      }
+    })
 
+
+}
+
+async function makeUserBusinessAdmin(businessId, instance, userId) {
+  const data = {
+    userId
+  }
+
+  return await instance
+      .put(`${SERVER_URL}/businesses/${businessId}/makeAdministrator`,
+          data,
+          {
+            headers: {
+              'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+            }
+          }
+      )
 }
 
 /**
@@ -299,7 +332,7 @@ async function addInventory(businessId, instance, product) {
   const inventory = createInventoryObject(product);
 
   const inventoryResponse = await instance
-    .post(`http://localhost:9499/businesses/${businessId}/inventory`, inventory, {
+    .post(`${SERVER_URL}/businesses/${businessId}/inventory`, inventory, {
       headers: {
         'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
       }
@@ -338,7 +371,7 @@ async function addListing(businessId, instance, inventory, inventoryItemId) {
   const listing = createListingObject(inventory, inventoryItemId);
 
   await instance
-    .post(`http://localhost:9499/businesses/${businessId}/listings`, listing, {
+    .post(`${SERVER_URL}/businesses/${businessId}/listings`, listing, {
       headers: {
         'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
       }
@@ -358,7 +391,7 @@ async function addProduct(businessId, instance, business) {
     try {
       const product = createProductObject(productNames[i], business);
       const productResponse = await instance
-        .post(`http://localhost:9499/businesses/${businessId}/products`, product, {
+        .post(`${SERVER_URL}/businesses/${businessId}/products`, product, {
           headers: {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
@@ -409,7 +442,7 @@ async function addCard(instance) {
 
     for (let i = 0; i < Math.floor(Math.random() * MAX_CARD_PER_USER); i++) {
         const card = createCardObject();
-        await instance.post(`http://localhost:9499/cards`, card, {
+        await instance.post(`${SERVER_URL}/cards`, card, {
             withCredentials: true,
             headers: {
                 'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
@@ -446,7 +479,7 @@ async function uploadProductImage (businessId, productId, instance, startImageId
   // See https://github.com/axios/axios/issues/710 for how this works
   let formData = new FormData();
   formData.append("filename", fs.createReadStream(`./exampleImages/${startImageId}.jpg`));
-  return instance.post(`http://localhost:9499/businesses/${businessId}/products/${productId}/images`, formData,
+  return instance.post(`${SERVER_URL}/businesses/${businessId}/products/${productId}/images`, formData,
       {headers: formData.getHeaders()});
 }
 

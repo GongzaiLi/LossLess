@@ -6,7 +6,6 @@ Date: 15/4/2021
   <div>
     <b-card v-if="canEditCatalogue" class="shadow">
       <b-card-title>Product Catalogue: {{businessName}}</b-card-title>
-      <hr class='m-0'>
       <b-row align-v="center">
         <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
         <b-col md="4">
@@ -212,7 +211,6 @@ export default {
             this.$bvModal.hide('product-card');
           })
           .catch((error) => {
-            console.log(productCreated);
             if (productCreated) {
               this.refreshProducts(); // Product has been created, must be image error, so refresh the table of products
               this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
