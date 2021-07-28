@@ -61,7 +61,7 @@ public class BusinessController {
      */
     @PostMapping("/businesses")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business, HttpServletRequest request) {
+    public ResponseEntity<Object> createBusiness(@Valid @RequestBody @JsonView(BusinessViews.PostBusinessRequestView.class) Business business) {
 
         logger.debug("Request to create new business {}", business);
 
@@ -117,7 +117,7 @@ public class BusinessController {
      * @return 200 and business if valid, 401 if unauthorised, 403 if forbidden, 406 if invalid id,
      */
     @GetMapping("/businesses/{id}")
-    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId, HttpServletRequest request) {
+    public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId) {
 
         logger.debug("Request to get business with ID: {}", businessId);
 

@@ -56,7 +56,7 @@ public class CatalogueController {
      */
     @PostMapping("/businesses/{id}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct, HttpServletRequest request) {
+    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct) {
 
         logger.debug("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
 
@@ -117,6 +117,7 @@ public class CatalogueController {
      * @param count number of results to be returned
      * @param sortBy the column to sort by
      * @param sortDirection the direction to sort
+     * @param searchQuery The query to search a product by
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/products")

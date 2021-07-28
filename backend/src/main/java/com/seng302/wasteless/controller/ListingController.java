@@ -127,6 +127,7 @@ public class ListingController {
 
     /**
      * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
+     *
      * @param businessId The id of the business to get
      * @param pageable pagination and sorting params
      * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
