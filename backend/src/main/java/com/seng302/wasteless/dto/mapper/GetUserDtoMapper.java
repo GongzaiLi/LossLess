@@ -49,6 +49,7 @@ public class GetUserDtoMapper {
         address.put("region", user.getHomeAddress().getRegion());
         address.put("country", user.getHomeAddress().getCountry());
         address.put("postcode", user.getHomeAddress().getPostcode());
+        address.put("suburb", user.getHomeAddress().getSuburb());
 
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
                 currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)

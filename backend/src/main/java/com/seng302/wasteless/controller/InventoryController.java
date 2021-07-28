@@ -101,8 +101,8 @@ public class InventoryController {
      * Handle get request to /businesses/{id}/inventory endpoint for retrieving all products in a business's inventory
      *
      * @param businessId The id of the business to get
-     * @param offset value of the offset from the start of the results query. Used for pagination
-     * @param count number of results to be returned
+     * @param pageable The pageable that consists of page index, size (number of pages) and sort order.
+     * @param searchQuery The search query to filter the inventory items by
      * @return Http Status 200 and list of products if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/inventory")
@@ -141,6 +141,7 @@ public class InventoryController {
      *
      * @param businessId The id of the business to get
      * @param itemId the id of the inventory item to be updated
+     * @param editedInventoryItem The new inventory item with data that replaces old inventory item data
      * @return Http Status 200  if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @PutMapping("/businesses/{businessId}/inventory/{inventoryItemId}")

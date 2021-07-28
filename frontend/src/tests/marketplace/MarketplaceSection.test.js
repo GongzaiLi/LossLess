@@ -143,7 +143,7 @@ describe ("Page Change handler", () => {
         }});
         await wrapper.vm.pageChanged(2);
 
-        expect(Api.getCardsBySection).toHaveBeenCalledWith("ForSale", 1, 10, "created", "asc");
+        expect(Api.getCardsBySection).toHaveBeenCalledWith("ForSale", 1, 10, "created", "desc");
         expect(wrapper.vm.totalItems).toBe(11);
     })
 })

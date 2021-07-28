@@ -27,6 +27,7 @@
         :items="items"
         :per-page="perPage"
         ref="productCatalogueTable"
+        :busy="tableLoading"
     >
       <template #cell(thumbnail)="products">
         <div v-if="!products.item.images.length">
@@ -74,6 +75,7 @@ export default {
   },
   data: function () {
     return {
+      tableLoading: true,
       searchQuery: "",
       businessName: "",
       currency: {
@@ -81,7 +83,7 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
-      sortDesc: false,
+      sortDesc: true,
       sortBy: "",
       items: [],
       totalItems: 0,
@@ -149,7 +151,7 @@ export default {
         this.totalItems = productsResponse.data.totalItems;
 
         this.$refs.productCatalogueTable.refresh();
-
+        this.tableLoading = false;
 
         if(currency != null){
           this.currency = currency;

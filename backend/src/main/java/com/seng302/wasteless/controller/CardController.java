@@ -13,9 +13,9 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -54,6 +54,7 @@ public class CardController {
      * Throws a 400 error if the section given is not one of the predefined ones ('ForSale', 'Wanted', or 'Exchange').
      *
      * @param section The section for which cards will be retrieved from. This should be in the query parameter named 'section
+     * @param pageable The pageable that consists of page index, size (number of pages) and sort order.
      * @return A 200 response with the list of cards in the given section
      */
     @GetMapping("/cards")
@@ -123,6 +124,7 @@ public class CardController {
      * 403 FORBIDDEN If trying to get cards of another user.
      * 200 If successfully got list of expiring cards.
      *
+     * @param userId The id of the user to get the expiring cards for.
      * @return Status code dependent on success. 400, 401, 403 errors. 200 List of cards.
      */
     @GetMapping("cards/{id}/expiring")
@@ -208,6 +210,7 @@ public class CardController {
      * 403 FORBIDDEN If user does not own the card and is not a GAA
      * 406 NOT_ACCEPTABLE If the card already doesn't exist
      * 200 If successfully deleted card.
+     *
      * @param id The unique id of the card to be deleted.
      * @return Status code dependent on success. 400, 401, 403, 406 errors. 200 If deleted successfully.
      */
@@ -239,6 +242,7 @@ public class CardController {
      * 403 FORBIDDEN If user does not own the card and is not a GAA
      * 406 NOT_ACCEPTABLE If the card doesn't exist
      * 200 If successfully extended card.
+     *
      * @param id The unique id of the card to be extended.
      * @return Status code dependent on success. 400, 401, 403, 406 errors. 200 If extended successfully.
      */

@@ -7,12 +7,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * CardService applies card logic over the card JPA repository.
@@ -56,6 +59,12 @@ public class CardService {
      * @return A (possibly empty) list of all cards that belong to the given section
      */
     public Page<Card> findBySection(CardSections section, Pageable pageable) {
+        List<Sort.Order> orders = pageable.getSort().stream().map(Sort.Order::ignoreCase).collect(Collectors.toList());
+        pageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(orders)
+        );
         return cardRepository.findBySection(section, pageable);
     }
 
