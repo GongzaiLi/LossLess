@@ -107,7 +107,7 @@ export default {
         { value: 'title', text: 'Title' },
         { value: 'location', text: 'Location'},
       ],
-      sortOrder: "asc",
+      sortOrder: "desc",
       sortOrderOptions: [
         { value: 'asc', text: 'Ascending' },
         { value: 'desc', text: 'Descending' },

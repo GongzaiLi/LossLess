@@ -12,7 +12,7 @@
           last-text="Last"
       />
     </b-col>
-    <b-col lg="3">
+    <b-col lg="4">
       <form @submit.prevent="jumpToPage">
         <b-input-group prepend="Jump to page">
           <b-form-input v-model="pageToJumpTo" type="number" min="1" :max="Math.ceil(this.totalItems/this.perPage)"></b-form-input>
