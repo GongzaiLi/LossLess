@@ -1,12 +1,17 @@
 <template>
 <div>
   <div style="margin-left: 15%; margin-right: 15%">
-    <b-input-group prepend="Search for inventory item:">
-      <b-form-input v-model="searchQuery"></b-form-input>
-      <b-input-group-append>
-        <b-button @click="searchClicked"> Search</b-button>
-      </b-input-group-append>
-    </b-input-group>
+    <div>
+      <b-form @submit.prevent="searchClicked">
+        <b-input-group prepend="Filter by inventory item ID:">
+          <b-form-input v-model="searchQuery"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit"> Filter </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+    </div>
+
   </div>
   <br>
   <b-table
