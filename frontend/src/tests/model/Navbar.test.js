@@ -71,11 +71,6 @@ const currentDateWithin24 = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.
 
 const expiringCards = [
     {
-      id: 1,
-      title: 'card 1 that expires within a week',
-      displayPeriodEnd: currentDateWithinAWeek
-    },
-    {
       id: 2,
       title: 'card 2 that expires within next 24 hours',
       displayPeriodEnd: currentDateWithin24
@@ -254,21 +249,16 @@ describe('Act as business', () => {
   })
 });
 
-describe('Get expiting cards', () => {
-  test('expiring cards get fetched from the server on login', () => {
-    expect(wrapper.vm.cards.length).toBe(3);
-  })
-
-  test('cards expiring withing 24 hours get added to notifications', () => {
-    wrapper.vm.updateNotifications();
+describe('Get expiring cards', () => {
+  test('cards expiring within 24 hours get added to notifications', async () => {
+    await wrapper.vm.updateNotifications();
     expect(wrapper.vm.notifications.length).toBe(2);
   })
-
-
 });
 
 describe('Get number of expired cards', () => {
-  test('number of expired cards is set to data from the server', () => {
+  test('number of expired cards is set to data from the server', async () => {
+    await wrapper.vm.$nextTick();
     expect(wrapper.vm.numExpiredCards).toBe(3);
   })
 

@@ -441,21 +441,7 @@ export default {
     async updateNotifications() {
       await this.getExpiringCards(this.$currentUser.id);
       await this.getExpiredCards(this.$currentUser.id);
-      console.log(this.cards);
-      if (this.notifications.length < this.cards.length) {
-        for (const card of this.cards) {
-          if (!this.notifications.includes(card)) {
-            const date = card.displayPeriodEnd.split("T")[0]
-            const time = card.displayPeriodEnd.split("T")[1]
-            const cardExpires = new Date(parseInt(date.split("-")[0]), parseInt(date.split("-")[1]) - 1, parseInt(date.split("-")[2]), parseInt(time.split(":")[0]), parseInt(time.split(":")[1]), parseFloat(time.split(":")[2]))
-            const currentDate = new Date();
-            const currentAfterADay = currentDate.setDate(currentDate.getDate() + 1);
-            if (cardExpires < currentAfterADay) {
-              this.notifications.push(card)
-            }
-          }
-        }
-      }
+      this.notifications = this.cards;
     },
     hoverLogo() {
       this.timer = setTimeout(() => {this.$bvToast.show('my-toast')}, 10000);
