@@ -99,6 +99,7 @@ Date: 23/5/2021
       </div>
       <inventory-table ref="inventoryTable" :editable="false"
                       v-on:inventoryItemClicked="selectInventoryItem"
+
       />
     </b-modal>
   </div>
