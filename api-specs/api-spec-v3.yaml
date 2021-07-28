@@ -69,7 +69,7 @@ paths:
         - 'U1: Registering and logging into an individual account'
         - 'Users'
       summary: Attempt to authenticate a user account with a username and password
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -100,7 +100,7 @@ paths:
         - 'U1: Registering and logging into an individual account'
         - 'Users'
       summary: Create a new user account
-      security: []
+      security: [ ]
       responses:
         '201':
           $ref: '#/components/responses/AuthenticatedResponse'
@@ -167,14 +167,26 @@ paths:
           name: offset
           schema:
             type: integer
-          required: true
+          required: false
           description: 'the offset used for pagination of the user search data'
         - in: query
           name: count
           schema:
             type: integer
-          required: true
+          required: false
           description: 'the count used for pagination of the user search data'
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+          required: false
+          description: 'the sortBy used for sorting user search data'
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+          required: false
+          description: 'the sortDirection used for sorting the user search data in ascending or descending order'
       responses:
         '200':
           description: Request successful, a (possibly empty) list of users is returned
@@ -384,6 +396,13 @@ paths:
           $ref: '#/components/responses/NotAcceptableError'
 
   '/businesses/{id}/products':
+    parameters:
+      - name: id
+        in: path
+        description: Business ID
+        required: true
+        schema:
+          type: integer
     get:
       tags:
         - 'U15: Product Catalogue'
@@ -396,12 +415,36 @@ paths:
             - globalApplicationAdmin
             - defaultGlobalApplicationAdmin
       parameters:
-        - name: id
-          in: path
-          description: Business ID
-          required: true
+        - in: query
+          name: searchQuery
+          schema:
+            type: string
+          required: false
+          description: 'Criteria to search users for, e.g: user’s full name or one or more of their names/nickname'
+        - in: query
+          name: offset
           schema:
             type: integer
+          required: false
+          description: 'the offset used for pagination of the user search data'
+        - in: query
+          name: count
+          schema:
+            type: integer
+          required: false
+          description: 'the count used for pagination of the user search data'
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+          required: false
+          description: 'the sortBy used for sorting the user search data'
+        - in: query
+          name: sortDirection
+          schema:
+            type: string
+          required: false
+          description: 'the sortDirection used for sorting the user search data in ascending or descending order'
       responses:
         '200':
           description: 'Catalogue retrieved successfully. This could be an empty array.'
@@ -456,6 +499,46 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Product'
+
+  '/images':
+    get:
+      tags:
+        - 'U16: Product Images'
+        - 'Catalogue / Products'
+      summary: Get an image
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '201':
+          description: Image created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imageId:
+                    type: integer
+                    description: The ID of the image that has just been created
+                    example: 1234
+                  fileName:
+                    type: string
+                    description: The URL of the image that has just been created
+                    example: media/images/1234.png
+                  thumbnail_Filename:
+                    type: string
+                    description: The URL of the image thumbnail that has just been created
+                    example: media/images/1234_thumbnail.png
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user tries to add an image for a product that it is in a catalogue for a business they do not administer AND the user is not a global application admin'
+
+
 
   '/businesses/{businessId}/products/{productId}/images':
     post:
@@ -631,6 +714,13 @@ paths:
           description: 'Forbidden: Returned when a user tries to update a product for a business they do not administer AND the user is not a global application admin'
 
   '/businesses/{id}/inventory/':
+    parameters:
+      - name: id
+        in: path
+        description: Business ID
+        required: true
+        schema:
+          type: integer
     get:
       tags:
         - 'U19: Create inventory'
@@ -643,12 +733,24 @@ paths:
             - globalApplicationAdmin
             - defaultGlobalApplicationAdmin
       parameters:
-        - name: id
-          in: path
-          description: Business ID
-          required: true
+        - name: page
+          in: query
+          description: page number
+          required: false
           schema:
             type: integer
+        - name: size
+          in: query
+          description: number per page
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: sort,sortDirection
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: 'Inventory retrieved successfully. This could be an empty array.'
@@ -743,6 +845,13 @@ paths:
           description: 'Forbidden: Returned when a user tries to update an inventory item for a business they do not administer AND the user is not a global application admin'
 
   '/businesses/{id}/listings':
+    parameters:
+      - name: id
+        in: path
+        description: Business ID
+        required: true
+        schema:
+          type: integer
     get:
       tags:
         - 'U22: List sale'
@@ -755,12 +864,24 @@ paths:
             - globalApplicationAdmin
             - defaultGlobalApplicationAdmin
       parameters:
-        - name: id
-          in: path
-          description: Business ID
-          required: true
+        - name: page
+          in: query
+          description: page number
+          required: false
           schema:
             type: integer
+        - name: size
+          in: query
+          description: number per page
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: sort,sortDirection
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: 'Listings retrieved successfully. This could be an empty array.'
@@ -864,6 +985,24 @@ paths:
               - ForSale
               - Wanted
               - Exchange
+        - name: page
+          in: query
+          description: page number
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: number per page
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: sort,sortDirection
+          required: false
+          schema:
+            type: string
       security:
         - CookieAuth:
             - user
@@ -940,6 +1079,91 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           description: 'Forbidden: Returned when a user tries to delete a card that they are not the creator of AND the user is not a GAA'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/cards/{id}/expiring':
+    get:
+      tags:
+        - 'UCM4: Card expiry'
+        - 'Cards / community marketplace'
+      summary: 'Endpoint to get a users expiring cards.'
+      parameters:
+        - name: id
+          in: path
+          description: The id of the card to get.
+          required: true
+          schema:
+            type: integer
+            example: 500
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: End of display period successfully extended. Extension amount should be a further two weeks.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user who is neither the creator of the card, nor a GAA, tries to get expiring cards.'
+
+  '/users/{id}/hasCardsExpired':
+    get:
+      tags:
+        - 'UCM4: Card expiry'
+        - 'Cards / community marketplace'
+      summary: 'Endpoint to GET number of expired and removed cards for a user.'
+      parameters:
+        - name: id
+          in: path
+          description: The id of the card to get.
+          required: true
+          schema:
+            type: integer
+            example: 500
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: End of display period successfully extended. Extension amount should be a further two weeks.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user who is neither the creator of the card, nor a GAA, tries to get the number of expired cards.'
+        '406':
+          $ref: '#/components/responses/NotAcceptableError'
+
+  '/users/{id}/clearHasCardsExpired':
+    put:
+      tags:
+        - 'UCM4: Card expiry'
+        - 'Cards / community marketplace'
+      summary: 'Endpoint to clear expired cards of user.'
+      parameters:
+        - name: id
+          in: path
+          description: The id of the card to get.
+          required: true
+          schema:
+            type: integer
+            example: 500
+      security:
+        - CookieAuth:
+            - user
+            - globalApplicationAdmin
+            - defaultGlobalApplicationAdmin
+      responses:
+        '200':
+          description: End of display period successfully extended. Extension amount should be a further two weeks.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: 'Forbidden: Returned when a user who is neither the creator of the card, nor a GAA, tries to clear expired cards of a user.'
         '406':
           $ref: '#/components/responses/NotAcceptableError'
 
@@ -1263,7 +1487,7 @@ components:
           description: The IDs of keywords that will be associated with a card once it is created. These keywords are created through the POST /keywords endpoints (UCM6).
           items:
             type: integer
-            example: [20, 15, 600]
+            example: [ 20, 15, 600 ]
 
     Listing:
       type: object
