@@ -1,5 +1,16 @@
 <template>
   <div>
+    <div>
+      <b-form @submit.prevent="getProducts(business)">
+        <b-input-group prepend="Filter by product ID:">
+          <b-form-input v-model="searchQuery"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit"> Filter </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+    </div>
+    <br>
     <b-table
         striped hovers
         responsive="true"
@@ -63,6 +74,7 @@ export default {
   },
   data: function () {
     return {
+      searchQuery: "",
       businessName: "",
       currency: {
         symbol: '$',
@@ -127,7 +139,7 @@ export default {
           sortByParam = "ID";
       }
 
-      const getProductsPromise = api.getProducts(business.id, this.perPage, this.currentPage - 1, sortByParam, sortDirectionString);  // Promise for getting products
+      const getProductsPromise = api.getProducts(business.id, this.perPage, this.currentPage - 1, sortByParam, sortDirectionString, this.searchQuery);  // Promise for getting products
       const getCurrencyPromise = api.getUserCurrency(business.address.country); // Promise for getting the currency data
 
       try {

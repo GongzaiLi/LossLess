@@ -40,7 +40,7 @@ beforeEach(() => {
   localVue.use(Router);
 
   Api.getUser.mockRejectedValue(new Error(''));
-  Api.getExpiringCards.mockResolvedValue({});
+  Api.getExpiringCards.mockResolvedValue({data: {}});
 
   wrapper = shallowMount(homePage, {
     localVue,
