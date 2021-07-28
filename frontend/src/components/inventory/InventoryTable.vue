@@ -3,7 +3,7 @@
   <div style="margin-left: 15%; margin-right: 15%">
     <div>
       <b-form @submit.prevent="searchClicked">
-        <b-input-group prepend="Filter by inventory item ID:">
+        <b-input-group prepend="Filter by product code:">
           <b-form-input v-model="searchQuery"></b-form-input>
           <b-input-group-append>
             <b-button type="submit"> Filter </b-button>
