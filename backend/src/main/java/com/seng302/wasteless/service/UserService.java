@@ -3,11 +3,21 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +26,8 @@ import java.util.regex.Pattern;
  */
 @Service
 public class UserService {
+
+    private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     private UserRepository userRepository;
 
@@ -80,7 +92,13 @@ public class UserService {
      * @return          The found user, if any, or wise null
      */
     public User findUserById(Integer id) {
-        return userRepository.findFirstById(id);
+
+        User possibleUser = userRepository.findFirstById(id);
+        if (possibleUser == null) {
+            logger.warn("User with ID: {} does not exist", id);
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "User does not exist");
+        }
+        return possibleUser;
     }
 
     /**
@@ -94,6 +112,25 @@ public class UserService {
     }
 
     /**
+     * Get Currently Logged in user by getting the email and searching by email
+     * @return Logged in user or Throw Response Status Exception
+     */
+    public User getCurrentlyLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalEmail = authentication.getName();
+
+        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
+        User user = findUserByEmail(currentPrincipalEmail);
+        if (user == null) {
+            logger.info("Access token invalid for user with Email: {}", currentPrincipalEmail);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
+        }
+
+        logger.debug("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        return user;
+    }
+
+    /**
      * Checks whether the user is an admin in the business
      *
      * @param businessId    The business ID
@@ -104,32 +141,34 @@ public class UserService {
 
 
     /**
-     * Search for users by a search query.
-     *      * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
+     *  Search for users by a search query. Returns upto count results. Starts at 'page' offset. Sorts by sortBy.
+     *  Sort direction sortDirection
      *
-     * @param searchQuery       The search query
-     * @return                  A set of all matching users
+     * @param searchQuery   The query to search for
+     * @param count         The number of results to return
+     * @param offset        The offset to start from
+     * @param sortBy        The column to sort by
+     * @param sortDirection The direction to sort by (ASC, DESC)
+     * @return  An array of users matching the search params
      */
-    public LinkedHashSet<User> searchForMatchingUsers(String searchQuery) {
-        // full matches
-        LinkedHashSet<User> fullMatches = userRepository.findAllByFirstNameOrLastNameOrMiddleNameOrNicknameOrderByFirstNameAscLastNameAscMiddleNameAscNicknameAsc(searchQuery, searchQuery, searchQuery, searchQuery);
+    public List<User> searchForMatchingUsers(String searchQuery, Integer count, Integer offset, UserSearchSortTypes sortBy, String sortDirection) {
 
-        // partial matches
-        LinkedHashSet<User> firstNamePartialMatches = userRepository.findAllByFirstNameContainsAndFirstNameNot(searchQuery, searchQuery);
-        LinkedHashSet<User> lastNamePartialMatches = userRepository.findAllByLastNameContainsAndLastNameNot(searchQuery, searchQuery);
-        LinkedHashSet<User> nicknamePartialMatches = userRepository.findAllByNicknameContainsAndNicknameNot(searchQuery, searchQuery);
-        LinkedHashSet<User> middleNamePartialMatches = userRepository.findAllByMiddleNameContainsAndMiddleNameNot(searchQuery, searchQuery);
+        Pageable pageable = PageRequest.of(
+                offset,
+                count,
+                sortDirection.equals("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortBy.toString()
+        );
 
-        // combine matches
+        return userRepository.findAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery, pageable);
+    }
 
-        LinkedHashSet<User> combinedResults = new LinkedHashSet<>();
-        combinedResults.addAll(fullMatches);
-        combinedResults.addAll(firstNamePartialMatches);
-        combinedResults.addAll(lastNamePartialMatches);
-        combinedResults.addAll(nicknamePartialMatches);
-        combinedResults.addAll(middleNamePartialMatches);
-
-        return combinedResults;
+    /**
+     * Calculates the total count of users matching searchQuery.
+     * @return the total count of users.
+     */
+    public Integer getTotalUsersCountMatchingQuery(String searchQuery) {
+        return userRepository.countAllByFirstNameContainsOrLastNameContainsOrMiddleNameContainsOrNicknameContainsAllIgnoreCase(searchQuery, searchQuery, searchQuery, searchQuery);
     }
 
     /**

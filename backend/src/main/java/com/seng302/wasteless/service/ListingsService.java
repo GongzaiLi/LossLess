@@ -3,6 +3,7 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.model.Listing;
 import com.seng302.wasteless.repository.ListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +29,24 @@ public class ListingsService {
     }
 
     /**
-     * Gets all listings for a given business
+     * Gets listings for a given business using a given pageable
      *
      * @param id The id of the business
-     * @return A list containing every listings in the business.
+     * @
+     * @return A list containing matching listings in the business.
      * Returns an empty list if there are no listings in the business, or if the business does not exist
      */
-    public List<Listing> findByBusinessId(int id) {
-        return listingRepository.findAllByBusinessId(id);
+    public List<Listing> findBusinessListingsWithPageable(int id, Pageable pageable) {
+        return listingRepository.findAllByBusinessId(id, pageable);
+    }
+
+    /**
+     * Get the count of all listings of a business.
+     *
+     * @param id The id of the business
+     * @return  The count of listings of the business
+     */
+    public Integer getCountOfAllListingsOfBusiness(int id) {
+        return listingRepository.countListingByBusinessId(id);
     }
 }

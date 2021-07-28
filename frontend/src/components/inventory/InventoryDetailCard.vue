@@ -8,9 +8,29 @@ Date: 13/5/2021
       class="profile-card shadow"
     >
       <b-form @submit.prevent="okAction">
-        <div :hidden="!disabled">
-          <b-img center v-bind="mainProps" rounded="circle" alt="Default Image"></b-img>
+        <div :hidden="!disabled" v-if="!loadingData && inventoryInfo.product">
+          <b-carousel
+              v-if="inventoryInfo.product.images.length && !loadingData"
+              id="carousel-1"
+              controls
+              indicators
+              class="mb-2"
+              :interval="0"
+              ref="image_carousel"
+          >
+            <b-carousel-slide v-for="image in inventoryInfo.product.images" :key="image.id">
+              <template #img>
+                <img
+                    class="product-image d-block w-100 rounded"
+                    alt="Product image"
+                    :src="getImage(image.fileName)"
+                >
+              </template>
+            </b-carousel-slide>
+          </b-carousel>
+          <b-img class="product-image d-block w-100 rounded" v-else center :src="require(`/public/product_default.png`)" alt="Product has no image"/>
         </div>
+
         <b-card-body>
           <h6 class="mb-2"><strong>Product Id *:</strong></h6>
           <p :hidden="disabled" style="margin:0">
@@ -92,6 +112,7 @@ Date: 13/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate()"
                           v-model="inventoryInfo.sellBy"/>
           </b-input-group>
 
@@ -103,6 +124,7 @@ Date: 13/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate()"
                           v-model="inventoryInfo.bestBefore"/>
           </b-input-group>
 
@@ -114,6 +136,7 @@ Date: 13/5/2021
                           :disabled="disabled"
                           autocomplete="off"
                           :min="getToday()"
+                          :max="getMaxDate()"
                           v-model="inventoryInfo.expires" required/>
           </b-input-group>
           <transition name="fade">
@@ -148,6 +171,11 @@ Date: 13/5/2021
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
+}
+
+.detail_card_image {
+  width: 250px;
+  height: 250px;
 }
 
 #select-products > .modal-dialog {
@@ -193,14 +221,15 @@ export default {
   },
   data() {
     return {
-      mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
       inventoryInfo: {},
       inventoryCardError: "",
-      showErrorAlert: false
+      showErrorAlert: false,
+      loadingData: true, //This is necessary to stop error in render
     }
   },
   mounted() {
     this.setUpInventoryCard();
+    this.loadingData = false; //This is necessary to stop error in render
   },
   methods: {
     /**
@@ -240,8 +269,15 @@ export default {
      **/
     getToday() {
       let date = new Date();
-      let today = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
-      return today;
+      return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+    },
+
+    /**
+     * return the maximum date allowed for inputs
+     * valid value on backend is a year with only 4 digits
+     **/
+    getMaxDate() {
+      return "9999-12-31"
     },
 
     /**
@@ -249,7 +285,7 @@ export default {
      */
     calculateTotalPrice() {
       const calculatedPrice = (this.inventoryInfo.pricePerItem * this.inventoryInfo.quantity).toFixed(2);
-      this.inventoryInfo.totalPrice = Math.max(calculatedPrice, 0);   // Make sure the total price doesn't go to negatives (eg. if the user enters a negative quantity) 
+      this.inventoryInfo.totalPrice = Math.max(calculatedPrice, 0);   // Make sure the total price doesn't go to negatives (eg. if the user enters a negative quantity)
     },
 
     /**
@@ -348,7 +384,7 @@ export default {
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
@@ -356,6 +392,15 @@ export default {
       } else {
         return "Server error";
       }
+    },
+
+    /**
+     * Uses an image's filename and returns the image with the filename requested.
+     * @param imageFileName is a string of the requested image's file name
+     * @return string
+     **/
+    getImage: function (imageFileName) {
+      return api.getImage(imageFileName);
     },
   }
 }

@@ -183,10 +183,9 @@ public class RegisterFeature {
                 .andExpect(status().isBadRequest());
     }
 
-    @Then("The registering user will receive an error message of {string}")
-    public void theRegisteringUserWillReceiveAnErrorMessageOf(String message) throws Exception {
+    @Then("The registering user will receive an error")
+    public void theRegisteringUserWillReceiveAnError() throws Exception {
         // Write code here that turns the phrase above into concrete actions
         result.andExpect(status().is4xxClientError());
-        result.andExpect(content().string(message));
     }
 }

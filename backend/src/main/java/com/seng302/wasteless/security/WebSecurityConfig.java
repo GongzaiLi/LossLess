@@ -42,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @return new AppUserDetailsService object.
      */
     @Bean
+    @Override
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
     }
@@ -91,10 +92,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         String[] publicRoutes = {"/login", "/users", "/h2/**"};
         http
                 .cors()
-                .and().csrf()
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    .ignoringAntMatchers(publicRoutes)
-                .and()
+                .and().csrf().disable()
+//                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                    .ignoringAntMatchers(publicRoutes)
                 .authorizeRequests()
                     .antMatchers(publicRoutes).permitAll()
                     .antMatchers("/users/{\\d+}/makeAdmin", "/users/{\\d+}/revokeAdmin")
@@ -110,16 +110,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // but Spring Security will return 403 Forbidden. This bit changes the default from 403 to 401
                 .exceptionHandling()
                     .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-
-       // http.csrf().disable();// when using the postman.
-
-//                .logout() //Can call '/logout' to log out
-//                .permitAll()
-//                .invalidateHttpSession(true)
-//                .deleteCookies("JSESSIONID")
-//                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
-
-
-
     }
+
+
 }

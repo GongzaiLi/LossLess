@@ -3,11 +3,21 @@ navbar at the top of screen once logged in to navigate the web app
 Date: sprint_1
 -->
 <template>
-  <b-navbar v-if="!['login', 'register'].includes($route.name)"
+  <b-navbar
     toggleable="lg" type="dark" variant="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand href="#">Wasteless</b-navbar-brand>
+    <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
+
+    <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
+      <template #toast-title>
+        Need Help?
+      </template>
+      This is top <em>left</em> corner of our web app. This is not a menu.
+      <br>
+      If you want to log out, or change who you are acting as,
+      use the menu on the <strong>top <em>right</em></strong> corner <b-icon-arrow-right/>
+    </b-toast>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -16,8 +26,10 @@ Date: sprint_1
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/users/search">User Search</b-nav-item>
-        <b-nav-item to="/marketPlace"> Market Place </b-nav-item>
+        <b-nav-item to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
+
+
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
             id="business-link-dropdown"
@@ -35,14 +47,48 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+
       <b-navbar-nav class="ml-auto">
+
+        <div class="icon mr-1" id="bell" @click="bellIconPressed">
+          <b-icon v-if="numExpiredCards > 0" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem;"></b-icon>
+          <b-icon v-else-if="numberOfNotifications"  icon="bell" class="iconBell" variant="warning" style="font-size:  1.8rem"></b-icon>
+          <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
+        </div>
+
+        <div class="notifications" id="box">
+          <h2>Notifications: <span> {{numberOfNotifications}}</span></h2>
+            <div v-if="numExpiredCards" class="expired-notifications-item" @click="clicked = !clicked">
+              <div class="text">
+                <h4> Marketplace Card Expired:</h4>
+                <h4> {{ numExpiredCards}} {{ expiredText }}</h4>
+              </div>
+              <b-col cols="2">
+                <b-icon style="width: 30px; height: 30px; margin-top: 50%"
+                        icon="trash-fill" @click="clearExpiredCards"></b-icon>
+              </b-col>
+            </div>
+
+          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id"  @click="goToHomePage">
+            <div class="text">
+              <h4> Marketplace Card: {{notification.title}}</h4>
+              <h4> expires within 24 hours</h4>
+            </div>
+          </div>
+        </div>
+      </b-navbar-nav>
+
+      <b-navbar-nav>
+        <span v-if="numberOfNotifications" :style="{position: 'absolute', color: (numExpiredCards > 0) ? 'red' : 'orange'}">{{numberOfNotifications}}</span>
+      </b-navbar-nav>
+
+      <b-navbar-nav class="dropdown-menu-end">
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
             <em class="ml-2" id="profile-name">{{profileName}}</em>
             <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
           </template>
-
 
           <div v-if="!isActingAsUser">
             <hr style="margin-top: 0; margin-bottom: 0;">
@@ -79,8 +125,102 @@ Date: sprint_1
   </b-navbar>
 </template>
 
+<style>
+
+.icon  {
+  cursor: pointer;
+  display: inline;
+  width: 26px;
+  margin-top: 4px;
+}
+.iconBell  {
+  font-size: 2rem;
+}
+
+.icon span {
+  color: #f00
+}
+
+.icon:hover {
+  opacity: .7
+}
+
+.notifications {
+  width: 300px;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  top: 63px;
+  right: 62px;
+  border-radius: 5px 0 5px 5px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+}
+
+.notifications h2 {
+  font-size: 14px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  color: #999
+}
+
+.notifications h2 span {
+  color: #f00
+}
+
+.notifications-item {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding: 6px 9px;
+  margin-bottom: 0;
+  cursor: pointer
+}
+
+.notifications-item:hover {
+  background-color: #eee
+}
+
+.notifications-item .text h4 {
+  color: #777;
+  font-size: 16px;
+  margin-top: 3px
+}
+
+.notifications-item .text p {
+  color: #aaa;
+  font-size: 12px
+}
+
+
+.expired-notifications-item {
+  display: flex;
+  border-bottom: 2px solid #eee;
+  padding: 6px 9px;
+  margin-bottom: 0;
+  cursor: pointer
+}
+
+.expired-notifications-item .text h4 {
+  color: orangered;
+  font-size: 16px;
+  margin-top: 3px
+}
+
+.expired-notifications-item .text p {
+  color: #aaa;
+  font-size: 12px
+}
+
+.expired-notifications-item:hover {
+  background-color: #eee;
+}
+
+
+</style>
+
 <script>
 import {setCurrentlyActingAs} from '../../auth'
+import api from "../../Api"
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -89,10 +229,21 @@ import {setCurrentlyActingAs} from '../../auth'
  */
 export default {
   name: "Navbar.vue",
+  data() {
+    return {
+      clicked: false,
+      showNotifications: false,
+      cards: [],
+      notifications: [],
+      numExpiredCards:0,
+      timer: null,
+    }
+  },
   computed: {
     isActingAsUser: function() {
       return this.$currentUser.currentlyActingAs == null;
     },
+
     /**
      * The name to be displayed in the profile area. It is either the first name of the user,
      * or the name of whichever business the user is acting as.
@@ -104,6 +255,7 @@ export default {
         return this.$currentUser.currentlyActingAs.name;
       }
     },
+
     /**
      * The businesses to show in the dropdown for the profile name. Contains
      * all businesses the user can act as, except for the business the user is acting as currently
@@ -127,12 +279,14 @@ export default {
     businessInventoryRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/inventory"
     },
+
     /**
      * Returns a string constructed to go to the sales page
      */
     businessListingsRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/listings"
     },
+
     /**
      * User friendly display string for the user role to be displayed as a badge.
      * Converts the user role string given by the api (eg. 'globalApplicationAdmin') to
@@ -149,8 +303,81 @@ export default {
           return "";
       }
     },
+
+    /**
+     * Checks if there are notifications about expiring or expired cards.
+     * @return The number of total notifications
+     */
+    numberOfNotifications: function () {
+      if (this.numExpiredCards){
+        return this.notifications.length+1;
+      }
+      return this.notifications.length;
+    },
+
+    /**
+     * Checks the number of expired cards
+     * @return The appropriate notification message based on number of cards
+     */
+    expiredText: function () {
+      if (this.numExpiredCards === 1){
+        return " of your cards has expired and been deleted"
+      }
+      return " of your cards have expired and been deleted"
+    }
   },
   methods: {
+    /**
+     * Gets all the expiring cards from for the current user.
+     */
+    getExpiringCards(userId) {
+      return api.getExpiringCards(userId)
+          .then((res) => {
+            this.cards = res.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
+    },
+
+    /**
+     * Gets all the expired cards for the current user.
+     */
+    getExpiredCards(userId) {
+      return api.expiredCardsNumber(userId)
+          .then((res) => {
+            this.numExpiredCards = res.data;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
+    },
+    /**
+     * Gets all the expired cards from for the current user.
+     */
+    clearExpiredCards() {
+      api.clearHasCardsExpired(this.$currentUser.id).then(() => {
+        this.numExpiredCards=0
+      }).catch((error) => {
+        this.$log.debug(error);
+      });
+    },
+
+    /**
+     *  Triggers when the notification icon is pressed to display the notifications.
+     */
+    bellIconPressed() {
+      if(this.showNotifications) {
+        document.getElementById("box").style.height='0px';
+        document.getElementById("box").style.opacity='0';
+        this.showNotifications = false;
+      } else {
+        document.getElementById("box").style.height='auto';
+        document.getElementById("box").style.opacity='1';
+        this.showNotifications = true;
+      }
+    },
+
     /**
      * Redirects to the profile of the account the user is acting as.
      * This will be the either the use profile if they are not acting as anyone,
@@ -168,6 +395,7 @@ export default {
         this.$router.push({path: pathToGoTo});
       }
     },
+
     /**
      * Logs out the current user and redirects to the login page.
      * Currently does nothing with managing cookies, this needs to be implemented later.
@@ -176,6 +404,17 @@ export default {
       this.$currentUser = null;
       this.$router.push('/login');
     },
+
+    /**
+     * Logs out the current user and redirects to the login page.
+     * Currently does nothing with managing cookies, this needs to be implemented later.
+     */
+    goToHomePage() {
+      if (this.$route.fullPath !== '/homepage') {
+        this.$router.push('/homepage');
+      }
+    },
+
     /**
      * Sets the user to act as the given business. Also sets the API
      * module to send all future requests acting as this business
@@ -184,8 +423,8 @@ export default {
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
       this.$router.push(`/businesses/${business.id}`);
-      console.log(this.$currentUser.currentlyActingAs);
     },
+
     /**
      * Sets the user to act as themselves again. Also sets the API
      * module to revert to sending all requests as the normal user
@@ -193,8 +432,30 @@ export default {
     actAsUser() {
       setCurrentlyActingAs(null);
       this.$router.push(`/users/${this.$currentUser.id}`);
-      console.log(this.$currentUser.currentlyActingAs);
+    },
+
+    /**
+     *  Adds a notification about a card that expires within next 24 hours.
+     *  This is done by adding the expiring card to the list of notifications.
+     */
+    async updateNotifications() {
+      await this.getExpiringCards(this.$currentUser.id);
+      await this.getExpiredCards(this.$currentUser.id);
+      this.notifications = this.cards;
+    },
+    hoverLogo() {
+      this.timer = setTimeout(() => {this.$bvToast.show('my-toast')}, 10000);
+    },
+    hoverLogoLeave() {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
     }
+  },
+
+  created() {
+    this.updateNotifications();
+    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 }
 </script>

@@ -49,7 +49,14 @@ beforeEach(() => {
           name: "Watties Baked Beans - 420g can",
           description: "Baked Beans as they should be.",
           recommendedRetailPrice: 2.2,
-          created: "2021-04-14T13:01:58.660Z"
+          created: "2021-04-14T13:01:58.660Z",
+          images: [
+            {
+              id: 1234,
+              filename: "/media/images/23987192387509-123908794328.png",
+              thumbnailFilename: "/media/images/23987192387509-123908794328_thumbnail.png"
+            }
+          ]
         },
         quantity: 4,
         pricePerItem: 6.5,
@@ -158,7 +165,7 @@ describe('Testing api put/post request and the response method with errors', () 
   });
 
   it("400 given Product ID doesn't exist", async () => {
-    Api.createInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+    Api.createInventory.mockRejectedValue({response: {status: 400, data: {message: "Product with given id does not exist"}}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.createInventory(mockEvent);
@@ -210,7 +217,7 @@ describe('Editing products', () => {
   });
 
   it("Displays errors if exist", async () => {
-    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: {message: "Product with given id does not exist"}}});
 
     await wrapper.vm.editInventory();
 
@@ -233,7 +240,7 @@ describe('Editing products', () => {
   });
 
   it("Displays errors if exist", async () => {
-    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: "Product with given id does not exist"}});
+    Api.modifyInventory.mockRejectedValue({response: {status: 400, data: {message: "Product with given id does not exist"}}});
 
     await wrapper.vm.editInventory();
 

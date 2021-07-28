@@ -50,50 +50,56 @@ afterEach(() => {
   wrapper.destroy();
 });
 
-const normalResponse = { data: [
-  {
-    "id": 100,
-    "firstName": "John",
-    "lastName": "Smith",
-    "middleName": "Hector",
-    "nickname": "Jonny",
-    "bio": "Likes long walks on the beach",
-    "email": "johnsmith99@gmail.com",
-    "dateOfBirth": "1999-04-27",
-    "phoneNumber": "+64 3 555 0129",
-    "homeAddress": {
-      "streetNumber": "3/24",
-      "streetName": "Ilam Road",
-      "city": "Christchurch",
-      "region": "Canterbury",
-      "country": "New Zealand",
-      "postcode": "90210"
-    },
-    "created": "2020-07-14T14:32:00Z",
-    "role": "user",
-    "businessesAdministered": [
-      {
-        "id": 100,
-        "administrators": [
-          "string"
-        ],
-        "primaryAdministratorId": 20,
-        "name": "Lumbridge General Store",
-        "description": "A one-stop shop for all your adventuring needs",
-        "address": {
-          "streetNumber": "3/24",
-          "streetName": "Ilam Road",
-          "city": "Christchurch",
-          "region": "Canterbury",
-          "country": "New Zealand",
-          "postcode": "90210"
-        },
-        "businessType": "Accommodation and Food Services",
-        "created": "2020-07-14T14:52:00Z"
-      }
-    ]
-  }
-]};
+const normalResponse = {
+  data:
+    {
+      totalItems: 1,
+      results: [
+        {
+          "id": 100,
+          "firstName": "John",
+          "lastName": "Smith",
+          "middleName": "Hector",
+          "nickname": "Jonny",
+          "bio": "Likes long walks on the beach",
+          "email": "johnsmith99@gmail.com",
+          "dateOfBirth": "1999-04-27",
+          "phoneNumber": "+64 3 555 0129",
+          "homeAddress": {
+            "streetNumber": "3/24",
+            "streetName": "Ilam Road",
+            "city": "Christchurch",
+            "region": "Canterbury",
+            "country": "New Zealand",
+            "postcode": "90210"
+          },
+          "created": "2020-07-14T14:32:00Z",
+          "role": "user",
+          "businessesAdministered": [
+            {
+              "id": 100,
+              "administrators": [
+                "string"
+              ],
+              "primaryAdministratorId": 20,
+              "name": "Lumbridge General Store",
+              "description": "A one-stop shop for all your adventuring needs",
+              "address": {
+                "streetNumber": "3/24",
+                "streetName": "Ilam Road",
+                "city": "Christchurch",
+                "region": "Canterbury",
+                "country": "New Zealand",
+                "postcode": "90210"
+              },
+              "businessType": "Accommodation and Food Services",
+              "created": "2020-07-14T14:52:00Z"
+            }
+          ]
+        }
+      ]
+    }
+};
 
 describe('User Search', () => {
   test('is a Vue instance', () => {
@@ -117,6 +123,9 @@ describe('User Search', () => {
 
     await wrapper.vm.displayResults('a');
     await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
     await wrapper.find('td').trigger('click');
 
@@ -129,10 +138,13 @@ describe('User Search', () => {
 
     await wrapper.vm.displayResults('a');
     await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
     const headers = wrapper.findAll('th');
     expect(headers.at(0).text()).toContain('Name');
-    expect(headers.at(1).text()).toContain('Nickname');
+    expect(headers.at(1).text()).toContain('Nick Name');
     expect(headers.at(2).text()).toContain('Email');
     expect(headers.at(3).text()).toContain('Location');
     expect(headers.at(4).text()).toContain('User Type');
@@ -145,10 +157,13 @@ describe('User Search', () => {
 
     await wrapper.vm.displayResults('a');
     await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
 
     const headers = wrapper.findAll('th');
     expect(headers.at(0).text()).toContain('Name');
-    expect(headers.at(1).text()).toContain('Nickname');
+    expect(headers.at(1).text()).toContain('Nick Name');
     expect(headers.at(2).text()).toContain('Email');
     expect(headers.at(3).text()).toContain('Location');
     expect(headers.at(4).text()).toContain('User Type');

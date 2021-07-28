@@ -1,20 +1,41 @@
 <template>
   <div>
+    <div>
+      <b-form @submit.prevent="getProducts(business)">
+        <b-input-group prepend="Filter by product ID:">
+          <b-form-input v-model="searchQuery"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit"> Filter </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+    </div>
+    <br>
     <b-table
         striped hovers
         responsive="true"
         no-border-collapse
+        stacked="sm"
         bordered
         show-empty
+        no-local-sorting
+        :sort-by.sync="sortBy"
+        :sort-desc.sync="sortDesc"
         @row-clicked="tableRowClick"
         class="catalogue-table"
         :fields="fields"
         :items="items"
         :per-page="perPage"
-        :current-page="currentPage"
-        :busy="tableLoading"
         ref="productCatalogueTable"
     >
+      <template #cell(thumbnail)="products">
+        <div v-if="!products.item.images.length">
+          <b-img  class="product-image-thumbnail" center :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image"/>
+        </div>
+        <div v-if="products.item.images.length">
+          <img class="product-image-thumbnail" center :src="getThumbnail(products.item)" alt="Failed to load image"/>
+        </div>
+      </template>
 
       <template v-slot:cell(actions)="products">
         <b-button id="edit-button" @click="editButtonClicked(products.item)" size="sm">
@@ -37,7 +58,7 @@
         </div>
       </template>
     </b-table>
-    <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+    <pagination v-if="totalItems>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
   </div>
 </template>
 
@@ -53,17 +74,21 @@ export default {
   },
   data: function () {
     return {
+      searchQuery: "",
       businessName: "",
       currency: {
         symbol: '$',
         code: 'USD',
         name: 'US Dollar',
       },
-      tableLoading: true,
+      sortDesc: false,
+      sortBy: "",
       items: [],
+      totalItems: 0,
       perPage: 10,
       currentPage: 1,
       currentUser: {},
+      business: null
     }
   },
   methods: {
@@ -71,19 +96,61 @@ export default {
      * Given a business's id, fills/updates the product table with the products of the business's catalogue.
      * This will also make network requests to a currency api in order to get the currency of the business.
      *
+     * Uses perPage and currentPage to determine the correct subset of products to retrieve for the table.
+     *
      * This component will not load items when mounted so you have to call this manually.
      * This saves us having to pass in a business id prop.
      */
     getProducts: async function (business) {
-      this.tableLoading = true;
-      const getProductsPromise = api.getProducts(business.id);  // Promise for getting products
+      this.business = business;
+
+      let sortDirectionString = "ASC"
+      if (this.sortDesc) {
+        sortDirectionString = "DESC"
+      }
+
+      let sortByParam;
+      switch (this.sortBy) {
+        case "id":
+          sortByParam = "ID";
+          break;
+
+        case "name":
+          sortByParam = "NAME";
+          break;
+
+        case "description":
+          sortByParam = "DESCRIPTION";
+          break;
+
+        case "manufacturer":
+          sortByParam = "MANUFACTURER";
+          break;
+
+        case "recommendedRetailPrice":
+          sortByParam = "RRP";
+          break;
+
+        case "created":
+          sortByParam = "CREATED";
+          break;
+
+        default:
+          sortByParam = "ID";
+      }
+
+      const getProductsPromise = api.getProducts(business.id, this.perPage, this.currentPage - 1, sortByParam, sortDirectionString, this.searchQuery);  // Promise for getting products
       const getCurrencyPromise = api.getUserCurrency(business.address.country); // Promise for getting the currency data
 
       try {
         const [productsResponse, currency] = await Promise.all([getProductsPromise, getCurrencyPromise]) // Run promises in parallel for lower latency
 
-        this.items = productsResponse.data;
-        this.tableLoading = false;
+        this.items = productsResponse.data.products;
+        this.totalItems = productsResponse.data.totalItems;
+
+        this.$refs.productCatalogueTable.refresh();
+
+
         if(currency != null){
           this.currency = currency;
         }
@@ -111,6 +178,16 @@ export default {
       }
       const showTenWordDescription = description.slice(0, 10).trim();
       return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
+    },
+
+    /**
+     * Takes a product as input and returns the primary image thumbnail for that product
+     * @param product   The product that's thumbnail is being requested
+     * @return image    The primary image thumbnail
+     **/
+    getThumbnail: function (product) {
+      const primaryImageFileName = product.primaryImage.thumbnailFilename;
+      return api.getImage(primaryImageFileName);
     }
   },
 
@@ -122,6 +199,13 @@ export default {
      */
     fields: function () {
       let fieldsList = [
+        {
+          key: 'thumbnail',
+          label: 'Image',
+          tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
+          thStyle: 'min-width: 80px;',
+        },
+
         {
           key: 'id',
           label: 'ID',
@@ -166,13 +250,37 @@ export default {
       return fieldsList;
     },
 
+  },
+
+
+  watch: {
     /**
-     * The totalResults function just computed how many pages in the search table.
-     * @returns number
+     * Watch for current page change, refresh products when it happens.
      */
-    totalItems: function () {
-      return this.items.length;
+    '$data.currentPage': {
+      handler: function() {
+        this.getProducts(this.business);
+      },
+      deep: true
     },
+    /**
+     * Watch for sortBy change, refresh products when it happens.
+     */
+    '$data.sortBy': {
+      handler: function() {
+        this.getProducts(this.business);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortDesc change, refresh products when it happens.
+     */
+    '$data.sortDesc': {
+      handler: function() {
+        this.getProducts(this.business);
+      },
+      deep: true
+    }
   }
 }
 </script>

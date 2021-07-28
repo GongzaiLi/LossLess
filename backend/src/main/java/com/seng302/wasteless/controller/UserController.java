@@ -3,12 +3,15 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
+import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
-import com.seng302.wasteless.model.User;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,8 +28,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -75,19 +78,19 @@ public class UserController {
 
         if (userService.checkEmailAlreadyUsed(user.getEmail())) {
             logger.warn("Attempted to create user with already used email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Attempted to create user with already used email");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to create user with already used email");
         }
-        logger.info("Email validated for user: {}", user);
 
         //check the email validation
         if (!userService.checkEmailValid(user.getEmail())) {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email address is invalid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
+        logger.info("Email validated for user: {}", user);
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Date out of expected range");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
         }
         logger.debug("Validated date for user: {}", user);
 
@@ -134,30 +137,58 @@ public class UserController {
 
     /**
      * Search for users by a search query.
-     * Ordered by full matches then partial matches, and by firstname > lastname > nickname > middlename
      *
-     * @param searchQuery   The query to search by
-     * @return              A list of matching results
+     * Searches first, last, middle, and nicknames for partial or full matches with the query, case insensitive.
+     *
+     * Takes a search query, offset, and count. Returns upto 'count' matching results, offset by the offset.
+     * Sorted by sortBy, Sort direction by sortDirection
+     *
+     * Default values: offset is 0, count is 10, sortBy is ID, sortDirection is ASC
+     *
+     * @param searchQuery       The query string to search for in users
+     * @param offset            The offset of the search (how many pages of results to 'skip')
+     * @param count             The number of results to return
+     * @param sortBy            The field (if any) to sort by
+     * @return                  List of users who match the search query, maximum length of count, offset by offset.
      */
     @GetMapping("/users/search")
-    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery, HttpServletRequest request) {
+    public ResponseEntity<Object> searchUsers (@RequestParam(value = "searchQuery") String searchQuery,
+                                               @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+                                               @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
+                                               @RequestParam(value = "sortBy", required = false, defaultValue = "NONE") String sortBy,
+                                               @RequestParam(value = "sortDirection", required = false, defaultValue = "ASC") String sortDirection
+                                               ) {
 
         logger.debug("Request to search for users with query: {}", searchQuery);
+        logger.info("Received count:{} offset:{}", count, offset);
+        logger.info("Using count:{} offset:{} sortBy:{}", count, offset, sortBy);
+        UserSearchSortTypes sortType;
 
-        logger.debug("Getting users matching query: {}", searchQuery);
-        LinkedHashSet<User> searchResults = userService.searchForMatchingUsers(searchQuery);
-
-        List<GetUserDto> searchResultsDto = new ArrayList<>();
-        //List<Object> searchResultsDto = new ArrayList <Object>();   //Use Map<> ?
-
-        logger.debug("Adding all matched users to list");
-        for (User user : searchResults) {
-            searchResultsDto.add(GetUserDtoMapper.toGetUserDto(user));
+        try {
+            sortType = UserSearchSortTypes.valueOf(sortBy);
+        } catch (IllegalArgumentException e) {
+            logger.info("Invalid value for sortBy. Value was {}", sortBy);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortBy. Acceptable values are: NAME, NICKNAME, EMAIL, ROLE, NONE");
         }
 
-        logger.info("User matching the query: {} are: {}", searchQuery, searchResultsDto);
+        if (!sortDirection.equals("ASC") && !sortDirection.equals("DESC")) {
+            logger.info("Invalid value for sortDirection. Value was {}", sortDirection);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortDirection. Acceptable values are: ASC, DESC");
+        }
 
-        return ResponseEntity.status(HttpStatus.OK).body(searchResultsDto);
+        if (count < 1) {
+            logger.info("Count must be great than or equal to one. Value was {}", count);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Count must be great than or equal to one.");
+        } else if (offset < 0) {
+            logger.info("Offset must be great than or equal to one. Value was {}", offset);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Offset must be positive if provided.");
+        }
+
+        logger.debug("Getting users matching query: {}", searchQuery);
+
+        UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset, sortType, sortDirection);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
 
 
     }
@@ -204,36 +235,76 @@ public class UserController {
     }
 
     /**
-     *  Uses a Get Request to grab the user with the specified ID
-     *  Returns either an unacceptable response if ID doesnt exist,
-     *  a body showing the details of the user if it does exist
-     *  and unauthorized if a user hasn't logged in
+     * Uses a Get Request to grab the user with the specified ID
+     * Returns either an unacceptable response if ID doesnt exist,
+     * a body showing the details of the user if it does exist
+     * and unauthorized if a user hasn't logged in
+     * <p>
      *
      * @param userId The userID integer
-     * @return              200 okay with user, 401 unauthorised, 406 not acceptable
+     * @return 200 okay with user, 401 unauthorised, 406 not acceptable
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<Object> getUser(@PathVariable("id") Integer userId) {
-
         logger.debug("Request to get a user ith ID: {}", userId);
 
-        User possibleUser = userService.findUserById(userId);
-        logger.debug("possible User: {}", possibleUser);
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
-        if (possibleUser == null) {
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-        }
-
-        // Not too sure what to do with Response 401 because it's possibly about security but do we need
-        // to have U4 for that or is it possible to do without it
-
-        logger.info("Account: {} retrieved successfully using ID: {}", possibleUser, userId);
-
-        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(possibleUser);
+        GetUserDto getUserDto = GetUserDtoMapper.toGetUserDto(userToGet);
 
         return ResponseEntity.status(HttpStatus.OK).body(getUserDto);
 
+    }
+
+    /**
+     * Endpoint to GET whether the user should receive a notification for
+     * cards that have expired
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @GetMapping("/users/{id}/hasCardsExpired")
+    public ResponseEntity<Object> getUserHasCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to get a user cards expired ith ID: {}", userId);
+
+        User userToGet = userService.findUserById(userId);
+        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+        Integer loggedInUserId = userService.getCurrentlyLoggedInUser().getId();
+        if (userId.equals(loggedInUserId)) {
+            return ResponseEntity.status(HttpStatus.OK).body(userToGet.getHasCardsDeleted());
+        } else {
+            logger.warn("User {} tried to get 'has cards expired' for user {}", loggedInUserId, userId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
+    }
+
+    /**
+     * Clears the card expiry notification for the user.
+     * DOes this by setting the Cards Deleted flag in the user to FALSE. This prevents the user
+     * from getting that notification again (until more cards expire)
+     *
+     * @param userId The id of the user
+     * @return 403 FORBIDDEN if a user makes this request for another user.
+     * 200 OK otherwise.
+     */
+    @PutMapping("/users/{id}/clearHasCardsExpired")
+    public ResponseEntity<Object> putClearCardsExpired(@PathVariable("id") Integer userId) {
+        logger.debug("Request to clear a user cards expired ith ID: {}", userId);
+
+        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
+            User userToGet = userService.findUserById(userId);
+            logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
+
+            userToGet.setHasCardsDeleted(0);
+            userService.saveUserChanges(userToGet);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
+        }
     }
 
 
@@ -251,27 +322,17 @@ public class UserController {
 
         logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
-
-            logger.warn("User with ID: {} does not exist", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+         if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to make others admin");
+             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
 
         } else if (possibleUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Cannot change role of default application admin");
+             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
 
         }
 
@@ -308,26 +369,17 @@ public class UserController {
         User possibleUser = userService.findUserById(userId);
         logger.info("User: {} found using Id : {}", possibleUser, userId);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Validating user with Email: {}", currentPrincipalEmail);
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
-
-        if (possibleUser == null) {
-
-            logger.warn("Could not find user with ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("ID does not exist");
-
-        } else if (!loggedInUser.checkUserDefaultAdmin()) {
+        if (!loggedInUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Must be default admin to revoke others admin");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to revoke others admin");
 
         } else if (possibleUser.checkUserDefaultAdmin()) {
 
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Cannot revoke your own admin rights");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own admin rights");
 
         }
 
@@ -363,7 +415,7 @@ public class UserController {
         User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have tried to log into an account with an email " +
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have tried to log into an account with an email " +
                     "that is not registered.");
         } else {
             logger.debug("User: {} found using data : {}", savedUser, login);
@@ -386,7 +438,7 @@ public class UserController {
 
             } catch (AuthenticationException e) {
                 logger.warn("Login unsuccessful. {}", e.getMessage());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect email or password");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
 
 

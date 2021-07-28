@@ -96,7 +96,7 @@ describe('check-model-product-card-page', () => {
 describe('Testing api put/post request and the response method with errors', () => {
 
   it('Succesfully edits a product ', async () => {
-    Api.modifyProduct.mockResolvedValue({response : {status: 200}});
+    Api.modifyProduct.mockResolvedValue({response : {status: 201}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.modifyProduct(mockEvent);
@@ -106,7 +106,7 @@ describe('Testing api put/post request and the response method with errors', () 
   });
 
   it('Succesfully creates a product ', async () => {
-    Api.createProduct.mockResolvedValue({response : {status: 201}});
+    Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: 'AAA'}});
 
     const mockEvent = {preventDefault: jest.fn()}
     await wrapper.vm.createProduct(mockEvent);
@@ -115,8 +115,30 @@ describe('Testing api put/post request and the response method with errors', () 
     expect(Api.createProduct).toHaveBeenCalled();
   });
 
+  it('Create product but receives 413 (image) error ', async () => {
+    Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: '51-A'}});
+    Api.uploadProductImage.mockRejectedValue({response : {status: 413, data:  "Image larger than 5MB"}});
+
+    wrapper.vm.productDisplayedInCard.images = [{filename: 'blah'}];
+    await wrapper.vm.createProduct();
+
+    expect(wrapper.vm.productCardError).toBe("");
+    expect(wrapper.vm.imageError).toBe("Some images you tried to upload are too large. Images must be less than 1MB in size.");
+  });
+
+  it('Create product but receives 400 image error ', async () => {
+    Api.createProduct.mockResolvedValue({response : {status: 201}, data: {productId: '51-A'}});
+    Api.uploadProductImage.mockRejectedValue({response : {status: 4400, data: {message: "File corrupted."}}});
+
+    wrapper.vm.productDisplayedInCard.images = [{filename: 'blah'}];
+    await wrapper.vm.createProduct();
+
+    expect(wrapper.vm.productCardError).toBe("");
+    expect(wrapper.vm.imageError).toBe("File corrupted.");
+  });
+
   it('400 error test if Product ID already exists', async () => {
-    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product ID provided already exists."}});
+    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: {message: "Product ID provided already exists."} }});
 
     const mockEvent = {preventDefault: jest.fn()};
     await wrapper.vm.modifyProduct(mockEvent);
@@ -125,7 +147,7 @@ describe('Testing api put/post request and the response method with errors', () 
   });
 
   it('400 error test if Product ID provided does not exist', async () => {
-    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: "Product does not exist."}});
+    Api.modifyProduct.mockRejectedValue({response : {status: 400, data: {message: "Product does not exist."}}});
 
     const mockEvent = {preventDefault: jest.fn()};
     await wrapper.vm.modifyProduct(mockEvent);

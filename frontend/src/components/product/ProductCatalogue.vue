@@ -1,13 +1,11 @@
 <!--
 Page that stores table show the business products
-Author: Gongzai Li，Arish Abalos
 Date: 15/4/2021
 -->
 <template>
   <div>
-    <b-card v-if="canEditCatalogue">
+    <b-card v-if="canEditCatalogue" class="shadow">
       <b-card-title>Product Catalogue: {{businessName}}</b-card-title>
-      <hr class='m-0'>
       <b-row align-v="center">
         <b-col md="8"><h6 class="ml-2">Click on a product to view more details</h6></b-col>
         <b-col md="4">
@@ -33,6 +31,7 @@ Date: 15/4/2021
                              :currency="currency"
                              :okAction="productCardAction"
                              :cancelAction="closeProductCardModal"
+                             @imageChange="refreshProducts"
         />
         <b-alert :show="productCardError ? 120 : 0" variant="danger">{{ productCardError }}</b-alert>
       </b-modal>
@@ -47,6 +46,12 @@ Date: 15/4/2021
       <h6 v-else> You are not an administrator of this business. If you need to edit this catalogue, contact the administrators of the business. <br>
       Return to the business profile page <router-link :to="'/businesses/' + $route.params.id">here.</router-link></h6>
     </b-card>
+
+    <b-modal id="image-error-modal" title="Some images couldn't be uploaded." ok-only>
+      <h5>{{ imageError }}</h5>
+      However, the product has been created successfully. If you would like to add more images to it, you can do so by
+      editing the product.
+    </b-modal>
   </div>
 </template>
 
@@ -59,11 +64,9 @@ h2 {
 </style>
 
 <script>
-import api from "../../Api";
 import productDetailCard from './ProductDetailCard';
 import ProductsTable from "./ProductsTable";
 import Api from "../../Api";
-
 
 export default {
   components: {
@@ -79,9 +82,10 @@ export default {
         code: 'USD',
         name: 'US Dollar',
       },
-      productCardAction: () => {},
+      productCardAction: null,
       productCardError: "",
-      productDisplayedInCard: {},
+      imageError: "",
+      productDisplayedInCard: { images: [] },
       isProductCardReadOnly: true,
       items: [],
       perPage: 10,
@@ -100,10 +104,10 @@ export default {
      * Api request to get business information
      **/
     async getBusinessInformation(businessId) {
-      await api.getBusiness(businessId)
+      await Api.getBusiness(businessId)
           .then((response) => {
             this.business = response.data;
-            return api.getUserCurrency(response.data.address.country);
+            return Api.getUserCurrency(response.data.address.country);
           })
           .then(currencyData => this.currency = currencyData)
           .catch((error) => {
@@ -182,19 +186,39 @@ export default {
 
     /**
      * Makes a request to the API to create a product with the form input.
+     * If successful, it will then upload all the images that the user has set for the product.
      * Then, will hide the product popup and reload the table items if successful.
      */
-    async createProduct(event) {
-      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-      await api
-          .createProduct(this.$route.params.id, this.productDisplayedInCard)
-          .then((createProductResponse) => {
+    async createProduct() {
+      let productCreated = false;
+        await Api.createProduct(this.$route.params.id, this.productDisplayedInCard)
+          .then(async (createProductResponse) => {
+            productCreated = true;
             this.$log.debug("Product Created", createProductResponse);
+            this.$log.debug("Uploading images");
+            // When creating a new product, the ProductDetailCard component will set product.images to the product images to be uploaded
+            // That is a bit hacky and it would be better for the API requests to be handled in the card component itself, but we don't have time to refactor all this
+            // We also need to extract the file objects from the list of images (see addImagePreviewsToCarousel in ProductDetailCard for why)
+            for (let image of this.productDisplayedInCard.images) {
+              let resp = await Api.uploadProductImage(this.$route.params.id, createProductResponse.data.productId, image.fileObject);
+              if (image.id === this.productDisplayedInCard.primaryImage.id) {
+                await Api.setPrimaryImage(this.$route.params.id, createProductResponse.data.productId, resp.data.id);
+              }
+            }
+          })
+          .then(() => {
+            this.refreshProducts(); // Refresh the table of products again to get the images
             this.$bvModal.hide('product-card');
-            this.refreshProducts();
           })
           .catch((error) => {
-            this.productCardError = this.getErrorMessageFromApiError(error);
+            if (productCreated) {
+              this.refreshProducts(); // Product has been created, must be image error, so refresh the table of products
+              this.$bvModal.hide('product-card'); // Hide modal anyway, the product was created
+              this.imageError = (error.response.status !== 413) ? error.response.data.message : "Some images you tried to upload are too large. Images must be less than 1MB in size.";
+              this.$bvModal.show('image-error-modal');
+            } else {
+              this.productCardError = this.getErrorMessageFromApiError(error);
+            }
             this.$log.debug(error);
           });
     },
@@ -203,12 +227,10 @@ export default {
      * button function for ok when clicked calls an API
      * place holder function for API task
      */
-    modifyProduct: async function (event) {
-      event.preventDefault();
-
+    modifyProduct: async function () {
       let editData = this.productDisplayedInCard;
       delete editData["created"];
-      await api
+      await Api
           .modifyProduct(this.$route.params.id, this.oldProductId, editData)
           .then((editProductResponse) => {
             this.$log.debug("Product has been edited",editProductResponse);
@@ -227,7 +249,7 @@ export default {
      */
     getErrorMessageFromApiError(error) {
       if ((error.response && error.response.status === 400)) {
-        return error.response.data;
+        return error.response.data.message;
       } else if ((error.response && error.response.status === 403)) {
         return "Forbidden. You are not an authorized administrator";
       } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors

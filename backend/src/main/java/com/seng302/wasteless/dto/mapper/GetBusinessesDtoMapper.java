@@ -9,8 +9,6 @@ import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -38,9 +36,7 @@ public class GetBusinessesDtoMapper {
 
     public static GetBusinessesDto toGetBusinessesDto(Business business) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincipalEmail = authentication.getName();
-        User loggedInUser = userService.findUserByEmail(currentPrincipalEmail);
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
 
         List<User> businessAdministrators = business.getAdministrators();

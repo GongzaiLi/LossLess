@@ -1,29 +1,47 @@
 <template>
 <div>
+  <div style="margin-left: 15%; margin-right: 15%">
+    <div>
+      <b-form @submit.prevent="searchClicked">
+        <b-input-group prepend="Filter by product code:">
+          <b-form-input v-model="searchQuery"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit"> Filter </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
+    </div>
+
+  </div>
+  <br>
   <b-table
       striped hovers
       responsive="lg"
       no-border-collapse
       bordered
       show-empty
+      no-local-sorting
+      :sort-by.sync="sortBy"
+      :sort-desc.sync="sortDesc"
       class="inventory-table"
       :fields="fields"
       :items="items"
       :per-page="perPage"
-      :current-page="currentPage"
       :busy="tableLoading"
       ref="inventoryTable"
       @row-clicked="tableRowClick"
   >
-    <template #cell(productThumbnail) class="thumbnail-row">
-      <b-img v-bind="mainProps" thumbnail fluid style="border-radius: 10px" blank-color="#777"
-             alt="Default Image"></b-img>
+    <template v-slot:cell(productThumbnail)="data" class="thumbnail-row">
+      <b-img v-if="!data.item.product.primaryImage" center class="product-image-thumbnail" :src="require(`/public/product_default.png`)" alt="Product has no image" />
+      <b-img v-if="data.item.product.primaryImage" center class="product-image-thumbnail" :src=getThumbnail(data.item.product) />
     </template>
+
     <template v-slot:cell(actions)="product">
       <b-button id="edit-button" @click="editButtonClicked(product.item)" size="sm">
         Edit
       </b-button>
     </template>
+
     <template #cell(pricePerItem)="data">
       {{ currency.symbol }}{{ data.item.pricePerItem }}
     </template>
@@ -42,7 +60,7 @@
       </div>
     </template>
   </b-table>
-  <pagination v-if="items.length>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
+  <pagination v-if="totalItems>0" :per-page="perPage" :total-items="totalItems" v-model="currentPage"/>
 </div>
 </template>
 
@@ -53,8 +71,16 @@
   text-align: center;
 }
 
+.product-image-thumbnail {
+  height: 60px !important;
+  object-fit: cover;
+  max-width: 80px;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
 .thumbnail-row {
-  padding: 0 0 0 0.5rem !important;
+  padding: 0 !important;
 }
 </style>
 
@@ -69,11 +95,14 @@ export default {
   props: ['editable'],
   data: function () {
     return {
+      searchQuery:'',
       items: [],
       business: {},
-      products: [],
       perPage: 10,
       currentPage: 1,
+      sortDesc: false,
+      sortBy: "",
+      totalItems: 0,
       tableLoading: true,
       currency: {
         symbol: '$',
@@ -88,30 +117,46 @@ export default {
   },
 
   methods: {
+    /**
+     *  Gets the inventory items based on search query
+     */
+    searchClicked() {
+      this.getInventoryInfo(this.$route.params.id)
+    },
 
     /**
      * this is a get api to get the name of the business
      * NOTE!! Best to add currency stuff here as well similar to the inventory
      * @param businessId
      */
-    getBusinessInfo: async function (businessId) {
-      this.tableLoading = true;
-      const getProductsPromise = api.getProducts(businessId)
-      const getInventoryPromise = api.getInventory(businessId)
+    getInventoryInfo: async function (businessId) {
+      let sortDirectionString = "ASC"
+      if (this.sortDesc) {
+        sortDirectionString = "DESC"
+      }
+
+      let sortByParam = this.sortBy;
+      if (sortByParam === "product") {
+        sortByParam = "product.id";
+      }
+
+      const getInventoryPromise = api.getInventory(businessId, this.perPage, this.currentPage-1, sortByParam, sortDirectionString, this.searchQuery);
       const currencyPromise = api.getBusiness(businessId)
           .then((resp) => {
             this.business = resp.data;
             return api.getUserCurrency(resp.data.address.country);
           })
-
       try {
-        const [productsResponse, currency, inventoryResponse] = await Promise.all([getProductsPromise, currencyPromise, getInventoryPromise])
-        this.products = productsResponse.data;
-        this.items = inventoryResponse.data;
-        this.tableLoading = false;
-        if (currency != null) {
+        const [currency, inventoryResponse] = await Promise.all([currencyPromise, getInventoryPromise])
+
+        this.items = inventoryResponse.data.inventory;
+
+        this.totalItems = inventoryResponse.data.totalItems;
+
+        if (currency !== null) {
           this.currency = currency;
         }
+        this.$refs.inventoryTable.refresh();
       } catch (error) {
         this.$log.debug(error);
       }
@@ -146,11 +191,24 @@ export default {
             `${date.getUTCFullYear()}`;
       }
     },
+
+    /**
+     * Uses the product of the inventory and returns the thumbnail of the primary image for that product.
+     * @param  product a product that's image is being requested
+     * @return string
+     **/
+    getThumbnail: function (product) {
+      if (product.primaryImage) {
+        const thumbnailFilename = product.primaryImage.thumbnailFilename;
+        return api.getImage(thumbnailFilename);
+      }
+    }
   },
 
-  mounted() {
+  async mounted() {
     const businessId = this.$route.params.id;
-    this.getBusinessInfo(businessId);
+    await this.getInventoryInfo(businessId);
+    this.tableLoading = false;
   },
 
   computed: {
@@ -163,7 +221,8 @@ export default {
         {
           key: 'productThumbnail',
           tdClass: 'thumbnail-row', // Class to make the padding around the thumbnail smaller
-          thStyle: 'width: 60px',
+          label: 'Thumbnail',
+          thStyle: 'width: 80px;',
         },
         {
           key: 'product',
@@ -233,16 +292,36 @@ export default {
       }
       return fieldsList
     },
-
-    /**
-     * The totalResults function just computed how many pages in the search table.
-     * @returns number
-     */
-    totalItems: function () {
-      return this.items.length;
-    },
-
   },
+  watch: {
+    /**
+     * Watch for current page change, refresh inventory when it happens
+     */
+    '$data.currentPage': {
+      handler: function () {
+        this.getInventoryInfo(this.business.id);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortBy change, refresh inventory when it happens.
+     */
+    '$data.sortBy': {
+      handler: function () {
+        this.getInventoryInfo(this.business.id);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortDesc change, refresh inventory when it happens.
+     */
+    '$data.sortDesc': {
+      handler: function () {
+        this.getInventoryInfo(this.business.id);
+      },
+      deep: true
+    },
+  }
 }
 </script>
 

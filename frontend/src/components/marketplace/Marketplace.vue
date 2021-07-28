@@ -1,14 +1,20 @@
 <!--
 Page for users to input business information for registration of a Business
-Authors: James
 Date: 21/5/21
 -->
 
-
 <template>
   <div>
-    <b-card class="shadow">
-      <h1><b-icon-shop/> Market Place </h1>
+    <b-card class="shadow" style="max-width: 85%">
+      <div class="row">
+        <h1 class="col-10"><b-icon-shop/> Marketplace </h1>
+        <div class="col-2">
+          <b-button class="float-right" @click="openCreateCardModal">
+            <b-icon-plus-square-fill animation="fade"/>
+            Create
+          </b-button>
+        </div>
+      </div>
       <b-input-group>
         <b-form-text style="margin-right: 7px">
           Table View
@@ -19,86 +25,48 @@ Date: 21/5/21
         </b-form-text>
       </b-input-group>
       <b-tabs v-model=activeTabIndex align="center" fill>
-        <b-tab title="For Sale">
+        <b-tab v-for="[section, sectionName] in sections" :key=section :title=sectionName>
           <marketplace-section
-            :cards="marketplaceCards.forSaleCards"
             :is-card-format="isCardFormat"
+            :cardsPerRow:="3"
+            :perPage="8"
+            :section="section"
+            :ref="section"
           />
         </b-tab>
-
-        <b-tab title="Wanted">
-          <marketplace-section
-              :cards="marketplaceCards.wantedCards"
-              :is-card-format="isCardFormat"
-          />
-        </b-tab>
-
-        <b-tab title="Exchange">
-          <marketplace-section
-              :cards="marketplaceCards.exchangeCards"
-              :is-card-format="isCardFormat"
-          />
-        </b-tab>
-
       </b-tabs>
+
+      <b-modal id="create-card" hide-header hide-footer>
+        <CreateCard @createAction="createCard($event)"
+                    :cancelAction="closeCreateCardModal"
+                    :showError="error"> </CreateCard>
+      </b-modal>
     </b-card>
   </div>
 </template>
 
 <script>
 
-import MarketplaceSection from "@/components/marketplace/MarketplaceSection";
+import MarketplaceSection from "./MarketplaceSection";
+import api from "../../Api";
+
+import CreateCard from "./CreateCard";
+
 export default {
-  components: {MarketplaceSection},
+  components: { MarketplaceSection, CreateCard },
   data: function () {
     return {
-      errors: [],
+      sections: [['ForSale', 'For Sale'], ['Wanted', 'Wanted'], ['Exchange', 'Exchange']],
+      error: "",
       activeTabIndex: 0,
       isCardFormat: true,
-      marketplaceCards: {
-        forSaleCards: [
-          {
-            title: "Clown shoes",
-            description: "Giving away premium clown shoes. " +
-                "Purchased them 8 years ago but they dont get " +
-                "used anymore since my wife left me. Pick up riccarton",
-            tags: ["Free", "Dress up", "Footwear"],
-            listerName: "James Harris",
-            listerLocation: "Riccarton, Christchurch"
-          },
-          {
-            title: "2002 Toyota Corolla",
-            description: "Selling the old beast, 250,000km but goes hard still, looking for $1000 ono",
-            tags: ["Car", "Nissan"],
-            listerName: "Scooter Hartley",
-            listerLocation: "Epsom, Auckland"
-          },
-          {
-            title: "Coconut Water",
-            description: "Selling premium coconut water, $5000 a litre",
-            tags: ["Water"],
-            listerName: "Fabian Gilson",
-            listerLocation: "Christchurch"
-          },
-          {
-            title: "Apple Airpods",
-            description: "Selling my old apple ear-pods, well worn, $125",
-            tags: ["Headphones", "Apple"],
-            listerName: "Michael Steven",
-            listerLocation: "Kaitaia, Northland"
-          }, {
-            title: "Bunnings Cap",
-            description: "Rare bunnings cap, seen some good times so has some damage, looking for $30",
-            tags: ["Hat", "Bunnings", "Collectable"],
-            listerName: "Ricky Ponting",
-            listerLocation: "Island Bay, Wellington"
-          },
-        ],
-        wantedCards: [],
-        exchangeCards: [],
-      }
+      marketplaceCards: [],
+      dismissSecs: 5,
+      dismissCountDown: 0,
+      showDismissibleAlert: false
     }
   },
+
   methods: {
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
@@ -107,9 +75,69 @@ export default {
     pushErrors(error) {
       this.errors.push(error.message);
     },
+
+    /**
+     * Opens the create card modal when create button pressed.
+     */
+    openCreateCardModal() {
+      this.$bvModal.show('create-card');
+    },
+
+    /**
+     * Closes the create card modal when cancel button pressed.
+     */
+    closeCreateCardModal() {
+      this.$bvModal.hide('create-card');
+    },
+
+    /**
+     * Sends a post request with the card data when create card button is pressed.
+     * @param cardData  The object that contains the card data.
+     */
+    createCard(cardData) {
+      api.createCard(cardData)
+      .then(createCardResponse => {
+        this.$log.debug("Card Created", createCardResponse);
+        this.$bvModal.hide('create-card');
+        this.error = '';
+
+        // Not the most elegant way to do it, but we have to make the marketplace section refresh
+        // The way this is done is by giving each section component a unique ref, with the same name as the section
+        // Then, we just get the component using the ref and call the refresh function
+        // Also, you have to index into the ref because... reasons: https://forum.vuejs.org/t/this-refs-theid-returns-an-array/31995/10
+
+        this.$refs[cardData.section][0].refreshData();
+      })
+      .catch(error => {
+        this.$log.debug(error);
+        this.error = this.getErrorMessageFromApiError(error);
+      })
+    },
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown
+    },
+
+    /**
+     * Given an error thrown by a rejected axios (api) request, returns a user-friendly string
+     * describing that error. Only applies to POST requests for cards
+     */
+    getErrorMessageFromApiError(error) {
+      if ((error.response && error.response.status === 400)) {
+        let errorMessage = '';
+        Object.keys(error.response.data).forEach(key => {
+          errorMessage += `${key}: ${error.response.data[key]}\n`
+        })
+        return errorMessage;
+      } else if ((error.response && error.response.status === 403)) {
+        return "Forbidden. You are not an authorized administrator";
+      } else if (error.request) {  // The request was made but no response was received, see https://github.com/axios/axios#handling-errors
+        return "No Internet Connectivity";
+      } else {
+        return "Server error";
+      }
+    },
   },
-  computed: {
-  }
+
 }
 </script>
 

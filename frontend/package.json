@@ -12,12 +12,13 @@
     "sonarqube": "node sonarqube-analysis.js"
   },
   "dependencies": {
-    "@babel/runtime": "^7.14.0",
     "@babel/core": "^7.14.0",
+    "@babel/runtime": "^7.14.0",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.8.3",
+    "lodash.sortby": "^4.7.0",
     "router": "^1.3.5",
     "serve": "^11.3.2",
     "vue": "^2.6.12",

@@ -3,6 +3,7 @@ package com.seng302.wasteless.repository;
 
 
 import com.seng302.wasteless.model.Listing;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -18,6 +19,7 @@ public interface ListingRepository extends JpaRepository<Listing, Integer> {
 
     Listing findFirstById(Integer id);
 
-    List<Listing> findAllByBusinessId(Integer id);
+    List<Listing> findAllByBusinessId(Integer id, Pageable pageable);
 
+    Integer countListingByBusinessId(Integer id);
 }

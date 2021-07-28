@@ -1,9 +1,10 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 
-import { BootstrapVue } from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import homePage from '../../components/user/HomePage';
 import Api from "../../Api";
 import Router from 'vue-router'
+import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
 
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -34,10 +35,12 @@ const $log = {
 beforeEach(() => {
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
+  localVue.use(BootstrapVueIcons);
   localVue.use(mockUserAuthPlugin);
   localVue.use(Router);
 
   Api.getUser.mockRejectedValue(new Error(''));
+  Api.getExpiringCards.mockResolvedValue({data: {}});
 
   wrapper = shallowMount(homePage, {
     localVue,
@@ -109,5 +112,27 @@ describe('check-getUserInfo-API-function', () => {
     expect(wrapper.vm.userData).toEqual(response.data);
   });
 });
+
+describe('check-that-expired-table-only-shows-when-necessary', () => {
+  test('check-table-not-shown-with-zero-expired-cards', async () => {
+
+
+    wrapper.vm.hasExpiredCards = false;
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(MarketplaceSection).exists()).toBeFalsy();
+  })
+
+  test('check-table-shown-with-many-expired-cards', async () => {
+
+
+    wrapper.vm.hasExpiredCards = true;
+    await wrapper.vm.$forceUpdate();
+
+    expect(wrapper.find(MarketplaceSection).exists()).toBeTruthy();
+  })
+
+});
+
 
 

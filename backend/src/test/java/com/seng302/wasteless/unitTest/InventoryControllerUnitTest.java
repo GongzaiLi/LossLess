@@ -3,28 +3,27 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.dto.PostInventoryDto;
 import com.seng302.wasteless.dto.mapper.PostInventoryDtoMapper;
-import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(InventoryController.class)
 @AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
-public class InventoryControllerUnitTest {
+ class InventoryControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -109,15 +108,15 @@ public class InventoryControllerUnitTest {
 
 
         Mockito
-                .when(authentication.getName())
-                .thenReturn("james@gmail.com");
-
-        Mockito
                 .when(inventoryService.createInventory(any(Inventory.class)))
                 .thenReturn(inventoryItem.setId(2));
 
+//        Mockito
+//                .when(userService.findUserByEmail(anyString()))
+//                .thenReturn(user);
+
         Mockito
-                .when(userService.findUserByEmail(anyString()))
+                .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
         Mockito
@@ -147,13 +146,13 @@ public class InventoryControllerUnitTest {
         inventories.add(inventoryItem);
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt()))
+                .when(inventoryService.searchInventoryFromBusinessId(anyInt(), any(), any()))
                 .thenReturn(inventories);
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andValidRequest_then201Response() throws Exception {
+     void whenPostRequestToCreateInventory_andValidRequest_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -165,11 +164,11 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoUserMakingRequest_the401Response() throws Exception {
+     void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoUserMakingRequest_the401Response() throws Exception {
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -178,25 +177,10 @@ public class InventoryControllerUnitTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoMatchingBusiness_the406Response() throws Exception {
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenReturn(null);
-
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andValidRequest_UserBusinessAdminButNotDGAA_then201Response() throws Exception {
+     void whenPostRequestToCreateInventory_andValidRequest_UserBusinessAdminButNotDGAA_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         doReturn(false).when(user).checkUserGlobalAdmin();
 
@@ -209,7 +193,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andValidRequest_UserDGAAButNotBusinessAdmin_then201Response() throws Exception {
+     void whenPostRequestToCreateInventory_andValidRequest_UserDGAAButNotBusinessAdmin_then201Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
 
@@ -224,13 +208,9 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
+     void whenPostRequestToCreateInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
 
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
-
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-
-        doReturn(false).when(user).checkUserGlobalAdmin();
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -241,12 +221,11 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoMatchingProduct_the400Response() throws Exception {
+     void whenPostRequestToCreateInventory_andInvalidRequest_BecauseNoMatchingProduct_the400Response() throws Exception {
 
-        doReturn(null).when(productService).findProductById(anyString());
-
+         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(anyString());
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
-        doReturn(null).when(productService).findProductById(null);
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(null);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -257,12 +236,13 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToCreateInventory_andInvalidRequest_productExistsForOtherBusiness_then400Response() throws Exception {
+     void whenPostRequestToCreateInventory_andInvalidRequest_productExistsForOtherBusiness_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         productForInventory.setBusinessId(5);
         doReturn(productForInventory).when(productService).findProductById(anyString());
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business")).when(productService).checkProductBelongsToBusiness(productForInventory, 1);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
+         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -270,22 +250,22 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andValidRequest_then200Response() throws Exception {
+     void whenGetRequestToInventory_andValidRequest_then200Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].id", is(2)))
-                .andExpect(jsonPath("[0].quantity", is(5)));
+                .andExpect(jsonPath("inventory[0].id", is(2)))
+                .andExpect(jsonPath("inventory[0].quantity", is(5)));
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andInvalidRequest_NoUserMakingRequest_then401Response() throws Exception {
+     void whenGetRequestToInventory_andInvalidRequest_NoUserMakingRequest_then401Response() throws Exception {
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
@@ -295,26 +275,9 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andInvalidRequest_BusinessNotFound_then406Response() throws Exception {
+     void whenGetRequestToInventory_andInvalidRequest_UserNotBusinessAdminOrDGAA_then403Response() throws Exception {
 
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenReturn(null);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andInvalidRequest_UserNotBusinessAdminOrDGAA_then403Response() throws Exception {
-
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
-
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-
-        doReturn(false).when(user).checkUserGlobalAdmin();
+         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
                 .contentType(APPLICATION_JSON))
@@ -323,7 +286,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andValidRequest_UserNotBusinessAdminButIsDGAA_then200Response() throws Exception {
+     void whenGetRequestToInventory_andValidRequest_UserNotBusinessAdminButIsDGAA_then200Response() throws Exception {
 
         doReturn(false).when(user).checkUserGlobalAdmin();
 
@@ -334,7 +297,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andValidRequest_UserBusinessAdminButIsNotDGAA_then200Response() throws Exception {
+     void whenGetRequestToInventory_andValidRequest_UserBusinessAdminButIsNotDGAA_then200Response() throws Exception {
 
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
 
@@ -348,10 +311,10 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenGetRequestToInventory_andValidRequest_BusinessHasNoInventory_then200Response_BodyEmptyList() throws Exception {
+     void whenGetRequestToInventory_andValidRequest_BusinessHasNoInventory_then200Response_BodyEmptyList() throws Exception {
 
         Mockito
-                .when(inventoryService.getInventoryFromBusinessId(anyInt()))
+                .when(inventoryService.searchInventoryFromBusinessId(anyInt(), any(), any()))
                 .thenReturn(new ArrayList<>());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/inventory")
@@ -363,7 +326,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_ExpiryDateInPast_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_ExpiryDateInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"2020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -374,7 +337,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_BestBeforeDateInPast_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_BestBeforeDateInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"2020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -385,7 +348,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_manufacturedInFuture_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_manufacturedInFuture_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"3020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -397,7 +360,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_sellByInPast_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_sellByInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -408,7 +371,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_quantityNegative_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_quantityNegative_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": -1, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -423,7 +386,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_pricePerItemNegative_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_pricePerItemNegative_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": -6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -435,7 +398,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPostRequestToInventory_andInvalidRequest_totalPriceNegative_then400Response() throws Exception {
+     void whenPostRequestToInventory_andInvalidRequest_totalPriceNegative_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": 6.5, \"totalPrice\": -21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
@@ -448,7 +411,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andValidRequest_then200Response() throws Exception {
+     void whenPutRequestToModifyInventory_andValidRequest_then200Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
 
         Mockito.
@@ -462,11 +425,11 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoUserMakingRequest_the401Response() throws Exception {
+     void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoUserMakingRequest_the401Response() throws Exception {
 
         Mockito
-                .when(userService.findUserByEmail(anyString()))
-                .thenReturn(null);
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -475,25 +438,10 @@ public class InventoryControllerUnitTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoMatchingBusiness_the406Response() throws Exception {
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenReturn(null);
-
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andValidRequest_UserBusinessAdminButNotDGAA_then200Response() throws Exception {
+     void whenPutRequestToModifyInventory_andValidRequest_UserBusinessAdminButNotDGAA_then200Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         doReturn(false).when(user).checkUserGlobalAdmin();
 
@@ -507,7 +455,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andValidRequest_UserDGAAButNotBusinessAdmin_then200Response() throws Exception {
+     void whenPutRequestToModifyInventory_andValidRequest_UserDGAAButNotBusinessAdmin_then200Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
 
@@ -523,15 +471,11 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
+     void whenPutRequestToModifyInventory_andInvalidRequest_BecauseUserIsNotAdminOrDGAA_the403Response() throws Exception {
 
-        doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
+         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
-        doReturn(false).when(business).checkUserIsAdministrator(user);
-
-        doReturn(false).when(user).checkUserGlobalAdmin();
-
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
+         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
@@ -540,12 +484,11 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoMatchingProduct_the400Response() throws Exception {
+     void whenPutRequestToModifyInventory_andInvalidRequest_BecauseNoMatchingProduct_the400Response() throws Exception {
 
-        doReturn(null).when(productService).findProductById(anyString());
-
+         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(anyString());
         //Request passed to controller is empty, could not tell you why, so the product id field is null.
-        doReturn(null).when(productService).findProductById(null);
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(null);
 
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -556,7 +499,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_ExpiryDateInPast_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_ExpiryDateInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"2020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -567,7 +510,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_BestBeforeDateInPast_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_BestBeforeDateInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"2020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -578,7 +521,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_manufacturedInFuture_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_manufacturedInFuture_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"3020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -590,7 +533,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_sellByInPast_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_sellByInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -601,7 +544,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_quantityNegative_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_quantityNegative_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": -1, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -616,7 +559,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_pricePerItemNegative_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_pricePerItemNegative_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": -6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -628,7 +571,7 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToInventory_andInvalidRequest_totalPriceNegative_then400Response() throws Exception {
+     void whenPutRequestToInventory_andInvalidRequest_totalPriceNegative_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": 6.5, \"totalPrice\": -21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
@@ -639,25 +582,25 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_wrongBusiness_then400Response() throws Exception {
+     void whenPutRequestToModifyInventory_andInvalidRequest_wrongBusiness_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
 
         inventoryItem.setBusinessId(2);
-
+        doThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist")).when(businessService).findBusinessById(1);
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotAcceptable());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_productExistsForOtherBusiness_then400Response() throws Exception {
+     void whenPutRequestToModifyInventory_andInvalidRequest_productExistsForOtherBusiness_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
         productForInventory.setBusinessId(5);
         doReturn(productForInventory).when(productService).findProductById(anyString());
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business")).when(productService).checkProductBelongsToBusiness(productForInventory, 1);
+         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -666,9 +609,9 @@ public class InventoryControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    public void whenPutRequestToModifyInventory_andInvalidRequest_productNotExist_then400Response() throws Exception {
+     void whenPutRequestToModifyInventory_andInvalidRequest_productNotExist_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"productId\": \"Soup\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"3021-05-12\"}";
-        doReturn(null).when(productService).findProductById(anyString());
+        doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product with given ID Not Found")).when(productService).findProductById(anyString());
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
                 .content(jsonInStringForRequest)

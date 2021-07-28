@@ -6,6 +6,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 import net.minidev.json.JSONObject;
 
+import java.util.List;
 
 
 /**
@@ -26,4 +27,5 @@ public class GetUserDto {
     private String email;                      //change later
     private JSONObject homeAddress;
     private String created;
+    private List<GetUserBusinessAdministeredDto> businessesAdministered;
 }
