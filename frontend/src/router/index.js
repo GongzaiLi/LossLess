@@ -46,6 +46,8 @@ router.beforeEach((to, _from, next) => {
     const currentUser = getCurrentUser();
     if (!['login', 'register'].includes(to.name) && currentUser == null) {
         next('/login');
+    } else if (to.name === 'market-place' && currentUser.currentlyActingAs) {
+        next('/homePage');
     } else {
         next();
     }
