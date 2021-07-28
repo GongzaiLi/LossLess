@@ -2,6 +2,7 @@ import {createLocalVue, mount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import NavBar from '../../components/model/Navbar'; // name of your Vue component
 import Auth from '../../auth'
+import Api from '../../Api'
 
 let wrapper;
 
@@ -62,6 +63,27 @@ let userData = {
 
 let $currentUser = userData;
 
+const date = new Date();
+const currentDateWithinAWeek = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+(date.getDate()+6)+'T'+date.getHours()+':'+date.getMinutes()+':'+date.getUTCSeconds()+'Z'
+
+const currentDateWithin24 = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()+'T'+(date.getHours()+2)+':'+date.getMinutes()+':'+date.getUTCSeconds()+'Z'
+
+
+const expiringCards = [
+    {
+      id: 2,
+      title: 'card 2 that expires within next 24 hours',
+      displayPeriodEnd: currentDateWithin24
+    },
+    {
+      id: 3,
+      title: 'card 2 that expires within next 24 hours',
+      displayPeriodEnd: currentDateWithin24
+    }
+    ]
+
+jest.mock('../../Api');
+
 beforeEach(() => {
   const localVue = createLocalVue();
 
@@ -69,10 +91,15 @@ beforeEach(() => {
   localVue.use(BootstrapVueIcons);
   localVue.use(Auth);
 
+  Api.getExpiringCards.mockResolvedValue({data: expiringCards});
+  Api.expiredCardsNumber.mockResolvedValue({data: 3});
+  Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
+
+
   wrapper = mount(NavBar, {
     localVue,
     propsData: {},
-    mocks: {$route, $router, $currentUser},
+    mocks: {$route, $router, $currentUser, displayPeriodEnd: { split: 'asd'  }},
     stubs: ['router-link'],
     methods: {},
     computed: {},
@@ -220,4 +247,43 @@ describe('Act as business', () => {
     expect(wrapper.findAll("hr").length).toEqual(3);
     userData = prevUser;
   })
+});
+
+describe('Get expiring cards', () => {
+  test('cards expiring within 24 hours get added to notifications', async () => {
+    await wrapper.vm.updateNotifications();
+    expect(wrapper.vm.notifications.length).toBe(2);
+  })
+});
+
+describe('Get number of expired cards', () => {
+  test('number of expired cards is set to data from the server', async () => {
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.numExpiredCards).toBe(3);
+  })
+
+  test('the notification has correct message if 1 card has expired', async () => {
+    Api.expiredCardsNumber.mockResolvedValue({data: 1});
+    wrapper.vm.getExpiredCards();
+    await wrapper.vm.$forceUpdate();
+    expect(wrapper.vm.expiredText).toBe(" of your cards has expired and been deleted");
+  })
+
+  test('the notification has correct message if multiple cards have expired', async () => {
+    Api.expiredCardsNumber.mockResolvedValue({data: 5});
+    wrapper.vm.getExpiredCards();
+    await wrapper.vm.$forceUpdate();
+    expect(wrapper.vm.expiredText).toBe(" of your cards have expired and been deleted");
+  })
+
+
+});
+
+describe('Clear expired cards notification', () => {
+  test('number of expired cards is set to zero after clearing', async () => {
+    wrapper.vm.clearExpiredCards()
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.numExpiredCards).toBe(0);
+  })
+
 });

@@ -95,7 +95,7 @@ public class User {
     private UserRoles role;
 
     @Column(name = "has_cards_deleted")
-    private Boolean hasCardsDeleted = Boolean.FALSE;
+    private Integer hasCardsDeleted = 0;
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges

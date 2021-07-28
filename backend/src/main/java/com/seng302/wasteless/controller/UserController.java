@@ -298,7 +298,7 @@ public class UserController {
             User userToGet = userService.findUserById(userId);
             logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
 
-            userToGet.setHasCardsDeleted(false);
+            userToGet.setHasCardsDeleted(0);
             userService.saveUserChanges(userToGet);
 
             return ResponseEntity.status(HttpStatus.OK).build();

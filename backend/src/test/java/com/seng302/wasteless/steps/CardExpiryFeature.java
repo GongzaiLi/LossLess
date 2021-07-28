@@ -268,6 +268,6 @@ public class CardExpiryFeature {
 
     @Then("I am notified")
     public void iAmNotified() {
-        Assertions.assertTrue(userService.findUserById(user.getId()).getHasCardsDeleted());
+        Assertions.assertEquals(userService.findUserById(user.getId()).getHasCardsDeleted(),1);
     }
 }
