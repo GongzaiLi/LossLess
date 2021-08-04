@@ -35,7 +35,22 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
     List<Business> findBySpecificAdminId(@Param("user_id") Integer userId);
 
 
+    /**
+     * Search businesses by search query on the name field. Paginate and sort results using pageable
+     *
+     * @param businessName  The search query to search businesses names by
+     * @param pageable      A pageable to perform pagination and sorting on the results
+     * @return              The count of businesses that match the search query on the name field, paginated and sorted
+     */
     List<Business> findAllByNameContainsAllIgnoreCase(String businessName, Pageable pageable);
+
+    /**
+     * Count the number of businesses that match the search query
+     *
+     * @param businessName   The search query to search businesses names by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    Integer countBusinessByNameContainsAllIgnoreCase(String businessName);
 
 }
 

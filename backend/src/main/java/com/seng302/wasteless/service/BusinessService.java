@@ -107,9 +107,25 @@ public class BusinessService {
     }
 
 
-
+    /**
+     * Search businesses by search query on the name field. Paginate and sort results using pageable
+     *
+     * @param searchQuery   The search query to search businesses names by
+     * @param pageable      A pageable to perform pagination and sorting on the results
+     * @return              The count of businesses that match the search query on the name field, paginated and sorted
+     */
     public List<Business> searchBusinesses(String searchQuery, Pageable pageable) {
         return businessRepository.findAllByNameContainsAllIgnoreCase(searchQuery, pageable);
     }
 
+    /**
+     * Count the number of businesses that match the search query
+     *
+     * @param searchQuery   The search query to search businesses names by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    public Integer getTotalBusinessesCount(String searchQuery) {
+        return businessRepository.countBusinessByNameContainsAllIgnoreCase(searchQuery);
+
+    }
 }
