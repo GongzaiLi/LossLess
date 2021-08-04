@@ -25,7 +25,7 @@ Date: sprint_1
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
-        <b-nav-item to="/users/search">User Search</b-nav-item>
+        <b-nav-item to="/search">Search</b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
 
