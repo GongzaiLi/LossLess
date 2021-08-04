@@ -6,6 +6,7 @@ import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Inventory;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
@@ -15,6 +16,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -133,6 +135,19 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
     }
 
+
+
+    @GetMapping("/businesses/search")
+    public ResponseEntity<Object> searchBusinesses(Pageable pageable, String searchQuery) {
+        if (searchQuery == null) searchQuery = "";
+        logger.debug("Request to search businesses with query: {}", searchQuery);
+
+        logger.debug("Retrieving businesses");
+        List<Business> businessList = businessService.searchBusinesses(searchQuery, pageable);
+
+
+
+    }
 
 
 

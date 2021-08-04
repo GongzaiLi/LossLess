@@ -6,6 +6,7 @@ import com.seng302.wasteless.repository.BusinessRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -104,4 +105,11 @@ public class BusinessService {
         logger.info("User: {} validated as global admin or admin of business: {}.", user, business);
 
     }
+
+
+
+    public List<Business> searchBusinesses(String searchQuery, Pageable pageable) {
+        return businessRepository.findAllByNameContainsAllIgnoreCase(searchQuery, pageable);
+    }
+
 }

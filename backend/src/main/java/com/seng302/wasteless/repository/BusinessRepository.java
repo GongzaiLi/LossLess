@@ -1,6 +1,7 @@
 package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.Business;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,5 +33,9 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
      */
     @Query(value = "Select * from Business where id in (SELECT distinct business_id FROM Business B inner join Business_administrators A where administrators_id = :user_id)", nativeQuery = true)
     List<Business> findBySpecificAdminId(@Param("user_id") Integer userId);
+
+
+    List<Business> findAllByNameContainsAllIgnoreCase(String businessName, Pageable pageable);
+
 }
 
