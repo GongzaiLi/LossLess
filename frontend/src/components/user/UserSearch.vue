@@ -5,7 +5,6 @@ Date: 7/3/2021
 -->
 <template>
   <b-card style="max-width: 1200px">
-    <h2 v-bind:hidden=isMakeAdmin>Search For a User</h2>
     <b-row style="height: 50px">
       <b-col cols="7">
         <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search"
