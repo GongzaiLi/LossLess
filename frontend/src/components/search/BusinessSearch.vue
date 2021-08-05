@@ -1,7 +1,5 @@
 <!--
-Page that stores table and search bar to search for other users
-Author: Caleb Sim, Gongzai Li
-Date: 7/3/2021
+Page that stores table and search bar to search for businesses
 -->
 <template>
   <b-card style="max-width: 1200px">
