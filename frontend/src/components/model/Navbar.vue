@@ -50,9 +50,9 @@ Date: sprint_1
       </b-navbar-nav>
 
 
-      <b-nav-form style="align-content: center">
+      <b-nav-form  style="position: fixed; left: 50%; margin-left: -8.5rem;">
         <b-input-group >
-          <b-form-input placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
+          <b-form-input   placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
           <b-input-group-append>
             <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
           </b-input-group-append>
