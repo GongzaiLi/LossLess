@@ -50,11 +50,11 @@ Date: sprint_1
       </b-navbar-nav>
 
 
-      <b-nav-form class="justify-content-center ml-auto mr-auto">
+      <b-nav-form style="align-content: center">
         <b-input-group >
           <b-form-input placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
           <b-input-group-append>
-            <b-button v-on:click="search(searchQuery)" type="submit" ><b-icon-search/></b-button>
+            <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
           </b-input-group-append>
         </b-input-group>
       </b-nav-form>
@@ -342,8 +342,9 @@ export default {
   methods: {
 
     /**
+     * Routes to Listing search page with search string
      * Called when user clicks search or presses enter
-     * @param searchQuery the string used to search for listings
+     * @param searchQuery the string used to search for listings passed as a query parameter
      **/
     search(searchQuery) {
       this.$router.push(`/listingSearch?searchQuery=${searchQuery}`);
