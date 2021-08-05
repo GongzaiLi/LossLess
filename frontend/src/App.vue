@@ -13,7 +13,6 @@ import Register from "./components/user/Register";
 import Navbar from "./components/model/Navbar";
 import UserProfile from "./components/user/UserProfile";
 import SearchPage from "./components/search/SearchPage";
-import UserSearch from "./components/search/UserSearch";
 import HomePage from "@/components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
@@ -35,7 +34,6 @@ const app = {
     HomePage,
     CreateBusiness,
     SearchPage,
-    UserSearch,
     BusinessProfile,
     InventoryPage
   },
