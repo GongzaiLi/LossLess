@@ -104,8 +104,8 @@ export default {
       if (description === "" || description.length <= 20) {
         return description.trim();
       }
-      const showTenWordDescription = description.slice(0, 20).trim();
-      return `${showTenWordDescription}${showTenWordDescription.endsWith('.') ? '..' : '...'}`;
+      const shortenedDescription = description.slice(0, 20).trim();
+      return `${shortenedDescription}${shortenedDescription.endsWith('.') ? '..' : '...'}`;
     },
 
     /**
