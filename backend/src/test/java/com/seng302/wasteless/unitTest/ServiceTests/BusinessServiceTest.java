@@ -15,6 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.seng302.wasteless.model.*;
 
+import java.util.Collections;
+
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusinessService.class)
@@ -59,6 +61,7 @@ class BusinessServiceTest {
             User admin = new User();
             admin.setId(2);
             business.setPrimaryAdministrator(admin);
+            business.setAdministrators(Collections.singletonList(admin));
             businessService.checkUserAdminOfBusinessOrGAA(business, user);
         } catch (ResponseStatusException e) {
             success = false;
