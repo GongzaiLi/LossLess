@@ -8,7 +8,7 @@ Date: 7/3/2021
     <b-row style="height: 50px">
       <b-col cols="7">
         <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search"
-                      placeholder="Search"></b-form-input>
+                      placeholder="Search users"></b-form-input>
       </b-col>
       <b-col cols="0">
         <b-button @click="displayResults(searchQuery)"> Search</b-button>
@@ -59,7 +59,6 @@ export default {
     pagination,
   },
   props: {isMakeAdmin: {default: false, type: Boolean}},
-  name: 'UserSearch', // DO NOT DELETE!!! The <keep-alive include="UserSearch"> in App.vue only matches component names so we register a name here.
   data: function () {
     return {
       searchQuery: "",

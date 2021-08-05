@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import userSearch from '../user/UserSearch';
+import UserSearch from '../search/UserSearch';
 
 export default {
   components: {
-    userSearch,
+    UserSearch,
   },
   props: ['makeAdminAction', 'userIdToAdmin'],
   name: "make-admin-modal",
