@@ -1,6 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.BusinessRepository;
 import org.apache.logging.log4j.LogManager;
@@ -30,8 +31,8 @@ public class BusinessService {
     /**
      * Create a new business in Database
      *
-     * @param business      The business object to create
-     * @return              The created business
+     * @param business The business object to create
+     * @return The created business
      */
     public Business createBusiness(Business business) {
         return businessRepository.save(business);
@@ -41,8 +42,8 @@ public class BusinessService {
     /**
      * Find business by id
      *
-     * @param id        The id of the business to find
-     * @return          The found business, if any, or throw ResponseStatusException
+     * @param id The id of the business to find
+     * @return The found business, if any, or throw ResponseStatusException
      */
     public Business findBusinessById(Integer id) {
         Business possibleBusiness = businessRepository.findFirstById(id);
@@ -57,16 +58,17 @@ public class BusinessService {
     /**
      * Find all businesses administered by user id
      *
-     * @param id        The id of the user administrators
-     * @return          All business ids administered by user id
+     * @param id The id of the user administrators
+     * @return All business ids administered by user id
      */
-    public List<Business> findBusinessesByUserId(Integer id) {return businessRepository.findBySpecificAdminId(id); }
+    public List<Business> findBusinessesByUserId(Integer id) {
+        return businessRepository.findBySpecificAdminId(id);
+    }
 
     /**
      * Add administrator to a business
-     *
+     * <p>
      * Calling the method in this way allows for mocking during automated testing
-     *
      */
     public void addAdministratorToBusiness(Business business, User user) {
         business.addAdministrator(user);
@@ -75,7 +77,6 @@ public class BusinessService {
     /**
      * Remove administrator from a business
      * Calling the method in this way allows for mocking during automated testing
-     *
      */
     public void removeAdministratorFromBusiness(Business business, User user) {
         business.removeAdministrator(user);
@@ -94,8 +95,9 @@ public class BusinessService {
     /**
      * Check if given user is admin of given business or if user is global admin
      * if not throw response status exception Forbidden 403
+     *
      * @param business business user may be admin of
-     * @param user user to check admin privileges of
+     * @param user     user to check admin privileges of
      */
     public void checkUserAdminOfBusinessOrGAA(Business business, User user) {
         if (!(user.checkUserGlobalAdmin() || business.checkUserIsPrimaryAdministrator(user) || business.checkUserIsAdministrator(user))) {
@@ -106,6 +108,18 @@ public class BusinessService {
 
     }
 
+
+    /**
+     * Search businesses by search query on the name field and business type. Paginate and sort results using pageable
+     *
+     * @param searchQuery  The search query to search businesses names by
+     * @param businessType The businessType to search by
+     * @param pageable     A pageable to perform pagination and sorting on the results
+     * @return A list of businesses that match the search query on the name field, paginated and sorted
+     */
+    public List<Business> searchBusinessesWithBusinessType(String searchQuery, BusinessTypes businessType, Pageable pageable) {
+        return businessRepository.findAllByNameContainsAndBusinessTypeAllIgnoreCase(searchQuery, businessType, pageable);
+    }
 
     /**
      * Search businesses by search query on the name field. Paginate and sort results using pageable
@@ -128,4 +142,19 @@ public class BusinessService {
         return businessRepository.countBusinessByNameContainsAllIgnoreCase(searchQuery);
 
     }
+
+    /**
+     * Count the number of businesses that match the search query
+     *
+     * @param searchQuery   The search query to search businesses names by
+     * @param businessType The businessType to search by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    public Integer getTotalBusinessesCountWithQueryAndType(String searchQuery, BusinessTypes businessType) {
+        return businessRepository.countBusinessByNameContainsAndBusinessTypeAllIgnoreCase(searchQuery, businessType);
+
+    }
+
+
+
 }
