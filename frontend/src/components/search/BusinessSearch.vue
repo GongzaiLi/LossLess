@@ -5,11 +5,11 @@ Page that stores table and search bar to search for businesses
   <b-card style="max-width: 1200px">
     <b-row style="height: 50px">
       <b-col cols="7">
-        <b-form-input v-model="searchQuery" type="search"
+        <b-form-input v-model="searchQuery" @keyup.enter="searchBusinessApiRequest(searchQuery)" type="search"
                       placeholder="Search businesses"></b-form-input>
       </b-col>
       <b-col cols="0">
-        <b-button> Search </b-button>
+        <b-button  @click="searchBusinessApiRequest(searchQuery)"> Search </b-button>
       </b-col>
     </b-row>
     <b-row>
@@ -21,11 +21,13 @@ Page that stores table and search bar to search for businesses
                  no-border-collapse
                  bordered
                  no-local-sorting
+                 :sort-by.sync="sortBy"
+                 :sort-desc.sync="sortDesc"
                  stacked="sm"
                  show-empty
                  :fields="fields"
                  :per-page="perPage"
-                 :items="items"
+                 :items="myProvider"
                  :current-page="currentPage">
           <template #empty>
             <h3 class="no-results-overlay" >No results to display</h3>
@@ -47,6 +49,7 @@ Page that stores table and search bar to search for businesses
 
 <script>
 import pagination from "../model/Pagination";
+import api from "../../Api";
 
 export default {
   components: {
@@ -61,38 +64,12 @@ export default {
       sortBy: "",
       perPage: 10,
       currentPage: 1,
-      items: [
-        {
-          name: "Willy Wonka Chocolate",
-          description: "We make the best chocolate in the world. Please buy some it is delicious.",
-          businessType: "Charitable organisation",
-          address: {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-          },
-        },
-        {
-          name: "Willy Wonka Candy",
-          description: "We make the best candy in the world. Please buy some it is yummy.",
-          businessType: "Accommodation and Food Services",
-          address: {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-          },
-        },
-      ],
+      items: [],
     }
   },
 
   methods: {
+
     /**
      * format the description so that it fits within the column in the table properly.
      * It keeps the first 20 characters and then adds ...
@@ -117,6 +94,53 @@ export default {
      */
     formatAddress: function (address) {
       return `${address.suburb ? address.suburb + ', ' : ''}${address.city}, ${address.country}`;
+    },
+
+    /**
+     * Uses Api.js to send a get request with the searchParameter.
+     * This is used to make the initial search using the searchQuery from the form-input and is used to
+     * refresh the table.
+     *
+     * @param searchParameter is the inputted search
+     */
+    searchBusinessApiRequest: function (searchParameter) {
+      api
+          .searchBusiness(searchParameter)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.totalResults = response.data.totalItems;
+            this.setQuery=this.searchQuery;
+            this.$refs.searchTable.refresh();
+            this.currentPage=1;
+            this.$refs.tablePag.currentPage=1;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.error = "Failed to load business data";
+          })
+
+    },
+
+    /**
+     * This sends a new api get request when the page is changed either by sorting or changing of pages.
+     * This gets the new table data back with the correct amount of
+     * businesses with the page and size.
+     *
+     * @returns list of Businesses
+     */
+    myProvider: async function () {
+      if(this.totalResults) {
+        try {
+          const response = await api
+              .searchBusiness(this.searchQuery, this.perPage, this.currentPage - 1, this.sortBy, ((this.sortDesc) ? "DESC" : "ASC"))
+          return response.data.businesses
+        } catch (error) {
+          this.$log.debug(error);
+          this.error = "Failed to load business data";
+          return []
+        }
+      }
+      return [];
     },
   },
 
