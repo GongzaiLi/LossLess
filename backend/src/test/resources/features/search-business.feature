@@ -13,7 +13,7 @@ Feature: U23 Search for business
     When The User searches businesses with partial name: "business-" searchQuery with default pagination and sort by "name" sort direction "desc"
     Then The 5 matching businesses are returned in descending name order
 
-  Scenario: AC2: I can enter a empty as a search term.
+  Scenario: AC2: I can enter an empty as a search term.
     When The User searches businesses with an empty: "" searchQuery with default pagination and sorting
     Then The first 20 matching businesses are returned
 

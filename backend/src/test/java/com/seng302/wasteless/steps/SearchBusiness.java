@@ -139,7 +139,8 @@ public class SearchBusiness {
         }
     }
 
-    // AC1 - Upload an image for the product with a wrong type
+    // AC2: I can enter an empty as a search term.
+
     @When("The User searches businesses with an empty: {string} searchQuery with default pagination and sorting")
     public void the_user_searches_businesses_with_an_empty_search_query_with_default_pagination_and_sorting(String query) throws Exception {
         responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/businesses/search?searchQuery=" + query)
