@@ -28,6 +28,7 @@
   {
     "id": 1,
     "name": "Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
@@ -101,6 +102,7 @@
   {
     "id": 1,
     "name": "Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
@@ -173,6 +175,7 @@
   {
     "id": 1,
     "name": "Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
@@ -245,6 +248,7 @@
     {
       "id": 1,
       "name": "Wonka Chocolate",
+      "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
       "description": "We make the best chocolate in the world",
       "address": {
         "streetNumber": "1",
@@ -317,6 +321,7 @@
   {
     "id": 1,
     "name": "Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
@@ -383,12 +388,13 @@
     },
     "quantity": 2,
     "price": 2.25,
-    "moreInfo": "10% discount!",
+    "moreInfo": "10% discounasdsaasdt!",
     "closes": "2021-09-20",
     "business":
   {
     "id": 1,
     "name": "Wonka Chocolate",
+    "currency": { "code": "", "name": "", "symbol": "" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
@@ -461,13 +467,14 @@
   {
     "id": 2,
     "name": "Not Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "United Kingdom",
       "postcode": "9762",
       "suburb": null
     },
@@ -533,13 +540,14 @@
   {
     "id": 2,
     "name": "Not Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "United Kingdom",
       "postcode": "9762",
       "suburb": null
     },
@@ -605,13 +613,14 @@
   {
     "id": 2,
     "name": "Not Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "United Kingdom",
       "postcode": "9762",
       "suburb": null
     },
@@ -675,14 +684,15 @@
   "business":
   {
     "id": 2,
-    "name": "Not Wonka Chocolate",
+    "name": "Muricas Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "America",
       "postcode": "9762",
       "suburb": null
     },
@@ -747,13 +757,14 @@
   {
     "id": 2,
     "name": "Not Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "United Kingdom",
       "postcode": "9762",
       "suburb": null
     },
@@ -818,13 +829,14 @@
   {
     "id": 2,
     "name": "Not Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "United Kingdom",
       "postcode": "9762",
       "suburb": null
     },
@@ -889,13 +901,14 @@
   {
     "id": 2,
     "name": "Not Wonka Chocolate",
+    "currency": { "code": "NZD", "name": "New Zealand dollar", "symbol": "$" },
     "description": "We make the best chocolate in the world",
     "address": {
       "streetNumber": "1",
       "streetName": "Chocolate Drive",
       "city": "Chocolate",
       "region": "Tasty",
-      "country": "New Zealand",
+      "country": "United Kingdom",
       "postcode": "9762",
       "suburb": null
     },
