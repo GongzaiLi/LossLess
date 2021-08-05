@@ -24,7 +24,7 @@ import UserSearch from "./UserSearch";
 import BusinessSearch from "./BusinessSearch";
 export default {
   components: {UserSearch, BusinessSearch},
-  name: "SearchPage", // DO NOT DELETE!!! The <keep-alive include="UserSearch"> in App.vue only matches component names so we register a name here.
+  name: "SearchPage", // DO NOT DELETE!!! The <keep-alive include="SearchPage"> in App.vue only matches component names so we register a name here.
   data: function () {
     return {
       sections: [['UserSearch', 'User Search'], ['BusinessSearch', 'Business Search']],
