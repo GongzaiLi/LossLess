@@ -721,7 +721,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
    @Test
    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
-   void whenGetRequestToBusinessProducts_withOffsetOfZero_andCountOfZero_then400BadRequest() throws Exception {
+   void whenGetRequestToBusinessProducts_withOffsetOfTwo_andCountOfZero_then400BadRequest() throws Exception {
       createOneBusiness("Business", "{\n" +
               "    \"streetNumber\": \"56\",\n" +
               "    \"streetName\": \"Clyde Road\",\n" +
