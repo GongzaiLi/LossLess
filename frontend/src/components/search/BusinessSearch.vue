@@ -133,7 +133,6 @@ export default {
       return [
         {
           key: 'name',
-          //label: 'F name',
           sortable: true
         },
         {
