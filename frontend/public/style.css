@@ -37,6 +37,6 @@ nav {
     background-color: #001142;
 }
 
-.card {
-    background-color: #f9f9ff;
+.card-header {
+    background-color: rgba(0, 0, 255,0.04);
 }
