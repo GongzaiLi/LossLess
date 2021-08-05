@@ -5,6 +5,9 @@ Date: 29/03/2021
 -->
 <template>
   <div v-show="!loading">
+    <b-link v-if="$route.query.fromSearch" variant="info" class="back-to-search-link" to="/search">
+      <strong><h4><b-icon-arrow-left/> Back to results</h4></strong>
+    </b-link>
     <b-card class="profile-card shadow" no-body
             v-if="businessFound"
     >
@@ -175,14 +178,18 @@ Date: 29/03/2021
 h6 {
   line-height: 1.4;
 }
+
+@media only screen and (min-width: 1250px) {
+  .back-to-search-link {
+    position: absolute;
+  }
+}
 </style>
 
 <script>
 import memberSince from "../model/MemberSince";
 import api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
-
-
 
 export default {
   components: {
