@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Navbar v-if="!['login', 'register'].includes($route.name)"/>
-    <keep-alive include="SearchPage"> <!-- The keep-alive prevents the UserSearch component from being re-rendered each time, so you can got back to your search results -->
+    <keep-alive include="SearchPage"> <!-- The keep-alive prevents the SearchPage component from being re-rendered each time, so you can got back to your search results -->
       <router-view/>
     </keep-alive>
   </div>
