@@ -40,7 +40,7 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
      *
      * @param businessName  The search query to search businesses names by
      * @param pageable      A pageable to perform pagination and sorting on the results
-     * @return              The count of businesses that match the search query on the name field, paginated and sorted
+     * @return              A list of businesses that match the search query on the name field, paginated and sorted
      */
     List<Business> findAllByNameContainsAllIgnoreCase(String businessName, Pageable pageable);
 
