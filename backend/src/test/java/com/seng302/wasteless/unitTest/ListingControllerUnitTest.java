@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,9 +27,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -217,6 +221,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(listing.setId(1));
 
         Mockito
+                .when(listingsService.searchListings(eq(""), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(listingList));
+
+        Mockito
+                .when(listingsService.searchListings(eq("blah"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Collections.singletonList(listing)));
+
+        Mockito
                 .when(productService.findProductById(anyString()))
                 .thenReturn(productForInventory);
 
@@ -380,7 +392,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-     void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
+    void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -389,5 +401,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andEmptyString_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("listings", hasSize(3)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andQueryString_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("searchQuery", "blah")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("listings", hasSize(1)));
+    }
 }
 
