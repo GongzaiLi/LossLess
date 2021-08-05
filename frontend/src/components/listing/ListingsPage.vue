@@ -2,7 +2,7 @@
 Listings Page
 -->
 <template>
-  <b-card style="max-width: 80em;">
+  <b-card style="max-width: 80em;" class="shadow">
     <b-container>
     <h1>{{ business.name }} Listings</h1>
     <b-row align-h="start">

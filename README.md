@@ -51,6 +51,18 @@ the following gitlab CI variables are used instead:
 
 If you do not have these environment variables defined then the application will not start.
 
+## Data Generation script
+Run the following commands:
+
+    cd data-generation
+    npm install
+    npm run start
+
+Ensure that the database is empty, otherwise email collisions may occur with existing users.
+
+## User Guide
+The user guide is in this repo's wiki, under the 'User Guide' page.
+
 ## Third Party Dependencies
 ### Frontend:
  - Vue-Router (3.5 or greater)

@@ -8,11 +8,9 @@ Date: 5/3/2021
 
   <div>
     <div v-show="!loading">
-      <b-card border-variant="secondary" header-border-variant="secondary"
-              class="profile-card shadow" no-body
+      <b-card class="profile-card shadow" no-body
               v-if="userFound"
       >
-
         <template #header>
 
           <b-row>
@@ -41,8 +39,8 @@ Date: 5/3/2021
           </b-row>
         </template>
 
-        <b-list-group border-variant="secondary">
-          <b-list-group-item>
+        <b-list-group>
+          <b-list-group-item style="border-radius: 0">
             <b-card-text style="text-align: justify">
               {{ userData.bio }}
             </b-card-text>
@@ -222,7 +220,6 @@ export default {
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
           this.userData = response.data;
-          // console.log(response.data);
           this.userFound = true;
           this.loading = false;
         })

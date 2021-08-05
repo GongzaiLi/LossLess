@@ -3,8 +3,8 @@ Page that stores table to show the business inventory
 Date: 11/5/2021
 -->
 <template>
-  <div class="overflow-auto">
-    <b-card v-if="canEditInventory" style="max-width: 1260px;">
+  <div>
+    <b-card v-if="canEditInventory" style="max-width: initial;" class="shadow">
       <b-card-title>Inventory: {{ business.name }}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center">
