@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.model.Listing;
 import com.seng302.wasteless.view.ListingViews;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
@@ -16,7 +15,6 @@ import java.util.List;
  */
 @Accessors(chain = true) //Allows chaining of getters and setters
 @Data // generate setters and getters for all fields (lombok pre-processor)
-@NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
 public class GetListingDto {
 
@@ -24,5 +22,5 @@ public class GetListingDto {
     private List<Listing> listings;
 
     @JsonView(ListingViews.GetListingView.class)
-    private Integer totalItems;
+    private Long totalItems;
 }
