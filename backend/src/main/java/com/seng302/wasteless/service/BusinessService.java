@@ -112,7 +112,7 @@ public class BusinessService {
      *
      * @param searchQuery   The search query to search businesses names by
      * @param pageable      A pageable to perform pagination and sorting on the results
-     * @return              The count of businesses that match the search query on the name field, paginated and sorted
+     * @return              A list of businesses that match the search query on the name field, paginated and sorted
      */
     public List<Business> searchBusinesses(String searchQuery, Pageable pageable) {
         return businessRepository.findAllByNameContainsAllIgnoreCase(searchQuery, pageable);
