@@ -2,6 +2,7 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.GetSearchBusinessDto;
 import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.Address;
@@ -15,6 +16,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -133,6 +134,34 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
     }
 
+
+    /**
+     * Handle request to /businesses/search for searching by name for all businesses. Takes a pageable to
+     * perform pagination and sorting.
+     *
+     * @param pageable The pageable that consists of page index, size (number of pages) and sort order.
+     * @param searchQuery The search query to search the businesses by name
+     * @return Http Status 200 and list of businesses and a total items value if valid, 401 is unauthorised
+     */
+    @JsonView({BusinessViews.SearchBusinessesView.class})
+    @GetMapping("/businesses/search")
+    public ResponseEntity<Object> searchBusinesses(Pageable pageable, String searchQuery) {
+        if (searchQuery == null) searchQuery = "";
+        logger.debug("Request to search businesses with query: {}", searchQuery);
+
+        logger.debug("Retrieving businesses");
+        List<Business> businessList = businessService.searchBusinesses(searchQuery, pageable);
+
+        Integer totalItems = businessService.getTotalBusinessesCount(searchQuery);
+
+        GetSearchBusinessDto getSearchBusinessDto = new GetSearchBusinessDto()
+                .setBusinesses(businessList)
+                .setTotalItems(totalItems);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getSearchBusinessDto);
+
+
+    }
 
 
 

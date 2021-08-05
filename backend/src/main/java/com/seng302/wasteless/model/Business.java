@@ -25,6 +25,7 @@ public class Business {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @JsonView({BusinessViews.SearchBusinessesView.class})
     private Integer id;
 
     @JoinColumn(name = "primary_administrator")
@@ -35,24 +36,24 @@ public class Business {
     @ManyToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
     private List<User> administrators;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @NotBlank(message = "name is mandatory")
     @Column(name = "name")
     @Size(min = 0, max = 50)
     private String name;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @Column(name = "description")
     @Size(min = 0, max = 250)
     private String description;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @NotNull
     @OneToOne
     @JoinColumn(name = "address") // map camelcase name (java) to snake case (SQL)
     private Address address;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @NotNull(message = "businessType is mandatory")
     @Column(name = "business_type")
     private BusinessTypes businessType;

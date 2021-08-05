@@ -6,6 +6,7 @@ import com.seng302.wasteless.repository.BusinessRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -102,6 +103,29 @@ public class BusinessService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request");
         }
         logger.info("User: {} validated as global admin or admin of business: {}.", user, business);
+
+    }
+
+
+    /**
+     * Search businesses by search query on the name field. Paginate and sort results using pageable
+     *
+     * @param searchQuery   The search query to search businesses names by
+     * @param pageable      A pageable to perform pagination and sorting on the results
+     * @return              A list of businesses that match the search query on the name field, paginated and sorted
+     */
+    public List<Business> searchBusinesses(String searchQuery, Pageable pageable) {
+        return businessRepository.findAllByNameContainsAllIgnoreCase(searchQuery, pageable);
+    }
+
+    /**
+     * Count the number of businesses that match the search query
+     *
+     * @param searchQuery   The search query to search businesses names by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    public Integer getTotalBusinessesCount(String searchQuery) {
+        return businessRepository.countBusinessByNameContainsAllIgnoreCase(searchQuery);
 
     }
 }
