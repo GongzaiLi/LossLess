@@ -1,6 +1,6 @@
 import {mount, createLocalVue} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import UserSearch from '../../components/user/UserSearch';
+import UserSearch from '../../components/search/UserSearch';
 import Api from "../../Api";
 
 let wrapper;

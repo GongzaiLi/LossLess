@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Login from '../components/user/Login.vue'
 import Register from '../components/user/Register.vue'
 import UserProfile from '../components/user/UserProfile'
-import SearchPage from "../components/user/SearchPage";
+import SearchPage from "../components/search/SearchPage";
 import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
