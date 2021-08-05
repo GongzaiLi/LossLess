@@ -21,6 +21,7 @@ Date: sprint_1
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
+
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
@@ -47,6 +48,17 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+
+
+      <b-nav-form class="justify-content-center ml-auto mr-auto">
+        <b-input-group >
+          <b-form-input placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
+          <b-input-group-append>
+            <b-button v-on:click="search(searchQuery)" type="submit" ><b-icon-search/></b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-nav-form>
+
 
       <b-navbar-nav class="ml-auto">
 
@@ -237,6 +249,7 @@ export default {
       notifications: [],
       numExpiredCards:0,
       timer: null,
+      searchQuery: '',
     }
   },
   computed: {
@@ -327,6 +340,15 @@ export default {
     }
   },
   methods: {
+
+    /**
+     * Called when user clicks search or presses enter
+     * @param searchQuery the string used to search for listings
+     **/
+    search(searchQuery) {
+      this.$router.push(`/listingSearch?searchQuery=${searchQuery}`);
+    },
+
     /**
      * Gets all the expiring cards from for the current user.
      */

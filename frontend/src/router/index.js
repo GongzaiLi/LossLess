@@ -11,6 +11,7 @@ import ListingsPage from "../components/listing/ListingsPage";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
+import ListingSearchPage from "../components/listing/ListingSearchPage";
 
 
 import {getCurrentUser} from '@/auth';
@@ -35,6 +36,7 @@ const router = new Router({
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
+        { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage}
     ]
 });
 
