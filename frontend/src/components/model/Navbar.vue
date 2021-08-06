@@ -9,6 +9,17 @@ Date: sprint_1
   >
     <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
 
+    <b-navbar-brand>
+    <b-nav-form>
+      <b-input-group >
+        <b-form-input   placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
+        <b-input-group-append>
+          <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
+        </b-input-group-append>
+      </b-input-group>
+    </b-nav-form>
+    </b-navbar-brand>
+
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
         Need Help?
@@ -50,14 +61,7 @@ Date: sprint_1
       </b-navbar-nav>
 
 
-      <b-nav-form  style="position: fixed; left: 50%; margin-left: -8.5rem;">
-        <b-input-group >
-          <b-form-input   placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
-          <b-input-group-append>
-            <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
-          </b-input-group-append>
-        </b-input-group>
-      </b-nav-form>
+
 
 
       <b-navbar-nav class="ml-auto">
