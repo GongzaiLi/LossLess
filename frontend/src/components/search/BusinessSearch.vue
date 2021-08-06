@@ -17,7 +17,7 @@ Page that stores table and search bar to search for businesses
         <b-table striped hover
                  ref="searchTable"
                  table-class="text-nowrap"
-                 responsive="md"
+                 responsive
                  no-border-collapse
                  bordered
                  no-local-sorting
@@ -194,6 +194,7 @@ export default {
           sortable: true,
         },{
           key: 'address',
+          label: 'Location',
           sortable: false,
           formatter: "formatAddress"
         }]
