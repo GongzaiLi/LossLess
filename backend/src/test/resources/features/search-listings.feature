@@ -19,13 +19,13 @@ Feature: U29 - Browse/Search Sale listings
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, part of a product name.
     When I search for listings by product name "water"
-    Then The results contain the following products:
+    Then The results contain exclusively the following products:
       | Black Water No Sugar |
       | Back Water           |
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, all of a product name.
     When I search for listings by product name "Back Water"
-    Then The results contain the following products:
+    Then The results contain exclusively the following products:
       | Back Water |
 
   Scenario: AC6 - No results shown when no product names match.

@@ -150,6 +150,15 @@ public class SearchListingsFeature {
     @Then("The results contain the following products:")
     public void theResultsContainTheFollowingProducts(List<String> listings) throws Exception {
         responseResult.andExpect(
+                jsonPath("$..inventoryItem.product.name",
+                        hasItems(listings.toArray())   // We have to let the compiler know this is an array so it works with varargs. See https://stackoverflow.com/questions/1092981/why-doesnt-this-code-attempting-to-use-hamcrests-hasitems-compile
+                )
+        );
+    }
+
+    @Then("The results contain exclusively the following products:")
+    public void theResultsContainExclusivelyTheFollowingProducts(List<String> listings) throws Exception {
+        responseResult.andExpect(
                 jsonPath("$..inventoryItem.product.name",   // Gets list of product names
                         containsInAnyOrder(listings.stream().map(Matchers::equalTo).collect(Collectors.toList()))   // Convert list of strings (listings) into list of matchers that match the strings
                 )
