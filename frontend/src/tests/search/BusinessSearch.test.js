@@ -1,6 +1,7 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import MarketplaceSection from '../../components/search/BusinessSearch';
+import BusinessSearch from '../../components/search/BusinessSearch';
+import Api from "../../Api";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
@@ -25,15 +26,42 @@ const $currentUser = {
 };
 
 
+const response = {
+    data: {
+        businesses: [
+            {
+                id: 1,
+                name: "B",
+                businessType: "A",
+                description: "a",
+                address: {
+                    streetNumber: "3/24",
+                    streetName: "Ilam Road",
+                    suburb: "Upper Riccarton",
+                    city: "Christchurch",
+                    region: "Canterbury",
+                    country: "New Zealand",
+                    postcode: "90210"
+                },
+            }
+        ],
+        totalItems: 1
+    }
+    };
+
 jest.mock('../../Api');
 
 beforeEach(() => {
+    Api.searchBusiness.mockResolvedValue({data: {
+            results: [{id: 1}],
+            totalItems: 1
+        }})
 
     const localVue = createLocalVue()
     localVue.use(BootstrapVue);
     localVue.use(BootstrapVueIcons);
 
-    wrapper = shallowMount(MarketplaceSection, {
+    wrapper = shallowMount(BusinessSearch, {
         localVue,
         mocks: {$route, $log, $currentUser},
         methods: {},
@@ -43,6 +71,27 @@ beforeEach(() => {
 
 afterEach(() => {
     wrapper.destroy();
+});
+
+describe('check-api-request-searchBusiness', () => {
+    test('is-getting-called-twice-when-the-get-items-for-table-is-called',  async() => {
+        Api.searchBusiness.mockResolvedValue(response);
+
+        await wrapper.vm.searchBusinessApiRequest("B");
+        await wrapper.vm.getItemsForTable();
+        await wrapper.vm.$nextTick();
+
+        expect(Api.searchBusiness).toHaveBeenCalledTimes(2);
+    })
+
+    test('check-api-request-get-searchBusiness-sets-wrapper-totalResults-to-the-totalItems-received', async () => {
+
+        Api.searchBusiness.mockResolvedValue(response);
+        await wrapper.vm.searchBusinessApiRequest("B");
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.totalResults).toBe(response.data.totalItems);
+    })
 });
 
 describe ("format-address", () => {
@@ -90,5 +139,17 @@ describe('check-formatDescription-function', () => {
     test('description-with-one-space', () => {
         const description = " ";
         expect(wrapper.vm.formatDescription(description)).toEqual('');
+    });
+});
+
+describe('check-formatName-function', () => {
+    test('description-less-then-25-characters', () => {
+        const name = "Chocolate Place";
+        expect(wrapper.vm.formatName(name)).toEqual('Chocolate Place');
+    });
+
+    test('description-more-than-25-characters', () => {
+        const name = "We make the best chocolate in the world. Please buy some it is delicious. This is a long name";
+        expect(wrapper.vm.formatName(name)).toEqual('We make the best chocolat...');
     });
 });
