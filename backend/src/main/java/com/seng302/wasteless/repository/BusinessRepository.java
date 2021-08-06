@@ -1,6 +1,7 @@
 package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.BusinessTypes;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,6 +37,16 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
 
 
     /**
+     * Search businesses by search query on the name field and by a business type. Paginate and sort results using pageable
+     *
+     * @param businessName  The search query to search businesses names by
+     * @param businessType  The businessType to search by
+     * @param pageable      A pageable to perform pagination and sorting on the results
+     * @return              A list of businesses that match the search query on the name field, paginated and sorted
+     */
+    List<Business> findAllByNameContainsAndBusinessTypeAllIgnoreCase(String businessName, BusinessTypes businessType, Pageable pageable);
+
+    /**
      * Search businesses by search query on the name field. Paginate and sort results using pageable
      *
      * @param businessName  The search query to search businesses names by
@@ -51,6 +62,15 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
      * @return              The count of businesses that match the search query on the name field
      */
     Integer countBusinessByNameContainsAllIgnoreCase(String businessName);
+
+    /**
+     * Count the number of businesses that match the search queries
+     *
+     * @param businessName   The search query to search businesses names by
+     * @param businessType  The businessType to search by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    Integer countBusinessByNameContainsAndBusinessTypeAllIgnoreCase(String businessName, BusinessTypes businessType);
 
 }
 

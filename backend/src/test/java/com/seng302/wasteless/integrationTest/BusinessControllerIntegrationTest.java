@@ -802,6 +802,227 @@ class BusinessControllerIntegrationTest {
                 .andExpect(jsonPath("businesses", hasSize(3)));
     }
 
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    void whenGetRequestToSearchBusiness_withEmptyType_thenCorrectlyResults() throws Exception {
+        createOneBusiness("A-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("B-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Retail Trade", "I am a business");
+        createOneBusiness("C-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Charitable organisation", "I am a business");
+        createOneBusiness("D-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/search?type=")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("businesses[0].name", is("A-Business")))
+                .andExpect(jsonPath("businesses[1].name", is("B-Business")))
+                .andExpect(jsonPath("businesses[2].name", is("C-Business")))
+                .andExpect(jsonPath("businesses[3].name", is("D-Business")))
+                .andExpect(jsonPath("businesses", hasSize(4)));
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    void whenGetRequestToSearchBusiness_withTypeIsAccommodationAndFoodServices_thenCorrectlyResults() throws Exception {
+        createOneBusiness("A-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("B-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Retail Trade", "I am a business");
+        createOneBusiness("C-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Charitable organisation", "I am a business");
+        createOneBusiness("D-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/search?type=ACCOMMODATION_AND_FOOD_SERVICES")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("businesses[0].name", is("A-Business")))
+                .andExpect(jsonPath("businesses[0].businessType", is("Accommodation and Food Services")))
+                .andExpect(jsonPath("businesses", hasSize(1)));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    void whenGetRequestToSearchBusiness_withTypeIsInvalid_thenCorrectlyResults() throws Exception {
+        createOneBusiness("A-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("B-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Retail Trade", "I am a business");
+        createOneBusiness("C-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Charitable organisation", "I am a business");
+        createOneBusiness("D-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/search?type=À")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    void whenGetRequestToSearchBusiness_withTypeIsAccommodationAndFoodServices_andSearchQueryBusiness_thenCorrectlyResults() throws Exception {
+        createOneBusiness("A-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("B-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Retail Trade", "I am a business");
+        createOneBusiness("C-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Charitable organisation", "I am a business");
+        createOneBusiness("D-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/search?type=ACCOMMODATION_AND_FOOD_SERVICES&searchQuery=Business")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("businesses[0].name", is("A-Business")))
+                .andExpect(jsonPath("businesses[0].businessType", is("Accommodation and Food Services")))
+                .andExpect(jsonPath("businesses", hasSize(1)));
+    }
+
+    @Test
+    @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
+    void whenGetRequestToSearchBusiness_withTypeIsEmpty_andSearchQueryBusiness_thenCorrectlyResults() throws Exception {
+        createOneBusiness("A-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Accommodation and Food Services", "I am a business");
+        createOneBusiness("B-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Retail Trade", "I am a business");
+        createOneBusiness("C-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Charitable organisation", "I am a business");
+        createOneBusiness("D-Business", "{\n" +
+                "    \"streetNumber\": \"56\",\n" +
+                "    \"streetName\": \"Clyde Road\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"8041\"\n" +
+                "  }", "Non-profit organisation", "I am a business");
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/search?searchQuery=Business&type=")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .contentTypeCompatibleWith(APPLICATION_JSON))
+                .andExpect(jsonPath("businesses[0].name", is("A-Business")))
+                .andExpect(jsonPath("businesses[1].name", is("B-Business")))
+                .andExpect(jsonPath("businesses[2].name", is("C-Business")))
+                .andExpect(jsonPath("businesses[3].name", is("D-Business")))
+                .andExpect(jsonPath("businesses", hasSize(4)));
+    }
+
 
     private void createOneBusiness(String name, String address, String businessType, String description) {
         String business = String.format("{\"name\": \"%s\", \"address\" : %s, \"businessType\": \"%s\", \"description\": \"%s\"}", name, address, businessType, description);
