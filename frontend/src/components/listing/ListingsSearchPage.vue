@@ -2,22 +2,20 @@
 
   <b-card style="max-width: 80em;">
     <b-container>
-      <h1>Search for Listings</h1>
+      <h1>Search Listings</h1>
       <hr>
       <div>
 
-        <b-row >
-          <b-col cols="5">
-            <div class="input-group mb-2 mr-sm-2">
-              <div class="input-group-prepend">
-                <div class="input-group-text">Search:</div>
-              </div>
+
+        <b-row align-h="around">
+          <b-col cols="12" md="5">
+            <b-input-group prepend="Search:">
               <b-input placeholder="Product Name" v-model="search.productName"></b-input>
-            </div>
+            </b-input-group>
           </b-col>
 
 
-          <b-col cols="4">
+          <b-col cols="12" md="4">
             <div class="input-group mb-2 mr-sm-2">
               <div class="input-group-prepend">
                 <div class="input-group-text">Sort:</div>
@@ -40,10 +38,10 @@
 
           </b-col>
 
-          <b-col class="search_button" cols="">
+          <b-col class="search_button" cols="3" md="1">
             <b-button @click="doSearch">Search</b-button>
           </b-col>
-          <b-col class="search_button" cols="1">
+          <b-col class="search_button" cols="3" md="1" >
             <b-button v-b-toggle.collapse-1 variant="primary">Filter</b-button>
           </b-col>
 
@@ -51,11 +49,10 @@
         <hr>
         <b-collapse id="collapse-1" class="mt-2">
         <b-row>
-
-          <b-col>
+          <b-col cols="12" md="4">
             <b-input placeholder="Business Name" v-model="search.businessName"></b-input>
           </b-col>
-          <b-col>
+          <b-col cols="12" md="4">
             <b-select  v-model="search.businessType" >
               <option :value="null"> Business Type</option>
               <option> Accommodation and Food Services</option>
@@ -64,27 +61,42 @@
               <option> Non-profit organisation</option>
             </b-select>
           </b-col>
-          <b-col>
+          <b-col cols="12" md="4">
             <b-input placeholder="Business Location" v-model="search.businessLocation"></b-input>
           </b-col>
 
         </b-row>
           <br>
         <b-row align-h="between">
-          <b-col cols="7">
-              <b-input-group prepend="Listing Close:">
+          <b-col cols="12" md="7">
+            <div class="input-group mb-2 mr-sm-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Listing Closes:</div>
+              </div>
+              <div>
                 <b-input type="date" v-model="search.closesStartDate"></b-input>
-                <label style="margin-left: 1rem;margin-right: 1rem;"> to </label>
+              </div>
+               <label style="margin-left: 1rem;margin-right: 1rem; margin-top: 10px"> to </label>
+              <div>
                 <b-input type="date" v-model="search.closesEndDate"> </b-input>
-              </b-input-group>
-
+              </div>
+              </div>
           </b-col>
-          <b-col cols="4" >
-            <b-input-group prepend="Price:" >
-              <b-input type="number" placeholder="Min:" v-model="search.priceMin"></b-input>
-              <label style="margin-left: 1rem;margin-right: 1rem"> to </label>
-              <b-input type="number" placeholder="Max"  v-model="search.priceMax"></b-input>
-            </b-input-group>
+          <b-col cols="12" md="4" >
+
+            <div class="input-group mb-2 mr-sm-2">
+              <div class="input-group-prepend">
+                <div class="input-group-text">Price:</div>
+              </div>
+              <div>
+                <b-input type="number" placeholder="Min:" v-model="search.priceMin" style="max-width: 6rem"></b-input>
+              </div>
+              <label style="margin-left: 1rem;margin-right: 1rem; margin-top: 10px"> to </label>
+              <div>
+                <b-input type="number" placeholder="Max"  v-model="search.priceMax" style="max-width: 7rem"></b-input>
+              </div>
+            </div>
+
           </b-col>
         </b-row>
           <hr>
