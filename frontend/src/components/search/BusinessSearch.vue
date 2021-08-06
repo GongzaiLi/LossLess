@@ -4,11 +4,14 @@ Page that stores table and search bar to search for businesses
 <template>
   <b-card style="max-width: 1200px">
     <b-row style="height: 50px">
-      <b-col cols="7">
+      <b-col cols="6">
         <b-form-input v-model="searchQuery" type="search"
                       placeholder="Search businesses"></b-form-input>
       </b-col>
-      <b-col cols="0">
+      <b-col md="4">
+        <b-form-select v-model="businessType" :options="businessTypeOptions" id="marketplaceSortBySelect"></b-form-select>
+      </b-col>
+      <b-col cols="1">
         <b-button> Search </b-button>
       </b-col>
     </b-row>
@@ -54,6 +57,13 @@ export default {
   },
   data: function () {
     return {
+      businessTypeOptions: [
+        { value: 'ACCOMMODATION_AND_FOOD_SERVICES', text: 'Accommodation and Food Services' },
+        { value: 'RETAIL_TRADE', text: 'Retail Trade' },
+        { value: 'CHARITABLE_ORGANISATION', text: 'Charitable organisation'},
+        { value: 'NON_PROFIT_ORGANISATION', text: 'Non-profit organisation'},
+      ],
+      businessType: "",
       searchQuery: "",
       setQuery:"",
       totalResults: 0,
