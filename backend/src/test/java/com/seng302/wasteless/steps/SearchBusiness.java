@@ -55,6 +55,8 @@ public class SearchBusiness {
     @Autowired
     private AddressService addressService;
 
+    private List<String> businessTypes;
+
 
 
     /**
@@ -108,9 +110,10 @@ public class SearchBusiness {
     }
 
 
-    @And("There are {int} businesses in the database with names business {int} through business {int}")
-    public void there_are_businesses_in_the_database_with_names_business_through_business(Integer totalBusinesses, Integer startId, Integer endId) {
-
+    @And("There are {int} businesses in the database with names business {int} through business {int} with types:")
+    public void there_are_businesses_in_the_database_with_names_business_through_business_with_types(Integer totalBusinesses, Integer startId, Integer endId, List<String> types) {
+        businessTypes = types;
+        int typeIndex = 0;
         while (startId <= endId) {
             createOneBusiness(String.format("business-%s", startId++), "{\n" +
                     "    \"streetNumber\": \"56\",\n" +
@@ -118,7 +121,9 @@ public class SearchBusiness {
                     "    \"city\": \"Christchurch\",\n" +
                     "    \"country\": \"New Zealand\",\n" +
                     "    \"postcode\": \"8041\"\n" +
-                    "  }", "Non-profit organisation", "I am a business");
+                    "  }", types.get(typeIndex++), "I am a business");
+            typeIndex = typeIndex == types.size() ? 0 : typeIndex;
+
         }
     }
 
@@ -246,5 +251,38 @@ public class SearchBusiness {
         }
     }
 
+    // AC4: I can enter a partial name as a search term and business type Accommodation and Food Services
+
+    @When("The User searches businesses with partial name: {string} searchQuery with business type {string}")
+    public void the_user_searches_businesses_with_partial_name_search_query_with_business_type(String query, String type) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/businesses/search?searchQuery=%s&type=%s", query, type))
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .with(user(currentUserDetails)));
+    }
+
+    @Then("The businesses with business type: {string} are returned")
+    public void the_businesses_with_business_type_are_returned(String type) throws Exception {
+        responseResult.andExpect(status().isOk());
+        List<Object> businesses = JsonPath.read(responseResult.andReturn().getResponse().getContentAsString(), "$.businesses");
+        Assertions.assertTrue(businesses.stream().allMatch(business -> JsonPath.read(business, "$.businessType").toString().equals(type)));
+    }
+
+    // AC4: I can enter a partial name as a search term and business type is empty
+
+    @Then("All matching businesses are returned")
+    public void all_matching_businesses_are_returned() throws Exception {
+        responseResult.andExpect(status().isOk());
+        List<Object> businesses = JsonPath.read(responseResult.andReturn().getResponse().getContentAsString(), "$.businesses");
+        Assertions.assertTrue(businesses.stream().allMatch(business -> businessTypes.contains(JsonPath.read(business, "$.businessType").toString())));
+    }
+
+    // AC4: I can enter a partial name as a search term and business type is invalid
+
+    @Then("The user will get a bad request error and a message {string}")
+    public void the_user_will_get_a_bad_request_error_and_a_message(String message) throws Exception {
+        responseResult.andExpect(status().isBadRequest());
+        Assertions.assertEquals(message, responseResult.andReturn().getResponse().getContentAsString());
+    }
 
 }
