@@ -10,6 +10,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.hamcrest.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
@@ -21,10 +22,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -58,6 +61,8 @@ public class SearchListingsFeature {
     private ListingsService listingsService;
 
     private ResultActions responseResult;
+
+    private static final List<String> createdListings = new ArrayList<>();
 
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
@@ -104,21 +109,26 @@ public class SearchListingsFeature {
     @And("The following listings exist:")
     public void theFollowingListingsExist(List<String> listings) {
         for (var name : listings) {
-            var product = new Product();
-            product.setName(name);
-            productService.createProduct(product);
+            if (!createdListings.contains(name)) {  // Make sure we don't create the listing more than once
+                System.out.println("Created Name " + name);
+                var product = new Product();
+                product.setName(name);
+                productService.createProduct(product);
 
-            var inventory = new Inventory();
-            inventory.setProduct(product);
-            inventory.setExpires(LocalDate.MAX);
-            inventory.setBusinessId(0);
-            inventoryService.createInventory(inventory);
+                var inventory = new Inventory();
+                inventory.setProduct(product);
+                inventory.setExpires(LocalDate.MAX);
+                inventory.setBusinessId(0);
+                inventoryService.createInventory(inventory);
 
-            var newListing = new Listing();
-            newListing.setInventoryItem(inventory);
-            newListing.setQuantity(69);
-            newListing.setBusinessId(0);
-            listingsService.createListing(newListing);
+                var newListing = new Listing();
+                newListing.setInventoryItem(inventory);
+                newListing.setQuantity(69);
+                newListing.setBusinessId(0);
+                listingsService.createListing(newListing);
+
+                createdListings.add(name);
+            }
         }
     }
 
@@ -139,9 +149,11 @@ public class SearchListingsFeature {
 
     @Then("The results contain the following products:")
     public void theResultsContainTheFollowingProducts(List<String> listings) throws Exception {
-        for (int i = 0; i < listings.size(); i++) {
-            responseResult.andExpect(jsonPath(String.format("listings[%d].inventoryItem.product.name", i), is(listings.get(i))));
-        }
+        responseResult.andExpect(
+                jsonPath("$..inventoryItem.product.name",   // Gets list of product names
+                        containsInAnyOrder(listings.stream().map(Matchers::equalTo).collect(Collectors.toList()))   // Convert list of strings (listings) into list of matchers that match the strings
+                )
+        );
     }
 
     @Then("No results are given")
