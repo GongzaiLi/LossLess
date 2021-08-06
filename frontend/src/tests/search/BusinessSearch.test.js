@@ -32,7 +32,7 @@ const response = {
             {
                 id: 1,
                 name: "B",
-                businessType: "A",
+                businessType: "Accommodation and Food Services",
                 description: "a",
                 address: {
                     streetNumber: "3/24",
@@ -77,7 +77,7 @@ describe('check-api-request-searchBusiness', () => {
     test('is-getting-called-twice-when-the-get-items-for-table-is-called',  async() => {
         Api.searchBusiness.mockResolvedValue(response);
 
-        await wrapper.vm.searchBusinessApiRequest("B");
+        await wrapper.vm.searchBusinessApiRequest("B", "");
         await wrapper.vm.getItemsForTable();
         await wrapper.vm.$nextTick();
 
@@ -87,11 +87,22 @@ describe('check-api-request-searchBusiness', () => {
     test('check-api-request-get-searchBusiness-sets-wrapper-totalResults-to-the-totalItems-received', async () => {
 
         Api.searchBusiness.mockResolvedValue(response);
-        await wrapper.vm.searchBusinessApiRequest("B");
+        await wrapper.vm.searchBusinessApiRequest("B", "");
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.totalResults).toBe(response.data.totalItems);
     })
+
+  test('check-api-request-get-searchBusiness-with-type-sets-wrapper-totalResults-to-the-totalItems-received', async () => {
+
+    Api.searchBusiness.mockResolvedValue(response);
+    await wrapper.vm.searchBusinessApiRequest("B", "Accommodation and Food Services");
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.totalResults).toBe(response.data.totalItems);
+  })
+
+
 });
 
 describe ("format-address", () => {

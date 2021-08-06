@@ -5,14 +5,19 @@ Page that stores table and search bar to search for businesses
   <b-card style="max-width: 1200px">
     <b-row style="height: 50px">
       <b-col cols="6">
-        <b-form-input v-model="searchQuery" @keyup.enter="searchBusinessApiRequest(searchQuery)" type="search"
-                      placeholder="Search businesses"></b-form-input>
+        <b-input-group prepend="Name:">
+          <b-form-input v-model="searchQuery" @keyup.enter="searchBusinessApiRequest(searchQuery)" type="search"
+                        placeholder="Search businesses"></b-form-input>
+        </b-input-group>
+
       </b-col>
       <b-col md="4">
-        <b-form-select v-model="businessType" :options="businessTypeOptions" id="marketplaceSortBySelect"></b-form-select>
+        <b-input-group prepend="Type:">
+          <b-form-select v-model="businessType" :options="businessTypeOptions" id="marketplaceSortBySelect"></b-form-select>
+        </b-input-group>
       </b-col>
       <b-col cols="1">
-        <b-button  @click="searchBusinessApiRequest(searchQuery)"> Search </b-button>
+        <b-button  @click="searchBusinessApiRequest(searchQuery, businessType)"> Search </b-button>
       </b-col>
     </b-row>
     <b-row>
@@ -62,10 +67,12 @@ export default {
   data: function () {
     return {
       businessTypeOptions: [
+        { value: '', text: 'None'},
         { value: 'ACCOMMODATION_AND_FOOD_SERVICES', text: 'Accommodation and Food Services' },
         { value: 'RETAIL_TRADE', text: 'Retail Trade' },
         { value: 'CHARITABLE_ORGANISATION', text: 'Charitable organisation'},
         { value: 'NON_PROFIT_ORGANISATION', text: 'Non-profit organisation'},
+
       ],
       businessType: "",
       searchQuery: "",
@@ -128,9 +135,9 @@ export default {
      *
      * @param searchParameter is the inputted search
      */
-    searchBusinessApiRequest: function (searchParameter) {
+    searchBusinessApiRequest: function (searchParameter, businessType) {
       api
-          .searchBusiness(searchParameter)
+          .searchBusiness(searchParameter, businessType)
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.totalResults = response.data.totalItems;
@@ -157,7 +164,7 @@ export default {
       if(this.totalResults) {
         try {
           const response = await api
-              .searchBusiness(this.searchQuery, this.perPage, this.currentPage - 1, this.sortBy, ((this.sortDesc) ? "DESC" : "ASC"))
+              .searchBusiness(this.searchQuery, this.businessType, this.perPage, this.currentPage - 1, this.sortBy, ((this.sortDesc) ? "DESC" : "ASC"))
           return response.data.businesses
         } catch (error) {
           this.$log.debug(error);
