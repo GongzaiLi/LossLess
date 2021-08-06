@@ -9,6 +9,17 @@ Date: sprint_1
   >
     <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
 
+    <b-navbar-brand>
+    <b-nav-form>
+      <b-input-group >
+        <b-form-input   placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
+        <b-input-group-append>
+          <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
+        </b-input-group-append>
+      </b-input-group>
+    </b-nav-form>
+    </b-navbar-brand>
+
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
         Need Help?
@@ -20,6 +31,7 @@ Date: sprint_1
     </b-toast>
 
     <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
@@ -47,6 +59,10 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+
+
+
+
 
       <b-navbar-nav class="ml-auto">
 
@@ -237,6 +253,7 @@ export default {
       notifications: [],
       numExpiredCards:0,
       timer: null,
+      searchQuery: '',
     }
   },
   computed: {
@@ -327,6 +344,16 @@ export default {
     }
   },
   methods: {
+
+    /**
+     * Routes to Listing search page with search string
+     * Called when user clicks search or presses enter
+     * @param searchQuery the string used to search for listings passed as a query parameter
+     **/
+    search(searchQuery) {
+      this.$router.push(`/listingSearch?searchQuery=${searchQuery}`);
+    },
+
     /**
      * Gets all the expiring cards from for the current user.
      */
