@@ -6,15 +6,17 @@ Feature: U29 - Browse/Search Sale listings
   Background:
     Given We are logged in as the individual user with email "a@a"
     And The following listings exist:
-      | Black Water No Sugar |
-      | Back Water           |
-      | Willy Wonka          |
+      | Black Water No Sugar | 1   |
+      | Back Water           | 1.5 |
+      | Willy Wonka          | 2   |
+      | Wonka Willy          | 100 |
 
   Scenario: AC2 - If no filtering is applied then all current sales listings are displayed.
     When I search for listings with no filtering
     Then The results contain the following products:
       | Black Water No Sugar |
       | Back Water           |
+      | Willy Wonka          |
       | Willy Wonka          |
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, part of a product name.
@@ -31,3 +33,9 @@ Feature: U29 - Browse/Search Sale listings
   Scenario: AC6 - No results shown when no product names match.
     When I search for listings by product name "Fab"
     Then No results are given
+
+  Scenario: AC6 - I can limit the results by setting a price range.
+    When I search for listings by min price 1.1 and max price 2
+    Then The results contain exclusively the following products:
+      | Back Water  |
+      | Willy Wonka |
