@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Listing service applies product logic over the Product JPA repository.
@@ -23,12 +24,25 @@ public class ListingsService {
         this.listingRepository = listingRepository;
     }
 
-//    public static Specification<Listing> priceWithinRange(Integer lower, Integer upper) {
-//        return (root, query, builder) -> builder.and(
-//                builder.greaterThanOrEqualTo(root.get(Listing_.price), lower),
-//                builder.lessThanOrEqualTo(root.get(Listing_.price), upper)
-//        );
-//    }
+    /**
+     * Returns a Specification that matches all listings with price greater than or equal to the given price
+     *
+     * @param price Lower inclusive bound for price
+     * @return A Specification that matches all listings with price greater than or equal to the given price
+     */
+    public static Specification<Listing> priceGreaterThanOrEqualTo(Double price) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("price"), price);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with price less than or equal to the given price
+     *
+     * @param price Upper inclusive bound for price
+     * @return A Specification that matches all listings with price less than or equal to the given price
+     */
+    public static Specification<Listing> priceLessThanOrEqualTo(Double price) {
+        return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("price"), price);
+    }
 
     /**
      * Returns a Specification that matches all listings with a product name that contains
@@ -71,8 +85,17 @@ public class ListingsService {
      * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
      * @return A list containing matching listings.
      */
-    public Page<Listing> searchListings(String searchQuery, Pageable pageable) {
-        return listingRepository.findAll(productNameMatches(searchQuery), pageable);
+    public Page<Listing> searchListings(
+            Optional<String> searchQuery,
+            Optional<Double> priceLower,
+            Optional<Double> priceUpper,
+            Pageable pageable) {
+        Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
+
+        if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
+        if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
+
+        return listingRepository.findAll(querySpec, pageable);
     }
 
     /**

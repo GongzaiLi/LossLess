@@ -29,6 +29,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
@@ -164,11 +165,14 @@ public class ListingController {
      */
     @GetMapping("/listings/search")
     @JsonView(ListingViews.GetListingView.class)
-    public ResponseEntity<Object> getListingsOfBusiness(String searchQuery, Pageable pageable) {
-        if (searchQuery == null) searchQuery = "";
+    public ResponseEntity<Object> getListingsOfBusiness(
+            @RequestParam Optional<String> searchQuery,
+            @RequestParam Optional<Double> priceLower,
+            @RequestParam Optional<Double> priceUpper,
+            Pageable pageable) {
         logger.info("Get request to search LISTING, query param: {}", searchQuery);
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())
