@@ -8,11 +8,9 @@ Date: 29/03/2021
     <b-link v-if="$route.query.fromSearch" variant="info" class="back-to-search-link" to="/search">
       <strong><h4><b-icon-arrow-left/> Back to results</h4></strong>
     </b-link>
-    <b-card border-variant="secondary" header-border-variant="secondary"
-            class="profile-card shadow" no-body
+    <b-card class="profile-card shadow" no-body
             v-if="businessFound"
     >
-
       <template #header>
         <b-row>
           <b-col>
@@ -107,8 +105,6 @@ Date: 29/03/2021
           </b-card-text>
           <b-row>
             <b-col cols="12">
-
-
               <b-table hover
                        striped
                        table-class="text-nowrap"
@@ -132,8 +128,6 @@ Date: 29/03/2021
                   </div>
                 </template>
               </b-table>
-
-
             </b-col>
           </b-row>
           <br>
