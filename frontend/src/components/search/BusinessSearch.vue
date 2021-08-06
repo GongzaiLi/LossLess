@@ -17,7 +17,7 @@ Page that stores table and search bar to search for businesses
         <b-table striped hover
                  ref="searchTable"
                  table-class="text-nowrap"
-                 responsive="lg"
+                 responsive="md"
                  no-border-collapse
                  bordered
                  no-local-sorting
@@ -27,7 +27,8 @@ Page that stores table and search bar to search for businesses
                  show-empty
                  :fields="fields"
                  :per-page="perPage"
-                 :items="myProvider"
+                 :items="getItemsForTable"
+                 @row-clicked="rowClickHandler"
                  :current-page="currentPage">
           <template #empty>
             <h3 class="no-results-overlay" >No results to display</h3>
@@ -58,7 +59,6 @@ export default {
   data: function () {
     return {
       searchQuery: "",
-      setQuery:"",
       totalResults: 0,
       sortDesc: false,
       sortBy: "",
@@ -86,6 +86,21 @@ export default {
     },
 
     /**
+     * format the name so that it fits within the column in the table properly.
+     * It keeps the first 25 characters and then adds ...
+     *
+     * @param name
+     * @return formattedName
+     */
+    formatName(name) {
+      if (name === "" || name.length <= 25) {
+        return name.trim();
+      }
+      const shortenedName = name.slice(0, 25).trim();
+      return `${shortenedName}${shortenedName.endsWith('.') ? '..' : '...'}`;
+    },
+
+    /**
      * Formats the address to show the suburb if one exists, followed by the city and the country
      * which will always exist. These are combined into a string separeted by commas.
      *
@@ -109,10 +124,10 @@ export default {
           .then((response) => {
             this.$log.debug("Data loaded: ", response.data);
             this.totalResults = response.data.totalItems;
-            this.setQuery=this.searchQuery;
             this.$refs.searchTable.refresh();
             this.currentPage=1;
             this.$refs.tablePag.currentPage=1;
+            this.items = response.data.businesses
           })
           .catch((error) => {
             this.$log.debug(error);
@@ -122,13 +137,13 @@ export default {
     },
 
     /**
-     * This sends a new api get request when the page is changed either by sorting or changing of pages.
      * This gets the new table data back with the correct amount of
+     * This sends a new api get request when the table is changed either by sorting or changing of pages.
      * businesses with the page and size.
      *
      * @returns list of Businesses
      */
-    myProvider: async function () {
+    getItemsForTable: async function () {
       if(this.totalResults) {
         try {
           const response = await api
@@ -142,6 +157,15 @@ export default {
       }
       return [];
     },
+
+    /**
+     * When called changes page to the business profile page based on the id of the business clicked
+     * with a fromSearch=true parameter
+     */
+    rowClickHandler: function (data) {
+      this.$router.push({path: `/businesses/${data.id}?fromSearch=true`});
+    },
+
   },
 
   computed: {
@@ -157,7 +181,8 @@ export default {
       return [
         {
           key: 'name',
-          sortable: true
+          sortable: true,
+          formatter: 'formatName'
         },
         {
           key: 'description',
