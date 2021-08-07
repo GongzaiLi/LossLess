@@ -1,19 +1,17 @@
 <template>
 
-  <b-card style="max-width: 80em;">
+  <b-card class="b_card_main" >
     <b-container>
       <h1>Search Listings</h1>
       <hr>
+
       <div>
-
-
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
               <b-input placeholder="Product Name" v-model="search.productName"></b-input>
             </b-input-group>
           </b-col>
-
 
           <b-col cols="12" md="4">
             <div class="input-group mb-2 mr-sm-2">
@@ -35,18 +33,19 @@
                 <option value="countryDesc">Location A to Z</option>
               </b-select>
             </div>
-
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
             <b-button @click="doSearch">Search</b-button>
           </b-col>
+
           <b-col class="search_button" cols="3" md="1" >
             <b-button v-b-toggle.collapse-1 variant="primary">Filter</b-button>
           </b-col>
 
         </b-row>
         <hr>
+
         <b-collapse id="collapse-1" class="mt-2">
         <b-row>
           <b-col cols="12" md="4">
@@ -76,7 +75,7 @@
               <div>
                 <b-input type="date" v-model="search.closesStartDate"></b-input>
               </div>
-               <label style="margin-left: 1rem;margin-right: 1rem; margin-top: 10px"> to </label>
+               <label class="to_label"> to </label>
               <div>
                 <b-input type="date" v-model="search.closesEndDate"> </b-input>
               </div>
@@ -89,11 +88,11 @@
                 <div class="input-group-text">Price:</div>
               </div>
               <div>
-                <b-input type="number" placeholder="Min:" v-model="search.priceMin" style="max-width: 6rem"></b-input>
+                <b-input class="price_min" type="number" placeholder="Min:" v-model="search.priceMin"></b-input>
               </div>
-              <label style="margin-left: 1rem;margin-right: 1rem; margin-top: 10px"> to </label>
+              <label class="to_label"> to </label>
               <div>
-                <b-input type="number" placeholder="Max"  v-model="search.priceMax" style="max-width: 7rem"></b-input>
+                <b-input class="price_max" type="number" placeholder="Max"  v-model="search.priceMax"></b-input>
               </div>
             </div>
 
@@ -104,9 +103,9 @@
       </div>
 
 
-      <b-row cols-lg="3" cols-md="3" style="margin-left: -38px">
+      <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
-          <b-card style="min-width: 17rem; height: 100%">
+          <b-card class="b_card_listing">
             <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
             <hr>
@@ -142,6 +141,34 @@
 .search_button {
   text-align: right;
 }
+
+.b_card_main {
+  max-width: 80em;
+}
+
+.to_label {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  margin-top: 10px;
+}
+
+.price_min {
+  max-width: 6rem
+}
+
+.price_max {
+  max-width: 7rem
+}
+
+.b_card_listing {
+  min-width: 17rem;
+  height: 100%
+}
+
+.listing_row {
+  margin-left: -38px
+}
+
 
 </style>
 
