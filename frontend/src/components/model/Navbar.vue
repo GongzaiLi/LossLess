@@ -56,7 +56,7 @@ Date: sprint_1
           <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
         </div>
 
-        <div class="notifications" id="box">
+        <div v-if="showNotifications" class="notifications" id="box" style="background-color: whitesmoke">
           <h2>Notifications: <span> {{numberOfNotifications}}</span></h2>
             <div v-if="numExpiredCards" class="expired-notifications-item" @click="clicked = !clicked">
               <div class="text">
@@ -69,7 +69,7 @@ Date: sprint_1
               </b-col>
             </div>
 
-          <div v-for="notification in notifications" class="notifications-item" v-bind:key="notification.id"  @click="goToHomePage">
+          <div v-for="notification in notifications"  class="notifications-item" v-bind:key="notification.id"  @click="goToHomePage">
             <div class="text">
               <h4> Marketplace Card: {{notification.title}}</h4>
               <h4> expires within 24 hours</h4>
@@ -148,7 +148,6 @@ Date: sprint_1
 .notifications {
   width: 300px;
   height: 0;
-  opacity: 0;
   position: absolute;
   top: 63px;
   right: 62px;
@@ -169,6 +168,7 @@ Date: sprint_1
 }
 
 .notifications-item {
+  background-color: whitesmoke;
   display: flex;
   border-bottom: 1px solid #eee;
   padding: 6px 9px;
@@ -367,15 +367,7 @@ export default {
      *  Triggers when the notification icon is pressed to display the notifications.
      */
     bellIconPressed() {
-      if(this.showNotifications) {
-        document.getElementById("box").style.height='0px';
-        document.getElementById("box").style.opacity='0';
-        this.showNotifications = false;
-      } else {
-        document.getElementById("box").style.height='auto';
-        document.getElementById("box").style.opacity='1';
-        this.showNotifications = true;
-      }
+      this.showNotifications = !this.showNotifications
     },
 
     /**
