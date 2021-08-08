@@ -5,6 +5,7 @@ import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
+import com.seng302.wasteless.unitTest.ServiceTests.ListingsServiceTest;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -110,22 +111,8 @@ public class SearchListingsFeature {
     public void theFollowingListingsExist(List<List<String>> listings) {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
-                var product = new Product();
-                product.setName(listingInfo.get(0));
-                productService.createProduct(product);
-
-                var inventory = new Inventory();
-                inventory.setProduct(product);
-                inventory.setExpires(LocalDate.MAX);
-                inventory.setBusinessId(0);
-                inventoryService.createInventory(inventory);
-
-                var newListing = new Listing();
-                newListing.setInventoryItem(inventory);
-                newListing.setQuantity(69);
-                newListing.setBusinessId(0);
-                newListing.setPrice(Double.parseDouble(listingInfo.get(1)));
-                listingsService.createListing(newListing);
+                ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService,
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
 
                 createdListings.add(listingInfo);
             }
