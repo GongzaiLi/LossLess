@@ -45,22 +45,24 @@ export default {
   getUser: (id) => instance.get(`users/${id}`, {withCredentials: true}),
   makeUserAdmin: (id) => instance.put(`users/${id}/makeAdmin`, null, {withCredentials: true}),
   revokeUserAdmin: (id) => instance.put(`users/${id}/revokeAdmin`, null, {withCredentials: true}),
-  searchUser: (searchParameter, count=10, offset=0, sortBy="NAME", sortDirection="ASC") => instance.get(`users/search?searchQuery=${searchParameter}&count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}`, {withCredentials: true}),
+  searchUser: (searchParameter, count = 10, offset = 0, sortBy = "NAME", sortDirection = "ASC") => instance.get(`users/search?searchQuery=${searchParameter}&count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}`, {withCredentials: true}),
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
-  getProducts: (id, count, offset, sortBy="ID", sortDirection="ASC", searchQuery="") => instance.get(`/businesses/${id}/products?count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}&searchQuery=${searchQuery}`, {withCredentials: true}),
+  getProducts: (id, count, offset, sortBy = "ID", sortDirection = "ASC", searchQuery = "") => instance.get(`/businesses/${id}/products?count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}&searchQuery=${searchQuery}`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id, productData) => instance.post(`/businesses/${id}/products`, productData, {withCredentials: true}),
   modifyProduct: (businessId, productId, editProductData) => instance.put(`/businesses/${businessId}/products/${productId}`, editProductData, {withCredentials: true}),
   createInventory: (id, inventoryData) => instance.post(`/businesses/${id}/inventory`, inventoryData, {withCredentials: true}),
-  getInventory: (id, count=10, offset=0, sortBy="id", sortDirection="ASC",searchQuery="") => instance.get(`/businesses/${id}/inventory?sort=${sortBy},${sortDirection}&page=${offset}&size=${count}&searchQuery=${searchQuery}`, {withCredentials: true}),
+  getInventory: (id, count = 10, offset = 0, sortBy = "id", sortDirection = "ASC", searchQuery = "") => instance.get(`/businesses/${id}/inventory?sort=${sortBy},${sortDirection}&page=${offset}&size=${count}&searchQuery=${searchQuery}`, {withCredentials: true}),
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials: true}),
-  createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials:true}),
+  createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials: true}),
   getListings: (businessId, count, offset, sortBy, sortDirection) => instance.get(`/businesses/${businessId}/listings?size=${count}&page=${offset}&sort=${sortBy},${sortDirection}`, {withCredentials: true}),
-  getImage: (imageName) => {return `${SERVER_URL}/images?filename=${imageName}`},
+  getImage: (imageName) => {
+    return `${SERVER_URL}/images?filename=${imageName}`
+  },
   deleteImage: (businessId, productId, imageId) => instance.delete(`/businesses/${businessId}/products/${productId}/images/${imageId}`, {withCredentials: true}),
-  setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null,{withCredentials: true}),
+  setPrimaryImage: (businessId, productId, imageId) => instance.put(`/businesses/${businessId}/products/${productId}/images/${imageId}/makeprimary`, null, {withCredentials: true}),
   createCard: (cardData) => instance.post("/cards", cardData, {withCredentials: true}),
   getCardsBySection: (section, currentPage, perPage, sortBy, sortOrder) => {
     let query = `/cards?section=${section}&page=${currentPage}&size=${perPage}`;
@@ -76,9 +78,9 @@ export default {
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
   expiredCardsNumber: (userId) => instance.get(`/users/${userId}/hasCardsExpired`, {withCredentials: true}),
-  clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null,{withCredentials: true}),
+  clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
-  searchBusiness: (searchParameter, size=10, page=0, sortBy="name", sortDirection="ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}`, {withCredentials: true}),
+  searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
