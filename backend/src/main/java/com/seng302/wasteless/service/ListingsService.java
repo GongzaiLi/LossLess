@@ -80,10 +80,15 @@ public class ListingsService {
     }
 
     /**
-     * Searches listings by product name using a given pageable
+     * Searches listings by product name using a given pageable and filter parameters.
+     * Any or all of the filter/search params are optional. The Pageable cannot be null
+     * but can simply be a Pageable.unpaged() object
      *
      * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
-     * @return A list containing matching listings.
+     * @param priceLower  Lower inclusive bound for listing prices
+     * @param priceUpper  Upper inclusive bound for listing prices
+     * @param pageable    Object containing pagination and sorting info
+     * @return A Page containing matching listings.
      */
     public Page<Listing> searchListings(
             Optional<String> searchQuery,
