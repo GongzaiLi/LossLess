@@ -94,7 +94,7 @@ public class ListingController {
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
         if (availableQuantity < listingQuantity) {
-            logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.",listingQuantity, availableQuantity);
+            logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.", listingQuantity, availableQuantity);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
@@ -131,7 +131,7 @@ public class ListingController {
      * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
      *
      * @param businessId The id of the business to get
-     * @param pageable pagination and sorting params
+     * @param pageable   pagination and sorting params
      * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/listings")
@@ -169,10 +169,12 @@ public class ListingController {
             @RequestParam Optional<String> searchQuery,
             @RequestParam Optional<Double> priceLower,
             @RequestParam Optional<Double> priceUpper,
+            @RequestParam Optional<String> businessName,
             Pageable pageable) {
-        logger.info("Get request to search LISTING, query param: {}", searchQuery);
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, pageable);
+        logger.info("Get request to search LISTING, query param: {}, business name: {}", searchQuery, businessName);
+
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())

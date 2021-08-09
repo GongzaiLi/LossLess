@@ -94,14 +94,17 @@ public class ListingsService {
             Optional<String> searchQuery,
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
+            Optional<String> businessName,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
 
+
         return listingRepository.findAll(querySpec, pageable);
     }
+
 
     /**
      * Get the count of all listings of a business.
