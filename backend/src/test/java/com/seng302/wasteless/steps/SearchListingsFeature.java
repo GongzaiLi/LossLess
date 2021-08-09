@@ -5,6 +5,7 @@ import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
+import com.seng302.wasteless.unitTest.ServiceTests.ListingsServiceTest;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -62,7 +63,7 @@ public class SearchListingsFeature {
 
     private ResultActions responseResult;
 
-    private static final List<String> createdListings = new ArrayList<>();
+    private static final List<List<String>> createdListings = new ArrayList<>();
 
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
@@ -107,27 +108,13 @@ public class SearchListingsFeature {
     }
 
     @And("The following listings exist:")
-    public void theFollowingListingsExist(List<String> listings) {
-        for (var name : listings) {
-            if (!createdListings.contains(name)) {  // Make sure we don't create the listing more than once
-                System.out.println("Created Name " + name);
-                var product = new Product();
-                product.setName(name);
-                productService.createProduct(product);
+    public void theFollowingListingsExist(List<List<String>> listings) {
+        for (var listingInfo : listings) {
+            if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
+                ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService,
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
 
-                var inventory = new Inventory();
-                inventory.setProduct(product);
-                inventory.setExpires(LocalDate.MAX);
-                inventory.setBusinessId(0);
-                inventoryService.createInventory(inventory);
-
-                var newListing = new Listing();
-                newListing.setInventoryItem(inventory);
-                newListing.setQuantity(69);
-                newListing.setBusinessId(0);
-                listingsService.createListing(newListing);
-
-                createdListings.add(name);
+                createdListings.add(listingInfo);
             }
         }
     }
@@ -168,5 +155,14 @@ public class SearchListingsFeature {
     @Then("No results are given")
     public void noResultsAreGiven() throws Exception {
         responseResult.andExpect(jsonPath("listings", hasSize(0)));
+    }
+
+    @When("I search for listings by min price {double} and max price {double}")
+    public void iSearchForListingsByMinPriceAndMaxPrice(Double min, Double max) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("priceLower", min.toString())
+                .queryParam("priceUpper", max.toString())
+                .with(user(currentUserDetails))
+                .with(csrf()));
     }
 }
