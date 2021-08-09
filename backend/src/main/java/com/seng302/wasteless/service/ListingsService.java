@@ -57,22 +57,40 @@ public class ListingsService {
                 "%" + productName.toLowerCase(Locale.ROOT) + "%");
     }
 
-    public static Specification<Listing> sellerAddressCountryMatches(String address) {
+    /**
+     * Returns a Specification that matches all listings with the country portion of an address.
+     * Matches are case-insensitive
+     * @param country Country to match listings by
+     * @return Specification that matches all listings with address potion country matching given country
+     */
+    public static Specification<Listing> sellerAddressCountryMatches(String country) {
         return (root, query, builder) -> builder.like(
                 builder.lower(root.get("business").get("address").get("country")),
-                "%" + address.toLowerCase(Locale.ROOT) + "%");
+                "%" + country.toLowerCase(Locale.ROOT) + "%");
     }
 
-    public static Specification<Listing> sellerAddressCityMatches(String address) {
+    /**
+     * Returns a Specification that matches all listings with the City portion of an address.
+     * Matches are case-insensitive
+     * @param city City to match listings by
+     * @return Specification that matches all listings with address potion city matching given city
+     */
+    public static Specification<Listing> sellerAddressCityMatches(String city) {
         return (root, query, builder) -> builder.like(
                 builder.lower(root.get("business").get("address").get("city")),
-                "%" + address.toLowerCase(Locale.ROOT) + "%");
+                "%" + city.toLowerCase(Locale.ROOT) + "%");
     }
 
-    public static Specification<Listing> sellerAddressSuburbMatches(String address) {
+    /**
+     * Returns a Specification that matches all listings with the Suburb portion of an address.
+     * Matches are case-insensitive
+     * @param suburb Suburb to match listings by
+     * @return Specification that matches all listings with address potion suburb matching given suburb
+     */
+    public static Specification<Listing> sellerAddressSuburbMatches(String suburb) {
         return (root, query, builder) -> builder.like(
                 builder.lower(root.get("business").get("address").get("suburb")),
-                "%" + address.toLowerCase(Locale.ROOT) + "%");
+                "%" + suburb.toLowerCase(Locale.ROOT) + "%");
     }
 
     /**

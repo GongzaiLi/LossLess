@@ -102,7 +102,7 @@ public class ListingsServiceTest {
 
     @Test
     void whenSearchByProductName_andCaseInsensitivePartialMatchesExists_thenAllPartialMatchesReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.of("water"), Optional.empty(), Optional.empty(), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.of("water"), Optional.empty(), Optional.empty(), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertTrue(names.containsAll(Arrays.asList("Back Water", "Black Water No Sugar"))
                 && Arrays.asList("Back Water", "Black Water No Sugar").containsAll(names));
@@ -110,7 +110,7 @@ public class ListingsServiceTest {
 
     @Test
     void whenSearchByProductName_andFullMatchExists_thenFullMatchReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.of("Back Water"), Optional.empty(), Optional.empty(), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.of("Back Water"), Optional.empty(), Optional.empty(), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertTrue(names.contains("Back Water")
                 && Collections.singletonList("Back Water").containsAll(names));
@@ -118,7 +118,7 @@ public class ListingsServiceTest {
 
     @Test
     void whenSearchByProductName_andNoMatchesExist_thenEmptyListReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.of("Blah"), Optional.empty(), Optional.empty(), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.of("Blah"), Optional.empty(), Optional.empty(), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
@@ -129,7 +129,7 @@ public class ListingsServiceTest {
 
     @Test
     void whenFilterByPriceRange_andUpperAndLowerInclusive_thenExcludedListingsNotReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(1.5), Optional.of(2.0), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(1.5), Optional.of(2.0), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         System.out.println(names);
         assertTrue(names.containsAll(Arrays.asList("Willy Wonka", "Back Water"))
@@ -138,7 +138,7 @@ public class ListingsServiceTest {
 
     @Test
     void whenFilterByPriceRange_andUpperAndLowerExclusive_thenAllListingsReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(0.0), Optional.of(10000.0), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(0.0), Optional.of(10000.0), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertTrue(names.containsAll(Arrays.asList("Willy Wonka", "Black Water No Sugar", "Back Water", "Wonka Willy"))
                 && Arrays.asList("Willy Wonka", "Black Water No Sugar", "Back Water", "Wonka Willy").containsAll(names));
@@ -146,14 +146,14 @@ public class ListingsServiceTest {
 
     @Test
     void whenFilterByPriceRange_andRangeTooLow_thenNoListingsReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(0.0), Optional.of(0.1), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(0.0), Optional.of(0.1), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
 
     @Test
     void whenFilterByPriceRange_andRangeTooHigh_thenNoListingsReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(101.0), Optional.of(101.0), Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(101.0), Optional.of(101.0), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
