@@ -32,6 +32,7 @@ public class Listing {
 
     @NotNull
     @ManyToOne
+    @JsonView(ListingViews.GetListingView.class)
     @JoinColumn(name = "business_id")
     private Business business;
 

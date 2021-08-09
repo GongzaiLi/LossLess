@@ -176,8 +176,7 @@ public class ListingController {
             Pageable pageable) {
         logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, address: {}", searchQuery, priceLower, priceUpper, address);
 
-//        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address, pageable);
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())

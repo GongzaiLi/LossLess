@@ -56,14 +56,24 @@ public class ListingsService {
                 builder.lower(root.get("inventoryItem").get("product").get("name")),
                 "%" + productName.toLowerCase(Locale.ROOT) + "%");
     }
-//
-//    public static Specification<Listing> sellerAddressMatches(String address) {
-//
-//        return (root, query, builder) -> builder.like(
-//                builder.lower(root.get("inventoryItem").get(""))
-//        );
-//    }
 
+    public static Specification<Listing> sellerAddressCountryMatches(String address) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("country")),
+                "%" + address.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    public static Specification<Listing> sellerAddressCityMatches(String address) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("city")),
+                "%" + address.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    public static Specification<Listing> sellerAddressSuburbMatches(String address) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("suburb")),
+                "%" + address.toLowerCase(Locale.ROOT) + "%");
+    }
 
     /**
      * Given an Listing object, 'creates' it by saving and persisting it in the database.
@@ -102,13 +112,21 @@ public class ListingsService {
             Optional<String> searchQuery,
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
-//            Optional<String> address,
+            Optional<String> address,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
-//        if (address.isPresent()) querySpec = querySpec.and(sellerAddressMatches(address.get()));
+
+        if (address.isPresent()) {
+            System.out.println("ADDRESS IS " + address.get());
+            querySpec = querySpec.and(
+                    sellerAddressCountryMatches(address.get())
+                    .or(sellerAddressCityMatches(address.get()))
+                    .or(sellerAddressSuburbMatches(address.get()))
+            );
+        }
 
         return listingRepository.findAll(querySpec, pageable);
     }
