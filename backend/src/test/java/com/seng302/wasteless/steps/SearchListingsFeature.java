@@ -115,8 +115,8 @@ public class SearchListingsFeature {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
                 ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
-
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4));
+                System.out.println(listingInfo);
                 createdListings.add(listingInfo);
             }
         }
@@ -168,4 +168,13 @@ public class SearchListingsFeature {
                 .with(user(currentUserDetails))
                 .with(csrf()));
     }
+
+    @When("I search for listings by address {string}")
+    public void i_search_for_listings_by_address(String address) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("address", address)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
 }

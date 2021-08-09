@@ -52,35 +52,38 @@ public class ListingsServiceTest {
      * Creates a Listing with the given product name and price. This method is re-used in other tests so we need
      * to take in the services and parameters.
      */
-    public static void createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService, ListingsService listingsService, BusinessService businessService, AddressService addressService,  String name, Double price) {
-        var address = new Address();
-        address.setCountry("NZ");
-        address.setSuburb("Riccarton");
-        address.setCity("Christchurch");
+    public static void createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService,
+                                                     ListingsService listingsService, BusinessService businessService,
+                                                     AddressService addressService,  String name, Double price,
+                                                     String country, String city, String suburb) {
+
+        Address address = new Address();
+        address.setCountry(country);
+        address.setSuburb(suburb);
+        address.setCity(city);
         address.setStreetNumber("1");
         address.setStreetName("Ilam Rd");
         address.setPostcode("8041");
         addressService.createAddress(address);
 
-        var business = new Business();
+        Business business = new Business();
         business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
-        business.setId(1);
         business.setAdministrators(new ArrayList<>());
         business.setName("Jimmy's clown store");
         business.setAddress(address);
         businessService.createBusiness(business);
 
-        var product = new Product();
+        Product product = new Product();
         product.setName(name);
         productService.createProduct(product);
 
-        var inventory = new Inventory();
+        Inventory inventory = new Inventory();
         inventory.setProduct(product);
         inventory.setExpires(LocalDate.MAX);
         inventory.setBusinessId(0);
         inventoryService.createInventory(inventory);
 
-        var newListing = new Listing();
+        Listing newListing = new Listing();
         newListing.setInventoryItem(inventory);
         newListing.setQuantity(69);
         newListing.setBusiness(business);
@@ -90,10 +93,10 @@ public class ListingsServiceTest {
 
     @BeforeAll
     void setUp() {
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0);
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5);
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0);
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton");
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton");
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton");
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton");
     }
 
     //
@@ -154,6 +157,38 @@ public class ListingsServiceTest {
     @Test
     void whenFilterByPriceRange_andRangeTooHigh_thenNoListingsReturned() {
         Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(101.0), Optional.of(101.0), Optional.empty(), Pageable.unpaged());
+        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
+        assertEquals(0, names.size());
+    }
+
+    //
+    // FILTER BY ADDRESS
+    //
+
+    @Test
+    void whenFilterByAddressCountry_andAddressMatchesExists_thenAllPartialMatchesReturned() {
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("NZ"), Pageable.unpaged());
+        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
+        assertEquals(4, names.size());
+    }
+
+    @Test
+    void whenFilterByAddressCity_andAddressMatchesExists_thenAllPartialMatchesReturned() {
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("Riccarton"), Pageable.unpaged());
+        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
+        assertEquals(4, names.size());
+    }
+
+    @Test
+    void whenFilterByAddressSuburb_andAddressMatchesExists_thenAllPartialMatchesReturned() {
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("Christchurch"), Pageable.unpaged());
+        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
+        assertEquals(4, names.size());
+    }
+
+    @Test
+    void whenFilterByAddress_andNoMatchesExists_thenNoMatchesReturned() {
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("Aus"), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
