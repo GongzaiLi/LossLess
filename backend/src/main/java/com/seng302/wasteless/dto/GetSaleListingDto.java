@@ -17,7 +17,6 @@ import java.time.LocalDate;
 
 /**
  * The DTO used to return data representing a single searched for sale listings object. Used by GET searchListings endpoint.
- * No DTO mapper is needed as the constructor takes care of everything.
  */
 
 
