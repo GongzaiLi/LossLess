@@ -128,7 +128,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setProduct(productForInventory);
 
 
-        LocalDate closes = inventoryItemForListing.getExpires();
+
 
         listing = new Listing();
         listing.setInventoryItem(inventoryItemForListing)
@@ -136,7 +136,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
-                .setCloses(closes);
+                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1));
 
 
         listingList = new ArrayList<>();
@@ -147,7 +147,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
-                .setCloses(closes));
+                .setCloses(LocalDate.of(2021, Month.JULY, 14)));
 
         listingList.add(
                 listing = new Listing()
@@ -156,7 +156,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .setQuantity(3)
                         .setPrice(17.99)
                         .setMoreInfo("Seller may be willing to consider near offers")
-                        .setCloses(closes));
+                        .setCloses(LocalDate.of(2021, Month.MARCH, 27)));
 
         listingList.add(
                 listing = new Listing()
@@ -165,7 +165,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .setQuantity(3)
                         .setPrice(17.99)
                         .setMoreInfo("Seller may be willing to consider near offers")
-                        .setCloses(closes));
+                        .setCloses(LocalDate.of(2022, Month.JANUARY, 1)));
 
 
 
@@ -222,11 +222,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(listing.setId(1));
 
         Mockito
-                .when(listingsService.searchListings(any(Optional.class), any(Optional.class), any(Optional.class), any(Pageable.class)))
+                .when(listingsService.searchListings(any(Optional.class), any(Optional.class), any(Optional.class),any(Optional.class), any(Optional.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(listingList));
 
         Mockito
-                .when(listingsService.searchListings(eq(Optional.of("blah")), any(Optional.class), any(Optional.class), any(Pageable.class)))
+                .when(listingsService.searchListings(eq(Optional.of("blah")), any(Optional.class), any(Optional.class),any(Optional.class), any(Optional.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(listing)));
 
         Mockito
@@ -406,6 +406,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenGetRequestToSearchListings_andEmptyString_then200Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("listings", hasSize(3)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andQueryString_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("searchQuery", "blah")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("listings", hasSize(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andEmptyString_then200Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", "2022-03-27")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("listings", hasSize(3)));

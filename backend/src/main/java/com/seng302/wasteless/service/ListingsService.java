@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -32,6 +34,26 @@ public class ListingsService {
      */
     public static Specification<Listing> priceGreaterThanOrEqualTo(Double price) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("price"), price);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with price less than or equal to the given price
+     *
+     * @param date Upper inclusive bound for price
+     * @return A Specification that matches all listings with price less than or equal to the given price
+     */
+    public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with price greater than or equal to the given price
+     *
+     * @param date Lower inclusive bound for price
+     * @return A Specification that matches all listings with price greater than or equal to the given price
+     */
+    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
     }
 
     /**
@@ -94,11 +116,15 @@ public class ListingsService {
             Optional<String> searchQuery,
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
+            Optional<LocalDate> closingDateStart,
+            Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
+        if (closingDateStart.isPresent()) querySpec = querySpec.and(closesGreaterThanOrEqualTo(closingDateStart.get()));
+        if (closingDateEnd.isPresent()) querySpec = querySpec.and(closesLessThanOrEqualTo(closingDateEnd.get()));
 
         return listingRepository.findAll(querySpec, pageable);
     }
