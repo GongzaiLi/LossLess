@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Login from '../components/user/Login.vue'
 import Register from '../components/user/Register.vue'
 import UserProfile from '../components/user/UserProfile'
-import SearchPage from "../components/user/SearchPage";
+import SearchPage from "../components/search/SearchPage";
 import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
 import CreateBusiness from "../components/business/CreateBusiness";
@@ -11,7 +11,7 @@ import ListingsPage from "../components/listing/ListingsPage";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
-import ListingsSearch from "@/components/listing/ListingsSearchPage";
+import ListingSearchPage from "../components/listing/ListingSearchPage";
 
 
 import {getCurrentUser} from '@/auth';
@@ -28,7 +28,6 @@ const router = new Router({
         { path: '/login', name: 'login', component: Login },
         { path: '/register', name: 'register', component: Register },
         { path: '/search', name: 'search', component: SearchPage},
-        { path: '/listings', name: 'listings-search-page', component: ListingsSearch},
         { path: '/users/:id', name: 'user-profile', component: UserProfile},
         { path: '/homePage', name: 'home-page', component: HomePage},
         { path: '/businesses/:id', name: 'business-profile', component: BusinessProfile},
@@ -37,6 +36,7 @@ const router = new Router({
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
+        { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage}
     ]
 });
 

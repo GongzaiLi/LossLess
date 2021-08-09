@@ -6,4 +6,5 @@ package com.seng302.wasteless.view;
  */
 public class BusinessViews {
     public interface PostBusinessRequestView{}
+    public interface SearchBusinessesView{}
 }

@@ -14,6 +14,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -144,13 +145,35 @@ public class ListingController {
 
         List<Listing> listings = listingsService.findBusinessListingsWithPageable(businessId, pageable);
 
-        Integer totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+        Long totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings)
                 .setTotalItems(totalItems);
 
         logger.info("{}", getListingDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
+    }
+
+    /**
+     * Handles endpoint to search for listings
+     *
+     * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param pageable    pagination and sorting params
+     * @return Http Status 200 if valid query, 401 if unauthorised
+     */
+    @GetMapping("/listings/search")
+    @JsonView(ListingViews.GetListingView.class)
+    public ResponseEntity<Object> getListingsOfBusiness(String searchQuery, Pageable pageable) {
+        if (searchQuery == null) searchQuery = "";
+        logger.info("Get request to search LISTING, query param: {}", searchQuery);
+
+        Page<Listing> listings = listingsService.searchListings(searchQuery, pageable);
+
+        GetListingDto getListingDto = new GetListingDto()
+                .setListings(listings.getContent())
+                .setTotalItems(listings.getTotalElements());
+
         return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 

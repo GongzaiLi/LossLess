@@ -40,18 +40,18 @@ public class Address {
     @Size(min = 0, max = 50)
     private String streetName;
 
-    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @NotBlank(message = "city is mandatory")
     @Column(name = "city")
     @Size(min = 0, max = 50)
     private String city;
 
-    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @Column(name = "region")
     @Size(min = 0, max = 50)
     private String region;
 
-    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @NotBlank(message = "country is mandatory")
     @Column(name = "country")
     @Size(min = 0, max = 50)
@@ -63,7 +63,7 @@ public class Address {
     @Size(min = 0, max = 50)
     private String postcode;
 
-    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
     @Column(name = "suburb")
     private String suburb;
 

@@ -2,11 +2,10 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.GetSearchBusinessDto;
 import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
-import com.seng302.wasteless.model.Address;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.UserService;
@@ -15,6 +14,7 @@ import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -133,6 +132,56 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
     }
 
+
+    /**
+     * Handle request to /businesses/search for searching by name for all businesses. Takes a pageable to
+     * perform pagination and sorting.
+     *
+     * @param searchQuery           The search query to search the businesses by name
+     * @param type                  The business type to search by, can be blank. Must be same as enum type i.e "CHARITABLE_ORGANISATION"
+     * @param pageable              The pageable that consists of page index, size (number of pages) and sort order.
+     * @return                      Http Status 200 and list of businesses and a total items value if valid,
+     *                              401 is unauthorised,
+     *                              400 bad request if invalid business type
+     */
+    @JsonView({BusinessViews.SearchBusinessesView.class})
+    @GetMapping("/businesses/search")
+    public ResponseEntity<Object> searchBusinesses(String searchQuery, String type, Pageable pageable) {
+        if (searchQuery == null) searchQuery = "";
+        logger.debug("Request to search businesses with query: {} and business type {}", searchQuery, type);
+
+        List<Business> businessList;
+        Integer totalItems;
+
+        if (type != null && !type.equals("")) {
+            BusinessTypes businessType;
+            try {
+                businessType = BusinessTypes.valueOf(type);
+            } catch (IllegalArgumentException e) {
+                logger.info("Invalid value for businessType. Value was {}", type);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for businessType.");
+            }
+
+            logger.debug("Retrieving businesses with search query {} and business type {}", searchQuery, businessType);
+            businessList = businessService.searchBusinessesWithBusinessType(searchQuery, businessType, pageable);
+            totalItems = businessService.getTotalBusinessesCountWithQueryAndType(searchQuery, businessType);
+        } else {
+            logger.debug("Retrieving businesses with search query {}", searchQuery);
+            businessList = businessService.searchBusinesses(searchQuery, pageable);
+            totalItems = businessService.getTotalBusinessesCount(searchQuery);
+        }
+
+
+
+
+        GetSearchBusinessDto getSearchBusinessDto = new GetSearchBusinessDto()
+                .setBusinesses(businessList)
+                .setTotalItems(totalItems);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getSearchBusinessDto);
+
+
+    }
 
 
 
