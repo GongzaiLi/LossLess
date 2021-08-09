@@ -81,6 +81,7 @@ export default {
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
   searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),
+  searchListings: (searchQuery) => instance.get(`/listings/search?searchQuery=${searchQuery}`, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images

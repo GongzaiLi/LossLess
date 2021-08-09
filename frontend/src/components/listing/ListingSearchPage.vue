@@ -5,7 +5,7 @@
       <h1>Search Listings</h1>
       <hr>
 
-      <div>
+      <b-form @submit="getListings">
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
@@ -36,7 +36,7 @@
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
-            <b-button @click="doSearch">Search</b-button>
+            <b-button type="submit">Search</b-button>
           </b-col>
 
           <b-col class="search_button" cols="3" md="1" >
@@ -101,11 +101,10 @@
           </b-row>
           <hr>
         </b-collapse>
-      </div>
-
+      </b-form>
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
-        <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
+        <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
           <b-card class="b_card_listing shadow-sm">
             <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
@@ -119,20 +118,22 @@
             <div v-if="!listing.inventoryItem.product.images.length">
               <img class="product-image" :src="require(`/public/product_default.png`)" alt="Product has no image">
             </div>
-            <hr>
-            <h5><b>Seller: {{ listing.business.name }}</b></h5>
-            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>
-            <span>Closes:{{ listing.closes }}</span>
-            <template #footer>
-              <h5 class="listing_price" v-if="listing.business.currency">
-                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}
-              </h5>
-            </template>
+            <!--COMMENTED OUT UNTIL WE SEND BACK BUSINESS WITH THE LISTING-->
+<!--            <hr>-->
+<!--            <h5><b>Seller: {{ listing.business.name }}</b></h5>-->
+<!--            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>-->
+<!--            <span>Closes:{{ listing.closes }}</span>-->
+<!--            <template #footer>-->
+<!--              <h5 class="listing_price" v-if="listing.business.currency">-->
+<!--                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}-->
+<!--              </h5>-->
+<!--            </template>-->
           </b-card>
         </b-col>
       </b-row>
+      <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
 
-      <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="cards.length"/>
+      <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
     </b-container>
   </b-card>
 </template>
@@ -174,11 +175,9 @@
 
 <script>
 import pagination from "../model/Pagination";
-import api from "../../Api";
-import testCards from "./testCards.json"
+import Api from "../../Api";
 
 export default {
-
   name: "ListingsSearchPage",
   components: {
     pagination,
@@ -197,18 +196,20 @@ export default {
         priceMax:null,
       },
       business: {},
-      cards: [],
+      listings: [],
       perPage: 12,
       currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
       images: [],
-      cardDemoData:testCards,
+      initialized: false
     }
   },
-  mounted() {
-    this.initListingPage();
-    this.search.closesStartDate = this.getToday()
+  async mounted() {
+    this.search.productName = this.$route.query.searchQuery || "";
+    await this.initListingPage();
+    this.search.closesStartDate = this.getToday();
+    this.initialized = true;
   },
 
   methods: {
@@ -226,16 +227,16 @@ export default {
      * Page initilisation function
      **/
     initListingPage: async function () {
-      await this.getListings()
-          .then(()=>this.getBusinessCurrency());
+      await this.getListings();
+      //await this.getBusinessCurrency();
     },
 
     /**
      * Api request to get business information
      **/
     async getBusinessCurrency() {
-      for (const card of this.cards) {
-        await api.getUserCurrency(card.business.address.country)
+      for (const card of this.listings) {
+        await Api.getUserCurrency(card.business.address.country)
             .then((response) => {
               card.business.currency = response;
             })
@@ -249,7 +250,7 @@ export default {
      * read all the listing in for the corresponding business
      **/
     getListings: async function () {
-      this.cards=this.cardDemoData
+      this.listings = (await Api.searchListings(this.search.productName)).data.listings;
     },
 
     /**
@@ -259,16 +260,19 @@ export default {
      **/
     getPrimaryImage: function (listing) {
       const primaryImageFileName = listing.inventoryItem.product.primaryImage.fileName;
-      return api.getImage(primaryImageFileName);
+      return Api.getImage(primaryImageFileName);
     },
+  },
 
+  watch: {
     /**
-     * Placeholder for search function
+     * This watches for those routing changes, so when the search query param is changed (eg from the navbar)
+     * then the search query is re-sent
      */
-    doSearch(){
-      console.log(this.search)
-    }
+    $route(to) {
+      this.search.productName = to.query.searchQuery || '';
+      this.getListings();
+    },
   }
-
 }
 </script>
