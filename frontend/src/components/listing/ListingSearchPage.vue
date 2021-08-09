@@ -1,6 +1,6 @@
 <template>
 
-  <b-card class="b_card_main" >
+  <b-card class="b_card_main shadow-lg">
     <b-container>
       <h1>Search Listings</h1>
       <hr>
@@ -53,7 +53,7 @@
             </b-col>
             <b-col cols="12" md="4">
               <b-select  v-model="search.businessType" >
-                <option :value="null"> Business Type</option>
+                <option :value="null"> Any Business Type</option>
                 <option> Accommodation and Food Services</option>
                 <option> Retail Trade</option>
                 <option> Charitable organisation</option>
@@ -67,6 +67,7 @@
           </b-row>
           <br>
           <b-row align-h="between">
+
             <b-col cols="12" md="7">
               <div class="input-group mb-2 mr-sm-2">
                 <div class="input-group-prepend">
@@ -105,7 +106,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
-          <b-card class="b_card_listing">
+          <b-card class="b_card_listing shadow-sm">
             <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
             <hr>
@@ -122,11 +123,11 @@
             <h5><b>Seller: {{ listing.business.name }}</b></h5>
             <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>
             <span>Closes:{{ listing.closes }}</span>
-            <b-card-footer>
-              <h5 v-if="listing.business.currency">
+            <template #footer>
+              <h5 class="listing_price" v-if="listing.business.currency">
                 {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}
               </h5>
-            </b-card-footer>
+            </template>
           </b-card>
         </b-col>
       </b-row>
@@ -149,7 +150,7 @@
 .to_label {
   margin-left: 1rem;
   margin-right: 1rem;
-  margin-top: 10px;
+  margin-top: auto;
 }
 
 .price_min {
@@ -165,10 +166,9 @@
   height: 100%
 }
 
-.listing_row {
-  margin-left: -38px
+.listing_price {
+  float: right;
 }
-
 
 </style>
 
