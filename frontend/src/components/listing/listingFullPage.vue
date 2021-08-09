@@ -1,6 +1,8 @@
 <template>
   <b-card>
-    <b-button variant="primary" @click="goBack">Return to search results</b-button>
+    <b-button variant="primary" @click="goBack">
+      <b-icon icon="arrow-left-circle" /> Return to search results
+    </b-button>
     <hr>
     <h1>
       Listing Title
