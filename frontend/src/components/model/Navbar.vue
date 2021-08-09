@@ -4,8 +4,7 @@ Date: sprint_1
 -->
 <template>
   <b-navbar
-    toggleable="lg" type="dark" fixed="top"
-    class="shadow"
+    variant="info"
   >
     <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
 

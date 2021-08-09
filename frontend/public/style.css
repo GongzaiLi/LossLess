@@ -30,13 +30,4 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-top: 100px;
-    background-color: #eaeef5 !important;
-}
-
-nav {
-    background-color: #001142;
-}
-
-.card-header {
-    background-color: rgba(0, 0, 255,0.04);
 }
