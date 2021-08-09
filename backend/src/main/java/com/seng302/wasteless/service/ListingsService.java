@@ -56,6 +56,13 @@ public class ListingsService {
                 builder.lower(root.get("inventoryItem").get("product").get("name")),
                 "%" + productName.toLowerCase(Locale.ROOT) + "%");
     }
+//
+//    public static Specification<Listing> sellerAddressMatches(String address) {
+//
+//        return (root, query, builder) -> builder.like(
+//                builder.lower(root.get("inventoryItem").get(""))
+//        );
+//    }
 
 
     /**
@@ -87,6 +94,7 @@ public class ListingsService {
      * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
+     * @param address     Address to match against suburb, city, and country of lister of listing
      * @param pageable    Object containing pagination and sorting info
      * @return A Page containing matching listings.
      */
@@ -94,11 +102,13 @@ public class ListingsService {
             Optional<String> searchQuery,
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
+//            Optional<String> address,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
+//        if (address.isPresent()) querySpec = querySpec.and(sellerAddressMatches(address.get()));
 
         return listingRepository.findAll(querySpec, pageable);
     }

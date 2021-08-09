@@ -31,8 +31,9 @@ public class Listing {
     private Integer id;
 
     @NotNull
-    @Column
-    private Integer businessId;
+    @ManyToOne
+    @JoinColumn(name = "business_id")
+    private Business business;
 
     @NotNull(message = "Inventory id is Mandatory")
     @ManyToOne

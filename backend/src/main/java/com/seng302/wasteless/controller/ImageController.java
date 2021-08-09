@@ -95,6 +95,8 @@ public class ImageController {
         }
 
         int numProductImages = possibleProduct.getImages().size();
+        System.out.println(numProductImages);
+        System.out.println(possibleProduct.getImages());
 
         if (numProductImages >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");

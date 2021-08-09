@@ -27,7 +27,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -81,7 +83,7 @@ class ImageControllerUnitTest {
         productForImage.setId("1-test-product");
         productForImage.setBusinessId(1);
         productForImage.setName("test-product");
-        productForImage.setImages(new ArrayList<>());
+        productForImage.setImages(new HashSet<>());
 
         productImage = new ProductImage();
         productImage.setFileName("test");
@@ -93,7 +95,20 @@ class ImageControllerUnitTest {
         productImageTwo.setThumbnailFilename("test2_thumbnail");
         productImageTwo.setId(2);
 
+        ProductImage productImageThree = new ProductImage();
+        productImageThree.setFileName("test3");
+        productImageThree.setThumbnailFilename("test3_thumbnail");
+        productImageThree.setId(3);
 
+        ProductImage productImageFour = new ProductImage();
+        productImageFour.setFileName("test4");
+        productImageFour.setThumbnailFilename("test4_thumbnail");
+        productImageFour.setId(4);
+
+        ProductImage productImageFive = new ProductImage();
+        productImageFive.setFileName("test5");
+        productImageFive.setThumbnailFilename("test5_thumbnail");
+        productImageFive.setId(5);
 
         productForImageLimit = new Product();
         productForImageLimit.setId("1-test-product-2");
@@ -102,12 +117,12 @@ class ImageControllerUnitTest {
 
         productForImageLimit.setPrimaryImage(productImage);
 
-        List<ProductImage> productImagesLimit = new ArrayList<>();
+        Set<ProductImage> productImagesLimit = new HashSet<>();
         productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImage);
+        productImagesLimit.add(productImageTwo);
+        productImagesLimit.add(productImageThree);
+        productImagesLimit.add(productImageFour);
+        productImagesLimit.add(productImageFive);
 
         productForImageLimit.setImages(productImagesLimit);
 
@@ -118,11 +133,11 @@ class ImageControllerUnitTest {
 
         productForImageOneSpace.setPrimaryImage(productImage);
 
-        List<ProductImage> productImagesOneSpace = new ArrayList<>();
+        Set<ProductImage> productImagesOneSpace = new HashSet<>();
         productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImage);
+        productImagesOneSpace.add(productImageTwo);
+        productImagesOneSpace.add(productImageThree);
+        productImagesOneSpace.add(productImageFour);
 
         productForImageOneSpace.setImages(productImagesOneSpace);
 
@@ -273,7 +288,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_andValidRequest_then200Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -290,7 +305,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_businessesIdNotFind_then400Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -306,7 +321,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productCodeNotFind_then400Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -322,7 +337,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productImageIdNotFind_then406Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -338,7 +353,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_andValidRequest_then200Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -354,7 +369,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_businessesIdNotFind_then400Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -370,7 +385,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productCodeNotFind_then400Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);
@@ -386,7 +401,7 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productImageIdNotFind_then406Response() throws Exception {
-        List<ProductImage> productImages = new ArrayList<>();
+        Set<ProductImage> productImages = new HashSet<>();
         productImages.add(productImage);
         productImages.add(productImageTwo);
         productForImage.setImages(productImages);

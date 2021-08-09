@@ -19,15 +19,12 @@ import java.util.List;
 @Component
 public class GetSaleListingDtoMapper {
 
-    private static BusinessService businessService;
-
-
     @Autowired
-    public GetSaleListingDtoMapper(BusinessService businessService) { GetSaleListingDtoMapper.businessService = businessService; }
+    public GetSaleListingDtoMapper() {}
 
     public static GetSaleListingDto toGetSaleListingDto(Listing listing) {
 
-        Business business = businessService.findBusinessById(listing.getBusinessId());
+        Business business = listing.getBusiness();
 
         return new GetSaleListingDto()
             .setId(listing.getId())

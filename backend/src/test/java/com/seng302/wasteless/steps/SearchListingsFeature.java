@@ -61,6 +61,9 @@ public class SearchListingsFeature {
     @Autowired
     private ListingsService listingsService;
 
+    @Autowired
+    private BusinessService businessService;
+
     private ResultActions responseResult;
 
     private static final List<List<String>> createdListings = new ArrayList<>();
@@ -111,7 +114,7 @@ public class SearchListingsFeature {
     public void theFollowingListingsExist(List<List<String>> listings) {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
-                ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService,
+                ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService,
                         listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
 
                 createdListings.add(listingInfo);

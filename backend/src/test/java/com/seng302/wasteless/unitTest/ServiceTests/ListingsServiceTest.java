@@ -1,11 +1,8 @@
 package com.seng302.wasteless.unitTest.ServiceTests;
 
-import com.seng302.wasteless.model.Inventory;
-import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.model.Product;
-import com.seng302.wasteless.service.InventoryService;
-import com.seng302.wasteless.service.ListingsService;
-import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.service.*;
+import io.cucumber.java.bs.A;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,14 +19,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
@@ -47,11 +42,34 @@ public class ListingsServiceTest {
     @Autowired
     private ListingsService listingsService;
 
+    @Autowired
+    private BusinessService businessService;
+
+    @Autowired
+    private AddressService addressService;
+
     /**
      * Creates a Listing with the given product name and price. This method is re-used in other tests so we need
      * to take in the services and parameters.
      */
-    public static void createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService, ListingsService listingsService, String name, Double price) {
+    public static void createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService, ListingsService listingsService, BusinessService businessService, AddressService addressService,  String name, Double price) {
+        var address = new Address();
+        address.setCountry("NZ");
+        address.setSuburb("Riccarton");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+        addressService.createAddress(address);
+
+        var business = new Business();
+        business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
+        business.setId(1);
+        business.setAdministrators(new ArrayList<>());
+        business.setName("Jimmy's clown store");
+        business.setAddress(address);
+        businessService.createBusiness(business);
+
         var product = new Product();
         product.setName(name);
         productService.createProduct(product);
@@ -65,17 +83,17 @@ public class ListingsServiceTest {
         var newListing = new Listing();
         newListing.setInventoryItem(inventory);
         newListing.setQuantity(69);
-        newListing.setBusinessId(0);
+        newListing.setBusiness(business);
         newListing.setPrice(price);
         listingsService.createListing(newListing);
     }
 
     @BeforeAll
     void setUp() {
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, "Black Water No Sugar", 1.0);
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, "Back Water", 1.5);
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, "Willy Wonka", 2.0);
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, "Wonka Willy", 100.0);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0);
     }
 
     //
