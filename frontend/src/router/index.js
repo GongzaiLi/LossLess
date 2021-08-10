@@ -12,10 +12,11 @@ import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
 import ListingSearchPage from "../components/listing/ListingSearchPage";
+import ListingFullPage from "@/components/listing/ListingFullPage";
+
 
 
 import {getCurrentUser} from '@/auth';
-import listingFullPage from "@/components/listing/listingFullPage";
 
 /**
  * This specifies all routing information used by Vue-Router.
@@ -38,7 +39,7 @@ const router = new Router({
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
         { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage},
-        { path : '/listing/:id', name: 'listings-full', component: listingFullPage}
+        { path : '/listing/:id', name: 'listings-full', component: ListingFullPage}
 
     ]
 });
