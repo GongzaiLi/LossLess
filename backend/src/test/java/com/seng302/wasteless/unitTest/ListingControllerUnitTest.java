@@ -420,26 +420,5 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("listings", hasSize(1)));
     }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestToSearchListings_andEmptyString_then200Response() throws Exception {
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
-                .queryParam("closingDateStart", "2022-03-27")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("listings", hasSize(3)));
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestToSearchListings_andQueryString_then200Response() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
-                .queryParam("searchQuery", "blah")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("listings", hasSize(1)));
-    }
 }
 
