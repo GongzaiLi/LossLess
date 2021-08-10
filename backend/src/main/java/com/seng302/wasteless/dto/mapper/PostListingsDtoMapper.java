@@ -14,7 +14,7 @@ public class PostListingsDtoMapper {
 
     @Autowired
     private PostListingsDtoMapper(InventoryService inventoryService) {
-        this.inventoryService = inventoryService;
+        PostListingsDtoMapper.inventoryService = inventoryService;
     }
 
     public static Listing postListingsDto(PostListingsDto listingsDto) {

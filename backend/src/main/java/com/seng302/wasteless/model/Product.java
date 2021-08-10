@@ -12,7 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 /**
  * An implementation of Product model.
@@ -61,7 +61,7 @@ public class Product {
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @Column(name = "image_ids")
     @OneToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
-    private List<ProductImage> images;
+    private Set<ProductImage> images;
 
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     @JoinColumn(name = "primary_Image")
