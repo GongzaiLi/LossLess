@@ -97,6 +97,10 @@ public class User {
     @Column(name = "has_cards_deleted")
     private Integer hasCardsDeleted = 0;
 
+    @JoinColumn(name = "listing_liked")
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Listing> listingsLiked;
+
     /**
      * Check this objects date is within the expected maximum and minimum date ranges
      */

@@ -69,5 +69,10 @@ public class Listing {
     @JsonView(ListingViews.GetListingView.class)
     private LocalDate closes;
 
+    @PositiveOrZero
+    @Column(name = "users_Liked")
+    @JsonView(ListingViews.GetListingView.class)
+    private Integer usersLiked = 0;
+
 
 }
