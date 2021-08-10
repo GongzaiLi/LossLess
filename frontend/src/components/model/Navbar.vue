@@ -63,7 +63,7 @@ Date: sprint_1
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right>
           <template #button-content>
-            <div class="icon mr-1" @click="bellIconPressed">
+            <div class="icon mr-1">
               <b-icon v-if="numExpiredCards > 0" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem;"></b-icon>
               <b-icon v-else-if="numberOfNotifications"  icon="bell" class="iconBell" variant="warning" style="font-size:  1.8rem"></b-icon>
               <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
@@ -339,21 +339,6 @@ export default {
       }).catch((error) => {
         this.$log.debug(error);
       });
-    },
-
-    /**
-     *  Triggers when the notification icon is pressed to display the notifications.
-     */
-    bellIconPressed() {
-      if(this.showNotifications) {
-        document.getElementById("box").style.height='0px';
-        document.getElementById("box").style.opacity='0';
-        this.showNotifications = false;
-      } else {
-        document.getElementById("box").style.height='auto';
-        document.getElementById("box").style.opacity='1';
-        this.showNotifications = true;
-      }
     },
 
     /**
