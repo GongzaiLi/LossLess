@@ -103,7 +103,7 @@ public class ListingController {
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
-        listing.setBusinessId(businessId);
+        listing.setBusiness(possibleBusiness);
         listing.setCreated(LocalDate.now());
 
         listing = listingsService.createListing(listing);
@@ -159,8 +159,11 @@ public class ListingController {
     /**
      * Handles endpoint to search for listings
      *
-     * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
-     * @param pageable    pagination and sorting params
+     * @param searchQuery       The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param priceLower  Lower inclusive bound for listing prices
+     * @param priceUpper  Upper inclusive bound for listing prices
+     * @param address           Address to match against suburb, city, and country of lister of listing
+     * @param pageable          pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
      */
     @GetMapping("/listings/search")
@@ -169,10 +172,11 @@ public class ListingController {
             @RequestParam Optional<String> searchQuery,
             @RequestParam Optional<Double> priceLower,
             @RequestParam Optional<Double> priceUpper,
+            @RequestParam Optional<String> address,
             Pageable pageable) {
-        logger.info("Get request to search LISTING, query param: {}", searchQuery);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, address: {}", searchQuery, priceLower, priceUpper, address);
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())
