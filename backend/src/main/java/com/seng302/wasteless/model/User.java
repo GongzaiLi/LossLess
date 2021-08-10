@@ -152,5 +152,7 @@ public class User {
     public boolean checkUserDefaultAdmin() {
         return this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
     }
+
+    public void addLikedListing(Listing listing) {this.listingsLiked.add(listing);}
 }
 

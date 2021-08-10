@@ -181,6 +181,18 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 
+
+    @PutMapping("/listings/{listingId}/like")
+    public ResponseEntity<Object> addLikeToListing(@PathVariable Integer listingId, Integer userId) {
+        User user = userService.getCurrentlyLoggedInUser();
+        if (!userId.equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Logged in User doesnt match given user id");
+        }
+        user.addLikedListing(listingsService.findFirstById(listingId));
+        userService.saveUserChanges(user);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     /**
      * Returns a json object of bad field found in the request
      *

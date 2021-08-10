@@ -24,6 +24,8 @@ public class ListingsService {
         this.listingRepository = listingRepository;
     }
 
+
+
     /**
      * Returns a Specification that matches all listings with price greater than or equal to the given price
      *
@@ -66,6 +68,10 @@ public class ListingsService {
      */
     public Listing createListing(Listing listingItem) {
         return listingRepository.save(listingItem);
+    }
+
+    public Listing findFirstById(Integer id) {
+        return listingRepository.findFirstById(id);
     }
 
     /**
