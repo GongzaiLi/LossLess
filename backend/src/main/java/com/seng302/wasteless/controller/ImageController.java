@@ -94,11 +94,7 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
         }
 
-        int numProductImages = possibleProduct.getImages().size();
-        System.out.println(numProductImages);
-        System.out.println(possibleProduct.getImages());
-
-        if (numProductImages >= 5) {
+        if (possibleProduct.getImages().size() >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }

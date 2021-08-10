@@ -339,7 +339,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Assertions.assertEquals(currentUser.getHasCardsDeleted(),0);
+        Assertions.assertEquals(0,currentUser.getHasCardsDeleted());
     }
 
     @Test
@@ -352,7 +352,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        Assertions.assertEquals(currentUser.getHasCardsDeleted(),0);
+        Assertions.assertEquals(0, currentUser.getHasCardsDeleted());
     }
 
     void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {

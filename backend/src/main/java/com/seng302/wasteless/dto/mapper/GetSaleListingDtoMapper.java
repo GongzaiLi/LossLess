@@ -1,15 +1,9 @@
 package com.seng302.wasteless.dto.mapper;
 
-import com.seng302.wasteless.dto.GetBusinessesDto;
-import com.seng302.wasteless.dto.GetBusinessesDtoAdmin;
 import com.seng302.wasteless.dto.GetSaleListingDto;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.BusinessService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -19,8 +13,6 @@ import java.util.List;
 @Component
 public class GetSaleListingDtoMapper {
 
-    @Autowired
-    public GetSaleListingDtoMapper() {}
 
     public static GetSaleListingDto toGetSaleListingDto(Listing listing) {
 

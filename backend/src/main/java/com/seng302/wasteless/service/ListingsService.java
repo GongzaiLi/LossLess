@@ -138,7 +138,6 @@ public class ListingsService {
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
 
         if (address.isPresent()) {
-            System.out.println("ADDRESS IS " + address.get());
             querySpec = querySpec.and(
                     sellerAddressCountryMatches(address.get())
                     .or(sellerAddressCityMatches(address.get()))
