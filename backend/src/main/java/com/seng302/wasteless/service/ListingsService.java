@@ -37,20 +37,20 @@ public class ListingsService {
     }
 
     /**
-     * Returns a Specification that matches all listings with price less than or equal to the given price
+     * Returns a Specification that matches all listings with close dates before or equal to the given close date
      *
-     * @param date Upper inclusive bound for price
-     * @return A Specification that matches all listings with price less than or equal to the given price
+     * @param date Upper inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates before or equal to the given close date
      */
     public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
         return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
     }
 
     /**
-     * Returns a Specification that matches all listings with price greater than or equal to the given price
+     * Returns a Specification that matches all listings with close dates after or equal to the given close date
      *
-     * @param date Lower inclusive bound for price
-     * @return A Specification that matches all listings with price greater than or equal to the given price
+     * @param date Lower inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates after or equal to the given close date
      */
     public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
@@ -109,6 +109,8 @@ public class ListingsService {
      * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
+     * @param closingDateStart  Lower inclusive bound for listing close dates
+     * @param closingDateEnd  Upper inclusive bound for listing close dates
      * @param pageable    Object containing pagination and sorting info
      * @return A Page containing matching listings.
      */

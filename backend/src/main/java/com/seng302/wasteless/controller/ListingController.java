@@ -160,6 +160,8 @@ public class ListingController {
      * Handles endpoint to search for listings
      *
      * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param closingDateStart A date string to filter listings with. This sets the start range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param closingDateEnd A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
      * @param pageable    pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
      */
