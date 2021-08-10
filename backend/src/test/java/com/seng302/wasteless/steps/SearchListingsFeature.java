@@ -25,6 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -112,7 +113,7 @@ public class SearchListingsFeature {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
                 ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), null);
 
                 createdListings.add(listingInfo);
             }
