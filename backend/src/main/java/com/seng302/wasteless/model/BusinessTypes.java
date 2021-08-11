@@ -19,6 +19,21 @@ public enum BusinessTypes {
     private final String text;
 
     /**
+     * Takes the text value and returns the enum heading
+     * @param text The text value
+     * @return the enum heading e.g RETAIL_TRADE
+     */
+    public static BusinessTypes fromString(String text) {
+        for (BusinessTypes heading : BusinessTypes.values()) {
+            if (heading.text.equalsIgnoreCase(text)) {
+                return heading;
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * @param text  The text of the enum
      */
     BusinessTypes(final String text) {

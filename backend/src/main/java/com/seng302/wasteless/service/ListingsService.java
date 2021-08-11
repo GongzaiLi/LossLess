@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.Listing;
 import com.seng302.wasteless.repository.ListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class ListingsService {
     /**
      * Returns a Specification that matches all listings with the country portion of an address.
      * Matches are case-insensitive
+     *
      * @param country Country to match listings by
      * @return Specification that matches all listings with address potion country matching given country
      */
@@ -72,6 +74,7 @@ public class ListingsService {
     /**
      * Returns a Specification that matches all listings with the City portion of an address.
      * Matches are case-insensitive
+     *
      * @param city City to match listings by
      * @return Specification that matches all listings with address potion city matching given city
      */
@@ -84,6 +87,7 @@ public class ListingsService {
     /**
      * Returns a Specification that matches all listings with the Suburb portion of an address.
      * Matches are case-insensitive
+     *
      * @param suburb Suburb to match listings by
      * @return Specification that matches all listings with address potion suburb matching given suburb
      */
@@ -96,6 +100,7 @@ public class ListingsService {
     /**
      * Returns a Specification that matches all listings with the name of a business.
      * Matches are case-insensitive.
+     *
      * @param businessName business name to match listings by
      * @return Specification that matches all listings with the name of the business matching given the business name.
      */
@@ -103,6 +108,19 @@ public class ListingsService {
         return (root, query, builder) -> builder.like(
                 builder.lower(root.get("business").get("name")),
                 "%" + businessName.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    /**
+     * Returns a Specification that matches all listings with the type of a business.
+     * Also takes a business type name and grabs the businessType enum heading to match with.
+     * Matches are case-insensitive.
+     *
+     * @param type business type to match listings by
+     * @return Specification that matches all listings with the type of the business matching given the business type
+     */
+    private Specification<Listing> sellerBusinessTypeMatches(String type) {
+        BusinessTypes businessType = BusinessTypes.fromString(type);
+        return (root, query, builder) -> builder.equal(root.get("business").get("businessType"), businessType);
     }
 
 
@@ -144,6 +162,7 @@ public class ListingsService {
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
             Optional<String> businessName,
+            Optional<String> businessType,
             Optional<String> address,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
@@ -151,19 +170,20 @@ public class ListingsService {
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
         if (businessName.isPresent()) querySpec = querySpec.and(sellerBusinessNameMatches(businessName.get()));
+        if (businessType.isPresent() && !businessType.get().isEmpty())
+            querySpec = querySpec.and(sellerBusinessTypeMatches(businessType.get()));
 
         if (address.isPresent()) {
             querySpec = querySpec.and(
                     sellerAddressCountryMatches(address.get())
-                    .or(sellerAddressCityMatches(address.get()))
-                    .or(sellerAddressSuburbMatches(address.get()))
+                            .or(sellerAddressCityMatches(address.get()))
+                            .or(sellerAddressSuburbMatches(address.get()))
             );
         }
 
 
         return listingRepository.findAll(querySpec, pageable);
     }
-
 
 
     /**

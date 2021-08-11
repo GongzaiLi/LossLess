@@ -173,14 +173,15 @@ public class ListingController {
             @RequestParam Optional<Double> priceLower,
             @RequestParam Optional<Double> priceUpper,
             @RequestParam Optional<String> businessName,
+            @RequestParam Optional<String> businessType,
             @RequestParam Optional<String> address,
             Pageable pageable) {
 
-        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, address: {}",
-                searchQuery, priceLower, priceUpper, businessName, address);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business type: {}, address: {}",
+                searchQuery, priceLower, priceUpper, businessName, businessType, address);
 
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, address, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessType, address, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())
