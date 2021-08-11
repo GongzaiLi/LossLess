@@ -62,14 +62,14 @@ Feature: U29 - Browse/Search Sale listings
       | Back Water  |
       | Willy Wonka |
 
-  Scenario: AC10 - I can limit the results by setting a earliest closing date.
+  Scenario: AC10 - I can limit the results by setting a latest closing date.
     When I search for listings with closing dates on or before "2050-01-03"
     Then The results contain exclusively the following products:
       | Black Water No Sugar |
       | Back Water           |
       | Willy Wonka          |
 
-  Scenario: AC10 - I can limit the results by setting a latest closing date .
+  Scenario: AC10 - I can limit the results by setting a earliest closing date .
     When I search for listings with closing dates on or after "2050-01-02"
     Then The results contain exclusively the following products:
       | Back Water           |
