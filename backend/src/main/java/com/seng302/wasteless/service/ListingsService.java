@@ -94,6 +94,19 @@ public class ListingsService {
     }
 
     /**
+     * Returns a Specification that matches all listings with the name of a business.
+     * Matches are case-insensitive.
+     * @param businessName business name to match listings by
+     * @return Specification that matches all listings with the name of the business matching given the business name.
+     */
+    private Specification<Listing> sellerBusinessNameMatches(String businessName) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("name")),
+                "%" + businessName.toLowerCase(Locale.ROOT) + "%");
+    }
+
+
+    /**
      * Given an Listing object, 'creates' it by saving and persisting it in the database.
      *
      * @param listingItem The Listing item item to create
@@ -137,6 +150,7 @@ public class ListingsService {
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
+        if (businessName.isPresent()) querySpec = querySpec.and(sellerBusinessNameMatches(businessName.get()));
 
         if (address.isPresent()) {
             querySpec = querySpec.and(
@@ -149,6 +163,7 @@ public class ListingsService {
 
         return listingRepository.findAll(querySpec, pageable);
     }
+
 
 
     /**

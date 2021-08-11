@@ -81,7 +81,7 @@ public class ListingController {
 
 
         logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);
-        logger.info("Retrievrf `{}` ", listingsDtoRequest.getInventoryItemId());
+        logger.info("Retrieved `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
 
@@ -159,11 +159,11 @@ public class ListingController {
     /**
      * Handles endpoint to search for listings
      *
-     * @param searchQuery       The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
-     * @param address           Address to match against suburb, city, and country of lister of listing
-     * @param pageable          pagination and sorting params
+     * @param address     Address to match against suburb, city, and country of lister of listing
+     * @param pageable    pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
      */
     @GetMapping("/listings/search")
@@ -172,15 +172,15 @@ public class ListingController {
             @RequestParam Optional<String> searchQuery,
             @RequestParam Optional<Double> priceLower,
             @RequestParam Optional<Double> priceUpper,
-            @RequestParam Optional<String> address,
             @RequestParam Optional<String> businessName,
+            @RequestParam Optional<String> address,
             Pageable pageable) {
-        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, address: {}", searchQuery, priceLower, priceUpper, address);
 
-        logger.info("Get request to search LISTING, query param: {}, business name: {}", searchQuery, businessName);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, address: {}",
+                searchQuery, priceLower, priceUpper, businessName, address);
 
-        //Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, pageable);
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address, pageable);
+
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, address, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())
