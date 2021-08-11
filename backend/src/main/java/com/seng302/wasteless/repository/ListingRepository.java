@@ -19,7 +19,7 @@ public interface ListingRepository extends JpaRepository<Listing, Integer>, JpaS
 
     Listing findFirstById(Integer id);
 
-    List<Listing> findAllByBusinessId(Integer id, Pageable pageable);
+    List<Listing> findAllByBusinessId(Integer businessId, Pageable pageable);
 
-    Long countListingByBusinessId(Integer id);
+    Long countListingByBusinessId(Integer businessId);
 }

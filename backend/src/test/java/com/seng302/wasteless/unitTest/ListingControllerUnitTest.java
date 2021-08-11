@@ -222,11 +222,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(listing.setId(1));
 
         Mockito
-                .when(listingsService.searchListings(any(Optional.class), any(Optional.class), any(Optional.class),any(Optional.class), any(Optional.class), any(Pageable.class)))
+                .when(listingsService.searchListings(any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(listingList));
 
         Mockito
-                .when(listingsService.searchListings(eq(Optional.of("blah")), any(Optional.class), any(Optional.class),any(Optional.class), any(Optional.class), any(Pageable.class)))
+                .when(listingsService.searchListings(eq(Optional.of("blah")), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(listing)));
 
         Mockito

@@ -1,16 +1,10 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.dto.mapper.GetSaleListingDtoMapper;
 import com.seng302.wasteless.model.Address;
-import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Inventory;
-import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.service.BusinessService;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 

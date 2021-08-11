@@ -79,6 +79,41 @@ public class ListingsService {
                 "%" + productName.toLowerCase(Locale.ROOT) + "%");
     }
 
+    /**
+     * Returns a Specification that matches all listings with the country portion of an address.
+     * Matches are case-insensitive
+     * @param country Country to match listings by
+     * @return Specification that matches all listings with address potion country matching given country
+     */
+    public static Specification<Listing> sellerAddressCountryMatches(String country) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("country")),
+                "%" + country.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    /**
+     * Returns a Specification that matches all listings with the City portion of an address.
+     * Matches are case-insensitive
+     * @param city City to match listings by
+     * @return Specification that matches all listings with address potion city matching given city
+     */
+    public static Specification<Listing> sellerAddressCityMatches(String city) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("city")),
+                "%" + city.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    /**
+     * Returns a Specification that matches all listings with the Suburb portion of an address.
+     * Matches are case-insensitive
+     * @param suburb Suburb to match listings by
+     * @return Specification that matches all listings with address potion suburb matching given suburb
+     */
+    public static Specification<Listing> sellerAddressSuburbMatches(String suburb) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("suburb")),
+                "%" + suburb.toLowerCase(Locale.ROOT) + "%");
+    }
 
     /**
      * Given an Listing object, 'creates' it by saving and persisting it in the database.
@@ -109,6 +144,7 @@ public class ListingsService {
      * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
+     * @param address     Address to match against suburb, city, and country of lister of listing
      * @param closingDateStart  Lower inclusive bound for listing close dates
      * @param closingDateEnd  Upper inclusive bound for listing close dates
      * @param pageable    Object containing pagination and sorting info
@@ -118,6 +154,7 @@ public class ListingsService {
             Optional<String> searchQuery,
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
+            Optional<String> address,
             Optional<LocalDate> closingDateStart,
             Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
@@ -127,6 +164,14 @@ public class ListingsService {
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
         if (closingDateStart.isPresent()) querySpec = querySpec.and(closesGreaterThanOrEqualTo(closingDateStart.get()));
         if (closingDateEnd.isPresent()) querySpec = querySpec.and(closesLessThanOrEqualTo(closingDateEnd.get()));
+
+        if (address.isPresent()) {
+            querySpec = querySpec.and(
+                    sellerAddressCountryMatches(address.get())
+                    .or(sellerAddressCityMatches(address.get()))
+                    .or(sellerAddressSuburbMatches(address.get()))
+            );
+        }
 
         return listingRepository.findAll(querySpec, pageable);
     }
