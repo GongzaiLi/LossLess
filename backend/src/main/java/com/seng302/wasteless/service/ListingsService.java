@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -32,6 +34,26 @@ public class ListingsService {
      */
     public static Specification<Listing> priceGreaterThanOrEqualTo(Double price) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("price"), price);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with close dates before or equal to the given close date
+     *
+     * @param date Upper inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates before or equal to the given close date
+     */
+    public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with close dates after or equal to the given close date
+     *
+     * @param date Lower inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates after or equal to the given close date
+     */
+    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
     }
 
     /**
@@ -123,6 +145,8 @@ public class ListingsService {
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
      * @param address     Address to match against suburb, city, and country of lister of listing
+     * @param closingDateStart  Lower inclusive bound for listing close dates
+     * @param closingDateEnd  Upper inclusive bound for listing close dates
      * @param pageable    Object containing pagination and sorting info
      * @return A Page containing matching listings.
      */
@@ -131,11 +155,15 @@ public class ListingsService {
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
             Optional<String> address,
+            Optional<LocalDate> closingDateStart,
+            Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
+        if (closingDateStart.isPresent()) querySpec = querySpec.and(closesGreaterThanOrEqualTo(closingDateStart.get()));
+        if (closingDateEnd.isPresent()) querySpec = querySpec.and(closesLessThanOrEqualTo(closingDateEnd.get()));
 
         if (address.isPresent()) {
             querySpec = querySpec.and(
