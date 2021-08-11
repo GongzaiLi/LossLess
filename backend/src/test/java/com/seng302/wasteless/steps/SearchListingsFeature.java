@@ -183,4 +183,20 @@ public class SearchListingsFeature {
                 .with(user(currentUserDetails))
                 .with(csrf()));
     }
+
+    @When("I search for listings with closing dates on or before {string}")
+    public void iSearchForListingsWithClosingDatesOnOrBefore(String closingDateEnd) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateEnd", closingDateEnd)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I search for listings with closing dates on or after {string}")
+    public void iSearchForListingsWithClosingDatesOnOrAfter(String closingDateStart) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", closingDateStart)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
 }
