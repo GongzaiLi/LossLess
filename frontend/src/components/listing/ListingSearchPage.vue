@@ -9,7 +9,7 @@
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
-              <b-input placeholder="Product Name" v-model="search.productName"></b-input>
+              <b-input ref="searchInput" placeholder="Product Name" v-model="search.productName"></b-input>
             </b-input-group>
           </b-col>
 
@@ -116,7 +116,7 @@
               <img class="product-image" :src="getPrimaryImage(listing)" alt="Failed to load image">
             </div>
             <div v-if="!listing.inventoryItem.product.images.length">
-              <img class="product-image" :src="require(`/public/product_default.png`)" alt="Product has no image">
+              <img class="product-image" src="product_default.png" alt="Product has no image">
             </div>
             <!--COMMENTED OUT UNTIL WE SEND BACK BUSINESS WITH THE LISTING-->
 <!--            <hr>-->
@@ -176,6 +176,7 @@
 <script>
 import pagination from "../model/Pagination";
 import Api from "../../Api";
+import {getToday} from "../../util";
 
 export default {
   name: "ListingsSearchPage",
@@ -206,23 +207,14 @@ export default {
     }
   },
   async mounted() {
+    this.$refs.searchInput.focus();
     this.search.productName = this.$route.query.searchQuery || "";
     await this.initListingPage();
-    this.search.closesStartDate = this.getToday();
+    this.search.closesStartDate = getToday();
     this.initialized = true;
   },
 
   methods: {
-    /**
-     * Get today's date without the time
-     * need to add one to get correct date
-     * @return today's date in format yyyy-mm-dd
-     **/
-    getToday() {
-      let date = new Date();
-      return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
-    },
-
     /**
      * Page initilisation function
      **/
@@ -272,6 +264,7 @@ export default {
     $route(to) {
       this.search.productName = to.query.searchQuery || '';
       this.getListings();
+      this.$refs.searchInput.focus();
     },
   }
 }

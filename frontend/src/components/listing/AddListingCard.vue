@@ -118,8 +118,8 @@ Date: 23/5/2021
 <script>
 
 import api from '../../Api';
-
 import InventoryTable from "../inventory/InventoryTable";
+import {getToday} from "../../util";
 
 export default {
 name: "add-listing-card",
@@ -150,6 +150,7 @@ name: "add-listing-card",
   },
   data() {
     return {
+      getToday: getToday, // Expose helper function to be used in the templates
       mainProps: {blank: true, blankColor: '#777', width: 150, height: 150, class: 'm1'},
       listingData: {
         inventoryItemId: '',
@@ -191,7 +192,7 @@ name: "add-listing-card",
         this.listingCardError = "Price must be greater than or equal to zero"
         return
       }
-      if (this.listingData.closes === this.getToday() ) {
+      if (this.listingData.closes === getToday() ) {
         if (this.listingData.closesTime < this.getTimeNow()) {
           this.listingCardError = "Listing must close in the future, Check the time of closure";
           return
@@ -245,16 +246,6 @@ name: "add-listing-card",
       if (date != null) {
         return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')
       }
-    },
-
-    /**
-     * get today's date without the time
-     * need to add one to get correct date
-     * @return today's date in format yyyy-mm-dd
-     **/
-    getToday() {
-      let date = new Date();
-      return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
     },
 
     /**
