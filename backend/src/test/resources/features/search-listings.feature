@@ -6,10 +6,10 @@ Feature: U29 - Browse/Search Sale listings
   Background:
     Given We are logged in as the individual user with email "a@a"
     And The following listings exist:
-      | Black Water No Sugar | 1   | Albania | Samarkand  | Ulugbek |
-      | Back Water           | 1.5 | Russia  | Moscow     | Kremlin |
-      | Willy Wonka          | 2   | Albania | Sypki      | Say     |
-      | Wonka Willy          | 100 | Russia  | Stalingrad | Kgb     |
+      | Black Water No Sugar | 1   | Albania | Samarkand  | Ulugbek | Wonka Water       | RETAIL_TRADE            |
+      | Back Water           | 1.5 | Russia  | Moscow     | Kremlin | Wonka Water       | RETAIL_TRADE            |
+      | Willy Wonka          | 2   | Albania | Sypki      | Say     | Peaches and Wonka | CHARITABLE_ORGANISATION |
+      | Wonka Willy          | 100 | Russia  | Stalingrad | Kgb     | Fraud             | NON_PROFIT_ORGANISATION |
 
   Scenario: AC2 - If no filtering is applied then all current sales listings are displayed.
     When I search for listings with no filtering
@@ -18,6 +18,35 @@ Feature: U29 - Browse/Search Sale listings
       | Back Water           |
       | Willy Wonka          |
       | Willy Wonka          |
+
+  Scenario: AC5 - I can limit the results by one business type.
+    When I search for listings by business type:
+      | Retail Trade |
+    Then The results contain exclusively the following products:
+      | Black Water No Sugar |
+      | Back Water           |
+
+  Scenario: AC5 - I can limit the results by two different business types.
+    When I search for listings by business type:
+      | Retail Trade            |
+      | Charitable organisation |
+    Then The results contain exclusively the following products:
+      | Black Water No Sugar |
+      | Back Water           |
+      | Willy Wonka          |
+
+  Scenario: AC5 - No results shown when I try and limit the results by one invalid type.
+    When I search for listings by business type:
+      | organisation |
+    Then No results are given
+
+  Scenario: AC5 - I can limit the results by one valid type and one invalid type.
+    When I search for listings by business type:
+      | Retail Trade |
+      | organisation |
+    Then The results contain exclusively the following products:
+      | Black Water No Sugar |
+      | Back Water           |
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, part of a product name.
     When I search for listings by product name "water"
@@ -39,6 +68,16 @@ Feature: U29 - Browse/Search Sale listings
     Then The results contain exclusively the following products:
       | Back Water  |
       | Willy Wonka |
+
+  Scenario: AC8 - I can limit the results by seller business name.
+    When I search for listings by business name "Wonka Water"
+    Then The results contain exclusively the following products:
+      | Black Water No Sugar |
+      | Back Water           |
+
+  Scenario: AC8 - No results shown when no business names match.
+    When I search for listings by business name "Poo"
+    Then No results are given
 
   Scenario: AC9 - I can limit the results by address, in a city name.
     When I search for listings by address "Samarkand"

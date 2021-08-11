@@ -162,6 +162,8 @@ public class ListingController {
      * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
+     * @param businessName  Business name to match against listings
+     * @param businessTypes List of business types to match against listings
      * @param address     Address to match against suburb, city, and country of lister of listing
      * @param pageable    pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
@@ -173,15 +175,15 @@ public class ListingController {
             @RequestParam Optional<Double> priceLower,
             @RequestParam Optional<Double> priceUpper,
             @RequestParam Optional<String> businessName,
-            @RequestParam Optional<String> businessType,
+            @RequestParam Optional<List<String>> businessTypes,
             @RequestParam Optional<String> address,
             Pageable pageable) {
 
-        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business type: {}, address: {}",
-                searchQuery, priceLower, priceUpper, businessName, businessType, address);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, address: {}",
+                searchQuery, priceLower, priceUpper, businessName, businessTypes, address);
 
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessType, address, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address, pageable);
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())

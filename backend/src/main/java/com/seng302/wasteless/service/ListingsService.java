@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -111,16 +112,22 @@ public class ListingsService {
     }
 
     /**
-     * Returns a Specification that matches all listings with the type of a business.
-     * Also takes a business type name and grabs the businessType enum heading to match with.
+     * Returns a Specification that matches all listings with valid business types within the scope of
+     * the business types enum.
      * Matches are case-insensitive.
      *
-     * @param type business type to match listings by
-     * @return Specification that matches all listings with the type of the business matching given the business type
+     * @param types list of Business types to match listings
+     * @return Specification that matches all listings with the type of the business matching given the business types
      */
-    private Specification<Listing> sellerBusinessTypeMatches(String type) {
-        BusinessTypes businessType = BusinessTypes.fromString(type);
-        return (root, query, builder) -> builder.equal(root.get("business").get("businessType"), businessType);
+    private Specification<Listing> sellerBusinessTypeMatches(List<String> types) {
+        List<BusinessTypes> businessTypes = new ArrayList<>();
+        for (String type : types) {
+            if (!type.isEmpty()) {
+                businessTypes.add(BusinessTypes.fromString(type));
+            }
+        }
+
+        return (root, query, builder) -> root.get("business").get("businessType").in(businessTypes);
     }
 
 
@@ -150,11 +157,13 @@ public class ListingsService {
      * Any or all of the filter/search params are optional. The Pageable cannot be null
      * but can simply be a Pageable.unpaged() object
      *
-     * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
-     * @param priceLower  Lower inclusive bound for listing prices
-     * @param priceUpper  Upper inclusive bound for listing prices
-     * @param address     Address to match against suburb, city, and country of lister of listing
-     * @param pageable    Object containing pagination and sorting info
+     * @param searchQuery   The search query - matches listings' product names by substring (case insensitive)
+     * @param priceLower    Lower inclusive bound for listing prices
+     * @param priceUpper    Upper inclusive bound for listing prices
+     * @param businessName  Business name to match against listings
+     * @param businessTypes List of business types to match against listings
+     * @param address       Address to match against suburb, city, and country of lister of listing
+     * @param pageable      Object containing pagination and sorting info
      * @return A Page containing matching listings.
      */
     public Page<Listing> searchListings(
@@ -162,7 +171,7 @@ public class ListingsService {
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
             Optional<String> businessName,
-            Optional<String> businessType,
+            Optional<List<String>> businessTypes,
             Optional<String> address,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
@@ -170,8 +179,8 @@ public class ListingsService {
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
         if (businessName.isPresent()) querySpec = querySpec.and(sellerBusinessNameMatches(businessName.get()));
-        if (businessType.isPresent() && !businessType.get().isEmpty())
-            querySpec = querySpec.and(sellerBusinessTypeMatches(businessType.get()));
+        if (businessTypes.isPresent() && !businessTypes.get().isEmpty())
+            querySpec = querySpec.and(sellerBusinessTypeMatches(businessTypes.get()));
 
         if (address.isPresent()) {
             querySpec = querySpec.and(

@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -112,8 +114,7 @@ public class SearchListingsFeature {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
                 ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4));
-                System.out.println(listingInfo);
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4),listingInfo.get(5), BusinessTypes.valueOf(listingInfo.get(6)));
                 createdListings.add(listingInfo);
             }
         }
@@ -173,5 +174,26 @@ public class SearchListingsFeature {
                 .with(user(currentUserDetails))
                 .with(csrf()));
     }
+
+    @When("I search for listings by business type:")
+    public void i_search_for_listings_by_business_type(List<String> types) throws Exception {
+        MultiValueMap<String, String> businessTypes = new LinkedMultiValueMap<>();
+        for (String type : types) {
+            businessTypes.add("businessTypes", type);
+        }
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParams(businessTypes)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I search for listings by business name {string}")
+    public void i_search_for_listings_by_business_name(String businessName) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("businessName", businessName)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
 
 }
