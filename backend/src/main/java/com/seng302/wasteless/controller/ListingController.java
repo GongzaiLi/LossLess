@@ -178,9 +178,9 @@ public class ListingController {
             @RequestParam Optional<LocalDate> closingDateStart,
             @RequestParam Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
-        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, address: {}", searchQuery, priceLower, priceUpper, address);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, address: {}, closingDateStart: {} closingDateEnd: {},", searchQuery, priceLower, priceUpper, address, closingDateStart, closingDateEnd );
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address,closingDateStart,closingDateEnd, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address, closingDateStart, closingDateEnd, pageable);
 
 
         GetListingDto getListingDto = new GetListingDto()

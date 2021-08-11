@@ -113,7 +113,7 @@ public class SearchListingsFeature {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
                 ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4));
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4),LocalDate.parse(listingInfo.get(5)));
                 System.out.println(listingInfo);
                 createdListings.add(listingInfo);
             }
@@ -175,4 +175,12 @@ public class SearchListingsFeature {
                 .with(csrf()));
     }
 
+    @When("I search for listings by closing date between {string} and {string}")
+    public void iSearchForListingsByClosingDateBetweenAnd(String closingDateStart, String closingDateEnd) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", closingDateStart)
+                .queryParam("closingDateEnd", closingDateEnd)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
 }
