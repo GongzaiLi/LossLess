@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -35,6 +37,26 @@ public class ListingsService {
     }
 
     /**
+     * Returns a Specification that matches all listings with close dates before or equal to the given close date
+     *
+     * @param date Upper inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates before or equal to the given close date
+     */
+    public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with close dates after or equal to the given close date
+     *
+     * @param date Lower inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates after or equal to the given close date
+     */
+    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
+    }
+
+    /**
      * Returns a Specification that matches all listings with price less than or equal to the given price
      *
      * @param price Upper inclusive bound for price
@@ -57,6 +79,41 @@ public class ListingsService {
                 "%" + productName.toLowerCase(Locale.ROOT) + "%");
     }
 
+    /**
+     * Returns a Specification that matches all listings with the country portion of an address.
+     * Matches are case-insensitive
+     * @param country Country to match listings by
+     * @return Specification that matches all listings with address potion country matching given country
+     */
+    public static Specification<Listing> sellerAddressCountryMatches(String country) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("country")),
+                "%" + country.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    /**
+     * Returns a Specification that matches all listings with the City portion of an address.
+     * Matches are case-insensitive
+     * @param city City to match listings by
+     * @return Specification that matches all listings with address potion city matching given city
+     */
+    public static Specification<Listing> sellerAddressCityMatches(String city) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("city")),
+                "%" + city.toLowerCase(Locale.ROOT) + "%");
+    }
+
+    /**
+     * Returns a Specification that matches all listings with the Suburb portion of an address.
+     * Matches are case-insensitive
+     * @param suburb Suburb to match listings by
+     * @return Specification that matches all listings with address potion suburb matching given suburb
+     */
+    public static Specification<Listing> sellerAddressSuburbMatches(String suburb) {
+        return (root, query, builder) -> builder.like(
+                builder.lower(root.get("business").get("address").get("suburb")),
+                "%" + suburb.toLowerCase(Locale.ROOT) + "%");
+    }
 
     /**
      * Given an Listing object, 'creates' it by saving and persisting it in the database.
@@ -87,6 +144,9 @@ public class ListingsService {
      * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
      * @param priceLower  Lower inclusive bound for listing prices
      * @param priceUpper  Upper inclusive bound for listing prices
+     * @param address     Address to match against suburb, city, and country of lister of listing
+     * @param closingDateStart  Lower inclusive bound for listing close dates
+     * @param closingDateEnd  Upper inclusive bound for listing close dates
      * @param pageable    Object containing pagination and sorting info
      * @return A Page containing matching listings.
      */
@@ -94,11 +154,24 @@ public class ListingsService {
             Optional<String> searchQuery,
             Optional<Double> priceLower,
             Optional<Double> priceUpper,
+            Optional<String> address,
+            Optional<LocalDate> closingDateStart,
+            Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
+        if (closingDateStart.isPresent()) querySpec = querySpec.and(closesGreaterThanOrEqualTo(closingDateStart.get()));
+        if (closingDateEnd.isPresent()) querySpec = querySpec.and(closesLessThanOrEqualTo(closingDateEnd.get()));
+
+        if (address.isPresent()) {
+            querySpec = querySpec.and(
+                    sellerAddressCountryMatches(address.get())
+                    .or(sellerAddressCityMatches(address.get()))
+                    .or(sellerAddressSuburbMatches(address.get()))
+            );
+        }
 
         return listingRepository.findAll(querySpec, pageable);
     }

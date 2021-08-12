@@ -105,7 +105,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
-          <b-card class="b_card_listing shadow-sm">
+          <b-card class="b_card_listing shadow-sm" @click="goToListingPage(listing.id)">
             <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
             <hr>
@@ -164,7 +164,13 @@
 
 .b_card_listing {
   min-width: 17rem;
-  height: 100%
+  height: 100%;
+}
+
+.b_card_listing:hover {
+  -webkit-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
+  cursor: pointer;
 }
 
 .listing_price {
@@ -179,6 +185,7 @@ import Api from "../../Api";
 import {getToday} from "../../util";
 
 export default {
+
   name: "ListingsSearchPage",
   components: {
     pagination,
@@ -254,6 +261,14 @@ export default {
       const primaryImageFileName = listing.inventoryItem.product.primaryImage.fileName;
       return Api.getImage(primaryImageFileName);
     },
+
+    /**
+     * Redirects to the full listing page when a listing card is clicked on the browse/search listings page.
+     * @param id The listing id that is displayed on the full listing page.
+     */
+    goToListingPage(id) {
+      this.$router.push(`/listing/${id}`);
+    }
   },
 
   watch: {

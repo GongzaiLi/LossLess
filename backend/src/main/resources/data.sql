@@ -46,15 +46,15 @@ INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_
                       product_id)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 9.5, 3, '2021-09-26', 28.5, 5);
 
-INSERT INTO Listing(businessid, closes, created, moreInfo, price, quantity, inventory_id)
+INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)
 VALUES (1, '2022-03-27', '2021-09-20', 'Willing to see offers.', 2.5, 2, 1);
-INSERT INTO Listing(businessid, closes, created, moreInfo, price, quantity, inventory_id)
+INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)
 VALUES (1, '2021-12-15', '2021-09-20', 'Limited edition flavour!', 2.5, 2, 2);
-INSERT INTO Listing(businessid, closes, created, moreInfo, price, quantity, inventory_id)
+INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)
 VALUES (1, '2022-02-27', '2021-09-20', 'Get now while stocks last!', 2.5, 6, 3);
-INSERT INTO Listing(businessid, closes, created, moreInfo, price, quantity, inventory_id)
+INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)
 VALUES (1, '2021-11-30', '2021-09-20', 'No DISCOUNTS!', 9.5, 1, 5);
-INSERT INTO Listing(businessid, closes, created, moreInfo, price, quantity, inventory_id)
+INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)
 VALUES (1, '2022-02-27', '2021-09-20', '10% discount!', 2.25, 2, 3);
 
 INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)

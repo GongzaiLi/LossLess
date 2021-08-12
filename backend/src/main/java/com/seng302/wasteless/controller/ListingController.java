@@ -103,7 +103,7 @@ public class ListingController {
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
-        listing.setBusinessId(businessId);
+        listing.setBusiness(possibleBusiness);
         listing.setCreated(LocalDate.now());
 
         listing = listingsService.createListing(listing);
@@ -159,7 +159,12 @@ public class ListingController {
     /**
      * Handles endpoint to search for listings
      *
-     * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param searchQuery       The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param priceLower  Lower inclusive bound for listing prices
+     * @param priceUpper  Upper inclusive bound for listing prices
+     * @param address           Address to match against suburb, city, and country of lister of listing
+     * @param closingDateStart A date string to filter listings with. This sets the start range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param closingDateEnd A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
      * @param pageable    pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
      */
@@ -169,10 +174,14 @@ public class ListingController {
             @RequestParam Optional<String> searchQuery,
             @RequestParam Optional<Double> priceLower,
             @RequestParam Optional<Double> priceUpper,
+            @RequestParam Optional<String> address,
+            @RequestParam Optional<LocalDate> closingDateStart,
+            @RequestParam Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
-        logger.info("Get request to search LISTING, query param: {}", searchQuery);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, address: {}, closingDateStart: {} closingDateEnd: {},", searchQuery, priceLower, priceUpper, address, closingDateStart, closingDateEnd );
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, address, closingDateStart, closingDateEnd, pageable);
+
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())

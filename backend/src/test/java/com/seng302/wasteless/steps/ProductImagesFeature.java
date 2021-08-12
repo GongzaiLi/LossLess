@@ -154,7 +154,7 @@ public class ProductImagesFeature {
      * @param productId   Id of product
      * @param productName Name of product
      * @param businessId  Id of business
-     * @throws ResponseStatusException
+     * @throws ResponseStatusException Throws error
      */
     @And("A product with id: {string}, name: {string} exists in the catalogue for business {int}")
     public void a_product_with_id_name_exists_in_the_catalogue_for_business(String productId, String productName, Integer businessId) throws ResponseStatusException {
@@ -165,7 +165,7 @@ public class ProductImagesFeature {
             product.setId(productId);
             product.setName(productName);
             product.setBusinessId(businessId);
-            product.setImages(new ArrayList<>());
+            product.setImages(new LinkedHashSet<>());
             product.setName("Blah");
             productService.createProduct(product);
         }
@@ -329,6 +329,12 @@ public class ProductImagesFeature {
         Assertions.assertEquals(imageSize, product.getImages().size());
         Assertions.assertEquals(primaryImageId, product.getPrimaryImage().getId());
     }
+
+    @Then("The current primary image id does not equal: {int}")
+    public void the_current_primary_image_id_does_not_equal(Integer primaryImageId) {
+        Assertions.assertNotEquals(product.getPrimaryImage().getId(), primaryImageId);
+    }
+
 
     //AC4 - Delete all product's image
 
