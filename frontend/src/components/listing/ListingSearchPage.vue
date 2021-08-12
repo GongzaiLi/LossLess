@@ -39,7 +39,7 @@
             <b-button type="submit">Search</b-button>
           </b-col>
 
-          <b-col class="search_button" cols="3" md="1" >
+          <b-col class="search_button" cols="3" md="1">
             <b-button v-b-toggle.collapse-1 variant="primary">Filter</b-button>
           </b-col>
 
@@ -52,7 +52,7 @@
               <b-input placeholder="Business Name" v-model="search.businessName"></b-input>
             </b-col>
             <b-col cols="12" md="4">
-              <b-select  v-model="search.businessType" >
+              <b-select v-model="search.businessType">
                 <option :value="null"> Any Business Type</option>
                 <option> Accommodation and Food Services</option>
                 <option> Retail Trade</option>
@@ -78,11 +78,11 @@
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input type="date" v-model="search.closesEndDate"> </b-input>
+                  <b-input type="date" v-model="search.closesEndDate"></b-input>
                 </div>
               </div>
             </b-col>
-            <b-col cols="12" md="4" >
+            <b-col cols="12" md="4">
 
               <div class="input-group mb-2 mr-sm-2">
                 <div class="input-group-prepend">
@@ -93,7 +93,7 @@
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input class="price_max" type="number" placeholder="Max"  v-model="search.priceMax"></b-input>
+                  <b-input class="price_max" type="number" placeholder="Max" v-model="search.priceMax"></b-input>
                 </div>
               </div>
 
@@ -119,15 +119,15 @@
               <img class="product-image" src="product_default.png" alt="Product has no image">
             </div>
             <!--COMMENTED OUT UNTIL WE SEND BACK BUSINESS WITH THE LISTING-->
-<!--            <hr>-->
-<!--            <h5><b>Seller: {{ listing.business.name }}</b></h5>-->
-<!--            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>-->
-<!--            <span>Closes:{{ listing.closes }}</span>-->
-<!--            <template #footer>-->
-<!--              <h5 class="listing_price" v-if="listing.business.currency">-->
-<!--                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}-->
-<!--              </h5>-->
-<!--            </template>-->
+            <!--            <hr>-->
+            <!--            <h5><b>Seller: {{ listing.business.name }}</b></h5>-->
+            <!--            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>-->
+            <!--            <span>Closes:{{ listing.closes }}</span>-->
+            <!--            <template #footer>-->
+            <!--              <h5 class="listing_price" v-if="listing.business.currency">-->
+            <!--                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}-->
+            <!--              </h5>-->
+            <!--            </template>-->
           </b-card>
         </b-col>
       </b-row>
@@ -192,16 +192,16 @@ export default {
   },
   data: function () {
     return {
-      search:{
-        productName:"",
-        sort:"nameAsc",
-        businessName:"",
-        businessType:[],
-        businessLocation:"",
+      search: {
+        productName: "",
+        sort: "nameAsc",
+        businessName: "",
+        businessType: [],
+        businessLocation: "",
         closesStartDate: "",
-        closesEndDate:"",
-        priceMin:"",
-        priceMax:"",
+        closesEndDate: "",
+        priceMin: "",
+        priceMax: "",
       },
       business: {},
       listings: [],
@@ -249,7 +249,13 @@ export default {
      * Calls get searchListings API request, which returns listings that match the given criteria.
      **/
     getListings: async function () {
-      this.listings = (await Api.searchListings(this.search.productName, this.search.priceMin, this.search.priceMax, this.search.businessName)).data.listings;
+      console.log(this.search.businessLocation, "1111111111111111")
+      this.listings = (await Api.searchListings(
+          this.search.productName,
+          this.search.priceMin,
+          this.search.priceMax,
+          this.search.businessName,
+          this.search.businessLocation)).data.listings;
     },
 
     /**
