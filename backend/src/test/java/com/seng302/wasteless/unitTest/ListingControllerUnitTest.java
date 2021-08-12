@@ -168,7 +168,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .setCloses(LocalDate.of(2022, Month.JANUARY, 1)));
 
 
-
         user = mock(User.class);
         user.setId(1);
         user.setEmail("james@gmail.com");
@@ -222,11 +221,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(listing.setId(1));
 
         Mockito
-                .when(listingsService.searchListings(any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Pageable.class)))
+                .when(listingsService.searchListings(any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class),any(Optional.class), any(Optional.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(listingList));
 
         Mockito
-                .when(listingsService.searchListings(eq(Optional.of("blah")), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class),  any(Optional.class),any(Pageable.class)))
+                .when(listingsService.searchListings(eq(Optional.of("blah")), any(Optional.class), any(Optional.class), any(Optional.class), any(Optional.class),  any(Optional.class),any(Optional.class), any(Optional.class),any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(listing)));
 
         Mockito
@@ -278,13 +277,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
 
-
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
-        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business,user);
+        doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -370,7 +368,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-     void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
+    void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
@@ -381,7 +379,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-     void whenPostRequestToCreateListing_andClosesOfNotTypeDate_then400Response() throws Exception {
+    void whenPostRequestToCreateListing_andClosesOfNotTypeDate_then400Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
