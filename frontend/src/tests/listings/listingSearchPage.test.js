@@ -45,3 +45,13 @@ describe('Route watcher', () => {
     expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 12, 0);
   });
 });
+
+describe('Testing api get request search Listing function', () => {
+  test('check-api-request-get-searchListings', async () => {
+    await Api.searchListings.mockResolvedValue({data: testCards});
+    await wrapper.vm.getListings();
+    await wrapper.vm.$forceUpdate();
+    expect(wrapper.vm.listings).toBe(testCards.listings);
+  });
+
+});
