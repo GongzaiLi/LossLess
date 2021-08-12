@@ -81,7 +81,7 @@ export default {
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
   searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),
-  searchListings: (searchQuery, priceLower, priceUpper, businessName, businessTypes, businessLocation, closingDateStart, closingDateEnd, sort) => {
+  searchListings: (searchQuery, priceLower, priceUpper, businessName, businessTypes, businessLocation, closingDateStart, closingDateEnd, sort, size = 10, page = 0) => {
     const params = new URLSearchParams({
       searchQuery: searchQuery,
       priceLower: priceLower,
@@ -90,8 +90,9 @@ export default {
       closingDateStart: closingDateStart,
       closingDateEnd: closingDateEnd,
       address: businessLocation,
-      sort: sort,//http://localhost:9499/listings/search?searchQuery=&priceLower=&priceUpper=&businessName=&closingDateStart=&closingDateEnd=&address=&sort=nameAsc
-
+      sort: sort,
+      size: size,
+      page: page
     });
     for (const type of businessTypes) {
       params.append("businessType", type);

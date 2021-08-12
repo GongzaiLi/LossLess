@@ -223,7 +223,7 @@ export default {
       business: {},
       listings: [],
       perPage: 12,
-      currentPage: 1,
+      currentPage: 0,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
       images: [],
@@ -275,7 +275,9 @@ export default {
           this.search.businessLocation,
           this.search.closesStartDate,
           this.search.closesEndDate,
-          this.search.sort)).data.listings;
+          this.search.sort,
+          this.perPage,
+          this.currentPage)).data.listings;
     },
 
     /**
