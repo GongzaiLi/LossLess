@@ -1,4 +1,5 @@
-[
+{
+  "listings": [
   {
     "id": 1,
     "inventoryItem": {
@@ -944,6 +945,5 @@
     "primaryAdministratorId": 1
   }
   }
-
-
-]
+],
+  "totalItems": 30}

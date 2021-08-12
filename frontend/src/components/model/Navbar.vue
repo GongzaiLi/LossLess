@@ -10,11 +10,11 @@ Date: sprint_1
     <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
 
     <b-navbar-brand>
-    <b-nav-form>
-      <b-input-group >
-        <b-form-input   placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
+    <b-nav-form @submit.prevent="search">
+      <b-input-group>
+        <b-form-input placeholder="Search Listings" v-model="searchQuery"></b-form-input>
         <b-input-group-append>
-          <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
+          <b-button type="submit"> <b-icon-search/> </b-button>
         </b-input-group-append>
       </b-input-group>
     </b-nav-form>
@@ -37,7 +37,7 @@ Date: sprint_1
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
-        <b-nav-item to="/search">Search</b-nav-item>
+        <b-nav-item to="/search">Search Accounts</b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
 
@@ -60,42 +60,40 @@ Date: sprint_1
         </b-nav-item-dropdown>
       </b-navbar-nav>
 
-
-
-
-
       <b-navbar-nav class="ml-auto">
+        <b-nav-item-dropdown right>
+          <template #button-content>
+            <div class="icon mr-1">
+              <b-icon v-if="numExpiredCards > 0" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem;"></b-icon>
+              <b-icon v-else-if="numberOfNotifications"  icon="bell" class="iconBell" variant="warning" style="font-size:  1.8rem"></b-icon>
+              <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
+              <span v-if="numberOfNotifications" :style="{color: ((numExpiredCards > 0) ? 'red' : 'orange')}" style="position: absolute; transform: translateY(5px)">
+                {{numberOfNotifications}}
+              </span>
+            </div>
+          </template>
+          <b-dropdown-item disabled>
+            <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
+          </b-dropdown-item>
 
-        <div class="icon mr-1" id="bell" @click="bellIconPressed">
-          <b-icon v-if="numExpiredCards > 0" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem;"></b-icon>
-          <b-icon v-else-if="numberOfNotifications"  icon="bell" class="iconBell" variant="warning" style="font-size:  1.8rem"></b-icon>
-          <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
-        </div>
-
-        <div v-if="showNotifications" class="notifications" id="box" style="background-color: whitesmoke">
-          <h2>Notifications: <span> {{numberOfNotifications}}</span></h2>
-            <div v-if="numExpiredCards" class="expired-notifications-item" @click="clicked = !clicked">
-              <div class="text">
-                <h4> Marketplace Card Expired:</h4>
-                <h4> {{ numExpiredCards}} {{ expiredText }}</h4>
-              </div>
-              <b-col cols="2">
+          <b-dropdown-item v-if="numExpiredCards"  @click="clicked = !clicked" class="expired-notifications-item">
+            <b-row no-gutters>
+              <b-col cols="11" style="white-space: initial">
+                <h6> Marketplace Card Expired:</h6>
+                <span>{{ numExpiredCards}} {{ expiredText }}</span>
+              </b-col>
+              <b-col cols="1">
                 <b-icon style="width: 30px; height: 30px; margin-top: 50%"
                         icon="trash-fill" @click="clearExpiredCards"></b-icon>
               </b-col>
-            </div>
+            </b-row>
+          </b-dropdown-item>
 
-          <div v-for="notification in notifications"  class="notifications-item" v-bind:key="notification.id"  @click="goToHomePage">
-            <div class="text">
-              <h4> Marketplace Card: {{notification.title}}</h4>
-              <h4> expires within 24 hours</h4>
-            </div>
-          </div>
-        </div>
-      </b-navbar-nav>
-
-      <b-navbar-nav>
-        <span v-if="numberOfNotifications" :style="{position: 'absolute', color: (numExpiredCards > 0) ? 'red' : 'orange'}">{{numberOfNotifications}}</span>
+          <b-dropdown-item class="notifications-item" v-for="notification in notifications" v-bind:key="notification.id"  @click="goToHomePage">
+            <h6> Marketplace Card: {{notification.title}}</h6>
+             expires within 24 hours
+          </b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
 
       <b-navbar-nav class="dropdown-menu-end">
@@ -144,94 +142,47 @@ Date: sprint_1
 <style>
 
 .icon  {
-  cursor: pointer;
   display: inline;
-  width: 26px;
-  margin-top: 4px;
-}
-.iconBell  {
-  font-size: 2rem;
-}
-
-.icon span {
-  color: #f00
 }
 
 .icon:hover {
   opacity: .7
 }
 
-.notifications {
-  width: 300px;
-  height: 0;
-  position: absolute;
-  top: 63px;
-  right: 62px;
-  border-radius: 5px 0 5px 5px;
-  background-color: #fff;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
-}
-
-.notifications h2 {
-  font-size: 14px;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  color: #999
-}
-
-.notifications h2 span {
-  color: #f00
-}
-
 .notifications-item {
-  background-color: whitesmoke;
-  display: flex;
-  border-bottom: 1px solid #eee;
-  padding: 6px 9px;
-  margin-bottom: 0;
-  cursor: pointer
+  border-top: 1px solid #eee;
 }
-
-.notifications-item:hover {
-  background-color: #eee
-}
-
-.notifications-item .text h4 {
-  color: #777;
-  font-size: 16px;
-  margin-top: 3px
-}
-
-.notifications-item .text p {
-  color: #aaa;
-  font-size: 12px
-}
-
 
 .expired-notifications-item {
-  display: flex;
-  border-bottom: 2px solid #eee;
-  padding: 6px 9px;
-  margin-bottom: 0;
-  cursor: pointer
+  border-top: 1px solid #eee;
+  cursor: pointer;
 }
 
-.expired-notifications-item .text h4 {
+.expired-notifications-item * {
   color: orangered;
-  font-size: 16px;
-  margin-top: 3px
 }
 
-.expired-notifications-item .text p {
-  color: #aaa;
-  font-size: 12px
+.expired-notifications-item h6 {
+  margin-top: 3px;
 }
 
-.expired-notifications-item:hover {
-  background-color: #eee;
+.notifications-item h6 {
+  margin-top: 3px;
 }
 
+.expired-notifications-item p {
+  color: orangered;
+}
 
+.expired-notifications-item .dropdown-item:active {
+  color: initial;
+  background-color: #cccccc;
+}
+
+.notifications-item .dropdown-item:active {
+  color: initial;
+  background-color: #cccccc;
+}
 </style>
 
 <script>
@@ -348,10 +299,14 @@ export default {
     /**
      * Routes to Listing search page with search string
      * Called when user clicks search or presses enter
-     * @param searchQuery the string used to search for listings passed as a query parameter
      **/
-    search(searchQuery) {
-      this.$router.push(`/listingSearch?searchQuery=${searchQuery}`);
+    search() {
+      if (this.$route.name === 'listings-search' && this.$route.query.searchQuery === this.searchQuery) {
+        this.$router.go();
+      } else {
+        this.$router.replace({path: `/listingSearch`, query: { searchQuery: this.searchQuery }});
+      }
+      this.searchQuery = "";
     },
 
     /**
@@ -388,13 +343,6 @@ export default {
       }).catch((error) => {
         this.$log.debug(error);
       });
-    },
-
-    /**
-     *  Triggers when the notification icon is pressed to display the notifications.
-     */
-    bellIconPressed() {
-      this.showNotifications = !this.showNotifications
     },
 
     /**

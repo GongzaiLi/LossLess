@@ -2,6 +2,7 @@ package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.BusinessViews;
+import com.seng302.wasteless.view.ListingViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -36,24 +37,24 @@ public class Business {
     @ManyToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
     private List<User> administrators;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class, ListingViews.GetListingView.class})
     @NotBlank(message = "name is mandatory")
     @Column(name = "name")
     @Size(min = 0, max = 50)
     private String name;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class, ListingViews.GetListingView.class})
     @Column(name = "description")
     @Size(min = 0, max = 250)
     private String description;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class, ListingViews.GetListingView.class})
     @NotNull
     @OneToOne
     @JoinColumn(name = "address") // map camelcase name (java) to snake case (SQL)
     private Address address;
 
-    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class})
+    @JsonView({BusinessViews.PostBusinessRequestView.class, BusinessViews.SearchBusinessesView.class, ListingViews.GetListingView.class})
     @NotNull(message = "businessType is mandatory")
     @Column(name = "business_type")
     private BusinessTypes businessType;

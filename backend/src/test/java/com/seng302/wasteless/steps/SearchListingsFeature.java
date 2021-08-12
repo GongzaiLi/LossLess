@@ -1,7 +1,6 @@
 package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.controller.ListingController;
-import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
@@ -12,7 +11,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.hamcrest.Matchers;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
@@ -27,12 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @WebMvcTest(ListingController.class)
@@ -60,6 +61,9 @@ public class SearchListingsFeature {
 
     @Autowired
     private ListingsService listingsService;
+
+    @Autowired
+    private BusinessService businessService;
 
     private ResultActions responseResult;
 
@@ -111,9 +115,8 @@ public class SearchListingsFeature {
     public void theFollowingListingsExist(List<List<String>> listings) {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
-                ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
-
+                ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService,
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4),listingInfo.get(5), BusinessTypes.valueOf(listingInfo.get(6)), LocalDate.parse(listingInfo.get(7)));
                 createdListings.add(listingInfo);
             }
         }
@@ -164,5 +167,66 @@ public class SearchListingsFeature {
                 .queryParam("priceUpper", max.toString())
                 .with(user(currentUserDetails))
                 .with(csrf()));
+    }
+
+    @When("I search for listings by address {string}")
+    public void i_search_for_listings_by_address(String address) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("address", address)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I search for listings by business type:")
+    public void i_search_for_listings_by_business_type(List<String> types) throws Exception {
+        MultiValueMap<String, String> businessTypes = new LinkedMultiValueMap<>();
+        for (String type : types) {
+            businessTypes.add("businessTypes", type);
+        }
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParams(businessTypes)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I search for listings by business name {string}")
+    public void i_search_for_listings_by_business_name(String businessName) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("businessName", businessName)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+
+    @When("I search for listings by closing date between {string} and {string}")
+    public void iSearchForListingsByClosingDateBetweenAnd(String closingDateStart, String closingDateEnd) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", closingDateStart)
+                .queryParam("closingDateEnd", closingDateEnd)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I search for listings with closing dates on or before {string}")
+    public void iSearchForListingsWithClosingDatesOnOrBefore(String closingDateEnd) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateEnd", closingDateEnd)
+                .queryParam("closingDateStart", "2049-01-03")
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @When("I search for listings with closing dates on or after {string}")
+    public void iSearchForListingsWithClosingDatesOnOrAfter(String closingDateStart) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", closingDateStart)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @Then("It should send a bad request error: {string}.")
+    public void it_should_send_a_bad_request_error(String errorMessage) throws Exception {
+        responseResult.andExpect(status().isBadRequest());
+        responseResult.andExpect(result -> Assertions.assertEquals(errorMessage, result.getResponse().getErrorMessage()));
     }
 }

@@ -31,8 +31,10 @@ public class Listing {
     private Integer id;
 
     @NotNull
-    @Column
-    private Integer businessId;
+    @ManyToOne
+    @JsonView(ListingViews.GetListingView.class)
+    @JoinColumn(name = "business_id")
+    private Business business;
 
     @NotNull(message = "Inventory id is Mandatory")
     @ManyToOne
