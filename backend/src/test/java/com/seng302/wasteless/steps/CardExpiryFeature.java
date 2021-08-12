@@ -3,10 +3,7 @@ package com.seng302.wasteless.steps;
 import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
-import com.seng302.wasteless.service.AddressService;
-import com.seng302.wasteless.service.CardExpiryService;
-import com.seng302.wasteless.service.CardService;
-import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.service.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -70,6 +67,9 @@ public class CardExpiryFeature {
 
     @Autowired
     private CardExpiryService cardExpiryService;
+
+    @Autowired
+    private NotificationService notificationService;
 
 
     /**
@@ -266,6 +266,6 @@ public class CardExpiryFeature {
 
     @Then("I am notified")
     public void iAmNotified() {
-        Assertions.assertEquals(1,userService.findUserById(user.getId()).getHasCardsDeleted());
+        Assertions.assertEquals(1,notificationService.findAllNotificationsByUserId(user.getId()).size());
     }
 }

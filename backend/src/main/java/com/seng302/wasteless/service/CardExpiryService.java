@@ -1,6 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Card;
+import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.CardRepository;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class CardExpiryService {
     private final CardService cardService;
     private final CardRepository cardRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     private final Logger logger = LoggerFactory.getLogger(CardExpiryService.class.getName());
 
@@ -33,10 +35,11 @@ public class CardExpiryService {
     private Integer notificationWaitPeriodSeconds;
 
     @Autowired
-    public CardExpiryService(CardService cardService, CardRepository cardRepository, UserService userService) {
+    public CardExpiryService(CardService cardService, CardRepository cardRepository, UserService userService, NotificationService notificationService) {
         this.cardService = cardService;
         this.cardRepository = cardRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -57,10 +60,13 @@ public class CardExpiryService {
         for (Card card : expiredCards) {
             logger.warn("Deleting expired card id={}, created={}, title={}, creator={}", card.getId(), card.getCreated(), card.getTitle(), card.getCreator());
 
-            User cardCreator = card.getCreator();
-            Integer deleted = cardCreator.getHasCardsDeleted();
-            cardCreator.setHasCardsDeleted(deleted+1);
-            userService.saveUserChanges(cardCreator);
+
+            Notification notification = new Notification();
+            notification.setType("Expired Marketplace Card");
+            notification.setSubjectId(card.getId());
+            notification.setMessage(String.format("Your card: %s has expired", card.getTitle()));
+            notification.setUserId(card.getCreator().getId());
+            notificationService.createNotification(notification);
 
             cardService.deleteCard(card);
         }
