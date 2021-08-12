@@ -19,18 +19,18 @@
                 <div class="input-group-text">Sort:</div>
               </div>
               <b-select v-model="search.sort" value="inventoryItem.product.name">
-                <option value="nameAsc">Product Name A to Z</option>
-                <option value="nameDesc">Product Name Z to A</option>
-                <option value="businessNameAsc">Seller Name A to Z</option>
-                <option value="businessNameDesc">Seller Name Z to A</option>
-                <option value="priceAsc">Price Low To High</option>
-                <option value="priceDesc">Price High To Low</option>
-                <option value="closesAsc">Listing Closes Earlier to Later</option>
-                <option value="closesDesc">Listing Closes Later to Earlier</option>
-                <option value="expiryAsc">Expiry Date Earlier to Later</option>
-                <option value="expiryDesc">Expiry Date Later to Earlier</option>
-                <option value="countryAsc">Location A to Z</option>
-                <option value="countryDesc">Location A to Z</option>
+                <option value="inventoryItem.product.name,asc">Product Name A to Z</option>
+                <option value="inventoryItem.product.name,desc">Product Name Z to A</option>
+                <option value="business.name,asc">Seller Name A to Z</option>
+                <option value="business.name,desc">Seller Name Z to A</option>
+                <option value="price,asc">Price Low To High</option>
+                <option value="price,desc">Price High To Low</option>
+                <option value="closes,asc">Listing Closes Earlier to Later</option>
+                <option value="closes,desc">Listing Closes Later to Earlier</option>
+                <option value="inventoryItem.expires,asc">Expiry Date Earlier to Later</option>
+                <option value="inventoryItem.expires,desc">Expiry Date Later to Earlier</option>
+                <option value="business.address.country,asc">Location A to Z</option>
+                <option value="business.address.country,desc">Location A to Z</option>
               </b-select>
             </div>
           </b-col>
@@ -210,7 +210,7 @@ export default {
     return {
       search: {
         productName: "",
-        sort: "nameAsc",
+        sort: "inventoryItem.product.name,asc",
         businessName: "",
         businessType: "",
         businessLocation: "",
@@ -274,7 +274,8 @@ export default {
           this.search.businessTypes,
           this.search.businessLocation,
           this.search.closesStartDate,
-          this.search.closesEndDate)).data.listings;
+          this.search.closesEndDate,
+          this.search.sort)).data.listings;
     },
 
     /**
