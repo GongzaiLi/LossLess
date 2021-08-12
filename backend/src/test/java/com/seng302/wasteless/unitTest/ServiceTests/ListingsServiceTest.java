@@ -12,13 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @RunWith(SpringRunner.class)
@@ -227,18 +227,22 @@ public class ListingsServiceTest {
 
     @Test
     void whenFilterByInvalidBusinessType_thenNoMatchesReturned() {
-        List<String> types = Arrays.asList("organisation");
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(types), Optional.empty(), Optional.empty(), Optional.empty(),Pageable.unpaged());
-        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        assertEquals(0, names.size());
+        try {
+            List<String> types = Arrays.asList("organisation");
+            listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(types), Optional.empty(), Optional.empty(), Optional.empty(),Pageable.unpaged());
+        } catch (ResponseStatusException e) {
+            assertEquals(400, e.getRawStatusCode());
+        }
     }
 
     @Test
     void whenFilterByOneValidBusinessTypeAndOneInvalidBusinessType_andValidBusinessTypeMatchesExists_thenAllPartialMatchesReturned() {
-        List<String> types = Arrays.asList("organisation", "Accommodation and Food Services");
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(types), Optional.empty(), Optional.empty(), Optional.empty(),Pageable.unpaged());
-        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        assertEquals(2, names.size());
+        try {
+            List<String> types = Arrays.asList("organisation", "Accommodation and Food Services");
+            listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(types), Optional.empty(), Optional.empty(), Optional.empty(),Pageable.unpaged());
+        } catch (ResponseStatusException e) {
+            assertEquals(400, e.getRawStatusCode());
+        }
     }
 
     //

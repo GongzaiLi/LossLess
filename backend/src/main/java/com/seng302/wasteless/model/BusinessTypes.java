@@ -1,6 +1,8 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * This enum specifies types for businesses and provides functionality
@@ -21,7 +23,7 @@ public enum BusinessTypes {
     /**
      * Takes the text value and returns the enum heading
      * @param text The text value
-     * @return the enum heading e.g RETAIL_TRADE
+     * @return the enum heading e.g RETAIL_TRADE or if it is not a valid type then it throws a 400 Bad Request error.
      */
     public static BusinessTypes fromString(String text) {
         for (BusinessTypes heading : BusinessTypes.values()) {
@@ -29,7 +31,7 @@ public enum BusinessTypes {
                 return heading;
             }
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This is not a valid business type");
     }
 
 

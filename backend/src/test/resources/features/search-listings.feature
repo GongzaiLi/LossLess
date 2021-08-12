@@ -38,15 +38,13 @@ Feature: U29 - Browse/Search Sale listings
   Scenario: AC5 - No results shown when I try and limit the results by one invalid type.
     When I search for listings by business type:
       | organisation |
-    Then No results are given
+    Then It should send a bad request error: "This is not a valid business type".
 
-  Scenario: AC5 - I can limit the results by one valid type and one invalid type.
+  Scenario: AC5 - If I try and limit the results by one valid type and one invalid type then I will get a bad request error.
     When I search for listings by business type:
       | Retail Trade |
       | organisation |
-    Then The results contain exclusively the following products:
-      | Black Water No Sugar |
-      | Back Water           |
+    Then It should send a bad request error: "This is not a valid business type".
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, part of a product name.
     When I search for listings by product name "water"
