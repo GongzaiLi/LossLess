@@ -222,7 +222,9 @@ export default {
 
   methods: {
     /**
-     * read all the listing in for the corresponding business
+     * Sends API request to get all the listings with the search parameters stored in this component. 
+     * Also queries the currencies API to get currency info for each business (the API call is cached
+     * so this should be fast).
      **/
     getListings: async function () {
       const resp = (await Api.searchListings(this.search.productName)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
