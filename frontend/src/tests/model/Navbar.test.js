@@ -6,16 +6,9 @@ import Api from '../../Api'
 
 let wrapper;
 
-const $route = {
-  name: "users",
-  params: {
-    id: 0
-  }
-}
+let $route;
 
-const $router = {
-  push: jest.fn()
-}
+let $router;
 
 let userData = {
   "id": 100,
@@ -64,8 +57,6 @@ let userData = {
 let $currentUser = userData;
 
 const date = new Date();
-const currentDateWithinAWeek = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+(date.getDate()+6)+'T'+date.getHours()+':'+date.getMinutes()+':'+date.getUTCSeconds()+'Z'
-
 const currentDateWithin24 = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()+'T'+(date.getHours()+2)+':'+date.getMinutes()+':'+date.getUTCSeconds()+'Z'
 
 
@@ -85,6 +76,20 @@ const expiringCards = [
 jest.mock('../../Api');
 
 beforeEach(() => {
+  $route = {
+    name: "users",
+    params: {
+      id: 0
+    },
+    query: {}
+  };
+
+  $router = {
+    push: jest.fn(),
+    replace: jest.fn(),
+    go: jest.fn(),
+  }
+
   const localVue = createLocalVue();
 
   localVue.use(BootstrapVue);
@@ -286,4 +291,31 @@ describe('Clear expired cards notification', () => {
     expect(wrapper.vm.numExpiredCards).toBe(0);
   })
 
+});
+
+describe("Listing search ", () => {
+  test('reloads if query is the name', async () => {
+    $route.name = 'listings-search';
+    $route.query.searchQuery = 'ABCDE';
+    wrapper.vm.searchQuery = 'ABCDE';
+    wrapper.vm.search();
+    await wrapper.vm.$nextTick();
+    expect($router.go).toHaveBeenCalled();
+    expect($router.replace).not.toHaveBeenCalled();
+  })
+
+  test('goes to new route if query is not the name', async () => {
+    $route.name = 'home';
+    wrapper.vm.searchQuery = 'ABCDE';
+    wrapper.vm.search();
+    await wrapper.vm.$nextTick();
+    expect($router.replace).toHaveBeenCalled();
+  })
+
+  test('clears search query after submitted', async () => {
+    wrapper.vm.searchQuery = 'ABCDE';
+    wrapper.vm.search();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.searchQuery).toStrictEqual('');
+  })
 });

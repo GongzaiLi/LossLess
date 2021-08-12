@@ -187,6 +187,7 @@ Date: 13/5/2021
 <script>
 import api from "../../Api";
 import ProductsTable from "../product/ProductsTable";
+import {getToday} from "../../util";
 
 export default {
   name: "inventory-detail-card",
@@ -217,10 +218,10 @@ export default {
     setUpInventoryPage: {
       type: Function,
     }
-
   },
   data() {
     return {
+      getToday: getToday,
       inventoryInfo: {},
       inventoryCardError: "",
       showErrorAlert: false,
@@ -260,16 +261,6 @@ export default {
       if (date != null) {
         return new Date(date).toUTCString().split(' ').slice(0, 4).join(' ')
       }
-    },
-
-    /**
-     * get today's date without the time
-     * need to add one to get correct date
-     * @return today's date in format yyyy-mm-dd
-     **/
-    getToday() {
-      let date = new Date();
-      return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
     },
 
     /**
