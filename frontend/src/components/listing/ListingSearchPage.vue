@@ -196,7 +196,7 @@ export default {
         productName:"",
         sort:"nameAsc",
         businessName:"",
-        businessType:null,
+        businessType:[],
         businessLocation:"",
         closesStartDate: "",
         closesEndDate:"",
@@ -249,7 +249,7 @@ export default {
      * Calls get searchListings API request, which returns listings that match the given criteria.
      **/
     getListings: async function () {
-      this.listings = (await Api.searchListings(this.search.productName, this.search.priceMin, this.search.priceMax)).data.listings;
+      this.listings = (await Api.searchListings(this.search.productName, this.search.priceMin, this.search.priceMax, this.search.businessName)).data.listings;
     },
 
     /**
