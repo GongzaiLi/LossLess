@@ -148,6 +148,14 @@ public class CreateListingFeature {
         Business business;
         try {
             business = businessService.findBusinessById(businessId);
+            business = new Business();
+            business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
+            business.setId(businessId);
+            business.setName("Jimmy's clown store");
+            business.setAddress(throwawayAddress);
+            business.setAdministrators(Collections.singletonList(user));
+            business.setPrimaryAdministrator(user);
+            businessService.createBusiness(business);
 
         } catch (ResponseStatusException e) {
             business = new Business();
@@ -198,12 +206,12 @@ public class CreateListingFeature {
     public void theBusinessWithIdHasAListingWithTheInventoryItemIDQuantityPriceMoreInfoAndCloses(int businessId, int inventoryItemId, int quantity, double price, String moreInfo, String closes) throws Exception {
         this.businessId = businessId;
         this.moreInfo = moreInfo;
-        this.quantity = quantity;
+        this.quantity = quantity*2;
         this.price = price;
 
         theUserWithEmailIsLoggedIn("a@a");
         thereIsAnInventoryItemWithAnInventoryIdAndProductId(inventoryItemId, "B");
-        inventoryService.updateInventoryItemQuantity(quantity * 2, inventoryItemId); // Ensure we have enough quantity
+        inventoryService.updateInventoryItemQuantity(this.quantity, inventoryItemId); // Ensure we have enough quantity
         theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(inventoryItemId, quantity, price, moreInfo, closes);
         result.andExpect(status().isCreated());
     }

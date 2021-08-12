@@ -5,7 +5,7 @@ Feature: U30 - Individual full sale listing
 
 
   Background:
-    Given We are logged in as a user with email "a@a"
+    Given We are logged in as a user with email "z@z"
     And There exists the following listings:
       | Literally anything else | 1   |
 

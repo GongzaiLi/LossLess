@@ -1,10 +1,7 @@
 package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.controller.ListingController;
-import com.seng302.wasteless.model.Address;
-import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
 import com.seng302.wasteless.unitTest.ServiceTests.ListingsServiceTest;
@@ -26,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +53,9 @@ public class IndividualFullListingFeature {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private BusinessService businessService;
 
     @Autowired
     private ProductService productService;
@@ -116,7 +117,9 @@ public class IndividualFullListingFeature {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
                 ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)));
+                        businessService, addressService,listingInfo.get(0), Double.parseDouble(listingInfo.get(1)),
+                        "NZ", "Christchurch", "Riccarton", "Wonka Stuff",
+                        BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1));
 
                 createdListings.add(listingInfo);
             }
