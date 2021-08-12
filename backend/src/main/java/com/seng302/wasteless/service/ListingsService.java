@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +35,26 @@ public class ListingsService {
      */
     public static Specification<Listing> priceGreaterThanOrEqualTo(Double price) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("price"), price);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with close dates before or equal to the given close date
+     *
+     * @param date Upper inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates before or equal to the given close date
+     */
+    public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
+    }
+
+    /**
+     * Returns a Specification that matches all listings with close dates after or equal to the given close date
+     *
+     * @param date Lower inclusive bound for close date
+     * @return Returns a Specification that matches all listings with close dates after or equal to the given close date
+     */
+    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
+        return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
     }
 
     /**
@@ -157,13 +178,15 @@ public class ListingsService {
      * Any or all of the filter/search params are optional. The Pageable cannot be null
      * but can simply be a Pageable.unpaged() object
      *
-     * @param searchQuery   The search query - matches listings' product names by substring (case insensitive)
-     * @param priceLower    Lower inclusive bound for listing prices
-     * @param priceUpper    Upper inclusive bound for listing prices
-     * @param businessName  Business name to match against listings
+     * @param searchQuery The search query - matches listings' product names by substring (case insensitive)
+     * @param priceLower  Lower inclusive bound for listing prices
+     * @param priceUpper  Upper inclusive bound for listing prices
+     * @param businessName  Business name to match against listings* @param businessTypes List of business types to match against listings
      * @param businessTypes List of business types to match against listings
-     * @param address       Address to match against suburb, city, and country of lister of listing
-     * @param pageable      Object containing pagination and sorting info
+     * @param address     Address to match against suburb, city, and country of lister of listing
+     * @param closingDateStart  Lower inclusive bound for listing close dates
+     * @param closingDateEnd  Upper inclusive bound for listing close dates
+     * @param pageable    Object containing pagination and sorting info
      * @return A Page containing matching listings.
      */
     public Page<Listing> searchListings(
@@ -173,6 +196,8 @@ public class ListingsService {
             Optional<String> businessName,
             Optional<List<String>> businessTypes,
             Optional<String> address,
+            Optional<LocalDate> closingDateStart,
+            Optional<LocalDate> closingDateEnd,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
@@ -181,6 +206,8 @@ public class ListingsService {
         if (businessName.isPresent()) querySpec = querySpec.and(sellerBusinessNameMatches(businessName.get()));
         if (businessTypes.isPresent() && !businessTypes.get().isEmpty())
             querySpec = querySpec.and(sellerBusinessTypeMatches(businessTypes.get()));
+        if (closingDateStart.isPresent()) querySpec = querySpec.and(closesGreaterThanOrEqualTo(closingDateStart.get()));
+        if (closingDateEnd.isPresent()) querySpec = querySpec.and(closesLessThanOrEqualTo(closingDateEnd.get()));
 
         if (address.isPresent()) {
             querySpec = querySpec.and(

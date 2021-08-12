@@ -164,6 +164,8 @@ public class ListingController {
      * @param priceUpper  Upper inclusive bound for listing prices
      * @param businessName  Business name to match against listings
      * @param businessTypes List of business types to match against listings
+     * @param closingDateStart A date string to filter listings with. This sets the start range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param closingDateEnd A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
      * @param address     Address to match against suburb, city, and country of lister of listing
      * @param pageable    pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
@@ -176,14 +178,17 @@ public class ListingController {
             @RequestParam Optional<Double> priceUpper,
             @RequestParam Optional<String> businessName,
             @RequestParam Optional<List<String>> businessTypes,
+            @RequestParam Optional<LocalDate> closingDateStart,
+            @RequestParam Optional<LocalDate> closingDateEnd,
             @RequestParam Optional<String> address,
             Pageable pageable) {
 
-        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, address: {}",
-                searchQuery, priceLower, priceUpper, businessName, businessTypes, address);
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, closingDateStart: {} closingDateEnd: {}, address: {}",
+                searchQuery, priceLower, priceUpper, businessName, businessTypes, closingDateStart, closingDateEnd, address);
 
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address,closingDateStart, closingDateEnd, pageable);
+
 
         GetListingDto getListingDto = new GetListingDto()
                 .setListings(listings.getContent())

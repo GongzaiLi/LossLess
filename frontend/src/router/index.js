@@ -12,6 +12,8 @@ import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
 import ListingSearchPage from "../components/listing/ListingSearchPage";
+import ListingFullPage from "@/components/listing/ListingFullPage";
+
 
 
 import {getCurrentUser} from '@/auth';
@@ -36,7 +38,9 @@ const router = new Router({
         { path: '/businesses', name: 'create-business', component: CreateBusiness},
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
-        { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage}
+        { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage},
+        { path : '/listing/:id', name: 'listings-full', component: ListingFullPage}
+
     ]
 });
 
