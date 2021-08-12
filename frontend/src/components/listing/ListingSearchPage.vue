@@ -52,13 +52,29 @@
               <b-input placeholder="Business Name" v-model="search.businessName"></b-input>
             </b-col>
             <b-col cols="12" md="4">
-              <b-select v-model="search.businessType">
+              <b-select v-model="search.businessType" @change="search.businessTypes.push(search.businessType);">
                 <option :value="null"> Any Business Type</option>
                 <option> Accommodation and Food Services</option>
                 <option> Retail Trade</option>
                 <option> Charitable organisation</option>
                 <option> Non-profit organisation</option>
               </b-select>
+              <b-form-tags
+                  class="mt-2"
+                  v-if="search.businessTypes.length"
+                  input-id="tags-remove-on-delete"
+                  v-model="search.businessTypes"
+                  remove-on-delete
+              >
+                <template v-slot="{ tags, removeTag }">
+                  <b-badge v-for="tag in tags" :key="tag" class="m-1 b-form-tag flex-grow-1">
+                    <span class="b-form-tag-content flex-grow-1 text-truncate">{{ tag }}</span>
+                    <button @click="removeTag(tag)" aria-keyshortcuts="Delete" type="button" aria-label="Remove tag"
+                            class="close b-form-tag-remove">×
+                    </button>
+                  </b-badge>
+                </template>
+              </b-form-tags>
             </b-col>
             <b-col cols="12" md="4">
               <b-input placeholder="Business Location" v-model="search.businessLocation"></b-input>
@@ -196,12 +212,13 @@ export default {
         productName: "",
         sort: "nameAsc",
         businessName: "",
-        businessType: [],
+        businessType: "",
         businessLocation: "",
         closesStartDate: "",
         closesEndDate: "",
         priceMin: "",
         priceMax: "",
+        businessTypes: []
       },
       business: {},
       listings: [],
@@ -249,12 +266,12 @@ export default {
      * Calls get searchListings API request, which returns listings that match the given criteria.
      **/
     getListings: async function () {
-      console.log(this.search.businessLocation, "1111111111111111")
       this.listings = (await Api.searchListings(
           this.search.productName,
           this.search.priceMin,
-          this.search.priceMax,
+          this.search.priceMax,//http://localhost:9499/listings/search?searchQuery=&priceLower=&priceUpper=&businessName=&businessTypes[]=Accommodation+and+Food+Services&address=
           this.search.businessName,
+          this.search.businessTypes,
           this.search.businessLocation)).data.listings;
     },
 
