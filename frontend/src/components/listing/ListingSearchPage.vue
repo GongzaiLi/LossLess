@@ -200,8 +200,8 @@ export default {
         businessLocation:"",
         closesStartDate: "",
         closesEndDate:"",
-        priceMin:null,
-        priceMax:null,
+        priceMin:"",
+        priceMax:"",
       },
       business: {},
       listings: [],
@@ -246,10 +246,10 @@ export default {
     },
 
     /**
-     * read all the listing in for the corresponding business
+     * Calls get searchListings API request, which returns listings that match the given criteria.
      **/
     getListings: async function () {
-      this.listings = (await Api.searchListings(this.search.productName)).data.listings;
+      this.listings = (await Api.searchListings(this.search.productName, this.search.priceMin, this.search.priceMax)).data.listings;
     },
 
     /**
