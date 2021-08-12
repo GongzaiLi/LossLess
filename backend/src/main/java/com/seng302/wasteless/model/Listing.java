@@ -75,4 +75,18 @@ public class Listing {
     private Integer usersLiked = 0;
 
 
+    /**
+     * Initialises the likes on the listing to 0 and increments the likes on the listing by 1
+     */
+    public void incrementUsersLiked(){
+        if (this.usersLiked == null) {
+            this.setUsersLiked(0);
+        }
+        this.usersLiked += 1;
+    }
+
+    /**
+     * Decrements the likes on the listing by 1
+     */
+    public void decrementUsersLiked(){this.usersLiked -= 1;}
 }

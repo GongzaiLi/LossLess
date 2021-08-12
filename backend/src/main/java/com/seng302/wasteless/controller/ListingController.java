@@ -57,7 +57,7 @@ public class ListingController {
 
     /**
      * Handle POST request to /businesses/{id}/listings endpoint for creating new listing for business
-     * <p>
+     *
      * Checks business with id from path exists
      * Checks user making request exists, and has privileges (admin of business, or (D)GAA)
      * Checks inventory with id exists
@@ -182,15 +182,42 @@ public class ListingController {
     }
 
 
+    /**
+     * Handle PUT request to /listings/{listingId}/like endpoint for adding or removing like(s) on a listing
+     *
+     * Checks user is logged in
+     * Checks listing with id exists
+     * Checks if user already has liked listing:
+     * if unliked then listing becomes liked
+     * if liked listing becomes unliked
+     *
+     * @param listingId id of listing to be liked or unliked
+     * @return Json object with boolean "liked" true = liked, false = unliked
+     * Http Status 200 if valid query, 401 if unauthorised, 406 if invalid listing id
+     */
     @PutMapping("/listings/{listingId}/like")
-    public ResponseEntity<Object> addLikeToListing(@PathVariable Integer listingId, Integer userId) {
+    public ResponseEntity<Object> addLikeToListing(@PathVariable Integer listingId) {
         User user = userService.getCurrentlyLoggedInUser();
-        if (!userId.equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Logged in User doesnt match given user id");
+        Listing listing = listingsService.findFirstById(listingId);
+        logger.info("Retrieved listing with ID: {}", listingId);
+
+        Boolean likeStatus;
+        if(user.getListingsLiked().contains(listing)) {
+            user.unLikeListing(listing);
+            likeStatus = Boolean.FALSE;
+            logger.info("Listing: {} unliked by user: {}", listingId, user.getId());
+            listing.decrementUsersLiked();
+        } else {
+            user.addLikedListing(listing);
+            likeStatus = Boolean.TRUE;
+            logger.info("Listing: {} liked by user: {}", listingId, user.getId());
+            listing.incrementUsersLiked();
         }
-        user.addLikedListing(listingsService.findFirstById(listingId));
+        listingsService.updateListing(listing);
         userService.saveUserChanges(user);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("liked", likeStatus);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     /**
@@ -232,5 +259,7 @@ public class ListingController {
         errors.put(constraintName, errorMsg);
         return errors;
     }
+
+
 
 }

@@ -5,6 +5,7 @@ import javax.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.UserViews;
@@ -99,7 +100,7 @@ public class User {
 
     @JoinColumn(name = "listing_liked")
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Listing> listingsLiked;
+    private Set<Listing> listingsLiked;
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges
@@ -147,12 +148,27 @@ public class User {
 
     /**
      * Check if user is default admin
+     *
      * @return true if default admin
      */
     public boolean checkUserDefaultAdmin() {
         return this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
     }
 
-    public void addLikedListing(Listing listing) {this.listingsLiked.add(listing);}
+    /**
+     * Adds a like to the listing
+     *
+     * @param listing The listing that the like is added to
+     */
+    public void addLikedListing(Listing listing) { this.listingsLiked.add(listing); }
+
+    /**
+     * Removes a like to the listing
+     *
+     * @param listing The listing that the like is removed from
+     */
+    public void unLikeListing(Listing listing) {
+        this.listingsLiked.remove(listing);
+    }
 }
 
