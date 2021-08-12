@@ -81,12 +81,14 @@ export default {
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
   searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),
-  searchListings: (searchQuery, priceLower, priceUpper, businessName, businessTypes, businessLocation) => {
+  searchListings: (searchQuery, priceLower, priceUpper, businessName, businessTypes, businessLocation, closingDateStart, closingDateEnd) => {
     const params = new URLSearchParams({
       searchQuery: searchQuery,
       priceLower: priceLower,
       priceUpper: priceUpper,
       businessName: businessName,
+      closingDateStart: closingDateStart,
+      closingDateEnd: closingDateEnd,
       address: businessLocation,
     });
     for (const type of businessTypes) {

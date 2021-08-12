@@ -269,10 +269,12 @@ export default {
       this.listings = (await Api.searchListings(
           this.search.productName,
           this.search.priceMin,
-          this.search.priceMax,//http://localhost:9499/listings/search?searchQuery=&priceLower=&priceUpper=&businessName=&businessTypes[]=Accommodation+and+Food+Services&address=
+          this.search.priceMax,
           this.search.businessName,
           this.search.businessTypes,
-          this.search.businessLocation)).data.listings;
+          this.search.businessLocation,
+          this.search.closesStartDate,
+          this.search.closesEndDate)).data.listings;
     },
 
     /**
