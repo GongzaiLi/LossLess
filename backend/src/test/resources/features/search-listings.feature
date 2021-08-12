@@ -22,7 +22,7 @@ Feature: U29 - Browse/Search Sale listings
   Scenario: AC5 - I can limit the results by one business type.
     When I search for listings by business type:
       | Retail Trade |
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
       | Back Water           |
 
@@ -30,7 +30,7 @@ Feature: U29 - Browse/Search Sale listings
     When I search for listings by business type:
       | Retail Trade            |
       | Charitable organisation |
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
       | Back Water           |
       | Willy Wonka          |
@@ -48,13 +48,13 @@ Feature: U29 - Browse/Search Sale listings
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, part of a product name.
     When I search for listings by product name "water"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
       | Back Water           |
 
   Scenario: AC6 - I can limit the results by typing, in a suitable field, all of a product name.
     When I search for listings by product name "Back Water"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Back Water |
 
   Scenario: AC6 - No results shown when no product names match.
@@ -63,13 +63,13 @@ Feature: U29 - Browse/Search Sale listings
 
   Scenario: AC6 - I can limit the results by setting a price range.
     When I search for listings by min price 1.1 and max price 2
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Back Water  |
       | Willy Wonka |
 
   Scenario: AC8 - I can limit the results by seller business name.
     When I search for listings by business name "Wonka Water"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
       | Back Water           |
 
@@ -79,36 +79,36 @@ Feature: U29 - Browse/Search Sale listings
 
   Scenario: AC9 - I can limit the results by address, in a city name.
     When I search for listings by address "Samarkand"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
 
   Scenario: AC9 - I can limit the results by address, in a country name.
     When I search for listings by address "Albania"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
       | Willy Wonka          |
 
   Scenario: AC9 - I can limit the results by address, in a suburb name.
     When I search for listings by address "Kgb"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Wonka Willy |
 
   Scenario: AC10 - I can limit the results by setting a closing date range.
     When I search for listings by closing date between "2050-01-02" and "2050-01-03"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Back Water  |
       | Willy Wonka |
 
   Scenario: AC10 - I can limit the results by setting a latest closing date.
     When I search for listings with closing dates on or before "2050-01-03"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Black Water No Sugar |
       | Back Water           |
       | Willy Wonka          |
 
   Scenario: AC10 - I can limit the results by setting a earliest closing date .
     When I search for listings with closing dates on or after "2050-01-02"
-    Then The results contain exclusively the following products:
+    Then The results contain the following products:
       | Back Water           |
       | Willy Wonka          |
       | Wonka Willy          |
