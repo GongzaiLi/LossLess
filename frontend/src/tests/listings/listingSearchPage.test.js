@@ -1,5 +1,5 @@
 import {createLocalVue, mount} from '@vue/test-utils';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import VueRouter from 'vue-router';
 import ListingSearchPage from '../../components/listing/ListingSearchPage'; // name of your Vue component
 import Auth from '../../auth';
@@ -36,12 +36,12 @@ describe('Route watcher', () => {
   test('re-queries data when route query changed', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`, query: {searchQuery: 'blackwaternosugar'}});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('blackwaternosugar');
+    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 12, 0);
   });
 
   test('re-queries all listings data when query not exists', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('');
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 12, 0);
   });
 });
