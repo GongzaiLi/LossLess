@@ -76,11 +76,11 @@ public class InventoryService {
     /**
      * Updates the quantity column of the inventory table in the database using a custom sql set statement.
      *
-     * @param newQuantity The new quantity remaining for the inventory item
+     * @param quantityInListing The keep quantity In Listing for the inventory item
      * @param inventoryId The inventory id of the inventory item
      * @return            Returns the updated inventory item entity
      */
-    public Integer updateInventoryItemQuantity(Integer newQuantity, Integer inventoryId) { return inventoryRepository.updateInventoryQuantity(newQuantity, inventoryId); }
+    public Integer updateInventoryItemQuantity(Integer quantityInListing, Integer inventoryId) { return inventoryRepository.updateInventoryQuantityInListing(quantityInListing, inventoryId); }
 
     /**
      * Get the count of inventory items of a business
