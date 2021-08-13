@@ -49,10 +49,12 @@
         <b-collapse id="collapse-1" class="mt-2">
           <b-row>
             <b-col cols="12" md="4">
-              <b-input placeholder="Business Name" v-model="search.businessName"></b-input>
+              <label>Business Name:</label>
+              <b-input v-model="search.businessName"></b-input>
             </b-col>
             <b-col cols="12" md="4">
-              <b-select v-model="search.businessType" @change="search.businessTypes.push(search.businessType);">
+              <label>Business Types:</label>
+              <b-select v-model="search.selectedBusinessType" @change="addBusinessType">
                 <option :value="null"> Any Business Type</option>
                 <option> Accommodation and Food Services</option>
                 <option> Retail Trade</option>
@@ -66,7 +68,7 @@
                   v-model="search.businessTypes"
                   remove-on-delete
               >
-                <template v-slot="{ tags, removeTag }">
+                <template v-slot="{ tags }">
                   <b-badge v-for="tag in tags" :key="tag" class="m-1 b-form-tag flex-grow-1">
                     <span class="b-form-tag-content flex-grow-1 text-truncate">{{ tag }}</span>
                     <button @click="removeTag(tag)" aria-keyshortcuts="Delete" type="button" aria-label="Remove tag"
@@ -77,7 +79,8 @@
               </b-form-tags>
             </b-col>
             <b-col cols="12" md="4">
-              <b-input placeholder="Business Location" v-model="search.businessLocation"></b-input>
+              <label>Business Location:</label>
+              <b-input placeholder="Type a country, city or suburb" v-model="search.businessLocation"></b-input>
             </b-col>
 
           </b-row>
@@ -105,11 +108,11 @@
                   <div class="input-group-text">Price:</div>
                 </div>
                 <div>
-                  <b-input class="price_min" type="number" placeholder="Min:" v-model="search.priceMin"></b-input>
+                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="Min" v-model="search.priceMin"></b-input>
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input class="price_max" type="number" placeholder="Max" v-model="search.priceMax"></b-input>
+                  <b-input class="price_max" step="0.01" min="0.01" max="1000000.00" type="number" placeholder="Max" v-model="search.priceMax"></b-input>
                 </div>
               </div>
 
@@ -211,7 +214,7 @@ export default {
         productName: "",
         sort: "inventoryItem.product.name,asc",
         businessName: "",
-        businessType: "",
+        selectedBusinessType: null,
         businessLocation: "",
         closesStartDate: "",
         closesEndDate: "",
@@ -279,6 +282,30 @@ export default {
      */
     goToListingPage(id) {
       this.$router.push(`/listing/${id}`);
+    },
+
+    /**
+     * Handler for when the user selects a business type to filter as. If the type is "Any Business Type",
+     * then the list of business types is cleared, otherwise the type is added to the selected business types.
+     */
+    addBusinessType() {
+      if (this.search.selectedBusinessType) {
+        this.search.businessTypes.push(this.search.selectedBusinessType);
+      } else {
+        this.search.businessTypes = [];
+      }
+    },
+
+    /**
+     */
+    removeTag(tag) {
+      this.search.businessTypes = this.search.businessTypes.filter(x => x !== tag);
+      if (this.search.selectedBusinessType === tag) {
+        this.search.selectedBusinessType = '';
+      }
+      if (this.search.businessTypes.length === 0) {
+        this.search.selectedBusinessType = null;
+      }
     }
   },
 

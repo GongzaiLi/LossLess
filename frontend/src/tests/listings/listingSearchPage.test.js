@@ -67,3 +67,45 @@ describe('Testing watcher for current page change', () => {
   });
 
 });
+
+
+describe('Add business type ', () => {
+  test('adds normal business type to business types', () => {
+    wrapper.vm.search.selectedBusinessType = "Accommodation and Food Services";
+    wrapper.vm.addBusinessType();
+    expect(wrapper.vm.search.businessTypes).toStrictEqual(["Accommodation and Food Services"]);
+  })
+
+  test('clears business types when null selected', () => {
+    wrapper.vm.search.businessTypes = ["Accommodation and Food Services"];
+    wrapper.vm.search.selectedBusinessType = null;
+    wrapper.vm.addBusinessType();
+    expect(wrapper.vm.search.businessTypes).toStrictEqual([]);
+  })
+});
+
+
+describe('Remove Tag ', () => {
+  test('removes unselected tag from business types', () => {
+    wrapper.vm.search.selectedBusinessType = "Accommodation and Food Services";
+    wrapper.vm.search.businessTypes = ["Accommodation and Food Services", "Retail Trade"];
+    wrapper.vm.removeTag("Retail Trade");
+    expect(wrapper.vm.search.businessTypes).toStrictEqual(["Accommodation and Food Services"]);
+  })
+
+  test('clears selected tag when removed', () => {
+    wrapper.vm.search.selectedBusinessType = "Accommodation and Food Services";
+    wrapper.vm.search.businessTypes = ["Accommodation and Food Services", "Retail Trade"];
+    wrapper.vm.removeTag("Accommodation and Food Services");
+    expect(wrapper.vm.search.businessTypes).toStrictEqual(["Retail Trade"]);
+    expect(wrapper.vm.search.selectedBusinessType).toStrictEqual("");
+  })
+
+  test('sets selected business type to null when all tags removed', () => {
+    wrapper.vm.search.selectedBusinessType = "Accommodation and Food Services";
+    wrapper.vm.search.businessTypes = ["Accommodation and Food Services"];
+    wrapper.vm.removeTag("Accommodation and Food Services");
+    expect(wrapper.vm.search.businessTypes).toStrictEqual([]);
+    expect(wrapper.vm.search.selectedBusinessType).toStrictEqual(null);
+  })
+});

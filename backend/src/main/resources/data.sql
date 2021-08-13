@@ -2,9 +2,9 @@ INSERT INTO Address(street_number, street_name, city, region, country, postcode)
 VALUES (1, 'Chocolate Drive', 'Chocolate', 'Tasty', 'New Zealand', 9762);
 
 INSERT INTO User(first_name, last_name, middle_name, nick_name, bio, email, date_of_birth, created, phone_number,
-                 home_address, password, role, HAS_CardS_DELETED)
+                 home_address, password, role)
 VALUES ('Willy', 'Wonka', 'Chocolate', 'Chocolate Man', 'The Lord of Chocolate', 'willy@wonka.com', '1990-07-15',
-        '2019-12-03', '(946) 570-2232', 1, '$2a$10$sE1aW/VTng8e71r.oaTzw.3hZtOpVymFcbqsnxmb22BlOsbHfbTjC', 0, 0);
+        '2019-12-03', '(946) 570-2232', 1, '$2a$10$sE1aW/VTng8e71r.oaTzw.3hZtOpVymFcbqsnxmb22BlOsbHfbTjC', 0);
 
 INSERT INTO Business(business_type, created, description, name, address, primary_administrator)
 VALUES (2, '2015-03-22', 'We make the best chocolate in the world', 'Wonka Chocolate', 1, 1);
