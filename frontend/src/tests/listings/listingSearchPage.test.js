@@ -39,13 +39,13 @@ describe('Route watcher', () => {
   test('re-queries data when route query changed', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`, query: {searchQuery: 'blackwaternosugar'}});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, 0);
+    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, -1);
   });
 
   test('re-queries all listings data when query not exists', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, 0);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, -1);
   });
 });
 
@@ -55,6 +55,15 @@ describe('Testing api get request search Listing function', () => {
     await wrapper.vm.getListings();
     await wrapper.vm.$forceUpdate();
     expect(wrapper.vm.listings).toBe(testCards.listings);
+  });
+
+});
+
+describe('Testing watcher for current page change', () => {
+  test('check-get-listings-is-called-when-current-page-updated', async () => {
+    wrapper.vm.currentPage = 3
+    await wrapper.vm.$nextTick();
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, 2);
   });
 
 });
