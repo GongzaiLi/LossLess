@@ -28,18 +28,20 @@
           </b-carousel>
         </div>
         <div style="float:left; margin-left: 10px">
-          <h1 style="text-align: center">
-            {{ listingItem.name }}
-          </h1>
-          <h6 style="text-align: center"> Listed on: {{listingItem.created}}</h6>
+          <h1 style="text-align: center"> {{ listingItem.name }} </h1>
+          <h6 style="text-align: center; margin-top: -6px"> Listed on: {{listingItem.created}}</h6>
           <b-card no-body id="infobox-1">
             <template #header>
-              <h5> Quantity: {{listingItem.quantity}} </h5>
+              <h5 style="margin-top: -4px"> Quantity: {{listingItem.quantity}} </h5>
               <h5> Closes: {{listingItem.closes}} </h5>
-              <h6 style="word-wrap: normal; font-size: 12px"> {{listingItem.description}} </h6>
-              <h2> {{listingItem.price}} </h2>
+              <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.description}} </h6>
+              <h2 style="float: left; margin-bottom: -5px"> {{listingItem.price}} </h2>
+              <b-button style="float: left; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
             </template>
           </b-card>
+          <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
+          <b-icon-star-fill class="like-icon" variant="warning" v-else></b-icon-star-fill>
+          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{listingItem.numLikes}} users like this listing </h6>
         </div>
       </b-card>
     </b-row>
@@ -49,9 +51,10 @@
 <style>
 
 .listing_card {
-  max-width: 55rem;
+  max-width: 60rem;
   margin-left: auto;
   margin-right: auto;
+
 }
 
 @media only screen and (min-width: 1250px) {
@@ -71,14 +74,28 @@
 #carousel-1{
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  max-width: 25rem;
-  margin-top: 15px;
+  max-width: 30rem;
+  margin-top: 7px;
 }
 
-#infobox-1{
+.product-image {
+  height: 20rem;
+  object-fit: cover;
+  width: 100%;
+}
+
+#infobox-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   max-width: 25rem;
+}
+
+.like-icon {
+  float: right;
+  margin-top: 8px;
+  margin-left: 5px;
+  width: 25px;
+  height: 25px;
 }
 
 </style>
@@ -90,6 +107,7 @@ export default {
   name: "listing-full",
   data() {
     return {
+      userLikedListing: false,
       slideNumber: 0,
       listingItem: {
         id: '',
@@ -101,6 +119,7 @@ export default {
         manufacturer: '',
         price: '$20.00',
         created: '11/11/2000',
+        numLikes: 123,
         images: [{
           fileName: 'media/images/cec425c1-ce03-4a95-ae35-93908e098be1.png'
         }, {
