@@ -10,11 +10,11 @@ Date: sprint_1
     <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
 
     <b-navbar-brand>
-    <b-nav-form>
-      <b-input-group >
-        <b-form-input   placeholder="Search Listings" v-model="searchQuery" @keyup.enter="search(searchQuery)"></b-form-input>
+    <b-nav-form @submit.prevent="search">
+      <b-input-group>
+        <b-form-input placeholder="Search Listings" v-model="searchQuery"></b-form-input>
         <b-input-group-append>
-          <b-button v-on:click="search(searchQuery)" type="submit"> <b-icon-search/> </b-button>
+          <b-button type="submit"> <b-icon-search/> </b-button>
         </b-input-group-append>
       </b-input-group>
     </b-nav-form>
@@ -37,7 +37,7 @@ Date: sprint_1
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
-        <b-nav-item to="/search">Search</b-nav-item>
+        <b-nav-item to="/search">Search Accounts</b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
 
@@ -299,10 +299,14 @@ export default {
     /**
      * Routes to Listing search page with search string
      * Called when user clicks search or presses enter
-     * @param searchQuery the string used to search for listings passed as a query parameter
      **/
-    search(searchQuery) {
-      this.$router.push(`/listingSearch?searchQuery=${searchQuery}`);
+    search() {
+      if (this.$route.name === 'listings-search' && this.$route.query.searchQuery === this.searchQuery) {
+        this.$router.go();
+      } else {
+        this.$router.replace({path: `/listingSearch`, query: { searchQuery: this.searchQuery }});
+      }
+      this.searchQuery = "";
     },
 
     /**
