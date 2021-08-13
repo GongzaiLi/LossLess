@@ -61,13 +61,12 @@ Date: sprint_1
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown right>
+        <b-nav-item-dropdown right class="notifications-tray">
           <template #button-content>
             <div class="icon mr-1">
-              <b-icon v-if="numExpiredCards > 0" icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem;"></b-icon>
-              <b-icon v-else-if="numberOfNotifications"  icon="bell" class="iconBell" variant="warning" style="font-size:  1.8rem"></b-icon>
+              <b-icon v-if="numberOfNotifications"  icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
               <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
-              <span v-if="numberOfNotifications" :style="{color: ((numExpiredCards > 0) ? 'red' : 'orange')}" style="position: absolute; transform: translateY(5px)">
+              <span v-if="numberOfNotifications" style="position: absolute; transform: translateY(5px); color: red">
                 {{numberOfNotifications}}
               </span>
             </div>
@@ -75,23 +74,13 @@ Date: sprint_1
           <b-dropdown-item disabled>
             <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
           </b-dropdown-item>
-
-          <b-dropdown-item v-if="numExpiredCards"  @click="clicked = !clicked" class="expired-notifications-item">
-            <b-row no-gutters>
-              <b-col cols="11" style="white-space: initial">
-                <h6> Marketplace Card Expired:</h6>
-                <span>{{ numExpiredCards}} {{ expiredText }}</span>
-              </b-col>
-              <b-col cols="1">
-                <b-icon style="width: 30px; height: 30px; margin-top: 50%"
-                        icon="trash-fill" @click="clearExpiredCards"></b-icon>
-              </b-col>
-            </b-row>
+          <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
+            <h6> Marketplace Card: {{card.title}}</h6>
+            <strong>expires within 24 hours</strong>
           </b-dropdown-item>
-
-          <b-dropdown-item class="notifications-item" v-for="notification in notifications" v-bind:key="notification.id"  @click="goToHomePage">
-            <h6> Marketplace Card: {{notification.title}}</h6>
-             expires within 24 hours
+          <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
+            <h6> {{notification.type}} </h6>
+            <span>{{ notification.message }}</span>
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
@@ -153,35 +142,20 @@ Date: sprint_1
   border-top: 1px solid #eee;
 }
 
-.expired-notifications-item {
-  border-top: 1px solid #eee;
-  cursor: pointer;
-}
-
-.expired-notifications-item * {
-  color: orangered;
-}
-
-.expired-notifications-item h6 {
-  margin-top: 3px;
-}
-
 .notifications-item h6 {
   margin-top: 3px;
-}
-
-.expired-notifications-item p {
-  color: orangered;
-}
-
-.expired-notifications-item .dropdown-item:active {
-  color: initial;
-  background-color: #cccccc;
 }
 
 .notifications-item .dropdown-item:active {
   color: initial;
   background-color: #cccccc;
+}
+.expiring-notifications-item * {
+  color: orangered;
+}
+.notifications-tray .dropdown-menu {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 </style>
 
@@ -202,6 +176,7 @@ export default {
       showNotifications: false,
       cards: [],
       notifications: [],
+      expiringCards: [],
       numExpiredCards:0,
       timer: null,
       searchQuery: '',
@@ -277,10 +252,7 @@ export default {
      * @return The number of total notifications
      */
     numberOfNotifications: function () {
-      if (this.numExpiredCards){
-        return this.notifications.length+1;
-      }
-      return this.notifications.length;
+      return this.expiringCards.length + this.notifications.length;
     },
 
     /**
@@ -307,42 +279,6 @@ export default {
         this.$router.replace({path: `/listingSearch`, query: { searchQuery: this.searchQuery }});
       }
       this.searchQuery = "";
-    },
-
-    /**
-     * Gets all the expiring cards from for the current user.
-     */
-    getExpiringCards(userId) {
-      return api.getExpiringCards(userId)
-          .then((res) => {
-            this.cards = res.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          });
-    },
-
-    /**
-     * Gets all the expired cards for the current user.
-     */
-    getExpiredCards(userId) {
-      return api.expiredCardsNumber(userId)
-          .then((res) => {
-            this.numExpiredCards = res.data;
-          })
-          .catch((error) => {
-            this.$log.debug(error);
-          });
-    },
-    /**
-     * Gets all the expired cards from for the current user.
-     */
-    clearExpiredCards() {
-      api.clearHasCardsExpired(this.$currentUser.id).then(() => {
-        this.numExpiredCards=0
-      }).catch((error) => {
-        this.$log.debug(error);
-      });
     },
 
     /**
@@ -406,10 +342,10 @@ export default {
      *  This is done by adding the expiring card to the list of notifications.
      */
     async updateNotifications() {
-      await this.getExpiringCards(this.$currentUser.id);
-      await this.getExpiredCards(this.$currentUser.id);
-      this.notifications = this.cards;
+      this.expiringCards = (await api.getExpiringCards(this.$currentUser.id)).data;
+      this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
     },
+
     hoverLogo() {
       this.timer = setTimeout(() => {this.$bvToast.show('my-toast')}, 10000);
     },

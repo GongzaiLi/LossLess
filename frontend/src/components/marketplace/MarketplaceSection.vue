@@ -98,6 +98,7 @@ export default {
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
     this.refreshData();
+    console.log('SADASDASDSAD');
   },
   data: function () {
     return {
@@ -193,7 +194,7 @@ export default {
         this.cards = resp.data.results;
         this.totalItems = resp.data.totalItems;
       } else {
-        const resp = await Api.getExpiringCards(this.$currentUser.id)
+        const resp = await Api.getExpiringCards(this.$currentUser.id);
         this.cards = resp.data;
         this.$emit('cardCountChanged', this.cards);
       }
