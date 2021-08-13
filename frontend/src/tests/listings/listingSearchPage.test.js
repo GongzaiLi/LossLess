@@ -4,14 +4,17 @@ import VueRouter from 'vue-router';
 import ListingSearchPage from '../../components/listing/ListingSearchPage'; // name of your Vue component
 import Auth from '../../auth';
 import Api from '../../Api';
+import {getToday} from "../../util";
 import testCards from './testCards.json';
 
 let wrapper;
 
 jest.mock('../../Api');
+jest.mock('../../util');
 
 beforeEach(() => {
   Api.searchListings.mockResolvedValue({data: testCards});
+  getToday.mockReturnValueOnce("2021-08-12");
 
   const localVue = createLocalVue();
 
@@ -25,7 +28,7 @@ beforeEach(() => {
   wrapper = mount(ListingSearchPage, {
     localVue,
     router
-  })
+  });
 });
 
 afterEach(() => {
