@@ -78,4 +78,8 @@ public class Inventory {
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private LocalDate expires;
 
+    @PositiveOrZero
+    @Column(name = "quantity_in_listing", columnDefinition = "integer default 0")
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    private Integer quantityInListing;
 }
