@@ -221,7 +221,7 @@ export default {
       },
       business: {},
       listings: [],
-      perPage: 3,
+      perPage: 9,
       currentPage: 0, // page start with 0
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
