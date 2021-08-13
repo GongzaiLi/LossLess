@@ -36,7 +36,7 @@
               <h5> Closes: {{listingItem.closes}} </h5>
               <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.description}} </h6>
               <h2 style="float: left; margin-bottom: -5px"> {{listingItem.price}} </h2>
-              <b-button style="float: left; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
+              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
             </template>
           </b-card>
           <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
@@ -60,7 +60,7 @@
 @media only screen and (min-width: 1250px) {
   .back-to-search-link {
     position: absolute;
-    left: 250px;
+    left: 200px;
   }
 }
 
