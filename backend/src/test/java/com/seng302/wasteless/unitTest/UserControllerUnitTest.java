@@ -324,7 +324,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void whenGetRequestToUserHasCardsExpired_AndUserIsSelf_thenExpiredReturned() throws Exception {
         User currentUser = userService.findUserById(1);
         System.out.println(notificationService.findAllNotificationsByUserId(1));
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/notifications")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -335,7 +335,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void whenGetRequestToUserHasCardsExpired_AndUserIsNotSelf_thenForbidden() throws Exception {
         User currentUser = userService.findUserById(2);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/notifications")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());

@@ -263,21 +263,14 @@ public class UserController {
     }
 
     /**
-     * Endpoint to GET all notifications of a user
+     * Endpoint to GET all notifications of the logged in user
      *
-     * @param userId The id of the user
-     * @return 403 FORBIDDEN if a user makes this request for another user.
-     * 200 OK otherwise.
+     * @return  200 OK if succesful request, With all notifications for logged in user
      */
-    @GetMapping("/users/{id}/notifications")
-    public ResponseEntity<Object> getNotifications(@PathVariable("id") Integer userId) {
-        logger.info("Request to get notifications for user: {}", userId);
+    @GetMapping("/users/notifications")
+    public ResponseEntity<Object> getNotifications() {
         User user = userService.getCurrentlyLoggedInUser();
-
-        if (!userId.equals(user.getId())) {
-            logger.info("User ({}) tried to access the notifications of another user ({}).", user.getId(), userId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You cannot view the notifications of another user.");
-        }
+        logger.info("Request to get notifications for user: {}", user.getId());
         return ResponseEntity.status(HttpStatus.OK).body(notificationService.findAllNotificationsByUserId(user.getId()));
     }
 
