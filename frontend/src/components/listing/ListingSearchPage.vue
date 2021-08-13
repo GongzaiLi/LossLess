@@ -118,22 +118,21 @@
             <div v-if="!listing.inventoryItem.product.images.length">
               <img class="product-image" src="product_default.png" alt="Product has no image">
             </div>
-            <!--COMMENTED OUT UNTIL WE SEND BACK BUSINESS WITH THE LISTING-->
-<!--            <hr>-->
-<!--            <h5><b>Seller: {{ listing.business.name }}</b></h5>-->
-<!--            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>-->
-<!--            <span>Closes:{{ listing.closes }}</span>-->
-<!--            <template #footer>-->
-<!--              <h5 class="listing_price" v-if="listing.business.currency">-->
-<!--                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}-->
-<!--              </h5>-->
-<!--            </template>-->
+            <hr>
+            <h5><b>Seller: {{ listing.business.name }}</b></h5>
+            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>
+            <span>Closes: {{ listing.closes }}</span>
+            <template #footer>
+              <h5 class="listing_price" v-if="listing.business.currency">
+                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}
+              </h5>
+            </template>
           </b-card>
         </b-col>
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
 
-      <pagination :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
+      <pagination v-if="totalResults > perPage" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
     </b-container>
   </b-card>
 </template>
@@ -205,7 +204,7 @@ export default {
       },
       business: {},
       listings: [],
-      perPage: 12,
+      perPage: 9,
       currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
@@ -216,40 +215,24 @@ export default {
   async mounted() {
     this.$refs.searchInput.focus();
     this.search.productName = this.$route.query.searchQuery || "";
-    await this.initListingPage();
+    await this.getListings();
     this.search.closesStartDate = getToday();
     this.initialized = true;
   },
 
   methods: {
     /**
-     * Page initilisation function
-     **/
-    initListingPage: async function () {
-      await this.getListings();
-      //await this.getBusinessCurrency();
-    },
-
-    /**
-     * Api request to get business information
-     **/
-    async getBusinessCurrency() {
-      for (const card of this.listings) {
-        await Api.getUserCurrency(card.business.address.country)
-            .then((response) => {
-              card.business.currency = response;
-            })
-            .catch((error) => {
-              this.$log.debug(error);
-            });
-      }
-    },
-
-    /**
-     * read all the listing in for the corresponding business
+     * Sends API request to get all the listings with the search parameters stored in this component. 
+     * Also queries the currencies API to get currency info for each business (the API call is cached
+     * so this should be fast).
      **/
     getListings: async function () {
-      this.listings = (await Api.searchListings(this.search.productName)).data.listings;
+      const resp = (await Api.searchListings(this.search.productName)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
+      for (const listing of resp.listings) {
+        listing.business.currency = await Api.getUserCurrency(listing.business.address.country);
+      }
+      this.listings = resp.listings;
+      this.totalResults = resp.totalItems;
     },
 
     /**
