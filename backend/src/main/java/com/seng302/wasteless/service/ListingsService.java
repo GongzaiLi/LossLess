@@ -233,7 +233,7 @@ public class ListingsService {
         if (priceLower.isPresent()) querySpec = querySpec.and(priceGreaterThanOrEqualTo(priceLower.get()));
         if (priceUpper.isPresent()) querySpec = querySpec.and(priceLessThanOrEqualTo(priceUpper.get()));
         if (businessName.isPresent()) querySpec = querySpec.and(sellerBusinessNameMatches(businessName.get()));
-        if (businessTypes.isPresent() && !businessTypes.get().isEmpty())
+        if (businessTypes.isPresent() && !businessTypes.get().stream().allMatch(String::isEmpty))
             querySpec = querySpec.and(sellerBusinessTypeMatches(businessTypes.get()));
         if (closingDateStart.isPresent()) querySpec = querySpec.and(closesGreaterThanOrEqualTo(closingDateStart.get()));
         if (closingDateEnd.isPresent()) querySpec = querySpec.and(closesLessThanOrEqualTo(closingDateEnd.get()));

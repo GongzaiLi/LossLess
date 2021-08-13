@@ -26,8 +26,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "update Inventory set quantity = :newQuantity where id = :inventoryId")
-    Integer updateInventoryQuantity(@Param("newQuantity") Integer newQuantity, @Param("inventoryId") Integer inventoryId);
+    @Query(value = "update Inventory set quantityInListing = :newQuantity where id = :inventoryId")
+    Integer updateInventoryQuantityInListing(@Param("newQuantity") Integer newQuantity, @Param("inventoryId") Integer inventoryId);
 
     Integer countInventoryByBusinessIdAndProductIdContainsAllIgnoreCase(Integer id,  String productName);
 }

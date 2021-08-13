@@ -100,9 +100,6 @@ public class User {
     @Column(name = "role")
     private UserRoles role;
 
-    @Column(name = "has_cards_deleted")
-    private Integer hasCardsDeleted = 0;
-
     @JoinColumn(name = "listing_liked")
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Listing> listingsLiked;

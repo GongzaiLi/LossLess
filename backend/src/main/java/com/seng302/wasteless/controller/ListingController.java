@@ -84,13 +84,16 @@ public class ListingController {
         logger.info("Retrieved `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
-
         if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
             logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getExpires());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item expiry is in the past.");
         }
 
-        Integer availableQuantity = possibleInventoryItem.getQuantity();
+        if (possibleInventoryItem.getQuantityInListing() == null) {
+            possibleInventoryItem.setQuantityInListing(0);
+        }
+
+        Integer availableQuantity = possibleInventoryItem.getQuantity() - possibleInventoryItem.getQuantityInListing();
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
         if (availableQuantity < listingQuantity) {
@@ -98,8 +101,7 @@ public class ListingController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
-        Integer remainingQuantity = availableQuantity - listingQuantity;
-
+        Integer quantityInListing = listingQuantity + possibleInventoryItem.getQuantityInListing();
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
@@ -108,7 +110,7 @@ public class ListingController {
 
         listing = listingsService.createListing(listing);
 
-        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(remainingQuantity, possibleInventoryItem.getId());
+        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(quantityInListing, possibleInventoryItem.getId());
 
         if (updateQuantityResult == 0) {
             logger.error("No inventory item quantity value was updated when this listing was created.");
