@@ -254,17 +254,6 @@ export default {
     numberOfNotifications: function () {
       return this.expiringCards.length + this.notifications.length;
     },
-
-    /**
-     * Checks the number of expired cards
-     * @return The appropriate notification message based on number of cards
-     */
-    expiredText: function () {
-      if (this.numExpiredCards === 1){
-        return " of your cards has expired and been deleted"
-      }
-      return " of your cards have expired and been deleted"
-    }
   },
   methods: {
 
