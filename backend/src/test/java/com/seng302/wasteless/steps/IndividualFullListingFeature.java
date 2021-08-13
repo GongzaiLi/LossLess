@@ -152,7 +152,7 @@ public class IndividualFullListingFeature {
     public void i_have_liked_the_listing_with_id(String string) {
         Listing listing = listingsService.findFirstById(Integer.parseInt(string));
         currentUser.setListingsLiked(new HashSet<>());
-        currentUser.addLikedListing(listing);
+        Assertions.assertTrue(currentUser.likeListing(listing));
         userService.updateUser(currentUser);
         listing.setUsersLiked(1);
         listingsService.updateListing(listing);

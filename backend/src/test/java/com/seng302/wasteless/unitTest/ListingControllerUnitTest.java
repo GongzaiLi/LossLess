@@ -421,6 +421,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPutRequestToLikeAListing_andListingNotAlreadyLiked_then200Response() throws Exception {
         Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Mockito.when(user.likeListing(listing)).thenReturn(true);
         mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -434,7 +435,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         Set<Listing> set = new HashSet<>();
         set.add(listing);
         Mockito.when(user.getListingsLiked()).thenReturn(set);
-        user.addLikedListing(listing);
+        user.likeListing(listing);
         mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())

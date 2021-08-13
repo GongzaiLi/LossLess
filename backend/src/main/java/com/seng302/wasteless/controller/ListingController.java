@@ -216,19 +216,7 @@ public class ListingController {
         User user = userService.getCurrentlyLoggedInUser();
         Listing listing = listingsService.findFirstById(listingId);
         logger.info("Retrieved listing with ID: {}", listingId);
-
-        Boolean likeStatus;
-        if(user.getListingsLiked().contains(listing)) {
-            user.unLikeListing(listing);
-            likeStatus = Boolean.FALSE;
-            logger.info("Listing: {} unliked by user: {}", listingId, user.getId());
-            listing.decrementUsersLiked();
-        } else {
-            user.addLikedListing(listing);
-            likeStatus = Boolean.TRUE;
-            logger.info("Listing: {} liked by user: {}", listingId, user.getId());
-            listing.incrementUsersLiked();
-        }
+        Boolean likeStatus = user.likeListing(listing);
         listingsService.updateListing(listing);
         userService.saveUserChanges(user);
         JSONObject responseBody = new JSONObject();

@@ -8,10 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An implementation of User model.
@@ -22,6 +25,8 @@ import lombok.ToString;
 @ToString // generate a toString method
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class User {
+
+    private static final Logger logger = LogManager.getLogger(User.class.getName());
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
@@ -155,19 +160,36 @@ public class User {
         return this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
     }
 
+
+    public boolean likeListing(Listing listing) {
+        Boolean likeStatus;
+        if(listingsLiked.contains(listing)) {
+            this.unLikeListing(listing);
+            likeStatus = Boolean.FALSE;
+            logger.info("Listing: {} unliked by user: {}", listing.getId(), this.id);
+            listing.decrementUsersLiked();
+        } else {
+            this.addLikedListing(listing);
+            likeStatus = Boolean.TRUE;
+            logger.info("Listing: {} liked by user: {}", listing.getId(), this.id);
+            listing.incrementUsersLiked();
+        }
+        return likeStatus;
+    }
+
     /**
      * Adds a like to the listing
      *
      * @param listing The listing that the like is added to
      */
-    public void addLikedListing(Listing listing) { this.listingsLiked.add(listing); }
+    private void addLikedListing(Listing listing) { this.listingsLiked.add(listing); }
 
     /**
      * Removes a like to the listing
      *
      * @param listing The listing that the like is removed from
      */
-    public void unLikeListing(Listing listing) {
+    private void unLikeListing(Listing listing) {
         this.listingsLiked.remove(listing);
     }
 }
