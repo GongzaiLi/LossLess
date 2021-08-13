@@ -135,7 +135,7 @@
               <img class="product-image" src="product_default.png" alt="Product has no image">
             </div>
             <hr>
-            <h5><b>Seller: {{ listing.business.name }}</b></h5>
+            <h5><strong>Seller: {{ listing.business.name }}</strong></h5>
             <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>
             <span>Closes: {{ listing.closes }}</span>
             <template #footer>
@@ -222,7 +222,7 @@ export default {
       business: {},
       listings: [],
       perPage: 9,
-      currentPage: 1,
+      currentPage: 0, // page start with 0
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
       images: [],
@@ -244,7 +244,8 @@ export default {
      * so this should be fast).
      **/
     getListings: async function () {
-      const resp = (await Api.searchListings(this.search.productName,
+      const resp = (await Api.searchListings(
+          this.search.productName,
           this.search.priceMin,
           this.search.priceMax,
           this.search.businessName,
