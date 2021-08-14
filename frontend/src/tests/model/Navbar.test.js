@@ -97,9 +97,8 @@ beforeEach(() => {
   localVue.use(Auth);
 
   Api.getExpiringCards.mockResolvedValue({data: expiringCards});
-  Api.expiredCardsNumber.mockResolvedValue({data: 3});
   Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
-
+  Api.getNotifications.mockResolvedValue({data: []});
 
   wrapper = mount(NavBar, {
     localVue,
@@ -257,40 +256,9 @@ describe('Act as business', () => {
 describe('Get expiring cards', () => {
   test('cards expiring within 24 hours get added to notifications', async () => {
     await wrapper.vm.updateNotifications();
-    expect(wrapper.vm.notifications.length).toBe(2);
-  })
-});
-
-describe('Get number of expired cards', () => {
-  test('number of expired cards is set to data from the server', async () => {
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numExpiredCards).toBe(3);
+    expect(wrapper.vm.numberOfNotifications).toBe(2);
   })
-
-  test('the notification has correct message if 1 card has expired', async () => {
-    Api.expiredCardsNumber.mockResolvedValue({data: 1});
-    wrapper.vm.getExpiredCards();
-    await wrapper.vm.$forceUpdate();
-    expect(wrapper.vm.expiredText).toBe(" of your cards has expired and been deleted");
-  })
-
-  test('the notification has correct message if multiple cards have expired', async () => {
-    Api.expiredCardsNumber.mockResolvedValue({data: 5});
-    wrapper.vm.getExpiredCards();
-    await wrapper.vm.$forceUpdate();
-    expect(wrapper.vm.expiredText).toBe(" of your cards have expired and been deleted");
-  })
-
-
-});
-
-describe('Clear expired cards notification', () => {
-  test('number of expired cards is set to zero after clearing', async () => {
-    wrapper.vm.clearExpiredCards()
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numExpiredCards).toBe(0);
-  })
-
 });
 
 describe("Listing search ", () => {
