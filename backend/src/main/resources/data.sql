@@ -31,19 +31,19 @@ VALUES (1, '2017-08-08', 'A treat that never ends', 'The Chocolate Factory', 'Ev
         '1-WONKA-ELG');
 
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
-                      product_id, quantity_remaining)
+                      product_id, quantity_unlisted)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 5, '2021-09-26', 12.5, 1, 3);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
-                      product_id, quantity_remaining)
+                      product_id, quantity_unlisted)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 2, '2021-09-26', 5, 2, 0);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
-                      product_id, quantity_remaining)
+                      product_id, quantity_unlisted)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 8, '2021-09-26', 20, 3, 2);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
-                      product_id, quantity_remaining)
+                      product_id, quantity_unlisted)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 3.5, 10, '2021-09-26', 35, 4, 9);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
-                      product_id, quantity_remaining)
+                      product_id, quantity_unlisted)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 9.5, 3, '2021-09-26', 28.5, 5, 1);
 
 INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)

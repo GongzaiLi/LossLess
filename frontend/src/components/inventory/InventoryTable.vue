@@ -238,8 +238,8 @@ export default {
           sortable: true
         },
         {
-          key: 'quantityRemaining',
-          label: 'Quantity Remaining',
+          key: 'quantityUnlisted',
+          label: 'Quantity Unlisted',
           sortable: true
         },
         {

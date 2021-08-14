@@ -89,11 +89,11 @@ public class ListingController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item expiry is in the past.");
         }
 
-        if (possibleInventoryItem.getQuantityRemaining() == null) {
-            possibleInventoryItem.setQuantityRemaining(possibleInventoryItem.getQuantity());
+        if (possibleInventoryItem.getQuantityUnlisted() == null) {
+            possibleInventoryItem.setQuantityUnlisted(possibleInventoryItem.getQuantity());
         }
 
-        Integer availableQuantity = possibleInventoryItem.getQuantityRemaining();
+        Integer availableQuantity = possibleInventoryItem.getQuantityUnlisted();
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
         if (availableQuantity < listingQuantity) {
@@ -101,7 +101,7 @@ public class ListingController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
-        Integer quantityRemaining = possibleInventoryItem.getQuantityRemaining() - listingQuantity;
+        Integer quantityRemaining = possibleInventoryItem.getQuantityUnlisted() - listingQuantity;
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 

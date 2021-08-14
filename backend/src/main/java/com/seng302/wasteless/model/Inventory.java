@@ -79,7 +79,7 @@ public class Inventory {
     private LocalDate expires;
 
     @PositiveOrZero
-    @Column(name = "quantity_remaining")
+    @Column(name = "quantity_unlisted")
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
-    private Integer quantityRemaining;
+    private Integer quantityUnlisted;
 }
