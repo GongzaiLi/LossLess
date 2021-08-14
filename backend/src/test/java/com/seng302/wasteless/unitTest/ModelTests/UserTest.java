@@ -2,12 +2,14 @@ package com.seng302.wasteless.unitTest.ModelTests;
 
 import com.seng302.wasteless.model.Listing;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.repository.UserRepository;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
@@ -19,6 +21,12 @@ import java.util.Set;
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserService.class)
 class UserTest {
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private UserService userService;
 
     private User user;
     private Listing listing;
