@@ -218,7 +218,7 @@ public class ListingController {
         User user = userService.getCurrentlyLoggedInUser();
         Listing listing = listingsService.findFirstById(listingId);
         logger.info("Retrieved listing with ID: {}", listingId);
-        Boolean likeStatus = user.likeListing(listing);
+        Boolean likeStatus = user.toggleListingLike(listing);
         listingsService.updateListing(listing);
         userService.saveUserChanges(user);
         JSONObject responseBody = new JSONObject();

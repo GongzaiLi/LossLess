@@ -158,7 +158,15 @@ public class User {
     }
 
 
-    public boolean likeListing(Listing listing) {
+    /**
+     * Toggles the like on a listing,
+     * if the user liked listing doesnt contain the new listing, the listing is added
+     * if the user is currently 'liking' it then the like is removed by removing the listing from the set
+     * the total likes on the listing is then increased or decreased depending ion if the like is added or removed
+     * @param listing listing to have current user's like's toggled
+     * @return true if like added, false if like removed
+     */
+    public boolean toggleListingLike(Listing listing) {
         Boolean likeStatus;
         if(listingsLiked.contains(listing)) {
             this.unLikeListing(listing);
