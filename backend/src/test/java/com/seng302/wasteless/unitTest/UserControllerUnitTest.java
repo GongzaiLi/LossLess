@@ -1,28 +1,38 @@
 package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.UserController;
+import com.seng302.wasteless.model.Card;
+import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.mockito.Mockito;
+import static org.mockito.ArgumentMatchers.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
@@ -37,6 +47,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @MockBean
     private AddressService addressService;
+
+    @MockBean
+    private NotificationService notificationService;
+
+    @BeforeEach
+            void setUp() {
+        Notification notification = new Notification();
+        notification.setType("Expired Marketplace Card");
+        notification.setSubjectId(1);
+        notification.setMessage(String.format("Your card has expired"));
+        notification.setUserId(1);
+        List<Notification> notifs = new ArrayList<>();
+        notifs.add(notification);
+
+        Mockito
+                .when(notificationService.findAllNotificationsByUserId(1))
+                .thenReturn(notifs);
+    }
 
     @Test
      void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
@@ -295,59 +323,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void whenGetRequestToUserHasCardsExpired_AndUserIsSelf_thenExpiredReturned() throws Exception {
         User currentUser = userService.findUserById(1);
-        currentUser.setHasCardsDeleted(1);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/hasCardsExpired")
+        System.out.println(notificationService.findAllNotificationsByUserId(1));
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string("1"));
-    }
-
-    @Test
-    void whenGetRequestToUserHasCardsExpired_AndUserIsNotSelf_thenForbidden() throws Exception {
-        User currentUser = userService.findUserById(2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/hasCardsExpired")
-                .with(user(new CustomUserDetails(currentUser)))
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void whenPutRequestToClearCardsExpired_AndUserIsNotSelf_thenForbidden() throws Exception {
-        User currentUser = userService.findUserById(2);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
-                .with(user(new CustomUserDetails(currentUser)))
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void whenPutRequestToClearCardsExpired_AndUserIsSelf_AndUserHasCardsExpired_thenCardsExpiredCleared() throws Exception {
-        User currentUser = userService.findUserById(1);
-        currentUser.setHasCardsDeleted(1);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
-                .with(user(new CustomUserDetails(currentUser)))
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        Assertions.assertEquals(0,currentUser.getHasCardsDeleted());
-    }
-
-    @Test
-    void whenPutRequestToClearCardsExpired_AndUserIsSelf_AndUserHasNoCardsExpired_thenCardsExpiredIsNotChanged() throws Exception {
-        User currentUser = userService.findUserById(1);
-        currentUser.setHasCardsDeleted(0);
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/clearHasCardsExpired")
-                .with(user(new CustomUserDetails(currentUser)))
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        Assertions.assertEquals(0, currentUser.getHasCardsDeleted());
+                .andExpect(jsonPath("$[0].message", is("Your card has expired")));
     }
 
     void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {

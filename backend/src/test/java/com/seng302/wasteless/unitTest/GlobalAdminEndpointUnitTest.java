@@ -4,6 +4,7 @@ import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @MockBean
     private Authentication authentication;
+
+    @MockBean
+    private NotificationService notificationService;
 
     private User user;
     private User admin;

@@ -255,7 +255,7 @@ export default {
           this.search.closesEndDate,
           this.search.sort,
           this.perPage,
-          this.currentPage)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
+          this.currentPage - 1)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
       for (const listing of resp.listings) {
         listing.business.currency = await Api.getUserCurrency(listing.business.address.country);
       }
@@ -292,6 +292,13 @@ export default {
       this.getListings();
       this.$refs.searchInput.focus();
     },
+
+    '$data.currentPage': {
+      handler: function() {
+        this.getListings();
+      },
+      deep: true
+    }
   }
 }
 </script>
