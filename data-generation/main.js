@@ -13,9 +13,11 @@ const FormData = require('form-data');
 
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
-const MAX_USERS_PER_API_REQUEST = 100;
+const MAX_USERS_PER_API_REQUEST = 16;
 const HAS_NICKNAME_PROB = 1 / 10;
 const HAS_MIDDLE_NAME_PROB = 4 / 10;
+const PROB_USER_LIKES_LISTINGS = 0.5;
+const MAX_LIKED_LISTINGS_PER_USER = 10;
 
 const NUM_BUSINESSES = 100;
 const NUM_BUSINESSTYPES = 4;
@@ -28,6 +30,7 @@ const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 const MAX_CARD_PER_USER = 5;
+const APPROX_NUM_LISTINGS = NUM_BUSINESSES * (MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -159,6 +162,24 @@ async function getBusinesses() {
   return businesses;
 }
 
+async function likeListings(instance) {
+  if (Math.random() < PROB_USER_LIKES_LISTINGS) {
+    for (let i = 0; i <= Math.random() * MAX_LIKED_LISTINGS_PER_USER; i++) {
+      const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS);
+      try {
+        await instance.put(`${SERVER_URL}/listings/${listingId}/like`, null, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+          }
+        });
+      } catch(e) {
+        //stfu
+      }
+    }
+  }
+}
+
 /**
  * Uses axios to make a post request to our backend to create a new user.
  */
@@ -177,6 +198,7 @@ async function registerUser(user) {
     instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
     await addCard(instance);
+    await likeListings(instance);
     return [response, instance];
 }
 
