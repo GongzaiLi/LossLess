@@ -238,6 +238,11 @@ export default {
           sortable: true
         },
         {
+          key: 'quantityUnlisted',
+          label: 'Quantity Unlisted',
+          sortable: true
+        },
+        {
           key: 'pricePerItem',
           label: `Price (${this.currency.code})`,
           sortable: true
