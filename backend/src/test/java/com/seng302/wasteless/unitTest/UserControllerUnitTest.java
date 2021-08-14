@@ -324,23 +324,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void whenGetRequestToUserHasCardsExpired_AndUserIsSelf_thenExpiredReturned() throws Exception {
         User currentUser = userService.findUserById(1);
         System.out.println(notificationService.findAllNotificationsByUserId(1));
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/notifications")
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].message", is("Your card has expired")));
     }
-
-    @Test
-    void whenGetRequestToUserHasCardsExpired_AndUserIsNotSelf_thenForbidden() throws Exception {
-        User currentUser = userService.findUserById(2);
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/1/notifications")
-                .with(user(new CustomUserDetails(currentUser)))
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
 
     void createOneUser(String firstName, String lastName, String email, String dateOfBirth, String homeAddress, String password) {
         String user = String.format("{\"firstName\": \"%s\", \"lastName\" : \"%s\", \"email\": \"%s\", \"dateOfBirth\": \"%s\", \"homeAddress\": %s, \"password\": \"%s\"}", firstName, lastName, email, dateOfBirth, homeAddress, password);
