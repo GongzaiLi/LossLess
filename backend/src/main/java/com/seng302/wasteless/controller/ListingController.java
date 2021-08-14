@@ -89,11 +89,11 @@ public class ListingController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item expiry is in the past.");
         }
 
-        if (possibleInventoryItem.getQuantityInListing() == null) {
-            possibleInventoryItem.setQuantityInListing(0);
+        if (possibleInventoryItem.getQuantityRemaining() == null) {
+            possibleInventoryItem.setQuantityRemaining(possibleInventoryItem.getQuantity());
         }
 
-        Integer availableQuantity = possibleInventoryItem.getQuantity() - possibleInventoryItem.getQuantityInListing();
+        Integer availableQuantity = possibleInventoryItem.getQuantityRemaining();
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
         if (availableQuantity < listingQuantity) {
@@ -101,7 +101,7 @@ public class ListingController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
-        Integer quantityInListing = listingQuantity + possibleInventoryItem.getQuantityInListing();
+        Integer quantityRemaining = possibleInventoryItem.getQuantityRemaining() - listingQuantity;
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
@@ -110,7 +110,7 @@ public class ListingController {
 
         listing = listingsService.createListing(listing);
 
-        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(quantityInListing, possibleInventoryItem.getId());
+        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(quantityRemaining, possibleInventoryItem.getId());
 
         if (updateQuantityResult == 0) {
             logger.error("No inventory item quantity value was updated when this listing was created.");

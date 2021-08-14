@@ -189,7 +189,7 @@ public class CreateListingFeature {
             inventory.setQuantity(5);
             inventory.setPricePerItem(1.5);
             inventory.setTotalPrice(15);
-            inventory.setQuantityInListing(0);
+            inventory.setQuantityRemaining(5);
             inventory.setExpires(LocalDate.parse("2022-05-23"));
             inventoryService.createInventory(inventory);
         }
