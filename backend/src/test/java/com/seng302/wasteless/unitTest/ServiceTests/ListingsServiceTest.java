@@ -284,4 +284,29 @@ public class ListingsServiceTest {
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
+
+    //
+    //  Purchase Listing
+    //
+
+    @Test
+    void whenPurchaseListing_andListingQuantityLessThanInventoryQuantity_thenInventoryQuantityDecreased() {
+        var listing = createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                4, 5);
+        Integer inventoryId = listing.getInventoryItem().getId();
+        listingsService.purchase(listing);
+        assertEquals(1, inventoryService.findInventoryById(inventoryId).getQuantity());
+        assertEquals(0, inventoryService.findInventoryById(inventoryId).getQuantityInListing());
+        assertThrows(ResponseStatusException.class, () -> listingsService.getListingWithId(inventoryId));
+    }
+
+    @Test
+    void whenPurchaseListing_andListingQuantityEqualToInventoryQuantity_thenInventoryQuantitySetToZero() {
+        var listing = createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                5, 5);
+        Integer inventoryId = listing.getInventoryItem().getId();
+        listingsService.purchase(listing);
+        assertEquals(0, inventoryService.findInventoryById(inventoryId).getQuantity());
+        assertEquals(0, inventoryService.findInventoryById(inventoryId).getQuantityInListing());
+    }
 }

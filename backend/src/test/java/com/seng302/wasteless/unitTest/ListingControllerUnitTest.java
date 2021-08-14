@@ -418,5 +418,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("listings", hasSize(1)));
     }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPostRequestToPurchaseListings_andListingExists_then200Response() throws Exception {
+        Mockito
+                .when(listingsService.getListingWithId(1))
+                .thenReturn(listing);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPostRequestToPurchaseListings_andListingNotExists_then406Response() throws Exception {
+        Mockito
+                .when(listingsService.getListingWithId(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/listings/42069/purchase")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
 }
 

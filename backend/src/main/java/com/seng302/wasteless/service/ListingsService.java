@@ -242,8 +242,8 @@ public class ListingsService {
     }
 
     /**
-     * Purchases the given listing, and deletes it.
-     * Will update the listing's inventory item's quantity as well.
+     * Purchases the given listing, and deletes it. The listing is assumed to exist (ie it cannot have already
+     * been deleted in the DB). Will update the listing's inventory item's quantity as well.
      * @param listing The listing to purchase
      */
     public void purchase(Listing listing) {
