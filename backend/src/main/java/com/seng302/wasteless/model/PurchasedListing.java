@@ -28,7 +28,7 @@ public class PurchasedListing {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user")
-    private User user;
+    private User purchaser;
 
 
     @NotNull
@@ -39,6 +39,10 @@ public class PurchasedListing {
     @NotNull
     @JoinColumn(name = "listing_date")
     private LocalDate listingDate;
+
+    @NotNull
+    @JoinColumn(name = "closing_date")
+    private LocalDate closingDate;
 
 
     @NotNull
