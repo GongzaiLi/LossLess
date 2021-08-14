@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
@@ -27,7 +29,7 @@ public class PurchasedListing {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "purchaser")
     private User purchaser;
 
 
@@ -35,12 +37,17 @@ public class PurchasedListing {
     @JoinColumn(name = "sale_date")
     private LocalDate saleDate;
 
+    @PositiveOrZero
+    @JoinColumn(name = "number_of_likes", columnDefinition = "integer default 0")
+    private Integer numberOfLikes;
+
 
     @NotNull
     @JoinColumn(name = "listing_date")
     private LocalDate listingDate;
 
     @NotNull
+    @FutureOrPresent
     @JoinColumn(name = "closing_date")
     private LocalDate closingDate;
 
@@ -52,10 +59,12 @@ public class PurchasedListing {
 
 
     @NotNull
+    @PositiveOrZero
     @Column(name = "quantity")
     private Integer quantity;
 
     @NotNull
+    @PositiveOrZero
     @Column(name = "price")
     private Double price;
 
