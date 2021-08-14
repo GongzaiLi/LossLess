@@ -59,8 +59,8 @@ public class InventoryService {
      * the saved object is not returned, as you should already have the database id in the object you passed in.
      * @param inventory The inventory item to update
      */
-    public void updateInventory(Inventory inventory) {
-        inventoryRepository.save(inventory);
+    public Inventory updateInventory(Inventory inventory) {
+        return inventoryRepository.save(inventory);
     }
 
     /**

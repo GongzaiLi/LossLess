@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -83,28 +84,11 @@ public class SearchListingsFeature {
 
     @Given("We are logged in as the individual user with email {string}")
     public void weAreLoggedInAsTheIndividualUserWithEmail(String email) {
-        Address throwawayAddress = new Address();
-        throwawayAddress.setCountry("NZ");
-        throwawayAddress.setSuburb("Riccarton");
-        throwawayAddress.setCity("Christchurch");
-        throwawayAddress.setStreetNumber("1");
-        throwawayAddress.setStreetName("Ilam Rd");
-        throwawayAddress.setPostcode("8041");
-        addressService.createAddress(throwawayAddress);
-
         User currentUser = userService.findUserByEmail(email);
 
         if (currentUser == null) {
-            currentUser = new User();
-            currentUser.setRole(UserRoles.USER);
-            currentUser.setEmail(email);
-            currentUser.setPassword(new BCryptPasswordEncoder().encode("a"));
-            currentUser.setDateOfBirth(LocalDate.now().minusYears(17));
-            currentUser.setBio("Bio");
-            currentUser.setFirstName("FirstName");
-            currentUser.setLastName("LastName");
-            currentUser.setHomeAddress(throwawayAddress);
-            currentUser.setCreated(LocalDate.now());
+            currentUser = newUserWithEmail(email);
+            addressService.createAddress(currentUser.getHomeAddress());
             userService.createUser(currentUser);
         }
 
@@ -116,7 +100,7 @@ public class SearchListingsFeature {
         for (var listingInfo : listings) {
             if (!createdListings.contains(listingInfo)) {  // Make sure we don't create the listing more than once
                 ListingsServiceTest.createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService,
-                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4),listingInfo.get(5), BusinessTypes.valueOf(listingInfo.get(6)), LocalDate.parse(listingInfo.get(7)));
+                        listingInfo.get(0), Double.parseDouble(listingInfo.get(1)), listingInfo.get(2), listingInfo.get(3), listingInfo.get(4),listingInfo.get(5), BusinessTypes.valueOf(listingInfo.get(6)), LocalDate.parse(listingInfo.get(7)), 69, 69);
                 createdListings.add(listingInfo);
             }
         }

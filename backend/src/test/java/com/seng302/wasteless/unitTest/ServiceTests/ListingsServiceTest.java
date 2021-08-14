@@ -45,10 +45,11 @@ public class ListingsServiceTest {
      * Creates a Listing with the given product name and price. This method is re-used in other tests so we need
      * to take in the services and parameters.
      */
-    public static void createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService,
+    public static Listing createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService,
                                                      ListingsService listingsService, BusinessService businessService,
                                                      AddressService addressService, String name, Double price,
-                                                     String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDate closes) {
+                                                     String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDate closes,
+                                                     Integer listingQuantity, Integer inventoryQuantity) {
 
         Address address = new Address();
         address.setCountry(country);
@@ -74,23 +75,27 @@ public class ListingsServiceTest {
         inventory.setProduct(product);
         inventory.setExpires(LocalDate.MAX);
         inventory.setBusinessId(0);
+        inventory.setQuantityInListing(listingQuantity);
+        inventory.setQuantity(inventoryQuantity);
         inventoryService.createInventory(inventory);
 
         Listing newListing = new Listing();
         newListing.setInventoryItem(inventory);
-        newListing.setQuantity(69);
+        newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
         newListing.setCloses(closes);
-        listingsService.createListing(newListing);
+        newListing = listingsService.createListing(newListing);
+
+        return newListing;
     }
 
     @BeforeAll
     void setUp() {
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1));
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES,LocalDate.of(2099, Month.FEBRUARY, 1));
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton", "Peaches and Wonka", BusinessTypes.RETAIL_TRADE, LocalDate.of(2099, Month.MARCH, 1));
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10));
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES,LocalDate.of(2099, Month.FEBRUARY, 1), 69, 69);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton", "Peaches and Wonka", BusinessTypes.RETAIL_TRADE, LocalDate.of(2099, Month.MARCH, 1), 69, 69);
+        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10), 69, 69);
     }
 
     //
