@@ -95,7 +95,7 @@ export default {
       page: page
     });
     for (const type of businessTypes) {
-      params.append("businessType", type);
+      params.append("businessTypes", type);
     }
     return instance.get(`/listings/search`,
       {
