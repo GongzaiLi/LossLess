@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,9 +24,12 @@ import java.util.Optional;
 public class ListingsService {
     private final ListingRepository listingRepository;
 
+    private final InventoryService inventoryService;
+
     @Autowired
-    public ListingsService(ListingRepository listingRepository) {
+    public ListingsService(ListingRepository listingRepository, InventoryService inventoryService) {
         this.listingRepository = listingRepository;
+        this.inventoryService = inventoryService;
     }
 
     /**
@@ -163,6 +168,21 @@ public class ListingsService {
     }
 
     /**
+     * Returns the listing with the given ID.
+     * @param id Id to find the listing of
+     * @return The listing with the given ID.
+     * @throws ResponseStatusException If no listing exists with the given id
+     */
+    public Listing getListingWithId(Integer id) {
+        var listing = listingRepository.findFirstById(id);
+        if (listing.isPresent()) {
+            return listing.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "No listing exists with the given id");
+        }
+    }
+
+    /**
      * Gets listings for a given business using a given pageable
      *
      * @param id The id of the business
@@ -221,6 +241,16 @@ public class ListingsService {
         return listingRepository.findAll(querySpec, pageable);
     }
 
+    /**
+     * Purchases the given listing, and deletes it.
+     * Will update the listing's inventory item's quantity as well.
+     * @param listing The listing to purchase
+     */
+    public void purchase(Listing listing) {
+        listing.purchase();
+        inventoryService.updateInventory(listing.getInventoryItem());
+        listingRepository.delete(listing);
+    }
 
     /**
      * Get the count of all listings of a business.

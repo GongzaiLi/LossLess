@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ListingRepository is a repository interface for Inventory objects.
@@ -17,7 +18,7 @@ import java.util.List;
 @RepositoryRestResource
 public interface ListingRepository extends JpaRepository<Listing, Integer>, JpaSpecificationExecutor<Listing> {
 
-    Listing findFirstById(Integer id);
+    Optional<Listing> findFirstById(Integer id);
 
     List<Listing> findAllByBusinessId(Integer businessId, Pageable pageable);
 

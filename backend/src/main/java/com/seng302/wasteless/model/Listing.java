@@ -65,11 +65,17 @@ public class Listing {
     @JsonView(ListingViews.GetListingView.class)
     private  LocalDate created;
 
-
     @FutureOrPresent
     @Column(name = "closes")
     @JsonView(ListingViews.GetListingView.class)
     private LocalDate closes;
 
-
+    /**
+     * Purchases this listing by decreasing the quantity of the listing's inventory item.
+     * TODO: Return a purchase record object
+     */
+    public void purchase() {
+        inventoryItem.setQuantityInListing(inventoryItem.getQuantityInListing() - quantity);
+        inventoryItem.setQuantity(inventoryItem.getQuantity() - quantity);
+    }
 }
