@@ -27,6 +27,7 @@
               </template>
             </b-carousel-slide>
           </b-carousel>
+          <img v-else class="default-product-image" src="../../../public/product_default.png" alt="Product has no image">
         </div>
         <div style="float:left; margin-left: 10px">
           <h1 style="text-align: center"> {{ listingItem.inventoryItem.product.name }} </h1>
@@ -60,7 +61,7 @@
             <br>
             <label class="details-text"> <strong> Expires: </strong> {{ listingItem.inventoryItem.expires }}  </label>
             <br>
-            <label class="details-text" style="text-align: left; white-space: normal; word-wrap: normal; height: 6rem;"> <strong> Description: </strong> {{ listingItem.inventoryItem.product.description }} </label>
+            <label class="details-text" style="text-align: left; height: 6rem;"> <strong> Description: </strong> {{ listingItem.inventoryItem.product.description }} </label>
           </b-container>
         </b-input-group-text>
       </b-row>
@@ -92,7 +93,7 @@
 @media only screen and (min-width: 1250px) {
   .back-to-search-link {
     position: absolute;
-    left: 200px;
+    left: 50px;
   }
 }
 
@@ -117,6 +118,12 @@
   width: 100%;
 }
 
+.default-product-image {
+  height: 20rem;
+  object-fit: cover;
+  width: 30rem;
+}
+
 #infobox-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -134,6 +141,8 @@
 .details-text {
   clear: both;
   float: left;
+  word-wrap: normal;
+  white-space: normal;
 }
 
 .bottom-info-boxes {
@@ -181,7 +190,9 @@ export default {
             manufacturer: 'The Chocolate Factory',
             description: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by thei",
             images: [{
-              fileName: 'media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg'
+              fileName: "media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg"
+            }, {
+              fileName: "media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg"
             }],
           }
         },
