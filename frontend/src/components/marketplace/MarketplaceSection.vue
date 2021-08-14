@@ -98,7 +98,6 @@ export default {
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
     this.refreshData();
-    console.log('SADASDASDSAD');
   },
   data: function () {
     return {

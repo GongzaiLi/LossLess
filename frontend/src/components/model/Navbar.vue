@@ -60,8 +60,8 @@ Date: sprint_1
         </b-nav-item-dropdown>
       </b-navbar-nav>
 
-      <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown right class="notifications-tray">
+      <b-navbar-nav class="ml-auto dropdown-menu-end">
+        <b-nav-item-dropdown right class="notifications-tray" v-if="isActingAsUser">
           <template #button-content>
             <div class="icon mr-1">
               <b-icon v-if="numberOfNotifications"  icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
@@ -83,9 +83,7 @@ Date: sprint_1
             <span>{{ notification.message }}</span>
           </b-dropdown-item>
         </b-nav-item-dropdown>
-      </b-navbar-nav>
 
-      <b-navbar-nav class="dropdown-menu-end">
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
