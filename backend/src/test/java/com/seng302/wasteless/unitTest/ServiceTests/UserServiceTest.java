@@ -24,7 +24,6 @@ class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
-    //private UserService userService;
 
     @Test
     void whenFindUserById_AndInvalidId_ThrowException() {
