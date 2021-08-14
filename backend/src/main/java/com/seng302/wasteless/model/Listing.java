@@ -72,10 +72,11 @@ public class Listing {
 
     /**
      * Purchases this listing by decreasing the quantity of the listing's inventory item.
-     * TODO: Return a purchase record object
+     * @param purchaser The user that purchased this listing
+     * @return A PurchasedListing object representing a record of this purchase
      */
-    public void purchase() {
-        inventoryItem.setQuantityInListing(inventoryItem.getQuantityInListing() - quantity);
+    public PurchasedListing purchase(User purchaser) {
         inventoryItem.setQuantity(inventoryItem.getQuantity() - quantity);
+        return new PurchasedListing(this, purchaser);
     }
 }

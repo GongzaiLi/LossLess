@@ -20,3 +20,8 @@ Feature: U31 - Purchases
     Given A listing exists with name "Very Unique Name Please Don't Duplicate This Anywhere Else", quantity 2 and its inventory item has quantity 2
     When I purchase that listing
     Then The sale listing does not appear when I search for it by name
+
+  Scenario: AC3: The seller’s inventory is updated to reflect the fact that the inventory is sold out.
+    Given A listing exists with quantity 2 and its inventory item has quantity 2
+    When I purchase that listing
+    Then Information about the sale (sale date, listing date, product, amount, number of likes) is recorded in a sales history for the seller’s business.

@@ -12,8 +12,8 @@ import java.util.Optional;
 
 /**
  * ListingRepository is a repository interface for Inventory objects.
- * This declares 'raw' accessors to Inventory JPA objects. Don't use this class to get/update Inventory items. Use the
- * InventoryService instead as it may have business logic implemented.
+ * This declares 'raw' accessors to Listing JPA objects. Don't use this class to get/update Listing items. Use the
+ * ListingService instead as it may have business logic implemented.
  */
 @RepositoryRestResource
 public interface ListingRepository extends JpaRepository<Listing, Integer>, JpaSpecificationExecutor<Listing> {

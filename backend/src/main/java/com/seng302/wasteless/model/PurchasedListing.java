@@ -68,5 +68,23 @@ public class PurchasedListing {
     @Column(name = "price")
     private Double price;
 
+    /**
+     * Creates a new Purchased Listing record from a Listing that was purchased
+     * and the User that purchased it.
+     * Will also set the sale date to the current date.
+     * @param listing The Listing that was purchased.
+     * @param purchaser The User that purchased the listing.
+     */
+    public PurchasedListing(Listing listing, User purchaser) {
+        setBusiness(listing.getBusiness());
+        setPurchaser(purchaser);
+        setSaleDate(LocalDate.now());
+        setListingDate(listing.getCreated());
+        setClosingDate(listing.getCloses());
+        setProduct(listing.getInventoryItem().getProduct());
+        setQuantity(listing.getQuantity());
+        setPrice(listing.getPrice());
+        // TODO: Set number of likes once that gets merged in
+    }
 }
 

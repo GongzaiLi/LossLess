@@ -201,13 +201,13 @@ public class ListingController {
      * Handles requests to the endpoint to purchase a listing
      *
      * @return A 200 OK status if the listing is successfully purchased.
-     * A 406 status if not listing exists with the given id
+     * A 406 status if no listing exists with the given id
      */
     @PostMapping("/listings/{id}/purchase")
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> purchaseListing(@PathVariable("id") Integer listingId) {
         var listing = listingsService.getListingWithId(listingId);
-        listingsService.purchase(listing);
+        listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

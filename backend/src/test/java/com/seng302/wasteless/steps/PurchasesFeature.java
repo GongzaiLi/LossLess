@@ -3,7 +3,9 @@ package com.seng302.wasteless.steps;
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.Listing;
+import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.repository.PurchasedListingRepository;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
 import io.cucumber.java.Before;
@@ -20,9 +22,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
-import static com.seng302.wasteless.unitTest.ServiceTests.ListingsServiceTest.createListingWithNameAndPrice;
+import static com.seng302.wasteless.TestUtils.createListingWithNameAndPrice;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -58,6 +61,9 @@ public class PurchasesFeature {
 
     @Autowired
     private BusinessService businessService;
+
+    @Autowired
+    private PurchasedListingRepository purchasedListingRepository;
 
     private Listing curListing;
 
@@ -124,5 +130,18 @@ public class PurchasesFeature {
                 .with(user(currentUserDetails))
                 .with(csrf()))
                 .andExpect(jsonPath("listings").isEmpty());
+    }
+
+    @Then("Information about the sale \\(sale date, listing date, product, amount, number of likes) is recorded in a sales history for the seller’s business.")
+    public void informationAboutTheSaleSaleDateListingDateProductAmountNumberOfLikesIsRecordedInASalesHistoryForTheSellerSBusiness() {
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessId(curListing.getBusiness().getId());
+        purchases.sort((a, b) -> b.getSaleDate().compareTo(a.getSaleDate()));  // Make sure we get the newest first
+        var purchasedListing = purchases.get(0);
+
+        Assertions.assertEquals(curListing.getCreated(), purchasedListing.getListingDate());
+        Assertions.assertEquals(curListing.getInventoryItem().getProduct().getId(), purchasedListing.getProduct().getId());
+        Assertions.assertEquals(curListing.getQuantity(), purchasedListing.getQuantity());
+        Assertions.assertEquals(curListing.getPrice(), purchasedListing.getPrice());
+        Assertions.assertNotNull(purchasedListing.getSaleDate());
     }
 }
