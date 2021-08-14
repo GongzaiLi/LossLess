@@ -199,7 +199,13 @@ public class CreateListingFeature {
 
         theUserWithEmailIsLoggedIn("a@a");
         thereIsAnInventoryItemWithAnInventoryIdAndProductId(inventoryItemId, "B");
-        inventoryService.updateInventoryItemQuantity(this.quantity, inventoryItemId); // Ensure we have enough quantity
+
+        inventoryService.updateInventory(
+                inventoryService.findInventoryById(inventoryItemId)
+                        .setQuantity(this.quantity*2)// Ensure we have enough quantity
+                        .setQuantityInListing(0)
+        );
+
         theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(inventoryItemId, quantity, price, moreInfo, closes);
         result.andExpect(status().isCreated());
     }
