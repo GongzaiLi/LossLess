@@ -183,13 +183,13 @@ public class IndividualFullListingFeature {
     @Then("A new notification is created for me telling me I liked the listing with id {string}")
     public void aNewNotificationIsCreatedForMeTellingMeILikedTheListingWithId(String id) {
         List<Notification> currentUserNotifications = notificationService.findAllNotificationsByUserId(currentUser.getId());
-        Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals("Liked Listing")));
+        Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals(NotificationType.LIKEDLISTING)));
     }
 
     @Then("A new notification is created for me telling me I unliked the listing with id {string}")
     public void aNewNotificationIsCreatedForMeTellingMeIUnlikedTheListingWithId(String id) {
         List<Notification> currentUserNotifications = notificationService.findAllNotificationsByUserId(currentUser.getId());
-        Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals("Unliked Listing")));
+        Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals(NotificationType.UNLIKEDLISTING)));
 
     }
 }

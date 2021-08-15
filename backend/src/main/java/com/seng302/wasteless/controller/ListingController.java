@@ -231,9 +231,9 @@ public class ListingController {
         userService.saveUserChanges(user);
         Notification likedStatusNotification;
         if (Boolean.TRUE.equals(likeStatus)) {
-            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),"Liked Listing",String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
+            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),NotificationType.LIKEDLISTING,String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
         } else {
-            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),"Unliked Listing",String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
+            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),NotificationType.UNLIKEDLISTING,String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
 
         }
         notificationService.saveNotification(likedStatusNotification);

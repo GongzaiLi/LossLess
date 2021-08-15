@@ -2,6 +2,7 @@ package com.seng302.wasteless.service;
 
 
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.repository.NotificationRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,7 +45,7 @@ public class NotificationService {
      * @param message String with the contents of the message of the notification. Can be null
      * @return Returns the created Notification object.
      */
-    public Notification createNotification(Integer userId, Integer subjectId, String type, String message) {
+    public Notification createNotification(Integer userId, Integer subjectId, NotificationType type, String message) {
         Notification notification = new Notification();
         notification.setType(type);
         notification.setSubjectId(subjectId);
