@@ -5,7 +5,6 @@ import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -456,7 +455,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToPurchaseListings_andListingExists_then200Response() throws Exception {
         Mockito
-                .when(listingsService.getListingWithId(1))
+                .when(listingsService.findFirstById(1))
                 .thenReturn(listing);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
@@ -468,7 +467,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToPurchaseListings_andListingNotExists_then406Response() throws Exception {
         Mockito
-                .when(listingsService.getListingWithId(anyInt()))
+                .when(listingsService.findFirstById(anyInt()))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/listings/42069/purchase")

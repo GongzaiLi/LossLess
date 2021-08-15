@@ -241,12 +241,12 @@ class ListingsServiceTest {
 
     @Test
     void whenGetListingById_andListingExists_thenListingReturned() {
-        Assertions.assertNotNull(listingsService.getListingWithId(1));
+        Assertions.assertNotNull(listingsService.findFirstById(1));
     }
 
     @Test
     void whenGetListingById_andListingNotExists_then406Thrown() {
-        Assertions.assertThrows(ResponseStatusException.class, () -> listingsService.getListingWithId(666));
+        Assertions.assertThrows(ResponseStatusException.class, () -> listingsService.findFirstById(666));
     }
 
     //
@@ -263,7 +263,7 @@ class ListingsServiceTest {
         assertEquals(1, inventoryService.findInventoryById(inventoryId).getQuantityUnlisted());
 
         var listingId = listing.getId();
-        assertThrows(ResponseStatusException.class, () -> listingsService.getListingWithId(listingId));
+        assertThrows(ResponseStatusException.class, () -> listingsService.findFirstById(listingId));
     }
 
     @Test

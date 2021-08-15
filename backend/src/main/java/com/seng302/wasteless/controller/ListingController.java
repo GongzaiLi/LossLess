@@ -233,7 +233,7 @@ public class ListingController {
     @PostMapping("/listings/{id}/purchase")
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> purchaseListing(@PathVariable("id") Integer listingId) {
-        var listing = listingsService.getListingWithId(listingId);
+        var listing = listingsService.findFirstById(listingId);
         listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
 
         return ResponseEntity.status(HttpStatus.OK).build();

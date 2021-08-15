@@ -186,27 +186,12 @@ public class ListingsService {
     }
 
     /**
-     * Gets the listing by the given id
-     *
-     * @param id The id of the listing to be retrieved
-     * @return The listing Object that matches the id
-     * @throws ResponseStatusException if no listing with id found
-     */
-    public Listing findFirstById(Integer id) {
-        Listing listing = listingRepository.findFirstById(id);
-        if (listing == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing with given ID does not exist");
-        }
-        return listing;
-    }
-
-    /**
      * Returns the listing with the given ID.
      * @param id Id to find the listing of
      * @return The listing with the given ID.
      * @throws ResponseStatusException If no listing exists with the given id
      */
-    public Listing getListingWithId(Integer id) {
+    public Listing findFirstById(Integer id) {
         var listing = listingRepository.findFirstById(id);
         if (listing.isPresent()) {
             return listing.get();
