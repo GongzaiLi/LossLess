@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -162,6 +164,23 @@ public class ListingsService {
         return listingRepository.save(listingItem);
     }
 
+
+    /**
+     * Gets the listing by the given id
+     *
+     * @param id The id of the listing to be retrieved
+     * @return The listing Object that matches the id
+     * @throws ResponseStatusException if no listing with id found
+     */
+    public Listing findFirstById(Integer id) {
+        Listing listing = listingRepository.findFirstById(id);
+        if (listing == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing with given ID does not exist");
+        }
+        return listing;
+    }
+
+
     /**
      * Gets listings for a given business using a given pageable
      *
@@ -231,4 +250,5 @@ public class ListingsService {
     public Long getCountOfAllListingsOfBusiness(int id) {
         return listingRepository.countListingByBusinessId(id);
     }
+
 }

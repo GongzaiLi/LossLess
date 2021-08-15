@@ -418,5 +418,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("listings", hasSize(1)));
     }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andListingExists_then200Response() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andInvalidListingId_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/listings/%s", "badId"))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andListingDoesNotExist_then406Response() throws Exception {
+
+        Mockito.when(listingsService.findFirstById(1))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing does not exist"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
 }
 

@@ -158,6 +158,25 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 
+
+    /**
+     * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
+     *
+     * @param listingId The id of the listing to get
+     * @return Http Status 200 and the listing if valid, 406 if invalid id
+     */
+    @GetMapping("/listings/{id}")
+    @JsonView(ListingViews.GetListingView.class)
+    public ResponseEntity<Object> getListingWithId(@PathVariable("id") Integer listingId) {
+        logger.info("Get request to GET a LISTING with id: {}", listingId);
+
+        Listing listing = listingsService.findFirstById(listingId);
+        logger.info("Retrieved listing with ID: {}", listingId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(listing);
+    }
+
+
     /**
      * Handles endpoint to search for listings
      *
