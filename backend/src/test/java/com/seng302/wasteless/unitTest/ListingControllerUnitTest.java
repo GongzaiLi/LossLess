@@ -5,7 +5,6 @@ import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,10 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -496,6 +492,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPostRequestToPurchaseListings_andListingExists_then200Response() throws Exception {
+        Mockito
+                .when(listingsService.findFirstById(1))
+                .thenReturn(listing);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPostRequestToPurchaseListings_andListingNotExists_then406Response() throws Exception {
+        Mockito
+                .when(listingsService.findFirstById(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/listings/42069/purchase")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
     }
 }
 
