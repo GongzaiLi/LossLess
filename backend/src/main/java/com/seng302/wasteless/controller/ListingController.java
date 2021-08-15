@@ -5,10 +5,7 @@ import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.InventoryService;
-import com.seng302.wasteless.service.ListingsService;
-import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.service.*;
 import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -43,14 +40,16 @@ public class ListingController {
     private final UserService userService;
     private final InventoryService inventoryService;
     private final ListingsService listingsService;
+    private final NotificationService notificationService;
 
 
     @Autowired
-    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService) {
+    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService, NotificationService notificationService) {
         this.businessService = businessService;
         this.userService = userService;
         this.inventoryService = inventoryService;
         this.listingsService = listingsService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -230,6 +229,14 @@ public class ListingController {
         Boolean likeStatus = user.toggleListingLike(listing);
         listingsService.updateListing(listing);
         userService.saveUserChanges(user);
+        Notification likedStatusNotification;
+        if (Boolean.TRUE.equals(likeStatus)) {
+            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),"Liked Listing",String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
+        } else {
+            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),"Unliked Listing",String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
+
+        }
+        notificationService.saveNotification(likedStatusNotification);
         JSONObject responseBody = new JSONObject();
         responseBody.put("liked", likeStatus);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);

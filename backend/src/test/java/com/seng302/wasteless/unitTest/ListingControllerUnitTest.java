@@ -61,6 +61,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private ListingsService listingsService;
 
+    @MockBean
+    private NotificationService notificationService;
+
     private Business business;
 
     private User user;

@@ -1,7 +1,6 @@
 package com.seng302.wasteless.service;
 
 
-import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.repository.NotificationRepository;
 import org.apache.logging.log4j.LogManager;
@@ -34,6 +33,24 @@ public class NotificationService {
      * @param notification The Notification object to be created.
      * @return The created Notification object.
      */
-    public Notification createNotification(Notification notification) {return notificationRepository.save(notification); }
+    public Notification saveNotification(Notification notification) {return notificationRepository.save(notification); }
+
+    /**
+     * Creates a notification object from the available inputs and returns the object. This object still needs to be saved
+     * using saveNotification() to save the object to the database
+     * @param userId Integer Id of the user this notification is for. Can not be Null
+     * @param subjectId The Integer id of the subject the notification is created for if applicable. Can be null
+     * @param type String detailing the type of notification being created. Can not be Null
+     * @param message String with the contents of the message of the notification. Can be null
+     * @return Returns the created Notification object.
+     */
+    public Notification createNotification(Integer userId, Integer subjectId, String type, String message) {
+        Notification notification = new Notification();
+        notification.setType(type);
+        notification.setSubjectId(subjectId);
+        notification.setMessage(message);
+        notification.setUserId(userId);
+        return notification;
+    }
 
 }
