@@ -160,16 +160,16 @@ public class ListingController {
 
 
     /**
-     * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
+     * Handle get request to /listings/{id} endpoint for retrieving the listing with given id
      *
      * @param listingId The id of the listing to get
-     * @return Http Status 200 and the listing if valid, 406 if invalid id
+     * @return Http Status 200 and the listing if valid, 401 if user is not logged in and 406 if invalid listing id
      */
     @GetMapping("/listings/{id}")
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingWithId(@PathVariable("id") Integer listingId) {
         logger.info("Get request to GET a LISTING with id: {}", listingId);
-
+        userService.getCurrentlyLoggedInUser();
         Listing listing = listingsService.findFirstById(listingId);
         logger.info("Retrieved listing with ID: {}", listingId);
 

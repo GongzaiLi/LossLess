@@ -449,5 +449,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andUserNotLoggedIn_then401Response() throws Exception {
+
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
 }
 
