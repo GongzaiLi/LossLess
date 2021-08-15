@@ -166,6 +166,15 @@ public class ListingsService {
 
 
     /**
+     * Given an Listing object, 'updates' it by saving and persisting it in the database.
+     * @param listingItem The Listing item item to update
+     *
+     */
+    public void updateListing(Listing listingItem) {
+        listingRepository.save(listingItem);
+    }
+
+    /**
      * Gets the listing by the given id
      *
      * @param id The id of the listing to be retrieved
@@ -179,7 +188,6 @@ public class ListingsService {
         }
         return listing;
     }
-
 
     /**
      * Gets listings for a given business using a given pageable
@@ -250,5 +258,4 @@ public class ListingsService {
     public Long getCountOfAllListingsOfBusiness(int id) {
         return listingRepository.countListingByBusinessId(id);
     }
-
 }
