@@ -79,33 +79,22 @@ public class BusinessController {
         adminList.add(user);
         business.setAdministrators(adminList);
 
-        logger.debug("Adding business date");
         business.setCreated(LocalDate.now());
 
         //Save business
         Address address = business.getAddress();
-        logger.debug("Attempt to create Address Entity: {} entered by user: {}", address, user);
         addressService.createAddress(address);
 
-        logger.debug("Attempt to create Business Entity: {} by user: {}", business, user);
         business = businessService.createBusiness(business);
 
-        logger.info("Successfully created Business Entity: {} requested by user: {}", business, user);
-
-        logger.debug("Trying to set user: {} as admin of business: {}", user, business);
+        logger.debug("Trying to set user: {} as admin of business: {}", user.getId(), business.getId());
         userService.addBusinessPrimarilyAdministered(user, business);
-
-        logger.debug("Trying to update user: {} with business: {}", user, business);
         userService.saveUserChanges(user);
-        logger.info("Successfully saved business: {} created by user: {}", business, user);
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("businessId", business.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-
-
-
     }
 
 
@@ -117,18 +106,14 @@ public class BusinessController {
      */
     @GetMapping("/businesses/{id}")
     public ResponseEntity<Object> getBusiness(@PathVariable("id") Integer businessId) {
-
         logger.debug("Request to get business with ID: {}", businessId);
 
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        logger.info("Successfully Retrieved Business: {} using ID: {}", possibleBusiness, businessId);
-
-
         logger.debug("Request to get formatted business: {}", businessId);
         GetBusinessesDto getBusinessesDto = GetBusinessesDtoMapper.toGetBusinessesDto(possibleBusiness);
 
-        logger.info("Successfully retrieved formatted business: {}", getBusinessesDto);
+        logger.info("Successfully retrieved formatted business");
         return ResponseEntity.status(HttpStatus.OK).body(getBusinessesDto);
     }
 
@@ -212,18 +197,9 @@ public class BusinessController {
 
         logger.debug("Request to make user: {} the admin of business: {}", requestBody.getUserId(), businessId);
 
-        logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusinessToAddAdminFor = businessService.findBusinessById(businessId);
 
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusinessToAddAdminFor, businessId);
-
-
-        logger.debug("Trying to find user with ID: {}", requestBody.getUserId());
         User possibleUserToMakeAdmin = userService.findUserById(requestBody.getUserId());
-
-        logger.info("User: {} found using Id : {}", possibleUserToMakeAdmin, requestBody.getUserId());
-
-
         User userMakingRequest = userService.getCurrentlyLoggedInUser();
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusinessToAddAdminFor, userMakingRequest);
@@ -234,11 +210,8 @@ public class BusinessController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already admin of business");
         }
 
-
         //Set user to be admin of business
-        logger.debug("Making user: {} an admin of business: {}.", possibleUserToMakeAdmin, businessId);
         businessService.addAdministratorToBusiness(possibleBusinessToAddAdminFor, possibleUserToMakeAdmin);
-        logger.debug("Updating business: {} with new admin: {}", businessId, possibleUserToMakeAdmin);
         businessService.saveBusinessChanges(possibleBusinessToAddAdminFor);
 
         logger.info("Successfully made user: {} an admin of business: {}.", requestBody.getUserId(), businessId);

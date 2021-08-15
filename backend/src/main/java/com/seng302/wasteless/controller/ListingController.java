@@ -69,19 +69,15 @@ public class ListingController {
      */
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
-        logger.info("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
+        logger.info("Post request to create business LISTING, business id: {}", businessId);
 
         User user = userService.getCurrentlyLoggedInUser();
 
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-
-        logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);
-        logger.info("Retrieved `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
         if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
@@ -120,8 +116,7 @@ public class ListingController {
             logger.info("Inventory item quantity value was updated when this listing was created.");
         }
 
-
-        logger.info("Created new Listing {}", listing);
+        logger.info("Created new Listing with Id {}", listing.getId());
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("listingId", listing.getId());
@@ -141,10 +136,7 @@ public class ListingController {
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, Pageable pageable) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
 
-        logger.debug("Retrieving business with id: {}", businessId);
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+        businessService.findBusinessById(businessId);
 
         List<Listing> listings = listingsService.findBusinessListingsWithPageable(businessId, pageable);
 

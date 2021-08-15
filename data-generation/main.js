@@ -13,7 +13,7 @@ const FormData = require('form-data');
 
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
-const MAX_USERS_PER_API_REQUEST = 16;
+const MAX_USERS_PER_API_REQUEST = 96;
 const HAS_NICKNAME_PROB = 1 / 10;
 const HAS_MIDDLE_NAME_PROB = 4 / 10;
 const PROB_USER_LIKES_LISTINGS = 0.5;
@@ -30,7 +30,7 @@ const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 const MAX_CARD_PER_USER = 5;
-const APPROX_NUM_LISTINGS = NUM_BUSINESSES * (MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
+const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS)/2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -174,7 +174,8 @@ async function likeListings(instance) {
           }
         });
       } catch(e) {
-        //stfu
+        console.log(`Tried to like listing Id ${listingId} but did not exist. This may happen a few times during data gen, but something may be broken if this happens a lot`);
+        console.log(`Error message was: ${e}`)
       }
     }
   }
@@ -183,7 +184,7 @@ async function likeListings(instance) {
 /**
  * Uses axios to make a post request to our backend to create a new user.
  */
-async function registerUser(user) {
+async function registerUser(user, preventLikeListings=false) {
     const instance = Axios.create({
         baseURL: SERVER_URL,
         timeout: 180000,// set 2 mins
@@ -198,7 +199,7 @@ async function registerUser(user) {
     instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
     await addCard(instance);
-    await likeListings(instance);
+    if (!preventLikeListings) await likeListings(instance);
     return [response, instance];
 }
 
@@ -206,7 +207,7 @@ async function registerUser(user) {
  * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
  */
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
-    const [response, instance] = await registerUser(user);
+    const [response, instance] = await registerUser(user, true);
     for (let i = 0; i < numBusinesses; i++) {
         const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
         await addProduct(businessResponse.data.businessId, instance, businesses[i]);
