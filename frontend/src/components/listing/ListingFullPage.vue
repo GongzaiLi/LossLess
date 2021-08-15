@@ -38,7 +38,7 @@
               <h6> Closes: {{listingItem.closes}} </h6>
               <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.moreInfo}} </h6>
               <h2 style="float: left; margin-bottom: -5px"> {{listingItem.price}} </h2>
-              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
+              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="purchaseListing"> Buy <b-icon-bag-check/></b-button>
             </template>
           </b-card>
           <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
@@ -172,7 +172,7 @@ export default {
       userLikedListing: false,
       slideNumber: 0,
       listingItem: {
-        id: '',
+        id: '2',
         quantity: 4,
         created: '11/11/2000',
         closes: '11/11/2021',
@@ -213,7 +213,22 @@ export default {
      */
     getURL(imageFileName) {
       return Api.getImage(imageFileName);
+    },
+
+    /**
+     * Sends an api request to notify the backend that a user has tried to purchase a listing.
+     */
+    async purchaseListing() {
+      await Api
+          .purchaseListing(this.listingItem.id)
+          .then(() => {
+            this.$router.push({path: `/homepage`});
+          })
+          .catch((err) => {
+            console.log(err)
+          })
     }
+
   },
 
   computed: {
