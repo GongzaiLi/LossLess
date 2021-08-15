@@ -203,7 +203,7 @@ public class CreateListingFeature {
         inventoryService.updateInventory(
                 inventoryService.findInventoryById(inventoryItemId)
                         .setQuantity(this.quantity*2)// Ensure we have enough quantity
-                        .setQuantityInListing(0)
+                        .setQuantityUnlisted(this.quantity*2)
         );
 
         theUserCreatesAListingWithTheInventoryItemIdQuantityPriceMoreInfoAndCloses(inventoryItemId, quantity, price, moreInfo, closes);

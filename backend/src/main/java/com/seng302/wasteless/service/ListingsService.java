@@ -2,7 +2,10 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.Listing;
+import com.seng302.wasteless.model.PurchasedListing;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.ListingRepository;
+import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +27,15 @@ import java.util.Optional;
 public class ListingsService {
     private final ListingRepository listingRepository;
 
+    private final InventoryService inventoryService;
+
+    private final PurchasedListingRepository purchasedListingRepository;
+
     @Autowired
-    public ListingsService(ListingRepository listingRepository) {
+    public ListingsService(ListingRepository listingRepository, InventoryService inventoryService, PurchasedListingRepository purchasedListingRepository) {
         this.listingRepository = listingRepository;
+        this.inventoryService = inventoryService;
+        this.purchasedListingRepository = purchasedListingRepository;
     }
 
 
@@ -177,18 +186,18 @@ public class ListingsService {
     }
 
     /**
-     * Gets the listing by the given id
-     *
-     * @param id The id of the listing to be retrieved
-     * @return The listing Object that matches the id
-     * @throws ResponseStatusException if no listing with id found
+     * Returns the listing with the given ID.
+     * @param id Id to find the listing of
+     * @return The listing with the given ID.
+     * @throws ResponseStatusException If no listing exists with the given id
      */
     public Listing findFirstById(Integer id) {
-        Listing listing = listingRepository.findFirstById(id);
-        if (listing == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing with given ID does not exist");
+        var listing = listingRepository.findFirstById(id);
+        if (listing.isPresent()) {
+            return listing.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "No listing exists with the given id");
         }
-        return listing;
     }
 
     /**
@@ -250,6 +259,19 @@ public class ListingsService {
         return listingRepository.findAll(querySpec, pageable);
     }
 
+    /**
+     * Purchases the given listing, and deletes it. The listing is assumed to exist (ie it cannot have already
+     * been deleted in the DB). Will update the listing's inventory item's quantity as well.
+     * @param listing The listing to purchase
+     * @param purchaser The user that purchased this listing
+     * @return A saved PurchasedListing object representing a record of this purchase
+     */
+    public PurchasedListing purchase(Listing listing, User purchaser) {
+        PurchasedListing purchaseRecord = listing.purchase(purchaser);
+        inventoryService.updateInventory(listing.getInventoryItem());
+        listingRepository.delete(listing);
+        return purchasedListingRepository.save(purchaseRecord);
+    }
 
     /**
      * Get the count of all listings of a business.

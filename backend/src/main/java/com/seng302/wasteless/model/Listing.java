@@ -65,7 +65,6 @@ public class Listing {
     @JsonView(ListingViews.GetListingView.class)
     private  LocalDate created;
 
-
     @FutureOrPresent
     @Column(name = "closes")
     @JsonView(ListingViews.GetListingView.class)
@@ -91,4 +90,14 @@ public class Listing {
      * Decrements the likes on the listing by 1
      */
     public void decrementUsersLiked(){this.usersLiked -= 1;}
+
+    /**
+     * Purchases this listing by decreasing the quantity of the listing's inventory item.
+     * @param purchaser The user that purchased this listing
+     * @return A PurchasedListing object representing a record of this purchase
+     */
+    public PurchasedListing purchase(User purchaser) {
+        inventoryItem.setQuantity(inventoryItem.getQuantity() - quantity);
+        return new PurchasedListing(this, purchaser);
+    }
 }

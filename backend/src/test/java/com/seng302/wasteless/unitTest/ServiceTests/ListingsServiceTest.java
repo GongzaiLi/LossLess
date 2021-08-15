@@ -1,10 +1,14 @@
 package com.seng302.wasteless.unitTest.ServiceTests;
 
+import com.seng302.wasteless.TestUtils;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +22,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
+import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -25,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)     // Allows non-static BeforeAll methods. baeldung.com/java-beforeall-afterall-non-static
-public class ListingsServiceTest {
+class ListingsServiceTest {
     @Autowired
     private ProductService productService;
 
@@ -41,56 +46,21 @@ public class ListingsServiceTest {
     @Autowired
     private AddressService addressService;
 
-    /**
-     * Creates a Listing with the given product name and price. This method is re-used in other tests so we need
-     * to take in the services and parameters.
-     */
-    public static void createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService,
-                                                     ListingsService listingsService, BusinessService businessService,
-                                                     AddressService addressService, String name, Double price,
-                                                     String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDate closes) {
+    @Autowired
+    private UserService userService;
 
-        Address address = new Address();
-        address.setCountry(country);
-        address.setSuburb(suburb);
-        address.setCity(city);
-        address.setStreetNumber("1");
-        address.setStreetName("Ilam Rd");
-        address.setPostcode("8041");
-        addressService.createAddress(address);
-
-        Business business = new Business();
-        business.setBusinessType(businessTypes);
-        business.setAdministrators(new ArrayList<>());
-        business.setName(businessName);
-        business.setAddress(address);
-        businessService.createBusiness(business);
-
-        Product product = new Product();
-        product.setName(name);
-        productService.createProduct(product);
-
-        Inventory inventory = new Inventory();
-        inventory.setProduct(product);
-        inventory.setExpires(LocalDate.MAX);
-        inventory.setBusinessId(0);
-        inventoryService.createInventory(inventory);
-
-        Listing newListing = new Listing();
-        newListing.setInventoryItem(inventory);
-        newListing.setQuantity(69);
-        newListing.setBusiness(business);
-        newListing.setPrice(price);
-        newListing.setCloses(closes);
-        listingsService.createListing(newListing);
-    }
+    private User curUser;
 
     @BeforeAll
     void setUp() {
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1));
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES,LocalDate.of(2099, Month.FEBRUARY, 1));
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton", "Peaches and Wonka", BusinessTypes.RETAIL_TRADE, LocalDate.of(2099, Month.MARCH, 1));
-        createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10));
+        TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);
+        TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES,LocalDate.of(2099, Month.FEBRUARY, 1), 69, 69);
+        TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton", "Peaches and Wonka", BusinessTypes.RETAIL_TRADE, LocalDate.of(2099, Month.MARCH, 1), 69, 69);
+        TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10), 69, 69);
+
+        curUser = newUserWithEmail("big@dave");
+        addressService.createAddress(curUser.getHomeAddress());
+        curUser = userService.createUser(curUser);
     }
 
     //
@@ -159,32 +129,17 @@ public class ListingsServiceTest {
     // FILTER BY ADDRESS
     //
 
-    @Test
-    void whenFilterByAddressCountry_andAddressMatchesExists_thenAllPartialMatchesReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("NZ"), Optional.empty(), Optional.empty(),Pageable.unpaged());
+    @ParameterizedTest
+    @CsvSource({
+            "NZ, 4",
+            "Riccarton, 4",
+            "Christchurch, 4",
+            "Aus, 0"
+    })
+    void whenFilterByLocation_thenNumberMatchesReturnedIs(String location, Integer numResults) {
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(location), Optional.empty(), Optional.empty(),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        assertEquals(4, names.size());
-    }
-
-    @Test
-    void whenFilterByAddressCity_andAddressMatchesExists_thenAllPartialMatchesReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("Riccarton"),Optional.empty(), Optional.empty(), Pageable.unpaged());
-        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        assertEquals(4, names.size());
-    }
-
-    @Test
-    void whenFilterByAddressSuburb_andAddressMatchesExists_thenAllPartialMatchesReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("Christchurch"), Optional.empty(), Optional.empty(),Pageable.unpaged());
-        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        assertEquals(4, names.size());
-    }
-
-    @Test
-    void whenFilterByAddress_andNoMatchesExists_thenNoMatchesReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of("Aus"), Optional.empty(), Optional.empty(),Pageable.unpaged());
-        List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        assertEquals(0, names.size());
+        assertEquals(numResults, names.size());
     }
 
     //
@@ -278,5 +233,72 @@ public class ListingsServiceTest {
         Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2100, Month.FEBRUARY, 1)),Optional.of(LocalDate.of(2101, Month.MARCH, 1)),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
+    }
+
+    //
+    //  Get Listing by Id
+    //
+
+    @Test
+    void whenGetListingById_andListingExists_thenListingReturned() {
+        Assertions.assertNotNull(listingsService.findFirstById(1));
+    }
+
+    @Test
+    void whenGetListingById_andListingNotExists_then406Thrown() {
+        Assertions.assertThrows(ResponseStatusException.class, () -> listingsService.findFirstById(666));
+    }
+
+    //
+    //  Purchase Listing
+    //
+
+    @Test
+    void whenPurchaseListing_andListingQuantityLessThanInventoryQuantity_thenInventoryQuantityDecreased() {
+        var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                4, 5);
+        Integer inventoryId = listing.getInventoryItem().getId();
+        listingsService.purchase(listing, curUser);
+        assertEquals(1, inventoryService.findInventoryById(inventoryId).getQuantity());
+        assertEquals(1, inventoryService.findInventoryById(inventoryId).getQuantityUnlisted());
+
+        var listingId = listing.getId();
+        assertThrows(ResponseStatusException.class, () -> listingsService.findFirstById(listingId));
+    }
+
+    @Test
+    void whenPurchaseListing_andListingQuantityEqualToInventoryQuantity_thenInventoryQuantitySetToZero() {
+        var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                5, 5);
+        Integer inventoryId = listing.getInventoryItem().getId();
+        listingsService.purchase(listing, curUser);
+        assertEquals(0, inventoryService.findInventoryById(inventoryId).getQuantity());
+        assertEquals(0, inventoryService.findInventoryById(inventoryId).getQuantityUnlisted());
+    }
+
+    @Test
+    void whenPurchaseListing_andListingHasNoLikes_thenPurchaseListingRecordCreated() {
+        var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                5, 5);
+
+        PurchasedListing purchasedListing = listingsService.purchase(listing, curUser);
+
+        Assertions.assertEquals(listing.getCreated(), purchasedListing.getListingDate());
+        Assertions.assertEquals(listing.getInventoryItem().getProduct().getId(), purchasedListing.getProduct().getId());
+        Assertions.assertEquals(listing.getQuantity(), purchasedListing.getQuantity());
+        Assertions.assertEquals(listing.getPrice(), purchasedListing.getPrice());
+        Assertions.assertEquals(curUser.getId(), purchasedListing.getPurchaser().getId());
+        Assertions.assertNotNull(purchasedListing.getSaleDate());
+    }
+
+    @Test
+    void whenPurchaseListing_andListingHasOneLike_thenLikeRecordedInPurchaseListingRecord() {
+        var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                5, 5);
+        listing.incrementUsersLiked();
+
+        PurchasedListing purchasedListing = listingsService.purchase(listing, curUser);
+
+        Assertions.assertEquals(listing.getUsersLiked(), purchasedListing.getNumberOfLikes());
     }
 }

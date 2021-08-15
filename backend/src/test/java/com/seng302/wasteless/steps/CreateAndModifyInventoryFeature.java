@@ -28,6 +28,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.seng302.wasteless.TestUtils.newThrowawayAddress;
+import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -53,8 +55,6 @@ public class CreateAndModifyInventoryFeature {
     private CustomUserDetails currentUserDetails;
 
     private ResultActions result;
-    
-    private Address throwawayAddress;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -74,22 +74,6 @@ public class CreateAndModifyInventoryFeature {
     @Autowired
     private InventoryService inventoryService;
 
-
-    /**
-     * Creates a throwaway address so we can use it for other step definitions.
-     * For example, we can reuse this address when creating a new user.
-     */
-    @Before
-    public void setupAddress() {
-        throwawayAddress = new Address();
-        throwawayAddress.setCountry("NZ");
-        throwawayAddress.setSuburb("Riccarton");
-        throwawayAddress.setCity("Christchurch");
-        throwawayAddress.setStreetNumber("1");
-        throwawayAddress.setStreetName("Ilam Rd");
-        throwawayAddress.setPostcode("8041");
-        addressService.createAddress(throwawayAddress);
-    }
 
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
@@ -116,21 +100,10 @@ public class CreateAndModifyInventoryFeature {
         User currentUser = userService.findUserByEmail(email);
 
         if (currentUser == null) {
-            currentUser = new User();
-            currentUser.setRole(UserRoles.USER);
-            currentUser.setEmail(email);
-            currentUser.setPassword(new BCryptPasswordEncoder().encode("a"));
-            currentUser.setDateOfBirth(LocalDate.now().minusYears(17));
-            currentUser.setBio("Bio");
-            currentUser.setFirstName("FirstName");
-            currentUser.setLastName("LastName");
-            currentUser.setHomeAddress(throwawayAddress);
-            currentUser.setCreated(LocalDate.now());
-
+            currentUser = newUserWithEmail(email);
+            addressService.createAddress(currentUser.getHomeAddress());
             userService.createUser(currentUser);
         }
-
-        Business business = new Business();
 
         currentUserDetails = new CustomUserDetails(currentUser);
     }
@@ -151,9 +124,10 @@ public class CreateAndModifyInventoryFeature {
             business.setId(id);
             business.setAdministrators(Collections.singletonList(user));
             business.setName("Jimmy's clown store");
-            business.setAddress(throwawayAddress);
+            business.setAddress(newThrowawayAddress());
             business.setPrimaryAdministrator(user);
 
+            addressService.createAddress(business.getAddress());
             businessService.createBusiness(business);
         }
 
