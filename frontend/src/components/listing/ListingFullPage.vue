@@ -30,14 +30,16 @@
           <img v-else class="default-product-image" src="../../../public/product_default.png" alt="Product has no image">
         </div>
         <div style="float:left; margin-left: 10px">
-          <h1 style="text-align: center"> {{ listingItem.inventoryItem.product.name }} </h1>
+            <h1 style="text-align: center;"> {{ listingItem.inventoryItem.product.name }} </h1>
           <h6 style="text-align: center; margin-top: -6px"> Listed on: {{listingItem.created}}</h6>
           <b-card no-body id="infobox-1">
             <template #header>
               <h5 style="margin-top: -4px"> Quantity: {{listingItem.quantity}} </h5>
               <h5> Closes: {{listingItem.closes}} </h5>
               <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.moreInfo}} </h6>
-              <h2 style="float: left; margin-bottom: -5px"> {{listingItem.price}} </h2>
+              <h2 style="float: left; margin-bottom: -5px">
+                {{ currency.symbol }} {{ listingItem.price }} {{currency.code}}
+              </h2>
               <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
             </template>
           </b-card>
@@ -70,9 +72,9 @@
           <b-container>
             <h6 style="margin-top: 7px"> <strong> Seller Information: </strong></h6>
             <hr>
-            <label class="details-text"> <strong> Business Name: </strong> {{ listingItem.businessName }}  </label>
+            <label class="details-text"> <strong> Business Name: </strong> {{ listingItem.business.name }}  </label>
             <br>
-            <label class="details-text"> <strong> Business Location: </strong> {{ getAddress }} </label>
+            <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
           </b-container>
         </b-input-group-text>
       </b-row>
@@ -155,52 +157,67 @@
 <script>
 import Api from "../../Api";
 
+
 export default {
   name: "listing-full",
   data() {
     return {
       userLikedListing: false,
       slideNumber: 0,
-      listingItem: {
-        id: '',
-        quantity: 4,
-        created: '11/11/2000',
-        closes: '11/11/2021',
-        moreInfo: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean ' +
-            'commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis,',
-        price: '$20.00',
-        numLikes: 123,
-        businessName: "Wonka Chocolate",
-        businessAddress: {
-          streetNumber: "3/24",
-          streetName: "Ilam Road",
-          suburb: "Riccarton",
-          city: "Christchurch",
-          region: "Canterbury",
-          country: "New Zealand",
-          postcode: "90210"
-        },
-        inventoryItem: {
-          manufactured: '1/1/1000',
-          bestBefore: '25/12/2021',
-          sellBy: '1/12/2021',
-          expires: '30/12/2021',
-          product: {
-            name: 'Chocolate Bar',
-            manufacturer: 'The Chocolate Factory',
-            description: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by thei",
-            images: [{
-              fileName: "media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg"
-            }, {
-              fileName: "media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg"
-            }],
-          }
-        },
-      },
+      listingItem: {},
+      address: {},
+      currency: {},
       imageError: ""
     }
   },
+  async mounted() {
+    console.log(111111, this.listingItem.inventoryItem)
+    await this.setListingData()
+  },
+
   methods: {
+
+    /**
+     * Gets the listing data either from the props when redirected from listings search page or
+     * using api request when page is reloaded since props data is not available on reload.
+     * Also formats the business address as single string.
+     *
+     */
+    async setListingData() {
+      let listingData = this.$route.params.listingData;
+      this.listingItem = listingData
+
+      if (this.listingItem === undefined) {
+        const currentListingId = this.$route.params.id
+        listingData = await Api.getListing(currentListingId)
+        this.listingItem = listingData.data
+      }
+
+      const address = this.listingItem.business.address;
+      this.address =  (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+      this.currency = await Api.getUserCurrency(address.country);
+
+    },
+
+    /**
+     * Makes an api request to get the individual listing
+     *
+     * @param id the id of the current listing
+     * @return the listing object
+     */
+
+    async getCurrentListing(id) {
+
+      let listing = {}
+       await Api.getListing(id)
+        .then(response => {
+          listing = response.data
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        return listing
+    },
 
     /**
      * Returns the URL required to get the image given the filename
@@ -209,16 +226,5 @@ export default {
       return Api.getImage(imageFileName);
     }
   },
-
-  computed: {
-
-    /**
-     * Combine fields of address
-     */
-    getAddress: function () {
-      const address = this.listingItem.businessAddress;
-      return (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-    },
-  }
 }
 </script>
