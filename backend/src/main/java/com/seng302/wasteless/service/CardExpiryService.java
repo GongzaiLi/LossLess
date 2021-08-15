@@ -2,7 +2,7 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Notification;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.repository.CardRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,13 +60,8 @@ public class CardExpiryService {
         for (Card card : expiredCards) {
             logger.warn("Deleting expired card id={}, created={}, title={}, creator={}", card.getId(), card.getCreated(), card.getTitle(), card.getCreator());
 
-
-            Notification notification = new Notification();
-            notification.setType("Expired Marketplace Card");
-            notification.setSubjectId(card.getId());
-            notification.setMessage(String.format("Your card: %s has expired", card.getTitle()));
-            notification.setUserId(card.getCreator().getId());
-            notificationService.createNotification(notification);
+            Notification notification = notificationService.createNotification(card.getCreator().getId(),card.getId(), NotificationType.EXPIRED,String.format("Your card: %s has expired", card.getTitle()));
+            notificationService.saveNotification(notification);
 
             cardService.deleteCard(card);
         }
