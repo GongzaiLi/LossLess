@@ -30,12 +30,12 @@
           <img v-else class="default-product-image" src="../../../public/product_default.png" alt="Product has no image">
         </div>
         <div style="float:left; margin-left: 10px">
-          <h1 style="text-align: center"> {{ listingItem.inventoryItem.product.name }} </h1>
-          <h6 style="text-align: center; margin-top: -6px"> Listed on: {{listingItem.created}}</h6>
+          <h1 class="listing-title"> {{ listingItem.inventoryItem.product.name }} </h1>
+          <h6 style="text-align: center; font-size: 12px"> Listed on: {{listingItem.created}}</h6>
           <b-card no-body id="infobox-1">
             <template #header>
-              <h5 style="margin-top: -4px"> Quantity: {{listingItem.quantity}} </h5>
-              <h5> Closes: {{listingItem.closes}} </h5>
+              <h6 style="margin-top: -4px"> Quantity: {{listingItem.quantity}} </h6>
+              <h6> Closes: {{listingItem.closes}} </h6>
               <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.moreInfo}} </h6>
               <h2 style="float: left; margin-bottom: -5px"> {{listingItem.price}} </h2>
               <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
@@ -83,6 +83,15 @@
 
 <style>
 
+.listing-title {
+  text-align: center;
+  font-size: 24px;
+  max-width: 25rem;
+  word-wrap: break-word;
+  white-space: normal;
+  height: 3rem
+}
+
 .listing_card {
   max-width: 60rem;
   margin-left: auto;
@@ -128,6 +137,7 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   max-width: 25rem;
+  max-font-size: 10px;
 }
 
 .like-icon {
@@ -186,14 +196,10 @@ export default {
           sellBy: '1/12/2021',
           expires: '30/12/2021',
           product: {
-            name: 'Chocolate Bar',
+            name: 'A really long listing name for testing title wrapping',
             manufacturer: 'The Chocolate Factory',
             description: "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by thei",
-            images: [{
-              fileName: "media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg"
-            }, {
-              fileName: "media/images/61be6c0a-c721-412f-858f-8ec5aded4df1.jpeg"
-            }],
+            images: [],
           }
         },
       },
