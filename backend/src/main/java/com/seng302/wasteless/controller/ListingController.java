@@ -1,7 +1,9 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetCardDto;
 import com.seng302.wasteless.dto.GetListingDto;
+import com.seng302.wasteless.dto.GetListingsDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
@@ -26,10 +28,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
@@ -140,12 +140,12 @@ public class ListingController {
 
         Long totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
 
-        GetListingDto getListingDto = new GetListingDto()
-                .setListings(listings)
+        GetListingsDto getListingsDto = new GetListingsDto()
+                .setListings(listings.stream().map(GetListingDto::new).collect(Collectors.toList()))
                 .setTotalItems(totalItems);
 
-        logger.info("{}", getListingDto);
-        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
+        logger.info("{}", getListingsDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingsDto);
     }
 
 
@@ -199,13 +199,17 @@ public class ListingController {
 
 
         Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address,closingDateStart, closingDateEnd, pageable);
-
-
-        GetListingDto getListingDto = new GetListingDto()
-                .setListings(listings.getContent())
+        List<GetListingDto> dtoListings = new ArrayList<>();
+        User user = userService.getCurrentlyLoggedInUser();
+        for (Listing listing: listings.getContent()) {
+            GetListingDto dtoListing = new GetListingDto(listing, user.checkUserLikesListing(listing));
+            dtoListings.add(dtoListing);
+        }
+        GetListingsDto getListingsDto = new GetListingsDto()
+                .setListings(dtoListings)
                 .setTotalItems(listings.getTotalElements());
-
-        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
+        logger.info(getListingsDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingsDto);
     }
 
 
