@@ -453,6 +453,49 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andListingExists_then200Response() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andInvalidListingId_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(String.format("/listings/%s", "badId"))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andListingDoesNotExist_then406Response() throws Exception {
+
+        Mockito.when(listingsService.findFirstById(1))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing does not exist"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToListings_andUserNotLoggedIn_then401Response() throws Exception {
+
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToPurchaseListings_andListingExists_then200Response() throws Exception {
         Mockito
                 .when(listingsService.findFirstById(1))

@@ -38,8 +38,6 @@ public class ListingsService {
         this.purchasedListingRepository = purchasedListingRepository;
     }
 
-
-
     /**
      * Returns a Specification that matches all listings with price greater than or equal to the given price
      *
