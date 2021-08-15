@@ -104,8 +104,6 @@ public class BusinessService {
             logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, business);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request");
         }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, business);
-
     }
 
 

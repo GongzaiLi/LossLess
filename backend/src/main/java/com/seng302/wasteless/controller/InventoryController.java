@@ -67,12 +67,8 @@ public class InventoryController {
         logger.debug("Post request to business INVENTORY products, business id: {}, PostInventoryDto {}", businessId, inventoryDtoRequest);
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
-        logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
@@ -87,7 +83,7 @@ public class InventoryController {
 
         inventory = inventoryService.createInventory(inventory);
 
-        logger.info("Created new inventory item {}", inventory);
+        logger.info("Created new inventory item with Id {}", inventory.getId());
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("inventoryItemId", inventory.getId());
@@ -115,13 +111,9 @@ public class InventoryController {
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
-
-
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-
-        logger.debug("Retrieving INVENTORY products for business: {}", possibleBusiness);
+        logger.debug("Retrieving INVENTORY products for business with Id: {}", possibleBusiness.getId());
         List<Inventory> inventoryList = inventoryService.searchInventoryFromBusinessId(businessId, searchQuery, pageable);
 
         Integer totalItems = inventoryService.getTotalInventoryCountByBusinessId(businessId, searchQuery);
@@ -150,11 +142,7 @@ public class InventoryController {
 
         User user = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
-
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
