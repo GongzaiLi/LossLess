@@ -14,7 +14,7 @@ jest.mock('../../util');
 
 beforeEach(() => {
   Api.searchListings.mockResolvedValue({data: testCards});
-  getToday.mockReturnValueOnce("2021-08-12");
+  //getToday.mockReturnValueOnce("2021-08-12");
 
   const localVue = createLocalVue();
 
@@ -39,13 +39,13 @@ describe('Route watcher', () => {
   test('re-queries data when route query changed', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`, query: {searchQuery: 'blackwaternosugar'}});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 9, -1);
+    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, -1);
   });
 
   test('re-queries all listings data when query not exists', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 9, -1);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, -1);
   });
 });
 
@@ -63,7 +63,7 @@ describe('Testing watcher for current page change', () => {
   test('check-get-listings-is-called-when-current-page-updated', async () => {
     wrapper.vm.currentPage = 3
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 9, 2);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "", "", "inventoryItem.product.name,asc", 9, 2);
   });
 
 });

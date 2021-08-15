@@ -10,14 +10,8 @@
         "manufacturer": "The Chocolate Factory",
         "recommendedRetailPrice": 2.5,
         "closes": "2017-08-08",
-        "images": [{
-          "id": 1,
-          "filename": "blah"
-        }],
-        "primaryImage": {
-          "id": 1,
-          "filename": "blah"
-        }
+        "images": [],
+        "primaryImage": null
       },
       "quantity": 5,
       "pricePerItem": 2.5,

@@ -67,7 +67,7 @@ export default {
   data: function () {
     return {
       businessTypeOptions: [
-        { value: '', text: 'All'},
+        { value: '', text: 'None'},
         { value: 'ACCOMMODATION_AND_FOOD_SERVICES', text: 'Accommodation and Food Services' },
         { value: 'RETAIL_TRADE', text: 'Retail Trade' },
         { value: 'CHARITABLE_ORGANISATION', text: 'Charitable organisation'},
@@ -133,7 +133,6 @@ export default {
      * This is used to make the initial search using the searchQuery from the form-input and is used to
      * refresh the table.
      *
-     * @param businessType The type of business to search for
      * @param searchParameter is the inputted search
      */
     searchBusinessApiRequest: function (searchParameter, businessType) {

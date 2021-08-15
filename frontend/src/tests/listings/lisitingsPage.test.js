@@ -1,7 +1,7 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import Api from "../../Api";
-import ListingPage from "../../components/listing/BusinessListingsPage";
+import ListingPage from "../../components/listing/ListingsPage";
 
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings

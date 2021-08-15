@@ -5,9 +5,9 @@ Date: 29/03/2021
 -->
 <template>
   <div v-show="!loading">
-    <h4 class="profile-card"><b-link v-if="$route.query.fromSearch" variant="info" to="/search">
-      <b-icon-arrow-left/> Back to results
-    </b-link></h4>
+    <b-link v-if="$route.query.fromSearch" variant="info" class="back-to-search-link" to="/search">
+      <strong><h4><b-icon-arrow-left/> Back to results</h4></strong>
+    </b-link>
     <b-card class="profile-card shadow" no-body
             v-if="businessFound"
     >
@@ -178,6 +178,12 @@ Date: 29/03/2021
 h6 {
   line-height: 1.4;
 }
+
+@media only screen and (min-width: 1250px) {
+  .back-to-search-link {
+    position: absolute;
+  }
+}
 </style>
 
 <script>
@@ -241,7 +247,7 @@ export default {
       },
       businessFound: true, // not smooth to switch the found or not find.
       loading: true,
-      makeAdminAction: null,
+      makeAdminAction: () => {},
       makeAdminError: "",
     }
   },
@@ -316,6 +322,7 @@ export default {
      * set the response data to businessData
      * @param data
      */
+    //todo may need split the data from response.
     setResponseData: function (data) {
       this.businessData = data;
     },
