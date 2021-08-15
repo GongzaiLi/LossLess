@@ -1,8 +1,12 @@
 <template>
-  <div>
-
+  <div v-if="!listingLoading">
     <b-link variant="info" class="back-to-search-link" to="/listingSearch">
-      <strong><h4><b-icon-arrow-left/> Back to results </h4></strong>
+      <strong>
+        <h4>
+          <b-icon-arrow-left/>
+          Back to results
+        </h4>
+      </strong>
     </b-link>
     <b-card class="listing_card shadow">
       <b-row>
@@ -27,52 +31,62 @@
               </template>
             </b-carousel-slide>
           </b-carousel>
-          <img v-else class="default-product-image" src="../../../public/product_default.png" alt="Product has no image">
+          <img v-else class="default-product-image" src="../../../public/product_default.png"
+               alt="Product has no image">
         </div>
         <div style="float:left; margin-left: 10px">
-            <h1 style="text-align: center;"> {{ listingItem.inventoryItem.product.name }} </h1>
-          <h6 style="text-align: center; margin-top: -6px"> Listed on: {{listingItem.created}}</h6>
+          <h1 style="text-align: center;"> {{ listingItem.inventoryItem.product.name }} </h1>
+          <h6 style="text-align: center; margin-top: -6px"> Listed on: {{ listingItem.created }}</h6>
           <b-card no-body id="infobox-1">
             <template #header>
-              <h5 style="margin-top: -4px"> Quantity: {{listingItem.quantity}} </h5>
-              <h5> Closes: {{listingItem.closes}} </h5>
-              <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.moreInfo}} </h6>
+              <h5 style="margin-top: -4px"> Quantity: {{ listingItem.quantity }} </h5>
+              <h5> Closes: {{ listingItem.closes }} </h5>
+              <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px">
+                {{ listingItem.moreInfo }} </h6>
               <h2 style="float: left; margin-bottom: -5px">
-                {{ currency.symbol }} {{ listingItem.price }} {{currency.code}}
+                {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
               </h2>
-              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy <b-icon-bag-check/></b-button>
+              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy
+                <b-icon-bag-check/>
+              </b-button>
             </template>
           </b-card>
           <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
           <b-icon-star-fill class="like-icon" variant="warning" v-else></b-icon-star-fill>
-          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{listingItem.numLikes}} users like this listing </h6>
+          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.numLikes }} users like this
+            listing </h6>
         </div>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
         <b-input-group-text class="bottom-info-boxes">
           <b-container>
-            <h6 style="margin-top: 7px"> <strong> Product Details: </strong></h6>
+            <h6 style="margin-top: 7px"><strong> Product Details: </strong></h6>
             <hr>
-            <label class="details-text"> <strong> Manufacturer: </strong> {{ listingItem.inventoryItem.product.manufacturer }}  </label>
+            <label class="details-text"> <strong> Manufacturer: </strong>
+              {{ listingItem.inventoryItem.product.manufacturer }} </label>
             <br>
-            <label class="details-text"> <strong> Manufactured Date: </strong> {{ listingItem.inventoryItem.manufactured }} </label>
+            <label class="details-text"> <strong> Manufactured Date: </strong> {{
+                listingItem.inventoryItem.manufactured
+              }} </label>
             <br>
-            <label class="details-text"> <strong> Best Before: </strong> {{ listingItem.inventoryItem.bestBefore }}  </label>
+            <label class="details-text"> <strong> Best Before: </strong> {{ listingItem.inventoryItem.bestBefore }}
+            </label>
             <br>
             <label class="details-text"> <strong> Sell By: </strong> {{ listingItem.inventoryItem.sellBy }} </label>
             <br>
-            <label class="details-text"> <strong> Expires: </strong> {{ listingItem.inventoryItem.expires }}  </label>
+            <label class="details-text"> <strong> Expires: </strong> {{ listingItem.inventoryItem.expires }} </label>
             <br>
-            <label class="details-text" style="text-align: left; height: 6rem;"> <strong> Description: </strong> {{ listingItem.inventoryItem.product.description }} </label>
+            <label class="details-text" style="text-align: left; height: 6rem;"> <strong> Description: </strong>
+              {{ listingItem.inventoryItem.product.description }} </label>
           </b-container>
         </b-input-group-text>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
         <b-input-group-text class="bottom-info-boxes">
           <b-container>
-            <h6 style="margin-top: 7px"> <strong> Seller Information: </strong></h6>
+            <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
             <hr>
-            <label class="details-text"> <strong> Business Name: </strong> {{ listingItem.business.name }}  </label>
+            <label class="details-text"> <strong> Business Name: </strong> {{ listingItem.business.name }} </label>
             <br>
             <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
           </b-container>
@@ -99,14 +113,14 @@
   }
 }
 
-.carousel-control-prev-icon , .carousel-control-next-icon {
+.carousel-control-prev-icon, .carousel-control-next-icon {
   background-color: black !important;
   border-radius: 20%;
-  padding:4px;
+  padding: 4px;
   color: white;
 }
 
-#carousel-1{
+#carousel-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   max-width: 30rem;
@@ -167,12 +181,15 @@ export default {
       listingItem: {},
       address: {},
       currency: {},
-      imageError: ""
+      imageError: "",
+      listingLoading: true,
     }
   },
   async mounted() {
-    console.log(111111, this.listingItem.inventoryItem)
+
     await this.setListingData()
+
+    console.log(111111, this.listingItem.inventoryItem)
   },
 
   methods: {
@@ -194,8 +211,9 @@ export default {
       }
 
       const address = this.listingItem.business.address;
-      this.address =  (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+      this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
       this.currency = await Api.getUserCurrency(address.country);
+      this.listingLoading = false;
 
     },
 
@@ -209,14 +227,14 @@ export default {
     async getCurrentListing(id) {
 
       let listing = {}
-       await Api.getListing(id)
-        .then(response => {
-          listing = response.data
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        return listing
+      await Api.getListing(id)
+          .then(response => {
+            listing = response.data
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      return listing
     },
 
     /**
