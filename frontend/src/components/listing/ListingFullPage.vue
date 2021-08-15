@@ -38,7 +38,7 @@
               <h6> Closes: {{listingItem.closes}} </h6>
               <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px"> {{listingItem.moreInfo}} </h6>
               <h2 style="float: left; margin-bottom: -5px"> {{listingItem.price}} </h2>
-              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="purchaseListing"> Buy <b-icon-bag-check/></b-button>
+              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="openConfirmPurchaseDialog"> Purchase <b-icon-bag-check/></b-button>
             </template>
           </b-card>
           <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
@@ -77,7 +77,11 @@
         </b-input-group-text>
       </b-row>
     </b-card>
-
+    <b-modal ref="confirmPurchaseModal" size="sm" title="Confirm Purchase" ok-variant="success" ok-title="Purchase" @ok="purchaseListingRequest">
+      <h6>
+        Are you sure you want to <strong>purchase</strong> this listing?
+      </h6>
+    </b-modal>
   </div>
 </template>
 
@@ -216,9 +220,16 @@ export default {
     },
 
     /**
+     * Opens the dialog to confirm the purchase
+     */
+    openConfirmPurchaseDialog: function() {
+      this.$refs.confirmPurchaseModal.show();
+    },
+
+    /**
      * Sends an api request to notify the backend that a user has tried to purchase a listing.
      */
-    async purchaseListing() {
+    async purchaseListingRequest() {
       await Api
           .purchaseListing(this.listingItem.id)
           .then(() => {
