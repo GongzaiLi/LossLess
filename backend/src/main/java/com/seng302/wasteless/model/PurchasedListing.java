@@ -84,7 +84,7 @@ public class PurchasedListing {
         setProduct(listing.getInventoryItem().getProduct());
         setQuantity(listing.getQuantity());
         setPrice(listing.getPrice());
-        // TODO: Set number of likes once that gets merged in
+        setNumberOfLikes(listing.getUsersLiked());
     }
 }
 

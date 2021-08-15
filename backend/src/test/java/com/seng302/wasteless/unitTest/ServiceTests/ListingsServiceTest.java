@@ -277,7 +277,7 @@ class ListingsServiceTest {
     }
 
     @Test
-    void whenPurchaseListing_andPurchaseSuccessful_thenPurchaseListingRecordCreated() {
+    void whenPurchaseListing_andListingHasNoLikes_thenPurchaseListingRecordCreated() {
         var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
                 5, 5);
 
@@ -289,5 +289,16 @@ class ListingsServiceTest {
         Assertions.assertEquals(listing.getPrice(), purchasedListing.getPrice());
         Assertions.assertEquals(curUser.getId(), purchasedListing.getPurchaser().getId());
         Assertions.assertNotNull(purchasedListing.getSaleDate());
+    }
+
+    @Test
+    void whenPurchaseListing_andListingHasOneLike_thenLikeRecordedInPurchaseListingRecord() {
+        var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
+                5, 5);
+        listing.incrementUsersLiked();
+
+        PurchasedListing purchasedListing = listingsService.purchase(listing, curUser);
+
+        Assertions.assertEquals(listing.getUsersLiked(), purchasedListing.getNumberOfLikes());
     }
 }

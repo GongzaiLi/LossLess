@@ -142,6 +142,7 @@ public class PurchasesFeature {
         Assertions.assertEquals(curListing.getInventoryItem().getProduct().getId(), purchasedListing.getProduct().getId());
         Assertions.assertEquals(curListing.getQuantity(), purchasedListing.getQuantity());
         Assertions.assertEquals(curListing.getPrice(), purchasedListing.getPrice());
+        Assertions.assertEquals(curListing.getUsersLiked(), purchasedListing.getNumberOfLikes());
         Assertions.assertNotNull(purchasedListing.getSaleDate());
     }
 }
