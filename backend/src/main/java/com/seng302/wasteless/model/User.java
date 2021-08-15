@@ -5,12 +5,16 @@ import javax.validation.constraints.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An implementation of User model.
@@ -21,6 +25,8 @@ import lombok.ToString;
 @ToString // generate a toString method
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 public class User {
+
+    private static final Logger logger = LogManager.getLogger(User.class.getName());
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
@@ -94,6 +100,10 @@ public class User {
     @Column(name = "role")
     private UserRoles role;
 
+    @JoinColumn(name = "listing_liked")
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Listing> listingsLiked;
+
     /**
      * Check this objects date is within the expected maximum and minimum date ranges
      */
@@ -140,10 +150,52 @@ public class User {
 
     /**
      * Check if user is default admin
+     *
      * @return true if default admin
      */
     public boolean checkUserDefaultAdmin() {
         return this.role == UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN;
+    }
+
+
+    /**
+     * Toggles the like on a listing,
+     * if the user liked listing doesnt contain the new listing, the listing is added
+     * if the user is currently 'liking' it then the like is removed by removing the listing from the set
+     * the total likes on the listing is then increased or decreased depending ion if the like is added or removed
+     * @param listing listing to have current user's like's toggled
+     * @return true if like added, false if like removed
+     */
+    public boolean toggleListingLike(Listing listing) {
+        Boolean likeStatus;
+        if(listingsLiked.contains(listing)) {
+            this.unLikeListing(listing);
+            likeStatus = Boolean.FALSE;
+            logger.info("Listing: {} unliked by user: {}", listing.getId(), this.id);
+            listing.decrementUsersLiked();
+        } else {
+            this.addLikedListing(listing);
+            likeStatus = Boolean.TRUE;
+            logger.info("Listing: {} liked by user: {}", listing.getId(), this.id);
+            listing.incrementUsersLiked();
+        }
+        return likeStatus;
+    }
+
+    /**
+     * Adds a like to the listing
+     *
+     * @param listing The listing that the like is added to
+     */
+    private void addLikedListing(Listing listing) { this.listingsLiked.add(listing); }
+
+    /**
+     * Removes a like to the listing
+     *
+     * @param listing The listing that the like is removed from
+     */
+    private void unLikeListing(Listing listing) {
+        this.listingsLiked.remove(listing);
     }
 }
 

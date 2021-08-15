@@ -57,7 +57,7 @@ public class ListingController {
 
     /**
      * Handle POST request to /businesses/{id}/listings endpoint for creating new listing for business
-     * <p>
+     *
      * Checks business with id from path exists
      * Checks user making request exists, and has privileges (admin of business, or (D)GAA)
      * Checks inventory with id exists
@@ -199,6 +199,33 @@ public class ListingController {
         return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
     }
 
+
+    /**
+     * Handle PUT request to /listings/{listingId}/like endpoint for adding or removing like(s) on a listing
+     *
+     * Checks user is logged in
+     * Checks listing with id exists
+     * Checks if user already has liked listing:
+     * if unliked then listing becomes liked
+     * if liked listing becomes unliked
+     *
+     * @param listingId id of listing to be liked or unliked
+     * @return Json object with boolean "liked" true = liked, false = unliked
+     * Http Status 200 if valid query, 401 if unauthorised, 406 if invalid listing id
+     */
+    @PutMapping("/listings/{listingId}/like")
+    public ResponseEntity<Object> addLikeToListing(@PathVariable Integer listingId) {
+        User user = userService.getCurrentlyLoggedInUser();
+        Listing listing = listingsService.findFirstById(listingId);
+        logger.info("Retrieved listing with ID: {}", listingId);
+        Boolean likeStatus = user.toggleListingLike(listing);
+        listingsService.updateListing(listing);
+        userService.saveUserChanges(user);
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("liked", likeStatus);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+    }
+
     /**
      * Returns a json object of bad field found in the request
      *
@@ -238,5 +265,7 @@ public class ListingController {
         errors.put(constraintName, errorMsg);
         return errors;
     }
+
+
 
 }
