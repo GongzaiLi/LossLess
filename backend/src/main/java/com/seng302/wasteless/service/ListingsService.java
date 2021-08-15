@@ -38,6 +38,8 @@ public class ListingsService {
         this.purchasedListingRepository = purchasedListingRepository;
     }
 
+
+
     /**
      * Returns a Specification that matches all listings with price greater than or equal to the given price
      *
@@ -171,6 +173,31 @@ public class ListingsService {
      */
     public Listing createListing(Listing listingItem) {
         return listingRepository.save(listingItem);
+    }
+
+
+    /**
+     * Given an Listing object, 'updates' it by saving and persisting it in the database.
+     * @param listingItem The Listing item item to update
+     *
+     */
+    public void updateListing(Listing listingItem) {
+        listingRepository.save(listingItem);
+    }
+
+    /**
+     * Gets the listing by the given id
+     *
+     * @param id The id of the listing to be retrieved
+     * @return The listing Object that matches the id
+     * @throws ResponseStatusException if no listing with id found
+     */
+    public Listing findFirstById(Integer id) {
+        Listing listing = listingRepository.findFirstById(id);
+        if (listing == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing with given ID does not exist");
+        }
+        return listing;
     }
 
     /**

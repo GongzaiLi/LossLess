@@ -5,6 +5,7 @@ import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -418,6 +416,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("listings", hasSize(1)));
     }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingNotAlreadyLiked_then200Response() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Mockito.when(user.toggleListingLike(listing)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("liked", is(true)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingAlreadyLiked_then200Response() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Set<Listing> set = new HashSet<>();
+        set.add(listing);
+        Mockito.when(user.getListingsLiked()).thenReturn(set);
+        user.toggleListingLike(listing);
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("liked", is(false)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingNotExist_then200Response() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Listing does not exist"));
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
