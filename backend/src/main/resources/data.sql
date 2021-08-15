@@ -32,7 +32,7 @@ VALUES (1, '2017-08-08', 'A treat that never ends', 'The Chocolate Factory', 'Ev
 
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
-VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 5, '2021-09-26', 12.5, 1, 3);
+VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 5, '2021-09-26', 12.5, 1, 4);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
 VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 2, '2021-09-26', 5, 2, 0);
