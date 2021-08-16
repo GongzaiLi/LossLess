@@ -153,6 +153,7 @@ public class CreateListingFeature {
         business.setAddress(throwawayAddress);
         business.setAdministrators(Collections.singletonList(user));
         business.setPrimaryAdministrator(user);
+        business.setCreated(LocalDate.now());
         businessService.createBusiness(business);
 
         if (!business.checkUserIsAdministrator(user)) {
