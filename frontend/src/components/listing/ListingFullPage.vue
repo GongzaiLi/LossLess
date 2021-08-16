@@ -191,8 +191,8 @@ export default {
   methods: {
 
     /**
-     * Gets the listing data either using api request.
-     * Also formats the business address as single string.
+     * Gets the listing data for the current listing by making an api request.
+     * Also formats the business address into a single string of address.
      *
      */
     async setListingData() {
@@ -223,13 +223,11 @@ export default {
      * @returns {string} The string to be returned
      */
     getLikeString() {
-      let string = ""
       if (this.listingItem.usersLiked === 1) {
-        string = "user likes this listing"
+        return  "user likes this listing"
       } else {
-        string = "users like this listing"
+        return "users like this listing"
       }
-      return string
     }
 
   }
