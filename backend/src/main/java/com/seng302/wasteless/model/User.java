@@ -1,6 +1,7 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.PurchasedListingView;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,32 +30,33 @@ public class User {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
+    @JsonView({PurchasedListingView.GetPurchasedListingView.class})
     private Integer id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
-    @JsonView(UserViews.PostUserRequestView.class)
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Size(min = 0, max = 50)
     private String firstName;
 
     @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Size(min = 0, max = 50)
     private String lastName;
 
     @Column(name = "middle_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Size(min = 0, max = 50)
     private String middleName;
 
     @Column(name = "nick_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Size(min = 0, max = 50)
     private String nickname;
 
     @Column(name = "bio") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.PostUserRequestView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Size(min = 0, max = 250)
     private String bio;
 
