@@ -39,7 +39,7 @@ const router = new Router({
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
         { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage},
-        { path : '/listing/:id', name: 'listings-full', component: ListingFullPage}
+        { path : '/listings/:id', name: 'listings-full', component: ListingFullPage}
 
     ]
 });
