@@ -35,3 +35,9 @@ Feature: U31 - Purchases
     Given A listing exists with quantity 2 and its inventory item has quantity 2
     When I purchase that listing
     Then A notifications is created telling me I have purchased the listing
+
+  Scenario: AC5:  I can get information about a sale
+    Given A purchase exists with the name "Black Water No Sugar"
+    When I try and get information about the sale
+    Then The information about the sale (sale date, listing date, product, amount, number of likes) is given from the sales history.
+

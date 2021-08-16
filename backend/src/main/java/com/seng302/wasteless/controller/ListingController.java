@@ -272,7 +272,7 @@ public class ListingController {
 
         notificationService.notifyAllUsers(usersWhoLiked, purchasedListing.getId(), NotificationType.LIKEDLISTING_PURCHASED,  String.format("The listing you liked of the product %s has been purchased by someone else", purchasedListing.getProduct().getName()));
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
