@@ -98,7 +98,7 @@ class ListingsServiceTest {
     void whenFilterByPriceRange_andUpperAndLowerInclusive_thenExcludedListingsNotReturned() {
         Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.of(1.5), Optional.of(2.0), Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(), Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        System.out.println(names);
+
         assertTrue(names.containsAll(Arrays.asList("Willy Wonka", "Back Water"))
                 && Arrays.asList("Back Water", "Willy Wonka").containsAll(names));
     }
@@ -208,7 +208,7 @@ class ListingsServiceTest {
     void whenFilterByClosingDateRange_andUpperAndLowerInclusive_thenExcludedListingsNotReturned() {
         Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2099, Month.FEBRUARY, 1)),Optional.of(LocalDate.of(2099, Month.MARCH, 1)),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
-        System.out.println(names);
+
         assertTrue(names.containsAll(Arrays.asList("Willy Wonka", "Back Water"))
                 && Arrays.asList("Back Water", "Willy Wonka").containsAll(names));
     }

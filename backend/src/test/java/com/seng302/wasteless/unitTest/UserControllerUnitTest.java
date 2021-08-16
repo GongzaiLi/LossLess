@@ -324,7 +324,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     void whenGetRequestToUserHasCardsExpired_AndUserIsSelf_thenExpiredReturned() throws Exception {
         User currentUser = userService.findUserById(1);
-        System.out.println(notificationService.findAllNotificationsByUserId(1));
+
         mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
                 .with(user(new CustomUserDetails(currentUser)))
                 .contentType(APPLICATION_JSON))
