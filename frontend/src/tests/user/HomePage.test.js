@@ -39,6 +39,7 @@ beforeEach(() => {
   localVue.use(mockUserAuthPlugin);
   localVue.use(Router);
 
+  Api.getNotifications.mockResolvedValue({data: {}});
   Api.getUser.mockRejectedValue(new Error(''));
   Api.getExpiringCards.mockResolvedValue({data: {}});
 
