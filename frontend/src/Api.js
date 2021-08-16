@@ -76,7 +76,7 @@ export default {
   },
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
-  getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
+  getExpiredCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
   getNotifications: () => instance.get(`/users/notifications`, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),

@@ -134,8 +134,8 @@ export default {
      * cards that have expired.
      */
     async updateNotifications() {
-      const expiringCards = (await Api.getExpiringCards(this.$currentUser.id)).data;
-      if (expiringCards.length > 0) {
+      const expiredCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
+      if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;

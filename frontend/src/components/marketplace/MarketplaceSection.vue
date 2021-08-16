@@ -194,7 +194,7 @@ export default {
         this.cards = resp.data.results;
         this.totalItems = resp.data.totalItems;
       } else {
-        const resp = await Api.getExpiringCards(this.$currentUser.id);
+        const resp = await Api.getExpiredCards(this.$currentUser.id);
         this.cards = resp.data;
         this.$emit('cardCountChanged', this.cards);
       }
