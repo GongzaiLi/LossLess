@@ -124,7 +124,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
-          <b-card class="b_card_listing shadow-sm" @click="goToListingPage(listing.id, listing)">
+          <b-card class="b_card_listing shadow-sm" @click="goToListingPage(listing.id)">
             <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
             <hr>
@@ -278,13 +278,13 @@ export default {
 
     /**
      * Redirects to the full listing page when a listing card is clicked on the browse/search listings page.
-     * The listing id and data is passed using the route params also saved to local storage.
+     * The listing id is passed using the route params.
      *
      * @param id The listing id that is displayed on the full listing page.
-     * @param listing The current listing data that is passed as s prop
+     *
      */
-    goToListingPage(id, listing) {
-      this.$router.push( {name: "listings-full", params: { id: id, listingData: listing } })
+    goToListingPage(id) {
+      this.$router.push(`listings/${id}`)
     },
 
     /**

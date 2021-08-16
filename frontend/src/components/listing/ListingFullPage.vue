@@ -53,8 +53,7 @@
           </b-card>
           <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
           <b-icon-star-fill class="like-icon" variant="warning" v-else></b-icon-star-fill>
-          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.numLikes }} users like this
-            listing </h6>
+          <h6 v-if="listingItem.usersLiked" style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }} {{getLikeString}}</h6>
         </div>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
@@ -186,29 +185,21 @@ export default {
     }
   },
   async mounted() {
-
     await this.setListingData()
-
-    console.log(111111, this.listingItem.inventoryItem)
   },
 
   methods: {
 
     /**
-     * Gets the listing data either from the props when redirected from listings search page or
-     * using api request when page is reloaded since props data is not available on reload.
+     * Gets the listing data either using api request.
      * Also formats the business address as single string.
      *
      */
     async setListingData() {
-      let listingData = this.$route.params.listingData;
-      this.listingItem = listingData
 
-      if (this.listingItem === undefined) {
-        const currentListingId = this.$route.params.id
-        listingData = await Api.getListing(currentListingId)
-        this.listingItem = listingData.data
-      }
+      const currentListingId = this.$route.params.id
+      const listingData = await Api.getListing(currentListingId)
+      this.listingItem = listingData.data
 
       const address = this.listingItem.business.address;
       this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
@@ -217,25 +208,6 @@ export default {
 
     },
 
-    /**
-     * Makes an api request to get the individual listing
-     *
-     * @param id the id of the current listing
-     * @return the listing object
-     */
-
-    async getCurrentListing(id) {
-
-      let listing = {}
-      await Api.getListing(id)
-          .then(response => {
-            listing = response.data
-          })
-          .catch(err => {
-            console.log(err)
-          })
-      return listing
-    },
 
     /**
      * Returns the URL required to get the image given the filename
@@ -244,5 +216,22 @@ export default {
       return Api.getImage(imageFileName);
     }
   },
+
+  computed: {
+    /**
+     * Returns the listing like string based on number of likes
+     * @returns {string} The string to be returned
+     */
+    getLikeString() {
+      let string = ""
+      if (this.listingItem.usersLiked === 1) {
+        string = "user likes this listing"
+      } else {
+        string = "users like this listing"
+      }
+      return string
+    }
+
+  }
 }
 </script>
