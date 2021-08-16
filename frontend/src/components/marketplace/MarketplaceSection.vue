@@ -2,7 +2,7 @@
   <div class="p-3 marketplace-section">
 
     <div v-if="isCardFormat">
-      <b-row class="pb-2">
+      <b-row v-if="section !== 'homepage'" class="pb-2">
         <b-col md="2"><h3 class="float-right">Sort By:</h3></b-col>
         <b-col md="2">
           <b-form-select v-model="sortBy" :options="sortByOptions" id="marketplaceSortBySelect"></b-form-select>
@@ -12,7 +12,7 @@
         </b-col>
         <b-col md="2"><b-button @click="refreshData">Sort</b-button></b-col>
       </b-row>
-        <b-row :cols-lg="cardsPerRow">
+        <b-row :cols-lg="cardsPerRow" cols-sm="1">
           <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
             <marketplace-card
                 :card-info="cardInfo"

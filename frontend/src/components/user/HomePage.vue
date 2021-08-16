@@ -11,7 +11,7 @@
     </router-link>
   </b-card>
 
-    <b-card style="margin-top: 20px; margin-right: 15px; max-width: 40rem; float:left" v-if="hasExpiredCards && !$currentUser.currentlyActingAs" class="shadow">
+    <b-card v-if="hasExpiredCards && !$currentUser.currentlyActingAs" class="expired-cards shadow">
       <h3><b-icon-clock/> Your recently closed cards </h3>
       <h6>These cards will be deleted within 24 hours of their closing date. You can either extend their display period or delete cards you no longer need.</h6>
       <b-input-group>
@@ -25,13 +25,13 @@
       </b-input-group>
       <marketplace-section
           :is-card-format="isCardFormat"
-          :cardsPerRow="2"
+          :cardsPerRow="3"
           :perPage="2"
           section="homepage"
           v-on:cardCountChanged="checkExpiredCardsExist"
       />
     </b-card>
-    <b-card style="margin-top: 20px; float: left" class="shadow">
+    <b-card v-if="!$currentUser.currentlyActingAs" style="margin-left: 15px; margin-top: 20px; float: left" class="shadow">
       <h3><b-icon-bell/> Notifications </h3>
       <div class="notification-holder">
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
@@ -45,9 +45,20 @@
 
 <style>
 
+.expired-cards {
+  overflow-y: scroll;
+  height: 42rem;
+  max-height: 42rem;
+  margin-top: 20px;
+  max-width: 52rem;
+  width: 52rem;
+  float:left
+
+}
+
 .notification-holder {
-  height: 31rem;
-  max-height: 31rem;
+  height: 37rem;
+  max-height: 37rem;
   overflow-y: scroll;
   margin-top: -3px;
 }
@@ -55,8 +66,8 @@
 
 .notification-cards {
   margin-top: 20px;
-  width: 34rem;
-  max-width: 34rem;
+  width: 22rem;
+  max-width: 22rem;
 
 }
 
