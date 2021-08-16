@@ -2,7 +2,7 @@
   <div class="p-3 marketplace-section">
 
     <div v-if="isCardFormat">
-      <b-row class="pb-2">
+      <b-row v-if="section !== 'homepage'" class="pb-2">
         <b-col md="2"><h3 class="float-right">Sort By:</h3></b-col>
         <b-col md="2">
           <b-form-select v-model="sortBy" :options="sortByOptions" id="marketplaceSortBySelect"></b-form-select>
@@ -12,7 +12,7 @@
         </b-col>
         <b-col md="2"><b-button @click="refreshData">Sort</b-button></b-col>
       </b-row>
-        <b-row cols-lg="4">
+        <b-row :cols-lg="cardsPerRow" cols-sm="1">
           <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
             <marketplace-card
                 :card-info="cardInfo"
@@ -97,6 +97,7 @@ export default {
   components: {pagination, MarketplaceCard, MarketplaceCardFull},
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
+    console.log(this.cardsPerRow);
     this.refreshData();
   },
   data: function () {
@@ -193,7 +194,7 @@ export default {
         this.cards = resp.data.results;
         this.totalItems = resp.data.totalItems;
       } else {
-        const resp = await Api.getExpiringCards(this.$currentUser.id);
+        const resp = await Api.getExpiredCards(this.$currentUser.id);
         this.cards = resp.data;
         this.$emit('cardCountChanged', this.cards);
       }
