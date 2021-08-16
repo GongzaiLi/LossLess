@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.logging.log4j.LogManager;
@@ -102,6 +102,8 @@ public class User {
 
     @JoinColumn(name = "listing_liked")
     @ManyToMany(fetch = FetchType.EAGER)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Listing> listingsLiked;
 
     /**
@@ -180,6 +182,15 @@ public class User {
             listing.incrementUsersLiked();
         }
         return likeStatus;
+    }
+
+    /**
+     * Checks if lisitng given is currently liked by the user
+     * @param listing listing to check if currently liked by user
+     * @return true if user has listing liked, false if listing not liked
+     */
+    public boolean checkUserLikesListing(Listing listing) {
+        return this.listingsLiked.stream().anyMatch(candidate -> candidate.getId().equals(listing.getId()));
     }
 
     /**

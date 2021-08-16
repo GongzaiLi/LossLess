@@ -2,6 +2,7 @@ package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.dto.PostListingsDto;
+import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
@@ -132,10 +133,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setProduct(productForInventory);
 
 
+        business = mock(Business.class);
+        business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
+        business.setId(1);
+        business.setAdministrators(new ArrayList<>());
+        business.setName("Jimmy's clown store");
 
 
         listing = new Listing();
         listing.setInventoryItem(inventoryItemForListing)
+                .setBusiness(business)
                 .setCreated(expiry.minusMonths(3))
                 .setQuantity(3)
                 .setPrice(17.99)
@@ -146,6 +153,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         listingList = new ArrayList<>();
         listingList.add(
                 listing = new Listing()
+                        .setBusiness(business)
                         .setInventoryItem(inventoryItemForListing2)
                 .setCreated(expiry.minusMonths(3))
                 .setQuantity(3)
@@ -155,6 +163,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         listingList.add(
                 listing = new Listing()
+                        .setBusiness(business)
                         .setInventoryItem(inventoryItemForListing3)
                         .setCreated(expiry.minusMonths(3))
                         .setQuantity(3)
@@ -164,6 +173,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         listingList.add(
                 listing = new Listing()
+                        .setBusiness(business)
                         .setInventoryItem(inventoryItemForListing4)
                         .setCreated(expiry.minusMonths(3))
                         .setQuantity(3)
@@ -177,11 +187,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
 
-        business = mock(Business.class);
-        business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
-        business.setId(1);
-        business.setAdministrators(new ArrayList<>());
-        business.setName("Jimmy's clown store");
+
 
         Product product = new Product();
         product.setId("Clown-Shows");
@@ -242,10 +248,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         doReturn(product).when(productService).findProductById(null);
 
 
+        doReturn(new ArrayList<>()).when(business).getAdministrators();
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
+        doReturn(LocalDate.MIN).when(business).getCreated();
         doReturn(true).when(user).checkUserGlobalAdmin();
+        doReturn(UserRoles.USER).when(user).getRole();
 
 
         Mockito
@@ -263,6 +272,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         Mockito
                 .when(inventoryService.searchInventoryFromBusinessId(anyInt(), any(), any()))
                 .thenReturn(inventories);
+
+        new GetBusinessesDtoMapper(businessService, userService);
 
         Mockito
                 .when(notificationService.createNotification(any(),any(),any(),any()))

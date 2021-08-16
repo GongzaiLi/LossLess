@@ -57,6 +57,7 @@ public class TestUtils {
         business.setAdministrators(new ArrayList<>());
         business.setName(businessName);
         business.setAddress(address);
+        business.setCreated(LocalDate.now());
         businessService.createBusiness(business);
 
         Product product = new Product();

@@ -40,10 +40,6 @@ public class GetBusinessesDtoMapper {
         UserRoles currentUserRole = loggedInUser.getRole();                     //get the role of Currently logged in user
 
         List<User> businessAdministrators = business.getAdministrators();
-
-
-
-
         if (currentUserRole.equals(UserRoles.GLOBAL_APPLICATION_ADMIN) ||
                 currentUserRole.equals(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)
                 || businessAdministrators.contains(loggedInUser)) {
