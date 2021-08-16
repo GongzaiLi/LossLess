@@ -40,8 +40,9 @@
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
-            <b-button v-b-toggle.collapse-1 variant="primary">Filter</b-button>
+            <b-button type="submit" variant="primary">Search</b-button>
           </b-col>
+
 
         </b-row>
         <hr>
@@ -208,12 +209,12 @@ export default {
   methods: {
     /**
      * Sends API request to get all the listings with the search parameters stored in this component.
+     * @param newQuery True if this query should reset pagination back to 0
      **/
     getListings: async function (newQuery=false) {
       if (newQuery) {
         this.currentPage = 0;
       }
-      console.log(this.sortOrdersForAPI);
       const resp = (await Api.searchListings(
           this.search.productName,
           this.search.priceMin,
