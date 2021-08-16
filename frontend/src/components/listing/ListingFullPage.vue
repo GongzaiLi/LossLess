@@ -85,7 +85,10 @@
           <b-container>
             <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
             <hr>
-            <label class="details-text"> <strong> Business Name: </strong> {{ listingItem.business.name }} </label>
+            <label class="details-text"> <strong> Business Name: </strong>
+              <router-link :to="'/businesses/'+listingItem.inventoryItem.businessId" >
+                {{ listingItem.business.name }} </router-link>
+              </label>
             <br>
             <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
           </b-container>

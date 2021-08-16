@@ -118,6 +118,7 @@ describe('Testing listing data is set using params or api request', () => {
         const mockListing = {
             "id": 1,
             "inventoryItem": {
+                "businessId": 1,
                 "id": 101,
                 "product": {
                     "name": "Watties Baked Beans - 420g can",
@@ -151,14 +152,10 @@ describe('Testing listing data is set using params or api request', () => {
             "closes": "2021-07-21T23:59:00Z"
         }
 
-
         Api.getListing.mockResolvedValue({data: mockListing});
         await wrapper.vm.setListingData();
         await wrapper.vm.$forceUpdate();
         expect(wrapper.vm.getLikeString).toBe("users like this listing");
-
-
-
     })
 
 })
