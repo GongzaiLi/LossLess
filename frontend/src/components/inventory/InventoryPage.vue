@@ -86,8 +86,7 @@ export default {
      **/
     refreshTable: async function() {
       const businessId = this.$route.params.id;
-      await this.$refs.inventoryTable.getBusinessInfo(businessId);
-
+      await this.$refs.inventoryTable.getInventoryInfo(businessId);
     },
     /**
      * call api read the business information
