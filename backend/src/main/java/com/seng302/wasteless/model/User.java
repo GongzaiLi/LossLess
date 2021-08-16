@@ -184,6 +184,15 @@ public class User {
     }
 
     /**
+     * Checks if lisitng given is currently liked by the user
+     * @param listing listing to check if currently liked by user
+     * @return true if user has listing liked, false if listing not liked
+     */
+    public boolean checkUserLikesListing(Listing listing) {
+        return this.listingsLiked.stream().anyMatch(candidate -> candidate.getId().equals(listing.getId()));
+    }
+
+    /**
      * Adds a like to the listing
      *
      * @param listing The listing that the like is added to
