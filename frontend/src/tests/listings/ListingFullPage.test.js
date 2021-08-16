@@ -16,6 +16,24 @@ const $log = {
     }
 };
 
+const $router = {
+    push: jest.fn(),
+}
+
+const $route = {
+    params: {
+        id: 1
+    }
+}
+
+const $refs = {
+    purchaseErrorModal: {
+        show() {}
+    }
+}
+
+
+
 
 const mockListing = {
     "id": 1,
@@ -54,13 +72,6 @@ const mockListing = {
 }
 
 
-const $route = {
-    params: {
-        id: 1
-    }
-}
-
-
 jest.mock('../../Api');
 
 beforeEach(() => {
@@ -70,18 +81,18 @@ beforeEach(() => {
     localVue.use(BootstrapVueIcons);
 
     Api.getUserCurrency.mockResolvedValue(
-      {
-        symbol: '$',
-          code: 'USD',
-          name: 'US Dollar'
-    });
+        {
+            symbol: '$',
+            code: 'USD',
+            name: 'US Dollar'
+        });
     Api.getBusiness.mockResolvedValue({data: {"address": {"country": "New Zealand"}}});
     Api.getListing.mockResolvedValue({data: mockListing});
 
     wrapper = shallowMount(ListingFullPage, {
         localVue,
         propsData: {},
-        mocks: {$route, $log, mockListing},
+        mocks: {$route, $log, mockListing, $router, $refs},
 
     });
 });
@@ -157,8 +168,32 @@ describe('Testing listing data is set using params or api request', () => {
         await wrapper.vm.$forceUpdate();
         expect(wrapper.vm.getLikeString).toBe("users like this listing");
 
-
-
     })
 
 })
+
+describe('Purchase Button', () => {
+
+    test('the purchase button function calls the api request', async () => {
+        Api.purchaseListing.mockResolvedValue();
+        await wrapper.vm.purchaseListingRequest();
+        expect(Api.purchaseListing).toHaveBeenCalled();
+    });
+
+    test('a successful purchase routes to the home page', async () => {
+        Api.purchaseListing.mockResolvedValue();
+        await wrapper.vm.purchaseListingRequest();
+        expect($router.push).toHaveBeenCalled();
+
+    })
+
+    test('check error message is displayed on 406 error', async () => {
+        Api.purchaseListing.mockRejectedValue({response: {status: 406}})
+        wrapper.vm.openErrorModal = jest.fn();
+        await wrapper.vm.purchaseListingRequest();
+        expect(wrapper.vm.openErrorModal).toHaveBeenCalled();
+        expect(wrapper.vm.errMessage).toStrictEqual("Someone else has already purchase this listing sorry.")
+
+    });
+});
+
