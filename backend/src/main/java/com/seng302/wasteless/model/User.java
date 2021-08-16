@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 /**
  * An implementation of User model.
@@ -101,7 +103,8 @@ public class User {
     private UserRoles role;
 
     @JoinColumn(name = "listing_liked")
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Listing> listingsLiked;
