@@ -11,10 +11,10 @@
     </router-link>
   </b-card>
 
-    <b-card v-if="hasExpiredCards && !$currentUser.currentlyActingAs" class="expired-cards shadow">
+    <b-card v-if="!$currentUser.currentlyActingAs" class="expired-cards shadow">
       <h3><b-icon-clock/> Your recently closed cards </h3>
       <h6>These cards will be deleted within 24 hours of their closing date. You can either extend their display period or delete cards you no longer need.</h6>
-      <b-input-group>
+      <b-input-group v-if="hasExpiredCards">
         <b-form-text style="margin-right: 7px">
           Table View
         </b-form-text>
@@ -23,7 +23,9 @@
           Card View
         </b-form-text>
       </b-input-group>
+      <h2 style="text-align: center; margin-top: 2rem" v-if="!hasExpiredCards"> You have no cards the recently expired </h2>
       <marketplace-section
+          v-else
           :is-card-format="isCardFormat"
           :cardsPerRow="3"
           :perPage="2"
@@ -31,9 +33,12 @@
           v-on:cardCountChanged="checkExpiredCardsExist"
       />
     </b-card>
-    <b-card v-if="!$currentUser.currentlyActingAs" style="margin-left: 15px; margin-top: 20px; float: left" class="shadow">
+    <b-card v-if="!$currentUser.currentlyActingAs" style="margin-left: 17px; margin-top: 20px; float: left" class="shadow">
       <h3><b-icon-bell/> Notifications </h3>
       <div class="notification-holder">
+        <b-card v-if="notifications.length === 0" class="notification-cards shadow">
+          <h6> You have no notifications </h6>
+        </b-card>
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
           <h6> {{notification.type}} </h6>
           <span>{{ notification.message }}</span>
@@ -46,7 +51,7 @@
 <style>
 
 .expired-cards {
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 42rem;
   max-height: 42rem;
   margin-top: 20px;
@@ -59,15 +64,16 @@
 .notification-holder {
   height: 37rem;
   max-height: 37rem;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: -3px;
+  width: 23rem;
 }
 
 
 .notification-cards {
   margin-top: 20px;
-  width: 22rem;
-  max-width: 22rem;
+  width: 21rem;
+  max-width: 21rem;
 
 }
 
