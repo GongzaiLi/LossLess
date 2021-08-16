@@ -1,7 +1,6 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.dto.GetCardDto;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
 import com.seng302.wasteless.dto.UserSearchDto;
@@ -33,9 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * UserController is used for mapping all Restful API requests starting with the address "/users".

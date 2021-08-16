@@ -28,6 +28,7 @@ public class Inventory {
     @JsonView(InventoryViews.GetInventoryView.class)
     private Integer id;
 
+    @JsonView(ListingViews.GetListingView.class)
     @NotNull
     @Column
     private Integer businessId;

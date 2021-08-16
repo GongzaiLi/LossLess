@@ -96,7 +96,7 @@ beforeEach(() => {
   localVue.use(BootstrapVueIcons);
   localVue.use(Auth);
 
-  Api.getExpiringCards.mockResolvedValue({data: expiringCards});
+  Api.getExpiredCards.mockResolvedValue({data: expiringCards});
   Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
   Api.getNotifications.mockResolvedValue({data: []});
 

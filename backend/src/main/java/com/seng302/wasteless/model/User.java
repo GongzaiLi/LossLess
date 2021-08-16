@@ -1,12 +1,5 @@
 package com.seng302.wasteless.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
@@ -17,6 +10,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An implementation of User model.
@@ -177,12 +176,10 @@ public class User {
             this.unLikeListing(listing);
             likeStatus = Boolean.FALSE;
             logger.info("Listing: {} unliked by user: {}", listing.getId(), this.id);
-            listing.decrementUsersLiked();
         } else {
             this.addLikedListing(listing);
             likeStatus = Boolean.TRUE;
             logger.info("Listing: {} liked by user: {}", listing.getId(), this.id);
-            listing.incrementUsersLiked();
         }
         return likeStatus;
     }
