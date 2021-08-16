@@ -31,11 +31,14 @@ public class ListingsService {
 
     private final PurchasedListingRepository purchasedListingRepository;
 
+    private final UserService userService;
+
     @Autowired
-    public ListingsService(ListingRepository listingRepository, InventoryService inventoryService, PurchasedListingRepository purchasedListingRepository) {
+    public ListingsService(ListingRepository listingRepository, InventoryService inventoryService, PurchasedListingRepository purchasedListingRepository, UserService userService) {
         this.listingRepository = listingRepository;
         this.inventoryService = inventoryService;
         this.purchasedListingRepository = purchasedListingRepository;
+        this.userService = userService;
     }
 
     /**
@@ -260,6 +263,9 @@ public class ListingsService {
     /**
      * Purchases the given listing, and deletes it. The listing is assumed to exist (ie it cannot have already
      * been deleted in the DB). Will update the listing's inventory item's quantity as well.
+     *
+     * Deletes all likes on all users for this listing before deleting the listing
+     *
      * @param listing The listing to purchase
      * @param purchaser The user that purchased this listing
      * @return A saved PurchasedListing object representing a record of this purchase
@@ -267,6 +273,7 @@ public class ListingsService {
     public PurchasedListing purchase(Listing listing, User purchaser) {
         PurchasedListing purchaseRecord = listing.purchase(purchaser);
         inventoryService.updateInventory(listing.getInventoryItem());
+        userService.unlikePurchasedListing(listing);
         listingRepository.delete(listing);
         return purchasedListingRepository.save(purchaseRecord);
     }

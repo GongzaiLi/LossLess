@@ -1,9 +1,6 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.model.UserSearchSortTypes;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -126,7 +123,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid");
         }
 
-        logger.debug("Validated token for user: {} with Email: {}.", user, currentPrincipalEmail);
+        logger.debug("Validated token for user: {} with Email: {}.", user.getId(), currentPrincipalEmail);
         return user;
     }
 
@@ -191,6 +188,26 @@ public class UserService {
      */
     public void saveUserChanges(User user) {
         userRepository.save(user);
+    }
+
+
+    /**
+     * Find all users who have liked a given listing
+     *
+     * @param listing   The listing to find users for
+     * @return          List of users who have liked the listing
+     */
+    public List<User> findUsersByLikedListing(Listing listing) {
+        return userRepository.findAllByLikedListingId(listing.getId());
+    }
+
+    /**
+     * Remove all likes on users that reference a given listing
+     *
+     * @param listing   The listing to remove likes for
+     */
+    public void unlikePurchasedListing(Listing listing) {
+        userRepository.unlikePurchasedListingAllUsers(listing.getId());
     }
 
 }

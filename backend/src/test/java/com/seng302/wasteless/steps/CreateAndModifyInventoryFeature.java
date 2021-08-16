@@ -197,8 +197,6 @@ public class CreateAndModifyInventoryFeature {
     public void theUserCreatesAnInventoryEntryForBusinessWithProductQuantityAndExpiryDate(int businessId, String productId, int quantity, String expiry) throws Exception {
         String jsonInStringForRequest = String.format("{\"productId\": \"%s\", \"quantity\": %d, \"pricePerItem\": null, \"totalPrice\": null, \"manufactured\": null, \"sellBy\": null,\"bestBefore\": null,\"expires\": \"%s\"}", productId, quantity, expiry);
 
-        System.out.println(businessService.findBusinessById(businessId).getAdministrators());
-
         result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/businesses/%d/inventory", businessId))
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)

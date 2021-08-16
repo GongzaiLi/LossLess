@@ -51,7 +51,7 @@ public class ListingController {
 
     /**
      * Handle POST request to /businesses/{id}/listings endpoint for creating new listing for business
-     *
+     * <p>
      * Checks business with id from path exists
      * Checks user making request exists, and has privileges (admin of business, or (D)GAA)
      * Checks inventory with id exists
@@ -163,15 +163,15 @@ public class ListingController {
     /**
      * Handles endpoint to search for listings
      *
-     * @param searchQuery The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
-     * @param priceLower  Lower inclusive bound for listing prices
-     * @param priceUpper  Upper inclusive bound for listing prices
-     * @param businessName  Business name to match against listings
-     * @param businessTypes List of business types to match against listings
+     * @param searchQuery      The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param priceLower       Lower inclusive bound for listing prices
+     * @param priceUpper       Upper inclusive bound for listing prices
+     * @param businessName     Business name to match against listings
+     * @param businessTypes    List of business types to match against listings
      * @param closingDateStart A date string to filter listings with. This sets the start range to filter listings by closing date. String should be converted to date via Spring magic.
-     * @param closingDateEnd A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
-     * @param address     Address to match against suburb, city, and country of lister of listing
-     * @param pageable    pagination and sorting params
+     * @param closingDateEnd   A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param address          Address to match against suburb, city, and country of lister of listing
+     * @param pageable         pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
      */
     @GetMapping("/listings/search")
@@ -200,7 +200,7 @@ public class ListingController {
 
     /**
      * Handle PUT request to /listings/{listingId}/like endpoint for adding or removing like(s) on a listing
-     *
+     * <p>
      * Checks user is logged in
      * Checks listing with id exists
      * Checks if user already has liked listing:
@@ -221,9 +221,9 @@ public class ListingController {
         userService.saveUserChanges(user);
         Notification likedStatusNotification;
         if (Boolean.TRUE.equals(likeStatus)) {
-            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),NotificationType.LIKEDLISTING,String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
+            likedStatusNotification = notificationService.createNotification(user.getId(), listing.getId(), NotificationType.LIKEDLISTING, String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
         } else {
-            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),NotificationType.UNLIKEDLISTING,String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
+            likedStatusNotification = notificationService.createNotification(user.getId(), listing.getId(), NotificationType.UNLIKEDLISTING, String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
 
         }
         notificationService.saveNotification(likedStatusNotification);
@@ -235,6 +235,11 @@ public class ListingController {
     /**
      * Handles requests to the endpoint to purchase a listing
      *
+     * Notifies user they have purchased this listing
+     * Notifies all other users who had liked this listing that it has been purchased by someone else
+     *
+     *
+     * @param listingId The id of the listing being purchased
      * @return A 200 OK status if the listing is successfully purchased.
      * A 406 status if no listing exists with the given id
      */
@@ -242,7 +247,21 @@ public class ListingController {
     @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> purchaseListing(@PathVariable("id") Integer listingId) {
         var listing = listingsService.findFirstById(listingId);
-        listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
+
+        List<User> usersWhoLiked = userService.findUsersByLikedListing(listing);
+
+        var purchasedListing = listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
+
+        var purchaseNotification = notificationService.createNotification(userService.getCurrentlyLoggedInUser().getId(),
+                purchasedListing.getId(), NotificationType.PURCHASED_LISTING, String.format("You have purchased %s of the product %s",
+                purchasedListing.getQuantity(), purchasedListing.getProduct().getName()));
+
+        notificationService.saveNotification(purchaseNotification);
+
+        usersWhoLiked.remove(userService.getCurrentlyLoggedInUser());
+
+        notificationService.notifyAllUsers(usersWhoLiked, purchasedListing.getId(), NotificationType.LIKEDLISTING_PURCHASED,  String.format("The listing you liked of the product %s has been purchased by someone else", purchasedListing.getProduct().getName()));
+
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -286,7 +305,6 @@ public class ListingController {
         errors.put(constraintName, errorMsg);
         return errors;
     }
-
 
 
 }
