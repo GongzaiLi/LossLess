@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!listingLoading">
+  <div>
     <b-link variant="info" class="back-to-search-link" to="/listingSearch">
       <strong>
         <h4>
@@ -8,7 +8,7 @@
         </h4>
       </strong>
     </b-link>
-    <b-card class="listing_card shadow">
+    <b-card v-if="!listingLoading" class="listing_card shadow">
       <b-row>
         <div style="float:left; margin-right: 10px; margin-left: 20px">
           <b-carousel
@@ -87,7 +87,10 @@
           <b-container>
             <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
             <hr>
-            <label class="details-text"> <strong> Business Name: </strong> {{ listingItem.business.name }} </label>
+            <label class="details-text"> <strong> Business Name: </strong>
+              <router-link :to="'/businesses/'+listingItem.inventoryItem.businessId" >
+                {{ listingItem.business.name }} </router-link>
+              </label>
             <br>
             <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
           </b-container>
@@ -95,6 +98,10 @@
       </b-row>
     </b-card>
 
+    <b-card v-if="listingNotExists">
+      <b-card-title><b-icon-exclamation-triangle/> This Listing no longer exists</b-card-title>
+      There is no listing at this page. It may have already been purchased by another user, or deleted by the business owner.
+    </b-card>
   </div>
 </template>
 
@@ -183,6 +190,7 @@ export default {
       currency: {},
       imageError: "",
       listingLoading: true,
+      listingNotExists: false,
     }
   },
   async mounted() {
@@ -197,13 +205,22 @@ export default {
      *
      */
     async setListingData() {
+      this.listingNotExists = false;
+      this.listingLoading = true;
+
       const currentListingId = this.$route.params.id
-      const listingData = await Api.getListing(currentListingId)
-      this.listingItem = listingData.data
-      const address = this.listingItem.business.address;
-      this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-      this.currency = await Api.getUserCurrency(address.country);
-      this.listingLoading = false;
+      await Api.getListing(currentListingId)
+        .then(async listingData => {
+          this.listingItem = listingData.data
+
+          const address = this.listingItem.business.address;
+          this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+          this.currency = await Api.getUserCurrency(address.country);
+          this.listingLoading = false;
+        })
+        .catch(() => {
+          this.listingNotExists = true;
+        });
     },
 
 
@@ -242,7 +259,12 @@ export default {
         return "users like this listing"
       }
     }
+  },
 
+  watch: {
+    $route() {
+      this.setListingData();
+    }
   }
 }
 </script>

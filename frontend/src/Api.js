@@ -92,10 +92,15 @@ export default {
       closingDateStart: closingDateStart,
       closingDateEnd: closingDateEnd,
       address: businessLocation,
-      sort: sort,
       size: size,
       page: page
     });
+
+    for (const sortOrder of sort) {
+      params.append("sort", sortOrder);
+    }
+    params.append("sort", "id,asc");
+
     for (const type of businessTypes) {
       params.append("businessTypes", type);
     }

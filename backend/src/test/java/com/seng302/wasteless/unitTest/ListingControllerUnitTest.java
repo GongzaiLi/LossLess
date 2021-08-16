@@ -143,6 +143,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         listing = new Listing();
         listing.setInventoryItem(inventoryItemForListing)
                 .setBusiness(business)
+                .setId(1)
                 .setCreated(expiry.minusMonths(3))
                 .setQuantity(3)
                 .setPrice(17.99)
@@ -559,9 +560,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToPurchaseListings_andListingExists_then200Response() throws Exception {
+
         Mockito
                 .when(listingsService.findFirstById(1))
                 .thenReturn(listing);
+        Mockito
+                .when(listingsService.purchase(any(), any()))
+                .thenReturn(new PurchasedListing(listing, user));
+        Mockito
+                .when(notificationService.createNotification(any(), any(), any(), any()))
+                .thenReturn(new Notification());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
                 .contentType(APPLICATION_JSON))
