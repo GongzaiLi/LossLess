@@ -28,8 +28,8 @@ Date: 21/5/21
         <b-tab v-for="[section, sectionName] in sections" :key=section :title=sectionName>
           <marketplace-section
             :is-card-format="isCardFormat"
-            :cardsPerRow:="3"
-            :perPage="8"
+            :cardsPerRow="3"
+            :perPage="6"
             :section="section"
             :ref="section"
           />

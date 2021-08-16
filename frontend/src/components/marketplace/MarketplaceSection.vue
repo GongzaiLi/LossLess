@@ -12,7 +12,7 @@
         </b-col>
         <b-col md="2"><b-button @click="refreshData">Sort</b-button></b-col>
       </b-row>
-        <b-row cols-lg="4">
+        <b-row :cols-lg="cardsPerRow">
           <b-col v-for="(cardInfo, index) in cards" v-bind:key="index">
             <marketplace-card
                 :card-info="cardInfo"
@@ -97,6 +97,7 @@ export default {
   components: {pagination, MarketplaceCard, MarketplaceCardFull},
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
+    console.log(this.cardsPerRow);
     this.refreshData();
   },
   data: function () {
