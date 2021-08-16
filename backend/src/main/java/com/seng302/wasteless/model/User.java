@@ -173,12 +173,10 @@ public class User {
             this.unLikeListing(listing);
             likeStatus = Boolean.FALSE;
             logger.info("Listing: {} unliked by user: {}", listing.getId(), this.id);
-            listing.decrementUsersLiked();
         } else {
             this.addLikedListing(listing);
             likeStatus = Boolean.TRUE;
             logger.info("Listing: {} liked by user: {}", listing.getId(), this.id);
-            listing.incrementUsersLiked();
         }
         return likeStatus;
     }

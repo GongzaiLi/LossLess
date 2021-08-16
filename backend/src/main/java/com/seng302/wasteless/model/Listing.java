@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -70,21 +71,9 @@ public class Listing {
     @JsonView(ListingViews.GetListingView.class)
     private LocalDate closes;
 
-    @PositiveOrZero
-    @Column(name = "users_Liked")
     @JsonView(ListingViews.GetListingView.class)
-    private Integer usersLiked = 0;
-
-
-    /**
-     * Increments the likes on the listing by 1
-     */
-    public void incrementUsersLiked(){ this.usersLiked += 1; }
-
-    /**
-     * Decrements the likes on the listing by 1
-     */
-    public void decrementUsersLiked(){this.usersLiked -= 1;}
+    @Formula("(SELECT COUNT(*) FROM USER_LISTINGSLIKED ul WHERE ul.LISTINGSLIKED_ID=id)")
+    private Integer usersLiked;
 
     /**
      * Purchases this listing by decreasing the quantity of the listing's inventory item.

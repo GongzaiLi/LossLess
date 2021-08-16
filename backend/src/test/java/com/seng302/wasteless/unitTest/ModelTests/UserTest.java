@@ -42,7 +42,8 @@ class UserTest {
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
-                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1));
+                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1))
+                .setUsersLiked(0);
 
     }
 
@@ -50,7 +51,6 @@ class UserTest {
     void whenToggleListingLike_AndListingNotLiked_ReturnTrueLikeListingAndIncreaseTotalLikes() {
         Assertions.assertTrue(user.toggleListingLike(listing));
         Assertions.assertSame(listing, user.getListingsLiked().iterator().next());
-        Assertions.assertEquals(1, listing.getUsersLiked());
 
     }
 
@@ -62,7 +62,6 @@ class UserTest {
         user.setListingsLiked(listings);
         Assertions.assertFalse(user.toggleListingLike(listing));
         Assertions.assertEquals(0, user.getListingsLiked().size());
-        Assertions.assertEquals(0, listing.getUsersLiked());
 
     }
 
