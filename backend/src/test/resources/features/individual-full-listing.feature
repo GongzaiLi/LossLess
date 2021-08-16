@@ -14,6 +14,11 @@ Feature: U30 - Individual full sale listing
     When I like a listing with id "1"
     Then The listing with id "1" is added to the list of my liked listings and total likes on the listing are increased
 
+  Scenario: AC3 -  When i like a listing I receive a notification
+    Given I have not liked the listing with id "1"
+    When I like a listing with id "1"
+    Then A new notification is created for me telling me I liked the listing with id "1"
+
   Scenario: AC5 - I can like a listing at most once.
     Given I have liked the listing  with id "1"
     When I like a listing with id "1"
@@ -23,5 +28,10 @@ Feature: U30 - Individual full sale listing
     Given I have liked the listing  with id "1"
     When I like a listing with id "1"
     Then The listing with id "1" is no longer in the list of my liked listings and total likes on the listing are decreased
+
+  Scenario: AC6 - When I unlike a listing I receive a notification
+    Given I have liked the listing  with id "1"
+    When I like a listing with id "1"
+    Then A new notification is created for me telling me I unliked the listing with id "1"
 
 

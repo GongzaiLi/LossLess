@@ -6,6 +6,8 @@ import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
+import org.aspectj.weaver.ast.Not;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 
@@ -63,6 +64,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private ListingsService listingsService;
 
+    @MockBean
+    private NotificationService notificationService;
 
     private Business business;
 
@@ -71,6 +74,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private Listing listing;
 
     private List<Listing> listingList;
+
+    private List<Notification> notificationList;
 
     @BeforeAll
     static void beforeAll() {
@@ -262,12 +267,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         inventories.add(inventoryItemForListing3);
         inventories.add(inventoryItemForListing4);
 
+        notificationList= new ArrayList<>();
 
         Mockito
                 .when(inventoryService.searchInventoryFromBusinessId(anyInt(), any(), any()))
                 .thenReturn(inventories);
 
         new GetBusinessesDtoMapper(businessService, userService);
+
+        Mockito
+                .when(notificationService.createNotification(any(),any(),any(),any()))
+                .thenCallRealMethod();
+        Mockito
+                .when(notificationService.findAllNotificationsByUserId(anyInt()))
+                .thenReturn(notificationList);
+        Mockito
+                .when(notificationService.saveNotification(any(Notification.class)))
+                .thenAnswer((answer) -> {
+                    Notification notif = (Notification) answer.getArguments()[0];
+                    notificationList.add(notif);
+                    return  notif;
+                });
     }
 
     @Test
@@ -442,6 +462,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingNotAlreadyLiked_then200ResponseAndNotificationAdded() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Mockito.when(user.toggleListingLike(listing)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        Assertions.assertEquals(user.getId(),notificationList.get(0).getUserId());
+        Assertions.assertEquals(listing.getId(),notificationList.get(0).getSubjectId());
+        Assertions.assertEquals(NotificationType.LIKEDLISTING,notificationList.get(0).getType());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPutRequestToLikeAListing_andListingAlreadyLiked_then200Response() throws Exception {
         Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
         Set<Listing> set = new HashSet<>();
@@ -452,6 +485,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("liked", is(false)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingAlreadyLiked_then200ResponseAndNotificationAdded() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Set<Listing> set = new HashSet<>();
+        set.add(listing);
+        Mockito.when(user.getListingsLiked()).thenReturn(set);
+        user.toggleListingLike(listing);
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        Assertions.assertEquals(user.getId(),notificationList.get(0).getUserId());
+        Assertions.assertEquals(listing.getId(),notificationList.get(0).getSubjectId());
+        Assertions.assertEquals(NotificationType.UNLIKEDLISTING,notificationList.get(0).getType());
     }
 
     @Test

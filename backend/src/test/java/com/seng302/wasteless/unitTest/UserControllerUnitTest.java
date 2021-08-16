@@ -3,6 +3,7 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.AddressService;
@@ -54,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @BeforeEach
             void setUp() {
         Notification notification = new Notification();
-        notification.setType("Expired Marketplace Card");
+        notification.setType(NotificationType.EXPIRED);
         notification.setSubjectId(1);
         notification.setMessage(String.format("Your card has expired"));
         notification.setUserId(1);

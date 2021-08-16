@@ -27,11 +27,10 @@ public class Notification {
 
     @NotNull(message = "Type is mandatory")
     @Column(name = "type")
-    @Size(min = 0, max = 50)
-    private String type;
+    private NotificationType type;
 
     @Column(name = "message")
-    @Size(min = 0, max = 50)
+    @Size(min = 0, max = 250)
     private String message;
 
     @Column(name = "subjectId")
