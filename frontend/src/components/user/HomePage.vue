@@ -23,7 +23,7 @@
           Card View
         </b-form-text>
       </b-input-group>
-      <h2 style="text-align: center; margin-top: 2rem" v-if="!hasExpiredCards"> You have no cards the recently expired </h2>
+      <h2 style="text-align: center; margin-top: 2rem" v-if="!hasExpiredCards"> You have no cards that recently expired </h2>
       <marketplace-section
           v-else
           :is-card-format="isCardFormat"
