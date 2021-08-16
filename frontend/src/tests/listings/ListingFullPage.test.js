@@ -13,12 +13,6 @@ let mockListing;
 
 jest.mock('../../Api');
 
-const $refs = {
-    purchaseErrorModal: {
-        show() {}
-    }
-}
-
 beforeEach(() => {
     mockListing = {
         "id": 1,
@@ -57,10 +51,6 @@ beforeEach(() => {
         "closes": "2021-07-21T23:59:00Z"
     };
 
-jest.mock('../../Api');
-
-beforeEach(() => {
-
     const localVue = createLocalVue()
     localVue.use(BootstrapVue);
     localVue.use(BootstrapVueIcons);
@@ -79,8 +69,16 @@ beforeEach(() => {
 
     wrapper = shallowMount(ListingFullPage, {
         localVue,
-        mocks: {$refs},
-        router
+        router,
+        stubs: {
+            // Stub out modal component, as the actual component doesn't play nice with vue test utils
+            'b-modal': {
+                render: () => {},
+                methods: {
+                    show: jest.fn()
+                }
+            }
+        }
     });
 });
 
@@ -123,9 +121,6 @@ describe('Listing not exists message', () => {
         expect(wrapper.html()).toContain("This Listing no longer exists");
     })
 })
-    })
-
-})
 
 describe('Purchase Button', () => {
 
@@ -135,11 +130,11 @@ describe('Purchase Button', () => {
         expect(Api.purchaseListing).toHaveBeenCalled();
     });
 
-    test('a successful purchase routes to the home page', async () => {
+    test('a successful purchase shows success modal', async () => {
+        wrapper.vm.$bvModal.show = jest.fn();
         Api.purchaseListing.mockResolvedValue();
         await wrapper.vm.purchaseListingRequest();
-        expect($router.push).toHaveBeenCalled();
-
+        expect(wrapper.vm.$bvModal.show).toHaveBeenCalledWith("completedPurchaseModal");
     })
 
     test('check error message is displayed on 406 error', async () => {

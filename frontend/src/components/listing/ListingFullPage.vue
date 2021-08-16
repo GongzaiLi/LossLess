@@ -46,8 +46,8 @@
               <h2 style="float: left; margin-bottom: -5px">
                 {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
               </h2>
-              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy
-                <b-icon-bag-check/>
+              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="openConfirmPurchaseDialog">
+                Purchase <b-icon-bag-check/>
               </b-button>
             </template>
           </b-card>
@@ -94,24 +94,34 @@
           </b-container>
         </b-input-group-text>
       </b-row>
+
+      <b-modal ref="confirmPurchaseModal" size="sm" title="Confirm Purchase" ok-variant="success" ok-title="Purchase" @ok="purchaseListingRequest">
+        <h6>
+          Are you sure you want to <strong>purchase</strong> this listing?
+        </h6>
+      </b-modal>
+
+      <b-modal ref="purchaseErrorModal" size="sm" title="Purchase Error" ok-only no-close-on-backdrop no-close-on-esc ok-title="Ok" @ok="listingPageRedirect">
+        <h6>
+          {{ errMessage }}
+        </h6>
+      </b-modal>
+
+      <b-modal id="completedPurchaseModal" title="Purchase Successful"
+               cancel-variant="primary" cancel-title="Back to Search" @cancel="listingPageRedirect"
+               ok-variant="primary" ok-title="Go to Home Page" @ok="$router.push('/homepage')"
+               no-close-on-backdrop no-close-on-esc>
+        <h6>
+          You have successfully purchased listing: {{listingItem.inventoryItem.product.name}}.
+        </h6>
+          Further instructions for your purchase will be in a notification on your home page.
+      </b-modal>
     </b-card>
 
     <b-card v-if="listingNotExists">
       <b-card-title><b-icon-exclamation-triangle/> This Listing no longer exists</b-card-title>
       There is no listing at this page. It may have already been purchased by another user, or deleted by the business owner.
     </b-card>
-
-    <b-modal ref="confirmPurchaseModal" size="sm" title="Confirm Purchase" ok-variant="success" ok-title="Purchase" @ok="purchaseListingRequest">
-      <h6>
-        Are you sure you want to <strong>purchase</strong> this listing?
-      </h6>
-    </b-modal>
-    <b-modal ref="purchaseErrorModal" size="sm" title="Purchase Error" ok-only no-close-on-backdrop no-close-on-esc ok-title="Ok" @ok="listingPageRedirect">
-      <h6>
-        {{ errMessage }}
-      </h6>
-    </b-modal>
-
   </div>
 </template>
 
@@ -212,10 +222,11 @@ export default {
       imageError: "",
       listingLoading: true,
       listingNotExists: false,
+      errMessage: null,
     }
   },
   async mounted() {
-    await this.setListingData()
+    await this.setListingData();
   },
 
   methods: {
@@ -266,7 +277,7 @@ export default {
       await Api
           .purchaseListing(this.listingItem.id)
           .then(() => {
-            this.$router.push({path: `/homepage`});
+            this.$bvModal.show("completedPurchaseModal");
           })
           .catch((err) => {
             if (err.response.status === 406) {
