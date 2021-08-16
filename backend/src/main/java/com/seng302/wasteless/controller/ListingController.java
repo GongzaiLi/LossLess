@@ -1,8 +1,6 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.dto.GetCardDto;
-import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.GetListingsDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
@@ -24,12 +22,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
@@ -101,6 +98,7 @@ public class ListingController {
 
         listing.setBusiness(possibleBusiness);
         listing.setCreated(LocalDate.now());
+        listing.setUsersLiked(0);
 
         listing = listingsService.createListing(listing);
 
@@ -130,7 +128,6 @@ public class ListingController {
      * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/listings")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, Pageable pageable) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
 
@@ -139,12 +136,9 @@ public class ListingController {
         List<Listing> listings = listingsService.findBusinessListingsWithPageable(businessId, pageable);
 
         Long totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+        User user = userService.getCurrentlyLoggedInUser();
+        GetListingsDto getListingsDto = new GetListingsDto(listings, totalItems, user);
 
-        GetListingsDto getListingsDto = new GetListingsDto()
-                .setListings(listings.stream().map(GetListingDto::new).collect(Collectors.toList()))
-                .setTotalItems(totalItems);
-
-        logger.info("{}", getListingsDto);
         return ResponseEntity.status(HttpStatus.OK).body(getListingsDto);
     }
 
@@ -182,7 +176,6 @@ public class ListingController {
      * @return Http Status 200 if valid query, 401 if unauthorised
      */
     @GetMapping("/listings/search")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(
             @RequestParam Optional<String> searchQuery,
             @RequestParam Optional<Double> priceLower,
@@ -199,15 +192,8 @@ public class ListingController {
 
 
         Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address,closingDateStart, closingDateEnd, pageable);
-        List<GetListingDto> dtoListings = new ArrayList<>();
         User user = userService.getCurrentlyLoggedInUser();
-        for (Listing listing: listings.getContent()) {
-            GetListingDto dtoListing = new GetListingDto(listing, user.checkUserLikesListing(listing));
-            dtoListings.add(dtoListing);
-        }
-        GetListingsDto getListingsDto = new GetListingsDto()
-                .setListings(dtoListings)
-                .setTotalItems(listings.getTotalElements());
+        GetListingsDto getListingsDto = new GetListingsDto(listings.getContent(), listings.getTotalElements(), user);
         logger.info(getListingsDto);
         return ResponseEntity.status(HttpStatus.OK).body(getListingsDto);
     }

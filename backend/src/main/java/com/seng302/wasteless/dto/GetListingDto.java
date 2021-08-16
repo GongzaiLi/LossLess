@@ -1,5 +1,6 @@
 package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.Inventory;
 import com.seng302.wasteless.model.Listing;
 import lombok.Data;
@@ -16,9 +17,10 @@ import java.time.LocalDate;
 @ToString // generate a toString method
 public class GetListingDto {
     private Integer id;
+    private GetBusinessesDto business;
     private Inventory inventoryItem;
-    private int quantity;
-    private double price;
+    private Integer quantity;
+    private Double price;
     private String moreInfo;
     private LocalDate created;
     private LocalDate closes;
@@ -28,22 +30,11 @@ public class GetListingDto {
     /**
      * Creates a new DTO from a Listing entity
      * @param listing The Listing entity to create this DTO from
-     * @param user logged in user, so can add if that user likes this listing
+     * @param currentUserLikes boolean for if current user likes this listing
      */
-    public GetListingDto(Listing listing) {
-        setId(listing.getId());
-        setInventoryItem(listing.getInventoryItem());
-        setQuantity(listing.getQuantity());
-        setPrice(listing.getPrice());
-        setMoreInfo(listing.getMoreInfo());
-        setCreated(listing.getCreated());
-        setCloses(listing.getCloses());
-        setUsersLiked(listing.getUsersLiked());
-        setCurrentUserLikes(Boolean.FALSE);
-    }
-
     public GetListingDto(Listing listing, Boolean currentUserLikes) {
         setId(listing.getId());
+        setBusiness(GetBusinessesDtoMapper.toGetBusinessesDto(listing.getBusiness()));
         setInventoryItem(listing.getInventoryItem());
         setQuantity(listing.getQuantity());
         setPrice(listing.getPrice());

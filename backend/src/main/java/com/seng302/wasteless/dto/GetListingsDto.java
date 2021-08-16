@@ -1,15 +1,13 @@
 package com.seng302.wasteless.dto;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Listing;
-import com.seng302.wasteless.view.ListingViews;
+import com.seng302.wasteless.model.User;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Data transfer object for GetListing endpoint, used to return the correct data in the correct format.
@@ -20,20 +18,24 @@ import java.util.stream.Collectors;
 @ToString // generate a toString method
 public class GetListingsDto {
 
-    @JsonView(ListingViews.GetListingView.class)
     private List<GetListingDto> listings;
 
-    @JsonView(ListingViews.GetListingView.class)
     private Long totalItems;
 
-//    /**
-//     * Creates GetCardsDto from a single page (list/slice) of listings, and the total number of such listings.
-//     * @param listings A List representing a single page of listings
-//     * @param totalItems The total number of such listings *across all pages*.
-//     */
-//    public GetListingsDto(List<Listing> listings, Long totalItems) {
-//        this.listings = listings.stream().map(GetListingDto::new).collect(Collectors.toList());
-//        this.totalItems = totalItems;
-//    }
+    /**
+     * Creates GetCardsDto from a single page (list/slice) of listings, and the total number of such listings.
+     * @param listings A List representing a single page of listings
+     * @param totalItems The total number of such listings *across all pages*.
+     * @param user currently logged in user to check if they like listing
+     */
+    public GetListingsDto(List<Listing> listings, Long totalItems, User user) {
+        List<GetListingDto> dtoListings = new ArrayList<>();
+        for (Listing listing: listings) {
+            GetListingDto dtoListing = new GetListingDto(listing, user.checkUserLikesListing(listing));
+            dtoListings.add(dtoListing);
+        }
+        this.listings = dtoListings;
+        this.totalItems = totalItems;
+    }
 
 }
