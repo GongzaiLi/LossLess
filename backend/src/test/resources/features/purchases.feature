@@ -25,3 +25,13 @@ Feature: U31 - Purchases
     Given A listing exists with quantity 2 and its inventory item has quantity 2
     When I purchase that listing
     Then Information about the sale (sale date, listing date, product, amount, number of likes) is recorded in a sales history for the seller’s business.
+
+  Scenario: AC1:  When I purchase listing any other users who have liked the corresponding sale listing are notified.
+    Given A listing exists with 10 user who have liked it
+    When I purchase that listing
+    Then Notifications are created for the 10 users who have liked the listing that was purchased
+
+  Scenario: AC2:  When I purchase listing I receive a notification that I have purchased it
+    Given A listing exists with quantity 2 and its inventory item has quantity 2
+    When I purchase that listing
+    Then A notifications is created telling me I have purchased the listing
