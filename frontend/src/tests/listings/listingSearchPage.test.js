@@ -109,3 +109,24 @@ describe('Remove Tag ', () => {
     expect(wrapper.vm.search.selectedBusinessType).toStrictEqual(null);
   })
 });
+
+
+describe('Sort orders for API computed ', () => {
+  test('Correct value for location ascending ',  async() => {
+    wrapper.vm.search.sort = 'location,asc';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["business.address.country,asc", "business.address.city,asc", "business.address.suburb,asc"]);
+  })
+
+  test('Correct value for location descending',async () => {
+    wrapper.vm.search.sort = 'location,desc';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["business.address.country,desc", "business.address.city,desc", "business.address.suburb,desc"]);
+  })
+
+  test('Correct value for normal location', async() => {
+    wrapper.vm.search.sort = 'price,desc';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["price,desc"]);
+  })
+});

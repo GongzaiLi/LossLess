@@ -5,7 +5,7 @@
       <h1>Search Listings</h1>
       <hr>
 
-      <b-form @submit="getListings">
+      <b-form @submit="getListings(true)">
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
@@ -29,8 +29,8 @@
                 <option value="closes,desc">Listing Closes Later to Earlier</option>
                 <option value="inventoryItem.expires,asc">Expiry Date Earlier to Later</option>
                 <option value="inventoryItem.expires,desc">Expiry Date Later to Earlier</option>
-                <option value="business.address.country,asc">Location A to Z</option>
-                <option value="business.address.country,desc">Location A to Z</option>
+                <option value="location,asc">Location A to Z</option>
+                <option value="location,desc">Location Z to A</option>
               </b-select>
             </div>
           </b-col>
@@ -246,7 +246,11 @@ export default {
      * Also queries the currencies API to get currency info for each business (the API call is cached
      * so this should be fast).
      **/
-    getListings: async function () {
+    getListings: async function (newQuery=false) {
+      if (newQuery) {
+        this.currentPage = 0;
+      }
+      console.log(this.sortOrdersForAPI);
       const resp = (await Api.searchListings(
           this.search.productName,
           this.search.priceMin,
@@ -256,7 +260,7 @@ export default {
           this.search.businessLocation,
           this.search.closesStartDate,
           this.search.closesEndDate,
-          this.search.sort,
+          this.sortOrdersForAPI,
           this.perPage,
           this.currentPage - 1)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
       for (const listing of resp.listings) {
@@ -309,6 +313,23 @@ export default {
     }
   },
 
+  computed: {
+    /**
+     * Returns a list of sort orders that should be passed to the API call to search listings.
+     * This exists mainly because we need special sort orders for sorting by location (as we
+     * need to sort by country first, then city etc.)
+     */
+    sortOrdersForAPI() {
+      if (this.search.sort === 'location,asc') {
+        return ["business.address.country,asc", "business.address.city,asc", "business.address.suburb,asc"];
+      } else if (this.search.sort === 'location,desc') {
+        return ["business.address.country,desc", "business.address.city,desc", "business.address.suburb,desc"];
+      } else {
+        return [this.search.sort];
+      }
+    }
+  },
+
   watch: {
     /**
      * This watches for those routing changes, so when the search query param is changed (eg from the navbar)
@@ -316,7 +337,7 @@ export default {
      */
     $route(to) {
       this.search.productName = to.query.searchQuery || '';
-      this.getListings();
+      this.getListings(true);
       this.$refs.searchInput.focus();
     },
 
