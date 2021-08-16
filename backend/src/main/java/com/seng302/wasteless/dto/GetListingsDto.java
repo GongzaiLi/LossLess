@@ -23,7 +23,8 @@ public class GetListingsDto {
     private Long totalItems;
 
     /**
-     * Creates GetCardsDto from a single page (list/slice) of listings, and the total number of such listings.
+     * Creates GetListingsDto from a single page (list/slice) of listings, and the total number of such listings.
+     * Passes in whether user likes each listing
      * @param listings A List representing a single page of listings
      * @param totalItems The total number of such listings *across all pages*.
      * @param user currently logged in user to check if they like listing

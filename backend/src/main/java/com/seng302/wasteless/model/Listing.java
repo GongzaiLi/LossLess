@@ -77,7 +77,7 @@ public class Listing {
 
 
     /**
-     * Initialises the likes on the listing to 0 and increments the likes on the listing by 1
+     * Increments the likes on the listing by 1
      */
     public void incrementUsersLiked(){ this.usersLiked += 1; }
 

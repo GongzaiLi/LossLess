@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 /**
  * The DTO used to return data representing a single listing object.
- * Not DTO mapper is needed as the constructor takes care of everything.
+ * No DTO mapper is needed as the constructor takes care of everything.
  */
 @Accessors(chain = true) //Allows chaining of getters and setters
 @Data // generate setters and getters for all fields (lombok pre-processor)
