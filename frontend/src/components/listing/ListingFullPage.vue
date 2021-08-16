@@ -82,6 +82,11 @@
         Are you sure you want to <strong>purchase</strong> this listing?
       </h6>
     </b-modal>
+    <b-modal ref="purchaseErrorModal" size="sm" title="Purchase Error" ok-only no-close-on-backdrop no-close-on-esc ok-title="Ok" @ok="listingPageRedirect">
+      <h6>
+        {{ errorMessage }}
+      </h6>
+    </b-modal>
   </div>
 </template>
 
@@ -207,7 +212,8 @@ export default {
           }
         },
       },
-      imageError: ""
+      imageError: "",
+      errorMessage: ""
     }
   },
   methods: {
@@ -236,9 +242,21 @@ export default {
             this.$router.push({path: `/homepage`});
           })
           .catch((err) => {
-            console.log(err)
+            if (err.response.status === 406) {
+              this.errorMessage = "Someone else has already purchase this listing sorry."
+            } else {
+              this.errorMessage = err;
+            }
+            this.$refs.purchaseErrorModal.show();
           })
-    }
+    },
+
+    /**
+     * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
+     */
+    listingPageRedirect() {
+      this.$router.push({path: `/listingSearch`, query: { searchQuery: "" }});
+    },
 
   },
 
