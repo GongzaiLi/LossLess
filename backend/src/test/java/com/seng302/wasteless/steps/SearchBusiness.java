@@ -230,9 +230,9 @@ public class SearchBusiness {
     @Then("The {int} matching businesses are returned in ascending name order")
     public void the_matching_businesses_are_returned_in_ascending_name_order(Integer size) throws Exception {
         List<Object> businesses = JsonPath.read(responseResult.andReturn().getResponse().getContentAsString(), "$.businesses");
-        System.out.println(JsonPath.read(responseResult.andReturn().getResponse().getContentAsString(), "$.businesses").toString());
+
         for (int i = 0; i <= size; i++) {
-            System.out.println(JsonPath.read(businesses.get(1), "$.name").toString());
+
             Assertions.assertTrue(
                     JsonPath.read(businesses.get(i + 1), "$.name")
                             .toString()
