@@ -526,7 +526,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestToListings_andInvalidListingId_then200Response() throws Exception {
+    void whenGetRequestToListings_andInvalidListingId_thenBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/listings/%s", "badId"))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

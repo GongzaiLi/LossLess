@@ -150,7 +150,6 @@ public class ListingController {
      * @return Http Status 200 and the listing if valid, 401 if user is not logged in and 406 if invalid listing id
      */
     @GetMapping("/listings/{id}")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingWithId(@PathVariable("id") Integer listingId) {
         logger.info("Get request to GET a LISTING with id: {}", listingId);
         User user = userService.getCurrentlyLoggedInUser();
