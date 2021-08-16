@@ -51,11 +51,10 @@
               </b-button>
             </template>
           </b-card>
-          <div @click="likeListingRequest">
-            <b-icon-heart class="like-icon" v-if="!listingItem.currentUserLikes" ></b-icon-heart>
-            <b-icon-heart-fill class="like-icon" variant="danger" v-else></b-icon-heart-fill>
-          </div>
-          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }} {{getLikeString}}</h6>
+          <b-icon-heart class="like-icon" v-if="!listingItem.currentUserLikes" @click="likeListing"></b-icon-heart>
+          <b-icon-heart-fill class="like-icon" variant="danger" v-else @click="dislikeListing"></b-icon-heart-fill>
+          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }}
+            {{ getLikeString }}</h6>
         </div>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
@@ -88,9 +87,10 @@
             <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
             <hr>
             <label class="details-text"> <strong> Business Name: </strong>
-              <router-link :to="'/businesses/'+listingItem.inventoryItem.businessId" >
-                {{ listingItem.business.name }} </router-link>
-              </label>
+              <router-link :to="'/businesses/'+listingItem.inventoryItem.businessId">
+                {{ listingItem.business.name }}
+              </router-link>
+            </label>
             <br>
             <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
           </b-container>
@@ -99,8 +99,12 @@
     </b-card>
 
     <b-card v-if="listingNotExists">
-      <b-card-title><b-icon-exclamation-triangle/> This Listing no longer exists</b-card-title>
-      There is no listing at this page. It may have already been purchased by another user, or deleted by the business owner.
+      <b-card-title>
+        <b-icon-exclamation-triangle/>
+        This Listing no longer exists
+      </b-card-title>
+      There is no listing at this page. It may have already been purchased by another user, or deleted by the business
+      owner.
     </b-card>
   </div>
 </template>
@@ -188,9 +192,10 @@ export default {
       listingItem: {},
       address: {},
       currency: {},
-      imageError: "",
       listingLoading: true,
       listingNotExists: false,
+      error: "",
+      errorFlag: false
     }
   },
   async mounted() {
@@ -202,7 +207,6 @@ export default {
     /**
      * Gets the listing data for the current listing by making an api request.
      * Also formats the business address into a single string of address.
-     *
      */
     async setListingData() {
       this.listingNotExists = false;
@@ -210,17 +214,17 @@ export default {
 
       const currentListingId = this.$route.params.id
       await Api.getListing(currentListingId)
-        .then(async listingData => {
-          this.listingItem = listingData.data
+          .then(async listingData => {
+            this.listingItem = listingData.data
 
-          const address = this.listingItem.business.address;
-          this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-          this.currency = await Api.getUserCurrency(address.country);
-          this.listingLoading = false;
-        })
-        .catch(() => {
-          this.listingNotExists = true;
-        });
+            const address = this.listingItem.business.address;
+            this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+            this.currency = await Api.getUserCurrency(address.country);
+            this.listingLoading = false;
+          })
+          .catch(() => {
+            this.listingNotExists = true;
+          });
     },
 
 
@@ -232,17 +236,41 @@ export default {
     },
 
     /**
+     * Method that gets called when like icon is pressed
+     * Sets the currentUserLikes to true and increments value of usersLiked
+     */
+    async likeListing() {
+      await this.callLikeRequest();
+      if (!this.errorFlag) {
+        this.listingItem.currentUserLikes = true;
+        this.listingItem.usersLiked++;
+      }
+    },
+
+    /**
+     * Method that gets called when unlike icon is pressed
+     * Sets the currentUserLikes to false and decrements value of usersLiked
+     */
+    async dislikeListing() {
+      await this.callLikeRequest();
+      if (!this.errorFlag) {
+        this.listingItem.currentUserLikes = false;
+        this.listingItem.usersLiked--;
+      }
+    },
+
+    /**
      * Uses Api.js to send a likeListing put request.
      * It sends the current Id of the listing to the Api request
      */
-    async likeListingRequest() {
+    async callLikeRequest() {
       try {
         await Api.likeListing(this.$route.params.id)
-        const res = await Api.getListing(this.$route.params.id)
-        this.listingItem = res.data
-        console.log(this.listingItem)
+        this.errorFlag = false
       } catch (error) {
         console.log(error)
+        this.error = error
+        this.errorFlag = true
       }
     }
   },
@@ -254,7 +282,7 @@ export default {
      */
     getLikeString() {
       if (this.listingItem.usersLiked === 1) {
-        return  "user likes this listing"
+        return "user likes this listing"
       } else {
         return "users like this listing"
       }
