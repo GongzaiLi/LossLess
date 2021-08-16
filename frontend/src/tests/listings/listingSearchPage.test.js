@@ -39,13 +39,13 @@ describe('Route watcher', () => {
   test('re-queries data when route query changed', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`, query: {searchQuery: 'blackwaternosugar'}});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 9, -1);
+    expect(Api.searchListings).toHaveBeenLastCalledWith("blackwaternosugar", "", "", "", [], "", "2021-08-12", "", ["inventoryItem.product.name,asc"], 9, -1);
   });
 
   test('re-queries all listings data when query not exists', async () => {
     await wrapper.vm.$router.replace({path: `/listingSearch`});
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 9, -1);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", ["inventoryItem.product.name,asc"], 9, -1);
   });
 });
 
@@ -63,7 +63,7 @@ describe('Testing watcher for current page change', () => {
   test('check-get-listings-is-called-when-current-page-updated', async () => {
     wrapper.vm.currentPage = 3
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", "inventoryItem.product.name,asc", 9, 2);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", ["inventoryItem.product.name,asc"], 9, 2);
   });
 
 });
@@ -107,5 +107,26 @@ describe('Remove Tag ', () => {
     wrapper.vm.removeTag("Accommodation and Food Services");
     expect(wrapper.vm.search.businessTypes).toStrictEqual([]);
     expect(wrapper.vm.search.selectedBusinessType).toStrictEqual(null);
+  })
+});
+
+
+describe('Sort orders for API computed ', () => {
+  test('Correct value for location ascending ',  async() => {
+    wrapper.vm.search.sort = 'location,asc';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["business.address.country,asc", "business.address.city,asc", "business.address.suburb,asc"]);
+  })
+
+  test('Correct value for location descending',async () => {
+    wrapper.vm.search.sort = 'location,desc';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["business.address.country,desc", "business.address.city,desc", "business.address.suburb,desc"]);
+  })
+
+  test('Correct value for normal location', async() => {
+    wrapper.vm.search.sort = 'price,desc';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["price,desc"]);
   })
 });
