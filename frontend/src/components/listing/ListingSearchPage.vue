@@ -124,29 +124,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
-          <b-card class="b_card_listing shadow-sm" @click="goToListingPage(listing.id)">
-            <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
-
-            <hr>
-            <b-card-sub-title>
-              Product Expires: {{ listing.inventoryItem.expires }}
-            </b-card-sub-title>
-            <div v-if="listing.inventoryItem.product.images.length">
-              <img class="product-image" :src="getPrimaryImage(listing)" alt="Failed to load image">
-            </div>
-            <div v-if="!listing.inventoryItem.product.images.length">
-              <img class="product-image" src="product_default.png" alt="Product has no image">
-            </div>
-            <hr>
-            <h5><strong>Seller: {{ listing.business.name }}</strong></h5>
-            <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>
-            <span>Closes: {{ listing.closes }}</span>
-            <template #footer>
-              <h5 class="listing_price" v-if="listing.business.currency">
-                {{ listing.business.currency.symbol }}{{ listing.price }} {{listing.business.currency.code}}
-              </h5>
-            </template>
-          </b-card>
+          <partial-listing-card :listing="listing"></partial-listing-card>
         </b-col>
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
@@ -180,32 +158,19 @@
   max-width: 7rem
 }
 
-.b_card_listing {
-  min-width: 17rem;
-  height: 100%;
-}
-
-.b_card_listing:hover {
-  -webkit-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
-  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.18) !important;
-  cursor: pointer;
-}
-
-.listing_price {
-  float: right;
-}
-
 </style>
 
 <script>
 import pagination from "../model/Pagination";
 import Api from "../../Api";
 import {getToday} from "../../util";
+import PartialListingCard from "./PartialListingCard";
 
 export default {
 
   name: "ListingsSearchPage",
   components: {
+    PartialListingCard,
     pagination,
   },
   data: function () {
@@ -243,8 +208,6 @@ export default {
   methods: {
     /**
      * Sends API request to get all the listings with the search parameters stored in this component.
-     * Also queries the currencies API to get currency info for each business (the API call is cached
-     * so this should be fast).
      **/
     getListings: async function () {
       const resp = (await Api.searchListings(
@@ -259,29 +222,8 @@ export default {
           this.search.sort,
           this.perPage,
           this.currentPage - 1)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
-      for (const listing of resp.listings) {
-        listing.business.currency = await Api.getUserCurrency(listing.business.address.country);
-      }
       this.listings = resp.listings;
       this.totalResults = resp.totalItems;
-    },
-
-    /**
-     * Takes a listing as input and returns the primary image for that listing
-     * @return image      The image of the listing
-     * @param listing     The listing to get the image of
-     **/
-    getPrimaryImage: function (listing) {
-      const primaryImageFileName = listing.inventoryItem.product.primaryImage.fileName;
-      return Api.getImage(primaryImageFileName);
-    },
-
-    /**
-     * Redirects to the full listing page when a listing card is clicked on the browse/search listings page.
-     * @param id The listing id that is displayed on the full listing page.
-     */
-    goToListingPage(id) {
-      this.$router.push(`/listing/${id}`);
     },
 
     /**
