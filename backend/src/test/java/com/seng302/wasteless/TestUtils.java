@@ -79,6 +79,7 @@ public class TestUtils {
         newListing.setPrice(price);
         newListing.setCloses(closes);
         newListing.setCreated(LocalDate.now());
+        newListing.setUsersLiked(0);
         newListing = listingsService.createListing(newListing);
 
         return newListing;
