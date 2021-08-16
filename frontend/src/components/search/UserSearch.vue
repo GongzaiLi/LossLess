@@ -11,7 +11,7 @@ Date: 7/3/2021
                       placeholder="Search users"></b-form-input>
       </b-col>
       <b-col cols="0">
-        <b-button @click="displayResults(searchQuery)"> Search</b-button>
+        <b-button variant="primary" @click="displayResults(searchQuery)"> Search</b-button>
       </b-col>
     </b-row>
     <b-row>
