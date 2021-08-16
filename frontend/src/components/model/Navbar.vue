@@ -330,7 +330,7 @@ export default {
      */
     async updateNotifications() {
       this.expiringCards = (await api.getExpiringCards(this.$currentUser.id)).data;
-      this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
+      this.notifications = (await api.getNotifications()).data;
     },
 
     hoverLogo() {
