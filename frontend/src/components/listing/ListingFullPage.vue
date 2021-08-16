@@ -51,9 +51,11 @@
               </b-button>
             </template>
           </b-card>
-          <b-icon-star class="like-icon" v-if="!userLikedListing"></b-icon-star>
-          <b-icon-star-fill class="like-icon" variant="warning" v-else></b-icon-star-fill>
-          <h6 v-if="listingItem.usersLiked" style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }} {{getLikeString}}</h6>
+          <div @click="likeListingRequest">
+            <b-icon-heart class="like-icon" v-if="!listingItem.currentUserLikes" ></b-icon-heart>
+            <b-icon-heart-fill class="like-icon" variant="danger" v-else></b-icon-heart-fill>
+          </div>
+          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }} {{getLikeString}}</h6>
         </div>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
@@ -175,7 +177,6 @@ export default {
   name: "listing-full",
   data() {
     return {
-      userLikedListing: false,
       slideNumber: 0,
       listingItem: {},
       address: {},
@@ -196,16 +197,13 @@ export default {
      *
      */
     async setListingData() {
-
       const currentListingId = this.$route.params.id
       const listingData = await Api.getListing(currentListingId)
       this.listingItem = listingData.data
-
       const address = this.listingItem.business.address;
       this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
       this.currency = await Api.getUserCurrency(address.country);
       this.listingLoading = false;
-
     },
 
 
@@ -214,6 +212,21 @@ export default {
      */
     getURL(imageFileName) {
       return Api.getImage(imageFileName);
+    },
+
+    /**
+     * Uses Api.js to send a likeListing put request.
+     * It sends the current Id of the listing to the Api request
+     */
+    async likeListingRequest() {
+      try {
+        await Api.likeListing(this.$route.params.id)
+        const res = await Api.getListing(this.$route.params.id)
+        this.listingItem = res.data
+        console.log(this.listingItem)
+      } catch (error) {
+        console.log(error)
+      }
     }
   },
 

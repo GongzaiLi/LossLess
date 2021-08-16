@@ -49,6 +49,7 @@ const mockListing = {
     },
     "usersLiked": 1,
     "price": 5.99,
+    "currentUserLikes": false,
     "created": "2000-07-14T11:44:00Z",
     "closes": "2021-07-21T23:59:00Z"
 }
@@ -70,11 +71,11 @@ beforeEach(() => {
     localVue.use(BootstrapVueIcons);
 
     Api.getUserCurrency.mockResolvedValue(
-      {
-        symbol: '$',
-          code: 'USD',
-          name: 'US Dollar'
-    });
+        {
+            symbol: '$',
+            code: 'USD',
+            name: 'US Dollar'
+        });
     Api.getBusiness.mockResolvedValue({data: {"address": {"country": "New Zealand"}}});
     Api.getListing.mockResolvedValue({data: mockListing});
 
@@ -108,7 +109,6 @@ describe('Testing listing data is set using params or api request', () => {
         await wrapper.vm.setListingData();
         await wrapper.vm.$forceUpdate();
         expect(wrapper.vm.getLikeString).toBe("user likes this listing");
-
 
 
     })
@@ -157,8 +157,13 @@ describe('Testing listing data is set using params or api request', () => {
         await wrapper.vm.$forceUpdate();
         expect(wrapper.vm.getLikeString).toBe("users like this listing");
 
-
-
     })
+})
 
+describe('Testing liking functionality', () => {
+    test('', async () => {
+        Api.likeListing.mockResolvedValue();
+        await wrapper.vm.likeListingRequest();
+        expect(Api.likeListing).toHaveBeenCalled();
+    })
 })
