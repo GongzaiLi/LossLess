@@ -59,6 +59,7 @@ export default {
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials: true}),
   getListings: (businessId, count, offset, sortBy, sortDirection) => instance.get(`/businesses/${businessId}/listings?size=${count}&page=${offset}&sort=${sortBy},${sortDirection}`, {withCredentials: true}),
   purchaseListing: (listingId) => instance.post(`/listings/${listingId}/purchase`, null, {withCredentials: true}),
+  getListing: (listingId) => instance.get(`/listings/${listingId}`, {withCredentials: true}),
   getImage: (imageName) => {
     return `${SERVER_URL}/images?filename=${imageName}`
   },

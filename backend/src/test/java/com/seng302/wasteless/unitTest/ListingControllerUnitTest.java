@@ -2,9 +2,12 @@ package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.dto.PostListingsDto;
+import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
+import org.aspectj.weaver.ast.Not;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,6 +64,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @MockBean
     private ListingsService listingsService;
 
+    @MockBean
+    private NotificationService notificationService;
+
     private Business business;
 
     private User user;
@@ -68,6 +74,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     private Listing listing;
 
     private List<Listing> listingList;
+
+    private List<Notification> notificationList;
 
     @BeforeAll
     static void beforeAll() {
@@ -125,10 +133,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setProduct(productForInventory);
 
 
+        business = mock(Business.class);
+        business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
+        business.setId(1);
+        business.setAdministrators(new ArrayList<>());
+        business.setName("Jimmy's clown store");
 
 
         listing = new Listing();
         listing.setInventoryItem(inventoryItemForListing)
+                .setBusiness(business)
                 .setCreated(expiry.minusMonths(3))
                 .setQuantity(3)
                 .setPrice(17.99)
@@ -139,6 +153,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         listingList = new ArrayList<>();
         listingList.add(
                 listing = new Listing()
+                        .setBusiness(business)
                         .setInventoryItem(inventoryItemForListing2)
                 .setCreated(expiry.minusMonths(3))
                 .setQuantity(3)
@@ -148,6 +163,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         listingList.add(
                 listing = new Listing()
+                        .setBusiness(business)
                         .setInventoryItem(inventoryItemForListing3)
                         .setCreated(expiry.minusMonths(3))
                         .setQuantity(3)
@@ -157,6 +173,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         listingList.add(
                 listing = new Listing()
+                        .setBusiness(business)
                         .setInventoryItem(inventoryItemForListing4)
                         .setCreated(expiry.minusMonths(3))
                         .setQuantity(3)
@@ -170,11 +187,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
 
-        business = mock(Business.class);
-        business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
-        business.setId(1);
-        business.setAdministrators(new ArrayList<>());
-        business.setName("Jimmy's clown store");
+
 
         Product product = new Product();
         product.setId("Clown-Shows");
@@ -235,10 +248,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         doReturn(product).when(productService).findProductById(null);
 
 
+        doReturn(new ArrayList<>()).when(business).getAdministrators();
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
+        doReturn(LocalDate.MIN).when(business).getCreated();
         doReturn(true).when(user).checkUserGlobalAdmin();
+        doReturn(UserRoles.USER).when(user).getRole();
 
 
         Mockito
@@ -251,10 +267,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         inventories.add(inventoryItemForListing3);
         inventories.add(inventoryItemForListing4);
 
+        notificationList= new ArrayList<>();
 
         Mockito
                 .when(inventoryService.searchInventoryFromBusinessId(anyInt(), any(), any()))
                 .thenReturn(inventories);
+
+        new GetBusinessesDtoMapper(businessService, userService);
+
+        Mockito
+                .when(notificationService.createNotification(any(),any(),any(),any()))
+                .thenCallRealMethod();
+        Mockito
+                .when(notificationService.findAllNotificationsByUserId(anyInt()))
+                .thenReturn(notificationList);
+        Mockito
+                .when(notificationService.saveNotification(any(Notification.class)))
+                .thenAnswer((answer) -> {
+                    Notification notif = (Notification) answer.getArguments()[0];
+                    notificationList.add(notif);
+                    return  notif;
+                });
     }
 
     @Test
@@ -429,6 +462,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingNotAlreadyLiked_then200ResponseAndNotificationAdded() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Mockito.when(user.toggleListingLike(listing)).thenReturn(true);
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        Assertions.assertEquals(user.getId(),notificationList.get(0).getUserId());
+        Assertions.assertEquals(listing.getId(),notificationList.get(0).getSubjectId());
+        Assertions.assertEquals(NotificationType.LIKEDLISTING,notificationList.get(0).getType());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPutRequestToLikeAListing_andListingAlreadyLiked_then200Response() throws Exception {
         Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
         Set<Listing> set = new HashSet<>();
@@ -439,6 +485,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("liked", is(false)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenPutRequestToLikeAListing_andListingAlreadyLiked_then200ResponseAndNotificationAdded() throws Exception {
+        Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
+        Set<Listing> set = new HashSet<>();
+        set.add(listing);
+        Mockito.when(user.getListingsLiked()).thenReturn(set);
+        user.toggleListingLike(listing);
+        mockMvc.perform(MockMvcRequestBuilders.put("/listings/1/like")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        Assertions.assertEquals(user.getId(),notificationList.get(0).getUserId());
+        Assertions.assertEquals(listing.getId(),notificationList.get(0).getSubjectId());
+        Assertions.assertEquals(NotificationType.UNLIKEDLISTING,notificationList.get(0).getType());
     }
 
     @Test
