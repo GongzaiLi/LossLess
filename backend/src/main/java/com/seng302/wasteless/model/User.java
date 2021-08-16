@@ -1,12 +1,5 @@
 package com.seng302.wasteless.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
@@ -15,6 +8,12 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An implementation of User model.

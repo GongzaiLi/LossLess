@@ -16,6 +16,7 @@ jest.mock('../../Api');
 beforeEach(() => {
     mockListing = {
         "id": 1,
+        "businessId": 1,
         "inventoryItem": {
             "id": 101,
             "product": {
@@ -98,9 +99,7 @@ describe('Testing listing data is set using params or api request', () => {
         await wrapper.vm.$forceUpdate();
         expect(wrapper.vm.getLikeString).toBe("users like this listing");
     })
-
 })
-
 
 describe('Listing not exists message', () => {
 
