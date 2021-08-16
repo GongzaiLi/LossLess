@@ -29,6 +29,12 @@ const $currentUser = {
     },
 };
 
+const $refs = {
+    purchaseErrorModal: {
+        show() {}
+    }
+}
+
 
 jest.mock('../../Api');
 
@@ -47,7 +53,7 @@ beforeEach(() => {
     wrapper = shallowMount(ListingFullPage, {
         localVue,
         propsData: {},
-        mocks: {$route, $log, $currentUser, $router},
+        mocks: {$route, $log, $currentUser, $router, $refs},
     });
 });
 
@@ -56,17 +62,27 @@ afterEach(() => {
 });
 
 describe('Purchase Button', () => {
-    Api.purchaseListing.mockResolvedValue();
 
     test('the purchase button function calls the api request', async () => {
+        Api.purchaseListing.mockResolvedValue();
         await wrapper.vm.purchaseListingRequest();
         expect(Api.purchaseListing).toHaveBeenCalled();
     });
 
     test('a successful purchase routes to the home page', async () => {
+        Api.purchaseListing.mockResolvedValue();
         await wrapper.vm.purchaseListingRequest();
         expect($router.push).toHaveBeenCalled();
 
     })
+
+    test('check error message is displayed on 406 error', async () => {
+        Api.purchaseListing.mockRejectedValue({response: {status: 406}})
+        wrapper.vm.openErrorModal = jest.fn();
+        await wrapper.vm.purchaseListingRequest();
+        expect(wrapper.vm.openErrorModal).toHaveBeenCalled();
+        expect(wrapper.vm.errMessage).toStrictEqual("Someone else has already purchase this listing sorry.")
+
+    });
 });
 

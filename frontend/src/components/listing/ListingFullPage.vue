@@ -84,7 +84,7 @@
     </b-modal>
     <b-modal ref="purchaseErrorModal" size="sm" title="Purchase Error" ok-only no-close-on-backdrop no-close-on-esc ok-title="Ok" @ok="listingPageRedirect">
       <h6>
-        {{ errorMessage }}
+        {{ errMessage }}
       </h6>
     </b-modal>
   </div>
@@ -213,7 +213,7 @@ export default {
         },
       },
       imageError: "",
-      errorMessage: ""
+      errMessage: ""
     }
   },
   methods: {
@@ -243,11 +243,11 @@ export default {
           })
           .catch((err) => {
             if (err.response.status === 406) {
-              this.errorMessage = "Someone else has already purchase this listing sorry."
+              this.errMessage = "Someone else has already purchase this listing sorry."
             } else {
-              this.errorMessage = err;
+              this.errMessage = err;
             }
-            this.$refs.purchaseErrorModal.show();
+          this.openErrorModal()
           })
     },
 
@@ -257,6 +257,13 @@ export default {
     listingPageRedirect() {
       this.$router.push({path: `/listingSearch`, query: { searchQuery: "" }});
     },
+
+    /**
+     * Opens the error modal
+     */
+    openErrorModal() {
+      this.$refs.purchaseErrorModal.show();
+    }
 
   },
 
