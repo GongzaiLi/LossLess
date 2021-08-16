@@ -5,8 +5,6 @@ import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.NotificationRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +15,6 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
-    private static final Logger logger = LogManager.getLogger(com.seng302.wasteless.service.NotificationService.class.getName());
 
     @Autowired
     public NotificationService(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }

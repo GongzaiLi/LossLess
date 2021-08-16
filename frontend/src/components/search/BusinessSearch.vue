@@ -3,21 +3,21 @@ Page that stores table and search bar to search for businesses
 -->
 <template>
   <b-card style="max-width: 1200px">
-    <b-row style="height: 50px">
-      <b-col cols="6">
+    <b-row>
+      <b-col md="6" class="mb-3">
         <b-input-group prepend="Name:">
           <b-form-input v-model="searchQuery" @keyup.enter="searchBusinessApiRequest(searchQuery)" type="search"
                         placeholder="Search businesses"></b-form-input>
         </b-input-group>
 
       </b-col>
-      <b-col md="4">
+      <b-col md="4" sm="12" class="mb-3">
         <b-input-group prepend="Type:">
           <b-form-select v-model="businessType" :options="businessTypeOptions" id="marketplaceSortBySelect"></b-form-select>
         </b-input-group>
       </b-col>
-      <b-col cols="1">
-        <b-button  @click="searchBusinessApiRequest(searchQuery, businessType)"> Search </b-button>
+      <b-col md="1" class="mb-3">
+        <b-button variant="primary" @click="searchBusinessApiRequest(searchQuery, businessType)"> Search </b-button>
       </b-col>
     </b-row>
     <b-row>
@@ -25,7 +25,7 @@ Page that stores table and search bar to search for businesses
         <b-table striped hover
                  ref="searchTable"
                  table-class="text-nowrap"
-                 responsive
+                 :responsive="true"
                  no-border-collapse
                  bordered
                  no-local-sorting
@@ -135,6 +135,7 @@ export default {
      *
      * @param businessType The type of business to search for
      * @param searchParameter is the inputted search
+     * @param businessType type of business to search for
      */
     searchBusinessApiRequest: function (searchParameter, businessType) {
       api
