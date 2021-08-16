@@ -5,10 +5,7 @@ import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.InventoryService;
-import com.seng302.wasteless.service.ListingsService;
-import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.service.*;
 import com.seng302.wasteless.view.ListingViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -43,14 +40,16 @@ public class ListingController {
     private final UserService userService;
     private final InventoryService inventoryService;
     private final ListingsService listingsService;
+    private final NotificationService notificationService;
 
 
     @Autowired
-    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService) {
+    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService, NotificationService notificationService) {
         this.businessService = businessService;
         this.userService = userService;
         this.inventoryService = inventoryService;
         this.listingsService = listingsService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -67,19 +66,15 @@ public class ListingController {
      */
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
-        logger.info("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
+        logger.info("Post request to create business LISTING, business id: {}", businessId);
 
         User user = userService.getCurrentlyLoggedInUser();
 
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-
-        logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);
-        logger.info("Retrieved `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
 
         if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
@@ -118,8 +113,7 @@ public class ListingController {
             logger.info("Inventory item quantity value was updated when this listing was created.");
         }
 
-
-        logger.info("Created new Listing {}", listing);
+        logger.info("Created new Listing with Id {}", listing.getId());
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("listingId", listing.getId());
@@ -139,10 +133,7 @@ public class ListingController {
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, Pageable pageable) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
 
-        logger.debug("Retrieving business with id: {}", businessId);
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+        businessService.findBusinessById(businessId);
 
         List<Listing> listings = listingsService.findBusinessListingsWithPageable(businessId, pageable);
 
@@ -238,6 +229,14 @@ public class ListingController {
         Boolean likeStatus = user.toggleListingLike(listing);
         listingsService.updateListing(listing);
         userService.saveUserChanges(user);
+        Notification likedStatusNotification;
+        if (Boolean.TRUE.equals(likeStatus)) {
+            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),NotificationType.LIKEDLISTING,String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
+        } else {
+            likedStatusNotification = notificationService.createNotification(user.getId(),listing.getId(),NotificationType.UNLIKEDLISTING,String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
+
+        }
+        notificationService.saveNotification(likedStatusNotification);
         JSONObject responseBody = new JSONObject();
         responseBody.put("liked", likeStatus);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
