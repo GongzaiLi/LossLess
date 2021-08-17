@@ -199,7 +199,7 @@ export default {
     this.$refs.searchInput.focus();
 
     this.search.productName = this.$route.query.searchQuery || "";
-    const queryObject = this.$route.query.secret;
+    const queryObject = this.$route.query.queryHistory;
     if (queryObject && Object.keys(queryObject).length !== 0 && queryObject.constructor === Object) {
       this.search = queryObject;
     }
@@ -277,15 +277,6 @@ export default {
   },
 
   watch: {
-    /**
-     * This watches for those routing changes, so when the search query param is changed (eg from the navbar)
-     * then the search query is re-sent
-     */
-    $route(to) {
-      this.search.productName = to.query.searchQuery || '';
-      this.getListings(true);
-      this.$refs.searchInput.focus();
-    },
 
     '$data.currentPage': {
       handler: function() {
