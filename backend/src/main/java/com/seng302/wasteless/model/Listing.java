@@ -72,7 +72,7 @@ public class Listing {
     private LocalDate closes;
 
     @JsonView(ListingViews.GetListingView.class)
-    @Formula("(SELECT COUNT(*) FROM USER_LISTINGSLIKED ul WHERE ul.LISTINGSLIKED_ID=id)")
+    @Formula("(select count(*) from User_listingsLiked ul where ul.listingsLiked_id=id)")
     private Integer usersLiked;
 
     /**
