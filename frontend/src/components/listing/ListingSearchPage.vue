@@ -125,9 +125,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
-          <div @click="$router.push(`/listings/${listing.id}`)">
-            <partial-listing-card :listing="listing" ></partial-listing-card>
-          </div>
+          <partial-listing-card :listing="listing"></partial-listing-card>
         </b-col>
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
