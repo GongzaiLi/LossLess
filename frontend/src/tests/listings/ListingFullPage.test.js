@@ -13,6 +13,12 @@ let mockListing;
 
 jest.mock('../../Api');
 
+const $currentUser = {
+    role: 'user',
+    currentlyActingAs: {
+        id: 0
+    }}
+
 beforeEach(() => {
     mockListing = {
         "id": 1,
@@ -70,6 +76,7 @@ beforeEach(() => {
     wrapper = shallowMount(ListingFullPage, {
         localVue,
         router,
+        mocks: {$currentUser},
         stubs: {
             // Stub out modal component, as the actual component doesn't play nice with vue test utils
             'b-modal': {
