@@ -155,7 +155,10 @@
   max-width: 60rem;
   margin-left: auto;
   margin-right: auto;
+}
 
+.modal-header .close {
+  display: none;
 }
 
 @media only screen and (min-width: 1250px) {
