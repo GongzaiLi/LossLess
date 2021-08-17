@@ -97,7 +97,6 @@ export default {
   components: {pagination, MarketplaceCard, MarketplaceCardFull},
   props: ["isCardFormat", "cardsPerRow", "perPage", "section"],
   mounted() {
-    console.log(this.cardsPerRow);
     this.refreshData();
   },
   data: function () {
@@ -138,6 +137,16 @@ export default {
           label: "Location",
           sortable: true
         },
+        {
+          key: 'created',
+          label: "created",
+          sortable: true,
+          formatter: (value) => {
+            const date = new Date(value).toUTCString();
+            return date.split(" ").slice(1, 5).join(" ");
+          },
+        }
+
       ]
     }
   },
