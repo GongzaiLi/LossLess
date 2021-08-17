@@ -253,14 +253,6 @@ describe('Act as business', () => {
   })
 });
 
-describe('Get expiring cards', () => {
-  test('cards expiring within 24 hours get added to notifications', async () => {
-    await wrapper.vm.updateNotifications();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numberOfNotifications).toBe(2);
-  })
-});
-
 describe("Listing search ", () => {
   test('reloads if query is the name', async () => {
     $route.name = 'listings-search';
