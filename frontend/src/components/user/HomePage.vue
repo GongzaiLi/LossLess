@@ -10,9 +10,6 @@
       <h4>Profile page</h4>
     </router-link>
   </b-card>
-
-
-
     <b-row>
     <b-col md="7">
     <b-card v-if="!$currentUser.currentlyActingAs" class="expired-cards mt-3 shadow">
@@ -45,9 +42,7 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-
-
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
           <h6> {{notification.type}} </h6>
           <hr>
           <div v-if="notification.type === 'Expired Marketplace Card'">
@@ -93,6 +88,8 @@
 
 .notification-cards {
   margin-top: 20px;
+  cursor: pointer;
+
 }
 
 </style>
@@ -171,6 +168,17 @@ export default {
         }
       }
     },
+
+    /**
+     * Performs an action based on the notification that has been clicked.
+     * When a liked or unliked listing is clicked it routes you to that listing
+     * @param notification the notification that has been clicked
+     */
+    notificationClicked(notification) {
+          this.$router.push('/listings/' + notification.subjectId);
+    },
+
+
 
     /**
      * Updates the purchase listing notification with the product data
