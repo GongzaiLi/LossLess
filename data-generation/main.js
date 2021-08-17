@@ -31,6 +31,7 @@ const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 const MAX_CARD_PER_USER = 5;
 const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS)/2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
+const LISTING_ID_OF_MAX_LIKED_LISTING = 1;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -162,10 +163,29 @@ async function getBusinesses() {
   return businesses;
 }
 
+/**
+ * likes listings for non business owning users
+ * all non business users like a specific listing to load test that listing
+ * then a percentage of these users like a random amount of random listings
+ * some users may unlike the high load listing but this is good for notifications of unliking
+ * @param instance for sending api requests
+ * @returns {Promise<void>}
+ */
 async function likeListings(instance) {
-  if (Math.random() < PROB_USER_LIKES_LISTINGS) {
+    try {
+        await instance.put(`${SERVER_URL}/listings/${LISTING_ID_OF_MAX_LIKED_LISTING}/like`, null, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+            }
+        });
+    } catch(e) {
+        console.log(`Tried to like listing Id ${LISTING_ID_OF_MAX_LIKED_LISTING} for max liked listing, but listing does not exist.`);
+        console.log(`Error message was: ${e}`)
+    }
+    if (Math.random() < PROB_USER_LIKES_LISTINGS) {
     for (let i = 0; i <= Math.random() * MAX_LIKED_LISTINGS_PER_USER; i++) {
-      const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS);
+      const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
       try {
         await instance.put(`${SERVER_URL}/listings/${listingId}/like`, null, {
           withCredentials: true,
@@ -239,17 +259,19 @@ async function registerUsers(users, businesses) {
 
   for (let i=0; i < users.length / MAX_USERS_PER_API_REQUEST; i++) {
     const promises = []
-    for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
-      if (businessesRegistered < NUM_BUSINESSES) {
-        let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
-        if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
-          numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
+    if (businessesRegistered < NUM_BUSINESSES) {
+        for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
+            let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
+            if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
+              numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
+            }
+            promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
+            businessesRegistered += numBusinessesForUser;
         }
-        promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
-        businessesRegistered += numBusinessesForUser;
-      } else {
-        promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
-      }
+    } else {
+        for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
+            promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
+        }
     }
     try {
       await Promise.all(promises);

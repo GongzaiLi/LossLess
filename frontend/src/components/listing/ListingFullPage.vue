@@ -46,8 +46,8 @@
               <h2 style="float: left; margin-bottom: -5px">
                 {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
               </h2>
-              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"> Buy
-                <b-icon-bag-check/>
+              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="openConfirmPurchaseDialog">
+                Purchase <b-icon-bag-check/>
               </b-button>
             </template>
           </b-card>
@@ -96,6 +96,28 @@
           </b-container>
         </b-input-group-text>
       </b-row>
+
+      <b-modal ref="confirmPurchaseModal" size="sm" title="Confirm Purchase" ok-variant="success" ok-title="Purchase" @ok="purchaseListingRequest">
+        <h6>
+          Are you sure you want to <strong>purchase</strong> this listing?
+        </h6>
+      </b-modal>
+
+      <b-modal ref="purchaseErrorModal" size="sm" title="Purchase Error" ok-only no-close-on-backdrop no-close-on-esc ok-title="Ok" @ok="listingPageRedirect">
+        <h6>
+          {{ errMessage }}
+        </h6>
+      </b-modal>
+
+      <b-modal id="completedPurchaseModal" title="Purchase Successful"
+               cancel-variant="primary" cancel-title="Back to Search" @cancel="listingPageRedirect"
+               ok-variant="primary" ok-title="Go to Home Page" @ok="$router.push('/homepage')"
+               no-close-on-backdrop no-close-on-esc>
+        <h6>
+          You have successfully purchased listing: {{listingItem.inventoryItem.product.name}}.
+        </h6>
+          Further instructions for your purchase will be in a notification on your home page.
+      </b-modal>
     </b-card>
 
     <b-card v-if="listingNotExists">
@@ -110,6 +132,15 @@
 </template>
 
 <style>
+
+.listing-title {
+  text-align: center;
+  font-size: 24px;
+  max-width: 25rem;
+  word-wrap: break-word;
+  white-space: normal;
+  height: 3rem
+}
 
 .listing_card {
   max-width: 60rem;
@@ -156,6 +187,7 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   max-width: 25rem;
+  max-font-size: 10px;
 }
 
 .like-icon {
@@ -196,11 +228,12 @@ export default {
       listingLoading: true,
       listingNotExists: false,
       error: "",
-      errorFlag: false
+      errorFlag: false,
+      errMessage: null,
     }
   },
   async mounted() {
-    await this.setListingData()
+    await this.setListingData();
   },
 
   methods: {
@@ -274,7 +307,48 @@ export default {
         this.error = error
         this.errorFlag = true
       }
+    },
+
+    /**
+     * Opens the dialog to confirm the purchase
+     */
+    openConfirmPurchaseDialog: function() {
+      this.$refs.confirmPurchaseModal.show();
+    },
+
+    /**
+     * Sends an api request to notify the backend that a user has tried to purchase a listing.
+     */
+    async purchaseListingRequest() {
+      await Api
+          .purchaseListing(this.listingItem.id)
+          .then(() => {
+            this.$bvModal.show("completedPurchaseModal");
+          })
+          .catch((err) => {
+            if (err.response.status === 406) {
+              this.errMessage = "Someone else has already purchase this listing sorry."
+            } else {
+              this.errMessage = err;
+            }
+          this.openErrorModal()
+          })
+    },
+
+    /**
+     * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
+     */
+    listingPageRedirect() {
+      this.$router.push({path: `/listingSearch`, query: { searchQuery: "" }});
+    },
+
+    /**
+     * Opens the error modal
+     */
+    openErrorModal() {
+      this.$refs.purchaseErrorModal.show();
     }
+
   },
 
   computed: {

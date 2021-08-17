@@ -58,8 +58,8 @@ export default {
   modifyInventory: (businessId, inventoryId, editInventoryData) => instance.put(`/businesses/${businessId}/inventory/${inventoryId}`, editInventoryData, {withCredentials: true}),
   createListing: (businessId, listing) => instance.post(`businesses/${businessId}/listings`, listing, {withCredentials: true}),
   getListings: (businessId, count, offset, sortBy, sortDirection) => instance.get(`/businesses/${businessId}/listings?size=${count}&page=${offset}&sort=${sortBy},${sortDirection}`, {withCredentials: true}),
+  purchaseListing: (listingId) => instance.post(`/listings/${listingId}/purchase`, null, {withCredentials: true}),
   getListing: (listingId) => instance.get(`/listings/${listingId}`, {withCredentials: true}),
-
   getImage: (imageName) => {
     return `${SERVER_URL}/images?filename=${imageName}`
   },
@@ -78,7 +78,7 @@ export default {
   },
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
-  getExpiringCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
+  getExpiredCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
   getNotifications: () => instance.get(`/users/notifications`, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),

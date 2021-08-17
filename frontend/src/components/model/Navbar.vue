@@ -330,8 +330,8 @@ export default {
      *  This is done by adding the expiring card to the list of notifications.
      */
     async updateNotifications() {
-      this.expiringCards = (await api.getExpiringCards(this.$currentUser.id)).data;
-      this.notifications = (await api.getNotifications()).data;
+      this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
+      this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
     },
 
     hoverLogo() {

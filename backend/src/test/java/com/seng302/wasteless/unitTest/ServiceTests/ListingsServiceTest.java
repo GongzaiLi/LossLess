@@ -295,7 +295,6 @@ class ListingsServiceTest {
     void whenPurchaseListing_andListingHasOneLike_thenLikeRecordedInPurchaseListingRecord() {
         var listing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Yoonique", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10),
                 5, 5);
-        listing.incrementUsersLiked();
 
         PurchasedListing purchasedListing = listingsService.purchase(listing, curUser);
 
