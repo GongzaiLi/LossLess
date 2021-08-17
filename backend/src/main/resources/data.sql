@@ -60,6 +60,46 @@ VALUES (1, '2022-02-27', '2021-03-20', '10% discount!', 2.25, 2, 3);
 INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
 values ('2021-08-02 11:30:53.523531',
         'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-17 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-18 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-17 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-18 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-17 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-18 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-17 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-18 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-17 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
+        '2021-08-18 11:30:53.523531', 0, 'Sugar Grinder', 1);
+INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
+values ('2021-08-02 11:30:53.523531',
+        'A nice long description, a nice long description, a nice long description, a nice long description',
         '2021-08-16 11:30:53.523531', 0, 'Sugar Grinder', 1);
 INSERT INTO Card (created, description, displayperiodend, section, title, creator_id)
 values ('2021-08-02 11:30:53.523585', 'A great quality machine for all your confectinary producing needs',
