@@ -78,7 +78,7 @@
           <h6><strong>Name*:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" maxlength="50" v-bind:disabled=disabled v-model="productCard.name" required/>
+          <b-form-input type="text" maxlength="38" v-bind:disabled=disabled v-model="productCard.name" required/>
         </b-input-group>
 
         <b-input-group>
