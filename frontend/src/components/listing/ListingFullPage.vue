@@ -182,6 +182,7 @@
 
 <script>
 import Api from "../../Api";
+import EventBus from "../../util/event-bus"
 
 
 export default {
@@ -266,6 +267,7 @@ export default {
     async callLikeRequest() {
       try {
         await Api.likeListing(this.$route.params.id)
+        EventBus.$emit('notificationUpdate')
         this.errorFlag = false
       } catch (error) {
         console.log(error)
