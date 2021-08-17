@@ -32,11 +32,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "select * from User where id = (select administrators_id from Business_administrators where business_id = :businessId and administrators_id = :userId)", nativeQuery = true)
     User findUserContainBusinessIdAndContainAdminId(@Param("businessId") Integer businessId, @Param("userId") Integer userId);
 
-    @Query(value = "select * from User where id in (select user_id from user_listingsliked where ListingsLiked_id = :listingId)", nativeQuery = true)
+    @Query(value = "select * from User where id in (select User_id from User_listingsLiked where listingsLiked_id = :listingId)", nativeQuery = true)
     List<User> findAllByLikedListingId(@Param("listingId") Integer likedListingId);
 
     @Transactional //Describes a transaction attribute on an individual method or on a class.
     @Modifying //Indicates a query method should be considered as modifying query
-    @Query(value = "delete from user_listingsliked where ListingsLiked_id = :listingId", nativeQuery = true)
+    @Query(value = "delete from User_listingsLiked where listingsLiked_id = :listingId", nativeQuery = true)
     void unlikePurchasedListingAllUsers(@Param("listingId") Integer likedListingId);
 }

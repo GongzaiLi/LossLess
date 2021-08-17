@@ -62,29 +62,7 @@ Date: sprint_1
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto dropdown-menu-end">
-        <b-nav-item-dropdown right class="notifications-tray" v-if="isActingAsUser">
-          <template #button-content>
-            <div class="icon mr-1">
-              <b-icon v-if="numberOfNotifications"  icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
-              <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
-              <span v-if="numberOfNotifications" style="position: absolute; transform: translateY(5px); color: red">
-                {{numberOfNotifications}}
-              </span>
-            </div>
-          </template>
-          <b-dropdown-item disabled>
-            <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
-          </b-dropdown-item>
-          <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
-            <h6> Marketplace Card: {{card.title}}</h6>
-            <strong>expires within 24 hours</strong>
-          </b-dropdown-item>
-          <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
-            <h6> {{notification.type}} </h6>
-            <span>{{ notification.message }}</span>
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
-
+        <NotificationDropdown/>
         <b-nav-item-dropdown right>
           <template #button-content>
             <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
@@ -160,7 +138,8 @@ Date: sprint_1
 
 <script>
 import {setCurrentlyActingAs} from '../../auth'
-import api from "../../Api"
+import NotificationDropdown from "./NotificationDropdown";
+
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -169,14 +148,12 @@ import api from "../../Api"
  */
 export default {
   name: "Navbar.vue",
+  components: {
+    NotificationDropdown
+  },
   data() {
     return {
-      clicked: false,
-      showNotifications: false,
       cards: [],
-      notifications: [],
-      expiringCards: [],
-      numExpiredCards:0,
       timer: null,
       searchQuery: '',
     }
@@ -244,14 +221,6 @@ export default {
         default:
           return "";
       }
-    },
-
-    /**
-     * Checks if there are notifications about expiring or expired cards.
-     * @return The number of total notifications
-     */
-    numberOfNotifications: function () {
-      return this.expiringCards.length + this.notifications.length;
     },
   },
   methods: {
@@ -321,28 +290,15 @@ export default {
       this.$router.push(`/users/${this.$currentUser.id}`);
     },
 
-    /**
-     *  Adds a notification about a card that expires within next 24 hours.
-     *  This is done by adding the expiring card to the list of notifications.
-     */
-    async updateNotifications() {
-      this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
-      this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
-    },
-
     hoverLogo() {
       this.timer = setTimeout(() => {this.$bvToast.show('my-toast')}, 10000);
     },
+
     hoverLogoLeave() {
       if (this.timer) {
         clearTimeout(this.timer);
       }
     }
-  },
-
-  created() {
-    this.updateNotifications();
-    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 }
 </script>

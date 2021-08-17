@@ -110,6 +110,7 @@ export default {
         params: params,
       })
   },
+  likeListing: (listingId) => instance.put(`/listings/${listingId}/like`, {}, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images

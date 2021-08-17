@@ -26,10 +26,10 @@
 
       <b-input-group-text>
         <b-container>
-          <h6> <strong> Seller Info: </strong></h6>
-          <label> Seller Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
+          <h6> <strong> Creator Info: </strong></h6>
+          <label> Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
           <br>
-          <label> Seller Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
+          <label> Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
         </b-container>
       </b-input-group-text>
       <br>

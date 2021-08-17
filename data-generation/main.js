@@ -19,11 +19,11 @@ const HAS_MIDDLE_NAME_PROB = 4 / 10;
 const PROB_USER_LIKES_LISTINGS = 0.5;
 const MAX_LIKED_LISTINGS_PER_USER = 10;
 
-const NUM_BUSINESSES = 100;
+const NUM_BUSINESSES = 10;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
-const MAX_PRODUCTS_PER_BUSINESS = 100;
-const MIN_PRODUCTS_PER_BUSINESS = 20;
+const MAX_PRODUCTS_PER_BUSINESS = 40;
+const MIN_PRODUCTS_PER_BUSINESS = 10;
 const MAX_PRODUCT_PRICE = 50;
 const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
 const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
@@ -32,6 +32,8 @@ const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 const MAX_CARD_PER_USER = 5;
 const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS)/2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
 const LISTING_ID_OF_MAX_LIKED_LISTING = 1;
+const MAX_PURCHASES_PER_USER = 3;
+const PROB_USER_PURCHASES_LISTING = 0.03;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -193,18 +195,49 @@ async function likeListings(instance) {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
         });
-      } catch(e) {
-        console.log(`Tried to like listing Id ${listingId} but did not exist. This may happen a few times during data gen, but something may be broken if this happens a lot`);
-        console.log(`Error message was: ${e}`)
+      } catch(err) {
+          if (err.response.status !== 406) {
+            console.log(err)
+        }
       }
     }
   }
 }
 
 /**
+ * Uses axios to make an api called to our backend purchase endpoint,
+ * purchases will only begin being made once all listings have been created,
+ * each user can like up to a maximum number of listings with a specific probability
+ * of liking a listing each time.
+ *
+ * @param instance for sending api requests
+ * @returns {Promise<void>}
+ */
+async function purchaseListing(instance){
+
+    for (let i = 0; i <= Math.random() * MAX_PURCHASES_PER_USER; i++) {
+        if (Math.random() < PROB_USER_PURCHASES_LISTING) {
+            const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
+            try {
+                await instance.post(`${SERVER_URL}/listings/${listingId}/purchase`, null, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+                    }
+                });
+            } catch(err) {
+                if (err.response.status !== 406) {
+                    console.log(err)
+                }
+            }
+        }
+    }
+}
+
+/**
  * Uses axios to make a post request to our backend to create a new user.
  */
-async function registerUser(user, preventLikeListings=false) {
+async function registerUser(user, listingsReady=true) {
     const instance = Axios.create({
         baseURL: SERVER_URL,
         timeout: 180000,// set 2 mins
@@ -219,7 +252,8 @@ async function registerUser(user, preventLikeListings=false) {
     instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
     await addCard(instance);
-    if (!preventLikeListings) await likeListings(instance);
+    if (listingsReady) await likeListings(instance);
+    if (listingsReady) await purchaseListing(instance);
     return [response, instance];
 }
 
@@ -227,7 +261,7 @@ async function registerUser(user, preventLikeListings=false) {
  * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
  */
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
-    const [response, instance] = await registerUser(user, true);
+    const [response, instance] = await registerUser(user, false);
     for (let i = 0; i < numBusinesses; i++) {
         const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
         await addProduct(businessResponse.data.businessId, instance, businesses[i]);
