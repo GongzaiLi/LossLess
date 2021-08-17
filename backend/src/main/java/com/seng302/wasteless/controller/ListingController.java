@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.GetListingsDto;
 import com.seng302.wasteless.dto.GetPurchasedListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
@@ -158,14 +159,16 @@ public class ListingController {
      * @return Http Status 200 and the listing if valid, 401 if user is not logged in and 406 if invalid listing id
      */
     @GetMapping("/listings/{id}")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingWithId(@PathVariable("id") Integer listingId) {
         logger.info("Get request to GET a LISTING with id: {}", listingId);
-        userService.getCurrentlyLoggedInUser();
+        User user = userService.getCurrentlyLoggedInUser();
         Listing listing = listingsService.findFirstById(listingId);
-        logger.info("Retrieved listing with ID: {}", listingId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(listing);
+        GetListingDto dtoListing = new GetListingDto(listing, user.checkUserLikesListing(listing));
+
+        logger.info("Retrieved listing with ID: {}", dtoListing);
+
+        return ResponseEntity.status(HttpStatus.OK).body(dtoListing);
     }
 
 

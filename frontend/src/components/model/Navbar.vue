@@ -160,6 +160,7 @@ Date: sprint_1
 <script>
 import {setCurrentlyActingAs} from '../../auth'
 import api from "../../Api"
+import EventBus from "../../util/event-bus"
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
  * Will not be shown if is current in the login or register routes. This is done by checking
@@ -347,5 +348,12 @@ export default {
     this.updateNotifications();
     this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
+
+  mounted() {
+    /**
+     * This mount listens to the notificationUpdate event
+     */
+    EventBus.$on('notificationUpdate', this.updateNotifications)
+  }
 }
 </script>
