@@ -10,6 +10,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
@@ -23,11 +24,15 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.IMAGE_PNG;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -185,7 +190,7 @@ public class ProductImagesFeature {
     public void upload_an_image_with_a_name_in_the_product_with_id(String imageName, String productId) throws Exception {
         String imageType;
         if (Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageName.split("\\.")[1])) {
-            imageType = "image/" + imageName.split("\\.")[1];
+            imageType = "*/" + imageName.split("\\.")[1];
         } else {
             imageType = "text/plain";
         }
@@ -199,7 +204,7 @@ public class ProductImagesFeature {
                 MockMvcRequestBuilders.multipart(String.format("/businesses/%d/products/%s/images", business.getId(), productId))
                         .file(image)
                         .with(user(currentUserDetails))
-                        .with(csrf()));
+                        .with(csrf()));;
 
         product = productService.findProductById(productId);
     }
@@ -243,7 +248,7 @@ public class ProductImagesFeature {
         String[] imageNames = {imageName1, imageName2, imageName3, imageName4};
 
         for (String imageName : imageNames) {
-            String imageType = "image/" + imageName.split("\\.")[1];
+            String imageType = "*/" + imageName.split("\\.")[1];
             File file = new File("src/test/java/com/seng302/wasteless/steps/resources/test.png");
             FileInputStream inputImage = new FileInputStream(file);
 
@@ -253,7 +258,7 @@ public class ProductImagesFeature {
                     MockMvcRequestBuilders.multipart(String.format("/businesses/%d/products/%s/images", business.getId(), productId))
                             .file(image)
                             .with(user(currentUserDetails))
-                            .with(csrf()));
+                            .with(csrf())).andExpect(status().isCreated());;
         }
 
         product = productService.findProductById(productId);
@@ -342,23 +347,29 @@ public class ProductImagesFeature {
     public void delete_all_images_in_the_product_with_id(String productId) throws Exception {
         Assertions.assertEquals(productId, product.getId());
 
-        for (ProductImage productImage : product.getImages()) {
-            Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(productImage.getId())));
-            mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/businesses/%d/products/%s/images/%d", business.getId(), productId, productImage.getId()))
+        Set<ProductImage> productImages = product.getImages();
+
+        while (productImages.size() > 0) {
+            Integer id = productImages.stream().findFirst().get().getId();
+            Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(id)));
+            mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/businesses/%d/products/%s/images/%d", business.getId(), productId, id))
                     .contentType(APPLICATION_JSON)
                     .with(user(currentUserDetails))
                     .with(csrf()))
                     .andExpect(status().isOk());
             product = productService.findProductById(productId);
-            Assertions.assertTrue(product.getImages().stream().noneMatch(image -> image.getId().equals(productImage.getId())));
+            Assertions.assertTrue(product.getImages().stream().noneMatch(image -> image.getId().equals(id)));
+            productImages = product.getImages();
         }
+
 
     }
 
 
     @Then("The current primary image is this product's image will be empty")
-    public void the_current_primary_image_is_this_product_s_image_id() {
+    public void the_current_primary_image_is_this_product_s_image_id() throws IOException {
         Assertions.assertNull(product.getPrimaryImage());
+        FileUtils.deleteDirectory(new File("./media"));
     }
 
 }

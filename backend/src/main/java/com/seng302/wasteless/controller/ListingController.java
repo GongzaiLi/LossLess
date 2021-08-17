@@ -1,12 +1,15 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.dto.GetListingDto;
 import com.seng302.wasteless.dto.GetListingsDto;
+import com.seng302.wasteless.dto.GetPurchasedListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
 import com.seng302.wasteless.view.ListingViews;
+import com.seng302.wasteless.view.PurchasedListingView;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,15 +41,22 @@ public class ListingController {
     private final InventoryService inventoryService;
     private final ListingsService listingsService;
     private final NotificationService notificationService;
+    private final PurchasedListingService purchasedListingService;
 
 
     @Autowired
-    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService, NotificationService notificationService) {
+    public ListingController(BusinessService businessService,
+                             UserService userService,
+                             InventoryService inventoryService,
+                             ListingsService listingsService,
+                             PurchasedListingService purchasedListingService,
+                             NotificationService notificationService) {
         this.businessService = businessService;
         this.userService = userService;
         this.inventoryService = inventoryService;
         this.listingsService = listingsService;
         this.notificationService = notificationService;
+        this.purchasedListingService = purchasedListingService;
     }
 
     /**
@@ -149,14 +159,16 @@ public class ListingController {
      * @return Http Status 200 and the listing if valid, 401 if user is not logged in and 406 if invalid listing id
      */
     @GetMapping("/listings/{id}")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingWithId(@PathVariable("id") Integer listingId) {
         logger.info("Get request to GET a LISTING with id: {}", listingId);
-        userService.getCurrentlyLoggedInUser();
+        User user = userService.getCurrentlyLoggedInUser();
         Listing listing = listingsService.findFirstById(listingId);
-        logger.info("Retrieved listing with ID: {}", listingId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(listing);
+        GetListingDto dtoListing = new GetListingDto(listing, user.checkUserLikesListing(listing));
+
+        logger.info("Retrieved listing with ID: {}", dtoListing);
+
+        return ResponseEntity.status(HttpStatus.OK).body(dtoListing);
     }
 
 
@@ -244,9 +256,10 @@ public class ListingController {
      * A 406 status if no listing exists with the given id
      */
     @PostMapping("/listings/{id}/purchase")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> purchaseListing(@PathVariable("id") Integer listingId) {
         var listing = listingsService.findFirstById(listingId);
+
+        logger.info("Retrieved listing with ID: {}", listingId);
 
         List<User> usersWhoLiked = userService.findUsersByLikedListing(listing);
 
@@ -262,8 +275,36 @@ public class ListingController {
 
         notificationService.notifyAllUsers(usersWhoLiked, purchasedListing.getId(), NotificationType.LIKEDLISTING_PURCHASED,  String.format("The listing you liked of the product %s has been purchased by someone else", purchasedListing.getProduct().getName()));
 
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+    /**
+     * Handles requests to the endpoint to get a purchased listing
+     *
+     * @param purchaseId    The id of the listing being purchased
+     * @return              A 200 OK status if the listing is successfully purchased and a purchased entity
+     *                      A 400 status if purchase Id not exist
+     *                      A 403 status if login user is not a purchaser or UserAdminOfBusiness Or GAA
+     */
+    @GetMapping("/purchase/{id}")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
+    public ResponseEntity<Object> getPurchaseListing(@PathVariable("id") Integer purchaseId) {
+        var purchasedListing = purchasedListingService.findPurchasedListingById(purchaseId);
+
+        logger.info("Retrieved Purchase Listing with ID: {}", purchaseId);
+        if (purchasedListing == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("purchase Id does not exist.");
+        }
+
+        var loginUser = userService.getCurrentlyLoggedInUser();
+
+        if (!purchasedListing.getPurchaser().getId().equals(loginUser.getId()) && Boolean.FALSE.equals(businessService.checkUserAdminOfBusinessOrGAA(purchasedListing.getBusiness(), loginUser))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+
+        GetPurchasedListingDto getPurchasedListingDto = new GetPurchasedListingDto(purchasedListing);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getPurchasedListingDto);
     }
 
     /**

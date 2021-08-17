@@ -5,7 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 /**
  * An implementation of User model.
@@ -35,5 +37,8 @@ public class Notification {
 
     @Column(name = "subjectId")
     private Integer subjectId;
+
+    @Column(name = "created")
+    private LocalDateTime created;
 }
 

@@ -13,6 +13,12 @@ let mockListing;
 
 jest.mock('../../Api');
 
+const $currentUser = {
+    role: 'user',
+    currentlyActingAs: {
+        id: 0
+    }}
+
 beforeEach(() => {
     mockListing = {
         "id": 1,
@@ -70,6 +76,7 @@ beforeEach(() => {
     wrapper = shallowMount(ListingFullPage, {
         localVue,
         router,
+        mocks: {$currentUser},
         stubs: {
             // Stub out modal component, as the actual component doesn't play nice with vue test utils
             'b-modal': {
@@ -147,3 +154,29 @@ describe('Purchase Button', () => {
     });
 });
 
+
+
+describe('Testing method calls API request', () => {
+    test('Testing likeListing to be 200 successful', async () => {
+        Api.likeListing.mockResolvedValue();
+        await wrapper.vm.callLikeRequest();
+        expect(Api.likeListing).toHaveBeenCalled();
+    })
+})
+
+
+describe('Testing like and dislike functionality', () => {
+    test('likeListing method increments usersLiked and changes currentUserLikes to true', async () => {
+        await wrapper.vm.likeListing();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.listingItem.usersLiked).toStrictEqual(2);
+        expect(wrapper.vm.listingItem.currentUserLikes).toStrictEqual(true);
+    })
+
+    test('likeListing method decrements usersLiked and changes currentUserLikes to true', async () => {
+        await wrapper.vm.dislikeListing();
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.listingItem.usersLiked).toStrictEqual(0);
+        expect(wrapper.vm.listingItem.currentUserLikes).toStrictEqual(false);
+    })
+})

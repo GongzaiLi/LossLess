@@ -1,12 +1,14 @@
 package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.ListingController;
+import com.seng302.wasteless.dto.GetPurchasedListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
 import org.aspectj.weaver.ast.Not;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -66,6 +69,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @MockBean
     private NotificationService notificationService;
+
+    @MockBean
+    private PurchasedListingService purchasedListingService;
 
     private Business business;
 
@@ -527,7 +533,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetRequestToListings_andInvalidListingId_then200Response() throws Exception {
+    void whenGetRequestToListings_andInvalidListingId_thenBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(String.format("/listings/%s", "badId"))
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -573,7 +579,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -587,5 +593,183 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToPurchaseListings_andPurchaseListingsIdExists_then200Response() throws Exception {
+        PurchasedListing purchasedListing  = new PurchasedListing();
+        purchasedListing.setId(1);
+        purchasedListing.setBusiness(business);
+        purchasedListing.setPurchaser(user);
+        purchasedListing.setListingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setPrice(1.0);
+        purchasedListing.setNumberOfLikes(1);
+        purchasedListing.setQuantity(1);
+        purchasedListing.setSaleDate(LocalDate.now());
+
+        Mockito
+                .when(purchasedListingService.findPurchasedListingById(anyInt()))
+                .thenReturn(purchasedListing);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToPurchaseListings_andPurchaseListingsIdIsNotExists_then400Response() throws Exception {
+
+        Mockito
+                .when(purchasedListingService.findPurchasedListingById(anyInt()))
+                .thenReturn(null);
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+        Assertions.assertEquals(result.getResponse().getContentAsString(), "purchase Id does not exist.");
+    }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToPurchaseListings_andPurchaseListingsIdExists_andLoginUserIsNotPurchaser_then403Response() throws Exception {
+
+        PurchasedListing purchasedListing  = new PurchasedListing();
+        purchasedListing.setId(1);
+        purchasedListing.setBusiness(business);
+        purchasedListing.setPurchaser(user);
+        purchasedListing.setListingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setPrice(1.0);
+        purchasedListing.setNumberOfLikes(1);
+        purchasedListing.setQuantity(1);
+        purchasedListing.setSaleDate(LocalDate.now());
+
+        Mockito
+                .when(purchasedListingService.findPurchasedListingById(anyInt()))
+                .thenReturn(purchasedListing);
+
+        var newUser = new User();
+        newUser.setId(2);
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(newUser);
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        Assertions.assertEquals(result.getResponse().getContentAsString(), "You are not allowed to make this request");
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToPurchaseListings_andPurchaseListingsIdExists_andLoginUserIsNotPurchaser_andNotUserAdminOfBusinessOrGAA_then403Response() throws Exception {
+
+        PurchasedListing purchasedListing  = new PurchasedListing();
+        purchasedListing.setId(1);
+        purchasedListing.setBusiness(business);
+        purchasedListing.setPurchaser(user);
+        purchasedListing.setListingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setPrice(1.0);
+        purchasedListing.setNumberOfLikes(1);
+        purchasedListing.setQuantity(1);
+        purchasedListing.setSaleDate(LocalDate.now());
+
+        Mockito
+                .when(purchasedListingService.findPurchasedListingById(anyInt()))
+                .thenReturn(purchasedListing);
+
+        var newUser = new User();
+        newUser.setId(2);
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(newUser);
+
+        Mockito
+                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenReturn(false);
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
+                .andExpect(status().isForbidden())
+                .andReturn();
+        Assertions.assertEquals(result.getResponse().getContentAsString(), "You are not allowed to make this request");
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToPurchaseListings_andPurchaseListingsIdExists_andLoginUserIsPurchaser_andNotUserAdminOfBusinessOrGAA_then200Response() throws Exception {
+
+        PurchasedListing purchasedListing  = new PurchasedListing();
+        purchasedListing.setId(1);
+        purchasedListing.setBusiness(business);
+        user.setId(1);
+        purchasedListing.setPurchaser(user);
+        purchasedListing.setListingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setPrice(1.0);
+        purchasedListing.setNumberOfLikes(1);
+        purchasedListing.setQuantity(1);
+        purchasedListing.setSaleDate(LocalDate.now());
+
+        Mockito
+                .when(purchasedListingService.findPurchasedListingById(anyInt()))
+                .thenReturn(purchasedListing);
+
+        var newUser = new User();
+        newUser.setId(0);
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(newUser);
+
+        Mockito
+                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenReturn(false);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToPurchaseListings_andPurchaseListingsIdExists_andLoginUserIsNotPurchaser_butIsUserAdminOfBusinessOrGAA_then200Response() throws Exception {
+
+        PurchasedListing purchasedListing  = new PurchasedListing();
+        purchasedListing.setId(1);
+        purchasedListing.setBusiness(business);
+        purchasedListing.setPurchaser(user);
+        purchasedListing.setListingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setPrice(1.0);
+        purchasedListing.setNumberOfLikes(1);
+        purchasedListing.setQuantity(1);
+        purchasedListing.setSaleDate(LocalDate.now());
+
+        Mockito
+                .when(purchasedListingService.findPurchasedListingById(anyInt()))
+                .thenReturn(purchasedListing);
+
+        var newUser = new User();
+        newUser.setId(1);
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(newUser);
+
+        Mockito
+                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenReturn(true);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
+                .andExpect(status().isOk());
+    }
+
 }
 

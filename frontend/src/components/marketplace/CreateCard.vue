@@ -9,9 +9,9 @@
     <b-input-group-text>
       <b-container>
         <h6 style="text-align:center"><strong> Card Info: </strong></h6>
-        <label> Seller Name: {{ cardInfo.fullName }} </label>
+        <label> Creator: {{ cardInfo.fullName }} </label>
         <br>
-        <label> Seller Location: {{ cardInfo.location }} </label>
+        <label> Location: {{ cardInfo.location }} </label>
         <br>
         <label> Creation Date: {{ cardInfo.dateCreated }} </label>
       </b-container>
