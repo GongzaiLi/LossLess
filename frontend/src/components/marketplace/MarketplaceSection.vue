@@ -142,8 +142,8 @@ export default {
           label: "created",
           sortable: true,
           formatter: (value) => {
-            const date = new Date(value).toUTCString();
-            return date.split(" ").slice(1, 5).join(" ");
+            const date = new Date(value);
+            return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
           },
         }
 

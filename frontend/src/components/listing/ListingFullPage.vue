@@ -223,11 +223,11 @@ export default {
       listingLoading: true,
       listingNotExists: false,
       errMessage: null,
-      secret: {}
+      queryHistory: {}
     }
   },
   async mounted() {
-    this.secret = this.$route.query.secret
+    this.queryHistory = this.$route.query.queryHistory
     await this.setListingData();
   },
 
@@ -245,7 +245,11 @@ export default {
       const currentListingId = this.$route.params.id
       await Api.getListing(currentListingId)
         .then(async listingData => {
-          this.listingItem = listingData.data
+          this.listingItem = listingData.data;
+
+          let product = this.listingItem.inventoryItem.product;
+          product.images = product.images.filter((a) => a.id !== product.primaryImage.id);
+          product.images.unshift(product.primaryImage);
 
           const address = this.listingItem.business.address;
           this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
@@ -295,7 +299,7 @@ export default {
      * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
      */
     listingPageRedirect: function () {
-      this.$router.push({path: `/listingSearch`, query: {secret: this.secret}});
+      this.$router.push({path: `/listingSearch`, query: {queryHistory: this.queryHistory}});
     },
 
     /**

@@ -1,6 +1,6 @@
 <template>
   <b-card class="b_card_listing shadow-sm"
-          @click="$router.push({path: `/listings/${listing.id}`, query: {secret: searchQuery}})">
+          @click="$router.push({path: `/listings/${listing.id}`, query: {queryHistory : searchQuery}})">
     <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
     <hr>
