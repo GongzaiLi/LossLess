@@ -276,15 +276,12 @@ public class ListingController {
     }
 
     /**
-     * Handles requests to the endpoint to purchase a listing
-     *
-     * Notifies user they have purchased this listing
-     * Notifies all other users who had liked this listing that it has been purchased by someone else
-     *
+     * Handles requests to the endpoint to get a purchased listing
      *
      * @param purchaseId    The id of the listing being purchased
      * @return              A 200 OK status if the listing is successfully purchased and a purchased entity
      *                      A 400 status if purchase Id not exist
+     *                      A 403 status if login user is not a purchaser or UserAdminOfBusiness Or GAA
      */
     @GetMapping("/purchase/{id}")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
@@ -295,6 +292,13 @@ public class ListingController {
         if (purchasedListing == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("purchase Id does not exist.");
         }
+
+        var loginUser = userService.getCurrentlyLoggedInUser();
+
+        if (!purchasedListing.getPurchaser().getId().equals(loginUser.getId()) && Boolean.FALSE.equals(businessService.checkUserAdminOfBusinessOrGAA(purchasedListing.getBusiness(), loginUser))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+
         GetPurchasedListingDto getPurchasedListingDto = new GetPurchasedListingDto(purchasedListing);
 
         return ResponseEntity.status(HttpStatus.OK).body(getPurchasedListingDto);
