@@ -19,7 +19,7 @@ const HAS_MIDDLE_NAME_PROB = 4 / 10;
 const PROB_USER_LIKES_LISTINGS = 0.5;
 const MAX_LIKED_LISTINGS_PER_USER = 10;
 
-const NUM_BUSINESSES = 500;
+const NUM_BUSINESSES = 10;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
 const MAX_PRODUCTS_PER_BUSINESS = 40;
@@ -195,10 +195,10 @@ async function likeListings(instance) {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
         });
-      } catch(e) {
-        // console.log(`Tried to like listing Id ${listingId} but did not exist. This may happen a few times during data gen, but something may be broken if this happens a lot`);
-        // console.log(`Error message was: ${e}`)
-        // Above two lines can be uncommented for debugging but should remain commented out to reduce unnecessary logging to console
+      } catch(err) {
+          if (err.response.status !== 406) {
+            console.log(err)
+        }
       }
     }
   }
@@ -226,9 +226,9 @@ async function purchaseListing(instance){
                     }
                 });
             } catch(err) {
-                // console.log(`Tried to purchase listing Id ${listingId} but did not exist (already purchased or other).`);
-                // console.log(`Error message was: ${e}`)
-                // Above two lines can be uncommented for debugging but should remain commented out to reduce unnecessary logging to console
+                if (err.response.status !== 406) {
+                    console.log(err)
+                }
             }
         }
     }
