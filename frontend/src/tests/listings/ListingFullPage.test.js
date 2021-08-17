@@ -57,11 +57,11 @@ beforeEach(() => {
     localVue.use(VueRouter);
 
     Api.getUserCurrency.mockResolvedValue(
-      {
-        symbol: '$',
-          code: 'USD',
-          name: 'US Dollar'
-    });
+        {
+            symbol: '$',
+            code: 'USD',
+            name: 'US Dollar'
+        });
     Api.getBusiness.mockResolvedValue({data: {"address": {"country": "New Zealand"}}});
     Api.getListing.mockResolvedValue({data: mockListing});
 
@@ -69,7 +69,16 @@ beforeEach(() => {
 
     wrapper = shallowMount(ListingFullPage, {
         localVue,
-        router
+        router,
+        stubs: {
+            // Stub out modal component, as the actual component doesn't play nice with vue test utils
+            'b-modal': {
+                render: () => {},
+                methods: {
+                    show: jest.fn()
+                }
+            }
+        }
     });
 });
 
@@ -112,3 +121,29 @@ describe('Listing not exists message', () => {
         expect(wrapper.html()).toContain("This Listing no longer exists");
     })
 })
+
+describe('Purchase Button', () => {
+
+    test('the purchase button function calls the api request', async () => {
+        Api.purchaseListing.mockResolvedValue();
+        await wrapper.vm.purchaseListingRequest();
+        expect(Api.purchaseListing).toHaveBeenCalled();
+    });
+
+    test('a successful purchase shows success modal', async () => {
+        wrapper.vm.$bvModal.show = jest.fn();
+        Api.purchaseListing.mockResolvedValue();
+        await wrapper.vm.purchaseListingRequest();
+        expect(wrapper.vm.$bvModal.show).toHaveBeenCalledWith("completedPurchaseModal");
+    })
+
+    test('check error message is displayed on 406 error', async () => {
+        Api.purchaseListing.mockRejectedValue({response: {status: 406}})
+        wrapper.vm.openErrorModal = jest.fn();
+        await wrapper.vm.purchaseListingRequest();
+        expect(wrapper.vm.openErrorModal).toHaveBeenCalled();
+        expect(wrapper.vm.errMessage).toStrictEqual("Someone else has already purchase this listing sorry.")
+
+    });
+});
+

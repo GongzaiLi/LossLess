@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -90,7 +92,8 @@ public class User {
     private String password;
 
     @Column(name = "businesses_primarily_administered")
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Business> businessesPrimarilyAdministered;
 
     @Column(name = "created") // map camelcase name (java) to snake case (SQL)
@@ -100,7 +103,8 @@ public class User {
     private UserRoles role;
 
     @JoinColumn(name = "listing_liked")
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Listing> listingsLiked;
