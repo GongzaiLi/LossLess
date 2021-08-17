@@ -18,4 +18,12 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @return All Purchased Listing records that belong to the given business
      */
     List<PurchasedListing> findAllByBusinessId(Integer businessId);
+
+
+    /**
+     * Returns a Purchased Listing records that belong to a given purchaseListing Id
+     * @param purchaseListingId id of purchase listing
+     * @return A purchaseListing entity
+     */
+    PurchasedListing findFirstById(Integer purchaseListingId);
 }

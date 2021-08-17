@@ -8,6 +8,7 @@ import com.seng302.wasteless.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -24,7 +25,7 @@ public class NotificationService {
      * @return          The found notifications, if any otherwise empty list
      */
     public List<Notification> findAllNotificationsByUserId(Integer userId) {
-        return  notificationRepository.findAllNotificationsByUserId(userId);
+        return  notificationRepository.findAllNotificationsByUserId_OrderByCreatedDesc(userId);
     }
 
     /**
@@ -49,6 +50,7 @@ public class NotificationService {
         notification.setSubjectId(subjectId);
         notification.setMessage(message);
         notification.setUserId(userId);
+        notification.setCreated(LocalDateTime.now());
         return notification;
     }
 

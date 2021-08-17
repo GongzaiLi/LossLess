@@ -2,6 +2,8 @@ package com.seng302.wasteless.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.PurchasedListingView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -25,47 +27,56 @@ public class PurchasedListing {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "business")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Business business;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "purchaser")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private User purchaser;
 
 
     @NotNull
     @JoinColumn(name = "sale_date")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private LocalDate saleDate;
 
     @PositiveOrZero
     @JoinColumn(name = "number_of_likes", columnDefinition = "integer default 0")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Integer numberOfLikes;
 
 
     @NotNull
     @JoinColumn(name = "listing_date")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private LocalDate listingDate;
 
     @NotNull
     @FutureOrPresent
     @JoinColumn(name = "closing_date")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private LocalDate closingDate;
 
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "product")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Product product;
 
 
     @NotNull
     @PositiveOrZero
     @Column(name = "quantity")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Integer quantity;
 
     @NotNull
     @PositiveOrZero
     @Column(name = "price")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Double price;
 
     /**
