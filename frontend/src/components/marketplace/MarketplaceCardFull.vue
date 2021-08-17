@@ -138,14 +138,14 @@ export default {
      * format Expiry date
      */
     formatExpiry: function () {
-      return new Date(this.fullCard.displayPeriodEnd).toUTCString().split(" ").slice(0, 5).join(" ");
+      return new Date(this.fullCard.displayPeriodEnd).toString().split(" ").slice(0, 5).join(" ");
     },
 
     /**
      * format Created date
      */
     formatCreated: function() {
-      return new Date(this.fullCard.created).toUTCString().split(" ").slice(0, 5).join(" ");
+      return new Date(this.fullCard.created).toString().split(" ").slice(0, 5).join(" ").toString();
     },
 
     /**
