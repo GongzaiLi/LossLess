@@ -1,5 +1,6 @@
 package com.seng302.wasteless.steps;
 
+import com.jayway.jsonpath.JsonPath;
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
@@ -16,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -75,6 +78,8 @@ public class PurchasesFeature {
 
     private List<User> userList;
 
+    private ResultActions responseResult;
+
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
      * We do this manually because @Autowired mockMvc doesn't work.
@@ -112,7 +117,7 @@ public class PurchasesFeature {
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/listings/%d/purchase", curListing.getId()))
                 .with(user(currentUserDetails))
                 .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
 
@@ -182,5 +187,31 @@ public class PurchasesFeature {
     public void a_notifications_is_created_telling_me_i_have_purchased_the_listing() {
         List<Notification> notificationList = notificationService.findAllNotificationsByUserId(currentUserDetails.getId());
         Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.PURCHASED_LISTING)));
+    }
+
+    @Given("A purchase exists with the name {string}")
+    public void a_purchase_exists_with_the_name(String productName) throws Exception {
+
+        curListing = createListingWithNameAndPrice(productService, inventoryService, listingsService, businessService, addressService, productName, 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1),
+                10, 20);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(String.format("/listings/%d/purchase", curListing.getId()))
+                .with(user(currentUserDetails))
+                .with(csrf()))
+                .andExpect(status().isCreated());
+    }
+
+    @When("I try and get information about the sale")
+    public void i_try_and_get_information_about_the_sale() throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/purchase/%d", 1))
+                .with(user(currentUserDetails))
+                .with(csrf()))
+                .andExpect(status().isOk());
+    }
+
+    @Then("The information about the sale \\(sale date, listing date, product, amount, number of likes) is given from the sales history.")
+    public void the_information_about_the_sale_sale_date_listing_date_product_amount_number_of_likes_is_given_from_the_sales_history() throws Exception {
+        Assertions.assertEquals(JsonPath.read(responseResult.andReturn().getResponse().getContentAsString(), "$.business.name"), curListing.getBusiness().getName());
+        Assertions.assertEquals(JsonPath.read(responseResult.andReturn().getResponse().getContentAsString(), "$.product.id"), curListing.getInventoryItem().getProduct().getId());
     }
 }
