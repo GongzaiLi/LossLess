@@ -10,7 +10,7 @@
     </b-link>
     <b-card v-if="!listingLoading" class="listing_card shadow">
       <b-row>
-        <div style="float:left; margin-right: 10px; margin-left: 20px">
+        <b-col md="6">
           <b-carousel
               id="carousel-1"
               :controls="listingItem.inventoryItem.product.images.length > 1"
@@ -18,7 +18,6 @@
               :interval="0"
               ref="image_carousel"
               v-model="slideNumber"
-              v-if="listingItem.inventoryItem.product.images.length > 0"
           >
             <b-carousel-slide v-for="image in listingItem.inventoryItem.product.images" :key="image.id">
               <template #img>
@@ -30,11 +29,16 @@
                 >
               </template>
             </b-carousel-slide>
+            <b-carousel-slide v-if="listingItem.inventoryItem.product.images.length === 0">
+              <template #img>
+                <img class="product-image d-block w-100 rounded" src="../../../public/product_default.png"
+                     alt="Product has no image">
+              </template>
+            </b-carousel-slide>
           </b-carousel>
-          <img v-else class="default-product-image" src="../../../public/product_default.png"
-               alt="Product has no image">
-        </div>
-        <div style="float:left; margin-left: 10px">
+
+        </b-col>
+        <b-col md="6">
           <h1 class="listing-title"> {{ listingItem.inventoryItem.product.name }} </h1>
           <h6 style="text-align: center; font-size: 12px"> Listed on: {{listingItem.created}}</h6>
           <b-card no-body id="infobox-1">
@@ -57,9 +61,10 @@
           </div>
           <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }}
             {{ getLikeString }}</h6>
-        </div>
+        </b-col>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
+        <b-col md="8">
         <b-input-group-text class="bottom-info-boxes">
           <b-container>
             <h6 style="margin-top: 7px"><strong> Product Details: </strong></h6>
@@ -82,8 +87,10 @@
               {{ listingItem.inventoryItem.product.description }} </label>
           </b-container>
         </b-input-group-text>
+      </b-col>
       </b-row>
       <b-row align-h="center" style="margin-top: 1rem">
+        <b-col md="8">
         <b-input-group-text class="bottom-info-boxes">
           <b-container>
             <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
@@ -97,6 +104,7 @@
             <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
           </b-container>
         </b-input-group-text>
+        </b-col>
       </b-row>
 
       <b-modal ref="confirmPurchaseModal" size="sm" title="Confirm Purchase" ok-variant="success" ok-title="Purchase" @ok="purchaseListingRequest">
@@ -138,7 +146,6 @@
 .listing-title {
   text-align: center;
   font-size: 24px;
-  max-width: 25rem;
   word-wrap: break-word;
   white-space: normal;
   height: 3rem
@@ -168,27 +175,18 @@
 #carousel-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  max-width: 30rem;
-  width: 30rem;
   margin-top: 7px;
 }
 
 .product-image {
   height: 20rem;
   object-fit: cover;
-  width: 100%;
 }
 
-.default-product-image {
-  height: 20rem;
-  object-fit: cover;
-  width: 30rem;
-}
 
 #infobox-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  max-width: 25rem;
   max-font-size: 10px;
 }
 
@@ -205,11 +203,6 @@
   float: left;
   word-wrap: normal;
   white-space: normal;
-}
-
-.bottom-info-boxes {
-  max-width: 40rem;
-  width: 40rem;
 }
 
 </style>
