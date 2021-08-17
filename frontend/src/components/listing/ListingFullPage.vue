@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-link variant="info" class="back-to-search-link" to="/listingSearch">
+    <b-link variant="info" class="back-to-search-link" @click="listingPageRedirect">
       <strong>
         <h4>
           <b-icon-arrow-left/>
@@ -341,7 +341,7 @@ export default {
      * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
      */
     listingPageRedirect() {
-      this.$router.push({path: `/listingSearch`, query: { searchQuery: "" }});
+      this.$router.push({path: `/listingSearch`, query: { searchQuery: "abc" }});
     },
 
     /**

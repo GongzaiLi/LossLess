@@ -1,5 +1,5 @@
 <template>
-  <b-card class="b_card_listing shadow-sm" @click="$router.push(`/listings/${listing.id}`)">
+  <b-card class="b_card_listing shadow-sm" >
     <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
     <hr>
