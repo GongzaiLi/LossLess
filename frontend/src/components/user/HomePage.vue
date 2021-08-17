@@ -10,6 +10,9 @@
       <h4>Profile page</h4>
     </router-link>
   </b-card>
+
+
+
     <b-row>
     <b-col md="7">
     <b-card v-if="!$currentUser.currentlyActingAs" class="expired-cards mt-3 shadow">
@@ -42,10 +45,27 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
+
+
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
           <h6> {{notification.type}} </h6>
-          <span>{{ notification.message }}</span>
+          <hr>
+          <div v-if="notification.type === 'Expired Marketplace Card'">
+            <span>{{ notification.message }}</span>
+          </div>
+          <div v-else>
+            <b-row>
+              <b-col>
+                <span>{{ notification.message }}</span>
+                <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
+              </b-col>
+              <b-col cols="3">
+                <h6> {{notification.price}} </h6>
+              </b-col>
+            </b-row>
+          </div>
         </b-card>
+
       </div>
     </b-card>
     </b-col>
@@ -102,6 +122,7 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
+      purchasedListing: {}
     }
   },
 
@@ -143,7 +164,27 @@ export default {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;
+
+      for (const notification of this.notifications) {
+        if (notification.type === "Purchased listing") {
+          await this.getPurchasedNotifications(notification)
+        }
+      }
     },
+
+    /**
+     * Updates the purchase listing notification with the product data
+     *
+     */
+    async getPurchasedNotifications(notification) {
+      this.purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
+      const address = this.purchasedListing.business.address;
+      notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+       const currency = await Api.getUserCurrency(address.country);
+      notification.type = "Purchased Listing"
+      notification.price = currency.symbol + this.purchasedListing.price + " " + currency.code
+      notification.message = `${this.purchasedListing.quantity} x ${this.purchasedListing.product.name}`
+    }
   },
 
   created() {
