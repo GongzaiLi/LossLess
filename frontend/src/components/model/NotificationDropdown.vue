@@ -65,10 +65,14 @@ export default {
       this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
     },
-
+    /**
+     * Performs an action based on the notification that has been clicked.
+     * When a liked or unliked listing is clicked it routes you to that listing
+     * @param notification the notification that has been clicked
+     */
     notificationClicked(notification) {
       if (notification.type=='Liked Listing' || notification.type=='Unliked Listing'){
-        if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
+        if (!(this.$route.name == 'listings-full' &&  this.$route.params.id == notification.subjectId)) {
           this.$router.push('/listings/' + notification.subjectId);
         }
       }
