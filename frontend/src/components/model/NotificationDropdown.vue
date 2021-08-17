@@ -1,6 +1,6 @@
 <template>
   <b-nav-item-dropdown right class="notifications-tray" v-if="isActingAsUser">
-    <template #button-content>
+    <template #button-content>  
       <div class="icon mr-1">
         <b-icon v-if="numberOfNotifications"  icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
         <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
@@ -13,12 +13,20 @@
       <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
     </b-dropdown-item>
     <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
-      <h6> Marketplace Card: {{card.title}}</h6>
+      <h6><b-icon-clock/> Marketplace Card: {{card.title}}</h6>
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
     <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
-      <h6> {{notification.type}} </h6>
-      <span>{{ notification.message }}</span>
+      <h6>
+        <b-icon-exclamation-triangle v-if="notification.type==='Liked Listing Purchased'"/> 
+        <b-icon-heart v-else-if="notification.type==='Liked Listing'"/> 
+        <b-icon-x-circle v-else-if="notification.type==='Unliked Listing'" />
+        <b-icon-clock-history v-else-if="notification.type==='Expired Marketplace Card'"/> 
+        <b-icon-cart v-else-if="notification.type==='Purchased listing'"/> 
+        
+        {{notification.type}}
+        </h6>
+      <div>{{ notification.message }}</div>
     </b-dropdown-item>
   </b-nav-item-dropdown>
 </template>
@@ -97,10 +105,16 @@ export default {
 <style>
 .notifications-item {
   border-top: 1px solid #eee;
+  width: 26rem;
 }
 
 .notifications-item h6 {
   margin-top: 3px;
+}
+
+.notifications-item * {
+  white-space:normal;
+  word-wrap:break-word;
 }
 
 .notifications-item .dropdown-item:active {
