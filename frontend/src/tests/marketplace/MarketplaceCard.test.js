@@ -86,6 +86,6 @@ describe ("format-expiry-date", () => {
     it('check-format-expiry-date',  async() => {
         cardInfo.displayPeriodEnd = "2021-07-21";
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.formatExpiry).toStrictEqual("Wed, 21 Jul 2021")
+        expect(wrapper.vm.formatExpiry).toStrictEqual("Wed Jul 21 2021")
     })
 })
