@@ -51,8 +51,10 @@
               </b-button>
             </template>
           </b-card>
-          <b-icon-heart class="like-icon" v-if="!listingItem.currentUserLikes" @click="likeListing"></b-icon-heart>
-          <b-icon-heart-fill class="like-icon" variant="danger" v-else @click="dislikeListing"></b-icon-heart-fill>
+          <div v-if="!$currentUser.currentlyActingAs">
+          <b-icon-heart title="Like this listing" class="like-icon" v-if="!listingItem.currentUserLikes" @click="likeListing"></b-icon-heart>
+          <b-icon-heart-fill title="Unlike this listing" class="like-icon" variant="danger" v-else @click="dislikeListing"></b-icon-heart-fill>
+          </div>
           <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }}
             {{ getLikeString }}</h6>
         </div>
