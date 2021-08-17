@@ -35,8 +35,8 @@
                alt="Product has no image">
         </div>
         <div style="float:left; margin-left: 10px">
-          <h1 style="text-align: center;"> {{ listingItem.inventoryItem.product.name }} </h1>
-          <h6 style="text-align: center; margin-top: -6px"> Listed on: {{ listingItem.created }}</h6>
+          <h1 class="listing-title"> {{ listingItem.inventoryItem.product.name }} </h1>
+          <h6 style="text-align: center; font-size: 12px"> Listed on: {{listingItem.created}}</h6>
           <b-card no-body id="infobox-1">
             <template #header>
               <h5 style="margin-top: -4px"> Quantity: {{ listingItem.quantity }} </h5>
