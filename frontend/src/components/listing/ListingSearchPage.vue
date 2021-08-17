@@ -40,7 +40,7 @@
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
-            <b-button type="submit" variant="primary">Search</b-button>
+            <b-button v-b-toggle.collapse-1 variant="primary">Filter</b-button>
           </b-col>
 
 
@@ -125,7 +125,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
-          <partial-listing-card :listing="listing"></partial-listing-card>
+          <partial-listing-card :listing="listing" :search-query="search"></partial-listing-card>
         </b-col>
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>

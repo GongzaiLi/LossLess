@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-link variant="info" class="back-to-search-link" to="/listingSearch">
+    <b-link variant="info" class="back-to-search-link" @click="listingPageRedirect">
       <strong>
         <h4>
           <b-icon-arrow-left/>
@@ -226,6 +226,8 @@ export default {
     }
   },
   async mounted() {
+
+    console.log(this.$route.query.query, "sadasdsa")
     await this.setListingData();
   },
 
