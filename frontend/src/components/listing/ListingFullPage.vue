@@ -223,11 +223,11 @@ export default {
       listingLoading: true,
       listingNotExists: false,
       errMessage: null,
+      secret: {}
     }
   },
   async mounted() {
-
-    console.log(this.$route.query.query, "sadasdsa")
+    this.secret = this.$route.query.secret
     await this.setListingData();
   },
 
@@ -294,8 +294,8 @@ export default {
     /**
      * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
      */
-    listingPageRedirect() {
-      this.$router.push({path: `/listingSearch`, query: { searchQuery: "" }});
+    listingPageRedirect: function () {
+      this.$router.push({path: `/listingSearch`, query: {secret: this.secret}});
     },
 
     /**
