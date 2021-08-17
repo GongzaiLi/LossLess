@@ -19,11 +19,11 @@ const HAS_MIDDLE_NAME_PROB = 4 / 10;
 const PROB_USER_LIKES_LISTINGS = 0.5;
 const MAX_LIKED_LISTINGS_PER_USER = 10;
 
-const NUM_BUSINESSES = 100;
+const NUM_BUSINESSES = 500;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
-const MAX_PRODUCTS_PER_BUSINESS = 100;
-const MIN_PRODUCTS_PER_BUSINESS = 20;
+const MAX_PRODUCTS_PER_BUSINESS = 40;
+const MIN_PRODUCTS_PER_BUSINESS = 10;
 const MAX_PRODUCT_PRICE = 50;
 const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
 const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
@@ -198,7 +198,7 @@ async function likeListings(instance) {
       } catch(e) {
         // console.log(`Tried to like listing Id ${listingId} but did not exist. This may happen a few times during data gen, but something may be broken if this happens a lot`);
         // console.log(`Error message was: ${e}`)
-        // Above two lines can be uncommented for debuging but should remain commented out to reduce unnecessary logging to console
+        // Above two lines can be uncommented for debugging but should remain commented out to reduce unnecessary logging to console
       }
     }
   }
@@ -228,7 +228,7 @@ async function purchaseListing(instance){
             } catch(err) {
                 // console.log(`Tried to purchase listing Id ${listingId} but did not exist (already purchased or other).`);
                 // console.log(`Error message was: ${e}`)
-                // Above two lines can be uncommented for debuging but should remain commented out to reduce unnecessary logging to console
+                // Above two lines can be uncommented for debugging but should remain commented out to reduce unnecessary logging to console
             }
         }
     }
