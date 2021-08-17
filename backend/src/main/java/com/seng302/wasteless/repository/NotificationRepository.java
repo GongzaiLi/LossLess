@@ -13,5 +13,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
      * @param userId The id of the current user.
      * @return A (possibly empty) list of all notifications that belong to the current user.
      */
-    List<Notification> findAllNotificationsByUserId(Integer userId);
+    List<Notification> findAllNotificationsByUserId_OrderByCreatedDesc(Integer userId);
 }
