@@ -43,7 +43,14 @@
           <h6> You have no notifications </h6>
         </b-card>
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-          <h6> {{notification.type}} </h6>
+          <h6>
+            <b-icon-exclamation-triangle v-if="notification.type==='Liked Listing Purchased'"/>
+            <b-icon-heart v-else-if="notification.type==='Liked Listing'"/>
+            <b-icon-x-circle v-else-if="notification.type==='Unliked Listing'" />
+            <b-icon-clock-history v-else-if="notification.type==='Expired Marketplace Card'"/>
+            <b-icon-cart v-else-if="notification.type==='Purchased listing'"/>
+            {{notification.type}}
+          </h6>
           <span>{{ notification.message }}</span>
         </b-card>
       </div>
@@ -153,7 +160,11 @@ export default {
      * @param notification the notification that has been clicked
      */
     notificationClicked(notification) {
+      if (notification.type == 'Liked Listing' || notification.type == 'Unliked Listing') {
+        if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
           this.$router.push('/listings/' + notification.subjectId);
+        }
+      }
     }
 
 
