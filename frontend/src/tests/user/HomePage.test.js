@@ -179,7 +179,7 @@ describe('check-purchased-notifications', () => {
 
     test('check-notification', async () => {
         Api.getUserCurrency.mockResolvedValue({data: {symbol: '', code: ''}});
-        await wrapper.vm.getPurchasedNotifications(mockNotifications[0])
+        await wrapper.vm.updatePurchasedNotifications(mockNotifications[0])
         await wrapper.vm.$forceUpdate();
         console.log(wrapper.vm.purchasedListing)
         expect(wrapper.vm.purchasedListing).toBe(mockListing);

@@ -17,8 +17,20 @@
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
     <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
-      <h6> {{notification.type}} </h6>
-      <span>{{ notification.message }}</span>
+      <b-row>
+        <b-col>
+          <h6> {{notification.type}} </h6>
+        </b-col>
+        <b-col cols="3">
+          <h6> {{notification.price}} </h6>
+        </b-col>
+      </b-row>
+        <span v-if="notification.type === 'Purchased Listing'">
+          <hr>
+          {{ notification.message }}</span>
+        <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
+        <span v-else>{{ notification.message }}</span>
+
     </b-dropdown-item>
   </b-nav-item-dropdown>
 </template>
@@ -26,6 +38,7 @@
 <script>
 import api from "../../Api";
 import EventBus from "../../util/event-bus";
+import Api from "../../Api";
 
 export default {
   name: "NotificationDropdown",
@@ -64,15 +77,38 @@ export default {
     async updateNotifications() {
       this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
+
+      for (const notification of this.notifications) {
+        if (notification.type === "Purchased listing") {
+          await this.updatePurchasedNotifications(notification)
+        }
+      }
+
     },
+
+    /**
+     * Updates the purchase listing notification with the product data
+     *
+     */
+    async updatePurchasedNotifications(notification) {
+      this.purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
+      const address = this.purchasedListing.business.address;
+      notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+      const currency = await Api.getUserCurrency(address.country);
+      notification.type = "Purchased Listing"
+      notification.price = currency.symbol + this.purchasedListing.price + " " + currency.code
+      notification.message = `${this.purchasedListing.quantity} x ${this.purchasedListing.product.name}`
+    },
+
+
     /**
      * Performs an action based on the notification that has been clicked.
      * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
     notificationClicked(notification) {
-      if (notification.type=='Liked Listing' || notification.type=='Unliked Listing'){
-        if (!(this.$route.name == 'listings-full' &&  this.$route.params.id == notification.subjectId)) {
+      if (notification.type==='Liked Listing' || notification.type==='Unliked Listing'){
+        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId)) {
           this.$router.push('/listings/' + notification.subjectId);
         }
       }

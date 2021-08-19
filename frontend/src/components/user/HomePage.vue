@@ -43,22 +43,19 @@
           <h6> You have no notifications </h6>
         </b-card>
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-          <h6> {{notification.type}} </h6>
+          <b-row>
+            <b-col>
+              <h6> {{notification.type}} </h6>
+            </b-col>
+            <b-col cols="3">
+              <h6> {{notification.price}} </h6>
+            </b-col>
+          </b-row>
           <hr>
-          <div v-if="notification.type === 'Expired Marketplace Card'">
-            <span>{{ notification.message }}</span>
-          </div>
-          <div v-else>
-            <b-row>
-              <b-col>
-                <span>{{ notification.message }}</span>
-                <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
-              </b-col>
-              <b-col cols="3">
-                <h6> {{notification.price}} </h6>
-              </b-col>
-            </b-row>
-          </div>
+          <span v-if="notification.type === 'Purchased Listing'">
+          {{ notification.message }}</span>
+          <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
+          <span v-else>{{ notification.message }}</span>
         </b-card>
 
       </div>
@@ -89,7 +86,6 @@
 .notification-cards {
   margin-top: 20px;
   cursor: pointer;
-
 }
 
 </style>
@@ -164,7 +160,7 @@ export default {
 
       for (const notification of this.notifications) {
         if (notification.type === "Purchased listing") {
-          await this.getPurchasedNotifications(notification)
+          await this.updatePurchasedNotifications(notification)
         }
       }
     },
@@ -179,12 +175,11 @@ export default {
     },
 
 
-
     /**
      * Updates the purchase listing notification with the product data
      *
      */
-    async getPurchasedNotifications(notification) {
+    async updatePurchasedNotifications(notification) {
       this.purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
       const address = this.purchasedListing.business.address;
       notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
