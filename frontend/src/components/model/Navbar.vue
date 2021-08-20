@@ -12,9 +12,10 @@ Date: sprint_1
     <b-navbar-brand>
     <b-nav-form @submit.prevent="search">
       <b-input-group>
-        <b-form-input placeholder="Search Listings" v-model="searchQuery"></b-form-input>
+        <b-form-input placeholder="Search Listings" v-model="searchQuery"
+                      :disabled="this.$route.name === 'listings-search'"></b-form-input>
         <b-input-group-append>
-          <b-button type="submit"> <b-icon-search/> </b-button>
+          <b-button type="submit" :disabled="this.$route.name === 'listings-search'"> <b-icon-search/> </b-button>
         </b-input-group-append>
       </b-input-group>
     </b-nav-form>
@@ -229,11 +230,7 @@ export default {
      * Called when user clicks search or presses enter
      **/
     search() {
-      if (this.$route.name === 'listings-search' && this.$route.query.searchQuery === this.searchQuery) {
-        this.$router.go();
-      } else {
-        this.$router.replace({path: `/listingSearch`, query: { searchQuery: this.searchQuery }});
-      }
+      this.$router.replace({path: `/listingSearch`, query: { searchQuery: this.searchQuery }});
       this.searchQuery = "";
     },
 
