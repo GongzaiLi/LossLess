@@ -43,19 +43,24 @@
           <h6> You have no notifications </h6>
         </b-card>
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-          <b-row>
-            <b-col>
-              <h6> {{notification.type}} </h6>
-            </b-col>
-            <b-col cols="3">
-              <h6> {{notification.price}} </h6>
-            </b-col>
-          </b-row>
-          <hr>
-          <span v-if="notification.type === 'Purchased Listing'">
-          {{ notification.message }}</span>
-          <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
-          <span v-else>{{ notification.message }}</span>
+            <b-row>
+              <b-col cols="1">
+                <b-icon-exclamation-triangle v-if="notification.type==='Liked Listing Purchased'"/>
+                <b-icon-heart v-else-if="notification.type==='Liked Listing'"/>
+                <b-icon-x-circle v-else-if="notification.type==='Unliked Listing'" />
+                <b-icon-clock-history v-else-if="notification.type==='Expired Marketplace Card'"/>
+                <b-icon-cart v-else-if="notification.type==='Purchased listing'"/>
+              </b-col>
+              <b-col cols="7">
+                <h6> {{notification.type}} </h6>
+              </b-col>
+              <b-col cols="3">
+                <h6> {{notification.price}} </h6>
+              </b-col>
+            </b-row>
+            <hr>
+            <span>{{ notification.message }}</span>
+            <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
         </b-card>
 
       </div>
@@ -184,7 +189,6 @@ export default {
       const address = this.purchasedListing.business.address;
       notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
        const currency = await Api.getUserCurrency(address.country);
-      notification.type = "Purchased Listing"
       notification.price = currency.symbol + this.purchasedListing.price + " " + currency.code
       notification.message = `${this.purchasedListing.quantity} x ${this.purchasedListing.product.name}`
     }
