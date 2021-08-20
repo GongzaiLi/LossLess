@@ -90,7 +90,7 @@ export default {
      * format Expiry date
      */
     formatExpiry: function () {
-      return new Date(this.cardInfo.displayPeriodEnd).toUTCString().split(" ").slice(0, 4).join(" ");
+      return new Date(this.cardInfo.displayPeriodEnd).toString().split(" ").slice(0, 4).join(" ");
     }
   }
 }

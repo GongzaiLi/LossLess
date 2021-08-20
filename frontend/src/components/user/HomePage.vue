@@ -62,7 +62,6 @@
             <span>{{ notification.message }}</span>
             <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
         </b-card>
-
       </div>
     </b-card>
     </b-col>
@@ -176,9 +175,12 @@ export default {
      * @param notification the notification that has been clicked
      */
     notificationClicked(notification) {
+      if (notification.type === 'Liked Listing' || notification.type === 'Unliked Listing') {
+        if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
           this.$router.push('/listings/' + notification.subjectId);
+        }
+      }
     },
-
 
     /**
      * Updates the purchase listing notification with the product data

@@ -137,10 +137,16 @@ export default {
 <style>
 .notifications-item {
   border-top: 1px solid #eee;
+  width: 26rem;
 }
 
 .notifications-item h6 {
   margin-top: 3px;
+}
+
+.notifications-item * {
+  white-space:normal;
+  word-wrap:break-word;
 }
 
 .notifications-item .dropdown-item:active {
