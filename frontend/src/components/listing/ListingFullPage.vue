@@ -190,7 +190,6 @@
 #infobox-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  max-font-size: 10px;
 }
 
 .like-icon {
@@ -311,7 +310,6 @@ export default {
         EventBus.$emit('notificationUpdate')
         this.errorFlag = false
       } catch (error) {
-        console.log(error)
         this.error = error
         this.errorFlag = true
       }
