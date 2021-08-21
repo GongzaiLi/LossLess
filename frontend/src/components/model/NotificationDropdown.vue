@@ -27,7 +27,6 @@
 import api from "../../Api";
 import EventBus from "../../util/event-bus";
 import Notification from "./Notification";
-import {updatePurchasedNotifications} from "../../util";
 
 
 export default {
@@ -69,13 +68,7 @@ export default {
       this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
 
-      for (const notification of this.notifications) {
-        if (notification.type === "Purchased listing") {
-          await updatePurchasedNotifications(notification)
-        }
-      }
-
-    },
+     },
 
     /**
      * Performs an action based on the notification that has been clicked.

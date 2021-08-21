@@ -35,7 +35,8 @@ export default {
   methods: {
     /**
      * Updates the purchase listing notification with the product data
-     *
+     * @param notification the purchase listing notification
+     * @return notification the same notification updated
      */
     async updatePurchasedNotifications(notification) {
       const purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
