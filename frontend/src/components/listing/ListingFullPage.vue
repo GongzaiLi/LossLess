@@ -122,7 +122,7 @@
       <b-modal id="completedPurchaseModal" title="Purchase Successful"
                cancel-variant="primary" cancel-title="Back to Search" @cancel="listingPageRedirect"
                ok-variant="primary" ok-title="Go to Home Page" @ok="$router.push('/homepage')"
-               no-close-on-backdrop no-close-on-esc>
+               no-close-on-backdrop no-close-on-esc hide-header-close>
         <h6>
           You have successfully purchased listing: {{listingItem.inventoryItem.product.name}}.
         </h6>

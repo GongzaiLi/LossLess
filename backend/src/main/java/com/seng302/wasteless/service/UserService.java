@@ -192,12 +192,17 @@ public class UserService {
 
 
     /**
-     * Find all users who have liked a given listing
+     * Finds IDs of all users who have liked a given listing.
+     *
+     * We return a list of IDs instead of users as the number of users
+     * who like a listing could be very large. As our users eagerly their
+     * administered businesses, returning the IDs is far faster than trying to
+     * return a list of User objects.
      *
      * @param listing   The listing to find users for
-     * @return          List of users who have liked the listing
+     * @return          List of IDs users who have liked the listing
      */
-    public List<User> findUsersByLikedListing(Listing listing) {
+    public List<Integer> findUserIdsByLikedListing(Listing listing) {
         return userRepository.findAllByLikedListingId(listing.getId());
     }
 

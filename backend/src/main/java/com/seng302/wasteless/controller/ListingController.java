@@ -8,7 +8,6 @@ import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import com.seng302.wasteless.view.ListingViews;
 import com.seng302.wasteless.view.PurchasedListingView;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -257,11 +256,11 @@ public class ListingController {
      */
     @PostMapping("/listings/{id}/purchase")
     public ResponseEntity<Object> purchaseListing(@PathVariable("id") Integer listingId) {
+        logger.info("Request to purchase listing with ID: {}", listingId);
+
         var listing = listingsService.findFirstById(listingId);
 
-        logger.info("Retrieved listing with ID: {}", listingId);
-
-        List<User> usersWhoLiked = userService.findUsersByLikedListing(listing);
+        List<Integer> usersWhoLiked = userService.findUserIdsByLikedListing(listing);
 
         var purchasedListing = listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
 
@@ -271,7 +270,7 @@ public class ListingController {
 
         notificationService.saveNotification(purchaseNotification);
 
-        usersWhoLiked.remove(userService.getCurrentlyLoggedInUser());
+        usersWhoLiked.remove(userService.getCurrentlyLoggedInUser().getId());
 
         notificationService.notifyAllUsers(usersWhoLiked, purchasedListing.getId(), NotificationType.LIKEDLISTING_PURCHASED,  String.format("The listing you liked of the product %s has been purchased by someone else", purchasedListing.getProduct().getName()));
 
