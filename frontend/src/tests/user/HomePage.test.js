@@ -9,9 +9,6 @@ import MarketplaceSection from "../../components/marketplace/MarketplaceSection"
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
-let mockListing;
-let mockNotifications;
-let mockExpiredCards;
 
 let userData = {
     id: 1,
@@ -43,42 +40,6 @@ beforeEach(() => {
     localVue.use(mockUserAuthPlugin);
     localVue.use(Router);
 
-
-    mockNotifications = [{type: "x", message: 'y', subjectId: 1}]
-
-    mockExpiredCards = [{"id": 1,}]
-
-    mockListing = {
-        "id": 1,
-        "businessId": 1,
-        "product": {
-            "name": "Watties Baked Beans - 420g can",
-            "primaryImage": {
-                "fileName": "media/images/a76ff8d8-e2ec-4fe3-95d7-235ef8e54565.png",
-                "id": 1
-            },
-        },
-        "business": {
-            "address": {
-                "streetNumber": "3/24",
-                "streetName": "Ilam Road",
-                "suburb": "Upper Riccarton",
-                "city": "Christchurch",
-                "region": "Canterbury",
-                "country": "New Zealand",
-                "postcode": "90210"
-            },
-        },
-        "usersLiked": 1,
-        "price": 5.99,
-        "created": "2000-07-14T11:44:00Z",
-        "closes": "2021-07-21T23:59:00Z"
-    };
-
-
-    Api.getPurchaseListing.mockResolvedValue({data: mockListing});
-    Api.getNotifications.mockResolvedValue({data: mockNotifications})
-    Api.getExpiredCards.mockResolvedValue({data: mockExpiredCards})
     Api.getUser.mockRejectedValue(new Error(''));
 
     wrapper = shallowMount(homePage, {
@@ -174,17 +135,5 @@ describe('check-that-expired-table-only-shows-when-necessary', () => {
 
 });
 
-
-describe('check-purchased-notifications', () => {
-
-    test('check-notification', async () => {
-        Api.getUserCurrency.mockResolvedValue({data: {symbol: '', code: ''}});
-        await wrapper.vm.updatePurchasedNotifications(mockNotifications[0])
-        await wrapper.vm.$forceUpdate();
-        console.log(wrapper.vm.purchasedListing)
-        expect(wrapper.vm.purchasedListing).toBe(mockListing);
-    })
-
-});
 
 

@@ -43,24 +43,7 @@
           <h6> You have no notifications </h6>
         </b-card>
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-            <b-row>
-              <b-col cols="1">
-                <b-icon-exclamation-triangle v-if="notification.type==='Liked Listing Purchased'"/>
-                <b-icon-heart v-else-if="notification.type==='Liked Listing'"/>
-                <b-icon-x-circle v-else-if="notification.type==='Unliked Listing'" />
-                <b-icon-clock-history v-else-if="notification.type==='Expired Marketplace Card'"/>
-                <b-icon-cart v-else-if="notification.type==='Purchased listing'"/>
-              </b-col>
-              <b-col cols="7">
-                <h6> {{notification.type}} </h6>
-              </b-col>
-              <b-col cols="3">
-                <h6> {{notification.price}} </h6>
-              </b-col>
-            </b-row>
-            <hr>
-            <span>{{ notification.message }}</span>
-            <h6 v-if="notification.location"> Location: {{notification.location}} </h6>
+          <notification :notification="notification"> </notification>
         </b-card>
       </div>
     </b-card>
@@ -97,9 +80,11 @@
 <script>
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
+import {updatePurchasedNotifications} from "../../util";
+import Notification from "../model/Notification";
 
 export default {
-  components: {MarketplaceSection},
+  components: {MarketplaceSection, Notification},
   data: function () {
     return {
       userData: {
@@ -119,7 +104,6 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
-      purchasedListing: {}
     }
   },
 
@@ -162,9 +146,10 @@ export default {
       }
       this.notifications = (await Api.getNotifications()).data;
 
-      for (const notification of this.notifications) {
+      for (let notification of this.notifications) {
         if (notification.type === "Purchased listing") {
-          await this.updatePurchasedNotifications(notification)
+          await updatePurchasedNotifications(notification)
+          console.log(notification)
         }
       }
     },
@@ -182,18 +167,18 @@ export default {
       }
     },
 
-    /**
-     * Updates the purchase listing notification with the product data
-     *
-     */
-    async updatePurchasedNotifications(notification) {
-      this.purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
-      const address = this.purchasedListing.business.address;
-      notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-       const currency = await Api.getUserCurrency(address.country);
-      notification.price = currency.symbol + this.purchasedListing.price + " " + currency.code
-      notification.message = `${this.purchasedListing.quantity} x ${this.purchasedListing.product.name}`
-    }
+    // /**
+    //  * Updates the purchase listing notification with the product data
+    //  *
+    //  */
+    // async updatePurchasedNotifications(notification) {
+    //   this.purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
+    //   const address = this.purchasedListing.business.address;
+    //   notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+    //    const currency = await Api.getUserCurrency(address.country);
+    //   notification.price = currency.symbol + this.purchasedListing.price + " " + currency.code
+    //   notification.message = `${this.purchasedListing.quantity} x ${this.purchasedListing.product.name}`
+    // }
   },
 
   created() {

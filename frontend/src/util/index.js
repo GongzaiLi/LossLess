@@ -1,3 +1,5 @@
+import Api from "../Api";
+
 /**
  * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
  * The months elapsed is not the total number of months elapsed, but the number months elapsed in
@@ -24,6 +26,20 @@ function getMonthsAndYearsBetween(start, end) {
 export function getToday() {
   let date = new Date();
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}
+
+
+/**
+ * Updates the purchase listing notification with the product data
+ *
+ */
+export async function updatePurchasedNotifications(notification) {
+  const purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
+  const address = purchasedListing.business.address;
+  notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+  const currency = await Api.getUserCurrency(address.country);
+  notification.price = currency.symbol + purchasedListing.price + " " + currency.code
+  notification.message = `${purchasedListing.quantity} x ${purchasedListing.product.name}`
 }
 
 export default getMonthsAndYearsBetween;
