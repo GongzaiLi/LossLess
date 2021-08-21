@@ -149,7 +149,6 @@ export default {
       for (let notification of this.notifications) {
         if (notification.type === "Purchased listing") {
           await updatePurchasedNotifications(notification)
-          console.log(notification)
         }
       }
     },
