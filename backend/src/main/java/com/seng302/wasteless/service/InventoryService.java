@@ -94,5 +94,20 @@ public class InventoryService {
         return inventoryRepository.countInventoryByBusinessIdAndQuantityGreaterThanAndProductIdContainsAllIgnoreCase(id, 0, searchQuery);
     }
 
+    /**
+     * when edit inventory quantity, then update the inventory quantity unlisted.
+     * @param inventory the inventory is edited
+     * @param editedInventoryQuantity the edit inventory's new quantity number.
+     */
+    public void updateQuantityUnlisted(Inventory inventory, Integer editedInventoryQuantity) {
+
+        int quantityUnlisted = inventory.getQuantityUnlisted() + editedInventoryQuantity - inventory.getQuantity();
+        if (quantityUnlisted < 0) {
+            logger.warn("Request Failed, Inventory's quantity unlisted can not lease then 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory's quantity unlisted can not lease then 0.");
+        }
+        inventory.setQuantityUnlisted(quantityUnlisted);
+    }
+
 
 }
