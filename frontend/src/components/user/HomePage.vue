@@ -43,15 +43,7 @@
           <h6> You have no notifications </h6>
         </b-card>
         <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-          <h6>
-            <b-icon-exclamation-triangle v-if="notification.type==='Liked Listing Purchased'"/>
-            <b-icon-heart v-else-if="notification.type==='Liked Listing'"/>
-            <b-icon-x-circle v-else-if="notification.type==='Unliked Listing'" />
-            <b-icon-clock-history v-else-if="notification.type==='Expired Marketplace Card'"/>
-            <b-icon-cart v-else-if="notification.type==='Purchased listing'"/>
-            {{notification.type}}
-          </h6>
-          <span>{{ notification.message }}</span>
+          <notification :notification="notification"> </notification>
         </b-card>
       </div>
     </b-card>
@@ -81,7 +73,6 @@
 .notification-cards {
   margin-top: 20px;
   cursor: pointer;
-
 }
 
 </style>
@@ -89,9 +80,10 @@
 <script>
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
+import Notification from "../model/Notification";
 
 export default {
-  components: {MarketplaceSection},
+  components: {MarketplaceSection, Notification},
   data: function () {
     return {
       userData: {
@@ -152,6 +144,7 @@ export default {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;
+
     },
 
     /**
@@ -160,19 +153,17 @@ export default {
      * @param notification the notification that has been clicked
      */
     notificationClicked(notification) {
-      if (notification.type == 'Liked Listing' || notification.type == 'Unliked Listing') {
+      if (notification.type === 'Liked Listing' || notification.type === 'Unliked Listing') {
         if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
           this.$router.push('/listings/' + notification.subjectId);
         }
       }
-    }
-
+    },
 
   },
 
   created() {
     this.updateNotifications();
-    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 }
 </script>

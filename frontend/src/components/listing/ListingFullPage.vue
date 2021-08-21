@@ -190,7 +190,6 @@
 #infobox-1 {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  max-font-size: 10px;
 }
 
 .like-icon {
@@ -246,23 +245,27 @@ export default {
       this.listingNotExists = false;
       this.listingLoading = true;
 
-      const currentListingId = this.$route.params.id
+      const currentListingId = this.$route.params.id;
       await Api.getListing(currentListingId)
         .then(async listingData => {
           this.listingItem = listingData.data;
 
           let product = this.listingItem.inventoryItem.product;
-          product.images = product.images.filter((a) => a.id !== product.primaryImage.id);
-          product.images.unshift(product.primaryImage);
 
-            const address = this.listingItem.business.address;
-            this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-            this.currency = await Api.getUserCurrency(address.country);
-            this.listingLoading = false;
-          })
-          .catch(() => {
-            this.listingNotExists = true;
-          });
+          // Display primary image as first image
+          if (product.images.length > 0) {
+            product.images = product.images.filter((a) => a.id !== product.primaryImage.id);
+            product.images.unshift(product.primaryImage);
+          }
+
+          const address = this.listingItem.business.address;
+          this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+          this.currency = await Api.getUserCurrency(address.country);
+          this.listingLoading = false;
+        })
+        .catch(() => {
+          this.listingNotExists = true;
+        });
     },
 
 
@@ -307,7 +310,6 @@ export default {
         EventBus.$emit('notificationUpdate')
         this.errorFlag = false
       } catch (error) {
-        console.log(error)
         this.error = error
         this.errorFlag = true
       }
@@ -328,6 +330,7 @@ export default {
           .purchaseListing(this.listingItem.id)
           .then(() => {
             this.$bvModal.show("completedPurchaseModal");
+            EventBus.$emit('notificationUpdate');
           })
           .catch((err) => {
             if (err.response.status === 406) {

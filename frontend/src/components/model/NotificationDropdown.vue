@@ -1,6 +1,6 @@
 <template>
   <b-nav-item-dropdown right class="notifications-tray" v-if="isActingAsUser">
-    <template #button-content>  
+    <template #button-content>
       <div class="icon mr-1">
         <b-icon v-if="numberOfNotifications"  icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
         <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
@@ -13,20 +13,12 @@
       <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
     </b-dropdown-item>
     <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
-      <h6><b-icon-clock/> Marketplace Card: {{card.title}}</h6>
+      <h6> Marketplace Card: {{card.title}}</h6>
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
+
     <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
-      <h6>
-        <b-icon-exclamation-triangle v-if="notification.type==='Liked Listing Purchased'"/> 
-        <b-icon-heart v-else-if="notification.type==='Liked Listing'"/> 
-        <b-icon-x-circle v-else-if="notification.type==='Unliked Listing'" />
-        <b-icon-clock-history v-else-if="notification.type==='Expired Marketplace Card'"/> 
-        <b-icon-cart v-else-if="notification.type==='Purchased listing'"/> 
-        
-        {{notification.type}}
-        </h6>
-      <div>{{ notification.message }}</div>
+      <notification :notification="notification"> </notification>
     </b-dropdown-item>
   </b-nav-item-dropdown>
 </template>
@@ -34,9 +26,12 @@
 <script>
 import api from "../../Api";
 import EventBus from "../../util/event-bus";
+import Notification from "./Notification";
+
 
 export default {
   name: "NotificationDropdown",
+  components: {Notification},
   data() {
     return {
       notifications: [],
@@ -72,15 +67,17 @@ export default {
     async updateNotifications() {
       this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
-    },
+
+     },
+
     /**
      * Performs an action based on the notification that has been clicked.
      * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
     notificationClicked(notification) {
-      if (notification.type=='Liked Listing' || notification.type=='Unliked Listing'){
-        if (!(this.$route.name == 'listings-full' &&  this.$route.params.id == notification.subjectId)) {
+      if (notification.type==='Liked Listing' || notification.type==='Unliked Listing'){
+        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId)) {
           this.$router.push('/listings/' + notification.subjectId);
         }
       }
@@ -89,7 +86,6 @@ export default {
 
   created() {
     this.updateNotifications();
-    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 
   mounted() {
