@@ -140,6 +140,7 @@ export default {
      * cards that have expired.
      */
     async updateNotifications() {
+      console.log(this.$currentUser);
       const expiredCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
       if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
@@ -182,7 +183,6 @@ export default {
 
   created() {
     this.updateNotifications();
-    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 }
 </script>

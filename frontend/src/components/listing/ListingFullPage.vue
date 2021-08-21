@@ -330,6 +330,7 @@ export default {
           .purchaseListing(this.listingItem.id)
           .then(() => {
             this.$bvModal.show("completedPurchaseModal");
+            EventBus.$emit('notificationUpdate');
           })
           .catch((err) => {
             if (err.response.status === 406) {

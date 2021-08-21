@@ -93,7 +93,6 @@ export default {
 
   created() {
     this.updateNotifications();
-    this.interval = setInterval(() => this.updateNotifications(), 60000);
   },
 
   mounted() {
