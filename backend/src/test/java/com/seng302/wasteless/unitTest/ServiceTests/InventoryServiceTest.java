@@ -5,6 +5,7 @@ import com.seng302.wasteless.model.Inventory;
 import com.seng302.wasteless.repository.InventoryRepository;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -41,7 +42,7 @@ class InventoryServiceTest {
             success = false;
             assertEquals(400, e.getRawStatusCode());
         }
-        assert !success;
+        Assertions.assertFalse(success);
 
     }
 
@@ -61,7 +62,7 @@ class InventoryServiceTest {
             success = false;
             assertEquals(400, e.getRawStatusCode());
         }
-        assert !success;
+        Assertions.assertFalse(success);
 
     }
 
@@ -80,7 +81,7 @@ class InventoryServiceTest {
             success = false;
             assertEquals(400, e.getRawStatusCode());
         }
-        assert success;
+        Assertions.assertTrue(success);
 
     }
 
