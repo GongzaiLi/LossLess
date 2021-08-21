@@ -140,7 +140,6 @@ export default {
      * cards that have expired.
      */
     async updateNotifications() {
-      console.log(this.$currentUser);
       const expiredCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
       if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
