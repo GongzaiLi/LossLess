@@ -7,19 +7,7 @@ Date: sprint_1
     toggleable="lg" type="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand href="#" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
-
-    <b-navbar-brand>
-    <b-nav-form @submit.prevent="search">
-      <b-input-group>
-        <b-form-input placeholder="Search Listings" v-model="searchQuery"
-                      :disabled="this.$route.name === 'listings-search'"></b-form-input>
-        <b-input-group-append>
-          <b-button type="submit" :disabled="this.$route.name === 'listings-search'"> <b-icon-search/> </b-button>
-        </b-input-group-append>
-      </b-input-group>
-    </b-nav-form>
-    </b-navbar-brand>
+    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
 
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
@@ -31,10 +19,20 @@ Date: sprint_1
       use the menu on the <strong>top <em>right</em></strong> corner <b-icon-arrow-right/>
     </b-toast>
 
-    <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
+    <b-navbar-toggle target="nav-collapse" class="mr-auto"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-brand>
+      <b-nav-form @submit.prevent="search">
+        <b-input-group>
+          <b-form-input placeholder="Search Listings" v-model="searchQuery"
+                        :disabled="this.$route.name === 'listings-search'"></b-form-input>
+          <b-input-group-append>
+            <b-button type="submit" :disabled="this.$route.name === 'listings-search'"> <b-icon-search/> </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-nav-form>
+      </b-navbar-brand>
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
@@ -60,48 +58,46 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
-
-      <b-navbar-nav class="ml-auto dropdown-menu-end">
-        <NotificationDropdown/>
-        <b-nav-item-dropdown right>
-          <template #button-content>
-            <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
-            <em class="ml-2" id="profile-name">{{profileName}}</em>
-            <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
-          </template>
-
-          <div v-if="!isActingAsUser">
-            <hr style="margin-top: 0; margin-bottom: 0;">
-            <sub style="padding-left:2em;">User Accounts</sub>
-            <b-dropdown-item
-                style="margin-top: 0.1em"
-                @click="actAsUser()"
-                class="user-name-drop-down">
-              {{$currentUser.firstName}}
-            </b-dropdown-item>
-            <hr style="margin-top: 0.5em; margin-bottom: 0;">
-          </div>
-
-          <div v-if="businessesInDropDown.length > 0" style="margin-bottom: 0.1em">
-            <hr v-if="isActingAsUser" style="margin-top: 0; margin-bottom: 0;" >
-            <sub style="margin-left:2em">Business Accounts</sub>
-
-            <b-dropdown-item
-                v-for="business in businessesInDropDown"
-                v-bind:key="business.id"
-                @click="actAsBusiness(business)"
-                class="business-name-drop-down">
-              {{business.name}}
-            </b-dropdown-item>
-
-            <hr style="margin-top: 0.5em; margin-bottom: 0.5em;">
-          </div>
-
-          <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
-        </b-nav-item-dropdown>
-      </b-navbar-nav>
-
     </b-collapse>
+
+    <NotificationDropdown class="ml-auto"/>
+
+    <b-dropdown right variant="link" toggle-class="text-decoration-none">
+      <template #button-content>
+        <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
+        <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
+        <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+      </template>
+
+      <div v-if="!isActingAsUser">
+        <hr style="margin-top: 0; margin-bottom: 0;">
+        <sub style="padding-left:2em;">User Accounts</sub>
+        <b-dropdown-item
+            style="margin-top: 0.1em"
+            @click="actAsUser()"
+            class="user-name-drop-down">
+          {{$currentUser.firstName}}
+        </b-dropdown-item>
+        <hr style="margin-top: 0.5em; margin-bottom: 0;">
+      </div>
+
+      <div v-if="businessesInDropDown.length > 0" style="margin-bottom: 0.1em">
+        <hr v-if="isActingAsUser" style="margin-top: 0; margin-bottom: 0;" >
+        <sub style="margin-left:2em">Business Accounts</sub>
+
+        <b-dropdown-item
+            v-for="business in businessesInDropDown"
+            v-bind:key="business.id"
+            @click="actAsBusiness(business)"
+            class="business-name-drop-down">
+          {{business.name}}
+        </b-dropdown-item>
+
+        <hr style="margin-top: 0.5em; margin-bottom: 0.5em;">
+      </div>
+
+      <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
+    </b-dropdown>
   </b-navbar>
 </template>
 
