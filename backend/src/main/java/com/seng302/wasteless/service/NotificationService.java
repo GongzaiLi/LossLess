@@ -3,13 +3,13 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.model.NotificationType;
-import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
@@ -56,17 +56,19 @@ public class NotificationService {
 
     /**
      * Send a notification made from the parameters to every user in the usersToNotify list
+     * This uses a batched update to run faster.
      *
-     * @param usersToNotify List of users to send the notification to
+     * @param usersToNotify List of ids of users to send the notification to
      * @param subjectId The Integer id of the subject the notification is created for if applicable. Can be null
      * @param type String detailing the type of notification being created. Can not be Null
      * @param message String with the contents of the message of the notification. Can be null
      */
-    public void notifyAllUsers(List<User> usersToNotify, Integer subjectId, NotificationType type, String message) {
-        for (User user: usersToNotify) {
-            var notification = createNotification(user.getId(), subjectId, type, message);
-            saveNotification(notification);
-        }
+    public void notifyAllUsers(List<Integer> usersToNotify, Integer subjectId, NotificationType type, String message) {
+        List<Notification> notifications = usersToNotify.stream().map(
+                userId -> createNotification(userId, subjectId, type, message)
+        ).collect(Collectors.toList());
+
+        notificationRepository.saveAll(notifications);
     }
 
 }

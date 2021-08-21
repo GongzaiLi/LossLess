@@ -260,8 +260,7 @@ describe("Listing search ", () => {
     wrapper.vm.searchQuery = 'ABCDE';
     wrapper.vm.search();
     await wrapper.vm.$nextTick();
-    expect($router.go).toHaveBeenCalled();
-    expect($router.replace).not.toHaveBeenCalled();
+    expect($router.replace).toHaveBeenCalled();
   })
 
   test('goes to new route if query is not the name', async () => {

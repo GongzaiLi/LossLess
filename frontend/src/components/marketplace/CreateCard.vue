@@ -53,6 +53,7 @@
       </b-input-group>
       <b-input-group class="mb-1">
         <b-form-tags input-id="keyword-name" v-model="createCardForm.keywords" name="blah" :tag-validator="tagValidator"
+                     invalid-tag-text="Tag too long - Max length allowed is 10"
                      :limit=5 :required="tagRequired"/>
       </b-input-group>
       <br>

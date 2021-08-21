@@ -34,16 +34,13 @@
               </b-select>
             </div>
           </b-col>
-
-          <b-col class="search_button" cols="3" md="1">
-            <b-button type="submit">Search</b-button>
+          <b-col class="search_button" cols="3" md="2">
+            <b-button v-b-toggle.collapse-1><b-icon-sliders/> Filter</b-button>
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
             <b-button type="submit" variant="primary">Search</b-button>
           </b-col>
-
-
         </b-row>
         <hr>
 
@@ -125,7 +122,7 @@
 
       <b-row class="listing_row" cols-lg="3" cols-md="3">
         <b-col v-for="(listing,index) in listings" :key="index" class="mb-4">
-          <partial-listing-card :listing="listing"></partial-listing-card>
+          <partial-listing-card :listing="listing" :search-query="search"></partial-listing-card>
         </b-col>
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
@@ -200,7 +197,13 @@ export default {
   },
   async mounted() {
     this.$refs.searchInput.focus();
+
     this.search.productName = this.$route.query.searchQuery || "";
+    const queryObject = this.$route.query.queryHistory;
+    if (queryObject && Object.keys(queryObject).length !== 0 && queryObject.constructor === Object) {
+      this.search = queryObject;
+    }
+
     await this.getListings();
     this.search.closesStartDate = getToday();
     this.initialized = true;
@@ -274,15 +277,6 @@ export default {
   },
 
   watch: {
-    /**
-     * This watches for those routing changes, so when the search query param is changed (eg from the navbar)
-     * then the search query is re-sent
-     */
-    $route(to) {
-      this.search.productName = to.query.searchQuery || '';
-      this.getListings(true);
-      this.$refs.searchInput.focus();
-    },
 
     '$data.currentPage': {
       handler: function() {

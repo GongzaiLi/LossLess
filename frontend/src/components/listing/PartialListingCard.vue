@@ -1,5 +1,6 @@
 <template>
-  <b-card class="b_card_listing shadow-sm" @click="$router.push(`/listings/${listing.id}`)">
+  <b-card class="b_card_listing shadow-sm"
+          @click="$router.push({path: `/listings/${listing.id}`, query: {queryHistory : searchQuery}})">
     <b-card-title>{{ listing.quantity }} x {{ listing.inventoryItem.product.name }}</b-card-title>
 
     <hr>
@@ -18,7 +19,7 @@
     <span>Closes: {{ listing.closes }}</span>
     <template #footer>
       <h5 class="listing_price" v-if="currency">
-        {{ currency.symbol }}{{ listing.price }} {{currency.code}}
+        {{ currency.symbol }}{{ listing.price }} {{ currency.code }}
       </h5>
     </template>
   </b-card>
@@ -46,7 +47,7 @@ import Api from "../../Api";
 
 export default {
   name: "PartialListingCard",
-  props: ["listing"],
+  props: ["listing", "searchQuery"],
   data() {
     return {
       currency: null,

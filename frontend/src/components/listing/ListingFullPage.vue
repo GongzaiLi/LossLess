@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-link variant="info" class="back-to-search-link" to="/listingSearch">
+    <b-link variant="info" class="back-to-search-link" @click="listingPageRedirect">
       <strong>
         <h4>
           <b-icon-arrow-left/>
@@ -122,7 +122,7 @@
       <b-modal id="completedPurchaseModal" title="Purchase Successful"
                cancel-variant="primary" cancel-title="Back to Search" @cancel="listingPageRedirect"
                ok-variant="primary" ok-title="Go to Home Page" @ok="$router.push('/homepage')"
-               no-close-on-backdrop no-close-on-esc>
+               no-close-on-backdrop no-close-on-esc hide-header-close>
         <h6>
           You have successfully purchased listing: {{listingItem.inventoryItem.product.name}}.
         </h6>
@@ -228,9 +228,11 @@ export default {
       error: "",
       errorFlag: false,
       errMessage: null,
+      queryHistory: {}
     }
   },
   async mounted() {
+    this.queryHistory = this.$route.query.queryHistory
     await this.setListingData();
   },
 
@@ -246,8 +248,12 @@ export default {
 
       const currentListingId = this.$route.params.id
       await Api.getListing(currentListingId)
-          .then(async listingData => {
-            this.listingItem = listingData.data
+        .then(async listingData => {
+          this.listingItem = listingData.data;
+
+          let product = this.listingItem.inventoryItem.product;
+          product.images = product.images.filter((a) => a.id !== product.primaryImage.id);
+          product.images.unshift(product.primaryImage);
 
             const address = this.listingItem.business.address;
             this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
@@ -336,8 +342,8 @@ export default {
     /**
      * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
      */
-    listingPageRedirect() {
-      this.$router.push({path: `/listingSearch`, query: { searchQuery: "" }});
+    listingPageRedirect: function () {
+      this.$router.push({path: `/listingSearch`, query: {queryHistory: this.queryHistory}});
     },
 
     /**
