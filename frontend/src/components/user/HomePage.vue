@@ -80,7 +80,6 @@
 <script>
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
-import {updatePurchasedNotifications} from "../../util";
 import Notification from "../model/Notification";
 
 export default {
@@ -140,18 +139,12 @@ export default {
      * cards that have expired.
      */
     async updateNotifications() {
-      console.log(this.$currentUser);
       const expiredCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
       if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;
 
-      for (let notification of this.notifications) {
-        if (notification.type === "Purchased listing") {
-          await updatePurchasedNotifications(notification)
-        }
-      }
     },
 
     /**
@@ -167,18 +160,6 @@ export default {
       }
     },
 
-    // /**
-    //  * Updates the purchase listing notification with the product data
-    //  *
-    //  */
-    // async updatePurchasedNotifications(notification) {
-    //   this.purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
-    //   const address = this.purchasedListing.business.address;
-    //   notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-    //    const currency = await Api.getUserCurrency(address.country);
-    //   notification.price = currency.symbol + this.purchasedListing.price + " " + currency.code
-    //   notification.message = `${this.purchasedListing.quantity} x ${this.purchasedListing.product.name}`
-    // }
   },
 
   created() {
