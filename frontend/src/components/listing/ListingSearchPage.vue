@@ -8,7 +8,7 @@
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
-              <b-input ref="searchInput" placeholder="Product Name" v-model="search.productName"></b-input>
+              <b-input ref="searchInput" placeholder="All Product Names" v-model="search.productName"></b-input>
             </b-input-group>
           </b-col>
 
@@ -47,7 +47,7 @@
           <b-row>
             <b-col cols="12" md="4">
               <label>Business Name:</label>
-              <b-input v-model="search.businessName"></b-input>
+              <b-input placeholder="All Businesses" v-model="search.businessName"></b-input>
             </b-col>
             <b-col cols="12" md="4">
               <label>Business Types:</label>
@@ -77,7 +77,7 @@
             </b-col>
             <b-col cols="12" md="4">
               <label>Business Location:</label>
-              <b-input placeholder="Type a country, city or suburb" v-model="search.businessLocation"></b-input>
+              <b-input placeholder="All countries, cities or suburbs" v-model="search.businessLocation"></b-input>
             </b-col>
 
           </b-row>
@@ -94,8 +94,9 @@
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input type="date" v-model="search.closesEndDate"></b-input>
+                  <b-input placeholder="Any" type="date" v-model="search.closesEndDate"></b-input>
                 </div>
+                <label class="any_label">(Any if blank)</label>
               </div>
             </b-col>
             <b-col cols="12" md="4">
@@ -105,11 +106,11 @@
                   <div class="input-group-text">Price:</div>
                 </div>
                 <div>
-                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="Min" v-model="search.priceMin"></b-input>
+                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="Any" v-model="search.priceMin"></b-input>
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input class="price_max" step="0.01" min="0.01" max="1000000.00" type="number" placeholder="Max" v-model="search.priceMax"></b-input>
+                  <b-input class="price_max" step="0.01" min="0.01" max="1000000.00" type="number" placeholder="Any" v-model="search.priceMax"></b-input>
                 </div>
               </div>
 
@@ -147,6 +148,10 @@
 .to_label {
   margin-left: 1rem;
   margin-right: 1rem;
+  margin-top: auto;
+}
+
+.any_label {
   margin-top: auto;
 }
 
