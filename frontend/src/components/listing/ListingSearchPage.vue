@@ -1,4 +1,5 @@
 <template>
+  <b-overlay :show="loading">
   <b-card class="b_card_main shadow-lg" id="listing-search">
     <b-container>
       <h1>Search Listings</h1>
@@ -133,6 +134,7 @@
       <pagination v-if="totalResults > perPage" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
     </b-container>
   </b-card>
+  </b-overlay>
 </template>
 
 <style>
@@ -190,6 +192,7 @@ export default {
         priceMax: "",
         businessTypes: []
       },
+      loading: false,
       business: {},
       listings: [],
       perPage: 9,
@@ -216,6 +219,8 @@ export default {
      * @param newQuery True if this query should reset pagination back to 0
      **/
     getListings: async function (newQuery=false) {
+      const timer = setTimeout(() =>  this.loading = true, 500);
+
       if (newQuery) {
         this.currentPage = 0;
       }
@@ -233,6 +238,9 @@ export default {
           this.currentPage - 1)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
       this.listings = resp.listings;
       this.totalResults = resp.totalItems;
+
+      this.loading = false;
+      clearTimeout(timer);
     },
 
     /**
