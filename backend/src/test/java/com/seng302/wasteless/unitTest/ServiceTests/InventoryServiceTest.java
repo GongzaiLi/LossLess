@@ -1,9 +1,11 @@
 package com.seng302.wasteless.unitTest.ServiceTests;
 
 
+import com.seng302.wasteless.model.Inventory;
 import com.seng302.wasteless.repository.InventoryRepository;
 import com.seng302.wasteless.service.InventoryService;
 import com.seng302.wasteless.service.UserService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -40,8 +42,46 @@ class InventoryServiceTest {
             success = false;
             assertEquals(400, e.getRawStatusCode());
         }
-        assert !success;
+        Assertions.assertFalse(success);
 
+    }
+
+
+    @Test
+    void whenUpdateQuantityUnlisted_AndQuantityUnlistedLessThenZero_ThrowException() {
+        Inventory inventory = new Inventory();
+        inventory.setQuantity(2);
+        inventory.setQuantityUnlisted(0);
+
+
+        boolean success = true;
+        try {
+            InventoryService inventoryService = new InventoryService(inventoryRepository);
+            inventoryService.updateQuantityUnlisted(inventory, 1);
+        } catch (ResponseStatusException e) {
+            success = false;
+            assertEquals(400, e.getRawStatusCode());
+        }
+        Assertions.assertFalse(success);
+
+    }
+
+    @Test
+    void whenUpdateQuantityUnlisted_AndQuantityUnlistedMoreThanEqualZero() {
+        Inventory inventory = new Inventory();
+        inventory.setQuantity(2);
+        inventory.setQuantityUnlisted(1);
+
+
+        boolean success = true;
+        try {
+            InventoryService inventoryService = new InventoryService(inventoryRepository);
+            inventoryService.updateQuantityUnlisted(inventory, 100);
+        } catch (ResponseStatusException e) {
+            success = false;
+            assertEquals(400, e.getRawStatusCode());
+        }
+        Assertions.assertTrue(success);
 
     }
 

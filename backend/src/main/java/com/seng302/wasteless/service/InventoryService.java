@@ -94,5 +94,23 @@ public class InventoryService {
         return inventoryRepository.countInventoryByBusinessIdAndQuantityGreaterThanAndProductIdContainsAllIgnoreCase(id, 0, searchQuery);
     }
 
+    /**
+     * when edit inventory quantity, then update the inventory quantity unlisted.
+     * @param inventory the inventory is edited
+     * @param editedInventoryQuantity the edit inventory's new quantity number.
+     * @throws  ResponseStatusException The new quantity is less than the quantity of this inventory that is currently listed
+     */
+    public void updateQuantityUnlisted(Inventory inventory, Integer editedInventoryQuantity) {
+
+        int quantityUnlisted = inventory.getQuantityUnlisted() + editedInventoryQuantity - inventory.getQuantity();
+        if (quantityUnlisted < 0) {
+            logger.warn(
+                    "The given quantity is too low. The new quantity is less than the quantity {} of this inventory that is currently listed",
+                    inventory.getQuantityUnlisted());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The new quantity is less than the quantity %s of this inventory that is currently listed", inventory.getQuantityUnlisted()));
+        }
+        inventory.setQuantityUnlisted(quantityUnlisted);
+    }
+
 
 }
