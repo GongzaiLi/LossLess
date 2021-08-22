@@ -20,6 +20,7 @@ const $currentUser = {
     }}
 
 beforeEach(() => {
+
     mockListing = {
         "id": 1,
         "businessId": 1,
@@ -180,3 +181,5 @@ describe('Testing like and dislike functionality', () => {
         expect(wrapper.vm.listingItem.currentUserLikes).toStrictEqual(false);
     })
 })
+
+

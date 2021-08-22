@@ -8,11 +8,26 @@ import {getToday} from "../../util";
 import testCards from './testCards.json';
 
 let wrapper;
+let defaultFilters;
 
 jest.mock('../../Api');
 jest.mock('../../util');
 
 beforeEach(() => {
+
+  defaultFilters = {
+    productName: "",
+    sort: "inventoryItem.product.name,asc",
+    businessName: "",
+    selectedBusinessType: null,
+    businessLocation: "",
+    closesStartDate: "",
+    closesEndDate: "",
+    priceMin: "",
+    priceMax: "",
+    businessTypes: []
+  }
+
   Api.searchListings.mockResolvedValue({data: testCards});
   getToday.mockReturnValueOnce("2021-08-12");
 
@@ -116,3 +131,22 @@ describe('Sort orders for API computed ', () => {
     expect(wrapper.vm.sortOrdersForAPI).toStrictEqual(["price,desc"]);
   })
 });
+
+describe('Testing search filters clearing functionality', () => {
+  test('Search filters clear when clear button is pressed', () => {
+    wrapper.vm.search.productName = "ABC"
+    wrapper.vm.search.sort = "inventoryItem.product.name,asc"
+    wrapper.vm.search.businessName = "XYZ"
+    wrapper.vm.search.selectedBusinessType = null
+    wrapper.vm.search.businessLocation = "some business"
+    wrapper.vm.search.closesStartDate = ""
+    wrapper.vm.search.closesEndDate = ""
+    wrapper.vm.search.priceMin = "5"
+    wrapper.vm.search.priceMax = "10"
+    wrapper.vm.search.businessTypes = []
+
+    wrapper.vm.clearFilters()
+    expect(wrapper.vm.search).toStrictEqual(defaultFilters);
+  })
+
+})
