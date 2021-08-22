@@ -309,13 +309,21 @@ export default {
   },
 
   watch: {
-
+    "$route": {
+      handler: function(to) {
+        if (to.name === 'listings-search' && localStorage.getItem('listingPurchased') === "true") {
+          this.getListings();
+          localStorage.setItem('listingPurchased', "false");
+        }
+      },
+      deep: true
+    },
     '$data.currentPage': {
       handler: function() {
         this.getListings();
       },
       deep: true
-    }
+    },
   }
 }
 </script>

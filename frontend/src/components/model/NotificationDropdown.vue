@@ -100,9 +100,10 @@ export default {
 
 <style>
 .notifications-item {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #aaa;
   width: 26rem;
   max-width: 80vw;
+  padding-top: 2px;
 }
 
 .notifications-item h6 {
