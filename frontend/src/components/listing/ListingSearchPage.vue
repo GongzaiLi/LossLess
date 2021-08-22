@@ -272,7 +272,6 @@ export default {
       this.search.businessName = ""
       this.search.selectedBusinessType = null
       this.search.businessLocation = ""
-      this.search.closesStartDate =  getToday()
       this.search.closesEndDate = ""
       this.search.priceMin = ""
       this.search.priceMax = ""
