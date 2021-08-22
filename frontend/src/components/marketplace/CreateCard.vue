@@ -123,8 +123,8 @@ export default {
           + (currentDate.getMonth() + 1) + "/"
           + currentDate.getFullYear() + " @ "
           + currentDate.getHours() + ":"
-          + currentDate.getMinutes() + ":"
-          + currentDate.getSeconds();
+          + this.addLeadingZero(currentDate.getMinutes()) + ":"
+          + this.addLeadingZero(currentDate.getSeconds());
       api
           .getUser(id)
           .then((response) => {
@@ -148,6 +148,21 @@ export default {
      */
     createAction() {
       this.$emit('createAction', this.createCardForm);
+    },
+
+    /**
+     * Adds a leading zero before a number if it is below 10
+     * Used for formatting hours and seconds nicely when displaying times
+     * @param number The number to potentially have a 0 put in front of
+     * @returns {string} A string of the input number with an added 0 if below 10
+     */
+    addLeadingZero(number){
+      if (number<10){
+        return '0'+number.toString()
+      }
+      else{
+        return number.toString()
+      }
     }
 
   },
