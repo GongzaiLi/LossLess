@@ -28,6 +28,7 @@ public class Inventory {
     @JsonView(InventoryViews.GetInventoryView.class)
     private Integer id;
 
+    @JsonView(ListingViews.GetListingView.class)
     @NotNull
     @Column
     private Integer businessId;
@@ -78,4 +79,8 @@ public class Inventory {
     @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
     private LocalDate expires;
 
+    @PositiveOrZero
+    @Column(name = "quantity_unlisted")
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    private Integer quantityUnlisted;
 }

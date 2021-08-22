@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.InventoryViews;
 import com.seng302.wasteless.view.ListingViews;
 import com.seng302.wasteless.view.ProductViews;
+import com.seng302.wasteless.view.PurchasedListingView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 /**
  * An implementation of Product model.
@@ -29,41 +30,41 @@ public class Product {
     @Column(name = "database_id")
     private Long databaseId;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "code", unique = true)
     private String id;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "name")
     @NotBlank(message = "product name is mandatory")
     private String name;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "description")
     private String description;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "manufacturer")
     private String manufacturer;
 
     @PositiveOrZero
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "recommended_retail_price")
     private Double recommendedRetailPrice;
 
-    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({ProductViews.PostProductRequestView.class, InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "created")
     private LocalDate created;
 
     @Column(name = "business_id")
     private Integer businessId;
 
-    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @Column(name = "image_ids")
     @OneToMany(fetch = FetchType.EAGER) //Eager so it is actually retrieved for testing
-    private List<ProductImage> images;
+    private Set<ProductImage> images;
 
-    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class})
+    @JsonView({InventoryViews.GetInventoryView.class, ListingViews.GetListingView.class, PurchasedListingView.GetPurchasedListingView.class})
     @JoinColumn(name = "primary_Image")
     @OneToOne
     private ProductImage primaryImage;

@@ -2,18 +2,18 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetListingDto;
+import com.seng302.wasteless.dto.GetListingsDto;
+import com.seng302.wasteless.dto.GetPurchasedListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
-import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.InventoryService;
-import com.seng302.wasteless.service.ListingsService;
-import com.seng302.wasteless.service.UserService;
-import com.seng302.wasteless.view.ListingViews;
+import com.seng302.wasteless.service.*;
+import com.seng302.wasteless.view.PurchasedListingView;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +21,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 /**
  * ListingsController is used for mapping all Restful API requests starting with the address "/businesses/{id}/listings".
@@ -41,16 +39,23 @@ public class ListingController {
     private final UserService userService;
     private final InventoryService inventoryService;
     private final ListingsService listingsService;
+    private final NotificationService notificationService;
+    private final PurchasedListingService purchasedListingService;
 
 
     @Autowired
-    public ListingController(BusinessService businessService, UserService userService, InventoryService inventoryService, ListingsService listingsService) {
+    public ListingController(BusinessService businessService,
+                             UserService userService,
+                             InventoryService inventoryService,
+                             ListingsService listingsService,
+                             PurchasedListingService purchasedListingService,
+                             NotificationService notificationService) {
         this.businessService = businessService;
         this.userService = userService;
         this.inventoryService = inventoryService;
         this.listingsService = listingsService;
-
-
+        this.notificationService = notificationService;
+        this.purchasedListingService = purchasedListingService;
     }
 
     /**
@@ -67,46 +72,45 @@ public class ListingController {
      */
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
-        logger.info("Post request to create business LISTING, business id: {}, PostListingsDto {}", businessId, listingsDtoRequest);
+        logger.info("Post request to create business LISTING, business id: {}", businessId);
 
         User user = userService.getCurrentlyLoggedInUser();
 
         logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-
-        logger.info("Retrieving inventory with id `{}` from business with id `{}` ", listingsDtoRequest, possibleBusiness);
-        logger.info("Retrievrf `{}` ", listingsDtoRequest.getInventoryItemId());
         Inventory possibleInventoryItem = inventoryService.findInventoryById(listingsDtoRequest.getInventoryItemId());
-
 
         if (possibleInventoryItem.getExpires().isBefore(LocalDate.now())) {
             logger.warn("Cannot create LISTING. Inventory item expiry: {} is in the past.", possibleInventoryItem.getExpires());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item expiry is in the past.");
         }
 
-        Integer availableQuantity = possibleInventoryItem.getQuantity();
+        if (possibleInventoryItem.getQuantityUnlisted() == null) {
+            possibleInventoryItem.setQuantityUnlisted(possibleInventoryItem.getQuantity());
+        }
+
+        Integer availableQuantity = possibleInventoryItem.getQuantityUnlisted();
         Integer listingQuantity = listingsDtoRequest.getQuantity();
 
         if (availableQuantity < listingQuantity) {
-            logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.",listingQuantity, availableQuantity);
+            logger.warn("Cannot create LISTING. Listing quantity: {} greater than available inventory quantity: {}.", listingQuantity, availableQuantity);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Listing quantity greater than available inventory quantity.");
         }
 
-        Integer remainingQuantity = availableQuantity - listingQuantity;
-
+        Integer quantityRemaining = possibleInventoryItem.getQuantityUnlisted() - listingQuantity;
 
         Listing listing = PostListingsDtoMapper.postListingsDto(listingsDtoRequest);
 
-        listing.setBusinessId(businessId);
+        listing.setBusiness(possibleBusiness);
         listing.setCreated(LocalDate.now());
+        listing.setUsersLiked(0);
 
         listing = listingsService.createListing(listing);
 
-        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(remainingQuantity, possibleInventoryItem.getId());
+        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(quantityRemaining, possibleInventoryItem.getId());
 
         if (updateQuantityResult == 0) {
             logger.error("No inventory item quantity value was updated when this listing was created.");
@@ -116,8 +120,7 @@ public class ListingController {
             logger.info("Inventory item quantity value was updated when this listing was created.");
         }
 
-
-        logger.info("Created new Listing {}", listing);
+        logger.info("Created new Listing with Id {}", listing.getId());
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("listingId", listing.getId());
@@ -129,29 +132,178 @@ public class ListingController {
      * Handle get request to /businesses/{id}/listings endpoint for retrieving all listings for a business
      *
      * @param businessId The id of the business to get
-     * @param pageable pagination and sorting params
+     * @param pageable   pagination and sorting params
      * @return Http Status 200 and list of listings if valid, 401 is unauthorised, 403 if forbidden, 406 if invalid id
      */
     @GetMapping("/businesses/{id}/listings")
-    @JsonView(ListingViews.GetListingView.class)
     public ResponseEntity<Object> getListingsOfBusiness(@PathVariable("id") Integer businessId, Pageable pageable) {
         logger.info("Get request to GET business LISTING, business id: {}", businessId);
 
-        logger.debug("Retrieving business with id: {}", businessId);
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+        businessService.findBusinessById(businessId);
 
         List<Listing> listings = listingsService.findBusinessListingsWithPageable(businessId, pageable);
 
-        Integer totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+        Long totalItems = listingsService.getCountOfAllListingsOfBusiness(businessId);
+        User user = userService.getCurrentlyLoggedInUser();
+        GetListingsDto getListingsDto = new GetListingsDto(listings, totalItems, user);
 
-        GetListingDto getListingDto = new GetListingDto()
-                .setListings(listings)
-                .setTotalItems(totalItems);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingsDto);
+    }
 
-        logger.info("{}", getListingDto);
-        return ResponseEntity.status(HttpStatus.OK).body(getListingDto);
+
+    /**
+     * Handle get request to /listings/{id} endpoint for retrieving the listing with given id
+     *
+     * @param listingId The id of the listing to get
+     * @return Http Status 200 and the listing if valid, 401 if user is not logged in and 406 if invalid listing id
+     */
+    @GetMapping("/listings/{id}")
+    public ResponseEntity<Object> getListingWithId(@PathVariable("id") Integer listingId) {
+        logger.info("Get request to GET a LISTING with id: {}", listingId);
+        User user = userService.getCurrentlyLoggedInUser();
+        Listing listing = listingsService.findFirstById(listingId);
+
+        GetListingDto dtoListing = new GetListingDto(listing, user.checkUserLikesListing(listing));
+
+        logger.info("Retrieved listing with ID: {}", dtoListing);
+
+        return ResponseEntity.status(HttpStatus.OK).body(dtoListing);
+    }
+
+
+    /**
+     * Handles endpoint to search for listings
+     *
+     * @param searchQuery      The query string to search listings with. Should be set to value of query param 'searchQuery' via Spring magic.
+     * @param priceLower       Lower inclusive bound for listing prices
+     * @param priceUpper       Upper inclusive bound for listing prices
+     * @param businessName     Business name to match against listings
+     * @param businessTypes    List of business types to match against listings
+     * @param closingDateStart A date string to filter listings with. This sets the start range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param closingDateEnd   A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param address          Address to match against suburb, city, and country of lister of listing
+     * @param pageable         pagination and sorting params
+     * @return Http Status 200 if valid query, 401 if unauthorised
+     */
+    @GetMapping("/listings/search")
+    public ResponseEntity<Object> getListingsOfBusiness(
+            @RequestParam Optional<String> searchQuery,
+            @RequestParam Optional<Double> priceLower,
+            @RequestParam Optional<Double> priceUpper,
+            @RequestParam Optional<String> businessName,
+            @RequestParam Optional<List<String>> businessTypes,
+            @RequestParam Optional<LocalDate> closingDateStart,
+            @RequestParam Optional<LocalDate> closingDateEnd,
+            @RequestParam Optional<String> address,
+            Pageable pageable) {
+
+        logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, closingDateStart: {} closingDateEnd: {}, address: {}",
+                searchQuery, priceLower, priceUpper, businessName, businessTypes, closingDateStart, closingDateEnd, address);
+
+
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address,closingDateStart, closingDateEnd, pageable);
+        User user = userService.getCurrentlyLoggedInUser();
+        GetListingsDto getListingsDto = new GetListingsDto(listings.getContent(), listings.getTotalElements(), user);
+        logger.info(getListingsDto);
+        return ResponseEntity.status(HttpStatus.OK).body(getListingsDto);
+    }
+
+
+    /**
+     * Handle PUT request to /listings/{listingId}/like endpoint for adding or removing like(s) on a listing
+     * <p>
+     * Checks user is logged in
+     * Checks listing with id exists
+     * Checks if user already has liked listing:
+     * if unliked then listing becomes liked
+     * if liked listing becomes unliked
+     *
+     * @param listingId id of listing to be liked or unliked
+     * @return Json object with boolean "liked" true = liked, false = unliked
+     * Http Status 200 if valid query, 401 if unauthorised, 406 if invalid listing id
+     */
+    @PutMapping("/listings/{listingId}/like")
+    public ResponseEntity<Object> addLikeToListing(@PathVariable Integer listingId) {
+        User user = userService.getCurrentlyLoggedInUser();
+        Listing listing = listingsService.findFirstById(listingId);
+        logger.info("Retrieved listing with ID: {}", listingId);
+        Boolean likeStatus = user.toggleListingLike(listing);
+        listingsService.updateListing(listing);
+        userService.saveUserChanges(user);
+        Notification likedStatusNotification;
+        if (Boolean.TRUE.equals(likeStatus)) {
+            likedStatusNotification = notificationService.createNotification(user.getId(), listing.getId(), NotificationType.LIKEDLISTING, String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
+        } else {
+            likedStatusNotification = notificationService.createNotification(user.getId(), listing.getId(), NotificationType.UNLIKEDLISTING, String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
+
+        }
+        notificationService.saveNotification(likedStatusNotification);
+        JSONObject responseBody = new JSONObject();
+        responseBody.put("liked", likeStatus);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+    }
+
+    /**
+     * Handles requests to the endpoint to purchase a listing
+     *
+     * Notifies user they have purchased this listing
+     * Notifies all other users who had liked this listing that it has been purchased by someone else
+     *
+     *
+     * @param listingId The id of the listing being purchased
+     * @return A 200 OK status if the listing is successfully purchased.
+     * A 406 status if no listing exists with the given id
+     */
+    @PostMapping("/listings/{id}/purchase")
+    public ResponseEntity<Object> purchaseListing(@PathVariable("id") Integer listingId) {
+        logger.info("Request to purchase listing with ID: {}", listingId);
+
+        var listing = listingsService.findFirstById(listingId);
+
+        List<Integer> usersWhoLiked = userService.findUserIdsByLikedListing(listing);
+
+        var purchasedListing = listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
+
+        var purchaseNotification = notificationService.createNotification(userService.getCurrentlyLoggedInUser().getId(),
+                purchasedListing.getId(), NotificationType.PURCHASED_LISTING, String.format("You have purchased %s of the product %s",
+                purchasedListing.getQuantity(), purchasedListing.getProduct().getName()));
+
+        notificationService.saveNotification(purchaseNotification);
+
+        usersWhoLiked.remove(userService.getCurrentlyLoggedInUser().getId());
+
+        notificationService.notifyAllUsers(usersWhoLiked, purchasedListing.getId(), NotificationType.LIKEDLISTING_PURCHASED,  String.format("The listing you liked of the product %s has been purchased by someone else", purchasedListing.getProduct().getName()));
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * Handles requests to the endpoint to get a purchased listing
+     *
+     * @param purchaseId    The id of the listing being purchased
+     * @return              A 200 OK status if the listing is successfully purchased and a purchased entity
+     *                      A 400 status if purchase Id not exist
+     *                      A 403 status if login user is not a purchaser or UserAdminOfBusiness Or GAA
+     */
+    @GetMapping("/purchase/{id}")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
+    public ResponseEntity<Object> getPurchaseListing(@PathVariable("id") Integer purchaseId) {
+        var purchasedListing = purchasedListingService.findPurchasedListingById(purchaseId);
+
+        logger.info("Retrieved Purchase Listing with ID: {}", purchaseId);
+        if (purchasedListing == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("purchase Id does not exist.");
+        }
+
+        var loginUser = userService.getCurrentlyLoggedInUser();
+
+        if (!purchasedListing.getPurchaser().getId().equals(loginUser.getId()) && Boolean.FALSE.equals(businessService.checkUserAdminOfBusinessOrGAA(purchasedListing.getBusiness(), loginUser))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to make this request");
+        }
+
+        GetPurchasedListingDto getPurchasedListingDto = new GetPurchasedListingDto(purchasedListing);
+
+        return ResponseEntity.status(HttpStatus.OK).body(getPurchasedListingDto);
     }
 
     /**
@@ -193,5 +345,6 @@ public class ListingController {
         errors.put(constraintName, errorMsg);
         return errors;
     }
+
 
 }

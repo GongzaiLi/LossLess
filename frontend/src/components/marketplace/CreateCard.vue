@@ -9,9 +9,9 @@
     <b-input-group-text>
       <b-container>
         <h6 style="text-align:center"><strong> Card Info: </strong></h6>
-        <label> Seller Name: {{ cardInfo.fullName }} </label>
+        <label> Creator: {{ cardInfo.fullName }} </label>
         <br>
-        <label> Seller Location: {{ cardInfo.location }} </label>
+        <label> Location: {{ cardInfo.location }} </label>
         <br>
         <label> Creation Date: {{ cardInfo.dateCreated }} </label>
       </b-container>
@@ -53,6 +53,7 @@
       </b-input-group>
       <b-input-group class="mb-1">
         <b-form-tags input-id="keyword-name" v-model="createCardForm.keywords" name="blah" :tag-validator="tagValidator"
+                     invalid-tag-text="Tag too long - Max length allowed is 10"
                      :limit=5 :required="tagRequired"/>
       </b-input-group>
       <br>
@@ -122,8 +123,8 @@ export default {
           + (currentDate.getMonth() + 1) + "/"
           + currentDate.getFullYear() + " @ "
           + currentDate.getHours() + ":"
-          + currentDate.getMinutes() + ":"
-          + currentDate.getSeconds();
+          + this.addLeadingZero(currentDate.getMinutes()) + ":"
+          + this.addLeadingZero(currentDate.getSeconds());
       api
           .getUser(id)
           .then((response) => {
@@ -147,6 +148,21 @@ export default {
      */
     createAction() {
       this.$emit('createAction', this.createCardForm);
+    },
+
+    /**
+     * Adds a leading zero before a number if it is below 10
+     * Used for formatting hours and seconds nicely when displaying times
+     * @param number The number to potentially have a 0 put in front of
+     * @returns {string} A string of the input number with an added 0 if below 10
+     */
+    addLeadingZero(number){
+      if (number<10){
+        return '0'+number.toString()
+      }
+      else{
+        return number.toString()
+      }
     }
 
   },

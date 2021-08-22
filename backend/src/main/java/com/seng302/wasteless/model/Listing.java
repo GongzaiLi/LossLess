@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -31,8 +32,10 @@ public class Listing {
     private Integer id;
 
     @NotNull
-    @Column
-    private Integer businessId;
+    @ManyToOne
+    @JsonView(ListingViews.GetListingView.class)
+    @JoinColumn(name = "business_id")
+    private Business business;
 
     @NotNull(message = "Inventory id is Mandatory")
     @ManyToOne
@@ -63,11 +66,22 @@ public class Listing {
     @JsonView(ListingViews.GetListingView.class)
     private  LocalDate created;
 
-
     @FutureOrPresent
     @Column(name = "closes")
     @JsonView(ListingViews.GetListingView.class)
     private LocalDate closes;
 
+    @JsonView(ListingViews.GetListingView.class)
+    @Formula("(select count(*) from User_listingsLiked ul where ul.listingsLiked_id=id)")
+    private Integer usersLiked;
 
+    /**
+     * Purchases this listing by decreasing the quantity of the listing's inventory item.
+     * @param purchaser The user that purchased this listing
+     * @return A PurchasedListing object representing a record of this purchase
+     */
+    public PurchasedListing purchase(User purchaser) {
+        inventoryItem.setQuantity(inventoryItem.getQuantity() - quantity);
+        return new PurchasedListing(this, purchaser);
+    }
 }

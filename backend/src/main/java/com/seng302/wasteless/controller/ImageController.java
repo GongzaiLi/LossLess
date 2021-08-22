@@ -77,14 +77,10 @@ public class ImageController {
 
         User user = userService.getCurrentlyLoggedInUser();
 
-        logger.info("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-        logger.info("Check if product with id ` {} ` exists on for business with id ` {} ` ", productId, businessId);
         Product possibleProduct = productService.findProductById(productId);
 
         productService.checkProductBelongsToBusiness(possibleProduct, businessId);
@@ -94,9 +90,7 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
         }
 
-        int numProductImages = possibleProduct.getImages().size();
-
-        if (numProductImages >= 5) {
+        if (possibleProduct.getImages().size() >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }
@@ -130,7 +124,7 @@ public class ImageController {
 
         productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
         newImage = productImageService.createProductImage(newImage);
-        logger.debug("Created new image entity {}", newImage);
+        logger.debug("Created new image entity with filename {}", newImage.getFileName());
 
 
         Product product = productService.findProductById(productId);
@@ -173,7 +167,6 @@ public class ImageController {
     public ResponseEntity<Object> deleteProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @PathVariable("imageId") Integer imageId) {
 
         User user = userService.getCurrentlyLoggedInUser();
-        logger.info("Got User {}", user);
 
         logger.debug("Retrieving business with id: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
@@ -182,7 +175,6 @@ public class ImageController {
             logger.warn("Cannot delete productImage. User: {} is not global admin or business admin: {}", user, possibleBusiness);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not an admin of the application or this business");
         }
-        logger.info("User: {} validated as global admin or admin of business: {}.", user, possibleBusiness);
 
 
         Product product = productService.findProductById(productId);
@@ -272,7 +264,7 @@ public class ImageController {
             logger.warn("Cannot post product image. Business ID: {} does not exist.", businessId);
             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business does not exist");
         }
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
+        logger.info("Successfully retrieved business with ID: {}.", businessId);
 
         if (!possibleBusiness.checkUserIsAdministrator(user) && !user.checkUserGlobalAdmin()) {
             logger.warn("Cannot post product image. User: {} is not global admin or business admin: {}", user.getId(), businessId);

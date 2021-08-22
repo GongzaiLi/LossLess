@@ -13,21 +13,27 @@ const FormData = require('form-data');
 
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
-const MAX_USERS_PER_API_REQUEST = 100;
+const MAX_USERS_PER_API_REQUEST = 96;
 const HAS_NICKNAME_PROB = 1 / 10;
 const HAS_MIDDLE_NAME_PROB = 4 / 10;
+const PROB_USER_LIKES_LISTINGS = 0.5;
+const MAX_LIKED_LISTINGS_PER_USER = 10;
 
-const NUM_BUSINESSES = 100;
+const NUM_BUSINESSES = 500;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
-const MAX_PRODUCTS_PER_BUSINESS = 100;
-const MIN_PRODUCTS_PER_BUSINESS = 20;
+const MAX_PRODUCTS_PER_BUSINESS = 40;
+const MIN_PRODUCTS_PER_BUSINESS = 10;
 const MAX_PRODUCT_PRICE = 50;
 const MAX_QUANTITY_PRODUCT_IN_INVENTORY = 100;
 const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 const MAX_CARD_PER_USER = 5;
+const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS)/2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
+const LISTING_ID_OF_MAX_LIKED_LISTING = 1;
+const MAX_PURCHASES_PER_USER = 3;
+const PROB_USER_PURCHASES_LISTING = 0.03;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -160,9 +166,78 @@ async function getBusinesses() {
 }
 
 /**
+ * likes listings for non business owning users
+ * all non business users like a specific listing to load test that listing
+ * then a percentage of these users like a random amount of random listings
+ * some users may unlike the high load listing but this is good for notifications of unliking
+ * @param instance for sending api requests
+ * @returns {Promise<void>}
+ */
+async function likeListings(instance) {
+    try {
+        await instance.put(`${SERVER_URL}/listings/${LISTING_ID_OF_MAX_LIKED_LISTING}/like`, null, {
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+            }
+        });
+    } catch(e) {
+        console.log(`Tried to like listing Id ${LISTING_ID_OF_MAX_LIKED_LISTING} for max liked listing, but listing does not exist.`);
+        console.log(`Error message was: ${e}`)
+    }
+    if (Math.random() < PROB_USER_LIKES_LISTINGS) {
+    for (let i = 0; i <= Math.random() * MAX_LIKED_LISTINGS_PER_USER; i++) {
+      const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
+      try {
+        await instance.put(`${SERVER_URL}/listings/${listingId}/like`, null, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+          }
+        });
+      } catch(err) {
+          if (err.response.status !== 406) {
+            console.log(err.message, err.response.data);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Uses axios to make an api called to our backend purchase endpoint,
+ * purchases will only begin being made once all listings have been created,
+ * each user can like up to a maximum number of listings with a specific probability
+ * of liking a listing each time.
+ *
+ * @param instance for sending api requests
+ * @returns {Promise<void>}
+ */
+async function purchaseListing(instance){
+
+    for (let i = 0; i <= Math.random() * MAX_PURCHASES_PER_USER; i++) {
+        if (Math.random() < PROB_USER_PURCHASES_LISTING) {
+            const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
+            try {
+                await instance.post(`${SERVER_URL}/listings/${listingId}/purchase`, null, {
+                    withCredentials: true,
+                    headers: {
+                        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+                    }
+                });
+            } catch(err) {
+                if (err.response.status !== 406) {
+                    console.log(err.message, err.response.data);
+                }
+            }
+        }
+    }
+}
+
+/**
  * Uses axios to make a post request to our backend to create a new user.
  */
-async function registerUser(user) {
+async function registerUser(user, listingsReady=true) {
     const instance = Axios.create({
         baseURL: SERVER_URL,
         timeout: 180000,// set 2 mins
@@ -177,6 +252,8 @@ async function registerUser(user) {
     instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
     await addCard(instance);
+    if (listingsReady) await likeListings(instance);
+    if (listingsReady) await purchaseListing(instance);
     return [response, instance];
 }
 
@@ -184,7 +261,7 @@ async function registerUser(user) {
  * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
  */
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
-    const [response, instance] = await registerUser(user);
+    const [response, instance] = await registerUser(user, false);
     for (let i = 0; i < numBusinesses; i++) {
         const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
         await addProduct(businessResponse.data.businessId, instance, businesses[i]);
@@ -216,22 +293,24 @@ async function registerUsers(users, businesses) {
 
   for (let i=0; i < users.length / MAX_USERS_PER_API_REQUEST; i++) {
     const promises = []
-    for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
-      if (businessesRegistered < NUM_BUSINESSES) {
-        let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
-        if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
-          numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
+    if (businessesRegistered < NUM_BUSINESSES) {
+        for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
+            let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
+            if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
+              numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
+            }
+            promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
+            businessesRegistered += numBusinessesForUser;
         }
-        promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
-        businessesRegistered += numBusinessesForUser;
-      } else {
-        promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
-      }
+    } else {
+        for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
+            promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
+        }
     }
     try {
       await Promise.all(promises);
     } catch(e) {
-      console.log(e);
+      console.log(e.message, e.response.data);
       throw e;
     }
     console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST} users.`);
@@ -385,11 +464,12 @@ async function addListing(businessId, instance, inventory, inventoryItemId) {
  */
 async function addProduct(businessId, instance, business) {
 
-  const startIndex = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS - MIN_PRODUCTS_PER_BUSINESS));
+  const numProducts = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS - MIN_PRODUCTS_PER_BUSINESS));
 
-  for (let i = startIndex; i < MAX_PRODUCTS_PER_BUSINESS; i++) {
+  const offset = Math.floor(Math.random() * (productNames.length - numProducts));
+  for (let i = 0; i < numProducts; i++) {
     try {
-      const product = createProductObject(productNames[i], business);
+      const product = createProductObject(productNames[i + offset], business);
       const productResponse = await instance
         .post(`${SERVER_URL}/businesses/${businessId}/products`, product, {
           headers: {
@@ -406,7 +486,7 @@ async function addProduct(businessId, instance, business) {
       }
 
     } catch (err) {
-      console.log(err)
+      console.log(err.message, err.response.data);
     }
 
   }
@@ -468,7 +548,7 @@ async function addProductImages(businessId, instance, productId) {
     }
     await Promise.all(imagePromises);
   } catch (err) {
-    console.log(err)
+    console.log(err.message, err.response.data);
   }
 }
 

@@ -19,14 +19,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BusinessController.class)
 @Import({MockUserServiceConfig.class, MockBusinessServiceConfig.class})
- class BusinessControllerUnitTest {
+class BusinessControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithUserDetails("user@700")
-     void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
+    void whenPostRequestToBusinessAndValidBusiness_then201Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -55,15 +57,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .with(csrf())
-                .content(business)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(business)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
 
     @Test
     @WithUserDetails("user@700")
-     void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingName_then400Response() throws Exception {
+    void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingName_then400Response() throws Exception {
         String business = "{\"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -75,9 +77,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "  }, \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .with(csrf())
-                .content(business)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(business)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -96,27 +98,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "\"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .with(csrf())
-                .content(business)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(business)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithUserDetails("user@700")
-     void whenPostRequestToBusiness_andInvalidBusiness_dueToAddress_then400Response() throws Exception {
+    void whenPostRequestToBusiness_andInvalidBusiness_dueToAddress_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"businessType\": \"Accommodation and Food Services\", \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .with(csrf())
-                .content(business)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(business)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithUserDetails("user@700")
-     void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingBusinessType_then400Response() throws Exception {
+    void whenPostRequestToBusiness_andInvalidBusiness_dueToMissingBusinessType_then400Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -128,15 +130,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "  }, \"description\": \"We sell peanuts\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .with(csrf())
-                .content(business)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(business)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithUserDetails("user@700")
-     void whenPostRequestToBusiness_andValidBusiness_withMissingDescription_then201Response() throws Exception {
+    void whenPostRequestToBusiness_andValidBusiness_withMissingDescription_then201Response() throws Exception {
         String business = "{\"name\": \"James's Peanut Store\", \"address\" : {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -148,9 +150,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "  }, \"businessType\": \"Accommodation and Food Services\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses")
-                .with(csrf())
-                .content(business)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(business)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
     }
 
@@ -161,9 +163,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
-                .with(csrf())
-                .content(request)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(request)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -173,9 +175,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
-                .with(csrf())
-                .content(request)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(request)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -186,9 +188,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/3/makeAdministrator")
-                .with(csrf())
-                .content(request)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(request)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
 
@@ -199,9 +201,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
-                .with(csrf())
-                .content(request)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(request)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -211,9 +213,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         String request = "{\"userId\": \"2\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
-                .with(csrf())
-                .content(request)
-                .contentType(APPLICATION_JSON))
+                        .with(csrf())
+                        .content(request)
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 

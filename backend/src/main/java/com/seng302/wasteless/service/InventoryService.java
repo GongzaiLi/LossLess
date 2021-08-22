@@ -59,37 +59,57 @@ public class InventoryService {
      * the saved object is not returned, as you should already have the database id in the object you passed in.
      * @param inventory The inventory item to update
      */
-    public void updateInventory(Inventory inventory) {
-        inventoryRepository.save(inventory);
+    public Inventory updateInventory(Inventory inventory) {
+        return inventoryRepository.save(inventory);
     }
 
     /**
-     * Get the entire inventory of items for a given business
+     * Get the entire inventory of items for a given business. Will not return inventory items whose quantities
+     * are equal to zero
      *
      * @param id The id of the business
      * @return A list containing every item in the business' inventory.
      * Returns an empty list if there are no items in the business' inventory, or if the business does not exist
      */
     public List<Inventory> searchInventoryFromBusinessId(Integer id, String searchQuery, Pageable pageable) {
-        return  inventoryRepository.findAllByBusinessIdAndProductIdContainsAllIgnoreCase(id, searchQuery, pageable); }
+        return inventoryRepository.findAllByBusinessIdAndQuantityGreaterThanAndProductIdContainsAllIgnoreCase(id, 0,  searchQuery, pageable); }
 
     /**
      * Updates the quantity column of the inventory table in the database using a custom sql set statement.
      *
-     * @param newQuantity The new quantity remaining for the inventory item
+     * @param quantityRemaining The keep quantity In Listing for the inventory item
      * @param inventoryId The inventory id of the inventory item
      * @return            Returns the updated inventory item entity
      */
-    public Integer updateInventoryItemQuantity(Integer newQuantity, Integer inventoryId) { return inventoryRepository.updateInventoryQuantity(newQuantity, inventoryId); }
+    public Integer updateInventoryItemQuantity(Integer quantityRemaining, Integer inventoryId) { return inventoryRepository.updateInventoryQuantityInListing(quantityRemaining, inventoryId); }
 
     /**
-     * Get the count of inventory items of a business
+     * Get the count of inventory items of a business. Does not count inventory items whose quantities
+     * are equal to zero
      *
      * @param id   The id of the business to get the inventory count of
      * @return     Amount of inventory items in database for that business
      */
     public Integer getTotalInventoryCountByBusinessId(Integer id, String searchQuery) {
-        return inventoryRepository.countInventoryByBusinessIdAndProductIdContainsAllIgnoreCase(id, searchQuery);
+        return inventoryRepository.countInventoryByBusinessIdAndQuantityGreaterThanAndProductIdContainsAllIgnoreCase(id, 0, searchQuery);
+    }
+
+    /**
+     * when edit inventory quantity, then update the inventory quantity unlisted.
+     * @param inventory the inventory is edited
+     * @param editedInventoryQuantity the edit inventory's new quantity number.
+     * @throws  ResponseStatusException The new quantity is less than the quantity of this inventory that is currently listed
+     */
+    public void updateQuantityUnlisted(Inventory inventory, Integer editedInventoryQuantity) {
+
+        int quantityUnlisted = inventory.getQuantityUnlisted() + editedInventoryQuantity - inventory.getQuantity();
+        if (quantityUnlisted < 0) {
+            logger.warn(
+                    "The given quantity is too low. The new quantity is less than the quantity {} of this inventory that is currently listed",
+                    inventory.getQuantityUnlisted());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The new quantity is less than the quantity %s of this inventory that is currently listed", inventory.getQuantityUnlisted()));
+        }
+        inventory.setQuantityUnlisted(quantityUnlisted);
     }
 
 

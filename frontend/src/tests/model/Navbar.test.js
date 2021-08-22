@@ -6,16 +6,9 @@ import Api from '../../Api'
 
 let wrapper;
 
-const $route = {
-  name: "users",
-  params: {
-    id: 0
-  }
-}
+let $route;
 
-const $router = {
-  push: jest.fn()
-}
+let $router;
 
 let userData = {
   "id": 100,
@@ -64,8 +57,6 @@ let userData = {
 let $currentUser = userData;
 
 const date = new Date();
-const currentDateWithinAWeek = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+(date.getDate()+6)+'T'+date.getHours()+':'+date.getMinutes()+':'+date.getUTCSeconds()+'Z'
-
 const currentDateWithin24 = date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()+'T'+(date.getHours()+2)+':'+date.getMinutes()+':'+date.getUTCSeconds()+'Z'
 
 
@@ -85,16 +76,29 @@ const expiringCards = [
 jest.mock('../../Api');
 
 beforeEach(() => {
+  $route = {
+    name: "users",
+    params: {
+      id: 0
+    },
+    query: {}
+  };
+
+  $router = {
+    push: jest.fn(),
+    replace: jest.fn(),
+    go: jest.fn(),
+  }
+
   const localVue = createLocalVue();
 
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
   localVue.use(Auth);
 
-  Api.getExpiringCards.mockResolvedValue({data: expiringCards});
-  Api.expiredCardsNumber.mockResolvedValue({data: 3});
+  Api.getExpiredCards.mockResolvedValue({data: expiringCards});
   Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
-
+  Api.getNotifications.mockResolvedValue({data: []});
 
   wrapper = mount(NavBar, {
     localVue,
@@ -249,41 +253,28 @@ describe('Act as business', () => {
   })
 });
 
-describe('Get expiring cards', () => {
-  test('cards expiring within 24 hours get added to notifications', async () => {
-    await wrapper.vm.updateNotifications();
-    expect(wrapper.vm.notifications.length).toBe(2);
-  })
-});
-
-describe('Get number of expired cards', () => {
-  test('number of expired cards is set to data from the server', async () => {
+describe("Listing search ", () => {
+  test('reloads if query is the name', async () => {
+    $route.name = 'listings-search';
+    $route.query.searchQuery = 'ABCDE';
+    wrapper.vm.searchQuery = 'ABCDE';
+    wrapper.vm.search();
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numExpiredCards).toBe(3);
+    expect($router.replace).toHaveBeenCalled();
   })
 
-  test('the notification has correct message if 1 card has expired', async () => {
-    Api.expiredCardsNumber.mockResolvedValue({data: 1});
-    wrapper.vm.getExpiredCards();
-    await wrapper.vm.$forceUpdate();
-    expect(wrapper.vm.expiredText).toBe(" of your cards has expired and been deleted");
-  })
-
-  test('the notification has correct message if multiple cards have expired', async () => {
-    Api.expiredCardsNumber.mockResolvedValue({data: 5});
-    wrapper.vm.getExpiredCards();
-    await wrapper.vm.$forceUpdate();
-    expect(wrapper.vm.expiredText).toBe(" of your cards have expired and been deleted");
-  })
-
-
-});
-
-describe('Clear expired cards notification', () => {
-  test('number of expired cards is set to zero after clearing', async () => {
-    wrapper.vm.clearExpiredCards()
+  test('goes to new route if query is not the name', async () => {
+    $route.name = 'home';
+    wrapper.vm.searchQuery = 'ABCDE';
+    wrapper.vm.search();
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numExpiredCards).toBe(0);
+    expect($router.replace).toHaveBeenCalled();
   })
 
+  test('clears search query after submitted', async () => {
+    wrapper.vm.searchQuery = 'ABCDE';
+    wrapper.vm.search();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.searchQuery).toStrictEqual('');
+  })
 });

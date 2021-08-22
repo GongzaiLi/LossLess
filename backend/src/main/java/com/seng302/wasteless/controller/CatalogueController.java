@@ -19,7 +19,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -66,15 +65,11 @@ public class CatalogueController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your product ID must be alphanumeric with dashes or underscores allowed.");
         }
 
-        logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
-
+        logger.info("Successfully retrieved business with ID: {}.", businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
-
-        logger.debug("Trying to create product: {} for business: {}", possibleProduct, possibleBusiness);
 
         logger.debug("Generating product ID");
         String productId = possibleProduct.createCode(businessId);
@@ -92,17 +87,14 @@ public class CatalogueController {
         possibleProduct.setCreated(dateCreated);
 
         //Save product
-        logger.debug("Trying to create Product Entity for product: {}", possibleProduct);
+        logger.debug("Trying to create Product Entity");
         possibleProduct = productService.createProduct(possibleProduct);
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("productId", possibleProduct.getId());
 
-        logger.info("Successfully created Product Entity: {}", possibleProduct);
+        logger.info("Successfully created Product Entity");
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-
-
-
     }
 
 
@@ -145,12 +137,12 @@ public class CatalogueController {
         try {
             sortType = GetProductSortTypes.valueOf(sortBy);
         } catch (IllegalArgumentException e) {
-            logger.info("Invalid value for sortBy. Value was {}", sortBy);
+            logger.warn("Invalid value for sortBy. Value was {}", sortBy);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortBy. Acceptable values are: ID, NAME, DESCRIPTION, MANUFACTURER, RRP, CREATED");
         }
 
         if (!sortDirection.equals("ASC") && !sortDirection.equals("DESC")) {
-            logger.info("Invalid value for sortDirection. Value was {}", sortDirection);
+            logger.warn("Invalid value for sortDirection. Value was {}", sortDirection);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid value for sortDirection. Acceptable values are: ASC, DESC");
         }
 
@@ -159,21 +151,17 @@ public class CatalogueController {
         logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
 
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
-
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
-
-        logger.debug("Trying to retrieve products for business: {}", possibleBusiness);
         List<Product> productList = productService.searchCountProductsByBusinessIdFromOffset(businessId, offset, count, sortType, sortDirection, searchQuery);
 
-        logger.debug("Trying to retrieve total count of products for business: {}", possibleBusiness);
         Integer totalItems = productService.getTotalProductsCountByBusinessId(businessId, searchQuery);
+
+        logger.debug("Successfully retrieved {} products for business with ID: {}", totalItems, businessId);
 
         GetProductDTO getProductDTO = new GetProductDTO()
                 .setProducts(productList)
                 .setTotalItems(totalItems);
 
-        logger.info("Products retrieved: {} for business: {}. Total product count: {}", productList, possibleBusiness, totalItems);
         return ResponseEntity.status(HttpStatus.OK).body(getProductDTO);
     }
 
@@ -195,10 +183,7 @@ public class CatalogueController {
 
         User user = userService.getCurrentlyLoggedInUser();
 
-        logger.debug("Request to get business with ID: {}", businessId);
         Business possibleBusiness = businessService.findBusinessById(businessId);
-
-        logger.info("Successfully retrieved business: {} with ID: {}.", possibleBusiness, businessId);
 
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
@@ -248,7 +233,7 @@ public class CatalogueController {
         exception.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-//            logger.error(errorMessage); it doesnt work I am not sure why
+            logger.warn("Validation exceptions: field name '{}', error message '{}'", errorMessage, fieldName);
             errors.put(fieldName, errorMessage);
         });
         return errors;
@@ -269,6 +254,7 @@ public class CatalogueController {
         String constraintName = exception.getConstraintViolations().toString();
         String errorMsg = exception.getMessage();
 
+        logger.warn("Validation exceptions: field name '{}', constraint name '{}'", errorMsg, constraintName);
         errors.put(constraintName, errorMsg);
         return errors;
     }

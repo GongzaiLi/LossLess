@@ -1,16 +1,13 @@
 package com.seng302.wasteless.unitTest.ServiceTests;
 
-
 import com.seng302.wasteless.repository.UserRepository;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,13 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @WebMvcTest(UserService.class)
 class UserServiceTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
     @MockBean
     private UserRepository userRepository;
 
-    //private UserService userService;
 
     @Test
     void whenFindUserById_AndInvalidId_ThrowException() {

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Navbar v-if="!['login', 'register'].includes($route.name)"/>
-    <keep-alive include="UserSearch"> <!-- The keep-alive prevents the UserSearch component from being re-rendered each time, so you can got back to your search results -->
+    <keep-alive include="SearchPage,ListingsSearchPage"> <!-- The keep-alive prevents the SearchPage component from being re-rendered each time, so you can got back to your search results -->
       <router-view/>
     </keep-alive>
   </div>
@@ -12,11 +12,12 @@ import Login from "./components/user/Login";
 import Register from "./components/user/Register";
 import Navbar from "./components/model/Navbar";
 import UserProfile from "./components/user/UserProfile";
-import UserSearch from "./components/user/UserSearch";
+import SearchPage from "./components/search/SearchPage";
 import HomePage from "@/components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
 import InventoryPage from "./components/inventory/InventoryPage";
+import ListingSearchPage from "./components/listing/ListingSearchPage";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -33,9 +34,11 @@ const app = {
     Navbar,
     HomePage,
     CreateBusiness,
-    UserSearch,
+    SearchPage,
     BusinessProfile,
-    InventoryPage
+    InventoryPage,
+    ListingSearchPage
+
   },
   // app initial state
   // https://vuejs.org/v2/guide/instance.html#Data-and-Methods

@@ -1,6 +1,8 @@
 package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.BusinessTypes;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,5 +34,43 @@ public interface BusinessRepository extends JpaRepository<Business, Integer> {
      */
     @Query(value = "Select * from Business where id in (SELECT distinct business_id FROM Business B inner join Business_administrators A where administrators_id = :user_id)", nativeQuery = true)
     List<Business> findBySpecificAdminId(@Param("user_id") Integer userId);
+
+
+    /**
+     * Search businesses by search query on the name field and by a business type. Paginate and sort results using pageable
+     *
+     * @param businessName  The search query to search businesses names by
+     * @param businessType  The businessType to search by
+     * @param pageable      A pageable to perform pagination and sorting on the results
+     * @return              A list of businesses that match the search query on the name field, paginated and sorted
+     */
+    List<Business> findAllByNameContainsAndBusinessTypeAllIgnoreCase(String businessName, BusinessTypes businessType, Pageable pageable);
+
+    /**
+     * Search businesses by search query on the name field. Paginate and sort results using pageable
+     *
+     * @param businessName  The search query to search businesses names by
+     * @param pageable      A pageable to perform pagination and sorting on the results
+     * @return              A list of businesses that match the search query on the name field, paginated and sorted
+     */
+    List<Business> findAllByNameContainsAllIgnoreCase(String businessName, Pageable pageable);
+
+    /**
+     * Count the number of businesses that match the search query
+     *
+     * @param businessName   The search query to search businesses names by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    Integer countBusinessByNameContainsAllIgnoreCase(String businessName);
+
+    /**
+     * Count the number of businesses that match the search queries
+     *
+     * @param businessName   The search query to search businesses names by
+     * @param businessType  The businessType to search by
+     * @return              The count of businesses that match the search query on the name field
+     */
+    Integer countBusinessByNameContainsAndBusinessTypeAllIgnoreCase(String businessName, BusinessTypes businessType);
+
 }
 

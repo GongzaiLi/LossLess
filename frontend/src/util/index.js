@@ -16,4 +16,15 @@ function getMonthsAndYearsBetween(start, end) {
   }
 }
 
+/**
+ * Get today's date without the time
+ * need to add one to get correct date
+ * @return today's date in format yyyy-mm-dd
+ **/
+export function getToday() {
+  let date = new Date();
+  return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}
+
+
 export default getMonthsAndYearsBetween;

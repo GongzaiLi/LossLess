@@ -148,7 +148,7 @@ public class ProductService {
     }
 
     /**
-     * update the primary image for product to first image list or null for empty
+     * update the primary image for product to some image in set or null for empty
      * @param product Product that image is being removed from
      * @param productImage image that is being removed from product
      */
@@ -157,7 +157,7 @@ public class ProductService {
             if (product.getImages().isEmpty()) {
                 product.setPrimaryImage(null);
             } else {
-                product.setPrimaryImage(product.getImages().get(0));
+                product.setPrimaryImage(product.getImages().iterator().next());
             }
 
         }

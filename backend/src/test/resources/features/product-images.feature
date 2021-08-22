@@ -50,10 +50,10 @@ Feature: U16 - Product Images
     Given There are 4 images of the product with id: "1-Back-Water", and the current primary image with id: 5
     When Delete an image with id: 5 in the product with id: "1-Back-Water"
     And The user will be able to see having 3 images from the product.
-    Then The current primary image is this product's image id: 2
+    Then The current primary image id does not equal: 5
 
   Scenario: AC4 - Delete all product's image
-    Given There are 3 images of the product with id: "1-Back-Water", and the current primary image with id: 2
+    Given There are 3 images of the product with id: "1-Back-Water"
     When Delete all images in the product with id: "1-Back-Water"
     And The user will be able to see having 0 images from the product.
     Then The current primary image is this product's image will be empty

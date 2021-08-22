@@ -5,11 +5,12 @@ Date: 29/03/2021
 -->
 <template>
   <div v-show="!loading">
-    <b-card border-variant="secondary" header-border-variant="secondary"
-            class="profile-card shadow" no-body
+    <h4 class="profile-card"><b-link v-if="$route.query.fromSearch" variant="info" to="/search">
+      <b-icon-arrow-left/> Back to results
+    </b-link></h4>
+    <b-card class="profile-card shadow" no-body
             v-if="businessFound"
     >
-
       <template #header>
         <b-row>
           <b-col>
@@ -104,8 +105,6 @@ Date: 29/03/2021
           </b-card-text>
           <b-row>
             <b-col cols="12">
-
-
               <b-table hover
                        striped
                        table-class="text-nowrap"
@@ -129,8 +128,6 @@ Date: 29/03/2021
                   </div>
                 </template>
               </b-table>
-
-
             </b-col>
           </b-row>
           <br>
@@ -188,8 +185,6 @@ import memberSince from "../model/MemberSince";
 import api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
 
-
-
 export default {
   components: {
     memberSince,
@@ -246,7 +241,7 @@ export default {
       },
       businessFound: true, // not smooth to switch the found or not find.
       loading: true,
-      makeAdminAction: () => {},
+      makeAdminAction: null,
       makeAdminError: "",
     }
   },
@@ -321,7 +316,6 @@ export default {
      * set the response data to businessData
      * @param data
      */
-    //todo may need split the data from response.
     setResponseData: function (data) {
       this.businessData = data;
     },

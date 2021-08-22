@@ -6,10 +6,9 @@ import com.seng302.wasteless.dto.LoginDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.model.UserSearchSortTypes;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.UserViews;
 import net.minidev.json.JSONObject;
@@ -47,16 +46,19 @@ public class UserController {
 
     private final UserService userService;
     private final AddressService addressService;
+    private final NotificationService notificationService;
 
     @Autowired
     public UserController(UserService userService,
                           AddressService addressService,
                           BCryptPasswordEncoder passwordEncoder,
-                          AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager,
+                          NotificationService notificationService) {
         this.addressService = addressService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -258,55 +260,16 @@ public class UserController {
     }
 
     /**
-     * Endpoint to GET whether the user should receive a notification for
-     * cards that have expired
+     * Endpoint to GET all notifications of the logged in user
      *
-     * @param userId The id of the user
-     * @return 403 FORBIDDEN if a user makes this request for another user.
-     * 200 OK otherwise.
+     * @return  200 OK if succesful request, With all notifications for logged in user
      */
-    @GetMapping("/users/{id}/hasCardsExpired")
-    public ResponseEntity<Object> getUserHasCardsExpired(@PathVariable("id") Integer userId) {
-        logger.debug("Request to get a user cards expired ith ID: {}", userId);
-
-        User userToGet = userService.findUserById(userId);
-        logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
-
-        Integer loggedInUserId = userService.getCurrentlyLoggedInUser().getId();
-        if (userId.equals(loggedInUserId)) {
-            return ResponseEntity.status(HttpStatus.OK).body(userToGet.getHasCardsDeleted());
-        } else {
-            logger.warn("User {} tried to get 'has cards expired' for user {}", loggedInUserId, userId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
-        }
+    @GetMapping("/users/notifications")
+    public ResponseEntity<Object> getNotifications() {
+        User user = userService.getCurrentlyLoggedInUser();
+        logger.info("Request to get notifications for user: {}", user.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(notificationService.findAllNotificationsByUserId(user.getId()));
     }
-
-    /**
-     * Clears the card expiry notification for the user.
-     * DOes this by setting the Cards Deleted flag in the user to FALSE. This prevents the user
-     * from getting that notification again (until more cards expire)
-     *
-     * @param userId The id of the user
-     * @return 403 FORBIDDEN if a user makes this request for another user.
-     * 200 OK otherwise.
-     */
-    @PutMapping("/users/{id}/clearHasCardsExpired")
-    public ResponseEntity<Object> putClearCardsExpired(@PathVariable("id") Integer userId) {
-        logger.debug("Request to clear a user cards expired ith ID: {}", userId);
-
-        if (userId.equals(userService.getCurrentlyLoggedInUser().getId())) {
-            User userToGet = userService.findUserById(userId);
-            logger.info("Account: {} retrieved successfully using ID: {}", userToGet, userId);
-
-            userToGet.setHasCardsDeleted(0);
-            userService.saveUserChanges(userToGet);
-
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not this user");
-        }
-    }
-
 
     /**
      * Endpoint to make a specified user an admin. Sets user role to GLOBAL_APPLICATION_ADMIN

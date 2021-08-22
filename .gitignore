@@ -42,8 +42,12 @@ bin/
 coverage/
 
 ### Logging ###
-/backend/spring.log
-*.gz
+**spring.log**
 
 ### Data generation ###
 /data-generation/users.json
+/data-generation/package-lock.json
+
+## Images ##
+/backend/media/**
+/media/**

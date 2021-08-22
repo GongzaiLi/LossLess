@@ -5,14 +5,13 @@ Date: 7/3/2021
 -->
 <template>
   <b-card style="max-width: 1200px">
-    <h2 v-bind:hidden=isMakeAdmin>Search For a User</h2>
     <b-row style="height: 50px">
       <b-col cols="7">
         <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search"
-                      placeholder="Search"></b-form-input>
+                      placeholder="Search users"></b-form-input>
       </b-col>
       <b-col cols="0">
-        <b-button @click="displayResults(searchQuery)"> Search</b-button>
+        <b-button variant="primary" @click="displayResults(searchQuery)"> Search</b-button>
       </b-col>
     </b-row>
     <b-row>
@@ -60,7 +59,6 @@ export default {
     pagination,
   },
   props: {isMakeAdmin: {default: false, type: Boolean}},
-  name: 'UserSearch', // DO NOT DELETE!!! The <keep-alive include="UserSearch"> in App.vue only matches component names so we register a name here.
   data: function () {
     return {
       searchQuery: "",

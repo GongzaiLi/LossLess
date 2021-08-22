@@ -3,8 +3,8 @@ Page that stores table to show the business inventory
 Date: 11/5/2021
 -->
 <template>
-  <div class="overflow-auto">
-    <b-card v-if="canEditInventory" style="max-width: 1260px;">
+  <div>
+    <b-card v-if="canEditInventory" style="max-width: initial;" class="shadow">
       <b-card-title>Inventory: {{ business.name }}</b-card-title>
       <hr class='m-0'>
       <b-row align-v="center">
@@ -86,8 +86,7 @@ export default {
      **/
     refreshTable: async function() {
       const businessId = this.$route.params.id;
-      await this.$refs.inventoryTable.getBusinessInfo(businessId);
-
+      await this.$refs.inventoryTable.getInventoryInfo(businessId);
     },
     /**
      * call api read the business information
