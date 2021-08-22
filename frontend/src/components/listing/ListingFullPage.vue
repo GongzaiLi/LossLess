@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-container>
-      <b-row>
+      <b-row class="mb-5">
         <b-link variant="info" class="back-to-search-link" @click="listingPageRedirect">
           <strong>
             <h4>
@@ -11,6 +11,7 @@
           </strong>
         </b-link>
       </b-row>
+
       <b-row>
         <b-card v-if="!listingLoading" class="listing_card shadow">
           <b-row>
@@ -41,82 +42,91 @@
                 </b-carousel-slide>
               </b-carousel>
 
-        </b-col>
-        <b-col md="6">
-          <h1 class="listing-title"> {{ listingItem.inventoryItem.product.name }} </h1>
-          <h6 style="text-align: center; font-size: 12px"> Listed on: {{listingItem.created}}</h6>
-          <b-card no-body id="infobox-1">
-            <template #header>
-              <h5 style="margin-top: -4px"> Quantity: {{ listingItem.quantity }} </h5>
-              <h5> Closes: {{ listingItem.closes }} </h5>
-              <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px">
-                {{ listingItem.moreInfo }} </h6>
-              <b-row no-gutters>
-                <b-col md="6">
-                  <h2 style="float: left; margin-bottom: -5px">
-                    {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
-                  </h2>
-                </b-col>
-                <b-col md="6">
-                  <b-button v-if="!$currentUser.currentlyActingAs" style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="openConfirmPurchaseDialog">
-                    Purchase <b-icon-bag-check/>
-                  </b-button>
-                  <span v-else>You must be acting as a user to like or purchase listings</span>
-                </b-col>
-              </b-row>
-            </template>
-          </b-card>
-          <div v-if="!$currentUser.currentlyActingAs">
-          <b-icon-heart title="Like this listing" class="like-icon" v-if="!listingItem.currentUserLikes" @click="likeListing"></b-icon-heart>
-          <b-icon-heart-fill title="Unlike this listing" class="like-icon" variant="danger" v-else @click="dislikeListing"></b-icon-heart-fill>
-          </div>
-          <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }}
-            {{ getLikeString }}</h6>
-        </b-col>
-      </b-row>
-      <b-row align-h="center" style="margin-top: 1rem">
-        <b-col md="8">
-        <b-input-group-text class="bottom-info-boxes">
-          <b-container>
-            <h6 style="margin-top: 7px"><strong> Product Details: </strong></h6>
-            <hr>
-            <label class="details-text"> <strong> Manufacturer: </strong>
-              {{ listingItem.inventoryItem.product.manufacturer }} </label>
-            <br>
-            <label class="details-text"> <strong> Manufactured Date: </strong> {{
-                listingItem.inventoryItem.manufactured
-              }} </label>
-            <br>
-            <label class="details-text"> <strong> Best Before: </strong> {{ listingItem.inventoryItem.bestBefore }}
-            </label>
-            <br>
-            <label class="details-text"> <strong> Sell By: </strong> {{ listingItem.inventoryItem.sellBy }} </label>
-            <br>
-            <label class="details-text"> <strong> Expires: </strong> {{ listingItem.inventoryItem.expires }} </label>
-            <br>
-            <label class="details-text" style="text-align: left; height: 6rem;"> <strong> Description: </strong>
-              {{ listingItem.inventoryItem.product.description }} </label>
-          </b-container>
-        </b-input-group-text>
-      </b-col>
-      </b-row>
-      <b-row align-h="center" style="margin-top: 1rem">
-        <b-col md="8">
-        <b-input-group-text class="bottom-info-boxes">
-          <b-container>
-            <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
-            <hr>
-            <label class="details-text"> <strong> Business Name: </strong>
-              <router-link :to="'/businesses/'+listingItem.inventoryItem.businessId">
-                {{ listingItem.business.name }}
-              </router-link>
-            </label>
-            <br>
-            <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
-          </b-container>
-        </b-input-group-text>
-        </b-col>
-      </b-row>
+            </b-col>
+            <b-col md="6">
+              <h1 class="listing-title"> {{ listingItem.inventoryItem.product.name }} </h1>
+              <h6 style="text-align: center; font-size: 12px"> Listed on: {{ listingItem.created }}</h6>
+              <b-card no-body id="infobox-1">
+                <template #header>
+                  <h5 style="margin-top: -4px"> Quantity: {{ listingItem.quantity }} </h5>
+                  <h5> Closes: {{ listingItem.closes }} </h5>
+                  <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px">
+                    {{ listingItem.moreInfo }} </h6>
+                  <b-row no-gutters>
+                    <b-col md="6">
+                      <h2 style="float: left; margin-bottom: -5px">
+                        {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
+                      </h2>
+                    </b-col>
+                    <b-col md="6">
+                      <b-button v-if="!$currentUser.currentlyActingAs"
+                                style="float: right; margin-left: 1rem; margin-top: 3px" variant="success"
+                                @click="openConfirmPurchaseDialog">
+                        Purchase
+                        <b-icon-bag-check/>
+                      </b-button>
+                      <span v-else>You must be acting as a user to like or purchase listings</span>
+                    </b-col>
+                  </b-row>
+                </template>
+              </b-card>
+              <div v-if="!$currentUser.currentlyActingAs">
+                <b-icon-heart title="Like this listing" class="like-icon" v-if="!listingItem.currentUserLikes"
+                              @click="likeListing"></b-icon-heart>
+                <b-icon-heart-fill title="Unlike this listing" class="like-icon" variant="danger" v-else
+                                   @click="dislikeListing"></b-icon-heart-fill>
+              </div>
+              <h6 style="font-size: 13px; margin-top: 13px; float: right;"> {{ listingItem.usersLiked }}
+                {{ getLikeString }}</h6>
+            </b-col>
+          </b-row>
+          <b-row align-h="center" style="margin-top: 1rem">
+            <b-col md="8">
+              <b-input-group-text class="bottom-info-boxes">
+                <b-container>
+                  <h6 style="margin-top: 7px"><strong> Product Details: </strong></h6>
+                  <hr>
+                  <label class="details-text"> <strong> Manufacturer: </strong>
+                    {{ listingItem.inventoryItem.product.manufacturer }} </label>
+                  <br>
+                  <label class="details-text"> <strong> Manufactured Date: </strong> {{
+                      listingItem.inventoryItem.manufactured
+                    }} </label>
+                  <br>
+                  <label class="details-text"> <strong> Best Before: </strong> {{
+                      listingItem.inventoryItem.bestBefore
+                    }}
+                  </label>
+                  <br>
+                  <label class="details-text"> <strong> Sell By: </strong> {{ listingItem.inventoryItem.sellBy }}
+                  </label>
+                  <br>
+                  <label class="details-text"> <strong> Expires: </strong> {{ listingItem.inventoryItem.expires }}
+                  </label>
+                  <br>
+                  <label class="details-text" style="text-align: left; height: 6rem;"> <strong> Description: </strong>
+                    {{ listingItem.inventoryItem.product.description }} </label>
+                </b-container>
+              </b-input-group-text>
+            </b-col>
+          </b-row>
+          <b-row align-h="center" style="margin-top: 1rem">
+            <b-col md="8">
+              <b-input-group-text class="bottom-info-boxes">
+                <b-container>
+                  <h6 style="margin-top: 7px"><strong> Seller Information: </strong></h6>
+                  <hr>
+                  <label class="details-text"> <strong> Business Name: </strong>
+                    <router-link :to="'/businesses/'+listingItem.inventoryItem.businessId">
+                      {{ listingItem.business.name }}
+                    </router-link>
+                  </label>
+                  <br>
+                  <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
+                </b-container>
+              </b-input-group-text>
+            </b-col>
+          </b-row>
 
           <b-modal ref="confirmPurchaseModal" size="sm" title="Confirm Purchase" ok-variant="success"
                    ok-title="Purchase"
@@ -144,16 +154,19 @@
             Further instructions for your purchase will be in a notification on your home page.
           </b-modal>
         </b-card>
-      </b-row>
 
-      <b-card v-if="listingNotExists">
-        <b-card-title>
-          <b-icon-exclamation-triangle/>
-          This Listing no longer exists
-        </b-card-title>
-        There is no listing at this page. It may have already been purchased by another user, or deleted by the business
-        owner.
-      </b-card>
+
+        <b-card v-if="listingNotExists">
+          <b-card-title>
+            <b-icon-exclamation-triangle/>
+            This Listing no longer exists
+          </b-card-title>
+          There is no listing at this page. It may have already been purchased by another user, or deleted by the
+          business
+          owner.
+        </b-card>
+
+      </b-row>
     </b-container>
   </div>
 </template>
@@ -264,25 +277,25 @@ export default {
 
       const currentListingId = this.$route.params.id;
       await Api.getListing(currentListingId)
-        .then(async listingData => {
-          this.listingItem = listingData.data;
+          .then(async listingData => {
+            this.listingItem = listingData.data;
 
-          let product = this.listingItem.inventoryItem.product;
+            let product = this.listingItem.inventoryItem.product;
 
-          // Display primary image as first image
-          if (product.images.length > 0) {
-            product.images = product.images.filter((a) => a.id !== product.primaryImage.id);
-            product.images.unshift(product.primaryImage);
-          }
+            // Display primary image as first image
+            if (product.images.length > 0) {
+              product.images = product.images.filter((a) => a.id !== product.primaryImage.id);
+              product.images.unshift(product.primaryImage);
+            }
 
-          const address = this.listingItem.business.address;
-          this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
-          this.currency = await Api.getUserCurrency(address.country);
-          this.listingLoading = false;
-        })
-        .catch(() => {
-          this.listingNotExists = true;
-        });
+            const address = this.listingItem.business.address;
+            this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+            this.currency = await Api.getUserCurrency(address.country);
+            this.listingLoading = false;
+          })
+          .catch(() => {
+            this.listingNotExists = true;
+          });
     },
 
 
@@ -355,7 +368,7 @@ export default {
             } else {
               this.errMessage = err;
             }
-          this.openErrorModal()
+            this.openErrorModal()
           })
     },
 
