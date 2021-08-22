@@ -132,7 +132,7 @@
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
 
-      <pagination v-if="totalResults > perPage" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
+      <pagination ref="listingsSearchPag" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
     </b-container>
   </b-card>
   </b-overlay>
@@ -228,6 +228,7 @@ export default {
 
       if (newQuery) {
         this.currentPage = 1;
+        this.$refs.listingsSearchPag.currentPage = 1; // We have to do this because the v-model doesn't update when we only set data.currentPage
       }
       const resp = (await Api.searchListings(
           this.search.productName,
