@@ -19,7 +19,7 @@ Date: 7/3/2021
         <b-table striped hover
                  ref="searchTable"
          table-class="text-nowrap"
-         responsive="lg"
+         responsive
          no-border-collapse
          bordered
          no-local-sorting
