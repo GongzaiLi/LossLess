@@ -156,6 +156,8 @@ public class InventoryController {
 
         productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
+        inventoryService.updateQuantityUnlisted(inventoryItem, editedInventoryItem.getQuantity());
+
         logger.info("Creating new Inventory Item and setting data.");
         inventoryItem.setProduct(possibleProduct);
         inventoryItem.setBusinessId(businessId);

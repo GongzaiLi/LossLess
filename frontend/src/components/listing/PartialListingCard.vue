@@ -54,7 +54,7 @@ export default {
     }
   },
   async mounted() {
-    this.setCurrency();
+    await this.setCurrency();
   },
 
   methods: {
