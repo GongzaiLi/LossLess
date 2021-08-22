@@ -1,6 +1,5 @@
 <template>
-
-  <b-card class="b_card_main shadow-lg">
+  <b-card class="b_card_main shadow-lg" id="listing-search">
     <b-container>
       <h1>Search Listings</h1>
       <hr>
@@ -115,6 +114,9 @@
               </div>
 
             </b-col>
+            <b-col class="search_button" cols="3" md="1">
+              <b-button @click="clearFilters" variant="secondary">Clear</b-button>
+            </b-col>
           </b-row>
           <hr>
         </b-collapse>
@@ -155,7 +157,9 @@
 .price_max {
   max-width: 7rem
 }
-
+#listing-search {
+  max-width: initial;
+}
 </style>
 
 <script>
@@ -199,10 +203,6 @@ export default {
     this.$refs.searchInput.focus();
 
     this.search.productName = this.$route.query.searchQuery || "";
-    const queryObject = this.$route.query.queryHistory;
-    if (queryObject && Object.keys(queryObject).length !== 0 && queryObject.constructor === Object) {
-      this.search = queryObject;
-    }
 
     await this.getListings();
     this.search.closesStartDate = getToday();
@@ -256,8 +256,26 @@ export default {
       if (this.search.businessTypes.length === 0) {
         this.search.selectedBusinessType = null;
       }
-    }
+    },
+
+    /**
+     * Clears all the filter options
+     */
+    clearFilters() {
+      this.search.productName = ""
+      this.search.sort = "inventoryItem.product.name,asc"
+      this.search.businessName = ""
+      this.search.selectedBusinessType = null
+      this.search.businessLocation = ""
+      this.search.closesStartDate = ""
+      this.search.closesEndDate = ""
+      this.search.priceMin = ""
+      this.search.priceMax = ""
+      this.search.businessTypes = []
+    },
   },
+
+
 
   computed: {
     /**

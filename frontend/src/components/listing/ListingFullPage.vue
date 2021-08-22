@@ -1,12 +1,12 @@
 <template>
   <div>
     <b-link variant="info" class="back-to-search-link" @click="listingPageRedirect">
+      <h4>
       <strong>
-        <h4>
           <b-icon-arrow-left/>
           Back to results
-        </h4>
       </strong>
+      </h4>
     </b-link>
     <b-card v-if="!listingLoading" class="listing_card shadow">
       <b-row>
@@ -346,7 +346,7 @@ export default {
      * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
      */
     listingPageRedirect: function () {
-      this.$router.push({path: `/listingSearch`, query: {queryHistory: this.queryHistory}});
+      this.$router.push({path: `/listingSearch`});
     },
 
     /**
