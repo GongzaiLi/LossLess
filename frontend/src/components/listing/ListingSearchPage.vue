@@ -5,7 +5,7 @@
       <h1>Search Listings</h1>
       <hr>
 
-      <b-form @submit="getListings(true)">
+      <b-form @submit.prevent="getListings(true)">
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
@@ -201,7 +201,7 @@ export default {
       business: {},
       listings: [],
       perPage: 9,
-      currentPage: 0, // page start with 0
+      currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
       images: [],
@@ -227,7 +227,7 @@ export default {
       const timer = setTimeout(() =>  this.loading = true, 500);
 
       if (newQuery) {
-        this.currentPage = 0;
+        this.currentPage = 1;
       }
       const resp = (await Api.searchListings(
           this.search.productName,
