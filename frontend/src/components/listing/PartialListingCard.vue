@@ -79,7 +79,7 @@ export default {
 
   watch: {
     async listing() {
-      this.setCurrency();
+      await this.setCurrency();
     },
   }
 }
