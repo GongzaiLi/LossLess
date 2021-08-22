@@ -19,7 +19,7 @@ const HAS_MIDDLE_NAME_PROB = 4 / 10;
 const PROB_USER_LIKES_LISTINGS = 0.5;
 const MAX_LIKED_LISTINGS_PER_USER = 10;
 
-const NUM_BUSINESSES = 10;
+const NUM_BUSINESSES = 500;
 const NUM_BUSINESSTYPES = 4;
 const MAX_BUSSINESSES_PER_USER = 3;
 const MAX_PRODUCTS_PER_BUSINESS = 40;
@@ -197,7 +197,7 @@ async function likeListings(instance) {
         });
       } catch(err) {
           if (err.response.status !== 406) {
-            console.log(err)
+            console.log(err.message, err.response.data);
         }
       }
     }
@@ -227,7 +227,7 @@ async function purchaseListing(instance){
                 });
             } catch(err) {
                 if (err.response.status !== 406) {
-                    console.log(err)
+                    console.log(err.message, err.response.data);
                 }
             }
         }
@@ -310,7 +310,7 @@ async function registerUsers(users, businesses) {
     try {
       await Promise.all(promises);
     } catch(e) {
-      console.log(e);
+      console.log(e.message, e.response.data);
       throw e;
     }
     console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST} users.`);
@@ -464,11 +464,12 @@ async function addListing(businessId, instance, inventory, inventoryItemId) {
  */
 async function addProduct(businessId, instance, business) {
 
-  const startIndex = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS - MIN_PRODUCTS_PER_BUSINESS));
+  const numProducts = Math.floor(Math.random() * (MAX_PRODUCTS_PER_BUSINESS - MIN_PRODUCTS_PER_BUSINESS));
 
-  for (let i = startIndex; i < MAX_PRODUCTS_PER_BUSINESS; i++) {
+  const offset = Math.floor(Math.random() * (productNames.length - numProducts));
+  for (let i = 0; i < numProducts; i++) {
     try {
-      const product = createProductObject(productNames[i], business);
+      const product = createProductObject(productNames[i + offset], business);
       const productResponse = await instance
         .post(`${SERVER_URL}/businesses/${businessId}/products`, product, {
           headers: {
@@ -485,7 +486,7 @@ async function addProduct(businessId, instance, business) {
       }
 
     } catch (err) {
-      console.log(err)
+      console.log(err.message, err.response.data);
     }
 
   }
@@ -547,7 +548,7 @@ async function addProductImages(businessId, instance, productId) {
     }
     await Promise.all(imagePromises);
   } catch (err) {
-    console.log(err)
+    console.log(err.message, err.response.data);
   }
 }
 
