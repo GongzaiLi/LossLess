@@ -42,7 +42,8 @@ Listings Page
 
         <b-row cols-lg="3" cols-md="3" style="margin-left: -38px">
           <b-col v-for="(listing,index) in cards" :key="index" class="mb-4">
-            <partial-listing-card :listing="listing"></partial-listing-card>
+            <partial-listing-card :listing="listing"
+                                  @click.native="$router.push({path: `/listings/${listing.id}`, query: {fromBusiness : businessId}})"/>
           </b-col>
         </b-row>
 

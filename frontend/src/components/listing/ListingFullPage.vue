@@ -1,11 +1,20 @@
 <template>
   <div>
-    <b-link variant="info" class="back-to-search-link" @click="listingPageRedirect">
+    <b-link v-if="$route.query.fromBusiness" variant="info" class="back-to-search-link"
+            @click="$router.push({path: `/businesses/${$route.query.fromBusiness}/listings`})">
       <h4>
       <strong>
           <b-icon-arrow-left/>
-          Back to results
+          Back to business listings
       </strong>
+      </h4>
+    </b-link>
+    <b-link v-else-if="$route.query.fromSearch" variant="info" class="back-to-search-link" @click="listingPageRedirect">
+      <h4>
+        <strong>
+          <b-icon-arrow-left/>
+          Back to results
+        </strong>
       </h4>
     </b-link>
     <b-card v-if="!listingLoading" class="listing_card shadow">
@@ -120,8 +129,7 @@
       </b-modal>
 
       <b-modal id="completedPurchaseModal" title="Purchase Successful"
-               cancel-variant="primary" cancel-title="Back to Search" @cancel="listingPageRedirect"
-               ok-variant="primary" ok-title="Go to Home Page" @ok="$router.push('/homepage')"
+               ok-only ok-variant="success" ok-title="Go to Home Page" @ok="$router.push('/homepage')"
                no-close-on-backdrop no-close-on-esc hide-header-close>
         <h6>
           You have successfully purchased listing: {{listingItem.inventoryItem.product.name}}.
@@ -340,13 +348,6 @@ export default {
             }
           this.openErrorModal()
           })
-    },
-
-    /**
-     * Handles errors and displays them in a modal for purchase, clicking okay on this modal redirects to listings search
-     */
-    listingPageRedirect: function () {
-      this.$router.push({path: `/listingSearch`});
     },
 
     /**
