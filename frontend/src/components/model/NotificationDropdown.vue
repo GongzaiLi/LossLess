@@ -77,7 +77,7 @@ export default {
      */
     notificationClicked(notification) {
       if (notification.type==='Liked Listing' || notification.type==='Unliked Listing'){
-        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId)) {
+        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId.toString())) {
           this.$router.push('/listings/' + notification.subjectId);
         }
       }
