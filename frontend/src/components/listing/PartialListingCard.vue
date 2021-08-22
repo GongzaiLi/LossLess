@@ -53,11 +53,8 @@ export default {
       currency: null,
     }
   },
-  /**
-   * Queries the currencies API to get currency info for the business
-   */
   async mounted() {
-    this.currency = await Api.getUserCurrency(this.listing.business.address.country);
+    this.setCurrency();
   },
 
   methods: {
@@ -70,7 +67,20 @@ export default {
     getPrimaryImage: function (listing) {
       const primaryImageFileName = listing.inventoryItem.product.primaryImage.fileName;
       return Api.getImage(primaryImageFileName);
+    },
+
+    /**
+     * Queries the currencies API to get currency info for the business
+     */
+    async setCurrency() {
+      this.currency = await Api.getUserCurrency(this.listing.business.address.country);
     }
   },
+
+  watch: {
+    async listing() {
+      await this.setCurrency();
+    },
+  }
 }
 </script>

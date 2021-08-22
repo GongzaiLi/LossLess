@@ -1,9 +1,9 @@
 <template>
-  <b-nav-item-dropdown right class="notifications-tray" v-if="isActingAsUser">
+  <b-dropdown right class="notifications-tray" v-if="isActingAsUser" no-caret variant="link" toggle-class="text-decoration-none">
     <template #button-content>
       <div class="icon mr-1">
-        <b-icon v-if="numberOfNotifications"  icon="bell" class="iconBell" variant="danger" style="font-size:  1.8rem"></b-icon>
-        <b-icon v-else icon="bell" class="iconBell" variant="light" style="font-size:  1.8rem"></b-icon>
+        <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger"></b-icon>
+        <b-icon v-else icon="bell" class="iconBell" variant="light"></b-icon>
         <span v-if="numberOfNotifications" style="position: absolute; transform: translateY(5px); color: red">
                 {{numberOfNotifications}}
               </span>
@@ -20,7 +20,7 @@
     <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
       <notification :notification="notification"> </notification>
     </b-dropdown-item>
-  </b-nav-item-dropdown>
+  </b-dropdown>
 </template>
 
 <script>
@@ -102,6 +102,7 @@ export default {
 .notifications-item {
   border-top: 1px solid #eee;
   width: 26rem;
+  max-width: 80vw;
 }
 
 .notifications-item h6 {
@@ -117,11 +118,28 @@ export default {
   color: initial;
   background-color: #cccccc;
 }
+
 .expiring-notifications-item * {
   color: orangered;
 }
+
 .notifications-tray .dropdown-menu {
   max-height: 80vh;
   overflow-y: auto;
+}
+
+.notifications-tray .dropdown-toggle {
+  padding: 0;
+}
+
+.iconBell {
+  font-size: 1.6rem !important;
+}
+
+@media (max-width: 992px) and (min-width: 357px) {
+  .notifications-tray .dropdown-menu {
+      right: -7rem;
+      left: auto;
+  }
 }
 </style>
