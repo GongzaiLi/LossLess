@@ -47,12 +47,19 @@
               <h5> Closes: {{ listingItem.closes }} </h5>
               <h6 style="word-wrap: normal; font-size: 14px; height: 5rem; margin-bottom: 10px">
                 {{ listingItem.moreInfo }} </h6>
-              <h2 style="float: left; margin-bottom: -5px">
-                {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
-              </h2>
-              <b-button style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="openConfirmPurchaseDialog">
-                Purchase <b-icon-bag-check/>
-              </b-button>
+              <b-row no-gutters>
+                <b-col md="6">
+                  <h2 style="float: left; margin-bottom: -5px">
+                    {{ currency.symbol }} {{ listingItem.price }} {{ currency.code }}
+                  </h2>
+                </b-col>
+                <b-col md="6">
+                  <b-button v-if="!$currentUser.currentlyActingAs" style="float: right; margin-left: 1rem; margin-top: 3px" variant="success" @click="openConfirmPurchaseDialog">
+                    Purchase <b-icon-bag-check/>
+                  </b-button>
+                  <span v-else>You must be acting as a user to like or purchase listings</span>
+                </b-col>
+              </b-row>
             </template>
           </b-card>
           <div v-if="!$currentUser.currentlyActingAs">
