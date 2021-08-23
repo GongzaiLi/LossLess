@@ -35,7 +35,7 @@
             </div>
           </b-col>
           <b-col class="search_button" cols="3" md="2">
-            <b-button v-b-toggle.collapse-1><b-icon-sliders/> Filter</b-button>
+            <b-button v-b-toggle.filter_collapse><b-icon-sliders/> Filter</b-button>
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
@@ -44,7 +44,7 @@
         </b-row>
         <hr>
 
-        <b-collapse id="collapse-1" class="mt-2">
+        <b-collapse id="filter_collapse" class="mt-2">
           <b-row>
             <b-col cols="12" md="4">
               <label>Business Name:</label>
@@ -282,6 +282,7 @@ export default {
       this.search.businessName = ""
       this.search.selectedBusinessType = null
       this.search.businessLocation = ""
+      this.search.closesStartDate = getToday()
       this.search.closesEndDate = ""
       this.search.priceMin = ""
       this.search.priceMax = ""
