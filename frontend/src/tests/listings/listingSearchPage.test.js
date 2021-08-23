@@ -21,7 +21,7 @@ beforeEach(() => {
     businessName: "",
     selectedBusinessType: null,
     businessLocation: "",
-    closesStartDate: "",
+    closesStartDate: "2021-08-12",
     closesEndDate: "",
     priceMin: "",
     priceMax: "",
@@ -29,7 +29,7 @@ beforeEach(() => {
   }
 
   Api.searchListings.mockResolvedValue({data: testCards});
-  getToday.mockReturnValueOnce("2021-08-12");
+  getToday.mockReturnValue("2021-08-12");
 
   const localVue = createLocalVue();
 
@@ -139,7 +139,7 @@ describe('Testing search filters clearing functionality', () => {
     wrapper.vm.search.businessName = "XYZ"
     wrapper.vm.search.selectedBusinessType = null
     wrapper.vm.search.businessLocation = "some business"
-    wrapper.vm.search.closesStartDate = ""
+    wrapper.vm.search.closesStartDate = "2011-12-10"
     wrapper.vm.search.closesEndDate = ""
     wrapper.vm.search.priceMin = "5"
     wrapper.vm.search.priceMax = "10"

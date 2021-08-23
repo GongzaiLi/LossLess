@@ -15,6 +15,7 @@ public class PostInventoryDtoMapper {
         .setBestBefore(inventoryDto.getBestBefore())
         .setManufactured(inventoryDto.getManufactured())
         .setQuantity(inventoryDto.getQuantity())
+        .setQuantityUnlisted(inventoryDto.getQuantity())
         .setPricePerItem(inventoryDto.getPricePerItem())
         .setSellBy(inventoryDto.getSellBy())
         .setTotalPrice(inventoryDto.getTotalPrice());

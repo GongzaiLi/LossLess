@@ -22,21 +22,11 @@ Date: sprint_1
     <b-navbar-toggle target="nav-collapse" class="mr-auto"></b-navbar-toggle>
 
     <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-brand>
-      <b-nav-form @submit.prevent="search">
-        <b-input-group>
-          <b-form-input placeholder="Search Listings" v-model="searchQuery"
-                        :disabled="this.$route.name === 'listings-search'"></b-form-input>
-          <b-input-group-append>
-            <b-button type="submit" :disabled="this.$route.name === 'listings-search'"> <b-icon-search/> </b-button>
-          </b-input-group-append>
-        </b-input-group>
-      </b-nav-form>
-      </b-navbar-brand>
       <b-navbar-nav>
         <b-nav-item to="/homepage">Home Page</b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/search">Search Accounts</b-nav-item>
+        <b-nav-item to="/listingSearch">Search Listings</b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/marketPlace"> Marketplace </b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
 
@@ -101,37 +91,6 @@ Date: sprint_1
   </b-navbar>
 </template>
 
-<style>
-
-.icon  {
-  display: inline;
-}
-
-.icon:hover {
-  opacity: .7
-}
-
-.notifications-item {
-  border-top: 1px solid #eee;
-}
-
-.notifications-item h6 {
-  margin-top: 3px;
-}
-
-.notifications-item .dropdown-item:active {
-  color: initial;
-  background-color: #cccccc;
-}
-.expiring-notifications-item * {
-  color: orangered;
-}
-.notifications-tray .dropdown-menu {
-  max-height: 80vh;
-  overflow-y: auto;
-}
-</style>
-
 <script>
 import {setCurrentlyActingAs} from '../../auth'
 import NotificationDropdown from "./NotificationDropdown";
@@ -151,7 +110,6 @@ export default {
     return {
       cards: [],
       timer: null,
-      searchQuery: '',
     }
   },
   computed: {
@@ -220,15 +178,6 @@ export default {
     },
   },
   methods: {
-
-    /**
-     * Routes to Listing search page with search string
-     * Called when user clicks search or presses enter
-     **/
-    search() {
-      this.$router.replace({path: `/listingSearch`, query: { searchQuery: this.searchQuery }});
-      this.searchQuery = "";
-    },
 
     /**
      * Redirects to the profile of the account the user is acting as.

@@ -5,7 +5,7 @@
       <h1>Search Listings</h1>
       <hr>
 
-      <b-form @submit="getListings(true)">
+      <b-form @submit.prevent="getListings(true)">
         <b-row align-h="around">
           <b-col cols="12" md="5">
             <b-input-group prepend="Search:">
@@ -35,7 +35,7 @@
             </div>
           </b-col>
           <b-col class="search_button" cols="3" md="2">
-            <b-button v-b-toggle.collapse-1><b-icon-sliders/> Filter</b-button>
+            <b-button v-b-toggle.filter_collapse><b-icon-sliders/> Filter</b-button>
           </b-col>
 
           <b-col class="search_button" cols="3" md="1">
@@ -44,7 +44,7 @@
         </b-row>
         <hr>
 
-        <b-collapse id="collapse-1" class="mt-2">
+        <b-collapse id="filter_collapse" class="mt-2">
           <b-row>
             <b-col cols="12" md="4">
               <label>Business Name:</label>
@@ -132,7 +132,7 @@
       </b-row>
       <h2 v-if="listings.length === 0 && initialized">Unfortunately, no listings matched your search.</h2>
 
-      <pagination v-if="totalResults > perPage" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
+      <pagination ref="listingsSearchPag" :per-page="perPage" :total-items="totalResults" v-model="currentPage" v-show="listings.length"/>
     </b-container>
   </b-card>
   </b-overlay>
@@ -201,7 +201,7 @@ export default {
       business: {},
       listings: [],
       perPage: 9,
-      currentPage: 0, // page start with 0
+      currentPage: 1,
       totalResults: 0,
       mainProps: {blank: true, width: 250, height: 200},
       images: [],
@@ -227,7 +227,8 @@ export default {
       const timer = setTimeout(() =>  this.loading = true, 500);
 
       if (newQuery) {
-        this.currentPage = 0;
+        this.currentPage = 1;
+        this.$refs.listingsSearchPag.currentPage = 1; // We have to do this because the v-model doesn't update when we only set data.currentPage
       }
       const resp = (await Api.searchListings(
           this.search.productName,
@@ -281,6 +282,7 @@ export default {
       this.search.businessName = ""
       this.search.selectedBusinessType = null
       this.search.businessLocation = ""
+      this.search.closesStartDate = getToday()
       this.search.closesEndDate = ""
       this.search.priceMin = ""
       this.search.priceMax = ""
@@ -308,13 +310,21 @@ export default {
   },
 
   watch: {
-
+    "$route": {
+      handler: function(to) {
+        if (to.name === 'listings-search' && localStorage.getItem('listingPurchased') === "true") {
+          this.getListings();
+          localStorage.setItem('listingPurchased', "false");
+        }
+      },
+      deep: true
+    },
     '$data.currentPage': {
       handler: function() {
         this.getListings();
       },
       deep: true
-    }
+    },
   }
 }
 </script>

@@ -77,7 +77,7 @@ export default {
      */
     notificationClicked(notification) {
       if (notification.type==='Liked Listing' || notification.type==='Unliked Listing'){
-        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId)) {
+        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId.toString())) {
           this.$router.push('/listings/' + notification.subjectId);
         }
       }
@@ -100,9 +100,10 @@ export default {
 
 <style>
 .notifications-item {
-  border-top: 1px solid #eee;
+  border-top: 1px solid #aaa;
   width: 26rem;
   max-width: 80vw;
+  padding-top: 2px;
 }
 
 .notifications-item h6 {

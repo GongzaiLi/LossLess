@@ -252,29 +252,3 @@ describe('Act as business', () => {
     userData = prevUser;
   })
 });
-
-describe("Listing search ", () => {
-  test('reloads if query is the name', async () => {
-    $route.name = 'listings-search';
-    $route.query.searchQuery = 'ABCDE';
-    wrapper.vm.searchQuery = 'ABCDE';
-    wrapper.vm.search();
-    await wrapper.vm.$nextTick();
-    expect($router.replace).toHaveBeenCalled();
-  })
-
-  test('goes to new route if query is not the name', async () => {
-    $route.name = 'home';
-    wrapper.vm.searchQuery = 'ABCDE';
-    wrapper.vm.search();
-    await wrapper.vm.$nextTick();
-    expect($router.replace).toHaveBeenCalled();
-  })
-
-  test('clears search query after submitted', async () => {
-    wrapper.vm.searchQuery = 'ABCDE';
-    wrapper.vm.search();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.searchQuery).toStrictEqual('');
-  })
-});

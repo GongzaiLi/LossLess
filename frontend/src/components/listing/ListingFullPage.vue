@@ -369,6 +369,7 @@ export default {
           .then(() => {
             this.$bvModal.show("completedPurchaseModal");
             EventBus.$emit('notificationUpdate');
+            localStorage.setItem('listingPurchased', "true");
           })
           .catch((err) => {
             if (err.response.status === 406) {
