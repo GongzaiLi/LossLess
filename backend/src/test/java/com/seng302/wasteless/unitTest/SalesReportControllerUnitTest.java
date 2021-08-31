@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -95,12 +96,17 @@ public class SalesReportControllerUnitTest {
                 .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
+
+
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
 
         //Returns the totalProducts value equal to the businessId that was passed
         when(purchasedListingService.countPurchasedListingForBusiness(anyInt())).thenAnswer(i -> i.getArguments()[0]);
+
+        //Returns the totalProducts value equal to the businessId that was passed
+        when(purchasedListingService.countPurchasedListingForBusinessInDateRange(anyInt(), any(LocalDate.class), any(LocalDate.class))).thenAnswer(i -> i.getArguments()[0]);
     }
 
 
@@ -153,6 +159,51 @@ public class SalesReportControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andStartDateNull_andEndDateNotNull_then400Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?endDate=2000-10-12")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andStartDateNotNull_andEndDateNull_then400Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andNegativeDateRange_then400Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&endDate=1999-10-12")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andValidDateRange_then200Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=1999-10-12&endDate=2000-10-12")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andSameDayDateRange_then200Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&endDate=2000-10-12")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
 }

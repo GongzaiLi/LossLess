@@ -51,7 +51,11 @@ public class SalesReportController {
     /**
      * Gets the total number of purchases for a business
      *
+     * Takes a date range in form of startDate and endDate. Either both or neither must be supplied
+     *
      * @param businessId    The id of the business to get purchases for
+     * @param startDate     The start date for the date range. Format yyyy-MM-dd
+     * @param endDate       The end date for the date range. Format yyyy-MM-dd
      * @return              The total purchases for a business
      */
     @GetMapping("/businesses/{id}/salesReport/totalPurchases")
@@ -68,14 +72,13 @@ public class SalesReportController {
         if (startDate == null && endDate == null) {
             totalPurchases = purchasedListingService.countPurchasedListingForBusiness(businessId);
         } else if (startDate == null | endDate == null) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
         } else {
             if (endDate.isBefore(startDate)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
             }
             totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, startDate, endDate);
         }
-
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("totalPurchases", totalPurchases);
