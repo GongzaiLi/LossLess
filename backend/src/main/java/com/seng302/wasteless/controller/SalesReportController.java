@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 
 
 /**
@@ -46,13 +49,27 @@ public class SalesReportController {
     }
 
     @GetMapping("/businesses/{id}/salesReport/totalPurchases")
-    public ResponseEntity<Object> getTotalPurchasesOfBusiness(@PathVariable("id") Integer businessId) {
+    public ResponseEntity<Object> getTotalPurchasesOfBusiness(@PathVariable("id") Integer businessId,
+                                                              @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                              @RequestParam(value = "endDate", required = false) LocalDate endDate) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
-        Integer totalPurchases = purchasedListingService.countPurchasedListingForBusiness(businessId);
+        Integer totalPurchases = 0;
+
+        if (startDate == null && endDate == null) {
+            totalPurchases = purchasedListingService.countPurchasedListingForBusiness(businessId);
+        } else if (startDate == null | endDate == null) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
+        } else {
+            if (endDate.isBefore(startDate)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
+            }
+            totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, startDate, endDate);
+        }
+
 
         JSONObject responseBody = new JSONObject();
         responseBody.put("totalPurchases", totalPurchases);

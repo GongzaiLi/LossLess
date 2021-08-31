@@ -4,6 +4,7 @@ import com.seng302.wasteless.model.PurchasedListing;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -32,4 +33,11 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @param businessId the id of the business
      */
     Integer countAllByBusiness_Id(Integer businessId);
+
+    /**
+     * Returns the total number of purchases for a specified business
+     * in a specified date range
+     * @param businessId the id of the business
+     */
+    Integer countAllByBusiness_IdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
 }
