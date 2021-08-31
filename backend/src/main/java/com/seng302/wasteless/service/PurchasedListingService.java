@@ -27,4 +27,6 @@ public class PurchasedListingService {
     public PurchasedListing findPurchasedListingById(Integer id) {
         return purchasedListingRepository.findFirstById(id);
     }
+
+
 }
