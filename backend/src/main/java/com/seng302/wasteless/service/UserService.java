@@ -217,9 +217,11 @@ public class UserService {
     }
 
     /**
+     * Sets the user details to the modified user details
+     * and updates the database
      *
-     * @param user
-     * @param modifiedUser
+     * @param user User to be updated
+     * @param modifiedUser Dto containing information needed to update a user
      */
     public void updateUserDetails(User user, PutUserDto modifiedUser) {
         user.setFirstName(modifiedUser.getFirstName());

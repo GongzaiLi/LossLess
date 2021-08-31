@@ -25,8 +25,8 @@ public class PutUserDto {
     @Size(min = 0, max = 50)
     private String firstName;
 
-    @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
+    @NotBlank(message = "lastName is mandatory")
     @Size(min = 0, max = 50)
     private String lastName;
 
@@ -62,7 +62,6 @@ public class PutUserDto {
     @JoinColumn(name = "home_address") // map camelcase name (java) to snake case (SQL)
     private Address homeAddress;
 
-    @NotBlank(message = "password is mandatory")
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     @Size(min = 0, max = 100)
     private String password;

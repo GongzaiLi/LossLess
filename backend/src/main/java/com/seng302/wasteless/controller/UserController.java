@@ -416,8 +416,7 @@ public class UserController {
     /**
      * Handle put request to /users endpoint
      *
-     * Checks if the old password matches current password if changing password.
-     * If the updated email isn't the same as the old one then it changes.
+     * If changing password checks if the old password matches current password.
      * Validates inputted data using same validation as registration.
      *
      * Returns 200 on success
@@ -434,6 +433,11 @@ public class UserController {
         User currentUser = userService.getCurrentlyLoggedInUser();
 
         if (modifiedUser.getNewPassword() != null) {
+            if (modifiedUser.getPassword() == null) {
+                logger.warn("Attempted to update password with but current password is empty, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is invalid");
+            }
+
             if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword()) && !modifiedUser.getNewPassword().isEmpty()) {
                 currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
             } else {
@@ -447,7 +451,7 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
         }
 
-        if (!userService.checkEmailValid(modifiedUser.getEmail()) && !modifiedUser.getEmail().equals(currentUser.getEmail())) {
+        if (!userService.checkEmailValid(modifiedUser.getEmail())) {
             logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }

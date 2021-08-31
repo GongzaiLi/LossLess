@@ -218,6 +218,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
+    void whenPutRequestToUser_andRequestToChangePassword_andNoPasswordField_then400Response() throws Exception {
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+                .content(modifiedUser)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void whenPutRequestToUser_andWrongPassword_then400Response() throws Exception {
 
         Mockito
