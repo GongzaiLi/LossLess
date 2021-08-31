@@ -48,6 +48,12 @@ public class SalesReportController {
         this.purchasedListingService = purchasedListingService;
     }
 
+    /**
+     * Gets the total number of purchases for a business
+     *
+     * @param businessId    The id of the business to get purchases for
+     * @return              The total purchases for a business
+     */
     @GetMapping("/businesses/{id}/salesReport/totalPurchases")
     public ResponseEntity<Object> getTotalPurchasesOfBusiness(@PathVariable("id") Integer businessId,
                                                               @RequestParam(value = "startDate", required = false) LocalDate startDate,

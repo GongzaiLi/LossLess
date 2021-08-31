@@ -299,7 +299,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToCreateListing_andNotLoggedIn_then401Response() throws Exception {       //NOT WORKING YET
+     void whenPostRequestToCreateListing_andNotLoggedIn_then401Response() throws Exception {
         String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
 
         Mockito
