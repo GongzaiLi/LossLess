@@ -23,6 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -432,11 +433,13 @@ public class UserController {
     public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
         User currentUser = userService.getCurrentlyLoggedInUser();
 
-        if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword()) && !modifiedUser.getNewPassword().isEmpty()) {
-            currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
-        } else {
-            logger.warn("Attempted to update password with but current password is incorrect, dropping request: {}", modifiedUser);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+        if (modifiedUser.getNewPassword() != null) {
+            if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword()) && !modifiedUser.getNewPassword().isEmpty()) {
+                currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
+            } else {
+                logger.warn("Attempted to update password with but current password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
         }
 
         if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail()) && !modifiedUser.getEmail().equals(currentUser.getEmail())) {
