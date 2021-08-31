@@ -1,48 +1,54 @@
 <template>
-  <div>
+  <b-form @submit.prevent="submitPressed">
     <b-row>
-      <b-col lg="2">
-        <b-form-group label="Filter results by">
-          <b-form-select v-model="dateType" :options="dateTypeOptions"></b-form-select>
-        </b-form-group>
-      </b-col>
+        <b-col lg="2">
+          <b-form-group label="Filter results by">
+            <b-form-select v-model="dateType" :options="dateTypeOptions"></b-form-select>
+          </b-form-group>
+        </b-col>
 
-      <b-col lg="2" v-if="dateType === 'year' || dateType === 'month'">
-        <b-form-group label="Year">
-          <b-form-input v-model="selectedYear" type="number" min="2000" :max="currentYear()"></b-form-input>
-        </b-form-group>
-      </b-col>
+        <b-col lg="2" v-if="dateType === 'year' || dateType === 'month'">
+          <b-form-group label="Year">
+            <b-form-input v-model="selectedYear" type="number" min="2000" :max="(new Date()).getFullYear()"></b-form-input>
+          </b-form-group>
+        </b-col>
 
-      <b-col lg="2" v-if="dateType === 'month'">
-        <b-form-group label="Month">
-          <b-form-select v-model="month" :options="monthNames"></b-form-select>
-        </b-form-group>
-      </b-col>
+        <b-col lg="2" v-if="dateType === 'month'">
+          <b-form-group label="Month">
+            <b-form-select v-model="selectedMonth">
+              <option v-for="(month, index) in selectableMonths" :key="index" :value="index">{{month}}</option>
+            </b-form-select>
+          </b-form-group>
+        </b-col>
 
-      <b-col lg="4" v-if="dateType === 'week'">
-        <b-form-group label="Week starting:">
-          <b-form-datepicker :date-disabled-fn="dateDisabled" value-as-date v-model="selectedWeek" class="eric-custom-week-picker"/>
-        </b-form-group>
-      </b-col>
+        <b-col lg="4" v-if="dateType === 'week'">
+          <b-form-group label="Week starting:">
+            <b-form-datepicker :date-disabled-fn="dateDisabled" value-as-date v-model="selectedWeek" class="eric-custom-week-picker"/>
+          </b-form-group>
+        </b-col>
 
-      <b-col lg="4" v-if="dateType === 'day'">
-        <b-form-group label="Select day">
-          <b-form-datepicker v-model="selectedDay"/>
-        </b-form-group>
-      </b-col>
+        <b-col lg="4" v-if="dateType === 'day'">
+          <b-form-group label="Select day">
+            <b-form-datepicker v-model="selectedDay"/>
+          </b-form-group>
+        </b-col>
 
-      <b-col lg="4" v-if="dateType === 'customRange'">
-        <b-form-group label="Start day">
-          <b-form-datepicker value-as-date v-model="startDay"/>
-        </b-form-group>
-      </b-col>
-      <b-col lg="4" v-if="dateType === 'customRange'">
-        <b-form-group label="End day">
-          <b-form-datepicker value-as-date v-model="endDay"/>
-        </b-form-group>
-      </b-col>
+        <b-col lg="4" v-if="dateType === 'customRange'">
+          <b-form-group label="Start day">
+            <b-form-datepicker value-as-date v-model="startDay"/>
+          </b-form-group>
+        </b-col>
+        <b-col lg="4" v-if="dateType === 'customRange'">
+          <b-form-group label="End day">
+            <b-form-datepicker value-as-date v-model="endDay"/>
+          </b-form-group>
+        </b-col>
+
+        <b-col lg="2" align-self="center">
+          <b-button type="submit">Filter</b-button>
+        </b-col>
     </b-row>
-  </div>
+  </b-form>
 </template>
 
 <script>
@@ -52,9 +58,6 @@ export default {
   data() {
     return {
       dateType: "any",
-      selectedYear: this.currentYear(),
-      month: this.currentMonth(),
-      monthNames: monthNames,
       dateTypeOptions: {
         any: "No Filter",
         year: "Year",
@@ -63,6 +66,9 @@ export default {
         day: "Day",
         customRange: "Custom Range"
       },
+      monthNames: monthNames,
+      selectedYear: (new Date()).getFullYear(),
+      selectedMonth: (new Date()).getMonth(),
       selectedWeek: this.currentWeek(),
       selectedDay: new Date(),
       startDay: new Date(),
@@ -78,13 +84,53 @@ export default {
       today.setDate(today.getDate() - today.getDay());
       return today;
     },
-    currentMonth() {
-      return monthNames[(new Date()).getMonth()];
-    },
-    currentYear() {
-      return (new Date()).getFullYear();
+    /**
+     * Handler when the user presses the 'Filter' button. Emits an input event with the given date range.
+     * Values emitted is null if the user has not selected any filtering. Otherwise, it is an array containing
+     * the first and last day of the selected year/month/week/day, of the custom range the user has selected
+     */
+    submitPressed() {
+      let dateRange;
+      if (this.dateType === "year") {
+        dateRange = [new Date(this.selectedYear, 0, 1), new Date(this.selectedYear, 11, 31)];
+      } else if (this.dateType === "month") {
+        dateRange = [new Date(this.selectedYear, this.selectedMonth, 1), new Date(this.selectedYear, this.selectedMonth + 1, 0)];
+      } else if (this.dateType === "week") {
+        const endOfWeek = new Date(this.selectedWeek.getTime());
+        endOfWeek.setDate(endOfWeek.getDate() + 7);
+        dateRange = [this.selectedWeek, endOfWeek];
+      } else if (this.dateType === "day") {
+        dateRange = [this.selectedDay, this.selectedDay];
+      } else if (this.dateType === "customRange") {
+        dateRange = [this.startDay, this.endDay];
+      }
+
+      if (this.dateType === "any") {
+        dateRange = null;
+      } else {
+        // Set time of start date to start of day, and time of end date to end of day, so the date range includes those two days
+        dateRange[0].setHours(0, 0, 0, 0);
+        dateRange[1].setHours(23, 59, 59, 999);
+      }
+
+      this.$emit('input', dateRange);
     }
   },
+  computed: {
+    /*
+     * Computed property returning the months that can be selected as options for the
+     * month drop-down selector.
+     * Returns all the months if the year selected is before the current year, otherwise
+     * returns every month up to and including the current month.
+     */
+    selectableMonths() {
+      if (this.selectedYear < (new Date()).getFullYear()) {
+        return monthNames;
+      } else {
+        return monthNames.slice(0, (new Date()).getMonth() + 1);
+      }
+    }
+  }
 }
 </script>
 
