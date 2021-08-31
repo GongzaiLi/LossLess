@@ -23,29 +23,32 @@
 
         <b-col lg="4" v-if="dateType === 'week'">
           <b-form-group label="Week starting:">
-            <b-form-datepicker :date-disabled-fn="dateDisabled" value-as-date v-model="selectedWeek" class="eric-custom-week-picker"/>
+            <b-form-datepicker :date-disabled-fn="weekDateDisabled" value-as-date v-model="selectedWeek" class="eric-custom-week-picker"/>
           </b-form-group>
         </b-col>
 
         <b-col lg="4" v-if="dateType === 'day'">
           <b-form-group label="Select day">
-            <b-form-datepicker v-model="selectedDay"/>
+            <b-form-datepicker :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
           </b-form-group>
         </b-col>
 
         <b-col lg="4" v-if="dateType === 'customRange'">
           <b-form-group label="Start day">
-            <b-form-datepicker value-as-date v-model="startDay"/>
+            <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="startDay"/>
           </b-form-group>
         </b-col>
         <b-col lg="4" v-if="dateType === 'customRange'">
           <b-form-group label="End day">
-            <b-form-datepicker value-as-date v-model="endDay"/>
+            <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker" :state="endDateValidityState"/>
+            <b-form-invalid-feedback>
+              End date must be same as or after starting date.
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
 
-        <b-col lg="2" align-self="center">
-          <b-button type="submit">Filter</b-button>
+        <b-col lg="2">
+          <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4">Filter</b-button>
         </b-col>
     </b-row>
   </b-form>
@@ -76,9 +79,25 @@ export default {
     }
   },
   methods: {
-    dateDisabled(ymd, date) {
-      return date.getDay() !== 0;
+    /**
+     * Returns true if the day is in the future. This function is used for the date-disabled-fn prop
+     * in the day pickers.
+     */
+    dateInFuture(ymd, date) {
+      return date > Date.now();
     },
+    /**
+     * Function that determines if a date should be disabled on the week date picker.
+     * Returns true if the day isn't a Sunday (so the user can only pick Sundays to represent a week)
+     * or if the day is in the future.
+     */
+    weekDateDisabled(ymd, date) {
+      return this.dateInFuture(ymd, date) || date.getDay() !== 0;
+    },
+    /**
+     * Convenience function that returns the first day of this week.
+     * Weeks start on Sundays.
+     */
     currentWeek() {
       const today = new Date();
       today.setDate(today.getDate() - today.getDay());
@@ -117,7 +136,7 @@ export default {
     }
   },
   computed: {
-    /*
+    /**
      * Computed property returning the months that can be selected as options for the
      * month drop-down selector.
      * Returns all the months if the year selected is before the current year, otherwise
@@ -129,6 +148,13 @@ export default {
       } else {
         return monthNames.slice(0, (new Date()).getMonth() + 1);
       }
+    },
+    /**
+     * Returns validation state for the end date picker. Return false (i.e. invalid value) if the end date is before
+     * the start date, otherwise returns NULL (i.e. no validation state).
+     */
+    endDateValidityState() {
+      return (this.startDay.getDate() <= this.endDay.getDate() ? null : false);
     }
   }
 }
