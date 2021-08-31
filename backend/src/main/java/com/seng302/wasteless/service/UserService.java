@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
@@ -213,6 +214,23 @@ public class UserService {
      */
     public void unlikePurchasedListing(Listing listing) {
         userRepository.unlikePurchasedListingAllUsers(listing.getId());
+    }
+
+    /**
+     *
+     * @param user
+     * @param modifiedUser
+     */
+    public void updateUserDetails(User user, PutUserDto modifiedUser) {
+        user.setFirstName(modifiedUser.getFirstName());
+        user.setLastName(modifiedUser.getLastName());
+        user.setMiddleName(modifiedUser.getMiddleName());
+        user.setNickname(modifiedUser.getNickname());
+        user.setBio(modifiedUser.getBio());
+        user.setEmail(modifiedUser.getEmail());
+        user.setDateOfBirth(modifiedUser.getDateOfBirth());
+        user.setHomeAddress(modifiedUser.getHomeAddress());
+        updateUser(user);
     }
 
 }
