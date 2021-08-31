@@ -13,11 +13,12 @@ import Register from "./components/user/Register";
 import Navbar from "./components/model/Navbar";
 import UserProfile from "./components/user/UserProfile";
 import SearchPage from "./components/search/SearchPage";
-import HomePage from "@/components/user/HomePage";
+import HomePage from "./components/user/HomePage";
 import CreateBusiness from "./components/business/CreateBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
 import InventoryPage from "./components/inventory/InventoryPage";
 import ListingSearchPage from "./components/listing/ListingSearchPage";
+import SalesReportPage from "./components/sales-report/SalesReportPage";
 
 // Vue app instance
 // it is declared as a reusable component in this case.
@@ -37,7 +38,8 @@ const app = {
     SearchPage,
     BusinessProfile,
     InventoryPage,
-    ListingSearchPage
+    ListingSearchPage,
+    SalesReportPage
 
   },
   // app initial state
