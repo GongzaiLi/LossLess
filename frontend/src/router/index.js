@@ -13,6 +13,7 @@ import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
 import ListingSearchPage from "../components/listing/ListingSearchPage";
 import ListingFullPage from "@/components/listing/ListingFullPage";
+import SalesReportPage from "../components/sales-report/SalesReportPage";
 
 
 
@@ -39,7 +40,8 @@ const router = new Router({
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
         { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage},
-        { path : '/listings/:id', name: 'listings-full', component: ListingFullPage}
+        { path : '/listings/:id', name: 'listings-full', component: ListingFullPage},
+        { path : '/businesses/:id/salesReport', name: 'sales-report-page', component: SalesReportPage},
 
     ]
 });

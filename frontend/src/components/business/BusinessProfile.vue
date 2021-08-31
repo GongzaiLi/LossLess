@@ -84,6 +84,12 @@ Date: 29/03/2021
               <b-icon-receipt/> Sales List
             </b-button>
           </router-link>
+          &nbsp;
+          <router-link v-if="isAdmin" :to="{ name: 'sales-report-page', params: { id: businessData.id }}">
+            <b-button type="submit" variant="primary">
+              <b-icon-newspaper/> Sales Report
+            </b-button>
+          </router-link>
 
         </b-container>
       </b-card-body>
@@ -301,7 +307,7 @@ export default {
         .getBusiness(id)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
-          this.setResponseData(response.data);
+          this.businessData = response.data;
           this.businessFound = true;
           this.loading = false;
         })
@@ -312,13 +318,7 @@ export default {
         })
     },
 
-    /**
-     * set the response data to businessData
-     * @param data
-     */
-    setResponseData: function (data) {
-      this.businessData = data;
-    },
+
     /**
      * Check whether the user currently logged can revoke admin from an given administrator in
      * the administrators table or not, for the purposes
