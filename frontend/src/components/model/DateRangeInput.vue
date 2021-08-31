@@ -3,19 +3,21 @@
     <b-row>
         <b-col lg="2">
           <b-form-group label="Filter results by">
-            <b-form-select v-model="dateType" :options="dateTypeOptions"></b-form-select>
+            <b-form-select v-model="dateType" id="dateTypeSelect">
+              <option v-for="[option, name] in Object.entries(dateTypeOptions)" :key="option" :value="option">{{name}}</option>
+            </b-form-select>
           </b-form-group>
         </b-col>
 
         <b-col lg="2" v-if="dateType === 'year' || dateType === 'month'">
           <b-form-group label="Year">
-            <b-form-input v-model="selectedYear" type="number" min="2000" :max="(new Date()).getFullYear()"></b-form-input>
+            <b-form-input v-model="selectedYear" type="number" min="2000" :max="(new Date()).getFullYear()" id="yearSelector"></b-form-input>
           </b-form-group>
         </b-col>
 
         <b-col lg="2" v-if="dateType === 'month'">
           <b-form-group label="Month">
-            <b-form-select v-model="selectedMonth">
+            <b-form-select v-model="selectedMonth" id="monthSelector">
               <option v-for="(month, index) in selectableMonths" :key="index" :value="index">{{month}}</option>
             </b-form-select>
           </b-form-group>
@@ -48,7 +50,9 @@
         </b-col>
 
         <b-col lg="2">
-          <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4">Filter</b-button>
+          <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4" id="filterDateBtn">
+            Filter
+          </b-button>
         </b-col>
     </b-row>
   </b-form>
@@ -116,10 +120,10 @@ export default {
         dateRange = [new Date(this.selectedYear, this.selectedMonth, 1), new Date(this.selectedYear, this.selectedMonth + 1, 0)];
       } else if (this.dateType === "week") {
         const endOfWeek = new Date(this.selectedWeek.getTime());
-        endOfWeek.setDate(endOfWeek.getDate() + 7);
+        endOfWeek.setDate(endOfWeek.getDate() + 6);
         dateRange = [this.selectedWeek, endOfWeek];
       } else if (this.dateType === "day") {
-        dateRange = [this.selectedDay, this.selectedDay];
+        dateRange = [new Date(this.selectedDay.getTime()), new Date(this.selectedDay.getTime())]; // Have to copy the dates as they will be modified later
       } else if (this.dateType === "customRange") {
         dateRange = [this.startDay, this.endDay];
       }
