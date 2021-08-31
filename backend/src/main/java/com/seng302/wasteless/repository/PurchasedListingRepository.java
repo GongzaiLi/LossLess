@@ -26,4 +26,10 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @return A purchaseListing entity
      */
     PurchasedListing findFirstById(Integer purchaseListingId);
+
+    /**
+     * Returns the total number of purchases for a specified business
+     * @param businessId the id of the business
+     */
+    Integer countAllByBusiness_Id(Integer businessId);
 }

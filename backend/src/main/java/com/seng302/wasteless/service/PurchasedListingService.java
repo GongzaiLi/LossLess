@@ -27,4 +27,11 @@ public class PurchasedListingService {
     public PurchasedListing findPurchasedListingById(Integer id) {
         return purchasedListingRepository.findFirstById(id);
     }
+
+    /**
+     * Returns the total number of purchased listings for a business.
+     * @param businessId Id of the business
+     * @return The count of purchased listings
+     */
+    public Integer countPurchasedListingForBusiness(Integer businessId) {return purchasedListingRepository.countAllByBusiness_Id(businessId);}
 }
