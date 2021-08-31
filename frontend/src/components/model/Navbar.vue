@@ -46,6 +46,9 @@ Date: sprint_1
           <b-dropdown-item :to="businessListingsRouteLink">
             <b-icon-receipt/> Sales List
           </b-dropdown-item>
+          <b-dropdown-item :to="businessSalesReportRouteLink">
+            <b-icon-graph-up/> Sales Report
+          </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -154,10 +157,17 @@ export default {
     },
 
     /**
-     * Returns a string constructed to go to the sales page
+     * Returns a string constructed to go to the sales listings page
      */
     businessListingsRouteLink: function() {
       return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/listings"
+    },
+
+    /**
+     * Returns a string constructed to go to the sales report page
+     */
+    businessSalesReportRouteLink: function() {
+      return "/businesses/"+this.$currentUser.currentlyActingAs.id+"/salesReport"
     },
 
     /**
