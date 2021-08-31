@@ -1,7 +1,7 @@
 <template>
   <b-form @submit.prevent="submitPressed">
     <b-row>
-        <b-col lg="2">
+        <b-col lg="2" md="4">
           <b-form-group label="Filter results by">
             <b-form-select v-model="dateType" id="dateTypeSelect">
               <option v-for="[option, name] in Object.entries(dateTypeOptions)" :key="option" :value="option">{{name}}</option>
@@ -9,13 +9,13 @@
           </b-form-group>
         </b-col>
 
-        <b-col lg="2" v-if="dateType === 'year' || dateType === 'month'">
+        <b-col lg="2" md="4" v-if="dateType === 'year' || dateType === 'month'">
           <b-form-group label="Year">
             <b-form-input v-model="selectedYear" type="number" min="2000" :max="(new Date()).getFullYear()" id="yearSelector"></b-form-input>
           </b-form-group>
         </b-col>
 
-        <b-col lg="2" v-if="dateType === 'month'">
+        <b-col lg="2" md="4" v-if="dateType === 'month'">
           <b-form-group label="Month">
             <b-form-select v-model="selectedMonth" id="monthSelector">
               <option v-for="(month, index) in selectableMonths" :key="index" :value="index">{{month}}</option>

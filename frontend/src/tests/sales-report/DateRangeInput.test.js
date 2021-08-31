@@ -1,6 +1,6 @@
 import { mount, createLocalVue } from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import DateRangeInput from '../../components/model/DateRangeInput';
+import DateRangeInput from '../../components/sales-report/DateRangeInput';
 
 let wrapper;
 // let mockDateNow = '2019-05-14T11:01:58.135Z';
@@ -100,5 +100,15 @@ describe('DateRangeInput', () => {
     const [start, end] = getLastEmitted();
     expect(start.toLocaleString()).toBe("4/19/2021, 12:00:00 AM");
     expect(end.toLocaleString()).toBe("4/20/2021, 11:59:59 PM");
+  });
+
+  test('disables filter button when date range invalid', async () => {
+    await wrapper.find('#dateTypeSelect').findAll('option').at(5).setSelected();
+    wrapper.vm.startDay = new Date(2021, 3, 21);
+    wrapper.vm.endDay = new Date(2021, 3, 20);
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find("#filterDateBtn").element.disabled).toBe(true);
   });
 });
