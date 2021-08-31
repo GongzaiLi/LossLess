@@ -5,8 +5,6 @@ Date: 3/3/2021
 -->
 <template>
   <b-container>
-    <date-range-input @input="x => blah = x"></date-range-input>
-    <span v-if="blah">{{blah[0].toLocaleDateString()}} {{blah[1].toLocaleDateString()}}</span>
     <b-row class="justify-content-md-center">
       <b-col md="8" xl="6">
         <b-card class="shadow">
@@ -58,16 +56,13 @@ Date: 3/3/2021
 
 <script>
 import api from "../../Api";
-import DateRangeInput from "@/components/model/DateRangeInput";
 
 
 export default {
-  components: {DateRangeInput},
   data: function () {
     return {
       errors: [],
       email: null,
-      blah: null,
       password: "",
       visiblePassword: false
     }
