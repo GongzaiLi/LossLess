@@ -40,4 +40,17 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @param businessId the id of the business
      */
     Integer countAllByBusiness_IdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * Returns the total value of purchases for a specified business
+     * @param businessId the id of the business
+     */
+    Integer sumPriceByBusiness_Id(Integer businessId);
+
+    /**
+     * Returns the total value of purchases for a specified business
+     * in a specified date range
+     * @param businessId the id of the business
+     */
+    Integer sumPriceByBusiness_IdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
 }

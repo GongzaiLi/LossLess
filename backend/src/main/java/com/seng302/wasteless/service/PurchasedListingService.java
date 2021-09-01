@@ -47,4 +47,21 @@ public class PurchasedListingService {
      */
     public Integer countPurchasedListingForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
         return purchasedListingRepository.countAllByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
+
+    /**
+     * Returns the total value of purchased listings for a business.
+     * @param businessId Id of the business
+     * @return The count of purchased listings
+     */
+    public Integer totalPurchasedListingValueForBusiness(Integer businessId) {
+        return purchasedListingRepository.sumPriceByBusiness_Id(businessId);}
+
+    /**
+     * Returns the total value of purchased listings for a business.
+     * @param businessId Id of the business
+     * @return The count of purchased listings
+     */
+    public Integer totalPurchasedListingValueForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
+        return purchasedListingRepository.sumPriceByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
+
 }

@@ -35,11 +35,11 @@ public class SalesReportDtoMapper {
         double totalValue;
 
         if (startDate == null && endDate == null) {
-            totalPurchases = 10;   // Hardcoded total purchased listings purchasedListingService should be used
-            totalValue = 100.00; // Hardcoded total value of purchased listings
+            totalPurchases = purchasedListingService.countPurchasedListingForBusiness(businessId);
+            totalValue = purchasedListingService.totalPurchasedListingValueForBusiness(businessId);
         } else {
-            totalPurchases = 1;
-            totalValue = 10.00;
+            totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, startDate, endDate);
+            totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, startDate, endDate);
         }
         return new SalesReportDto().setTotalPurchases(totalPurchases)
                 .setTotalValue(totalValue);
