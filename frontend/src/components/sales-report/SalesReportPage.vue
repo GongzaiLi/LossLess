@@ -4,8 +4,12 @@ Date: sprint_6
 -->
 <template>
   <div>
-    <b-card v-if="canViewReport">
-      <h4 class="mb-1">{{ business.name }}'s Sale Report</h4>
+    <b-card v-if="canViewReport" class="shadow mw-100">
+      <template #header>
+        <h4 class="mb-1">{{ business.name }}'s Sale Report</h4>
+      </template>
+
+      <DateRangeInput/>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
       <b-card-title>
@@ -27,9 +31,10 @@ Date: sprint_6
 </template>
 <script>
 import api from "../../Api";
+import DateRangeInput from "./DateRangeInput";
 export default {
   name: "sales-report-page",
-
+  components: {DateRangeInput},
   data: function () {
     return {
       business: {},
