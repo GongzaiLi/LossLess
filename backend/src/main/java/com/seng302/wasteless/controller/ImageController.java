@@ -301,11 +301,6 @@ public class ImageController {
             userForImage = userService.findUserById(userId);
         }
 
-        if (file.isEmpty()) {
-            logger.warn("Cannot post user image, no image received");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
-        }
-
         //Used for deleting old user image if they had one. Must come before the below code
         Image oldUserImage = userForImage.getProfileImage();
 
@@ -332,9 +327,14 @@ public class ImageController {
      * @param file      The image file to save
      * @return          Image entity containing image information
      */
-    private Image doImageValidationAndSaving(MultipartFile file) {
+    private Image doImageValidationAndSaving(MultipartFile file) throws ResponseStatusException {
         Image newImage = new Image();
         String imageType;
+
+        if (file.isEmpty()) {
+            logger.warn("Cannot post user image, no image received");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
+        }
 
         String fileContentType = file.getContentType();
         if (fileContentType != null && fileContentType.contains("/")) {
