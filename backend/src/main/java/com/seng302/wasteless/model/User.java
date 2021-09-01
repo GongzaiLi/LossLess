@@ -111,6 +111,11 @@ public class User {
     @ToString.Exclude
     private Set<Listing> listingsLiked;
 
+    @JoinColumn(name = "profile_image")
+    @OneToOne
+    private Image profileImage;
+
+
     /**
      * Check this objects date is within the expected maximum and minimum date ranges
      */

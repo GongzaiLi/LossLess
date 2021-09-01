@@ -215,4 +215,14 @@ public class UserService {
         userRepository.unlikePurchasedListingAllUsers(listing.getId());
     }
 
+    /**
+     * Add image to a user
+     * Calling the method in this way allows for mocking during automated testing
+     * @param user User that image is to be added to
+     * @param image image that is to be added to user
+     */
+    public void addImageToUser(User user, Image image) {
+        user.setProfileImage(image);
+    }
+
 }

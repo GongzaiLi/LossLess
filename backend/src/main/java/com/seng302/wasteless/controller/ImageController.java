@@ -73,7 +73,7 @@ public class ImageController {
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
     public ResponseEntity<Object> postProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @RequestParam("filename") MultipartFile file) {
 
-        logger.info("Request to Create product: {} for business ID: {}", productId, businessId);
+        logger.info("Request to create product image: {} for business ID: {}", productId, businessId);
 
         User user = userService.getCurrentlyLoggedInUser();
 
@@ -302,4 +302,67 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).body("Primary image successfully updated");
     }
 
+
+    @PostMapping("/users/{userId}/image")
+    public ResponseEntity<Object> postUserImage(@PathVariable("userId") Integer userId, @RequestParam("filename") MultipartFile file) {
+        logger.info("Request to upload user image for user: {}", userId);
+
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
+
+        //If we are not uploading the image to ourselves, and we are not a global admin, return error
+        if (!loggedInUser.getId().equals(userId) && !loggedInUser.checkUserGlobalAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to make change for this user");
+        }
+
+        User userForImage;
+
+        //If the request is made for not the currently logged in user, get their information
+        if (loggedInUser.getId().equals(userId)) {
+            userForImage = loggedInUser;
+        } else {
+            userForImage = userService.findUserById(userId);
+        }
+
+        if (file.isEmpty()) {
+            logger.warn("Cannot post user image, no image received");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
+        }
+
+        Image newImage = new Image();
+        String imageType;
+
+        String fileContentType = file.getContentType();
+        if (fileContentType != null && fileContentType.contains("/")) {
+            imageType = fileContentType.split("/")[1];
+        } else {
+            logger.debug("Error with image type is null");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null");
+        }
+
+        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
+            logger.warn("Cannot post product image, invalid image type");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
+        }
+
+        newImage = imageService.createImageFileName(newImage, imageType);
+
+        imageService.storeImage(newImage.getFileName(), file);
+
+        BufferedImage thumbnail = imageService.resizeImage(newImage);
+        if (thumbnail == null) {
+            logger.debug("Error resizing image");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
+        }
+
+        imageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
+        newImage = imageService.createImage(newImage);
+        logger.debug("Created new image entity with filename {}", newImage.getFileName());
+
+        userService.addImageToUser(userForImage, newImage);
+
+        userService.saveUserChanges(userForImage);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
+
+    }
 }
