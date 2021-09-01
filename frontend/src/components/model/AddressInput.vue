@@ -159,7 +159,10 @@ export default {
   name: "address-input",
   // This prop is needed for parent components to use v-model on this.
   // See https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
-  props: ['value'],
+  props:{
+    value: {type: Object},
+    address: {type: Object}
+  },
   data: function () {
     return {
       addressResults: [],
@@ -181,6 +184,8 @@ export default {
   // Add click event listener to document root that closes the autocomplete dropdown
   // This is needed to close the dropdown when you click outside it
   mounted: function () {
+    console.log(this.homeAddress, '2')
+    this.homeAddress =this.address;
     document.addEventListener('click', () => {
       this.showAutocompleteDropdown = false;
     });

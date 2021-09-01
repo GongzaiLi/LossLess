@@ -154,7 +154,7 @@ Date: 5/3/2021
     </div>
 
     <b-modal id="edit-user-profile" hide-header hide-footer>
-      <Register/>
+      <Register :is-edit-user="true" :user-details="userData"/>
     </b-modal>
   </div>
 </template>
