@@ -1,6 +1,5 @@
 <!--
 Page for users to input their information for registration
-Authors: Nitish Singh, Eric Song
 Date: 3/3/2021
 -->
 

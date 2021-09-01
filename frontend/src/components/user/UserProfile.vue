@@ -1,7 +1,6 @@
 <!--
 Individual User profile Page. Currently displays all user data
 to all logged in users, regardless of permissions.
-Author: Gongzai Li && Eric Song
 Date: 5/3/2021
 -->
 <template>
@@ -14,18 +13,31 @@ Date: 5/3/2021
         <template #header>
 
           <b-row>
-            <b-col>
-              <h4 class="mb-1">{{ userData.firstName + " " + userData.lastName }}</h4>
-              Member since:
-              <member-since :date="userData.created"/>
+            <b-col md="2">
+              <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="75" class="rounded-circle"
+                   style="margin-left: 5px; position: relative">
+            </b-col>
+            <b-col md="10" class="mt-2">
+              <b-row>
+                <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
+                  <b-icon-pencil-fill id="editProfile" @click="editUserModel" style="cursor: pointer;"/>
+                </h4>
+                <b-tooltip target="editProfile" triggers="hover">
+                  Edit Profile
+                </b-tooltip>
+              </b-row>
+              <b-row>
+                Member since:
+                <member-since :date="userData.created"/>
+              </b-row>
             </b-col>
             <b-col cols="2" sm="auto"
                    v-if="showUserRole">
               <h4>{{ userRoleDisplayString }}</h4>
               <b-button
-                v-bind:variant="toggleAdminButtonVariant"
-                v-if="showToggleAdminButton"
-                @click="toggleAdmin">{{ adminButtonText }}
+                  v-bind:variant="toggleAdminButtonVariant"
+                  v-if="showToggleAdminButton"
+                  @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
 
@@ -140,6 +152,10 @@ Date: 5/3/2021
         </b-card-body>
       </b-card>
     </div>
+
+    <b-modal id="edit-user-profile" hide-header hide-footer>
+      <Register/>
+    </b-modal>
   </div>
 </template>
 
@@ -158,9 +174,11 @@ h6 {
 <script>
 import api from "../../Api";
 import memberSince from "../model/MemberSince";
+import Register from "./Register";
 
 export default {
   components: {
+    Register,
     memberSince
   },
 
@@ -216,18 +234,18 @@ export default {
      */
     getUserInfo: function (id) {
       api
-        .getUser(id)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.userData = response.data;
-          this.userFound = true;
-          this.loading = false;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.userFound = false;
-          this.loading = false;
-        })
+          .getUser(id)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.userData = response.data;
+            this.userFound = true;
+            this.loading = false;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.userFound = false;
+            this.loading = false;
+          })
     },
 
     /**
@@ -247,14 +265,14 @@ export default {
      */
     giveAdmin: function () {
       api
-        .makeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Made user ${this.userData.id} admin`);
-          this.userData.role = 'globalApplicationAdmin';
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-        });
+          .makeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Made user ${this.userData.id} admin`);
+            this.userData.role = 'globalApplicationAdmin';
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
     },
     /**
      *  Attempts to revoke the 'globalApplicationAdmin' role from the displayed user
@@ -262,15 +280,20 @@ export default {
      */
     revokeAdmin: function () {
       api
-        .revokeUserAdmin(this.userData.id)
-        .then(() => {
-          this.$log.debug(`Revoked admin for user ${this.userData.id}`);
-          this.userData.role = 'user';
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-        });
+          .revokeUserAdmin(this.userData.id)
+          .then(() => {
+            this.$log.debug(`Revoked admin for user ${this.userData.id}`);
+            this.userData.role = 'user';
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+          });
     },
+
+
+    editUserModel: function () {
+      this.$bvModal.show('edit-user-profile');
+    }
   },
   computed: {
     toggleAdminButtonVariant() {
@@ -282,7 +305,7 @@ export default {
     getAddress: function () {
       const address = this.userData.homeAddress;
       return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
     },
     /**
      * Returns the full name of the user, in the format:
@@ -342,8 +365,8 @@ export default {
      **/
     viewable: function () {
       return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.id === this.userData.id
-        || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
-    }
+          || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
+    },
 
 
   },
