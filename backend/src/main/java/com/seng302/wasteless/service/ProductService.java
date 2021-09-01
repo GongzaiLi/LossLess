@@ -3,7 +3,7 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.GetProductSortTypes;
 import com.seng302.wasteless.model.Product;
-import com.seng302.wasteless.model.ProductImage;
+import com.seng302.wasteless.model.Image;
 import com.seng302.wasteless.repository.ProductRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -119,10 +119,10 @@ public class ProductService {
      * Add image to a product
      * Calling the method in this way allows for mocking during automated testing
      * @param product Product that image is to be added to
-     * @param productImage image that is to be added to product
+     * @param image image that is to be added to product
      */
-    public void addImageToProduct(Product product, ProductImage productImage) {
-        product.addImage(productImage);
+    public void addImageToProduct(Product product, Image image) {
+        product.addImage(image);
     }
 
     /**
@@ -141,19 +141,19 @@ public class ProductService {
      * Remove an image from a product
      * Calling the method in this way allows for mocking during automated testing
      *  @param product Product that image is to be removed from
-     *  @param productImage image that is to be removed from product
+     *  @param image image that is to be removed from product
      */
-    public void deleteImageRecordFromProductInDB (Product product, ProductImage productImage) {
-        product.removeImage(productImage);
+    public void deleteImageRecordFromProductInDB (Product product, Image image) {
+        product.removeImage(image);
     }
 
     /**
      * update the primary image for product to some image in set or null for empty
      * @param product Product that image is being removed from
-     * @param productImage image that is being removed from product
+     * @param image image that is being removed from product
      */
-    public void updatePrimaryImage(Product product, ProductImage productImage) {
-        if (product.getPrimaryImage().getId().equals(productImage.getId())){
+    public void updatePrimaryImage(Product product, Image image) {
+        if (product.getPrimaryImage().getId().equals(image.getId())){
             if (product.getImages().isEmpty()) {
                 product.setPrimaryImage(null);
             } else {

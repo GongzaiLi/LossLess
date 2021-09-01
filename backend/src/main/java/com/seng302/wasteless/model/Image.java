@@ -21,7 +21,7 @@ import javax.validation.constraints.*;
 @ToString // generate a toString method, excluded to prevent recursive problems
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 @Accessors(chain = true) //Allows chaining of getters and setters
-public class ProductImage {
+public class Image {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID

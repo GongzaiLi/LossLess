@@ -4,7 +4,7 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.ImageController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.ProductImageService;
+import com.seng302.wasteless.service.ImageService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.Assertions;
@@ -61,7 +61,7 @@ class ImageControllerUnitTest {
     private ProductService productService;
 
     @MockBean
-    private ProductImageService productImageService;
+    private ImageService imageService;
 
     private Business business;
 
@@ -71,8 +71,8 @@ class ImageControllerUnitTest {
     private Product productForImageLimit;
     private Product productForImageOneSpace;
 
-    private ProductImage productImage;
-    private ProductImage productImageTwo;
+    private Image image;
+    private Image imageTwo;
 
 
     @BeforeEach
@@ -84,61 +84,61 @@ class ImageControllerUnitTest {
         productForImage.setName("test-product");
         productForImage.setImages(new HashSet<>());
 
-        productImage = new ProductImage();
-        productImage.setFileName("test");
-        productImage.setThumbnailFilename("test_thumbnail");
-        productImage.setId(1);
+        image = new Image();
+        image.setFileName("test");
+        image.setThumbnailFilename("test_thumbnail");
+        image.setId(1);
 
-        productImageTwo = new ProductImage();
-        productImageTwo.setFileName("test2");
-        productImageTwo.setThumbnailFilename("test2_thumbnail");
-        productImageTwo.setId(2);
+        imageTwo = new Image();
+        imageTwo.setFileName("test2");
+        imageTwo.setThumbnailFilename("test2_thumbnail");
+        imageTwo.setId(2);
 
-        ProductImage productImageThree = new ProductImage();
-        productImageThree.setFileName("test3");
-        productImageThree.setThumbnailFilename("test3_thumbnail");
-        productImageThree.setId(3);
+        Image imageThree = new Image();
+        imageThree.setFileName("test3");
+        imageThree.setThumbnailFilename("test3_thumbnail");
+        imageThree.setId(3);
 
-        ProductImage productImageFour = new ProductImage();
-        productImageFour.setFileName("test4");
-        productImageFour.setThumbnailFilename("test4_thumbnail");
-        productImageFour.setId(4);
+        Image imageFour = new Image();
+        imageFour.setFileName("test4");
+        imageFour.setThumbnailFilename("test4_thumbnail");
+        imageFour.setId(4);
 
-        ProductImage productImageFive = new ProductImage();
-        productImageFive.setFileName("test5");
-        productImageFive.setThumbnailFilename("test5_thumbnail");
-        productImageFive.setId(5);
+        Image imageFive = new Image();
+        imageFive.setFileName("test5");
+        imageFive.setThumbnailFilename("test5_thumbnail");
+        imageFive.setId(5);
 
         productForImageLimit = new Product();
         productForImageLimit.setId("1-test-product-2");
         productForImageLimit.setBusinessId(1);
         productForImageLimit.setName("test-product-2");
 
-        productForImageLimit.setPrimaryImage(productImage);
+        productForImageLimit.setPrimaryImage(image);
 
-        Set<ProductImage> productImagesLimit = new HashSet<>();
-        productImagesLimit.add(productImage);
-        productImagesLimit.add(productImageTwo);
-        productImagesLimit.add(productImageThree);
-        productImagesLimit.add(productImageFour);
-        productImagesLimit.add(productImageFive);
+        Set<Image> imagesLimit = new HashSet<>();
+        imagesLimit.add(image);
+        imagesLimit.add(imageTwo);
+        imagesLimit.add(imageThree);
+        imagesLimit.add(imageFour);
+        imagesLimit.add(imageFive);
 
-        productForImageLimit.setImages(productImagesLimit);
+        productForImageLimit.setImages(imagesLimit);
 
         productForImageOneSpace = new Product();
         productForImageOneSpace.setId("1-test-product-3");
         productForImageOneSpace.setBusinessId(1);
         productForImageOneSpace.setName("test-product-3");
 
-        productForImageOneSpace.setPrimaryImage(productImage);
+        productForImageOneSpace.setPrimaryImage(image);
 
-        Set<ProductImage> productImagesOneSpace = new HashSet<>();
-        productImagesOneSpace.add(productImage);
-        productImagesOneSpace.add(productImageTwo);
-        productImagesOneSpace.add(productImageThree);
-        productImagesOneSpace.add(productImageFour);
+        Set<Image> imagesOneSpace = new HashSet<>();
+        imagesOneSpace.add(image);
+        imagesOneSpace.add(imageTwo);
+        imagesOneSpace.add(imageThree);
+        imagesOneSpace.add(imageFour);
 
-        productForImageOneSpace.setImages(productImagesOneSpace);
+        productForImageOneSpace.setImages(imagesOneSpace);
 
 
         user = mock(User.class);
@@ -169,18 +169,18 @@ class ImageControllerUnitTest {
 
 
         Mockito
-                .when(productImageService.resizeImage(any(ProductImage.class)))
+                .when(imageService.resizeImage(any(Image.class)))
                 .thenReturn(target);
 
         Mockito
-                .when(productImageService.createProductImage(any(ProductImage.class)))
-                .thenReturn(productImage);
+                .when(imageService.createImage(any(Image.class)))
+                .thenReturn(image);
 
         Mockito
-                .when(productImageService.findProductImageById(2))
-                .thenReturn(productImageTwo);
+                .when(imageService.findImageById(2))
+                .thenReturn(imageTwo);
 
-        doCallRealMethod().when(productService).deleteImageRecordFromProductInDB(productForImage, productImageTwo);
+        doCallRealMethod().when(productService).deleteImageRecordFromProductInDB(productForImage, imageTwo);
 
 
         doReturn(productForImage).when(productService).findProductById(productForImage.getId());
@@ -199,7 +199,7 @@ class ImageControllerUnitTest {
 
         doReturn(true).when(user).checkUserGlobalAdmin();
 
-        doReturn(productImage).when(productImageService).createImageFileName(any(ProductImage.class), anyString());
+        doReturn(image).when(imageService).createImageFileName(any(Image.class), anyString());
 
 
 
@@ -287,130 +287,130 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_andValidRequest_then200Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
-        Assertions.assertNotEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImageTwo.getId());
+        Assertions.assertNotEquals(productForImage.getPrimaryImage().getId(), image.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), imageTwo.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_businessesIdNotFind_then400Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/2/products/1-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productCodeNotFind_then400Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/99-test-product/images/2/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPutRequestToAddProductPrimaryImage_productImageIdNotFind_then406Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/products/1-test-product/images/999/makeprimary")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
-        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), productImage.getId());
+        Assertions.assertEquals(productForImage.getPrimaryImage().getId(), image.getId());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_andValidRequest_then200Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/2")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
-        Assertions.assertFalse(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertFalse(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_businessesIdNotFind_then400Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/2/products/1-test-product/images/2")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productCodeNotFind_then400Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/99-test-product/images/2")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productImageIdNotFind_then406Response() throws Exception {
-        Set<ProductImage> productImages = new HashSet<>();
-        productImages.add(productImage);
-        productImages.add(productImageTwo);
-        productForImage.setImages(productImages);
-        productForImage.setPrimaryImage(productImage);
+        Set<Image> images = new HashSet<>();
+        images.add(image);
+        images.add(imageTwo);
+        productForImage.setImages(images);
+        productForImage.setPrimaryImage(image);
 
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
         mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/1-test-product/images/99")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(productImageTwo.getId())));
+        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
     }
 
     @Test

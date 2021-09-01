@@ -2,10 +2,10 @@ package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
-import com.seng302.wasteless.model.ProductImage;
+import com.seng302.wasteless.model.Image;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.ProductImageService;
+import com.seng302.wasteless.service.ImageService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import org.apache.commons.io.IOUtils;
@@ -37,17 +37,17 @@ public class ImageController {
 
     private final UserService userService;
     private final BusinessService businessService;
-    private final ProductImageService productImageService;
+    private final ImageService imageService;
     private final ProductService productService;
 
 
 
     @Autowired
-    public ImageController(BusinessService businessService, ProductService productService, ProductImageService productImageService, UserService userService) {
+    public ImageController(BusinessService businessService, ProductService productService, ImageService imageService, UserService userService) {
         this.userService = userService;
         this.businessService = businessService;
         this.productService = productService;
-        this.productImageService = productImageService;
+        this.imageService = imageService;
     }
 
     /**
@@ -95,7 +95,7 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }
 
-        ProductImage newImage = new ProductImage();
+        Image newImage = new Image();
         String imageType;
 
         String fileContentType = file.getContentType();
@@ -111,19 +111,19 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
         }
 
-        newImage = productImageService.createImageFileName(newImage, imageType);
+        newImage = imageService.createImageFileName(newImage, imageType);
 
-        productImageService.storeImage(newImage.getFileName(), file);
+        imageService.storeImage(newImage.getFileName(), file);
 
 
-        BufferedImage thumbnail = productImageService.resizeImage(newImage);
+        BufferedImage thumbnail = imageService.resizeImage(newImage);
         if (thumbnail == null) {
             logger.debug("Error resizing image");
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
         }
 
-        productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
-        newImage = productImageService.createProductImage(newImage);
+        imageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
+        newImage = imageService.createImage(newImage);
         logger.debug("Created new image entity with filename {}", newImage.getFileName());
 
 
@@ -188,7 +188,7 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
         }
 
-        ProductImage image = productImageService.findProductImageById(imageId);
+        Image image = imageService.findImageById(imageId);
 
         if (image==null){
             logger.warn("Cannot delete productImage. image: {}", image);
@@ -203,8 +203,8 @@ public class ImageController {
         productService.deleteImageRecordFromProductInDB (product, image);
         productService.updatePrimaryImage(product, image);
         productService.updateProduct(product);
-        productImageService.deleteImageRecordFromDB (image);
-        productImageService.deleteImageFile(image);
+        imageService.deleteImageRecordFromDB (image);
+        imageService.deleteImageFile(image);
         return ResponseEntity.status(HttpStatus.OK).body("Image deleted successfully");
     }
 
@@ -284,7 +284,7 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
         }
 
-        ProductImage possibleImage = productImageService.findProductImageById(imagedId);
+        Image possibleImage = imageService.findImageById(imagedId);
 
         if (possibleImage == null) {
             logger.warn("Cannot post product image for product image id that does not exist");

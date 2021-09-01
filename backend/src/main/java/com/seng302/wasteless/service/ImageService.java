@@ -1,7 +1,7 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.model.ProductImage;
-import com.seng302.wasteless.repository.ProductImageRepository;
+import com.seng302.wasteless.model.Image;
+import com.seng302.wasteless.repository.ImageRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,63 +23,63 @@ import java.util.UUID;
 import java.nio.file.Paths;
 
 /**
- * ProductImageService applies product image logic over the ProductImage JPA repository.
+ * ImageService applies image logic over the Image JPA repository.
  */
 @Service
-public class ProductImageService {
+public class ImageService {
 
-    private final ProductImageRepository productImageRepository;
-    private static final Logger logger = LogManager.getLogger(ProductImageService.class.getName());
+    private final ImageRepository imageRepository;
+    private static final Logger logger = LogManager.getLogger(ImageService.class.getName());
 
     //Constant for Thumbnail.
     private static final int TARGET_HEIGHT = 128;
 
     @Autowired
-    public ProductImageService(ProductImageRepository productImageRepository) {
-        this.productImageRepository = productImageRepository;
+    public ImageService(ImageRepository imageRepository) {
+        this.imageRepository = imageRepository;
     }
 
     /**
-     * Find product image by id (database_id)
-     * @param imageId  The id of the product image to find
-     * @return The found product image, if any, otherwise null
+     * Find image by id (database_id)
+     * @param imageId  The id of the image to find
+     * @return The found image, if any, otherwise null
      */
-    public ProductImage findProductImageById(Integer imageId) {
-        return productImageRepository.findFirstById(imageId);
+    public Image findImageById(Integer imageId) {
+        return imageRepository.findFirstById(imageId);
     }
 
     /**
-     * Creates a ProductImage by saving the productImage object and persisting it in the database
+     * Creates a Image by saving the Image object and persisting it in the database
      *
-     * @param productImage The ProductImage object to be created.
-     * @return The created ProductImage object.
+     * @param image The Image object to be created.
+     * @return The created Image object.
      */
-    public ProductImage createProductImage(ProductImage productImage) {
-        return productImageRepository.save(productImage);
+    public Image createImage(Image image) {
+        return imageRepository.save(image);
     }
 
     /**
      * Create unique image filename for the database by using UUID which crates unique alphanumeric value by hashing the time
      *
-     * @param productImage product image setting the file name and thumbnail file name
+     * @param image image setting the file name and thumbnail file name
      * @param fileType image type
-     * @return productImage
+     * @return Image
      */
-    public ProductImage createImageFileName(ProductImage productImage, String fileType) {
+    public Image createImageFileName(Image image, String fileType) {
         UUID uuid = UUID.randomUUID();
-        productImage.setFileName(String.format("media/images/%s.%s", uuid, fileType));
-        productImage.setThumbnailFilename(String.format("media/images/%s_thumbnail.%s", uuid, fileType));
-        return productImage;
+        image.setFileName(String.format("media/images/%s.%s", uuid, fileType));
+        image.setThumbnailFilename(String.format("media/images/%s_thumbnail.%s", uuid, fileType));
+        return image;
     }
 
     /**     
      * saves the image into given path and creates directory if it doesnt exist already
      *
-     * @param productImagePath path in which file is to be saved to
+     * @param imagePath path in which file is to be saved to
      * @param image            image to be saved
      */
-    public void storeImage(String productImagePath, MultipartFile image) {
-        File file = new File("./" + productImagePath);
+    public void storeImage(String imagePath, MultipartFile image) {
+        File file = new File("./" + imagePath);
         try {
             if (!file.exists()) file.mkdirs();
             Files.copy(image.getInputStream(), file.getAbsoluteFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -100,12 +100,12 @@ public class ProductImageService {
      * by using Graphics2D library
      * https://www.baeldung.com/java-resize-image#2-imagegetscaledinstance
      *
-     * @param productImage The Product image to be resized
-     * @throws IOException
-     * @returnconstant The resized version of the original image
+     * @param image The image to be resized
+     * @throws IOException IOException
+     * @return The resized version of the original image
      */
-    public BufferedImage resizeImage(ProductImage productImage) {
-        File image = new File("./" + productImage.getFileName());
+    public BufferedImage resizeImage(Image imageObj) {
+        File image = new File("./" + imageObj.getFileName());
         try {
             BufferedImage originalImage = ImageIO.read(image);
             if (originalImage == null) {
@@ -129,27 +129,27 @@ public class ProductImageService {
 
 
     /**
-     * delete product image from database
-     * @param productImage
+     * delete image from database
+     * @param image the image to delete
      */
-    public void deleteImageRecordFromDB (ProductImage productImage) {
-        this.productImageRepository.delete(productImage);
+    public void deleteImageRecordFromDB (Image image) {
+        this.imageRepository.delete(image);
     }
 
     /**
      * delete image file and thumbnail from serve
-     * @param productImage
+     * @param image the image to delete
      */
-    public void deleteImageFile(ProductImage productImage) {
+    public void deleteImageFile(Image image) {
         try {
-            logger.info("Deleting: {}", productImage.getFileName());
-            Files.delete(Paths.get("./" + productImage.getFileName()));
+            logger.info("Deleting: {}", image.getFileName());
+            Files.delete(Paths.get("./" + image.getFileName()));
         } catch (IOException error) {
             logger.debug("Failed to delete image locally: {0}", error);
         }
         try {
-            logger.info("Deleting: {}", productImage.getThumbnailFilename());
-            Files.delete(Paths.get("./" + productImage.getThumbnailFilename()));
+            logger.info("Deleting: {}", image.getThumbnailFilename());
+            Files.delete(Paths.get("./" + image.getThumbnailFilename()));
         } catch (IOException error) {
             logger.debug("Failed to delete thumbnail image locally: {0}", error);
         }
@@ -159,12 +159,12 @@ public class ProductImageService {
     /**
      * Saves the thumbnail image into given path.
      *
-     * @param productImagePath The file path that is used to save the image
+     * @param imagePath The file path that is used to save the image
      * @param imageType        The image type
      * @param image            The image to be saved
      */
-    public void storeThumbnailImage(String productImagePath, String imageType, BufferedImage image) {
-        File file = new File("./" + productImagePath);
+    public void storeThumbnailImage(String imagePath, String imageType, BufferedImage image) {
+        File file = new File("./" + imagePath);
         try {
             FileOutputStream out = new FileOutputStream(file);
             ImageIO.write(image, imageType, out);
