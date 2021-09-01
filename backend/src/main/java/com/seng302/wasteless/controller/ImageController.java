@@ -85,47 +85,12 @@ public class ImageController {
 
         productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
-        if (file.isEmpty()) {
-            logger.warn("Cannot post product image, no image received");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
-        }
-
         if (possibleProduct.getImages().size() >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }
 
-        Image newImage = new Image();
-        String imageType;
-
-        String fileContentType = file.getContentType();
-        if (fileContentType != null && fileContentType.contains("/")) {
-            imageType = fileContentType.split("/")[1];
-        } else {
-            logger.debug("Error with image type is null");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null");
-        }
-
-        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
-            logger.warn("Cannot post product image, invalid image type");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
-        }
-
-        newImage = imageService.createImageFileName(newImage, imageType);
-
-        imageService.storeImage(newImage.getFileName(), file);
-
-
-        BufferedImage thumbnail = imageService.resizeImage(newImage);
-        if (thumbnail == null) {
-            logger.debug("Error resizing image");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
-        }
-
-        imageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
-        newImage = imageService.createImage(newImage);
-        logger.debug("Created new image entity with filename {}", newImage.getFileName());
-
+        Image newImage = doImageValidationAndSaving(file);
 
         Product product = productService.findProductById(productId);
         logger.info("Retrieved product with ID: {}", product.getId());
@@ -303,6 +268,19 @@ public class ImageController {
     }
 
 
+    /**
+     * Handle request for uploading images for users
+     * Allows for GAA/DGAA to upload an image for a user
+     *
+     * 401                      If not currently authenticated
+     * 403 Forbidden            If attempting to make a request to change another users image and not DGAA or GAA
+     * 400 Bad Request          No file content, Bad file type
+     * 406 Not Acceptable       UserId not found
+     *
+     * @param userId    The id of the user to upload the image for (possibly different from currently logged in user if DGAA)
+     * @param file      The image to upload
+     * @return          The image after uploading, or one of the error codes detailed above.
+     */
     @PostMapping("/users/{userId}/image")
     public ResponseEntity<Object> postUserImage(@PathVariable("userId") Integer userId, @RequestParam("filename") MultipartFile file) {
         logger.info("Request to upload user image for user: {}", userId);
@@ -328,6 +306,33 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
         }
 
+        //Used for deleting old user image if they had one. Must come before the below code
+        Image oldUserImage = userForImage.getProfileImage();
+
+        Image newImage = doImageValidationAndSaving(file);
+
+        userService.addImageToUser(userForImage, newImage);
+
+        userService.saveUserChanges(userForImage);
+
+        //Cleanup old user image if they had one
+        if (oldUserImage != null) {
+            imageService.deleteImageRecordFromDB (oldUserImage);
+            imageService.deleteImageFile(oldUserImage);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
+
+    }
+
+    /**
+     * Valid image file and save. Also create thumbnail and save.
+     * Returns Image entity
+     *
+     * @param file      The image file to save
+     * @return          Image entity containing image information
+     */
+    private Image doImageValidationAndSaving(MultipartFile file) {
         Image newImage = new Image();
         String imageType;
 
@@ -358,11 +363,8 @@ public class ImageController {
         newImage = imageService.createImage(newImage);
         logger.debug("Created new image entity with filename {}", newImage.getFileName());
 
-        userService.addImageToUser(userForImage, newImage);
-
-        userService.saveUserChanges(userForImage);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
-
+        return newImage;
     }
 }
+
+

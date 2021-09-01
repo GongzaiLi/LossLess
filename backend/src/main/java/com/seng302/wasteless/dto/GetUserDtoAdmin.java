@@ -1,5 +1,6 @@
 package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.model.Image;
 import com.seng302.wasteless.model.UserRoles;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,4 +34,5 @@ public class GetUserDtoAdmin extends GetUserDto {
     private String created;
     private UserRoles role;
     private Integer hasCardsDeleted;
+    private Image profileImage;
 }
