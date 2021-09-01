@@ -416,7 +416,8 @@ public class UserController {
     /**
      * Handle put request to /users endpoint
      *
-     * If changing password checks if the old password matches current password.
+     * If changing password checks if the old password matches current password
+     * and checks if changing password is equal to the confirm password.
      * Validates inputted data using same validation as registration.
      *
      * Returns 200 on success
@@ -434,14 +435,19 @@ public class UserController {
 
         if (modifiedUser.getNewPassword() != null) {
             if (modifiedUser.getPassword() == null) {
-                logger.warn("Attempted to update password with but current password is empty, dropping request: {}", modifiedUser);
+                logger.warn("Attempted to update password but current password is empty, dropping request: {}", modifiedUser);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is invalid");
+            }
+
+            if (!modifiedUser.getNewPassword().equals(modifiedUser.getConfirmPassword())) {
+                logger.warn("Attempted to update password but confirm password does not match, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirm password does not match");
             }
 
             if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword()) && !modifiedUser.getNewPassword().isEmpty()) {
                 currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
             } else {
-                logger.warn("Attempted to update password with but current password is incorrect, dropping request: {}", modifiedUser);
+                logger.warn("Attempted to update password but current password is incorrect, dropping request: {}", modifiedUser);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
             }
         }

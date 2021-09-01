@@ -69,5 +69,9 @@ public class PutUserDto {
     @Column(name = "newPassword")
     @Size(min = 0, max = 100)
     private String newPassword;
+
+    @Column(name = "confirmPassword")
+    @Size(min = 0, max = 100)
+    private String confirmPassword;
 }
 

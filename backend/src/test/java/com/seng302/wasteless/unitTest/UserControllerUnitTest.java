@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
 @Import(MockUserServiceConfig.class)
- class UserControllerUnitTest {
+class UserControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -152,8 +152,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, " +
-                "\"password\": \"1337\"}";
+                "  },\n" +
+                "\"password\": \"1337\",\n" +
+                "\"newPassword\": \"1337\",\n" +
+                "\"confirmPassword\": \"1337\"\n" +
+                "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                 .content(modifiedUser)
@@ -178,7 +181,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
                 "\"password\": \"1337\",\n" +
-                "\"newPassword\": \"1338\"\n" +
+                "\"newPassword\": \"1338\",\n" +
+                "\"confirmPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -208,7 +212,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
                 "\"password\": \"1337\",\n" +
-                "\"newPassword\": \"1338\"\n" +
+                "\"newPassword\": \"1338\",\n" +
+                "\"confirmPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -242,7 +247,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-    void whenPutRequestToUser_andWrongPassword_then400Response() throws Exception {
+    void whenPutRequestToUser_andRequestToChangePassword_andWrongPassword_then400Response() throws Exception {
 
         Mockito
                 .when(passwordEncoder.matches(anyString(), anyString()))
@@ -262,6 +267,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
                 "\"password\": \"1336\",\n" +
+                "\"newPassword\": \"1338\",\n" +
+                "\"confirmPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -280,7 +287,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         String modifiedUser = "{\"firstName\": \"James\",\n" +
                 "\"lastName\" : \"Harris\",\n" +
-                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"email\": \"jeh128uclive.ac.nz\",\n" +
                 "\"dateOfBirth\": \"2000-10-27\",\n" +
                 "\"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -291,7 +298,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
-                "\"password\": \"1336\",\n" +
+                "\"password\": \"1337\",\n" +
+                "\"newPassword\": \"1338\",\n" +
+                "\"confirmPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -329,7 +338,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndValidUser_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -397,7 +406,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMissingFirstName_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToMissingFirstName_thenCorrectResponse() throws Exception {
         String user = "{\"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"27-10-2000\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -415,7 +424,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMissingLastName_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToMissingLastName_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -432,7 +441,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMissingEmail_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToMissingEmail_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -449,7 +458,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMissingDateOfBirth_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToMissingDateOfBirth_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -466,7 +475,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMissingHomeAddress_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToMissingHomeAddress_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"password\": \"1337\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
@@ -475,27 +484,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMissingPassword_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"suburb\": \"Riccarton\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }}";
-        mockMvc.perform(MockMvcRequestBuilders.post("/users")
-                .content(user)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-     void whenPostRequestToUsersAndUserInvalidDueToAlreadyUsedEmail_thenCorrectResponse() throws Exception {
-
-
-
+    void whenPostRequestToUsersAndUserInvalidDueToAlreadyUsedEmail_thenCorrectResponse() throws Exception {
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -515,7 +504,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthTooOld_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToDateOfBirthTooOld_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"1800-20-10\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -549,6 +538,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void whenPostRequestToUsersAndUserValidOnBirthday() throws Exception {
         LocalDate today = LocalDate.now();
@@ -569,7 +559,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
     @Test
-     void whenPostRequestToUsersAndUserInvalidDueToMalformedDateOfBirth_thenCorrectResponse() throws Exception {
+    void whenPostRequestToUsersAndUserInvalidDueToMalformedDateOfBirth_thenCorrectResponse() throws Exception {
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"10/27/1000\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
