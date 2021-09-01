@@ -180,6 +180,10 @@ class ImageControllerUnitTest {
                 .when(imageService.findImageById(2))
                 .thenReturn(imageTwo);
 
+        Mockito
+                .when(userService.findUserById(1))
+                .thenReturn(user);
+
         doCallRealMethod().when(productService).deleteImageRecordFromProductInDB(productForImage, imageTwo);
 
 
@@ -434,6 +438,87 @@ class ImageControllerUnitTest {
                 .file(image))
                 .andExpect(status().isCreated());
     }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andValidRequest_withTypeIsPNG_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andValidRequest_withTypeIsJPEG_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/jpeg" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andValidRequest_withTypeIsJPG_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/jpg" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andValidRequest_withTypeIsGIF_then201Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/gif" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andInvalidFileType_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.txt", "text/plain" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andEmptyFile_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" , (byte[]) null);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddUserImage_andEmptyContentType_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", null ,"image example".getBytes());
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
+                        .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+
 
 
 }
