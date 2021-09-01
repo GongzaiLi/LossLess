@@ -51,57 +51,17 @@ Date: 3/3/2021
 
         <b-form-group v-if="isEditUser">
           <strong>Old Password *</strong>
-          <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-bind:type="passwordType" required
-                          v-model=userData.password
-                          maxLength=50
-                          class="form-control"
-                          placeholder="Password"
-                          autocomplete="off"/>
-            <div class="input-group-prepend">
-              <div class="input-group-text" @click="showPassword">
-                <b-icon-eye-fill v-if="!visiblePassword"/>
-                <b-icon-eye-slash-fill v-else-if="visiblePassword"/>
-              </div>
-            </div>
-          </div>
+          <password-input v-model="userData.confirmPassword" id="oldPassword" place-holder="Old Password"/>
         </b-form-group>
 
         <b-form-group>
           <strong>{{isEditUser ? 'New ' : ''}}Password *</strong>
-          <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-bind:type="passwordType" required
-                          v-model=userData.password
-                          maxLength=50
-                          class="form-control"
-                          placeholder="Password"
-                          autocomplete="off"/>
-            <div class="input-group-prepend">
-              <div class="input-group-text" @click="showPassword">
-                <b-icon-eye-fill v-if="!visiblePassword"/>
-                <b-icon-eye-slash-fill v-else-if="visiblePassword"/>
-              </div>
-            </div>
-          </div>
+          <password-input v-model="userData.password" id="password" place-holder="New Password"/>
         </b-form-group>
 
         <b-form-group>
           <strong>Confirm {{isEditUser ? 'New ' : ''}}Password *</strong>
-          <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-bind:type="confirmPasswordType" required
-                          v-model=userData.confirmPassword
-                          maxLength=50
-                          class="form-control"
-                          id="confirmPasswordInput"
-                          placeholder="Confirm Password"
-                          autocomplete="off"/>
-            <div class="input-group-prepend">
-              <div class="input-group-text" @click="showConfirmPassword">
-                <b-icon-eye-fill v-if="!visibleConfirmPassword"/>
-                <b-icon-eye-slash-fill v-else-if="visibleConfirmPassword"/>
-              </div>
-            </div>
-          </div>
+          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" place-holder="Confirm Password"/>
         </b-form-group>
 
         <b-form-group
@@ -130,6 +90,7 @@ Date: 3/3/2021
                         placeholder="Phone Number"
                         autocomplete="off"
                         size=30;
+                        type="number"
           />
         </b-form-group>
         <b-button v-if="isEditUser" variant="primary" type="submit" style="margin-top:0.7em" id="confirm-btn">Confirm</b-button>
@@ -154,6 +115,7 @@ Date: 3/3/2021
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
+import PasswordInput from "../model/PasswordInput";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 120;
@@ -161,7 +123,8 @@ const UNIX_EPOCH_YEAR = 1970;
 
 export default {
   components: {
-    AddressInput
+    PasswordInput,
+    AddressInput,
   },
   props: {
     isEditUser: {
@@ -196,8 +159,6 @@ export default {
         confirmPassword: "",
       },
       errors: [],
-      visiblePassword: false,
-      visibleConfirmPassword: false
     }
   },
 
@@ -209,15 +170,6 @@ export default {
   },
 
   methods: {
-    //Password can hidden or shown by clicking button
-    showPassword: function () {
-      this.visiblePassword = !this.visiblePassword;
-    },
-    //ConfirmPassword can hidden or shown by clicking button
-    showConfirmPassword: function () {
-      this.visibleConfirmPassword = !this.visibleConfirmPassword;
-    },
-
     getRegisterData() {
       return {
         firstName: this.userData.firstName,
@@ -242,7 +194,7 @@ export default {
     setCustomValidities() {
 
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-      confirmPasswordInput.setCustomValidity(this.password !== this.confirmPassword ? "Passwords do not match." : "");
+      confirmPasswordInput.setCustomValidity(this.userData.password !== this.userData.confirmPassword ? "Passwords do not match." : "");
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
@@ -283,17 +235,6 @@ export default {
     },
   },
   computed: {
-    passwordsMatch() {
-      return this.password === this.confirmPassword;
-    },
-    //if the confirm password can visible to be text else be password
-    confirmPasswordType() {
-      return this.visibleConfirmPassword ? "text" : "password";
-    },
-    //if the password can visible to be text else be password
-    passwordType() {
-      return this.visiblePassword ? "text" : "password";
-    },
     /**
      * Returns the HTML5 validity string based on the value of the birth date input. Birth dates must be at least
      * 13 years old and cannot be more tha 130 years old.
