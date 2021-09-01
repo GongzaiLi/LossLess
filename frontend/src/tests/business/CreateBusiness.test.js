@@ -39,6 +39,17 @@ const address = "17 Chappie Place, Hornby, Christchurch 8042";
 
 beforeEach(() => {
   wrapper = mount(CreateBusiness, {
+    propsData: {
+      address: {
+        streetNumber: "",
+        streetName: "",
+        suburb: "",
+        city: "",
+        region: "",
+        country: "",
+        postcode: ""
+      }
+    },
     localVue,
     router,
     mocks: {$log, $currentUser : JSON.parse(JSON.stringify($currentUser))}

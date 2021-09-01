@@ -49,31 +49,31 @@ describe('Date Validation', () => {
   });
 
   test('Invalid if date in future', async () => {
-    wrapper.vm.dateOfBirth = "04/13/2021";
+    wrapper.vm.userData.dateOfBirth = "04/13/2021";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("You must be at least 13 years old");
   });
 
   test('Invalid if less than 13 years', async () => {
-    wrapper.vm.dateOfBirth = "04/13/2008";
+    wrapper.vm.userData.dateOfBirth = "04/13/2008";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("You must be at least 13 years old");
   });
 
   test('Valid if 13 years', async () => {
-    wrapper.vm.dateOfBirth = "04/12/2008";
+    wrapper.vm.userData.dateOfBirth = "04/12/2008";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("");
   });
 
   test('Valid if 119 years', async () => {
-    wrapper.vm.dateOfBirth = "04/13/1901";
+    wrapper.vm.userData.dateOfBirth = "04/13/1901";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("");
   });
 
   test('Invalid if 120 years', async () => {
-    wrapper.vm.dateOfBirth = "04/11/1900";
+    wrapper.vm.userData.dateOfBirth = "04/11/1900";
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.dateOfBirthCustomValidity).toEqual("You cannot be older than 120 years");
   });
