@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,8 +25,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -184,6 +188,10 @@ class ImageControllerUnitTest {
                 .when(userService.findUserById(1))
                 .thenReturn(user);
 
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenReturn(image);
+
         doCallRealMethod().when(productService).deleteImageRecordFromProductInDB(productForImage, imageTwo);
 
 
@@ -258,6 +266,10 @@ class ImageControllerUnitTest {
     void whenPostRequestToAddProductImage_andInvalidFileType_then400Response() throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.txt", "text/plain" ,"image example".getBytes());
 
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type"));
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
                 .file(image))
@@ -270,6 +282,10 @@ class ImageControllerUnitTest {
     void whenPostRequestToAddProductImage_andEmptyFile_then400Response() throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" , (byte[]) null);
 
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received"));
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
                 .file(image))
@@ -280,6 +296,11 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToAddProductImage_andEmptyContentType_then400Response() throws Exception {
+
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null"));
+
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", null ,"image example".getBytes());
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/products/1-test-product/images")
@@ -489,6 +510,10 @@ class ImageControllerUnitTest {
     void whenPostRequestToAddUserImage_andInvalidFileType_then400Response() throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.txt", "text/plain" ,"image example".getBytes());
 
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type"));
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
                         .file(image))
@@ -501,6 +526,10 @@ class ImageControllerUnitTest {
     void whenPostRequestToAddUserImage_andEmptyFile_then400Response() throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" , (byte[]) null);
 
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received"));
+
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")
                         .file(image))
@@ -511,6 +540,11 @@ class ImageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToAddUserImage_andEmptyContentType_then400Response() throws Exception {
+
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null"));
+
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", null ,"image example".getBytes());
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/users/1/image")

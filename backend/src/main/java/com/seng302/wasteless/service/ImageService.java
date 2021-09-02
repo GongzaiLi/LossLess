@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.UUID;
 
 import java.nio.file.Paths;
@@ -178,6 +179,69 @@ public class ImageService {
             logger.debug("Failed to save thumbnail image locally: {0}", error);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to save thumbnail image");
         }
+    }
+
+    /**
+     * Validates the image file, and returns the type of the image.
+     *
+     * Image validated for content and type.
+     *
+     * @param file  The image file to validate
+     * @return      The file type of the image
+     * @throws ResponseStatusException  If the image is invalid
+     */
+    private String validateImageFileAndReturnImageType(MultipartFile file) throws ResponseStatusException {
+        String imageType;
+
+        if (file.isEmpty()) {
+            logger.warn("Cannot post user image, no image received");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
+        }
+
+        String fileContentType = file.getContentType();
+        if (fileContentType != null && fileContentType.contains("/")) {
+            imageType = fileContentType.split("/")[1];
+        } else {
+            logger.debug("Error with image type is null");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null");
+        }
+
+        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
+            logger.warn("Cannot post product image, invalid image type");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
+        }
+
+        return imageType;
+    }
+
+
+    /**
+     * Save an image and create and save a thumbnail.
+     * Validates image using helper function
+     *
+     * @param file  The image file to be saved
+     * @throws ResponseStatusException If the image is invalid
+     * @return Image entity containing image information
+     */
+    public Image saveImageWithThumbnail(MultipartFile file) throws ResponseStatusException {
+        String imageType = validateImageFileAndReturnImageType(file);
+
+        Image newImage = new Image();
+        newImage = createImageFileName(newImage, imageType);
+
+        storeImage(newImage.getFileName(), file);
+
+        BufferedImage thumbnail = resizeImage(newImage);
+        if (thumbnail == null) {
+            logger.debug("Error resizing image");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
+        }
+
+        storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
+        newImage = createImage(newImage);
+        logger.debug("Created new image entity with filename {}", newImage.getFileName());
+
+        return newImage;
     }
 
 }
