@@ -175,8 +175,8 @@ public class ModifyUserFeature {
     @When("The User modifies his email to {string}")
     public void theUserModifiesHisEmailTo(String email) throws Exception {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
-                        "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
-                "John", "Smith", "1999-04-27", email, "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode");
+                        "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}, \"password\": \"%s\"}",
+                "John", "Smith", "1999-04-27", email, "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode", "2145");
         responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
