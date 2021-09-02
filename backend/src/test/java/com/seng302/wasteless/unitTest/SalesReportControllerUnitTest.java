@@ -78,6 +78,7 @@ public class SalesReportControllerUnitTest {
         business.setId(1);
         business.setAdministrators(new ArrayList<>());
         business.setName("Jimmy's clown store");
+        business.setCreated(LocalDate.now());
 
         user = mock(User.class);
         user.setId(1);
@@ -101,12 +102,15 @@ public class SalesReportControllerUnitTest {
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
+        doReturn(LocalDate.now()).when(business).getCreated();
+
 
         //Returns the totalProducts value equal to the businessId that was passed
         when(purchasedListingService.countPurchasedListingForBusiness(anyInt())).thenAnswer(i -> i.getArguments()[0]);
 
         //Returns the totalProducts value equal to the businessId that was passed
         when(purchasedListingService.countPurchasedListingForBusinessInDateRange(anyInt(), any(LocalDate.class), any(LocalDate.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(anyInt(), any(LocalDate.class), any(LocalDate.class))).thenAnswer(i -> 5.0);
     }
 
 
@@ -114,10 +118,11 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andValidBusiness_Then200Response() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("totalPurchases", is(5)));
+                .andExpect(jsonPath("[0].totalPurchases", is(5)))
+                .andExpect(jsonPath("[0].totalValue", is(5.0)));
     }
 
     @Test
@@ -129,7 +134,7 @@ public class SalesReportControllerUnitTest {
         doReturn(false).when(business).checkUserIsAdministrator(user);
         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -143,7 +148,7 @@ public class SalesReportControllerUnitTest {
                 .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
 
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
@@ -156,7 +161,7 @@ public class SalesReportControllerUnitTest {
                 .when(businessService.findBusinessById(anyInt()))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
@@ -165,7 +170,7 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andStartDateNull_andEndDateNotNull_then400Response() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?endDate=2000-10-12")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?endDate=2000-10-12&period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -174,7 +179,7 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andStartDateNotNull_andEndDateNull_then400Response() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -183,7 +188,7 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andNegativeDateRange_then400Response() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&endDate=1999-10-12")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&endDate=1999-10-12&period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -192,7 +197,7 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andValidDateRange_then200Response() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=1999-10-12&endDate=2000-10-12")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=1999-10-12&endDate=2000-10-12&period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -201,9 +206,25 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andSameDayDateRange_then200Response() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&endDate=2000-10-12")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2000-10-12&endDate=2000-10-12&period=day")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andThreeDayRange_then200ResponseWithThreeDaysData() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2000-10-12&endDate=2000-10-14&period=day")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].totalPurchases", is(5)))
+                .andExpect(jsonPath("[0].totalValue", is(5.0)))
+                .andExpect(jsonPath("[1].totalPurchases", is(5)))
+                .andExpect(jsonPath("[1].totalValue", is(5.0)))
+                .andExpect(jsonPath("[2].totalPurchases", is(5)))
+                .andExpect(jsonPath("[2].totalValue", is(5.0)))
+                .andExpect(jsonPath("$.length()", is(3)));
     }
 
 }
