@@ -27,6 +27,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.ConstraintViolationException;
@@ -88,52 +89,33 @@ public class UserController {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
-        logger.info("Email validated for user: {}", user);
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
         }
-        logger.debug("Validated date for user: {}", user);
 
-
-        logger.debug("Setting created date");
         user.setCreated(LocalDate.now());
-        logger.debug("Setting created date");
         user.setRole(UserRoles.USER);
 
-        logger.debug("Logging in user: {}", user);
         String tempEmail = user.getEmail();
         String tempPassword = user.getPassword();
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRoles.USER);
 
-
-        //Save user object in h2 database
-        logger.debug("Creating Address Entity for user: {}", user);
         addressService.createAddress(user.getHomeAddress());
-        logger.debug("Creating user: {}", user);
         userService.createUser(user);
-
-        logger.info("Successfully registered user: {}", user.getId());
-
-        logger.debug("Authenticating user: {}", user.getId());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 tempEmail, tempPassword);
         Authentication auth = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        logger.info("Saved and authenticated new user {}", user);
-
         JSONObject responseBody = new JSONObject();
         responseBody.put("id", user.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-
-
-
     }
 
 
@@ -191,8 +173,6 @@ public class UserController {
         UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset, sortType, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
-
-
     }
 
 
@@ -281,39 +261,21 @@ public class UserController {
      */
     @PutMapping("/users/{id}/makeAdmin")
     public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId) {
-
-        logger.debug("Request to make user: {} an application admin", userId);
-
-        logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
          if (!loggedInUser.checkUserDefaultAdmin()) {
-
-            logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
-             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
-
+            logger.warn("User {} who is not default admin tried to make another user {} admin", loggedInUser.getId(), userId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
         } else if (possibleUser.checkUserDefaultAdmin()) {
-
             logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
-             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
-
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
         }
 
-        logger.info("User: {} found using Id : {}", possibleUser, userId);
-
-        logger.debug("Setting role to admin for user: {}", possibleUser.getId());
-
         possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-
-        logger.debug("Updating user: {} ith new role", possibleUser.getId());
-
         userService.updateUser(possibleUser);
 
-        logger.info("User: {} successfully made application administrator.", possibleUser.getId());
-
         return ResponseEntity.status(HttpStatus.OK).build();
-
     }
 
     /**
@@ -327,40 +289,22 @@ public class UserController {
      */
     @PutMapping("/users/{id}/revokeAdmin")
     public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId) {
-
-        logger.debug("Request to revoke admin status for  user: {}", userId);
-
-        logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
-        logger.info("User: {} found using Id : {}", possibleUser, userId);
-
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
         if (!loggedInUser.checkUserDefaultAdmin()) {
-
             logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to revoke others admin");
-
         } else if (possibleUser.checkUserDefaultAdmin()) {
-
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own admin rights");
-
         }
 
-        logger.debug("User: {} found using Id : {}", possibleUser, userId);
-
-        logger.debug("Revoking admin status for user: {} ", possibleUser.getId());
         possibleUser.setRole(UserRoles.USER);
-        logger.debug("Updating user: {} ith new role", possibleUser.getId());
         userService.updateUser(possibleUser);
-        logger.info("Successfully revoked admin rights for user: {}", possibleUser.getId());
 
         return ResponseEntity.status(HttpStatus.OK).build();
-
-
     }
-
 
 
     /**
@@ -373,19 +317,12 @@ public class UserController {
     @PostMapping(value = "/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody LoginDto login) {
-
-        logger.debug("Request to authenticate user login for user with data: {}" , login);
-
-
         User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have tried to log into an account with an email " +
                     "that is not registered.");
         } else {
-            logger.debug("User: {} found using data : {}", savedUser, login);
-            logger.debug("Authenticating user: {} with {}", savedUser, login);
-
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     login.getEmail(), login.getPassword());
             try {
@@ -394,20 +331,22 @@ public class UserController {
 
                 JSONObject responseBody = new JSONObject();
                 responseBody.put("userId", savedUser.getId());
-                logger.debug("Getting user ID for user: {}", savedUser);
-
-
-                logger.info("Successfully logged into user: {} with {}", savedUser, login);
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseBody);
-
             } catch (AuthenticationException e) {
                 logger.warn("Login unsuccessful. {}", e.getMessage());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
-
-
         }
+    }
 
+
+    @DeleteMapping("/users/{userId}/image")
+    public ResponseEntity<Object> deleteUserImage(@PathVariable("userId") Integer userId) {
+        User userForImage = getUserToModify(userId);
+
+        userService.deleteUserImage(userForImage);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

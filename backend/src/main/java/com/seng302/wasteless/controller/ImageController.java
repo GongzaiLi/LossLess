@@ -144,10 +144,6 @@ public class ImageController {
 
         Product product = productService.findProductById(productId);
 
-        if (product==null){
-            logger.warn("Cannot delete productImage. Product is null");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product no longer exists");
-        }
         if (!product.getBusinessId().equals(businessId)) {
             logger.warn("Cannot post product image for product that does not belong to current business");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");

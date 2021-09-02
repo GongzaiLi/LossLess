@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -27,10 +28,12 @@ public class UserService {
     private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     private UserRepository userRepository;
+    private ImageService imageService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService) {
         this.userRepository = userRepository;
+        this.imageService = imageService;
     }
 
     /**
@@ -225,4 +228,18 @@ public class UserService {
         user.setProfileImage(image);
     }
 
+    /**
+     * Delete profile image of a user, leaving it null.
+     * The actual image file will also get deleted from the filesystem.
+     * @param user User for whom image is to be deleted
+     */
+    public void deleteUserImage(User user) {
+        Image oldUserImage = user.getProfileImage();
+
+        imageService.deleteImageRecordFromDB(oldUserImage);
+        imageService.deleteImageFile(oldUserImage);
+
+        user.setProfileImage(null);
+        saveUserChanges(user);
+    }
 }
