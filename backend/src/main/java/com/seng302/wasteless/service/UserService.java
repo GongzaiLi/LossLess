@@ -217,6 +217,16 @@ public class UserService {
     }
 
     /**
+     * Add image to a user
+     * Calling the method in this way allows for mocking during automated testing
+     * @param user User that image is to be added to
+     * @param image image that is to be added to user
+     */
+    public void addImageToUser(User user, Image image) {
+        user.setProfileImage(image);
+    }
+
+    /**
      * Sets the user details to the modified user details
      * and updates the database
      *
