@@ -1,9 +1,8 @@
-Feature: Modify Inventory
-  As a business administrator
-  I can modify any of the inventory entries
-  So that the inventory of the business is correct and up to date
+Feature: Modify User
+  As a logged on user
+  I can modify my own user details
 
-  Background: As a User can search any businesses
+  Background: As a User can modify their own user profile
     Given I am logged in as a user with the email "c@c"
 
     Scenario: AC1: As a registered individual, I can update any of my attributes
@@ -19,12 +18,9 @@ Feature: Modify Inventory
       Then The User who is modifying will receive an error
 
     Scenario: AC2: A user tries to modify his email but his inputted email already exists
+      Given A user exists with the email "a@a"
       When The User modifies his email to "a@a"
       Then The User who is modifying will receive an email taken error
-
-    Scenario: AC2: A user tries to modify his password but his confirm password doesn't match his password change
-      When The User modifies his password to "newPassword" and he inputs confirm password as "NewPassword"
-      Then The User who is modifying will receive an error
 
     Scenario: AC3: A user tries to modify but is missing an email
       When The User modifies his profile with the email: ""

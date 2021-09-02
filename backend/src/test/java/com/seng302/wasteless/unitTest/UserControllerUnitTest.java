@@ -152,11 +152,8 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  },\n" +
-                "\"password\": \"1337\",\n" +
-                "\"newPassword\": \"1337\",\n" +
-                "\"confirmPassword\": \"1337\"\n" +
-                "}";
+                "  }, " +
+                "\"password\": \"1337\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
                 .content(modifiedUser)
@@ -181,8 +178,7 @@ class UserControllerUnitTest {
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
                 "\"password\": \"1337\",\n" +
-                "\"newPassword\": \"1338\",\n" +
-                "\"confirmPassword\": \"1338\"\n" +
+                "\"newPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -212,8 +208,7 @@ class UserControllerUnitTest {
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
                 "\"password\": \"1337\",\n" +
-                "\"newPassword\": \"1338\",\n" +
-                "\"confirmPassword\": \"1338\"\n" +
+                "\"newPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -247,10 +242,10 @@ class UserControllerUnitTest {
     }
 
     @Test
-    void whenPutRequestToUser_andRequestToChangePassword_andWrongPassword_then400Response() throws Exception {
+    void whenPutRequestToUser_andInvalidEmail_then400Response() throws Exception {
 
         Mockito
-                .when(passwordEncoder.matches(anyString(), anyString()))
+                .when(userService.checkEmailValid(anyString()))
                 .thenReturn(false);
 
         String modifiedUser = "{\"firstName\": \"James\",\n" +
@@ -267,40 +262,6 @@ class UserControllerUnitTest {
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
                 "\"password\": \"1336\",\n" +
-                "\"newPassword\": \"1338\",\n" +
-                "\"confirmPassword\": \"1338\"\n" +
-                "}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
-                .content(modifiedUser)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    void whenPutRequestToUser_andInvalidEmail_then400Response() throws Exception {
-
-        Mockito
-                .when(userService.checkEmailValid(anyString()))
-                .thenReturn(false);
-
-        String modifiedUser = "{\"firstName\": \"James\",\n" +
-                "\"lastName\" : \"Harris\",\n" +
-                "\"email\": \"jeh128uclive.ac.nz\",\n" +
-                "\"dateOfBirth\": \"2000-10-27\",\n" +
-                "\"homeAddress\": {\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"suburb\": \"Riccarton\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  },\n" +
-                "\"password\": \"1337\",\n" +
-                "\"newPassword\": \"1338\",\n" +
-                "\"confirmPassword\": \"1338\"\n" +
                 "}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users")
@@ -484,7 +445,27 @@ class UserControllerUnitTest {
     }
 
     @Test
+    void whenPostRequestToUsersAndUserInvalidDueToMissingPassword_thenCorrectResponse() throws Exception {
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .content(user)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void whenPostRequestToUsersAndUserInvalidDueToAlreadyUsedEmail_thenCorrectResponse() throws Exception {
+
+
+
         createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", "{\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
                 "    \"streetName\": \"Ilam Road\",\n" +
@@ -538,7 +519,6 @@ class UserControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
     @Test
     void whenPostRequestToUsersAndUserValidOnBirthday() throws Exception {
         LocalDate today = LocalDate.now();
@@ -602,4 +582,3 @@ class UserControllerUnitTest {
     }
 
 }
-

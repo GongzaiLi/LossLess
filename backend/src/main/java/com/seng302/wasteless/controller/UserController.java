@@ -417,7 +417,6 @@ public class UserController {
      * Handle put request to /users endpoint
      *
      * If changing password checks if the old password matches current password
-     * and checks if changing password is equal to the confirm password.
      * Validates inputted data using same validation as registration.
      *
      * Returns 200 on success
@@ -433,18 +432,8 @@ public class UserController {
     public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
         User currentUser = userService.getCurrentlyLoggedInUser();
 
-        if (modifiedUser.getNewPassword() != null) {
-            if (modifiedUser.getPassword() == null) {
-                logger.warn("Attempted to update password but current password is empty, dropping request: {}", modifiedUser);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Current password is invalid");
-            }
-
-            if (!modifiedUser.getNewPassword().equals(modifiedUser.getConfirmPassword())) {
-                logger.warn("Attempted to update password but confirm password does not match, dropping request: {}", modifiedUser);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Confirm password does not match");
-            }
-
-            if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword()) && !modifiedUser.getNewPassword().isEmpty()) {
+        if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
+            if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
                 currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
             } else {
                 logger.warn("Attempted to update password but current password is incorrect, dropping request: {}", modifiedUser);
@@ -452,16 +441,18 @@ public class UserController {
             }
         }
 
-        if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail()) && !modifiedUser.getEmail().equals(currentUser.getEmail())) {
-            logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
-        }
+        if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
+            if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail())) {
+                logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
+            }
 
-        if (!userService.checkEmailValid(modifiedUser.getEmail())) {
-            logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
+            if (!userService.checkEmailValid(modifiedUser.getEmail())) {
+                logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
+            }
+            logger.info("New email validated for user with ID {}", currentUser.getId());
         }
-        logger.info("Email validated for user: {}", modifiedUser);
 
         if (!currentUser.getDateOfBirth().equals(modifiedUser.getDateOfBirth())) {
             currentUser.setDateOfBirth(modifiedUser.getDateOfBirth());
@@ -472,7 +463,7 @@ public class UserController {
         }
 
         if (!currentUser.getHomeAddress().equals(modifiedUser.getHomeAddress())) {
-            logger.debug("Creating Address Entity for user: {}", modifiedUser);
+            logger.debug("Creating new Address Entity for user with ID", currentUser.getId());
             addressService.createAddress(modifiedUser.getHomeAddress());
         }
 

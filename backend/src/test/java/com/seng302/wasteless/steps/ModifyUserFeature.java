@@ -79,9 +79,9 @@ public class ModifyUserFeature {
 
     @When("The User modifies his profile with firstName: {string}, lastName: {string}, date of Birth: {string}, password: {string}, newPassword: {string}, middleName: {string}, nickname {string}, bio: {string}, phoneNumber: {string}, email {string}, country {string},  streetNumber {string},  streetName {string},  suburb {string}, city {string},  region {string},  postcode {string}")
     public void theUserModifiesHisProfileWithFirstNameLastNameDateOfBirthPasswordNewPasswordMiddleNameNicknameBioPhoneNumberEmailCountryStreetNumberStreetNameSuburbCityRegionPostcode(String firstName, String lastName, String dateOfBirth, String password, String newPassword, String middleName, String nickname, String bio, String phoneNumber, String email, String country, String streetNumber, String streetName, String suburb, String city, String region, String postcode) throws Exception {
-        String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"password\": \"%s\", \"newPassword\": \"%s\", \"confirmPassword\": \"%s\", \"middleName\": \"%s\", \"nickname\": \"%s\", \"bio\": \"%s\", \"phoneNumber\": \"%s\", \"email\": \"%s\", " +
+        String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"password\": \"%s\", \"newPassword\": \"%s\", \"middleName\": \"%s\", \"nickname\": \"%s\", \"bio\": \"%s\", \"phoneNumber\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
-                firstName, lastName, dateOfBirth, password, newPassword, newPassword, middleName, nickname, bio, phoneNumber, email, country, streetNumber, streetName, suburb, city, region, postcode);
+                firstName, lastName, dateOfBirth, password, newPassword, middleName, nickname, bio, phoneNumber, email, country, streetNumber, streetName, suburb, city, region, postcode);
         responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
@@ -172,19 +172,6 @@ public class ModifyUserFeature {
                 .with(csrf()));
     }
 
-    @When("The User modifies his password to {string} and he inputs confirm password as {string}")
-    public void theUserModifiesHisPasswordToAndHeInputsConfirmPasswordAs(String newPassword, String confirmPassword) throws Exception {
-        String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
-                        "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}, " +
-                        "\"password\": \"%s\", \"newPassword\": \"%s\", \"confirmPassword\": \"%s\"}",
-                "John", "Smith", "1999-04-27", "c@c", "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode", "demo", newPassword, confirmPassword);
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON)
-                .with(user(currentUserDetails))
-                .with(csrf()));
-    }
-
     @When("The User modifies his email to {string}")
     public void theUserModifiesHisEmailTo(String email) throws Exception {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
@@ -200,6 +187,16 @@ public class ModifyUserFeature {
     @Then("The User who is modifying will receive an email taken error")
     public void theUserWhoIsModifyingWillReceiveAnEmailTakenError() throws Exception {
         responseResult.andExpect(status().isConflict());
+    }
+
+    @Given("A user exists with the email {string}")
+    public void aUserExistsWithTheEmail(String email) {
+        User newUser = userService.findUserByEmail(email);
+        if (newUser == null) {
+            newUser = newUserWithEmail(email);
+            addressService.createAddress(newUser.getHomeAddress());
+            userService.createUser(newUser);
+        }
     }
 }
 
