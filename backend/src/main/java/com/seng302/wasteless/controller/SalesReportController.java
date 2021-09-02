@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,14 +80,14 @@ public class SalesReportController {
             endDate = LocalDate.now();
         }
 
-        Integer dayPeriod = 1;
+        Period periodOfData = Period.ofDays(1);
         LocalDate periodStart = startDate;
         LocalDate periodEnd = endDate;
         if (period.equals("day")) {
-            dayPeriod = 1;
+            periodOfData = Period.ofDays(1);
         }
         else if(period.equals("week")){
-            dayPeriod = 7;
+            periodOfData = Period.ofDays(7);
             while(periodStart.getDayOfWeek()!=START_OF_WEEK){
                 periodStart = periodStart.minusDays(1);
                 logger.info("Minus.{}",START_OF_WEEK);
@@ -97,6 +98,7 @@ public class SalesReportController {
             }
         }
         else if(period.equals("month")){
+            periodOfData = Period.ofMonths(1);
             periodStart = startDate.withDayOfMonth(1);
             periodEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
         }
@@ -112,10 +114,11 @@ public class SalesReportController {
             }
             LocalDate searchStart;
             LocalDate searchEnd;
-            for (LocalDate date = periodStart; date.isBefore(periodEnd.plusDays(1)); date = date.plusDays(dayPeriod)) {
+            for (LocalDate date = periodStart; date.isBefore(periodEnd.plusDays(1)); date = date.plus(periodOfData)) {
                 logger.info("Successfully retrieved date: {}.", date);
                 searchStart = date;
-                searchEnd = searchStart.plusDays(dayPeriod - 1);
+                logger.info(periodOfData.getDays() + ',' + periodOfData.getMonths());
+                searchEnd = searchStart.plus(periodOfData).minusDays(1);
                 logger.info("Before {}.", searchStart.isBefore(startDate));
                 logger.info("After: {}.", searchEnd.isAfter(endDate));
                 if (searchStart.isBefore(startDate)){ searchStart = startDate;}
