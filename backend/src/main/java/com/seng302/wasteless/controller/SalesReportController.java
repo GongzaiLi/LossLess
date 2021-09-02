@@ -1,5 +1,6 @@
 package com.seng302.wasteless.controller;
 
+import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -61,27 +64,55 @@ public class SalesReportController {
     @GetMapping("/businesses/{id}/salesReport/totalPurchases")
     public ResponseEntity<Object> getTotalPurchasesOfBusiness(@PathVariable("id") Integer businessId,
                                                               @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                              @RequestParam(value = "endDate", required = false) LocalDate endDate) {
+                                                              @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                                              @RequestParam(value = "period") String period) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
-        Integer totalPurchases = 0;
+        Integer dayPeriod = 1;
+        if (period.equals("day")) {
+            dayPeriod = 1;
+        }
+
+        List<SalesReportDto> responseBody = new ArrayList<>();
 
         if (startDate == null && endDate == null) {
-            totalPurchases = purchasedListingService.countPurchasedListingForBusiness(businessId);
+
+            for (LocalDate date = possibleBusiness.getCreated(); date.isBefore(LocalDate.now().plusDays(1)); date = date.plusDays(dayPeriod)) {
+                Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
+                Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
+
+                if (totalValue == null) {
+                    totalValue = 0.0;
+                }
+
+                SalesReportDto reportDto = new SalesReportDto(date, date.plusDays(dayPeriod - 1), totalPurchases, totalValue);
+                responseBody.add(reportDto);
+            }
+
         } else if (startDate == null | endDate == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
         } else {
             if (endDate.isBefore(startDate)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
             }
-            totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, startDate, endDate);
-        }
 
-        JSONObject responseBody = new JSONObject();
-        responseBody.put("totalPurchases", totalPurchases);
+            for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(dayPeriod)) {
+                Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
+                Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
+
+                if (totalValue == null) {
+                    totalValue = 0.0;
+                }
+
+                SalesReportDto reportDto = new SalesReportDto(date, date.plusDays(dayPeriod - 1), totalPurchases, totalValue);
+                responseBody.add(reportDto);
+            }
+
+
+        }
 
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }

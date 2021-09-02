@@ -63,7 +63,7 @@ public class PurchasedListingService {
      * @param endDate       The end date for the date range. Format yyyy-MM-dd
      * @return The count of purchased listings
      */
-    public Integer totalPurchasedListingValueForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
+    public Double totalPurchasedListingValueForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
         return purchasedListingRepository.sumPriceByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
 
 }
