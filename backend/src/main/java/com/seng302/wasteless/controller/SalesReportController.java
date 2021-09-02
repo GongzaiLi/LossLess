@@ -75,66 +75,63 @@ public class SalesReportController {
 //todo AC4: I can select the granularity of the report.
 // By default, I will just see the total number and total value of all purchases made during the period,
 // together with the details of the period, and any other relevant detail (e.g. the business name)..
+
         if (startDate == null && endDate == null) {
             startDate = possibleBusiness.getCreated();
             endDate = LocalDate.now();
+        } else if (startDate == null | endDate == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
+        } else if (endDate.isBefore(startDate)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
         }
 
         Period periodOfData = Period.ofDays(1);
         LocalDate periodStart = startDate;
         LocalDate periodEnd = endDate;
-        if (period.equals("day")) {
-            periodOfData = Period.ofDays(1);
-        }
-        else if(period.equals("week")){
-            periodOfData = Period.ofDays(7);
-            while(periodStart.getDayOfWeek()!=START_OF_WEEK){
-                periodStart = periodStart.minusDays(1);
-                logger.info("Minus.{}",START_OF_WEEK);
-            }
-            while(periodEnd.getDayOfWeek()!=START_OF_WEEK.minus(1)){
-                periodEnd = periodEnd.plusDays(1);
-                logger.info("Plus.{}",START_OF_WEEK.minus(1));
-            }
-        }
-        else if(period.equals("month")){
-            periodOfData = Period.ofMonths(1);
-            periodStart = startDate.withDayOfMonth(1);
-            periodEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
+        switch (period) {
+            case "day":
+                periodOfData = Period.ofDays(1);
+                break;
+            case "week":
+                periodOfData = Period.ofDays(7);
+                while (periodStart.getDayOfWeek() != START_OF_WEEK) {
+                    periodStart = periodStart.minusDays(1);
+                    logger.info("Minus.{}", START_OF_WEEK);
+                }
+                while (periodEnd.getDayOfWeek() != START_OF_WEEK.minus(1)) {
+                    periodEnd = periodEnd.plusDays(1);
+                    logger.info("Plus.{}", START_OF_WEEK.minus(1));
+                }
+                break;
+            case "month":
+                periodOfData = Period.ofMonths(1);
+                periodStart = startDate.withDayOfMonth(1);
+                periodEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
+                break;
         }
 
         List<SalesReportDto> responseBody = new ArrayList<>();
 
+        LocalDate searchStart;
+        LocalDate searchEnd;
+        for (LocalDate date = periodStart; date.isBefore(periodEnd.plusDays(1)); date = date.plus(periodOfData)) {
+            logger.info("Successfully retrieved date: {}.", date);
+            searchStart = date;
+            logger.info(periodOfData.getDays() + ',' + periodOfData.getMonths());
+            searchEnd = searchStart.plus(periodOfData).minusDays(1);
+            logger.info("Before {}.", searchStart.isBefore(startDate));
+            logger.info("After: {}.", searchEnd.isAfter(endDate));
+            if (searchStart.isBefore(startDate)){ searchStart = startDate;}
+            if (searchEnd.isAfter(endDate)){ searchEnd = endDate;}
+            Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, searchStart, searchEnd);
+            Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, searchStart, searchEnd);
 
-        if (startDate == null | endDate == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
-        } else {
-            if (endDate.isBefore(startDate)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
-            }
-            LocalDate searchStart;
-            LocalDate searchEnd;
-            for (LocalDate date = periodStart; date.isBefore(periodEnd.plusDays(1)); date = date.plus(periodOfData)) {
-                logger.info("Successfully retrieved date: {}.", date);
-                searchStart = date;
-                logger.info(periodOfData.getDays() + ',' + periodOfData.getMonths());
-                searchEnd = searchStart.plus(periodOfData).minusDays(1);
-                logger.info("Before {}.", searchStart.isBefore(startDate));
-                logger.info("After: {}.", searchEnd.isAfter(endDate));
-                if (searchStart.isBefore(startDate)){ searchStart = startDate;}
-                if (searchEnd.isAfter(endDate)){ searchEnd = endDate;}
-                Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, searchStart, searchEnd);
-                Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, searchStart, searchEnd);
-
-                if (totalValue == null) {
-                    totalValue = 0.0;
-                }
-
-                SalesReportDto reportDto = new SalesReportDto(searchStart,searchEnd, totalPurchases, totalValue);
-                responseBody.add(reportDto);
+            if (totalValue == null) {
+                totalValue = 0.0;
             }
 
-
+            SalesReportDto reportDto = new SalesReportDto(searchStart,searchEnd, totalPurchases, totalValue);
+            responseBody.add(reportDto);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
