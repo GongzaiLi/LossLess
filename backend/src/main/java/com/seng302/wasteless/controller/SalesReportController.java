@@ -67,14 +67,11 @@ public class SalesReportController {
     public ResponseEntity<Object> getTotalPurchasesOfBusiness(@PathVariable("id") Integer businessId,
                                                               @RequestParam(value = "startDate", required = false) LocalDate startDate,
                                                               @RequestParam(value = "endDate", required = false) LocalDate endDate,
-                                                              @RequestParam(value = "period") String period) {
+                                                              @RequestParam(value = "period", required = false) String period) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
-//todo AC4: I can select the granularity of the report.
-// By default, I will just see the total number and total value of all purchases made during the period,
-// together with the details of the period, and any other relevant detail (e.g. the business name)..
 
         if (startDate == null && endDate == null) {
             startDate = possibleBusiness.getCreated();
@@ -88,6 +85,16 @@ public class SalesReportController {
         Period periodOfData = Period.ofDays(1);
         LocalDate periodStart = startDate;
         LocalDate periodEnd = endDate;
+
+        if (period == null) {
+            Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, startDate, endDate);
+            Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, startDate, endDate);
+            SalesReportDto reportDto = new SalesReportDto(startDate, endDate, totalPurchases, totalValue);
+            List<SalesReportDto> responseBody = new ArrayList<>();
+            responseBody.add(reportDto);
+            return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+        }
+
         switch (period) {
             case "day":
                 periodOfData = Period.ofDays(1);
