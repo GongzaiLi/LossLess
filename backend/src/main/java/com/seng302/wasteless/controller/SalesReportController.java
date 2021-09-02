@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.List;
 @RestController
 public class SalesReportController {
     private static final Logger logger = LogManager.getLogger(com.seng302.wasteless.controller.SalesReportController.class.getName());
-
+    private static final DayOfWeek START_OF_WEEK = DayOfWeek.MONDAY;
 
     private final BusinessService businessService;
     private final UserService userService;
@@ -70,44 +71,63 @@ public class SalesReportController {
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
+//todo AC4: I can select the granularity of the report.
+// By default, I will just see the total number and total value of all purchases made during the period,
+// together with the details of the period, and any other relevant detail (e.g. the business name)..
+        if (startDate == null && endDate == null) {
+            startDate = possibleBusiness.getCreated();
+            endDate = LocalDate.now();
+        }
 
         Integer dayPeriod = 1;
+        LocalDate periodStart = startDate;
+        LocalDate periodEnd = endDate;
         if (period.equals("day")) {
             dayPeriod = 1;
+        }
+        else if(period.equals("week")){
+            dayPeriod = 7;
+            while(periodStart.getDayOfWeek()!=START_OF_WEEK){
+                periodStart = periodStart.minusDays(1);
+                logger.info("Minus.{}",START_OF_WEEK);
+            }
+            while(periodEnd.getDayOfWeek()!=START_OF_WEEK.minus(1)){
+                periodEnd = periodEnd.plusDays(1);
+                logger.info("Plus.{}",START_OF_WEEK.minus(1));
+            }
+        }
+        else if(period.equals("month")){
+            periodStart = startDate.withDayOfMonth(1);
+            periodEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
         }
 
         List<SalesReportDto> responseBody = new ArrayList<>();
 
-        if (startDate == null && endDate == null) {
 
-            for (LocalDate date = possibleBusiness.getCreated(); date.isBefore(LocalDate.now().plusDays(1)); date = date.plusDays(dayPeriod)) {
-                Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
-                Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
-
-                if (totalValue == null) {
-                    totalValue = 0.0;
-                }
-
-                SalesReportDto reportDto = new SalesReportDto(date, date.plusDays(dayPeriod - 1), totalPurchases, totalValue);
-                responseBody.add(reportDto);
-            }
-
-        } else if (startDate == null | endDate == null) {
+        if (startDate == null | endDate == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
         } else {
             if (endDate.isBefore(startDate)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
             }
-
-            for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(dayPeriod)) {
-                Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
-                Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, date, date.plusDays(dayPeriod - 1));
+            LocalDate searchStart;
+            LocalDate searchEnd;
+            for (LocalDate date = periodStart; date.isBefore(periodEnd.plusDays(1)); date = date.plusDays(dayPeriod)) {
+                logger.info("Successfully retrieved date: {}.", date);
+                searchStart = date;
+                searchEnd = searchStart.plusDays(dayPeriod - 1);
+                logger.info("Before {}.", searchStart.isBefore(startDate));
+                logger.info("After: {}.", searchEnd.isAfter(endDate));
+                if (searchStart.isBefore(startDate)){ searchStart = startDate;}
+                if (searchEnd.isAfter(endDate)){ searchEnd = endDate;}
+                Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, searchStart, searchEnd);
+                Double totalValue = purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(businessId, searchStart, searchEnd);
 
                 if (totalValue == null) {
                     totalValue = 0.0;
                 }
 
-                SalesReportDto reportDto = new SalesReportDto(date, date.plusDays(dayPeriod - 1), totalPurchases, totalValue);
+                SalesReportDto reportDto = new SalesReportDto(searchStart,searchEnd, totalPurchases, totalValue);
                 responseBody.add(reportDto);
             }
 
