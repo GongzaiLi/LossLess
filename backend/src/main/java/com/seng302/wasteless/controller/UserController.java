@@ -7,7 +7,9 @@ import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
@@ -23,7 +25,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -31,10 +32,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UserController is used for mapping all Restful API requests starting with the address "/users".
@@ -397,8 +401,7 @@ public class UserController {
                 responseBody.put("userId", savedUser.getId());
                 logger.debug("Getting user ID for user: {}", savedUser);
 
-
-                logger.info("Successfully logged into user: {} with {}", savedUser, login);
+                logger.info("Successfully logged into user: {} with {}", savedUser.getId(), login.getEmail());
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseBody);
 
@@ -406,7 +409,6 @@ public class UserController {
                 logger.warn("Login unsuccessful. {}", e.getMessage());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
-
 
         }
 
@@ -418,6 +420,8 @@ public class UserController {
      *
      * If changing password checks if the old password matches current password
      * Validates inputted data using same validation as registration.
+     *
+     * Keeps user logged in if changing username or password
      *
      * Returns 200 on success
      * Returns 400 if password is incorrect, email is invalid or any invalid inputs e.g. date, address etc.
@@ -432,13 +436,16 @@ public class UserController {
     public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
         User currentUser = userService.getCurrentlyLoggedInUser();
 
+        //Verify user entered correct password
+        System.out.println(modifiedUser.getPassword());
+        System.out.println(currentUser.getPassword());
+        if (!passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
+            logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+        }
+
         if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
-            if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
-                currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
-            } else {
-                logger.warn("Attempted to update password but current password is incorrect, dropping request: {}", modifiedUser);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
-            }
+            currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
         }
 
         if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
@@ -469,6 +476,23 @@ public class UserController {
 
         logger.debug("Updating user: {}", modifiedUser);
         userService.updateUserDetails(currentUser, modifiedUser);
+
+        //If user has new password, possibly changed email
+        if (modifiedUser.getNewPassword() != null) {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                    modifiedUser.getEmail(), modifiedUser.getNewPassword());
+
+            Authentication auth = authenticationManager.authenticate(token);
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        } else { //No new password, use old password
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                    modifiedUser.getEmail(), modifiedUser.getPassword());
+
+            Authentication auth = authenticationManager.authenticate(token);
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
