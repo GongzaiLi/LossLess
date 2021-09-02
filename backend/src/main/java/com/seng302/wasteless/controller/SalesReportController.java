@@ -108,6 +108,10 @@ public class SalesReportController {
                 periodStart = startDate.withDayOfMonth(1);
                 periodEnd = endDate.withDayOfMonth(endDate.lengthOfMonth());
                 break;
+            case "year":
+                periodOfData = Period.ofYears(1);
+                periodStart = startDate.withDayOfYear(1);
+                periodEnd = endDate.withDayOfYear(endDate.lengthOfYear());
         }
 
         List<SalesReportDto> responseBody = new ArrayList<>();
