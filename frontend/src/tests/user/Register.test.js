@@ -9,6 +9,7 @@ const $log = {
 };
 
 jest.mock('../../Api');
+jest.mock("../../../public/profile-default.jpg", ()=>{}) // mock image
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
