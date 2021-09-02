@@ -13,6 +13,15 @@ Date: 3/3/2021
         @submit="register"
         @input="setCustomValidities"
       >
+        <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
+             alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
+        <b-img v-else :src="require('../../../public/profile-default.jpg')" class="mx-auto" fluid block rounded="circle"
+               alt="default image" style="height: 12rem; width: 12rem; display: inline-block" />
+        <b-form-file
+            class="col-md-9 py-2" id="imageInput" accept="image/png,image/jpeg,image/gif"
+            @change="openImage($event)" ref="file"
+            style="margin-top: 0.5em" placeholder="" plain />
+
         <b-form-group
         >
           <strong>First Name *</strong>
@@ -51,17 +60,17 @@ Date: 3/3/2021
 
         <b-form-group v-if="isEditUser">
           <strong>Old Password *</strong>
-          <password-input v-model="userData.confirmPassword" id="oldPassword" place-holder="Old Password"/>
+          <password-input v-model="userData.password" id="password" :is-required="!isEditUser" place-holder="Old Password"/>
         </b-form-group>
 
         <b-form-group>
           <strong>{{isEditUser ? 'New ' : ''}}Password *</strong>
-          <password-input v-model="userData.password" id="password" place-holder="New Password"/>
+          <password-input v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
         </b-form-group>
 
         <b-form-group>
           <strong>Confirm {{isEditUser ? 'New ' : ''}}Password *</strong>
-          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" place-holder="Confirm Password"/>
+          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
 
         <b-form-group
@@ -156,20 +165,38 @@ export default {
           postcode: ""
         },
         password: "",
+        newPassword: "",
         confirmPassword: "",
       },
+      uploaded: false,
       errors: [],
+      imageURL: ''
     }
   },
 
   beforeMount() {
 
     if (this.isEditUser) {
-      this.userData = this.userDetails
+      this.userData = this.userDetails;
+      this.userData.password = '';
+      this.userData.newPassword = '';
+      this.userData.confirmPassword = '';
+
     }
   },
 
   methods: {
+    openImage(event) {
+      if (event.target.files[0]) {
+        this.imageURL = window.URL.createObjectURL(event.target.files[0]);
+        event.target.value = '';
+        this.uploaded = true;
+      }
+
+    },
+
+    /**
+     **/
     getRegisterData() {
       return {
         firstName: this.userData.firstName,
@@ -194,10 +221,23 @@ export default {
     setCustomValidities() {
 
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-      confirmPasswordInput.setCustomValidity(this.userData.password !== this.userData.confirmPassword ? "Passwords do not match." : "");
+      confirmPasswordInput.setCustomValidity(this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : "");
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
+
+
+      if (this.isEditUser) {
+        const passwordInput =  document.getElementById('password');
+        passwordInput.setCustomValidity(this.userData.newPassword.length > 0 && this.userData.password.length === 0? "Old Password required to change Password" : "");
+
+        const newPasswordInput =  document.getElementById('newPassword');
+        newPasswordInput.setCustomValidity(this.userData.password.length > 0 && this.userData.newPassword.length === 0? "Enter New Password" : "");
+      }
+
+
+
+
     },
 
     /**
@@ -260,7 +300,9 @@ export default {
         return "You cannot be older than 120 years"
       }
       return "";
-    }
+    },
+
+
   }
 }
 </script>

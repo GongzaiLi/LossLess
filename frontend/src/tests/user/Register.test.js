@@ -26,6 +26,7 @@ beforeEach(() => {
     .mockImplementationOnce(() =>
       new Date('04/12/2021').valueOf()
     );
+  jest.mock('../../../public/profile-default.jpg');
   wrapper = mount(Register, {
     localVue,
     router,

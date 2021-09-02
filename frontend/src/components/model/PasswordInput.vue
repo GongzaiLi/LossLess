@@ -1,6 +1,6 @@
 <template>
   <div class="input-group mb-2 mr-sm-2">
-    <b-form-input :type="passwordType()" required
+    <b-form-input :type="passwordType()" :required="isRequired"
                   v-model="inputPassword"
                   :value="value"
                   @input="$emit('input', inputPassword)"
@@ -21,7 +21,7 @@
 <script>
 export default {
   name: "password-input",
-  props:['value', 'id', 'placeHolder'],
+  props:['value', 'id', 'placeHolder', 'isRequired'],
   data() {
     return {
       visiblePassword: false,
@@ -37,6 +37,6 @@ export default {
     passwordType() {
       return this.visiblePassword ? "text" : "password";
     },
-  }
+  },
 }
 </script>
