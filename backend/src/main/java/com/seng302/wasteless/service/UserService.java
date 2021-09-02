@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
@@ -223,6 +224,25 @@ public class UserService {
      */
     public void addImageToUser(User user, Image image) {
         user.setProfileImage(image);
+    }
+
+    /**
+     * Sets the user details to the modified user details
+     * and updates the database
+     *
+     * @param user User to be updated
+     * @param modifiedUser Dto containing information needed to update a user
+     */
+    public void updateUserDetails(User user, PutUserDto modifiedUser) {
+        user.setFirstName(modifiedUser.getFirstName());
+        user.setLastName(modifiedUser.getLastName());
+        user.setMiddleName(modifiedUser.getMiddleName());
+        user.setNickname(modifiedUser.getNickname());
+        user.setBio(modifiedUser.getBio());
+        user.setEmail(modifiedUser.getEmail());
+        user.setDateOfBirth(modifiedUser.getDateOfBirth());
+        user.setHomeAddress(modifiedUser.getHomeAddress());
+        updateUser(user);
     }
 
 }

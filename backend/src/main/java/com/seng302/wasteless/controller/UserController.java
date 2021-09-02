@@ -3,6 +3,7 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -362,7 +364,6 @@ public class UserController {
     }
 
 
-
     /**
      * Takes an inputed username and password and checks the credentials against the database of saved users.
      * Returns either a bad request response or an authenticated ok response with a JSESSIONID cookie.
@@ -409,5 +410,66 @@ public class UserController {
 
         }
 
+    }
+
+
+    /**
+     * Handle put request to /users endpoint
+     *
+     * If changing password checks if the old password matches current password
+     * Validates inputted data using same validation as registration.
+     *
+     * Returns 200 on success
+     * Returns 400 if password is incorrect, email is invalid or any invalid inputs e.g. date, address etc.
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 409 if email already exist
+     *
+     * @param modifiedUser Dto containing information needed to update a user
+     * @return  Response code with message, see above for codes
+     */
+    @PutMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
+        User currentUser = userService.getCurrentlyLoggedInUser();
+
+        if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
+            if (passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
+                currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
+            } else {
+                logger.warn("Attempted to update password but current password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
+        }
+
+        if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
+            if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail())) {
+                logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
+            }
+
+            if (!userService.checkEmailValid(modifiedUser.getEmail())) {
+                logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
+            }
+            logger.info("New email validated for user with ID {}", currentUser.getId());
+        }
+
+        if (!currentUser.getDateOfBirth().equals(modifiedUser.getDateOfBirth())) {
+            currentUser.setDateOfBirth(modifiedUser.getDateOfBirth());
+            if (!currentUser.checkDateOfBirthValid()) {
+                logger.warn("Invalid date for user: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
+            }
+        }
+
+        if (!currentUser.getHomeAddress().equals(modifiedUser.getHomeAddress())) {
+            logger.debug("Creating new Address Entity for user with ID", currentUser.getId());
+            addressService.createAddress(modifiedUser.getHomeAddress());
+        }
+
+        logger.debug("Updating user: {}", modifiedUser);
+        userService.updateUserDetails(currentUser, modifiedUser);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
