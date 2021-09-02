@@ -2,6 +2,8 @@ package com.seng302.wasteless.repository;
 
 import com.seng302.wasteless.model.PurchasedListing;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.time.LocalDate;
@@ -45,12 +47,19 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * Returns the total value of purchases for a specified business
      * @param businessId the id of the business
      */
-    Integer sumPriceByBusiness_Id(Integer businessId);
+    @Query(value = "Select sum(PL.price from PurchasedListing PL where PL.business_id = :businessId)", nativeQuery = true)
+    Integer sumPriceByBusiness_Id(@Param("businessId") Integer businessId);
 
     /**
      * Returns the total value of purchases for a specified business
      * in a specified date range
-     * @param businessId the id of the business
+     * @param businessId     the id of the business
+     * @param startDate     The start date for the date range. Format yyyy-MM-dd
+     * @param endDate       The end date for the date range. Format yyyy-MM-dd
      */
-    Integer sumPriceByBusiness_IdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
+    @Query(value = "Select sum(PL.price from PurchasedListing PL where PL.business_id = :businessId and  " +
+            "PL.sale_date >= :startDate and PL.sale_date <= :endDate )", nativeQuery = true)
+    Integer sumPriceByBusiness_IdAndSaleDateBetween(@Param("businessId") Integer businessId,
+                                                    @Param("startDate") LocalDate startDate,
+                                                    @Param("endDate") LocalDate endDate);
 }

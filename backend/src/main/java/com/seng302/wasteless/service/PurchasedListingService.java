@@ -58,7 +58,9 @@ public class PurchasedListingService {
 
     /**
      * Returns the total value of purchased listings for a business.
-     * @param businessId Id of the business
+     * @param businessId    Id of the business
+     * @param startDate     The start date for the date range. Format yyyy-MM-dd
+     * @param endDate       The end date for the date range. Format yyyy-MM-dd
      * @return The count of purchased listings
      */
     public Integer totalPurchasedListingValueForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
