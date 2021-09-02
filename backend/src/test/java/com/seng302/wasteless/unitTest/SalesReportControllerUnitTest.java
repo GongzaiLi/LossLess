@@ -289,6 +289,36 @@ public class SalesReportControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andFiveYearRange_then200ResponseWithFiveYearsData() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2000-10-01&endDate=2004-02-11&period=year")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].totalPurchases", is(5)))
+                .andExpect(jsonPath("[0].totalValue", is(5.0)))
+                .andExpect(jsonPath("[1].totalPurchases", is(5)))
+                .andExpect(jsonPath("[1].totalValue", is(5.0)))
+                .andExpect(jsonPath("[2].totalPurchases", is(5)))
+                .andExpect(jsonPath("[2].totalValue", is(5.0)))
+                .andExpect(jsonPath("$.length()", is(5)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andLastDayToFirstDayOfYear_then200ResponseWithTwoYearsData() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-12-31&endDate=2022-01-01&period=year")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].totalPurchases", is(5)))
+                .andExpect(jsonPath("[0].totalValue", is(5.0)))
+                .andExpect(jsonPath("[1].totalPurchases", is(5)))
+                .andExpect(jsonPath("[1].totalValue", is(5.0)))
+                .andExpect(jsonPath("$.length()", is(2)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andLeapDayChosenOnNonLeapYear_then200Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-02-29&endDate=2021-10-01&period=month")

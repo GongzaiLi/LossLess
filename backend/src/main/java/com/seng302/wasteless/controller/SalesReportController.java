@@ -119,12 +119,12 @@ public class SalesReportController {
         LocalDate searchStart;
         LocalDate searchEnd;
         for (LocalDate date = periodStart; date.isBefore(periodEnd.plusDays(1)); date = date.plus(periodOfData)) {
-            logger.info("Successfully retrieved date: {}.", date);
+            logger.debug("Successfully retrieved date: {}.", date);
             searchStart = date;
             logger.info(periodOfData.getDays() + ',' + periodOfData.getMonths());
             searchEnd = searchStart.plus(periodOfData).minusDays(1);
-            logger.info("Before {}.", searchStart.isBefore(startDate));
-            logger.info("After: {}.", searchEnd.isAfter(endDate));
+            logger.debug("Before {}.", searchStart.isBefore(startDate));
+            logger.debug("After: {}.", searchEnd.isAfter(endDate));
             if (searchStart.isBefore(startDate)){ searchStart = startDate;}
             if (searchEnd.isAfter(endDate)){ searchEnd = endDate;}
             Integer totalPurchases = purchasedListingService.countPurchasedListingForBusinessInDateRange(businessId, searchStart, searchEnd);
