@@ -319,6 +319,18 @@ public class SalesReportControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andNoPeriodSet_then200ResponseWithTotalDataForRange() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-12-01&endDate=2022-01-31")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].totalPurchases", is(5)))
+                .andExpect(jsonPath("[0].totalValue", is(5.0)))
+                .andExpect(jsonPath("$.length()", is(1)));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andLeapDayChosenOnNonLeapYear_then200Response() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-02-29&endDate=2021-10-01&period=month")
