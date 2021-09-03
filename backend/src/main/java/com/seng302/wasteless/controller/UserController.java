@@ -437,8 +437,6 @@ public class UserController {
         User currentUser = userService.getCurrentlyLoggedInUser();
 
         //Verify user entered correct password
-        System.out.println(modifiedUser.getPassword());
-        System.out.println(currentUser.getPassword());
         if (!passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
             logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
