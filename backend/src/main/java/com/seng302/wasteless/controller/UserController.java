@@ -30,11 +30,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
@@ -433,16 +430,6 @@ public class UserController {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-
-    @DeleteMapping("/users/{userId}/image")
-    public ResponseEntity<Object> deleteUserImage(@PathVariable("userId") Integer userId) {
-        User userForImage = getUserToModify(userId);
-
-        userService.deleteUserImage(userForImage);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

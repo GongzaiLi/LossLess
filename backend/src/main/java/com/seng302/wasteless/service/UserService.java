@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -237,11 +236,12 @@ public class UserService {
     public void deleteUserImage(User user) {
         Image oldUserImage = user.getProfileImage();
 
-        imageService.deleteImageRecordFromDB(oldUserImage);
-        imageService.deleteImageFile(oldUserImage);
-
+        // Have to do this before deleting image otherwise we violate a foreign key constraint
         user.setProfileImage(null);
         saveUserChanges(user);
+
+        imageService.deleteImageRecordFromDB(oldUserImage);
+        imageService.deleteImageFile(oldUserImage);
     }
 
     /**

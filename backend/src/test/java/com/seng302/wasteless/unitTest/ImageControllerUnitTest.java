@@ -192,6 +192,13 @@ class ImageControllerUnitTest {
                 .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
                 .thenReturn(image);
 
+        User requestedUser = Mockito.mock(User.class);
+        Mockito.when(requestedUser.getId()).thenReturn(2);
+
+        Mockito
+                .when(userService.findUserById(2))
+                .thenReturn(requestedUser);
+
         doCallRealMethod().when(productService).deleteImageRecordFromProductInDB(productForImage, imageTwo);
 
 
@@ -408,22 +415,6 @@ class ImageControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenDeleteRequestToDeleteProductImage_productCodeNotFind_then400Response() throws Exception {
-        Set<Image> images = new HashSet<>();
-        images.add(image);
-        images.add(imageTwo);
-        productForImage.setImages(images);
-        productForImage.setPrimaryImage(image);
-
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
-        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/products/99-test-product/images/2")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-        Assertions.assertTrue(productForImage.getImages().stream().anyMatch(image -> image.getId().equals(imageTwo.getId())));
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenDeleteRequestToDeleteProductImage_productImageIdNotFind_then406Response() throws Exception {
         Set<Image> images = new HashSet<>();
         images.add(image);
@@ -553,6 +544,30 @@ class ImageControllerUnitTest {
     }
 
 
+    @Test
+    void whenDeleteRequestToUserImage_andUserNotSelfOrAdmin_then403Response() throws Exception {
+        Mockito.when(user.checkUserGlobalAdmin()).thenReturn(false);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/2/image"))
+                .andExpect(status().isForbidden());
+    }
 
 
+    @Test
+    void whenDeleteRequestToUserImage_andUserIsSelf_then200Response() throws Exception {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/1/image"))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void whenDeleteRequestToUserImage_andUserIsGAA_then200Response() throws Exception {
+        Mockito.when(user.checkUserGlobalAdmin()).thenReturn(true);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/1/image"))
+                .andExpect(status().isOk());
+    }
 }
