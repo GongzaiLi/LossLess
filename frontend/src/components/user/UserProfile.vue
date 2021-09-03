@@ -153,7 +153,8 @@ Date: 5/3/2021
       </b-card>
     </div>
 
-    <b-modal id="edit-user-profile" hide-header hide-footer scrollable>
+    <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
+
       <Register :is-edit-user="true" :user-details="userData"/>
     </b-modal>
   </div>
