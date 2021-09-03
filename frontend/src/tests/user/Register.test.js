@@ -3,7 +3,6 @@ import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import Register from '../../components/user/Register';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
-import * as assert from "assert";
 
 const $log = {
   debug: jest.fn(),
@@ -124,7 +123,7 @@ describe('Testing-api-post-register', () => {
 describe('Testing-password-validation-for-editing', () => {
 
   test('Invalid if no old password but new password present', async () => {
-    wrapper.vm.isEditUser = true;
+    wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.password = '';
     wrapper.vm.userData.newPassword = 'a password';
     await wrapper.vm.$nextTick();
@@ -132,7 +131,7 @@ describe('Testing-password-validation-for-editing', () => {
   });
 
   test('Valid if  old password and new password present', async () => {
-    wrapper.vm.isEditUser = true;
+    wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.password = 'old password';
     wrapper.vm.userData.newPassword = 'a password';
     await wrapper.vm.$nextTick();
@@ -141,7 +140,7 @@ describe('Testing-password-validation-for-editing', () => {
 
 
   test('Invalid if no old password but new email present', async () => {
-    wrapper.vm.isEditUser = true;
+    wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.password = '';
     wrapper.vm.userData.email = 'a new email';
     wrapper.vm.email = 'email'
@@ -150,7 +149,7 @@ describe('Testing-password-validation-for-editing', () => {
   });
 
   test('Valid if old password and email not changed present', async () => {
-    wrapper.vm.isEditUser = true;
+    wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.password = 'old password';
     wrapper.vm.userData.email = 'email';
     wrapper.vm.email = 'email'
@@ -159,7 +158,7 @@ describe('Testing-password-validation-for-editing', () => {
   });
 
   test('Invalid if password not match confirm password', async () => {
-    wrapper.vm.isEditUser = true;
+    wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.newPassword = 'bad password';
     wrapper.vm.userData.confirmPassword = 'other password';
     await wrapper.vm.$nextTick();
@@ -167,7 +166,7 @@ describe('Testing-password-validation-for-editing', () => {
   });
 
   test('Valid if password match confirm password', async () => {
-    wrapper.vm.isEditUser = true;
+    wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.newPassword = 'password';
     wrapper.vm.userData.confirmPassword = 'password';
     await wrapper.vm.$nextTick();
