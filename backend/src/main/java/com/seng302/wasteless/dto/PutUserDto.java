@@ -64,7 +64,6 @@ public class PutUserDto {
 
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
     @Size(min = 0, max = 100)
-    @NotNull(message = "password is mandatory")
     private String password;
 
     @Column(name = "newPassword")

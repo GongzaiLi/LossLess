@@ -436,29 +436,6 @@ public class UserController {
     public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
         User currentUser = userService.getCurrentlyLoggedInUser();
 
-        //Verify user entered correct password
-        if (!passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
-            logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
-        }
-
-        if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
-            currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
-        }
-
-        if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
-            if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail())) {
-                logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
-            }
-
-            if (!userService.checkEmailValid(modifiedUser.getEmail())) {
-                logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
-            }
-            logger.info("New email validated for user with ID {}", currentUser.getId());
-        }
-
         if (!currentUser.getDateOfBirth().equals(modifiedUser.getDateOfBirth())) {
             currentUser.setDateOfBirth(modifiedUser.getDateOfBirth());
             if (!currentUser.checkDateOfBirthValid()) {
@@ -472,24 +449,58 @@ public class UserController {
             addressService.createAddress(modifiedUser.getHomeAddress());
         }
 
-        logger.debug("Updating user: {}", modifiedUser);
+        boolean userPasswordChange = modifiedUser.getNewPassword() != null;
+        boolean userEmailChange = !modifiedUser.getEmail().equals(currentUser.getEmail());
+        boolean userSuppliedOldPassword = modifiedUser.getPassword() != null;
+
+        //If user changing email or password, re-authenticate them
+        if (userEmailChange || userPasswordChange) {
+            if (!userSuppliedOldPassword) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password required when updating email or password");
+            }
+            if (!passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
+                logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
+
+            if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
+                currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
+            }
+
+            if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
+                if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail())) {
+                    logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
+                }
+
+                if (!userService.checkEmailValid(modifiedUser.getEmail())) {
+                    logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
+                }
+                logger.info("New email validated for user with ID {}", currentUser.getId());
+            }
+        }
+
+        logger.debug("Updating user: {}", modifiedUser.getEmail());
         userService.updateUserDetails(currentUser, modifiedUser);
 
-        //If user has new password, possibly changed email
-        if (modifiedUser.getNewPassword() != null) {
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    modifiedUser.getEmail(), modifiedUser.getNewPassword());
+        //If user email or password changed, re-authenticate them
+        if (userEmailChange || userPasswordChange) {
+            if (modifiedUser.getNewPassword() != null) { //User has new password
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        modifiedUser.getEmail(), modifiedUser.getNewPassword());
 
-            Authentication auth = authenticationManager.authenticate(token);
+                Authentication auth = authenticationManager.authenticate(token);
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        } else { //No new password, use old password
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    modifiedUser.getEmail(), modifiedUser.getPassword());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else { //No new password, use old password
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        modifiedUser.getEmail(), modifiedUser.getPassword());
 
-            Authentication auth = authenticationManager.authenticate(token);
+                Authentication auth = authenticationManager.authenticate(token);
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
 
         return ResponseEntity.status(HttpStatus.OK).build();
