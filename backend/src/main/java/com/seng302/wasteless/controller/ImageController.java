@@ -307,6 +307,10 @@ public class ImageController {
     public ResponseEntity<Object> deleteUserImage(@PathVariable("userId") Integer userId) {
         User userForImage = getUserToModify(userId);
 
+        if (userForImage.getProfileImage() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given user does not have a profile image");
+        }
+
         userService.deleteUserImage(userForImage);
 
         return ResponseEntity.status(HttpStatus.OK).build();

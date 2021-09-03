@@ -231,6 +231,7 @@ public class UserService {
     /**
      * Delete profile image of a user, leaving it null.
      * The actual image file will also get deleted from the filesystem.
+     * Make sure that the user must have a profile image, otherwise this method will crash.
      * @param user User for whom image is to be deleted
      */
     public void deleteUserImage(User user) {

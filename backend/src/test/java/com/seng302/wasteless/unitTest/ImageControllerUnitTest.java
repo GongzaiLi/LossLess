@@ -150,6 +150,8 @@ class ImageControllerUnitTest {
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
 
+        Mockito.when(user.getProfileImage()).thenReturn(Mockito.mock(Image.class));
+
         business = mock(Business.class);
         business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
         business.setId(1);
@@ -551,6 +553,16 @@ class ImageControllerUnitTest {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/2/image"))
                 .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    void whenDeleteRequestToUserImage_andUserHasNoImage_then404Response() throws Exception {
+        Mockito.when(user.getProfileImage()).thenReturn(null);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/1/image"))
+                .andExpect(status().isNotFound());
     }
 
 
