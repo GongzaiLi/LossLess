@@ -3,6 +3,7 @@ import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import Register from '../../components/user/Register';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
+import * as assert from "assert";
 
 const $log = {
   debug: jest.fn(),
@@ -117,5 +118,114 @@ describe('Testing-api-post-register', () => {
     Api.register.mockRejectedValue({});
     await wrapper.vm.register(event);
     expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
+  });
+});
+
+describe('Testing-password-validation-for-editing', () => {
+
+  test('Invalid if no old password but new password present', async () => {
+    wrapper.vm.isEditUser = true;
+    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.newPassword = 'a password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("Old Password required to change Password");
+  });
+
+  test('Valid if  old password and new password present', async () => {
+    wrapper.vm.isEditUser = true;
+    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.newPassword = 'a password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("");
+  });
+
+
+  test('Invalid if no old password but new email present', async () => {
+    wrapper.vm.isEditUser = true;
+    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.email = 'a new email';
+    wrapper.vm.email = 'email'
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordEmailValidity).toEqual("Old Password required to change email");
+  });
+
+  test('Valid if old password and email not changed present', async () => {
+    wrapper.vm.isEditUser = true;
+    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.email = 'email';
+    wrapper.vm.email = 'email'
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordEmailValidity).toEqual("");
+  });
+
+  test('Invalid if password not match confirm password', async () => {
+    wrapper.vm.isEditUser = true;
+    wrapper.vm.userData.newPassword = 'bad password';
+    wrapper.vm.userData.confirmPassword = 'other password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordMatchValidity).toEqual("Passwords do not match.");
+  });
+
+  test('Valid if password match confirm password', async () => {
+    wrapper.vm.isEditUser = true;
+    wrapper.vm.userData.newPassword = 'password';
+    wrapper.vm.userData.confirmPassword = 'password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordMatchValidity).toEqual("");
+  });
+
+});
+
+describe('Testing-password-validation-for-register', () => {
+
+  test('valid if no old password but new password present', async () => {
+    wrapper.vm.isEditUser = false;
+    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.newPassword = 'a password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("");
+  });
+
+  test('Valid if  old password and new password present', async () => {
+    wrapper.vm.isEditUser = false;
+    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.newPassword = 'a password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("");
+  });
+
+
+  test('valid if no old password but new email present', async () => {
+    wrapper.vm.isEditUser = false;
+    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.email = 'a new email';
+    wrapper.vm.email = 'email'
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordEmailValidity).toEqual("");
+  });
+
+  test('Valid if old password and email not changed present', async () => {
+    wrapper.vm.isEditUser = false;
+    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.email = 'email';
+    wrapper.vm.email = 'email'
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordEmailValidity).toEqual("");
+  });
+
+  test('Invalid if password not match confirm password', async () => {
+    wrapper.vm.isEditUser = false;
+    wrapper.vm.userData.newPassword = 'bad password';
+    wrapper.vm.userData.confirmPassword = 'other password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordMatchValidity).toEqual("Passwords do not match.");
+  });
+
+  test('Valid if password match confirm password', async () => {
+    wrapper.vm.isEditUser = false;
+    wrapper.vm.userData.newPassword = 'password';
+    wrapper.vm.userData.confirmPassword = 'password';
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.passwordMatchValidity).toEqual("");
   });
 });

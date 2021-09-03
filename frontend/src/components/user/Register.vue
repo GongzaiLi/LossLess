@@ -17,13 +17,11 @@ Date: 3/3/2021
              alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
         <b-img v-else :src="require('../../../public/profile-default.jpg')" class="mx-auto" fluid block rounded="circle"
                alt="default image" style="height: 12rem; width: 12rem; display: inline-block" />
-        <b-form-file
-            class="col-md-9 py-2" id="imageInput" accept="image/png,image/jpeg,image/gif"
-            @change="openImage($event)" ref="file"
-            style="margin-top: 0.5em" placeholder="" plain />
+        <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
+               accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
+        <b-button variant="info" class="w-100 add-image-btn mt-2 mb-4" @click="$refs.userImagePicker.click()">Upload</b-button>
 
-        <b-form-group
-        >
+        <b-form-group>
           <strong>First Name *</strong>
           <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
@@ -102,8 +100,15 @@ Date: 3/3/2021
                         type="number"
           />
         </b-form-group>
-        <b-button v-if="isEditUser" variant="primary" type="submit" style="margin-top:0.7em" id="confirm-btn">Confirm</b-button>
-        <b-button v-else variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
+        <b-row>
+          <b-col cols="auto" class="mr-auto p-3">
+            <b-button v-if="isEditUser" variant="primary" class="button" type="submit" id="confirm-btn">Confirm</b-button>
+            <b-button v-else variant="primary" type="submit" class="button"  id="register-btn">Register</b-button>
+          </b-col>
+          <b-col cols="auto" class="p-3">
+            <b-button v-show="isEditUser" class="button"   @click="$bvModal.hide('edit-user-profile')" style="align-self: end">Cancel</b-button>
+          </b-col>
+        </b-row>
       </b-form>
       <br>
       <div v-if="errors.length">
@@ -120,6 +125,13 @@ Date: 3/3/2021
     <br>
   </div>
 </template>
+
+
+<style>
+.button{
+  margin-top:0.7em
+}
+</style>
 
 <script>
 import api from "../../Api";
@@ -168,6 +180,7 @@ export default {
         newPassword: "",
         confirmPassword: "",
       },
+      email: '',
       uploaded: false,
       errors: [],
       imageURL: ''
@@ -175,17 +188,21 @@ export default {
   },
 
   beforeMount() {
-
     if (this.isEditUser) {
-      this.userData = this.userDetails;
+      Object.assign(this.userData, this.userDetails);
       this.userData.password = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
 
     }
+    this.email = this.userData.email;
   },
 
   methods: {
+    /**
+     * when user uploads image display the image as a preview
+     * @param event object for image uploaded
+     **/
     openImage(event) {
       if (event.target.files[0]) {
         this.imageURL = window.URL.createObjectURL(event.target.files[0]);
@@ -213,27 +230,23 @@ export default {
     },
 
     /**
-     * Author: Eric Song
-     * Uses HTML constraint validation to set custom validity rules (so far, only checks that the 'password'
-     * and 'confirm password' fields match, and the date of birth is valid). See below for more info:
+     * Uses HTML constraint validation to set custom validity rules checks:
+     * that the 'password' and 'confirm password' fields match
+     * date of birth is valid
+     * old password present when trying to change new password or email (editing only)
+     * See below for more info:
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
 
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-      confirmPasswordInput.setCustomValidity(this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : "");
+      confirmPasswordInput.setCustomValidity(this.passwordMatchValidity);
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
-
-
-      if (this.isEditUser) {
-        const passwordInput =  document.getElementById('password');
-        passwordInput.setCustomValidity(this.userData.newPassword.length > 0 && this.userData.password.length === 0? "Old Password required to change Password" : "");
-
-        const newPasswordInput =  document.getElementById('newPassword');
-        newPasswordInput.setCustomValidity(this.userData.password.length > 0 && this.userData.newPassword.length === 0? "Enter New Password" : "");
-      }
+      const passwordInput =  document.getElementById('password');
+      passwordInput.setCustomValidity(this.passwordNewPasswordValidity);
+      passwordInput.setCustomValidity(this.passwordEmailValidity);
 
 
 
@@ -301,6 +314,18 @@ export default {
       }
       return "";
     },
+
+    passwordEmailValidity() {
+      return this.isEditUser && this.userData.email !== this.email && this.userData.password.length === 0? "Old Password required to change email" : ""
+    },
+
+    passwordNewPasswordValidity() {
+      return this.isEditUser && this.userData.newPassword.length > 0 && this.userData.password.length === 0? "Old Password required to change Password" : ""
+    },
+
+    passwordMatchValidity() {
+      return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
+    }
 
 
   }
