@@ -7,7 +7,7 @@ Date: 3/3/2021
 <template>
   <div>
     <b-card class="shadow">
-      <h1 v-show="!isEditUser">Update User Profile": "Sign Up to Wasteless</h1>
+      <h1 v-show="!isEditUser">Sign Up to Wasteless</h1>
       <br>
       <b-form
         @submit="register"
