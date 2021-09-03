@@ -90,14 +90,13 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }
 
-        Image newImage = doImageValidationAndSaving(file);
+        Image newImage = imageService.saveImageWithThumbnail(file);
 
         Product product = productService.findProductById(productId);
         logger.info("Retrieved product with ID: {}", product.getId());
 
 
         productService.addImageToProduct(product, newImage);
-
 
         if (product.getPrimaryImage() == null) {
             logger.info("No primary image found for product with ID: {} in th database", product.getId());
@@ -300,7 +299,7 @@ public class ImageController {
         //Used for deleting old user image if they had one. Must come before the below code
         Image oldUserImage = userForImage.getProfileImage();
 
-        Image newImage = doImageValidationAndSaving(file);
+        Image newImage = imageService.saveImageWithThumbnail(file);
 
         userService.addImageToUser(userForImage, newImage);
 
@@ -315,52 +314,5 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
 
     }
-
-    /**
-     * Valid image file and save. Also create thumbnail and save.
-     * Returns Image entity
-     *
-     * @param file      The image file to save
-     * @return          Image entity containing image information
-     */
-    private Image doImageValidationAndSaving(MultipartFile file) throws ResponseStatusException {
-        Image newImage = new Image();
-        String imageType;
-
-        if (file.isEmpty()) {
-            logger.warn("Cannot post user image, no image received");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
-        }
-
-        String fileContentType = file.getContentType();
-        if (fileContentType != null && fileContentType.contains("/")) {
-            imageType = fileContentType.split("/")[1];
-        } else {
-            logger.debug("Error with image type is null");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null");
-        }
-
-        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
-            logger.warn("Cannot post product image, invalid image type");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
-        }
-
-        newImage = imageService.createImageFileName(newImage, imageType);
-
-        imageService.storeImage(newImage.getFileName(), file);
-
-        BufferedImage thumbnail = imageService.resizeImage(newImage);
-        if (thumbnail == null) {
-            logger.debug("Error resizing image");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
-        }
-
-        imageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
-        newImage = imageService.createImage(newImage);
-        logger.debug("Created new image entity with filename {}", newImage.getFileName());
-
-        return newImage;
-    }
 }
-
 

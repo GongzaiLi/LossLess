@@ -3,10 +3,13 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
@@ -30,10 +33,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UserController is used for mapping all Restful API requests starting with the address "/users".
@@ -306,7 +312,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
     /**
      * Takes an inputed username and password and checks the credentials against the database of saved users.
      * Returns either a bad request response or an authenticated ok response with a JSESSIONID cookie.
@@ -338,6 +343,98 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
         }
+    }
+
+
+    /**
+     * Handle put request to /users endpoint
+     *
+     * If changing password checks if the old password matches current password
+     * Validates inputted data using same validation as registration.
+     *
+     * Keeps user logged in if changing username or password
+     *
+     * Returns 200 on success
+     * Returns 400 if password is incorrect, email is invalid or any invalid inputs e.g. date, address etc.
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 409 if email already exist
+     *
+     * @param modifiedUser Dto containing information needed to update a user
+     * @return  Response code with message, see above for codes
+     */
+    @PutMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
+        User currentUser = userService.getCurrentlyLoggedInUser();
+
+        if (!currentUser.getDateOfBirth().equals(modifiedUser.getDateOfBirth())) {
+            currentUser.setDateOfBirth(modifiedUser.getDateOfBirth());
+            if (!currentUser.checkDateOfBirthValid()) {
+                logger.warn("Invalid date for user: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
+            }
+        }
+
+        if (!currentUser.getHomeAddress().equals(modifiedUser.getHomeAddress())) {
+            logger.debug("Creating new Address Entity for user with ID", currentUser.getId());
+            addressService.createAddress(modifiedUser.getHomeAddress());
+        }
+
+        boolean userPasswordChange = modifiedUser.getNewPassword() != null;
+        boolean userEmailChange = !modifiedUser.getEmail().equals(currentUser.getEmail());
+        boolean userSuppliedOldPassword = modifiedUser.getPassword() != null;
+
+        //If user changing email or password, re-authenticate them
+        if (userEmailChange || userPasswordChange) {
+            if (!userSuppliedOldPassword) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password required when updating email or password");
+            }
+            if (!passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
+                logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
+
+            if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
+                currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
+            }
+
+            if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
+                if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail())) {
+                    logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
+                }
+
+                if (!userService.checkEmailValid(modifiedUser.getEmail())) {
+                    logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
+                }
+                logger.info("New email validated for user with ID {}", currentUser.getId());
+            }
+        }
+
+        logger.debug("Updating user: {}", modifiedUser.getEmail());
+        userService.updateUserDetails(currentUser, modifiedUser);
+
+        //If user email or password changed, re-authenticate them
+        if (userEmailChange || userPasswordChange) {
+            if (modifiedUser.getNewPassword() != null) { //User has new password
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        modifiedUser.getEmail(), modifiedUser.getNewPassword());
+
+                Authentication auth = authenticationManager.authenticate(token);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else { //No new password, use old password
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        modifiedUser.getEmail(), modifiedUser.getPassword());
+
+                Authentication auth = authenticationManager.authenticate(token);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
