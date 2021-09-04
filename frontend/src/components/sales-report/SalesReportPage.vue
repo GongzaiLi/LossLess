@@ -18,7 +18,7 @@ Date: sprint_6
               <h4>{{totalResults.totalPurchases}} Total Items Sold </h4>
               </b-col>
               <b-col cols="4">
-             <h4> ${{totalResults.totalValue}} Total Value</h4>
+             <h4> {{ currency.symbol }}{{totalResults.totalValue}} {{currency.code}} Total Value</h4>
               </b-col>
             </b-row>
           </b-card-text>
@@ -65,6 +65,7 @@ export default {
   data: function () {
     return {
       business: {},
+      currency:{},
       fields:[
         { key: 'startDate', sortable: true },
         { key: 'endDate', sortable: true },
@@ -119,10 +120,14 @@ export default {
           .getBusiness(id)
           .then((response) => {
             this.business = response.data;
+            this.getCurrency(this.business)
           })
           .catch((error) => {
             this.$log.debug(error);
           })
+    },
+    async getCurrency(business) {
+      this.currency = await api.getUserCurrency(business.address.country);
     }
   },
 
