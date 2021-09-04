@@ -124,37 +124,37 @@ describe('Testing-password-validation-for-editing', () => {
 
   test('Invalid if no old password but new password present', async () => {
     wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.oldPassword = '';
     wrapper.vm.userData.newPassword = 'a password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("Old Password required to change Password");
+    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("Old Password required to change Password");
   });
 
   test('Valid if  old password and new password present', async () => {
     wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.oldPassword = 'old password';
     wrapper.vm.userData.newPassword = 'a password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("");
+    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
   });
 
 
   test('Invalid if no old password but new email present', async () => {
     wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.oldPassword = '';
     wrapper.vm.userData.email = 'a new email';
     wrapper.vm.email = 'email'
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity).toEqual("Old Password required to change email");
+    expect(wrapper.vm.passwordEmailValidity()).toEqual("Old Password required to change email");
   });
 
   test('Valid if old password and email not changed present', async () => {
     wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.oldPassword = 'old password';
     wrapper.vm.userData.email = 'email';
     wrapper.vm.email = 'email'
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity).toEqual("");
+    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
   });
 
   test('Invalid if password not match confirm password', async () => {
@@ -162,7 +162,7 @@ describe('Testing-password-validation-for-editing', () => {
     wrapper.vm.userData.newPassword = 'bad password';
     wrapper.vm.userData.confirmPassword = 'other password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordMatchValidity).toEqual("Passwords do not match.");
+    expect(wrapper.vm.passwordMatchValidity()).toEqual("Passwords do not match.");
   });
 
   test('Valid if password match confirm password', async () => {
@@ -170,7 +170,7 @@ describe('Testing-password-validation-for-editing', () => {
     wrapper.vm.userData.newPassword = 'password';
     wrapper.vm.userData.confirmPassword = 'password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordMatchValidity).toEqual("");
+    expect(wrapper.vm.passwordMatchValidity()).toEqual("");
   });
 
 });
@@ -179,37 +179,37 @@ describe('Testing-password-validation-for-register', () => {
 
   test('valid if no old password but new password present', async () => {
     wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.oldPassword = '';
     wrapper.vm.userData.newPassword = 'a password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("");
+    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
   });
 
   test('Valid if  old password and new password present', async () => {
     wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.oldPassword = 'old password';
     wrapper.vm.userData.newPassword = 'a password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity).toEqual("");
+    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
   });
 
 
   test('valid if no old password but new email present', async () => {
     wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.password = '';
+    wrapper.vm.userData.oldPassword = '';
     wrapper.vm.userData.email = 'a new email';
     wrapper.vm.email = 'email'
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity).toEqual("");
+    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
   });
 
   test('Valid if old password and email not changed present', async () => {
     wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.password = 'old password';
+    wrapper.vm.userData.oldPassword = 'old password';
     wrapper.vm.userData.email = 'email';
     wrapper.vm.email = 'email'
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity).toEqual("");
+    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
   });
 
   test('Invalid if password not match confirm password', async () => {
@@ -217,7 +217,7 @@ describe('Testing-password-validation-for-register', () => {
     wrapper.vm.userData.newPassword = 'bad password';
     wrapper.vm.userData.confirmPassword = 'other password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordMatchValidity).toEqual("Passwords do not match.");
+    expect(wrapper.vm.passwordMatchValidity()).toEqual("Passwords do not match.");
   });
 
   test('Valid if password match confirm password', async () => {
@@ -225,6 +225,6 @@ describe('Testing-password-validation-for-register', () => {
     wrapper.vm.userData.newPassword = 'password';
     wrapper.vm.userData.confirmPassword = 'password';
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordMatchValidity).toEqual("");
+    expect(wrapper.vm.passwordMatchValidity()).toEqual("");
   });
 });

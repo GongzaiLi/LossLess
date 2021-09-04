@@ -10,7 +10,7 @@ Date: 3/3/2021
       <h1 v-show="!isEditUser">Sign Up to Wasteless</h1>
       <br>
       <b-form
-        @submit="register"
+        @submit="submit"
         @input="setCustomValidities"
       >
         <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
@@ -58,16 +58,16 @@ Date: 3/3/2021
 
         <b-form-group v-if="isEditUser">
           <strong>Old Password *</strong>
-          <password-input v-model="userData.password" id="password" :is-required="!isEditUser" place-holder="Old Password"/>
+          <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser" place-holder="Old Password"/>
         </b-form-group>
 
         <b-form-group>
-          <strong>{{isEditUser ? 'New ' : ''}}Password *</strong>
+          <strong>{{isEditUser ? 'New Password' : 'Password *'}}</strong>
           <password-input v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
         </b-form-group>
 
         <b-form-group>
-          <strong>Confirm {{isEditUser ? 'New ' : ''}}Password *</strong>
+          <strong>Confirm {{isEditUser ? 'Confirm New Password' : 'Password *'}}</strong>
           <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
 
@@ -173,7 +173,7 @@ export default {
           country: "",
           postcode: ""
         },
-        password: "",
+        oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       },
@@ -187,7 +187,7 @@ export default {
   beforeMount() {
     if (this.isEditUser) {
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
-      this.userData.password = '';
+      this.userData.oldPassword = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
     }
@@ -195,6 +195,33 @@ export default {
   },
 
   methods: {
+
+    /**
+     * If in edit mode and user has changed the email without adding the old password return a string
+     * that can be used as the value for a custom validity on the old password field else return empty string
+     * */
+    passwordEmailValidity() {
+      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change email" : ""
+    },
+
+    /**
+     * If in edit mode and user has added a new password without adding the old password return a string
+     * that can be used as the value for a custom validity on the old password field else return empty string
+     * */
+    passwordNewPasswordValidity() {
+      return this.isEditUser && this.userData.newPassword.length > 0 && this.userData.oldPassword.length === 0? "Old Password required to change Password" : ""
+    },
+
+    /**
+     * If new password does not match old pass word return a string
+     * that can be used as the value for a custom validity on the confirm password field else return empty string
+     * */
+    passwordMatchValidity() {
+      return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
+    },
+
+
+
     /**
      * when user uploads image display the image as a preview
      * @param event object for image uploaded
@@ -221,7 +248,7 @@ export default {
         dateOfBirth: this.userData.dateOfBirth,
         phoneNumber: this.userData.phoneNumber,
         homeAddress: this.userData.homeAddress,
-        password: this.userData.password
+        password: this.userData.newPassword
       };
     },
 
@@ -236,17 +263,40 @@ export default {
     setCustomValidities() {
 
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-      confirmPasswordInput.setCustomValidity(this.passwordMatchValidity);
+      confirmPasswordInput.setCustomValidity(this.passwordMatchValidity());
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
-      const passwordInput =  document.getElementById('password');
-      passwordInput.setCustomValidity(this.passwordNewPasswordValidity);
-      passwordInput.setCustomValidity(this.passwordEmailValidity);
+      if(this.isEditUser) {
+        const passwordInput =  document.getElementById('oldPassword');
+        passwordInput.setCustomValidity(this.passwordNewPasswordValidity());
+        passwordInput.setCustomValidity(this.passwordEmailValidity());
+      }
 
 
 
 
+    },
+
+    /**
+     * Called when user submits form, if editing calls edit function else register function
+     * */
+    submit(event) {
+      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+      if(this.isEditUser) {
+        this.updateUser()
+      } else {
+        this.register()
+      }
+
+    },
+
+    /**
+     * function for api call for update user
+     * TO BE IMPLEMENTED
+     * */
+    async updateUser() {
+      console.log("Update User, TO BE IMPLEMENTED")
     },
 
     /**
@@ -256,11 +306,8 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    async register(event) {
-      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-
+    async register() {
       let registerData = this.getRegisterData();
-
 
       await api
         .register(registerData)
@@ -311,17 +358,7 @@ export default {
       return "";
     },
 
-    passwordEmailValidity() {
-      return this.isEditUser && this.userData.email !== this.email && this.userData.password.length === 0? "Old Password required to change email" : ""
-    },
 
-    passwordNewPasswordValidity() {
-      return this.isEditUser && this.userData.newPassword.length > 0 && this.userData.password.length === 0? "Old Password required to change Password" : ""
-    },
-
-    passwordMatchValidity() {
-      return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
-    }
 
 
   }
