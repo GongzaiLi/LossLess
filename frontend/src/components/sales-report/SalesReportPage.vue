@@ -4,12 +4,38 @@ Date: sprint_6
 -->
 <template>
   <div>
-    <b-card v-if="canViewReport" class="shadow mw-100">
-      <template #header>
-        <h4 class="mb-1">{{ business.name }}'s Sale Report</h4>
-      </template>
-
-      <DateRangeInput/>
+    <b-card v-if="canViewReport" class="shadow mw-100" no-body>
+        <b-list-group>
+        <b-list-group-item>
+          <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
+        <DateRangeInput/>
+        </b-list-group-item>
+        <b-list-group-item v-if="totalResults">
+          <b-card-text>
+            <h3>Sales Summary for {{totalResults.startDate}} to {{totalResults.endDate}}</h3>
+            <b-row align-h="start" >
+              <b-col cols="4">
+              <h4>{{totalResults.totalPurchases}} Total Items Sold </h4>
+              </b-col>
+              <b-col cols="4">
+             <h4> ${{totalResults.totalValue}} Total Value</h4>
+              </b-col>
+            </b-row>
+          </b-card-text>
+        </b-list-group-item>
+        <b-list-group-item>
+          <h3>Sales Details</h3>
+          <b-row>
+          <b-col>
+            <b-table striped :items="groupedResults" :fields="fields" bordered>
+            </b-table>
+          </b-col>
+            <b-col>
+              graph
+            </b-col>
+          </b-row>
+        </b-list-group-item>
+      </b-list-group>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
       <b-card-title>
@@ -29,6 +55,7 @@ Date: sprint_6
   </div>
 
 </template>
+
 <script>
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
@@ -38,6 +65,46 @@ export default {
   data: function () {
     return {
       business: {},
+      fields:[
+        { key: 'startDate', sortable: true },
+        { key: 'endDate', sortable: true },
+        { key: 'totalPurchases', sortable: true },
+        { key: 'totalValue', sortable: true }
+      ],
+      totalResults:{
+        "startDate": "2021-09-01",
+        "endDate": "2021-09-04",
+        "totalPurchases": 999999999999,
+        "totalValue": 99999999999
+      },
+      groupedResults:
+        [
+            {
+              "startDate": "2021-09-01",
+              "endDate": "2021-09-01",
+              "totalPurchases": 0,
+              "totalValue": 0.0
+            },
+    {
+      "startDate": "2021-09-02",
+        "endDate": "2021-09-02",
+        "totalPurchases": 0,
+        "totalValue": 0.0
+    },
+    {
+      "startDate": "2021-09-03",
+        "endDate": "2021-09-03",
+        "totalPurchases": 0,
+        "totalValue": 0.0
+    },
+    {
+      "startDate": "2021-09-04",
+        "endDate": "2021-09-04",
+        "totalPurchases": 1,
+        "totalValue": 2.5
+    }
+  ]
+      ,
     }
   },
 
@@ -78,7 +145,7 @@ export default {
         }
       }
       return null;
-    }
+    },
   }
 }
 </script>
