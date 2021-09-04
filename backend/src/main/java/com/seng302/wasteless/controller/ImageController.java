@@ -1,8 +1,8 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.Image;
+import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ImageService;
@@ -12,17 +12,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-
-import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,10 +142,6 @@ public class ImageController {
 
         Product product = productService.findProductById(productId);
 
-        if (product==null){
-            logger.warn("Cannot delete productImage. Product is null");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product no longer exists");
-        }
         if (!product.getBusinessId().equals(businessId)) {
             logger.warn("Cannot post product image for product that does not belong to current business");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
@@ -284,24 +279,12 @@ public class ImageController {
     public ResponseEntity<Object> postUserImage(@PathVariable("userId") Integer userId, @RequestParam("filename") MultipartFile file) {
         logger.info("Request to upload user image for user: {}", userId);
 
-        User loggedInUser = userService.getCurrentlyLoggedInUser();
+        User userForImage = getUserToModify(userId);
 
-        //If we are not uploading the image to ourselves, and we are not a global admin, return error
-        if (!loggedInUser.getId().equals(userId) && !loggedInUser.checkUserGlobalAdmin()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allow to make change for this user");
+        //Delete old user image if they had one
+        if (userForImage.getProfileImage() != null) {
+            userService.deleteUserImage(userForImage);
         }
-
-        User userForImage;
-
-        //If the request is made for not the currently logged in user, get their information
-        if (loggedInUser.getId().equals(userId)) {
-            userForImage = loggedInUser;
-        } else {
-            userForImage = userService.findUserById(userId);
-        }
-
-        //Used for deleting old user image if they had one. Must come before the below code
-        Image oldUserImage = userForImage.getProfileImage();
 
         Image newImage = imageService.saveImageWithThumbnail(file);
 
@@ -309,14 +292,52 @@ public class ImageController {
 
         userService.saveUserChanges(userForImage);
 
-        //Cleanup old user image if they had one
-        if (oldUserImage != null) {
-            imageService.deleteImageRecordFromDB (oldUserImage);
-            imageService.deleteImageFile(oldUserImage);
-        }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
 
+    }
+
+    /**
+     * Handles requests to delete a user's image.
+     * @param userId Id of user to delete image for
+     * @return 200 OK response if deleted successfully
+     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the user with given id,
+     * 406 NOT ACCEPTABLE if given user doesn't exist
+     */
+    @DeleteMapping("/users/{userId}/image")
+    public ResponseEntity<Object> deleteUserImage(@PathVariable("userId") Integer userId) {
+        User userForImage = getUserToModify(userId);
+
+        if (userForImage.getProfileImage() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given user does not have a profile image");
+        }
+
+        userService.deleteUserImage(userForImage);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Given the ID of a user to modify, returns a User object with given ID.
+     * Will also check if the user is allowed to modify the user, and if not, throws a
+     * 403 FORBIDDEN exception.
+     * This should really be in the User Controller but that file is wayyy too big so we
+     * decided to put this here for now. Hopefully when the user controller gets refactored
+     * we can chuck it back there.
+     * @param userId ID of user to modify
+     * @return Object of user with given ID
+     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the user with given id,
+     * 406 NOT ACCEPTABLE if given user doesn't exist
+     */
+    private User getUserToModify(Integer userId) {
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
+
+        if (loggedInUser.getId().equals(userId)) {
+            return loggedInUser;
+        } else if (loggedInUser.checkUserGlobalAdmin()) {
+            return userService.findUserById(userId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this user");
+        }
     }
 }
 

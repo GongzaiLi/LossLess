@@ -28,10 +28,12 @@ public class UserService {
     private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     private UserRepository userRepository;
+    private ImageService imageService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService) {
         this.userRepository = userRepository;
+        this.imageService = imageService;
     }
 
     /**
@@ -224,6 +226,23 @@ public class UserService {
      */
     public void addImageToUser(User user, Image image) {
         user.setProfileImage(image);
+    }
+
+    /**
+     * Delete profile image of a user, leaving it null.
+     * The actual image file will also get deleted from the filesystem.
+     * Make sure that the user must have a profile image, otherwise this method will crash.
+     * @param user User for whom image is to be deleted
+     */
+    public void deleteUserImage(User user) {
+        Image oldUserImage = user.getProfileImage();
+
+        // Have to do this before deleting image otherwise we violate a foreign key constraint
+        user.setProfileImage(null);
+        saveUserChanges(user);
+
+        imageService.deleteImageRecordFromDB(oldUserImage);
+        imageService.deleteImageFile(oldUserImage);
     }
 
     /**
