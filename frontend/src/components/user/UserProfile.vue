@@ -20,11 +20,9 @@ Date: 5/3/2021
             <b-col md="10" class="mt-2">
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
-                  <b-icon-pencil-fill id="editProfile" @click="editUserModel" style="cursor: pointer;"/>
+                  <b-icon-pencil-fill v-if="userData.id === $currentUser.id" v-b-tooltip.hover title="Edit Profile" id="editProfile" @click="editUserModel" style="cursor: pointer;"/>
                 </h4>
-                <b-tooltip target="editProfile" triggers="hover">
-                  Edit Profile
-                </b-tooltip>
+
               </b-row>
               <b-row>
                 Member since:
