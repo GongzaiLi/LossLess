@@ -24,7 +24,10 @@ Date: sprint_6
           </b-card-text>
         </b-list-group-item>
         <b-list-group-item>
-          <h3>Sales Details</h3>
+          <b-row>
+          <b-col cols="2"><h3>Sales Details</h3></b-col>
+            <b-col cols="2"><b-select v-model="groupBy" :options="groupByOptions"></b-select></b-col>
+          </b-row>
           <b-row>
           <b-col>
             <b-table striped :items="groupedResults" :fields="fields" bordered>
@@ -66,6 +69,13 @@ export default {
     return {
       business: {},
       currency:{},
+      groupBy:"day",
+      groupByOptions:[
+        {value:"day", text:"Daily"},
+        {value:"week", text:"Weekly"},
+        { value:"month", text:"Monthly"},
+        {value:"year", text:"Yearly"}
+      ],
       fields:[
         { key: 'startDate', sortable: true },
         { key: 'endDate', sortable: true },
