@@ -7,7 +7,6 @@ import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -90,7 +89,7 @@ class UserControllerUnitTest {
         notifs.add(notification);
 
         Mockito
-                .when(notificationService.findAllNotificationsByUserId(anyInt()))
+                .when(notificationService.findAllUnArchivedNotificationsByUserId(anyInt()))
                 .thenReturn(notifs);
 
         Mockito

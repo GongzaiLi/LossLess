@@ -251,7 +251,7 @@ public class UserController {
     public ResponseEntity<Object> getNotifications() {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Request to get notifications for user: {}", user.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(notificationService.findAllNotificationsByUserId(user.getId()));
+        return ResponseEntity.status(HttpStatus.OK).body(notificationService.findAllUnArchivedNotificationsByUserId(user.getId()));
     }
 
     /**

@@ -283,7 +283,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .when(NotificationService.createNotification(any(),any(),any(),any()))
                 .thenCallRealMethod();
         Mockito
-                .when(notificationService.findAllNotificationsByUserId(anyInt()))
+                .when(notificationService.findAllUnArchivedNotificationsByUserId(anyInt()))
                 .thenReturn(notificationList);
         Mockito
                 .when(notificationService.saveNotification(any(Notification.class)))

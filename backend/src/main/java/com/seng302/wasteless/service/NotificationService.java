@@ -39,12 +39,12 @@ public class NotificationService {
     }
 
     /**
-     * get notifications for user
+     * Get notifications for user that have not been archived
      * @param userId        The id of the user to get notifications for
      * @return          The found notifications, if any otherwise empty list
      */
-    public List<Notification> findAllNotificationsByUserId(Integer userId) {
-        return  notificationRepository.findAllNotificationsByUserId_OrderByCreatedDesc(userId);
+    public List<Notification> findAllUnArchivedNotificationsByUserId(Integer userId) {
+        return  notificationRepository.findByUserIdAndArchivedOrderByCreatedDesc(userId, false);
     }
 
     /**
