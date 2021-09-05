@@ -340,11 +340,7 @@ export default {
      * Returns the URL required to get the image given the filename
      */
     getURL(imageFileName) {
-      if (this.isCreatingProduct) { // Return preview URL if we're creating to product (and so image isn't in the backend yet).
-        return imageFileName;
-      } else {
-        return api.getImage(imageFileName);
-      }
+      return api.getImage(imageFileName);
     },
 
     /**
@@ -361,6 +357,9 @@ export default {
         .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");
+          if (this.imageURL) {
+            api.uploadProfileImage(loginResponse.data.id, this.imageFile)
+          }
           return api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {

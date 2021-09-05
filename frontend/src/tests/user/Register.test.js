@@ -228,3 +228,37 @@ describe('Testing-password-validation-for-register', () => {
     expect(wrapper.vm.passwordMatchValidity()).toEqual("");
   });
 });
+
+describe('Testing-api-put-updating-user', () => {
+  const event = {
+    preventDefault: () => {
+    }
+  };
+  it('Successful-update-user', async () => {
+    Api.modifyUser.mockResolvedValue({
+      status: 200
+    });
+    Api.uploadProfileImage.mockResolvedValue(
+        {
+          status: 201
+        })
+
+    await wrapper.vm.updateUser(event);
+    expect(wrapper.vm.errors).toStrictEqual([]);
+  });
+
+  it('409-error-update-user-testing', async () => {
+    Api.modifyUser.mockRejectedValue({response: {
+        data:  {message: "Email address already in use"},
+        status: 409
+      }});
+    await wrapper.vm.updateUser(event);
+    expect(wrapper.vm.errors).toStrictEqual(["Updating user failed: Email address already in use"]);
+  });
+
+  it('500-error-update-user-testing', async () => {
+    Api.modifyUser.mockRejectedValue({});
+    await wrapper.vm.updateUser(event);
+    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
+  });
+});
