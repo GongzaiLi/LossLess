@@ -18,8 +18,48 @@
   <hr class="mt-1 mb-2">
   <span>{{ updatedNotification.message }}</span>
   <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
+
+    <div v-if="updatedNotification.read">
+      <hr class="readHr ">
+      <span class="readLabel">
+      <b-icon-check2-all> </b-icon-check2-all> Read </span>
     </div>
+    <div v-else>
+      <hr class="unreadHr">
+      <span class="unreadLabel">
+         <b-icon-eye-slash> </b-icon-eye-slash>  Unread </span>
+    </div>
+
+  </div>
 </template>
+
+
+<style>
+
+hr {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+hr.readHr {
+  border-top: 1px solid green;
+}
+
+hr.unreadHr {
+  border-top: 1px solid orangered;
+}
+
+span.readLabel {
+  float: right; color: green;
+}
+
+span.unreadLabel {
+  float: right; color: orangered;
+}
+
+
+
+</style>
 
 <script>
 import Api from "../../Api";
@@ -32,6 +72,7 @@ export default {
       updatedNotification: {message:"", type:""}
     }
   },
+
   methods: {
     /**
      * Updates the purchase listing notification with the product data
