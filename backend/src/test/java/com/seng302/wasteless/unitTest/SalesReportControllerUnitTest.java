@@ -2,6 +2,7 @@ package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.controller.SalesReportController;
+import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.User;
@@ -24,7 +25,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -51,18 +54,6 @@ public class SalesReportControllerUnitTest {
     private Authentication authentication;
 
     @MockBean
-    private ProductService productService;
-
-    @MockBean
-    private InventoryService inventoryService;
-
-    @MockBean
-    private ListingsService listingsService;
-
-    @MockBean
-    private NotificationService notificationService;
-
-    @MockBean
     private PurchasedListingService purchasedListingService;
 
     private Business business;
@@ -85,6 +76,9 @@ public class SalesReportControllerUnitTest {
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
 
+
+        List<SalesReportDto> salesData = new ArrayList<>();
+
         Mockito
                 .when(authentication.getName())
                 .thenReturn("james@gmail.com");
@@ -97,20 +91,22 @@ public class SalesReportControllerUnitTest {
                 .when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(user);
 
+        Mockito
+                .when(purchasedListingService.getSalesReportDataNoPeriod(anyInt(), any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(salesData);
+
+        Mockito
+                .when(purchasedListingService.getSalesReportDataWithPeriod(anyInt(), any(LocalDate.class), any(LocalDate.class),
+                        any(LocalDate.class), any(LocalDate.class), any(Period.class)))
+                .thenReturn(salesData);
+
+
 
 
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(true).when(business).checkUserIsAdministrator(user);
         doReturn(LocalDate.now()).when(business).getCreated();
-
-
-        //Returns the totalProducts value equal to the businessId that was passed
-        when(purchasedListingService.countPurchasedListingForBusiness(anyInt())).thenAnswer(i -> i.getArguments()[0]);
-
-        //Returns the totalProducts value equal to the businessId that was passed
-        when(purchasedListingService.countPurchasedListingForBusinessInDateRange(anyInt(), any(LocalDate.class), any(LocalDate.class))).thenAnswer(i -> i.getArguments()[0]);
-        when(purchasedListingService.totalPurchasedListingValueForBusinessInDateRange(anyInt(), any(LocalDate.class), any(LocalDate.class))).thenAnswer(i -> 5.0);
     }
 
 
@@ -120,9 +116,7 @@ public class SalesReportControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?period=day")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -215,32 +209,18 @@ public class SalesReportControllerUnitTest {
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andThreeDayRange_then200ResponseWithThreeDaysData() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2000-10-12&endDate=2000-10-14&period=day")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/3/salesReport/totalPurchases?startDate=2000-10-12&endDate=2000-10-14&period=day")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("[2].totalPurchases", is(5)))
-                .andExpect(jsonPath("[2].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(3)));
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSaleReportTotalCount_andSixWeekRange_then200ResponseWithSixWeeksData() throws Exception {
+    void whenGetSaleReportTotalCount_andFiveWeekRange_then200ResponseWithFiveWeeksData() throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-09-01&endDate=2021-10-06&period=week")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("[2].totalPurchases", is(5)))
-                .andExpect(jsonPath("[2].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(6)));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -249,42 +229,25 @@ public class SalesReportControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2000-10-01&endDate=2001-02-11&period=month")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("[2].totalPurchases", is(5)))
-                .andExpect(jsonPath("[2].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(5)));
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andSundayToMonday_then200ResponseWithTwoWeeksData() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-09-05&endDate=2021-09-06&period=week")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/2/salesReport/totalPurchases?startDate=2021-09-05&endDate=2021-09-06&period=week")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(2)));
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andLastDayToFirstDayOfMonth_then200ResponseWithTwoMonthsData() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-09-31&endDate=2021-10-01&period=month")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/2/salesReport/totalPurchases?startDate=2021-09-31&endDate=2021-10-01&period=month")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(2)));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -293,40 +256,25 @@ public class SalesReportControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2000-10-01&endDate=2004-02-11&period=year")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("[2].totalPurchases", is(5)))
-                .andExpect(jsonPath("[2].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(5)));
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andLastDayToFirstDayOfYear_then200ResponseWithTwoYearsData() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-12-31&endDate=2022-01-01&period=year")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/2/salesReport/totalPurchases?startDate=2021-12-31&endDate=2022-01-01&period=year")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("[1].totalPurchases", is(5)))
-                .andExpect(jsonPath("[1].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(2)));
+                .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenGetSaleReportTotalCount_andNoPeriodSet_then200ResponseWithTotalDataForRange() throws Exception {
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-12-01&endDate=2022-01-31")
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?startDate=2021-12-01&endDate=2022-01-31")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].totalPurchases", is(5)))
-                .andExpect(jsonPath("[0].totalValue", is(5.0)))
-                .andExpect(jsonPath("$.length()", is(1)));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -335,8 +283,7 @@ public class SalesReportControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2021-02-29&endDate=2021-10-01&period=month")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].startDate", is("2021-02-28")));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -345,8 +292,7 @@ public class SalesReportControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2020-02-29&endDate=2021-10-01&period=month")
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].startDate", is("2020-02-29")));
+                .andExpect(status().isOk());
     }
 
 }
