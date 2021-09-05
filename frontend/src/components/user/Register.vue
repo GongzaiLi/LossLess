@@ -121,13 +121,45 @@ Date: 3/3/2021
         Already have an account?
         <router-link to="/login">Login here</router-link>
       </h6>
+
+
+      <b-modal size="lg" ref="currencyChangeModal" title="Change Currency?" cancel-title="No" ok-title="Yes">
+        <h6>
+          Updating your country will update the currency for all future listing you create. <br>
+          Do you wish to update existing listings to match the new currency? <br>
+        </h6>
+        <p>
+          *Note Business Listings for businesses you administer will not be affected
+        </p>
+        <template #modal-footer="{cancel}">
+          <div class="w-100">
+            <b-row>
+              <b-col>
+                <b-button size="sm" class="footer-buttons"  variant="primary" @click="updateUser(true)">
+                  Yes
+                </b-button>
+
+                <b-button size="sm"  class="footer-buttons" variant="danger" @click="updateUser(false)">
+                  No
+                </b-button>
+
+                  <b-button size="sm" class="footer-buttons" variant="secondary" @click="cancel()">
+                    Cancel
+                  </b-button>
+              </b-col>
+            </b-row>
+          </div>
+        </template>
+      </b-modal>
     </b-card>
     <br>
   </div>
 </template>
-
-
 <style>
+.footer-buttons {
+  min-width: 4rem;
+  margin-right: 1rem;
+}
 </style>
 
 <script>
@@ -178,6 +210,7 @@ export default {
         confirmPassword: "",
       },
       email: '',
+      country: '',
       uploaded: false,
       errors: [],
       imageURL: ''
@@ -185,13 +218,16 @@ export default {
   },
 
   beforeMount() {
+    //if in edit mode set password fields to empty
+    //set email and country to compare if the user has altered the values
     if (this.isEditUser) {
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
       this.userData.oldPassword = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
+      this.email = this.userData.email;
+      this.country = this.userData.homeAddress.country;
     }
-    this.email = this.userData.email;
   },
 
   methods: {
@@ -280,11 +316,16 @@ export default {
 
     /**
      * Called when user submits form, if editing calls edit function else register function
+     * if the user has changed their country open the currency change alert modal
      * */
     submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
       if(this.isEditUser) {
-        this.updateUser()
+        if (this.country !== this.userData.homeAddress.country) {
+          this.$refs.currencyChangeModal.show();
+        } else {
+          this.updateUser(false);
+        }
       } else {
         this.register()
       }
@@ -295,8 +336,8 @@ export default {
      * function for api call for update user
      * TO BE IMPLEMENTED
      * */
-    async updateUser() {
-      console.log("Update User, TO BE IMPLEMENTED")
+    async updateUser(updatePrevListingsCurrency) {
+      console.log("Update User, TO BE IMPLEMENTED", updatePrevListingsCurrency)
     },
 
     /**
