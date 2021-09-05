@@ -7,6 +7,7 @@ import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
+import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.model.UserRoles;
 import com.seng302.wasteless.model.UserSearchSortTypes;
@@ -380,6 +381,7 @@ public class UserController {
         boolean userPasswordChange = modifiedUser.getNewPassword() != null;
         boolean userEmailChange = !modifiedUser.getEmail().equals(currentUser.getEmail());
         boolean userSuppliedOldPassword = modifiedUser.getPassword() != null;
+        boolean userCountryChanged = !modifiedUser.getHomeAddress().getCountry().equals(currentUser.getHomeAddress().getCountry());
 
         //If user changing email or password, re-authenticate them
         if (userEmailChange || userPasswordChange) {
@@ -429,6 +431,13 @@ public class UserController {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
+        }
+
+        if (userCountryChanged) {
+            notificationService.createNotification(currentUser.getId(), null, NotificationType.CURRENCY_CHANGE,
+                    "You have changed country and therefore your currency may have changed. " +
+                            "This will not affect the currency of products in your administered business unless you " +
+                            "also modify the address of the business.");
         }
 
         return ResponseEntity.status(HttpStatus.OK).build();
