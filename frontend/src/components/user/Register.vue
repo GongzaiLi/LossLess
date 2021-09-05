@@ -324,6 +324,7 @@ export default {
             if (this.imageURL) {
               api.uploadProfileImage(this.userData.id, this.imageFile)
             }
+            this.$emit("updatedUser")
         })
         .catch((error) => {
           this.errors = [];

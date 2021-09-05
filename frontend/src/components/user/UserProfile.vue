@@ -153,7 +153,7 @@ Date: 5/3/2021
 
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
 
-      <Register :is-edit-user="true" :user-details="userData"/>
+      <Register :is-edit-user="true" :user-details="userData" v-on:updatedUser="updatedUserHandler"/>
     </b-modal>
   </div>
 </template>
@@ -289,9 +289,19 @@ export default {
           });
     },
 
-
+    /**
+     * When clicking the edit icon button then this modal shows
+     */
     editUserModel: function () {
       this.$bvModal.show('edit-user-profile');
+    },
+
+    /**
+     * This hides the edit user modal and refreshes the user's details
+     */
+    updatedUserHandler: function () {
+      this.getUserInfo(this.userData.id);
+      this.$bvModal.hide('edit-user-profile');
     }
   },
   computed: {
