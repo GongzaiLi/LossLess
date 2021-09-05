@@ -18,9 +18,8 @@
   <hr class="mt-1 mb-2">
   <span>{{ updatedNotification.message }}</span>
   <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
-
     <div v-if="updatedNotification.read">
-      <hr class="readHr ">
+      <hr class="readHr">
       <span class="readLabel">
       <b-icon-check2-all> </b-icon-check2-all> Read </span>
     </div>
@@ -36,16 +35,15 @@
 
 <style>
 
-hr {
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
 hr.readHr {
+  margin-top: 0;
+  margin-bottom: 0;
   border-top: 1px solid green;
 }
 
 hr.unreadHr {
+  margin-top: 0;
+  margin-bottom: 0;
   border-top: 1px solid orangered;
 }
 
@@ -69,7 +67,7 @@ export default {
   props: ['notification'],
   data() {
     return {
-      updatedNotification: {message:"", type:""}
+      updatedNotification: {message:"", type:""},
     }
   },
 
