@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,5 +71,20 @@ public class NotificationService {
 
         notificationRepository.saveAll(notifications);
     }
+
+    /**
+     * Get a notification by id for the logged-in user
+     * @param id        The id of the notifications to be retrieved
+     * @return          The found notification
+     */
+    public Notification findNotificationById(Integer id) {
+        return notificationRepository.findFirstById(id);
+    }
+
+    /**
+     * Deletes a Notification object and persists the action in the database
+     * @param notification The Notification object to be created.
+     */
+    public void deleteNotification(Notification notification) {notificationRepository.delete(notification); }
 
 }
