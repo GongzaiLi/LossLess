@@ -75,15 +75,10 @@ public class ManageMyFeedFeature {
         currentUserDetails = new CustomUserDetails(currentUser);
     }
 
-    @And("We have a notification with id {int}")
-    public void weHaveANotificationWithId(int id) {
-        try {
-            notification = notificationService.findNotificationById(id);
-        } catch (ResponseStatusException e) {
-            notification = NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "");
-            notification.setId(id);
-            notificationService.saveNotification(notification);
-        }
+    @And("We have a notification")
+    public void weHaveANotification() {
+        notification = NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "");
+        notificationService.saveNotification(notification);
     }
 
     @Given("My notification has not been read")
@@ -94,7 +89,7 @@ public class ManageMyFeedFeature {
 
     @When("I mark it as read")
     public void iMarkItAsRead() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
                 .content("{\"read\": true}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(currentUserDetails)))
@@ -116,7 +111,7 @@ public class ManageMyFeedFeature {
 
     @When("I star it")
     public void iStarIt() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
                 .content("{\"starred\": true}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(currentUserDetails)))
@@ -138,7 +133,7 @@ public class ManageMyFeedFeature {
 
     @When("I archive it")
     public void iArchiveIt() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
                 .content("{\"archived\": true}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(currentUserDetails)))

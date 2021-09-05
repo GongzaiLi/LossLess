@@ -5,7 +5,7 @@ Feature: U32 Managing my feed
 
   Background:
     Given We are logged in as a person with email "a@a"
-    And We have a notification with id 1
+    And We have a notification
 
   Scenario: AC2: I can easily distinguish between items I have clicked on (“read”) and those I haven’t (“unread”)
     Given My notification has not been read
