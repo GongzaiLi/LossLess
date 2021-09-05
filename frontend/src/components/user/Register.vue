@@ -15,7 +15,9 @@ Date: 3/3/2021
       >
         <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
              alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
-        <b-img v-else :src="require('../../../public/profile-default.jpg')" class="mx-auto" fluid block rounded="circle"
+        <b-img v-else :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+               class="mx-auto"
+               fluid block rounded="circle"
                alt="default image" style="height: 12rem; width: 12rem; display: inline-block" />
         <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
                accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
@@ -41,7 +43,7 @@ Date: 3/3/2021
         <b-form-group
         >
           <strong>Nickname</strong>
-          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nick Name"></b-form-input>
+          <b-form-input v-model="userData.nickName" maxLength=50 placeholder="Nick Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
@@ -57,7 +59,7 @@ Date: 3/3/2021
         </b-form-group>
 
         <b-form-group v-if="isEditUser">
-          <strong>Old Password *</strong>
+          <strong>Old Password</strong>
           <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser" place-holder="Old Password"/>
         </b-form-group>
 
@@ -97,7 +99,6 @@ Date: 3/3/2021
                         placeholder="Phone Number"
                         autocomplete="off"
                         size=30;
-                        type="number"
           />
         </b-form-group>
         <b-row>
@@ -180,7 +181,8 @@ export default {
       email: '',
       uploaded: false,
       errors: [],
-      imageURL: ''
+      imageURL: '',
+      imageFile: '',
     }
   },
 
@@ -192,6 +194,7 @@ export default {
       this.userData.confirmPassword = '';
     }
     this.email = this.userData.email;
+    this.$log.debug(this.userData);
   },
 
   methods: {
@@ -220,14 +223,13 @@ export default {
       return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
     },
 
-
-
     /**
      * when user uploads image display the image as a preview
      * @param event object for image uploaded
      **/
     openImage(event) {
       if (event.target.files[0]) {
+        this.imageFile = event.target.files[0];
         this.imageURL = window.URL.createObjectURL(event.target.files[0]);
         event.target.value = '';
         this.uploaded = true;
@@ -236,6 +238,7 @@ export default {
     },
 
     /**
+     * Gets the data from the HTML elements that is to be used for registering a user
      **/
     getRegisterData() {
       return {
@@ -253,6 +256,28 @@ export default {
     },
 
     /**
+     * Gets the data from the HTML elements that is to be used for editing a user
+     **/
+    getEditData() {
+      let editData = {
+        firstName: this.userData.firstName,
+        lastName: this.userData.lastName,
+        middleName: this.userData.middleName,
+        nickname: this.userData.nickname,
+        bio: this.userData.bio,
+        email: this.userData.email,
+        dateOfBirth: this.userData.dateOfBirth,
+        phoneNumber: this.userData.phoneNumber,
+        homeAddress: this.userData.homeAddress,
+      }
+      if (this.userData.newPassword !== "") {
+        editData.newPassword = this.userData.newPassword
+        editData.password = this.userData.oldPassword
+      }
+      return editData;
+    },
+
+    /**
      * Uses HTML constraint validation to set custom validity rules checks:
      * that the 'password' and 'confirm password' fields match
      * date of birth is valid
@@ -261,7 +286,6 @@ export default {
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
-
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
       confirmPasswordInput.setCustomValidity(this.passwordMatchValidity());
 
@@ -272,10 +296,6 @@ export default {
         passwordInput.setCustomValidity(this.passwordNewPasswordValidity());
         passwordInput.setCustomValidity(this.passwordEmailValidity());
       }
-
-
-
-
     },
 
     /**
@@ -288,15 +308,43 @@ export default {
       } else {
         this.register()
       }
-
     },
 
     /**
-     * function for api call for update user
-     * TO BE IMPLEMENTED
-     * */
+     * Uses Api.js to send a put request to user profile.
+     * This is used to modify the user's details.
+     * This also sends an api request to post an image if the user has an image that they
+     * want to upload
+     */
     async updateUser() {
-      console.log("Update User, TO BE IMPLEMENTED")
+      let editData = this.getEditData();
+      await api
+        .modifyUser(editData)
+          .then(() => {
+            if (this.imageURL) {
+              api.uploadProfileImage(this.userData.id, this.imageFile)
+            }
+        })
+        .catch((error) => {
+          this.errors = [];
+          this.$log.debug(error);
+          if (error.response) {
+            this.errors.push(`Updating user failed: ${error.response.data.message}`);
+          } else {
+            this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+          }
+        });
+    },
+
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      if (this.isCreatingProduct) { // Return preview URL if we're creating to product (and so image isn't in the backend yet).
+        return imageFileName;
+      } else {
+        return api.getImage(imageFileName);
+      }
     },
 
     /**
@@ -330,6 +378,7 @@ export default {
         });
     },
   },
+
   computed: {
     /**
      * Returns the HTML5 validity string based on the value of the birth date input. Birth dates must be at least
@@ -357,9 +406,6 @@ export default {
       }
       return "";
     },
-
-
-
 
   }
 }
