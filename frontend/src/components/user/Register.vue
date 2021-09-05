@@ -1,6 +1,5 @@
 <!--
 Page for users to input their information for registration
-Authors: Nitish Singh, Eric Song
 Date: 3/3/2021
 -->
 
@@ -8,96 +7,81 @@ Date: 3/3/2021
 <template>
   <div>
     <b-card class="shadow">
-      <h1> Sign Up to Wasteless </h1>
+      <h1 v-show="!isEditUser">Sign Up to Wasteless</h1>
       <br>
       <b-form
-        @submit="register"
+        @submit="submit"
         @input="setCustomValidities"
       >
-        <b-form-group
-        >
+        <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
+             alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
+        <b-img v-else :src="require('../../../public/profile-default.jpg')" class="mx-auto" fluid block rounded="circle"
+               alt="default image" style="height: 12rem; width: 12rem; display: inline-block" />
+        <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
+               accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
+        <b-button variant="info" class="w-100 add-image-btn mt-2 mb-4" @click="$refs.userImagePicker.click()">Upload</b-button>
+
+        <b-form-group>
           <strong>First Name *</strong>
-          <b-form-input v-model="firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
+          <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Last Name *</strong>
-          <b-form-input v-model="lastName" maxLength=50 required placeholder="Last Name"></b-form-input>
+          <b-form-input v-model="userData.lastName" maxLength=50 required placeholder="Last Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Middle Name</strong>
-          <b-form-input v-model="middleName" maxLength=50 placeholder="Middle Name"></b-form-input>
+          <b-form-input v-model="userData.middleName" maxLength=50 placeholder="Middle Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Nickname</strong>
-          <b-form-input v-model="nickname" maxLength=50 placeholder="Nick Name"></b-form-input>
+          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nick Name"></b-form-input>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Bio</strong>
-          <b-form-textarea v-model="bio" maxLength=250 placeholder="Enter your Bio"></b-form-textarea>
+          <b-form-textarea v-model="userData.bio" maxLength=250 placeholder="Enter your Bio"></b-form-textarea>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Email *</strong>
-          <b-form-input required type="email" maxLength=50 v-model="email" placeholder="Email"></b-form-input>
+          <b-form-input required type="email" maxLength=50 v-model="userData.email" placeholder="Email"></b-form-input>
+        </b-form-group>
+
+        <b-form-group v-if="isEditUser">
+          <strong>Old Password *</strong>
+          <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser" place-holder="Old Password"/>
         </b-form-group>
 
         <b-form-group>
-          <strong>Password *</strong>
-          <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-bind:type="passwordType" required
-                          v-model=password
-                          maxLength=50
-                          class="form-control"
-                          placeholder="Password"
-                          autocomplete="off"/>
-            <div class="input-group-prepend">
-              <div class="input-group-text" @click="showPassword">
-                <b-icon-eye-fill v-if="!visiblePassword"/>
-                <b-icon-eye-slash-fill v-else-if="visiblePassword"/>
-              </div>
-            </div>
-          </div>
+          <strong>{{isEditUser ? 'New Password' : 'Password *'}}</strong>
+          <password-input v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
         </b-form-group>
 
         <b-form-group>
-          <strong>Confirm Password *</strong>
-          <div class="input-group mb-2 mr-sm-2">
-            <b-form-input v-bind:type="confirmPasswordType" required
-                          v-model=confirmPassword
-                          maxLength=50
-                          class="form-control"
-                          id="confirmPasswordInput"
-                          placeholder="Confirm Password"
-                          autocomplete="off"/>
-            <div class="input-group-prepend">
-              <div class="input-group-text" @click="showConfirmPassword">
-                <b-icon-eye-fill v-if="!visibleConfirmPassword"/>
-                <b-icon-eye-slash-fill v-else-if="visibleConfirmPassword"/>
-              </div>
-            </div>
-          </div>
+          <strong>Confirm {{isEditUser ? 'Confirm New Password' : 'Password *'}}</strong>
+          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Home Address *</strong>
-          <address-input v-model="homeAddress"/>
+          <address-input v-model="userData.homeAddress" :address="userData.homeAddress"/>
         </b-form-group>
 
         <b-form-group
         >
           <strong>Date of Birth *</strong>
           <div>Note: you must be at least 13 years old to register</div>
-          <b-form-input type="date" v-model="dateOfBirth" required
+          <b-form-input type="date" v-model="userData.dateOfBirth" required
                         id="dateOfBirthInput"
                         placeholder="Date of Birth"
                         autocomplete="off"
@@ -108,14 +92,23 @@ Date: 3/3/2021
         <b-form-group
         >
           <strong>Phone Number</strong>
-          <b-form-input v-model="phoneNumber"
+          <b-form-input v-model="userData.phoneNumber"
                         maxLength=50
                         placeholder="Phone Number"
                         autocomplete="off"
                         size=30;
+                        type="number"
           />
         </b-form-group>
-        <b-button variant="primary" type="submit" style="margin-top:0.7em" id="register-btn">Register</b-button>
+        <b-row>
+          <b-col cols="auto" class="mr-auto p-3">
+            <b-button v-if="isEditUser" variant="primary" class="button" type="submit" id="confirm-btn">Confirm</b-button>
+            <b-button v-else variant="primary" type="submit" class="button"  id="register-btn">Register</b-button>
+          </b-col>
+          <b-col cols="auto" class="p-3">
+            <b-button v-show="isEditUser" class="button"   @click="$bvModal.hide('edit-user-profile')" style="align-self: end">Cancel</b-button>
+          </b-col>
+        </b-row>
       </b-form>
       <br>
       <div v-if="errors.length">
@@ -124,7 +117,7 @@ Date: 3/3/2021
           }}
         </b-alert>
       </div>
-      <h6>
+      <h6 v-if="!isEditUser">
         Already have an account?
         <router-link to="/login">Login here</router-link>
       </h6>
@@ -133,9 +126,14 @@ Date: 3/3/2021
   </div>
 </template>
 
+
+<style>
+</style>
+
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
+import PasswordInput from "../model/PasswordInput";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 120;
@@ -143,72 +141,162 @@ const UNIX_EPOCH_YEAR = 1970;
 
 export default {
   components: {
-    AddressInput
+    PasswordInput,
+    AddressInput,
+  },
+  props: {
+    isEditUser: {
+      type: Boolean,
+      default: false
+    },
+    userDetails: {
+      type: Object
+    }
   },
   data: function () {
     return {
-      "firstName": "",
-      "lastName": "",
-      "middleName": "",
-      "nickname": "",
-      "bio": "",
-      "email": "",
-      "dateOfBirth": "",
-      "phoneNumber": "",
-      "homeAddress": {
-        "streetNumber": "",
-        "streetName": "",
-        "suburb": "",
-        "city": "",
-        "region": "",
-        "country": "",
-        "postcode": ""
+      userData: {
+        firstName: "",
+        lastName: "",
+        middleName: "",
+        nickname: "",
+        bio: "",
+        email: "",
+        dateOfBirth: "",
+        phoneNumber: "",
+        homeAddress: {
+          streetNumber: "",
+          streetName: "",
+          suburb: "",
+          city: "",
+          region: "",
+          country: "",
+          postcode: ""
+        },
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       },
-      "password": "",
-      "confirmPassword": "",
+      email: '',
+      uploaded: false,
       errors: [],
-      visiblePassword: false,
-      visibleConfirmPassword: false
+      imageURL: ''
     }
   },
+
+  beforeMount() {
+    if (this.isEditUser) {
+      this.userData = JSON.parse(JSON.stringify(this.userDetails));
+      this.userData.oldPassword = '';
+      this.userData.newPassword = '';
+      this.userData.confirmPassword = '';
+    }
+    this.email = this.userData.email;
+  },
+
   methods: {
-    //Password can hidden or shown by clicking button
-    showPassword: function () {
-      this.visiblePassword = !this.visiblePassword;
-    },
-    //ConfirmPassword can hidden or shown by clicking button
-    showConfirmPassword: function () {
-      this.visibleConfirmPassword = !this.visibleConfirmPassword;
+
+    /**
+     * If in edit mode and user has changed the email without adding the old password return a string
+     * that can be used as the value for a custom validity on the old password field else return empty string
+     * */
+    passwordEmailValidity() {
+      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change email" : ""
     },
 
+    /**
+     * If in edit mode and user has added a new password without adding the old password return a string
+     * that can be used as the value for a custom validity on the old password field else return empty string
+     * */
+    passwordNewPasswordValidity() {
+      return this.isEditUser && this.userData.newPassword.length > 0 && this.userData.oldPassword.length === 0? "Old Password required to change Password" : ""
+    },
+
+    /**
+     * If new password does not match old pass word return a string
+     * that can be used as the value for a custom validity on the confirm password field else return empty string
+     * */
+    passwordMatchValidity() {
+      return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
+    },
+
+
+
+    /**
+     * when user uploads image display the image as a preview
+     * @param event object for image uploaded
+     **/
+    openImage(event) {
+      if (event.target.files[0]) {
+        this.imageURL = window.URL.createObjectURL(event.target.files[0]);
+        event.target.value = '';
+        this.uploaded = true;
+      }
+
+    },
+
+    /**
+     **/
     getRegisterData() {
       return {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        middleName: this.middleName,
-        nickname: this.nickname,
-        bio: this.bio,
-        email: this.email,
-        dateOfBirth: this.dateOfBirth,
-        phoneNumber: this.phoneNumber,
-        homeAddress: this.homeAddress,
-        password: this.password
+        firstName: this.userData.firstName,
+        lastName: this.userData.lastName,
+        middleName: this.userData.middleName,
+        nickname: this.userData.nickname,
+        bio: this.userData.bio,
+        email: this.userData.email,
+        dateOfBirth: this.userData.dateOfBirth,
+        phoneNumber: this.userData.phoneNumber,
+        homeAddress: this.userData.homeAddress,
+        password: this.userData.newPassword
       };
     },
 
     /**
-     * Author: Eric Song
-     * Uses HTML constraint validation to set custom validity rules (so far, only checks that the 'password'
-     * and 'confirm password' fields match, and the date of birth is valid). See below for more info:
+     * Uses HTML constraint validation to set custom validity rules checks:
+     * that the 'password' and 'confirm password' fields match
+     * date of birth is valid
+     * old password present when trying to change new password or email (editing only)
+     * See below for more info:
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
 
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-      confirmPasswordInput.setCustomValidity(this.password !== this.confirmPassword ? "Passwords do not match." : "");
+      confirmPasswordInput.setCustomValidity(this.passwordMatchValidity());
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
+      if(this.isEditUser) {
+        const passwordInput =  document.getElementById('oldPassword');
+        passwordInput.setCustomValidity(this.passwordNewPasswordValidity());
+        passwordInput.setCustomValidity(this.passwordEmailValidity());
+      }
+
+
+
+
+    },
+
+    /**
+     * Called when user submits form, if editing calls edit function else register function
+     * */
+    submit(event) {
+      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
+      if(this.isEditUser) {
+        this.updateUser()
+      } else {
+        this.register()
+      }
+
+    },
+
+    /**
+     * function for api call for update user
+     * TO BE IMPLEMENTED
+     * */
+    async updateUser() {
+      console.log("Update User, TO BE IMPLEMENTED")
     },
 
     /**
@@ -218,11 +306,8 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    async register(event) {
-      event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-
+    async register() {
       let registerData = this.getRegisterData();
-
 
       await api
         .register(registerData)
@@ -246,17 +331,6 @@ export default {
     },
   },
   computed: {
-    passwordsMatch() {
-      return this.password === this.confirmPassword;
-    },
-    //if the confirm password can visible to be text else be password
-    confirmPasswordType() {
-      return this.visibleConfirmPassword ? "text" : "password";
-    },
-    //if the password can visible to be text else be password
-    passwordType() {
-      return this.visiblePassword ? "text" : "password";
-    },
     /**
      * Returns the HTML5 validity string based on the value of the birth date input. Birth dates must be at least
      * 13 years old and cannot be more tha 130 years old.
@@ -266,7 +340,7 @@ export default {
      * otherwise "You must be at least 13 years old" or "Please enter a valid birthdate"
      */
     dateOfBirthCustomValidity() {
-      const dateOfBirthJSDate = Date.parse(this.dateOfBirth);
+      const dateOfBirthJSDate = Date.parse(this.userData.dateOfBirth);
       if (isNaN(dateOfBirthJSDate)) {
         return "Please enter a valid birthdate";
       }
@@ -282,7 +356,11 @@ export default {
         return "You cannot be older than 120 years"
       }
       return "";
-    }
+    },
+
+
+
+
   }
 }
 </script>
