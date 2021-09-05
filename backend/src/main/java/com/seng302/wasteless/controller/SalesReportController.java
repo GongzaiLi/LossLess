@@ -79,10 +79,7 @@ public class SalesReportController {
         LocalDate lastPeriodEnd = endDate;
 
         if (period == null) {
-
             List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataNoPeriod(businessId, startDate, endDate);
-            logger.info(responseBody);
-
             return ResponseEntity.status(HttpStatus.OK).body(responseBody);
         }
 
@@ -115,7 +112,6 @@ public class SalesReportController {
 
         List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataWithPeriod(businessId, startDate,
                 endDate, firstPeriodStart, lastPeriodEnd, periodOfData);
-        logger.info(responseBody);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
