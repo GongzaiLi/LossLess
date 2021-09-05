@@ -63,7 +63,7 @@ public class NotificationService {
      * @param message String with the contents of the message of the notification. Can be null
      * @return Returns the created Notification object.
      */
-    public Notification createNotification(Integer userId, Integer subjectId, NotificationType type, String message) {
+    public static Notification createNotification(Integer userId, Integer subjectId, NotificationType type, String message) {
         Notification notification = new Notification();
         notification.setType(type);
         notification.setSubjectId(subjectId);

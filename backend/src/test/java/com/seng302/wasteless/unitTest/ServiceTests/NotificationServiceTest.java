@@ -26,7 +26,7 @@ class NotificationServiceTest {
     @Test
     void whenFindNotificationById_NotificationExists_ThenNotificationIsReturned() {
         Integer createdNotificationId = notificationService.saveNotification(
-                notificationService.createNotification(1, 1, NotificationType.LIKEDLISTING, ""))
+                NotificationService.createNotification(1, 1, NotificationType.LIKEDLISTING, ""))
                 .getId();
 
         assertNotNull(notificationService.findNotificationById(createdNotificationId));

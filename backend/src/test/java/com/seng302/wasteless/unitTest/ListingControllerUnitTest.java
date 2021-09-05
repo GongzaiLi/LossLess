@@ -1,14 +1,11 @@
 package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.ListingController;
-import com.seng302.wasteless.dto.GetPurchasedListingDto;
 import com.seng302.wasteless.dto.PostListingsDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.dto.mapper.PostListingsDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
-import org.aspectj.weaver.ast.Not;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -283,7 +280,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         new GetBusinessesDtoMapper(businessService, userService);
 
         Mockito
-                .when(notificationService.createNotification(any(),any(),any(),any()))
+                .when(NotificationService.createNotification(any(),any(),any(),any()))
                 .thenCallRealMethod();
         Mockito
                 .when(notificationService.findAllNotificationsByUserId(anyInt()))
@@ -574,7 +571,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .when(listingsService.purchase(any(), any()))
                 .thenReturn(new PurchasedListing(listing, user));
         Mockito
-                .when(notificationService.createNotification(any(), any(), any(), any()))
+                .when(NotificationService.createNotification(any(), any(), any(), any()))
                 .thenReturn(new Notification());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
