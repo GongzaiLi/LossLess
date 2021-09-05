@@ -280,9 +280,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         new GetBusinessesDtoMapper(businessService, userService);
 
         Mockito
-                .when(NotificationService.createNotification(any(),any(),any(),any()))
-                .thenCallRealMethod();
-        Mockito
                 .when(notificationService.findAllUnArchivedNotificationsByUserId(anyInt()))
                 .thenReturn(notificationList);
         Mockito
@@ -570,9 +567,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         Mockito
                 .when(listingsService.purchase(any(), any()))
                 .thenReturn(new PurchasedListing(listing, user));
-        Mockito
-                .when(NotificationService.createNotification(any(), any(), any(), any()))
-                .thenReturn(new Notification());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/listings/1/purchase")
                 .contentType(APPLICATION_JSON))
