@@ -140,7 +140,7 @@ export default {
         dateRange[0].setHours(0, 0, 0, 0);
         dateRange[1].setHours(23, 59, 59, 999);
       }
-
+      this.$emit('input', dateRange);
       if (dateRange!= null) {
         this.getSalesReport(dateRange);
       }

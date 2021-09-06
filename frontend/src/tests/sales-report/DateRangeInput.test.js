@@ -1,5 +1,5 @@
-import { mount, createLocalVue } from '@vue/test-utils';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
+import {mount, createLocalVue} from '@vue/test-utils';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import DateRangeInput from '../../components/sales-report/DateRangeInput';
 
 let wrapper;
@@ -24,13 +24,14 @@ beforeEach(() => {
     stubs: {},
     methods: {},
   });
+  wrapper.setProps({getSalesReport: jest.fn()});
 });
 
 afterEach(() => {
   wrapper.destroy();
 });
 
-const getLastEmitted = function() {
+const getLastEmitted = function () {
   return wrapper.emitted().input[wrapper.emitted().input.length - 1][0];
 }
 
