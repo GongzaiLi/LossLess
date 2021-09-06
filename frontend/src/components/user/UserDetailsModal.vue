@@ -15,7 +15,9 @@ Date: 3/3/2021
       >
         <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
              alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
-        <b-img v-else :src="require('../../../public/profile-default.jpg')" class="mx-auto" fluid block rounded="circle"
+        <b-img v-else :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+               class="mx-auto"
+               fluid block rounded="circle"
                alt="default image" style="height: 12rem; width: 12rem; display: inline-block" />
         <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
                accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
@@ -41,7 +43,7 @@ Date: 3/3/2021
         <b-form-group
         >
           <strong>Nickname</strong>
-          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nick Name"></b-form-input>
+          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nickname"></b-form-input>
         </b-form-group>
 
         <b-form-group
@@ -57,7 +59,7 @@ Date: 3/3/2021
         </b-form-group>
 
         <b-form-group v-if="isEditUser">
-          <strong>Old Password *</strong>
+          <strong>Old Password</strong>
           <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser" place-holder="Old Password"/>
         </b-form-group>
 
@@ -97,7 +99,6 @@ Date: 3/3/2021
                         placeholder="Phone Number"
                         autocomplete="off"
                         size=30;
-                        type="number"
           />
         </b-form-group>
         <b-row>
@@ -126,9 +127,6 @@ Date: 3/3/2021
   </div>
 </template>
 
-
-<style>
-</style>
 
 <script>
 import api from "../../Api";
@@ -178,20 +176,26 @@ export default {
         confirmPassword: "",
       },
       email: '',
+      country: '',
       uploaded: false,
       errors: [],
-      imageURL: ''
+      imageURL: '',
+      imageFile: '',
     }
   },
 
   beforeMount() {
+    //if in edit mode set password fields to empty
+    //set email and country to compare if the user has altered the values
     if (this.isEditUser) {
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
       this.userData.oldPassword = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
+      this.email = this.userData.email;
+      this.country = this.userData.homeAddress.country;
     }
-    this.email = this.userData.email;
+    this.$log.debug(this.userData);
   },
 
   methods: {
@@ -201,7 +205,7 @@ export default {
      * that can be used as the value for a custom validity on the old password field else return empty string
      * */
     passwordEmailValidity() {
-      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change email" : ""
+      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change Email" : ""
     },
 
     /**
@@ -220,14 +224,13 @@ export default {
       return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
     },
 
-
-
     /**
      * when user uploads image display the image as a preview
      * @param event object for image uploaded
      **/
     openImage(event) {
       if (event.target.files[0]) {
+        this.imageFile = event.target.files[0];
         this.imageURL = window.URL.createObjectURL(event.target.files[0]);
         event.target.value = '';
         this.uploaded = true;
@@ -236,6 +239,7 @@ export default {
     },
 
     /**
+     * Gets the data from the HTML elements that is to be used for registering a user
      **/
     getRegisterData() {
       return {
@@ -253,6 +257,28 @@ export default {
     },
 
     /**
+     * Gets the data from the HTML elements that is to be used for editing a user
+     **/
+    getEditData() {
+      let editData = {
+        firstName: this.userData.firstName,
+        lastName: this.userData.lastName,
+        middleName: this.userData.middleName,
+        nickname: this.userData.nickname,
+        bio: this.userData.bio,
+        email: this.userData.email,
+        dateOfBirth: this.userData.dateOfBirth,
+        phoneNumber: this.userData.phoneNumber,
+        homeAddress: this.userData.homeAddress,
+      }
+      if (this.userData.newPassword !== "") {
+        editData.newPassword = this.userData.newPassword
+        editData.password = this.userData.oldPassword
+      }
+      return editData;
+    },
+
+    /**
      * Uses HTML constraint validation to set custom validity rules checks:
      * that the 'password' and 'confirm password' fields match
      * date of birth is valid
@@ -261,7 +287,6 @@ export default {
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
-
       const confirmPasswordInput = document.getElementById('confirmPasswordInput');
       confirmPasswordInput.setCustomValidity(this.passwordMatchValidity());
 
@@ -269,34 +294,94 @@ export default {
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
       if(this.isEditUser) {
         const passwordInput =  document.getElementById('oldPassword');
-        passwordInput.setCustomValidity(this.passwordNewPasswordValidity());
-        passwordInput.setCustomValidity(this.passwordEmailValidity());
+        passwordInput.setCustomValidity([this.passwordEmailValidity(), this.passwordNewPasswordValidity()].filter(x => typeof x === 'string' && x.length > 0).join(", "));
       }
-
-
-
-
     },
 
     /**
      * Called when user submits form, if editing calls edit function else register function
+     * if the user has changed their country and that causes a new currency the open the currency change confirm modal
      * */
-    submit(event) {
+    async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
       if(this.isEditUser) {
-        this.updateUser()
+        if (this.country !== this.userData.homeAddress.country) {
+          let oldCurrency = await api.getUserCurrency(this.country);
+          let newCurrency = await api.getUserCurrency(this.userData.homeAddress.country);
+          if (oldCurrency.code !== newCurrency.code) {
+            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
+                " This will not affect the currency of products in your administered business unless you " +
+                "also modify the address of the business."
+            )) {
+              await this.updateUser();
+            }
+          }
+        } else {
+          await this.updateUser();
+        }
       } else {
-        this.register()
+        await this.register()
       }
-
     },
 
     /**
-     * function for api call for update user
-     * TO BE IMPLEMENTED
-     * */
+     * This sends an api request to post an image.
+     * If successful, it emits an event called updatedUser.
+     * Else, it pushes error messages to the errors field.
+     * @param id Id of user who wants an image to be uploaded.
+     */
+    uploadImageRequest(id) {
+      api.uploadProfileImage(id, this.imageFile).then(() => {
+        this.$emit("updatedUser");
+      })
+      .catch((error) => {
+        this.errors = [];
+        this.$log.debug(error);
+        if (error.response) {
+          if (error.response.status === 413) {
+            this.errors.push("The image you tried to upload is too large. Images must be less than 1MB in size.");
+            return
+          }
+          this.errors.push(`Uploading images failed: ${error.response.data.message}`);
+        } else {
+          this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+        }
+    })
+  },
+
+    /**
+     * Uses Api.js to send a put request to user profile.
+     * This is used to modify the user's details.
+     * If successful, it emits an event called updatedUser.
+     * Else, it pushes error messages to the errors field.
+     */
     async updateUser() {
-      console.log("Update User, TO BE IMPLEMENTED")
+      let editData = this.getEditData();
+      await api
+        .modifyUser(editData)
+          .then(() => {
+            if (this.imageURL) {
+              this.uploadImageRequest(this.userData.id)
+            } else {
+              this.$emit("updatedUser");
+            }
+        })
+        .catch((error) => {
+          this.errors = [];
+          this.$log.debug(error);
+          if (error.response) {
+            this.errors.push(`Updating user failed: ${error.response.data.message}`);
+          } else {
+            this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+          }
+        });
+    },
+
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
     },
 
     /**
@@ -308,11 +393,21 @@ export default {
      */
     async register() {
       let registerData = this.getRegisterData();
+      this.errors = [];
+
+      // Different form of error checking as upload attempt on images need user id, hence it isn't possible until log in
+      if (this.imageURL && this.imageFile.size > 1000 * 1000) {
+        this.errors.push(`The image you tried to upload is too large. Images must be less than 1MB in size.`);
+        return
+      }
 
       await api
         .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");
+          if (this.imageURL) {
+            this.uploadImageRequest(loginResponse.data.id);
+          }
           return api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {
@@ -320,7 +415,6 @@ export default {
           this.$router.push({path: `/homePage`});
         })
         .catch((error) => {
-          this.errors = [];
           this.$log.debug(error);
           if (error.response) {
             this.errors.push(`Registration failed: ${error.response.data.message}`);
@@ -330,6 +424,7 @@ export default {
         });
     },
   },
+
   computed: {
     /**
      * Returns the HTML5 validity string based on the value of the birth date input. Birth dates must be at least
@@ -357,9 +452,6 @@ export default {
       }
       return "";
     },
-
-
-
 
   }
 }
