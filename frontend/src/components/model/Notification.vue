@@ -1,6 +1,16 @@
 <template>
   <div>
-  <b-row>
+    <div v-if="!updatedNotification.read">
+      <b-row >
+        <b-col>
+         <span class="unreadLabel">
+         <b-icon-star-fill> </b-icon-star-fill> New Notification</span>
+        </b-col>
+      </b-row>
+      <hr class="unreadHr">
+    </div>
+
+    <b-row>
     <b-col cols="1">
       <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
       <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
@@ -17,17 +27,16 @@
   </b-row>
   <hr class="mt-1 mb-2">
   <span>{{ updatedNotification.message }}</span>
-  <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
-    <div v-if="updatedNotification.read">
-      <hr class="readHr">
-      <span class="readLabel">
-      <b-icon-check2-all> </b-icon-check2-all> Read </span>
-    </div>
-    <div v-else>
-      <hr class="unreadHr">
-      <span class="unreadLabel">
-         <b-icon-eye-slash> </b-icon-eye-slash>  Unread </span>
-    </div>
+
+    <b-row>
+      <b-col cols="11">
+        <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
+      </b-col>
+      <b-col v-if="updatedNotification.read"  cols="1">
+        <span class="readLabel">
+         <b-icon-check2-all> </b-icon-check2-all> </span>
+      </b-col>
+    </b-row>
 
   </div>
 </template>
@@ -35,27 +44,22 @@
 
 <style>
 
-hr.readHr {
-  margin-top: 0;
-  margin-bottom: 0;
-  border-top: 1px solid green;
+.readLabel {
+  float: right;
+  color: green;
+
 }
 
 hr.unreadHr {
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-top: 0.3rem;
+  margin-bottom: 0.5rem;
   border-top: 1px solid orangered;
 }
 
-span.readLabel {
-  float: right; color: green;
-}
-
 span.unreadLabel {
-  float: right; color: orangered;
+  float: left;
+  color: orangered;
 }
-
-
 
 </style>
 
@@ -67,7 +71,7 @@ export default {
   props: ['notification'],
   data() {
     return {
-      updatedNotification: {message:"", type:""},
+      updatedNotification: {message:"", type:"", read: false},
     }
   },
 
