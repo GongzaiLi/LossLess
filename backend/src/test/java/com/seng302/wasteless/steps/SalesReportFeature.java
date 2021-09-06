@@ -62,7 +62,7 @@ public class SalesReportFeature {
     private PurchasedListingRepository purchasedListingRepository;
 
     private ResultActions responseResult;
-    private static final List<List<String>> createdPurchases = new ArrayList<>();
+    private static Boolean initilised = Boolean.FALSE;
     private static Product productToPurchase = new Product();
 
     /**
@@ -80,18 +80,21 @@ public class SalesReportFeature {
 
     @And("the following purchases have been made:")
     public void theFollowingPurchasesHaveBeenMade(List<List<String>> purchases) {
-        for (var purchaseInfo : purchases) {
-            PurchasedListing purchaseRecord = new PurchasedListing();
-            purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
-            purchaseRecord.setPurchaser(userService.findUserById(Integer.parseInt(purchaseInfo.get(1))));
-            purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
-            purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
-            purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
-            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
-            purchaseRecord.setProduct(productToPurchase);
-            purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
-            purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
-            purchasedListingRepository.save(purchaseRecord);
+        if (!initilised) {
+            for (var purchaseInfo : purchases) {
+                PurchasedListing purchaseRecord = new PurchasedListing();
+                purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
+                purchaseRecord.setPurchaser(userService.findUserById(Integer.parseInt(purchaseInfo.get(1))));
+                purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
+                purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
+                purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
+                purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
+                purchaseRecord.setProduct(productToPurchase);
+                purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
+                purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
+                purchasedListingRepository.save(purchaseRecord);
+            }
+            initilised = Boolean.TRUE;
         }
     }
 
@@ -135,9 +138,11 @@ public class SalesReportFeature {
 
     @And("The following product {string} exists")
     public void theFollowingProductExists(String product) {
-        Product newProduct = new Product();
-        newProduct.setName(product);
-        productToPurchase=productService.createProduct(newProduct);
+        if (productToPurchase.getName()!=product) {
+            Product newProduct = new Product();
+            newProduct.setName(product);
+            productToPurchase = productService.createProduct(newProduct);
+        }
 }
     @Given("We are logged in as the individual user with email  {string}")
     public void weAreLoggedInAsTheIndividualUserWithEmail(String email) {
