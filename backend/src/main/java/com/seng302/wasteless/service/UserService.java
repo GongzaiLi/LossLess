@@ -275,6 +275,7 @@ public class UserService {
         user.setMiddleName(modifiedUser.getMiddleName());
         user.setNickname(modifiedUser.getNickname());
         user.setBio(modifiedUser.getBio());
+        user.setPhoneNumber(modifiedUser.getPhoneNumber());
         updateUser(user);
     }
 

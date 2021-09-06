@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '../components/user/Login.vue'
-import Register from '../components/user/Register.vue'
+import UserDetailsModal from '../components/user/UserDetailsModal.vue'
 import UserProfile from '../components/user/UserProfile'
 import SearchPage from "../components/search/SearchPage";
 import BusinessProfile from "@/components/business/BusinessProfile";
@@ -29,7 +29,7 @@ const router = new Router({
     routes: [
         { path: '/', redirect: '/login' },
         { path: '/login', name: 'login', component: Login },
-        { path: '/register', name: 'register', component: Register },
+        { path: '/register', name: 'register', component: UserDetailsModal },
         { path: '/search', name: 'search', component: SearchPage},
         { path: '/users/:id', name: 'user-profile', component: UserProfile},
         { path: '/homePage', name: 'home-page', component: HomePage},
