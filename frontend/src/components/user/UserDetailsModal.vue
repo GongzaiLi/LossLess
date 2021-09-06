@@ -43,7 +43,7 @@ Date: 3/3/2021
         <b-form-group
         >
           <strong>Nickname</strong>
-          <b-form-input v-model="userData.nickName" maxLength=50 placeholder="Nick Name"></b-form-input>
+          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nickname"></b-form-input>
         </b-form-group>
 
         <b-form-group
@@ -204,7 +204,7 @@ export default {
      * that can be used as the value for a custom validity on the old password field else return empty string
      * */
     passwordEmailValidity() {
-      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change email" : ""
+      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change Email" : ""
     },
 
     /**
@@ -293,8 +293,7 @@ export default {
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
       if(this.isEditUser) {
         const passwordInput =  document.getElementById('oldPassword');
-        passwordInput.setCustomValidity(this.passwordNewPasswordValidity());
-        passwordInput.setCustomValidity(this.passwordEmailValidity());
+        passwordInput.setCustomValidity([this.passwordEmailValidity(), this.passwordNewPasswordValidity()].filter(x => typeof x === 'string' && x.length > 0).join(", "));
       }
     },
 
@@ -311,10 +310,35 @@ export default {
     },
 
     /**
+     * This sends an api request to post an image.
+     * If successful, it emits an event called updatedUser.
+     * Else, it pushes error messages to the errors field.
+     * @param id Id of user who wants an image to be uploaded.
+     */
+    uploadImageRequest(id) {
+      api.uploadProfileImage(id, this.imageFile).then(() => {
+        this.$emit("updatedUser");
+      })
+      .catch((error) => {
+        this.errors = [];
+        this.$log.debug(error);
+        if (error.response) {
+          if (error.response.status === 413) {
+            this.errors.push("The image you tried to upload is too large. Images must be less than 1MB in size.");
+            return
+          }
+          this.errors.push(`Uploading images failed: ${error.response.data.message}`);
+        } else {
+          this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+        }
+    })
+  },
+
+    /**
      * Uses Api.js to send a put request to user profile.
      * This is used to modify the user's details.
-     * This also sends an api request to post an image if the user has an image that they
-     * want to upload
+     * If successful, it emits an event called updatedUser.
+     * Else, it pushes error messages to the errors field.
      */
     async updateUser() {
       let editData = this.getEditData();
@@ -322,9 +346,10 @@ export default {
         .modifyUser(editData)
           .then(() => {
             if (this.imageURL) {
-              api.uploadProfileImage(this.userData.id, this.imageFile)
+              this.uploadImageRequest(this.userData.id)
+            } else {
+              this.$emit("updatedUser");
             }
-            this.$emit("updatedUser")
         })
         .catch((error) => {
           this.errors = [];
@@ -353,13 +378,20 @@ export default {
      */
     async register() {
       let registerData = this.getRegisterData();
+      this.errors = [];
+
+      // Different form of error checking as upload attempt on images need user id, hence it isn't possible until log in
+      if (this.imageURL && this.imageFile.size > 1000 * 1000) {
+        this.errors.push(`The image you tried to upload is too large. Images must be less than 1MB in size.`);
+        return
+      }
 
       await api
         .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");
           if (this.imageURL) {
-            api.uploadProfileImage(loginResponse.data.id, this.imageFile)
+            this.uploadImageRequest(loginResponse.data.id);
           }
           return api.getUser(loginResponse.data.id);
         })
@@ -368,7 +400,6 @@ export default {
           this.$router.push({path: `/homePage`});
         })
         .catch((error) => {
-          this.errors = [];
           this.$log.debug(error);
           if (error.response) {
             this.errors.push(`Registration failed: ${error.response.data.message}`);

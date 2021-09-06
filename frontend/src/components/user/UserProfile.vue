@@ -153,7 +153,7 @@ Date: 5/3/2021
 
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
 
-      <Register :is-edit-user="true" :user-details="userData" v-on:updatedUser="updatedUserHandler"/>
+      <UserDetailsModal :is-edit-user="true" :user-details="userData" v-on:updatedUser="updatedUserHandler"/>
     </b-modal>
   </div>
 </template>
@@ -173,11 +173,11 @@ h6 {
 <script>
 import api from "../../Api";
 import memberSince from "../model/MemberSince";
-import Register from "./Register";
+import UserDetailsModal from "./UserDetailsModal";
 
 export default {
   components: {
-    Register,
+    UserDetailsModal,
     memberSince
   },
 
