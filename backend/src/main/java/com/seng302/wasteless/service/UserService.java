@@ -261,6 +261,7 @@ public class UserService {
         user.setEmail(modifiedUser.getEmail());
         user.setDateOfBirth(modifiedUser.getDateOfBirth());
         user.setHomeAddress(modifiedUser.getHomeAddress());
+        user.setPhoneNumber(modifiedUser.getPhoneNumber());
         updateUser(user);
     }
 
