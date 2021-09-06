@@ -266,6 +266,6 @@ public class CardExpiryFeature {
 
     @Then("I am notified")
     public void iAmNotified() {
-        Assertions.assertEquals(1,notificationService.findAllNotificationsByUserId(user.getId()).size());
+        Assertions.assertEquals(1,notificationService.findAllUnArchivedNotificationsByUserId(user.getId()).size());
     }
 }
