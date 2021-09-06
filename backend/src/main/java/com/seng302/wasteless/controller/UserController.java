@@ -7,10 +7,7 @@ import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
-import com.seng302.wasteless.model.NotificationType;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.model.UserSearchSortTypes;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
@@ -374,7 +371,7 @@ public class UserController {
         }
 
         if (!currentUser.getHomeAddress().equals(modifiedUser.getHomeAddress())) {
-            logger.debug("Creating new Address Entity for user with ID", currentUser.getId());
+            logger.debug("Creating new Address Entity for user with ID: {}", currentUser.getId());
             addressService.createAddress(modifiedUser.getHomeAddress());
         }
 
@@ -434,10 +431,11 @@ public class UserController {
         }
 
         if (userCountryChanged) {
-            notificationService.createNotification(currentUser.getId(), null, NotificationType.CURRENCY_CHANGE,
+            Notification notification = notificationService.createNotification(currentUser.getId(), null, NotificationType.CURRENCY_CHANGE,
                     "You have changed country and therefore your currency may have changed. " +
                             "This will not affect the currency of products in your administered business unless you " +
                             "also modify the address of the business.");
+            notificationService.saveNotification(notification);
         }
 
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -34,7 +34,7 @@ Feature: Modify User
       When The User modifies his profile with the lastname: ""
       Then The User who is modifying will receive an error
 
-    Scenario: AC3: A user tries to modify but is missing a home address
-      When The User modifies his profile with the home address: ""
-      Then The User who is modifying will receive an error
+    Scenario: AC4: A user changes their country and gets a notification
+      When The User modifies his profile with the country: "New Zealand"
+      Then The User who is modifying will have a notification saved
 
