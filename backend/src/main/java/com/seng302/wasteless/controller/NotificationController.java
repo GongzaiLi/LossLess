@@ -11,10 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * NotificationController is used for mapping all Restful API requests starting with the address "/users/notifications".
+  */
+@RestController
 public class NotificationController {
 
-    private static final Logger logger = LogManager.getLogger(UserController.class.getName());
+    private static final Logger logger = LogManager.getLogger(NotificationController.class.getName());
 
     private final UserService userService;
     private final NotificationService notificationService;
@@ -29,7 +34,7 @@ public class NotificationController {
     /**
      * Endpoint to DELETE a notification of the logged-in user.
      *
-     * @return  200 OK if successful request or 406 if notification does nt belong to current user or
+     * @return  200 OK if successful request or 403 if notification does not belong to current user or
      * user not global admin.
      */
     @DeleteMapping("/users/notifications/{id}")
@@ -49,5 +54,4 @@ public class NotificationController {
         notificationService.deleteNotification(notification);
         return ResponseEntity.status(HttpStatus.OK).body("Notification deleted successfully");
     }
-
 }

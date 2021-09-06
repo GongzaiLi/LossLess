@@ -581,4 +581,15 @@ class UserControllerUnitTest {
         }
     }
 
+    @Test
+    void whenDeleteRequestForNotification_AndUserIsSelf_AndNotificationExists_thenOkResponse() throws Exception {
+        User currentUser = userService.findUserById(1);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
+                .with(user(new CustomUserDetails(currentUser)))
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].message", is("Your card has expired")));
+    }
+
 }
