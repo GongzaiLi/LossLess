@@ -112,6 +112,7 @@ export default {
       })
   },
   likeListing: (listingId) => instance.put(`/listings/${listingId}/like`, {}, {withCredentials: true}),
+  modifyUser: (editUserData) => instance.put(`/users`, editUserData, {withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
@@ -125,6 +126,19 @@ export default {
     let formData = new FormData();
     formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
     return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
+  },
+
+  /**
+   * Uploads one image file to a user's Profile. Will send a POST request to the user image
+   * endpoint. Each image is sent as multipart/form-data with the param name "file".
+   * @param userId Id of the user
+   * @param imageFile Image file object to be uploaded.
+   */
+  uploadProfileImage: (userId, imageFile) => {
+    // See https://github.com/axios/axios/issues/710 for how this works
+    let formData = new FormData();
+    formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+    return instance.post(`/users/${userId}/image`, formData, {withCredentials: true});
   },
 
   /**

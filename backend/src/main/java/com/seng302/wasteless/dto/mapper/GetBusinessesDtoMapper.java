@@ -62,7 +62,7 @@ public class GetBusinessesDtoMapper {
                                 .setFirstName(businessAdministrator.getFirstName())
                                 .setLastName(businessAdministrator.getLastName())
                                 .setMiddleName(businessAdministrator.getMiddleName())
-                                .setNickName(businessAdministrator.getNickname())
+                                .setNickname(businessAdministrator.getNickname())
                                 .setBio(businessAdministrator.getBio())
                                 .setEmail(businessAdministrator.getEmail())
                                 .setDateOfBirth(businessAdministrator.getDateOfBirth().toString())

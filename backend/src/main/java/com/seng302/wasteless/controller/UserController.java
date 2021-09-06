@@ -3,10 +3,13 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetUserDto;
 import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.UserSearchSortTypes;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
@@ -32,7 +35,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * UserController is used for mapping all Restful API requests starting with the address "/users".
@@ -88,52 +92,33 @@ public class UserController {
             logger.warn("Attempted to create user with invalid email, dropping request: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
         }
-        logger.info("Email validated for user: {}", user);
 
         if (!user.checkDateOfBirthValid()) {
             logger.warn("Invalid date for user: {}", user);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
         }
-        logger.debug("Validated date for user: {}", user);
 
-
-        logger.debug("Setting created date");
         user.setCreated(LocalDate.now());
-        logger.debug("Setting created date");
         user.setRole(UserRoles.USER);
 
-        logger.debug("Logging in user: {}", user);
         String tempEmail = user.getEmail();
         String tempPassword = user.getPassword();
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(UserRoles.USER);
 
-
-        //Save user object in h2 database
-        logger.debug("Creating Address Entity for user: {}", user);
         addressService.createAddress(user.getHomeAddress());
-        logger.debug("Creating user: {}", user);
         userService.createUser(user);
-
-        logger.info("Successfully registered user: {}", user.getId());
-
-        logger.debug("Authenticating user: {}", user.getId());
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                 tempEmail, tempPassword);
         Authentication auth = authenticationManager.authenticate(token);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        logger.info("Saved and authenticated new user {}", user);
-
         JSONObject responseBody = new JSONObject();
         responseBody.put("id", user.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-
-
-
     }
 
 
@@ -191,8 +176,6 @@ public class UserController {
         UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset, sortType, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
-
-
     }
 
 
@@ -281,39 +264,21 @@ public class UserController {
      */
     @PutMapping("/users/{id}/makeAdmin")
     public ResponseEntity<Object> makeAdmin(@PathVariable("id") Integer userId) {
-
-        logger.debug("Request to make user: {} an application admin", userId);
-
-        logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
          if (!loggedInUser.checkUserDefaultAdmin()) {
-
-            logger.warn("User {} who is not default admin tried to make another user admin", loggedInUser.getId());
-             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
-
+            logger.warn("User {} who is not default admin tried to make another user {} admin", loggedInUser.getId(), userId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to make others admin");
         } else if (possibleUser.checkUserDefaultAdmin()) {
-
             logger.warn("User {} tried to make User {} (who is default application admin) admin.", loggedInUser.getId(), possibleUser.getId());
-             throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
-
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Cannot change role of default application admin");
         }
 
-        logger.info("User: {} found using Id : {}", possibleUser, userId);
-
-        logger.debug("Setting role to admin for user: {}", possibleUser.getId());
-
         possibleUser.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
-
-        logger.debug("Updating user: {} ith new role", possibleUser.getId());
-
         userService.updateUser(possibleUser);
 
-        logger.info("User: {} successfully made application administrator.", possibleUser.getId());
-
         return ResponseEntity.status(HttpStatus.OK).build();
-
     }
 
     /**
@@ -327,41 +292,22 @@ public class UserController {
      */
     @PutMapping("/users/{id}/revokeAdmin")
     public ResponseEntity<Object> revokeAdmin(@PathVariable("id") Integer userId) {
-
-        logger.debug("Request to revoke admin status for  user: {}", userId);
-
-        logger.debug("Trying to find user with ID: {}", userId);
         User possibleUser = userService.findUserById(userId);
-        logger.info("User: {} found using Id : {}", possibleUser, userId);
-
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
         if (!loggedInUser.checkUserDefaultAdmin()) {
-
             logger.warn("User {} who is not the default admin tried to revoke another user admin", loggedInUser.getId());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be default admin to revoke others admin");
-
         } else if (possibleUser.checkUserDefaultAdmin()) {
-
             logger.warn("User {} tried to revoke their own admin rights.", loggedInUser.getId());
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot revoke your own admin rights");
-
         }
 
-        logger.debug("User: {} found using Id : {}", possibleUser, userId);
-
-        logger.debug("Revoking admin status for user: {} ", possibleUser.getId());
         possibleUser.setRole(UserRoles.USER);
-        logger.debug("Updating user: {} ith new role", possibleUser.getId());
         userService.updateUser(possibleUser);
-        logger.info("Successfully revoked admin rights for user: {}", possibleUser.getId());
 
         return ResponseEntity.status(HttpStatus.OK).build();
-
-
     }
-
-
 
     /**
      * Takes an inputed username and password and checks the credentials against the database of saved users.
@@ -373,19 +319,12 @@ public class UserController {
     @PostMapping(value = "/login")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> verifyLogin(@Validated @RequestBody LoginDto login) {
-
-        logger.debug("Request to authenticate user login for user with data: {}" , login);
-
-
         User savedUser = userService.findUserByEmail(login.getEmail());
         if (savedUser == null) {
             logger.warn("Attempted to login to account that does not exist, dropping request: {}", login.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have tried to log into an account with an email " +
                     "that is not registered.");
         } else {
-            logger.debug("User: {} found using data : {}", savedUser, login);
-            logger.debug("Authenticating user: {} with {}", savedUser, login);
-
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
                     login.getEmail(), login.getPassword());
             try {
@@ -394,20 +333,104 @@ public class UserController {
 
                 JSONObject responseBody = new JSONObject();
                 responseBody.put("userId", savedUser.getId());
-                logger.debug("Getting user ID for user: {}", savedUser);
-
-
-                logger.info("Successfully logged into user: {} with {}", savedUser, login);
 
                 return ResponseEntity.status(HttpStatus.OK).body(responseBody);
-
             } catch (AuthenticationException e) {
                 logger.warn("Login unsuccessful. {}", e.getMessage());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect email or password");
             }
+        }
+    }
 
 
+    /**
+     * Handle put request to /users endpoint
+     *
+     * If changing password checks if the old password matches current password
+     * Validates inputted data using same validation as registration.
+     *
+     * Keeps user logged in if changing username or password
+     *
+     * Returns 200 on success
+     * Returns 400 if password is incorrect, email is invalid or any invalid inputs e.g. date, address etc.
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 409 if email already exist
+     *
+     * @param modifiedUser Dto containing information needed to update a user
+     * @return  Response code with message, see above for codes
+     */
+    @PutMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser) {
+        User currentUser = userService.getCurrentlyLoggedInUser();
+
+        if (!currentUser.getDateOfBirth().equals(modifiedUser.getDateOfBirth())) {
+            currentUser.setDateOfBirth(modifiedUser.getDateOfBirth());
+            if (!currentUser.checkDateOfBirthValid()) {
+                logger.warn("Invalid date for user: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date out of expected range");
+            }
         }
 
+        if (!currentUser.getHomeAddress().equals(modifiedUser.getHomeAddress())) {
+            logger.debug("Creating new Address Entity for user with ID", currentUser.getId());
+            addressService.createAddress(modifiedUser.getHomeAddress());
+        }
+
+        boolean userPasswordChange = modifiedUser.getNewPassword() != null;
+        boolean userEmailChange = !modifiedUser.getEmail().equals(currentUser.getEmail());
+        boolean userSuppliedOldPassword = modifiedUser.getPassword() != null;
+
+        //If user changing email or password, re-authenticate them
+        if (userEmailChange || userPasswordChange) {
+            if (!userSuppliedOldPassword) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password required when updating email or password");
+            }
+            if (!passwordEncoder.matches(modifiedUser.getPassword(), currentUser.getPassword())) {
+                logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
+
+            if (modifiedUser.getNewPassword() != null && !modifiedUser.getNewPassword().isEmpty()) {
+                currentUser.setPassword(passwordEncoder.encode(modifiedUser.getNewPassword()));
+            }
+
+            if (!modifiedUser.getEmail().equals(currentUser.getEmail())) {
+                if (userService.checkEmailAlreadyUsed(modifiedUser.getEmail())) {
+                    logger.warn("Attempted to update user with already used email, dropping request: {}", modifiedUser);
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email");
+                }
+
+                if (!userService.checkEmailValid(modifiedUser.getEmail())) {
+                    logger.warn("Attempted to update user with invalid email, dropping request: {}", modifiedUser);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email address is invalid");
+                }
+                logger.info("New email validated for user with ID {}", currentUser.getId());
+            }
+        }
+
+        logger.debug("Updating user: {}", modifiedUser.getEmail());
+        userService.updateUserDetails(currentUser, modifiedUser);
+
+        //If user email or password changed, re-authenticate them
+        if (userEmailChange || userPasswordChange) {
+            if (modifiedUser.getNewPassword() != null) { //User has new password
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        modifiedUser.getEmail(), modifiedUser.getNewPassword());
+
+                Authentication auth = authenticationManager.authenticate(token);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else { //No new password, use old password
+                UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                        modifiedUser.getEmail(), modifiedUser.getPassword());
+
+                Authentication auth = authenticationManager.authenticate(token);
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

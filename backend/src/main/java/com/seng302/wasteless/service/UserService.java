@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
@@ -27,10 +28,12 @@ public class UserService {
     private static final Logger logger = LogManager.getLogger(UserService.class.getName());
 
     private UserRepository userRepository;
+    private ImageService imageService;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ImageService imageService) {
         this.userRepository = userRepository;
+        this.imageService = imageService;
     }
 
     /**
@@ -213,6 +216,53 @@ public class UserService {
      */
     public void unlikePurchasedListing(Listing listing) {
         userRepository.unlikePurchasedListingAllUsers(listing.getId());
+    }
+
+    /**
+     * Add image to a user
+     * Calling the method in this way allows for mocking during automated testing
+     * @param user User that image is to be added to
+     * @param image image that is to be added to user
+     */
+    public void addImageToUser(User user, Image image) {
+        user.setProfileImage(image);
+    }
+
+    /**
+     * Delete profile image of a user, leaving it null.
+     * The actual image file will also get deleted from the filesystem.
+     * Make sure that the user must have a profile image, otherwise this method will crash.
+     * @param user User for whom image is to be deleted
+     */
+    public void deleteUserImage(User user) {
+        Image oldUserImage = user.getProfileImage();
+
+        // Have to do this before deleting image otherwise we violate a foreign key constraint
+        user.setProfileImage(null);
+        saveUserChanges(user);
+
+        imageService.deleteImageRecordFromDB(oldUserImage);
+        imageService.deleteImageFile(oldUserImage);
+    }
+
+    /**
+     * Sets the user details to the modified user details
+     * and updates the database
+     *
+     * @param user User to be updated
+     * @param modifiedUser Dto containing information needed to update a user
+     */
+    public void updateUserDetails(User user, PutUserDto modifiedUser) {
+        user.setFirstName(modifiedUser.getFirstName());
+        user.setLastName(modifiedUser.getLastName());
+        user.setMiddleName(modifiedUser.getMiddleName());
+        user.setNickname(modifiedUser.getNickname());
+        user.setBio(modifiedUser.getBio());
+        user.setEmail(modifiedUser.getEmail());
+        user.setDateOfBirth(modifiedUser.getDateOfBirth());
+        user.setHomeAddress(modifiedUser.getHomeAddress());
+        user.setPhoneNumber(modifiedUser.getPhoneNumber());
+        updateUser(user);
     }
 
 }

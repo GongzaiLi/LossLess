@@ -25,14 +25,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.IMAGE_PNG;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -347,10 +344,10 @@ public class ProductImagesFeature {
     public void delete_all_images_in_the_product_with_id(String productId) throws Exception {
         Assertions.assertEquals(productId, product.getId());
 
-        Set<ProductImage> productImages = product.getImages();
+        Set<Image> images = product.getImages();
 
-        while (productImages.size() > 0) {
-            Integer id = productImages.stream().findFirst().get().getId();
+        while (images.size() > 0) {
+            Integer id = images.stream().findFirst().get().getId();
             Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(id)));
             mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/businesses/%d/products/%s/images/%d", business.getId(), productId, id))
                     .contentType(APPLICATION_JSON)
@@ -359,7 +356,7 @@ public class ProductImagesFeature {
                     .andExpect(status().isOk());
             product = productService.findProductById(productId);
             Assertions.assertTrue(product.getImages().stream().noneMatch(image -> image.getId().equals(id)));
-            productImages = product.getImages();
+            images = product.getImages();
         }
 
 

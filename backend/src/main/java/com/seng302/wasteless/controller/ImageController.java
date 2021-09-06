@@ -1,28 +1,27 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Image;
 import com.seng302.wasteless.model.Product;
-import com.seng302.wasteless.model.ProductImage;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.ProductImageService;
+import com.seng302.wasteless.service.ImageService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-
-import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,17 +36,17 @@ public class ImageController {
 
     private final UserService userService;
     private final BusinessService businessService;
-    private final ProductImageService productImageService;
+    private final ImageService imageService;
     private final ProductService productService;
 
 
 
     @Autowired
-    public ImageController(BusinessService businessService, ProductService productService, ProductImageService productImageService, UserService userService) {
+    public ImageController(BusinessService businessService, ProductService productService, ImageService imageService, UserService userService) {
         this.userService = userService;
         this.businessService = businessService;
         this.productService = productService;
-        this.productImageService = productImageService;
+        this.imageService = imageService;
     }
 
     /**
@@ -73,7 +72,7 @@ public class ImageController {
     @PostMapping("/businesses/{businessId}/products/{productId}/images")
     public ResponseEntity<Object> postProductImage(@PathVariable("businessId") Integer businessId, @PathVariable("productId") String productId, @RequestParam("filename") MultipartFile file) {
 
-        logger.info("Request to Create product: {} for business ID: {}", productId, businessId);
+        logger.info("Request to create product image: {} for business ID: {}", productId, businessId);
 
         User user = userService.getCurrentlyLoggedInUser();
 
@@ -85,54 +84,18 @@ public class ImageController {
 
         productService.checkProductBelongsToBusiness(possibleProduct, businessId);
 
-        if (file.isEmpty()) {
-            logger.warn("Cannot post product image, no image received");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received");
-        }
-
         if (possibleProduct.getImages().size() >= 5) {
             logger.warn("Cannot post product image, limit reached for this product.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot upload product image, limit reached for this product.");
         }
 
-        ProductImage newImage = new ProductImage();
-        String imageType;
-
-        String fileContentType = file.getContentType();
-        if (fileContentType != null && fileContentType.contains("/")) {
-            imageType = fileContentType.split("/")[1];
-        } else {
-            logger.debug("Error with image type is null");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error with image type is null");
-        }
-
-        if (!Arrays.asList("png", "jpeg", "jpg", "gif").contains(imageType)) {
-            logger.warn("Cannot post product image, invalid image type");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type");
-        }
-
-        newImage = productImageService.createImageFileName(newImage, imageType);
-
-        productImageService.storeImage(newImage.getFileName(), file);
-
-
-        BufferedImage thumbnail = productImageService.resizeImage(newImage);
-        if (thumbnail == null) {
-            logger.debug("Error resizing image");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error resizing file");
-        }
-
-        productImageService.storeThumbnailImage(newImage.getThumbnailFilename(), imageType, thumbnail);
-        newImage = productImageService.createProductImage(newImage);
-        logger.debug("Created new image entity with filename {}", newImage.getFileName());
-
+        Image newImage = imageService.saveImageWithThumbnail(file);
 
         Product product = productService.findProductById(productId);
         logger.info("Retrieved product with ID: {}", product.getId());
 
 
         productService.addImageToProduct(product, newImage);
-
 
         if (product.getPrimaryImage() == null) {
             logger.info("No primary image found for product with ID: {} in th database", product.getId());
@@ -179,16 +142,12 @@ public class ImageController {
 
         Product product = productService.findProductById(productId);
 
-        if (product==null){
-            logger.warn("Cannot delete productImage. Product is null");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product no longer exists");
-        }
         if (!product.getBusinessId().equals(businessId)) {
             logger.warn("Cannot post product image for product that does not belong to current business");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
         }
 
-        ProductImage image = productImageService.findProductImageById(imageId);
+        Image image = imageService.findImageById(imageId);
 
         if (image==null){
             logger.warn("Cannot delete productImage. image: {}", image);
@@ -203,8 +162,8 @@ public class ImageController {
         productService.deleteImageRecordFromProductInDB (product, image);
         productService.updatePrimaryImage(product, image);
         productService.updateProduct(product);
-        productImageService.deleteImageRecordFromDB (image);
-        productImageService.deleteImageFile(image);
+        imageService.deleteImageRecordFromDB (image);
+        imageService.deleteImageFile(image);
         return ResponseEntity.status(HttpStatus.OK).body("Image deleted successfully");
     }
 
@@ -284,7 +243,7 @@ public class ImageController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id does not exist for Current Business");
         }
 
-        ProductImage possibleImage = productImageService.findProductImageById(imagedId);
+        Image possibleImage = imageService.findImageById(imagedId);
 
         if (possibleImage == null) {
             logger.warn("Cannot post product image for product image id that does not exist");
@@ -302,4 +261,83 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).body("Primary image successfully updated");
     }
 
+
+    /**
+     * Handle request for uploading images for users
+     * Allows for GAA/DGAA to upload an image for a user
+     *
+     * 401                      If not currently authenticated
+     * 403 Forbidden            If attempting to make a request to change another users image and not DGAA or GAA
+     * 400 Bad Request          No file content, Bad file type
+     * 406 Not Acceptable       UserId not found
+     *
+     * @param userId    The id of the user to upload the image for (possibly different from currently logged in user if DGAA)
+     * @param file      The image to upload
+     * @return          The image after uploading, or one of the error codes detailed above.
+     */
+    @PostMapping("/users/{userId}/image")
+    public ResponseEntity<Object> postUserImage(@PathVariable("userId") Integer userId, @RequestParam("filename") MultipartFile file) {
+        logger.info("Request to upload user image for user: {}", userId);
+
+        User userForImage = getUserToModify(userId);
+
+        //Delete old user image if they had one
+        if (userForImage.getProfileImage() != null) {
+            userService.deleteUserImage(userForImage);
+        }
+
+        Image newImage = imageService.saveImageWithThumbnail(file);
+
+        userService.addImageToUser(userForImage, newImage);
+
+        userService.saveUserChanges(userForImage);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
+
+    }
+
+    /**
+     * Handles requests to delete a user's image.
+     * @param userId Id of user to delete image for
+     * @return 200 OK response if deleted successfully
+     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the user with given id,
+     * 406 NOT ACCEPTABLE if given user doesn't exist
+     */
+    @DeleteMapping("/users/{userId}/image")
+    public ResponseEntity<Object> deleteUserImage(@PathVariable("userId") Integer userId) {
+        User userForImage = getUserToModify(userId);
+
+        if (userForImage.getProfileImage() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given user does not have a profile image");
+        }
+
+        userService.deleteUserImage(userForImage);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Given the ID of a user to modify, returns a User object with given ID.
+     * Will also check if the user is allowed to modify the user, and if not, throws a
+     * 403 FORBIDDEN exception.
+     * This should really be in the User Controller but that file is wayyy too big so we
+     * decided to put this here for now. Hopefully when the user controller gets refactored
+     * we can chuck it back there.
+     * @param userId ID of user to modify
+     * @return Object of user with given ID
+     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the user with given id,
+     * 406 NOT ACCEPTABLE if given user doesn't exist
+     */
+    private User getUserToModify(Integer userId) {
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
+
+        if (loggedInUser.getId().equals(userId)) {
+            return loggedInUser;
+        } else if (loggedInUser.checkUserGlobalAdmin()) {
+            return userService.findUserById(userId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this user");
+        }
+    }
 }
+
