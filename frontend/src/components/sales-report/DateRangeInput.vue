@@ -42,7 +42,7 @@
         </b-col>
         <b-col lg="4" v-if="dateType === 'customRange'">
           <b-form-group label="End day">
-            <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker" :state="endDateValidityState"/>
+            <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker" :state="!endDateValidityState"/>
             <b-form-invalid-feedback>
               End date must be same as or after starting date.
             </b-form-invalid-feedback>
@@ -50,7 +50,7 @@
         </b-col>
 
         <b-col lg="2">
-          <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4" id="filterDateBtn">
+          <b-button type="submit" :disabled="endDateValidityState" variant="primary" class="mt-4" id="filterDateBtn" :style="endDateValidityState? 'cursor: not-allowed, rad;' : ''">
             Filter
           </b-button>
         </b-col>
@@ -62,6 +62,11 @@
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export default {
   name: "DateRangeInput",
+  props: {
+    getSalesReport: {
+      type: Function
+    }
+  },
   data() {
     return {
       dateType: "any",
@@ -136,7 +141,9 @@ export default {
         dateRange[1].setHours(23, 59, 59, 999);
       }
 
-      this.$emit('input', dateRange);
+      if (dateRange!= null) {
+        this.getSalesReport(dateRange);
+      }
     }
   },
   computed: {
@@ -158,7 +165,7 @@ export default {
      * the start date, otherwise returns NULL (i.e. no validation state).
      */
     endDateValidityState() {
-      return (this.startDay.getDate() <= this.endDay.getDate() ? null : false);
+      return this.startDay.getTime() > this.endDay.getTime();
     }
   }
 }
