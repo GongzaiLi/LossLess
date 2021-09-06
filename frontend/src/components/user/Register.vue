@@ -121,46 +121,11 @@ Date: 3/3/2021
         Already have an account?
         <router-link to="/login">Login here</router-link>
       </h6>
-
-
-      <b-modal size="lg" ref="currencyChangeModal" title="Change Currency?" cancel-title="No" ok-title="Yes">
-        <h6>
-          Updating your country will update the currency for all future listing you create. <br>
-          Do you wish to update existing listings to match the new currency? <br>
-        </h6>
-        <p>
-          *Note Business Listings for businesses you administer will not be affected
-        </p>
-        <template #modal-footer="{cancel}">
-          <div class="w-100">
-            <b-row>
-              <b-col>
-                <b-button size="sm" class="footer-buttons"  variant="primary" @click="updateUser(true)">
-                  Yes
-                </b-button>
-
-                <b-button size="sm"  class="footer-buttons" variant="danger" @click="updateUser(false)">
-                  No
-                </b-button>
-
-                  <b-button size="sm" class="footer-buttons" variant="secondary" @click="cancel()">
-                    Cancel
-                  </b-button>
-              </b-col>
-            </b-row>
-          </div>
-        </template>
-      </b-modal>
     </b-card>
     <br>
   </div>
 </template>
-<style>
-.footer-buttons {
-  min-width: 4rem;
-  margin-right: 1rem;
-}
-</style>
+
 
 <script>
 import api from "../../Api";
@@ -316,18 +281,27 @@ export default {
 
     /**
      * Called when user submits form, if editing calls edit function else register function
-     * if the user has changed their country open the currency change alert modal
+     * if the user has changed their country and that causes a new currency the open the currency change confirm modal
      * */
-    submit(event) {
+    async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
       if(this.isEditUser) {
         if (this.country !== this.userData.homeAddress.country) {
-          this.$refs.currencyChangeModal.show();
+          let oldCurrency = await api.getUserCurrency(this.country);
+          let newCurrency = await api.getUserCurrency(this.userData.homeAddress.country);
+          if (oldCurrency.code !== newCurrency.code) {
+            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
+                " This will not affect the currency of products in your administered business unless you " +
+                "also modify the address of the business."
+            )) {
+              await this.updateUser();
+            }
+          }
         } else {
-          this.updateUser(false);
+          await this.updateUser();
         }
       } else {
-        this.register()
+        await this.register()
       }
 
     },
@@ -336,8 +310,8 @@ export default {
      * function for api call for update user
      * TO BE IMPLEMENTED
      * */
-    async updateUser(updatePrevListingsCurrency) {
-      console.log("Update User, TO BE IMPLEMENTED", updatePrevListingsCurrency)
+    async updateUser() {
+      console.log("Update User, TO BE IMPLEMENTED")
     },
 
     /**
