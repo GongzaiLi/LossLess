@@ -1,6 +1,6 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import Register from '../../components/user/Register';
+import UserDetailsModal from '../../components/user/UserDetailsModal';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
 
@@ -28,7 +28,7 @@ beforeEach(() => {
       new Date('04/12/2021').valueOf()
     );
   jest.mock('../../../public/profile-default.jpg');
-  wrapper = mount(Register, {
+  wrapper = mount(UserDetailsModal, {
     localVue,
     router,
     mocks: {$log}
@@ -145,7 +145,7 @@ describe('Testing-password-validation-for-editing', () => {
     wrapper.vm.userData.email = 'a new email';
     wrapper.vm.email = 'email'
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("Old Password required to change email");
+    expect(wrapper.vm.passwordEmailValidity()).toEqual("Old Password required to change Email");
   });
 
   test('Valid if old password and email not changed present', async () => {
@@ -226,5 +226,71 @@ describe('Testing-password-validation-for-register', () => {
     wrapper.vm.userData.confirmPassword = 'password';
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.passwordMatchValidity()).toEqual("");
+  });
+});
+
+describe('Testing-api-put-updating-user', () => {
+  const event = {
+    preventDefault: () => {
+    }
+  };
+  it('Successful-update-user', async () => {
+    Api.modifyUser.mockResolvedValue({
+      status: 200
+    });
+    Api.uploadProfileImage.mockResolvedValue(
+        {
+          status: 201
+        })
+
+    await wrapper.vm.updateUser(event);
+    expect(wrapper.vm.errors).toStrictEqual([]);
+  });
+
+  it('409-error-update-user-testing', async () => {
+    Api.modifyUser.mockRejectedValue({response: {
+        data:  {message: "Email address already in use"},
+        status: 409
+      }});
+    await wrapper.vm.updateUser(event);
+    expect(wrapper.vm.errors).toStrictEqual(["Updating user failed: Email address already in use"]);
+  });
+
+  it('500-error-update-user-testing', async () => {
+    Api.modifyUser.mockRejectedValue({});
+    await wrapper.vm.updateUser(event);
+    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
+  });
+});
+
+describe('Testing-api-post-upload-image-for-user', () => {
+  it('Successful-upload-image', async () => {
+    Api.uploadProfileImage.mockResolvedValue(
+        {
+          status: 201
+        })
+
+    await wrapper.vm.uploadImageRequest(1);
+    expect(wrapper.vm.errors).toStrictEqual([]);
+  });
+
+  it('413-error-upload-image', async () => {
+    Api.uploadProfileImage.mockRejectedValue({response: {
+        data:  {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
+        status: 413
+      }});
+    await wrapper.vm.uploadImageRequest(1);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.errors).toStrictEqual(["The image you tried to upload is too large. Images must be less than 1MB in size."]);
+  });
+
+  it('500-error-upload-image', async () => {
+    Api.uploadProfileImage.mockRejectedValue({});
+
+    await wrapper.vm.uploadImageRequest(1);
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
   });
 });
