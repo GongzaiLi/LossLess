@@ -128,9 +128,6 @@ Date: 3/3/2021
 </template>
 
 
-<style>
-</style>
-
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
@@ -179,6 +176,7 @@ export default {
         confirmPassword: "",
       },
       email: '',
+      country: '',
       uploaded: false,
       errors: [],
       imageURL: '',
@@ -187,13 +185,16 @@ export default {
   },
 
   beforeMount() {
+    //if in edit mode set password fields to empty
+    //set email and country to compare if the user has altered the values
     if (this.isEditUser) {
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
       this.userData.oldPassword = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
+      this.email = this.userData.email;
+      this.country = this.userData.homeAddress.country;
     }
-    this.email = this.userData.email;
     this.$log.debug(this.userData);
   },
 
@@ -299,13 +300,27 @@ export default {
 
     /**
      * Called when user submits form, if editing calls edit function else register function
+     * if the user has changed their country and that causes a new currency the open the currency change confirm modal
      * */
-    submit(event) {
+    async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
       if(this.isEditUser) {
-        this.updateUser()
+        if (this.country !== this.userData.homeAddress.country) {
+          let oldCurrency = await api.getUserCurrency(this.country);
+          let newCurrency = await api.getUserCurrency(this.userData.homeAddress.country);
+          if (oldCurrency.code !== newCurrency.code) {
+            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
+                " This will not affect the currency of products in your administered business unless you " +
+                "also modify the address of the business."
+            )) {
+              await this.updateUser();
+            }
+          }
+        } else {
+          await this.updateUser();
+        }
       } else {
-        this.register()
+        await this.register()
       }
     },
 
