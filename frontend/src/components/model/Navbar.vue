@@ -59,7 +59,8 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+        <img v-if="userHasProfilePicture" :src="getURL()" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+        <img  v-else-if="!userHasProfilePicture" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
       </template>
 
       <div v-if="!isActingAsUser">
@@ -95,6 +96,7 @@ Date: sprint_1
 </template>
 
 <script>
+import api from "../../Api";
 import {setCurrentlyActingAs} from '../../auth'
 import NotificationDropdown from "./NotificationDropdown";
 
@@ -130,6 +132,12 @@ export default {
       } else {
         return this.$currentUser.currentlyActingAs.name;
       }
+    },
+    userHasProfilePicture: function () {
+      if(this.$currentUser.profileImage){
+        return true
+      }
+      return false
     },
 
     /**
@@ -253,7 +261,13 @@ export default {
       if (this.timer) {
         clearTimeout(this.timer);
       }
-    }
+    },
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL() {
+      return api.getImage(this.$currentUser.profileImage.thumbnailFilename);
+    },
   },
 }
 </script>

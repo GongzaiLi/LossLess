@@ -14,7 +14,9 @@ Date: 5/3/2021
 
           <b-row>
             <b-col md="2">
-              <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="75" class="rounded-circle"
+              <img v-if="userHasProfilePicture" :src="getURL()" alt="User Profile Image" width="75" class="rounded-circle"
+                   style="margin-left: 5px; position: relative">
+              <img v-else-if="!userHasProfilePicture" src="../../../public/profile-default.jpg" alt="User Profile Image" width="75" class="rounded-circle"
                    style="margin-left: 5px; position: relative">
             </b-col>
             <b-col md="10" class="mt-2">
@@ -248,6 +250,13 @@ export default {
     },
 
     /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL() {
+        return api.getImage(this.userData.profileImage.thumbnailFilename);
+    },
+
+    /**
      * Revoke or give the current user the 'globalApplicationAdmin' role,
      * depending on whether the current user already has that role.
      */
@@ -376,6 +385,13 @@ export default {
       return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.id === this.userData.id
           || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     },
+
+    userHasProfilePicture: function () {
+      if(this.userData.profileImage){
+        return true
+      }
+      return false
+    }
 
 
   },

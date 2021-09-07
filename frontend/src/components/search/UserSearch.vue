@@ -35,6 +35,11 @@ Date: 7/3/2021
          <template #empty>
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
+          <template #cell(name)="data">
+            <img v-if="userHasProfilePicture(data.item)" :src="getURL(data.item)" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img  v-else-if="!userHasProfilePicture(data.item)" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            {{createUsername(data.item)}}
+          </template>
         </b-table>
       </b-col>
     </b-row>
@@ -167,7 +172,7 @@ export default {
       let tableHeader = {};
       for (const user of data) {
         tableHeader = user;
-        tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
+        //tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
@@ -190,7 +195,22 @@ export default {
         roleLabel = "USER";
       }
       return roleLabel;
-    }
+    },
+    createUsername(user){
+      return `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
+    },
+    userHasProfilePicture(user) {
+      if(user.profileImage){
+        return true
+      }
+      return false
+    },
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(user) {
+      return api.getImage(user.profileImage.thumbnailFilename);
+    },
   },
 
   computed: {
@@ -210,7 +230,7 @@ export default {
           sortable: true
         },
         {
-          key: 'nickName',
+          key: 'nickname',
           sortable: true
         },
         {
@@ -228,7 +248,7 @@ export default {
         });
       }
       return fields;
-    }
+    },
   }
 }
 </script>
