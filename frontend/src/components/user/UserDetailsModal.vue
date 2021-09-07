@@ -188,7 +188,6 @@ export default {
 
   beforeMount() {
     if (this.isEditUser) {
-      this.userId =
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
       this.userData.oldPassword = '';
       this.userData.newPassword = '';
