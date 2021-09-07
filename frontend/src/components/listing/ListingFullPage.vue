@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="listings-page">
     <b-container>
       <b-row class="mb-5">
         <b-link v-if="$route.query.fromBusiness" variant="info" class="back-to-search-link"
@@ -195,7 +195,7 @@
   margin-right: auto;
 }
 
-.modal-header .close {
+.listings-page .modal-header .close {
   display: none;
 }
 

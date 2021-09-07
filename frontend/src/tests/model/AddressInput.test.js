@@ -12,7 +12,17 @@ beforeEach(() => {
 
   wrapper = shallowMount(AddressInput, {
     localVue,
-    propsData: {},
+    propsData: {
+      address: {
+        streetNumber: "",
+        streetName: "",
+        suburb: "",
+        city: "",
+        region: "",
+        country: "",
+        postcode: ""
+      }
+    },
     mocks: {},
     stubs: {},
     methods: {},

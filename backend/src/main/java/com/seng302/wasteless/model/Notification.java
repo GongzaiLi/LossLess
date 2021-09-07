@@ -10,8 +10,8 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 /**
- * An implementation of User model.
- * This class creates a User JPA entity that is mapped to an SQL table.
+ * Class representing a Notification that a user receives.
+ * This class creates a Notification JPA entity that is mapped to an SQL table.
  */
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
@@ -32,13 +32,31 @@ public class Notification {
     private NotificationType type;
 
     @Column(name = "message")
-    @Size(min = 0, max = 250)
+    @Size(max = 250)
     private String message;
 
+    /**
+     * The Id of the 'subject' the notification refers to. What exactly the subject is is context-dependent.
+     * For example, if this notification is for a purchase of a listing, then the ID will be the ID of the
+     * corresponding sale record. If this is for a marketplace card expiry warning, then the ID is the ID of the
+     * marketplace card.
+     */
     @Column(name = "subjectId")
     private Integer subjectId;
 
     @Column(name = "created")
     private LocalDateTime created;
+
+    @Column(name = "read")
+    private Boolean read = false;
+
+    @Column(name = "archived")
+    private Boolean archived = false;
+
+    @Column(name = "starred")
+    private Boolean starred = false;
+
+    @Column(name = "tag")
+    private NotificationTag tag;
 }
 

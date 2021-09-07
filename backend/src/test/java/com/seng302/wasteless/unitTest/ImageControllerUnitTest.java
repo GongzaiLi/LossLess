@@ -222,7 +222,9 @@ class ImageControllerUnitTest {
 
         doReturn(image).when(imageService).createImageFileName(any(Image.class), anyString());
 
-
+        Mockito
+                .when(userService.getUserToModify(anyInt()))
+                .thenReturn(user);
 
     }
 
@@ -548,7 +550,9 @@ class ImageControllerUnitTest {
 
     @Test
     void whenDeleteRequestToUserImage_andUserNotSelfOrAdmin_then403Response() throws Exception {
-        Mockito.when(user.checkUserGlobalAdmin()).thenReturn(false);
+        Mockito.when(userService.getUserToModify(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this user"));
+
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/2/image"))

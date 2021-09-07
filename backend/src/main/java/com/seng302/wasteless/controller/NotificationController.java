@@ -21,12 +21,29 @@ public class NotificationController {
 
     private static final Logger logger = LogManager.getLogger(NotificationController.class.getName());
 
+import com.seng302.wasteless.dto.PatchNotificationStatusDTO;
+import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.service.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import javax.validation.Valid;
+
+/**
+ * NotificationController is used for mapping all Restful API requests involving specific notifications.
+ * All paths start with the address "/notifications/{id}".
+ */
+@RestController
+public class NotificationController {
     private final UserService userService;
     private final NotificationService notificationService;
 
     @Autowired
-    public NotificationController(UserService userService,
-                          NotificationService notificationService) {
+    public NotificationController(UserService userService, NotificationService notificationService) {
         this.userService = userService;
         this.notificationService = notificationService;
     }
