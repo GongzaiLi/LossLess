@@ -374,8 +374,6 @@ public class UserController {
         userService.modifyUserDateOfBirth(userToModify, modifiedUser.getDateOfBirth());
         userService.modifyUserHomeAddress(userToModify, modifiedUser.getHomeAddress());
 
-        System.out.println(userModifyingThemselves);
-
         if (!userModifyingThemselves) {
             userService.modifyUserPassword(userToModify, modifiedUser.getNewPassword());
             userService.updateUserEmail(userToModify, modifiedUser.getEmail());
