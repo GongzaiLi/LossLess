@@ -114,7 +114,9 @@ public class ManageMyFeedFeature {
         notificationService.saveNotification(notification);
 
         // Create newer notification
-        weHaveANotification();
+        notificationService.saveNotification(
+                NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "")
+        );
     }
 
     @When("I star it")
@@ -126,11 +128,23 @@ public class ManageMyFeedFeature {
                 .andExpect(status().isOk());
     }
 
-    @Then("The notification appears at the top of my feed")
+    @Then("The starred notification is at the top of my feed")
     public void theNotificationAppearsAtTheTopOfMyFeed() throws Exception {
         getNotifications()
             .andExpect(jsonPath("$[0].id").value(notification.getId()))
             .andExpect(jsonPath("$[0].starred").value(true));
+    }
+
+    @Given("My notification has been starred")
+    public void myNotificationHasBeenStarred() throws Exception {
+        iStarIt();
+    }
+
+    @When("A new notification arrives")
+    public void aNewNotificationArrives() {
+        notificationService.saveNotification(
+                NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "")
+        );
     }
 
     @Given("My notification had not been archived")
