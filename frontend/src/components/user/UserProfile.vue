@@ -21,7 +21,7 @@ Date: 5/3/2021
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
                   <b-icon-pencil-fill
-                      v-if="(userData.id === $currentUser.id || $currentUser.role === 'defaultGlobalApplicationAdmin' || $currentUser.role === 'globalApplicationAdmin') && userData.role !== 'defaultGlobalApplicationAdmin'"
+                      v-if="(userData.id === $currentUser.id || $currentUser.role === 'defaultGlobalApplicationAdmin' || $currentUser.role === 'globalApplicationAdmin') && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
                       v-b-tooltip.hover
                       title="Edit Profile"
                       id="editProfile"
