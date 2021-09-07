@@ -2,8 +2,11 @@ package com.seng302.wasteless.service;
 
 
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationTag;
 import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.repository.NotificationRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private static final Logger logger = LogManager.getLogger(NotificationService.class.getName());
 
 
     @Autowired
@@ -88,6 +92,22 @@ public class NotificationService {
         ).collect(Collectors.toList());
 
         notificationRepository.saveAll(notifications);
+    }
+
+    /**
+     * Check if a given string is of valid tag type, tags are in all caps and can be null
+     * @param tag tag to be checked is of valid type
+     * @return the Notification tag object that corresponds to teh given string
+     */
+    public NotificationTag checkValidTag(String tag) {
+        if(tag == null) {return null;}
+        for (NotificationTag t : NotificationTag.values()) {
+            if (t.toString().equals(tag)) {
+                return t;
+            }
+        }
+        logger.warn("Tag '{}' is not a valid tag", tag);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The tag specified is not valid");
     }
 
 }

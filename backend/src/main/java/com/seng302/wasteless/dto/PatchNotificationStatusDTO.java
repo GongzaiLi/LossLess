@@ -1,6 +1,7 @@
 package com.seng302.wasteless.dto;
 
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationTag;
 import lombok.Data;
 import lombok.ToString;
 
@@ -18,8 +19,13 @@ public class PatchNotificationStatusDTO {
     private Boolean read;
     private Boolean starred;
     private Boolean archived;
+    private String tag;
 
-    public void applyToNotification(Notification notification) {
+    /**
+     * @param notification the notification being updated
+     * @param newTag the new tag of the notification, can be null
+     */
+    public void applyToNotification(Notification notification, NotificationTag newTag) {
         if (read != null) {
             notification.setRead(read);
         }
@@ -29,5 +35,7 @@ public class PatchNotificationStatusDTO {
         if (archived != null) {
             notification.setArchived(archived);
         }
+        //This does not need a null check because the user needs to be able to remove the tag
+        notification.setTag(newTag);
     }
 }

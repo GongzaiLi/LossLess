@@ -34,19 +34,18 @@ public class NotificationController {
      * @param notificationStatusDTO Valid DTO containing data on how the notification will be patched
      * @return
      * 200 OK if notification was patched successfully
+     * 400 Bad Request invalid tag type
      * 403 Forbidden if the logged in user does not own the notification and is not an admin
      * 404 Not Found if notification with given id does not exist
      */
     @PatchMapping("/notifications/{id}")
     public ResponseEntity<Object> patchNotificationStatus(@PathVariable("id") Integer notificationId, @Valid @RequestBody PatchNotificationStatusDTO notificationStatusDTO) {
         Notification notification = notificationService.findNotificationById(notificationId);
-
         User loggedInUser = userService.getCurrentlyLoggedInUser();
         if (!notification.getUserId().equals(loggedInUser.getId()) && !loggedInUser.checkUserGlobalAdmin()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the user that this notification belongs to, and you are not an admin.");
         }
-
-        notificationStatusDTO.applyToNotification(notification);
+        notificationStatusDTO.applyToNotification(notification, notificationService.checkValidTag(notificationStatusDTO.getTag()));
         notificationService.saveNotification(notification);
 
         return ResponseEntity.status(HttpStatus.OK).build();
