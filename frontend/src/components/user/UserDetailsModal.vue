@@ -188,6 +188,7 @@ export default {
 
   beforeMount() {
     if (this.isEditUser) {
+      this.userId =
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
       this.userData.oldPassword = '';
       this.userData.newPassword = '';
@@ -343,7 +344,7 @@ export default {
     async updateUser() {
       let editData = this.getEditData();
       await api
-        .modifyUser(editData)
+        .modifyUser(editData, this.$route.params.id)
           .then(() => {
             if (this.imageURL) {
               this.uploadImageRequest(this.userData.id)
