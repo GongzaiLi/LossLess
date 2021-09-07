@@ -232,9 +232,9 @@ public class ListingController {
         userService.saveUserChanges(user);
         Notification likedStatusNotification;
         if (Boolean.TRUE.equals(likeStatus)) {
-            likedStatusNotification = notificationService.createNotification(user.getId(), listing.getId(), NotificationType.LIKEDLISTING, String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
+            likedStatusNotification = NotificationService.createNotification(user.getId(), listing.getId(), NotificationType.LIKEDLISTING, String.format("You have liked listing: %s. This listing closes at %tF", listing.getInventoryItem().getProduct().getName(), listing.getCloses()));
         } else {
-            likedStatusNotification = notificationService.createNotification(user.getId(), listing.getId(), NotificationType.UNLIKEDLISTING, String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
+            likedStatusNotification = NotificationService.createNotification(user.getId(), listing.getId(), NotificationType.UNLIKEDLISTING, String.format("You have unliked listing: %s", listing.getInventoryItem().getProduct().getName()));
 
         }
         notificationService.saveNotification(likedStatusNotification);
@@ -264,7 +264,7 @@ public class ListingController {
 
         var purchasedListing = listingsService.purchase(listing, userService.getCurrentlyLoggedInUser());
 
-        var purchaseNotification = notificationService.createNotification(userService.getCurrentlyLoggedInUser().getId(),
+        var purchaseNotification = NotificationService.createNotification(userService.getCurrentlyLoggedInUser().getId(),
                 purchasedListing.getId(), NotificationType.PURCHASED_LISTING, String.format("You have purchased %s of the product %s",
                 purchasedListing.getQuantity(), purchasedListing.getProduct().getName()));
 
