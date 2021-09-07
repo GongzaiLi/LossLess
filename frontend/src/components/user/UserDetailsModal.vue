@@ -358,7 +358,7 @@ export default {
     async updateUser() {
       let editData = this.getEditData();
       await api
-        .modifyUser(editData)
+        .modifyUser(editData, this.$route.params.id)
           .then(() => {
             if (this.imageURL) {
               this.uploadImageRequest(this.userData.id)
