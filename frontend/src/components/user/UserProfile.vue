@@ -153,7 +153,7 @@ Date: 5/3/2021
 
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
 
-      <UserDetailsModal :is-edit-user="true" :user-details="userData" v-on:updatedUser="updatedUserHandler"/>
+      <UserDetailsModal :is-edit-user="true" :user-details="userData"/>
     </b-modal>
   </div>
 </template>
@@ -174,6 +174,7 @@ h6 {
 import api from "../../Api";
 import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
+import EventBus from "../../util/event-bus";
 
 export default {
   components: {
@@ -214,6 +215,7 @@ export default {
     const userId = this.$route.params.id;
     this.launchPage(userId);
 
+    EventBus.$on('updatedUser', this.updatedUserHandler)
   },
 
   methods: {
