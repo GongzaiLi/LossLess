@@ -44,7 +44,7 @@ public class NotificationService {
      * @return          The found notifications, if any otherwise empty list
      */
     public List<Notification> findAllUnArchivedNotificationsByUserId(Integer userId) {
-        return  notificationRepository.findByUserIdAndArchivedOrderByCreatedDesc(userId, false);
+        return  notificationRepository.findByUserIdAndArchivedOrderByStarredDescCreatedDesc(userId, false);
     }
 
     /**
