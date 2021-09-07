@@ -20,7 +20,14 @@ Date: 5/3/2021
             <b-col md="10" class="mt-2">
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
-                  <b-icon-pencil-fill v-if="userData.id === $currentUser.id" v-b-tooltip.hover title="Edit Profile" id="editProfile" @click="editUserModel" style="cursor: pointer;"/>
+                  <b-icon-pencil-fill
+                      v-if="(userData.id === $currentUser.id || $currentUser.role === 'defaultGlobalApplicationAdmin' || $currentUser.role === 'globalApplicationAdmin') && userData.role !== 'defaultGlobalApplicationAdmin'"
+                      v-b-tooltip.hover
+                      title="Edit Profile"
+                      id="editProfile"
+                      @click="editUserModel"
+                      style="cursor: pointer;"
+                  />
                 </h4>
 
               </b-row>
@@ -30,7 +37,7 @@ Date: 5/3/2021
               </b-row>
             </b-col>
             <b-col cols="2" sm="auto"
-                   v-if="showUserRole">
+                   v-if="currentUserAdmin">
               <h4>{{ userRoleDisplayString }}</h4>
               <b-button
                   v-bind:variant="toggleAdminButtonVariant"
@@ -152,8 +159,7 @@ Date: 5/3/2021
     </div>
 
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
-
-      <UserDetailsModal :is-edit-user="true" :user-details="userData"/>
+      <UserDetailsModal :is-edit-user="true" :logged-in-user-admin="loggedInUserAdmin" :user-details="userData"/>
     </b-modal>
   </div>
 </template>
@@ -186,6 +192,7 @@ export default {
     return {
       userData: {
         id: "",
+        role: "",
         firstName: "",
         lastName: "",
         middleName: "",
@@ -206,6 +213,7 @@ export default {
         created: "",
         businessesAdministered: [],
       },
+      loggedInUserAdmin: false,
       userFound: true,
       loading: true
     }
@@ -226,6 +234,7 @@ export default {
     launchPage(userId) {
       this.loading = true;
       this.getUserInfo(userId);
+      this.loggedInUserAdmin = this.currentUserAdmin;
     },
 
     /**
@@ -304,7 +313,8 @@ export default {
     updatedUserHandler: function () {
       this.getUserInfo(this.userData.id);
       this.$bvModal.hide('edit-user-profile');
-    }
+    },
+
   },
   computed: {
     toggleAdminButtonVariant() {
@@ -351,7 +361,7 @@ export default {
     /**
      * Computed function that returns a boolean. True if the user role should be shown in the profile page, false otherwise.
      */
-    showUserRole: function () {
+    currentUserAdmin: function () {
       return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.role === 'globalApplicationAdmin';
     },
     /**
