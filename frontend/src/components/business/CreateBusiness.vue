@@ -107,7 +107,7 @@ Date: 26/3/2021
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
-import getMonthsAndYearsBetween from '../../util';
+import {getMonthsAndYearsBetween} from '../../util';
 
 const MIN_AGE_TO_CREATE_BUSINESS = 16;
 

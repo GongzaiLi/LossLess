@@ -114,6 +114,15 @@ export default {
   likeListing: (listingId) => instance.put(`/listings/${listingId}/like`, {}, {withCredentials: true}),
   modifyUser: (editUserData, userId) => instance.put(`/users/${userId}`, editUserData, {withCredentials: true}),
   archiveNotification: (notificationId) => instance.patch(`/notifications/${notificationId}`, {archived: true}, {withCredentials: true}),
+  getSalesReport: (businessId, startDate, endDate, period) => instance.get(`/businesses/${businessId}/salesReport/totalPurchases`,
+    {
+      withCredentials: true,
+      params: {
+        startDate: startDate,
+        endDate: endDate,
+        period: period
+      }
+    }),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images

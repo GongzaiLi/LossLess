@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import getMonthsAndYearsBetween from '../../util'
+import {getMonthsAndYearsBetween} from '../../util'
 
 export default {
   name: "member-since",

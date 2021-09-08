@@ -5,36 +5,63 @@ Date: sprint_6
 <template>
   <div>
     <b-card v-if="canViewReport" class="shadow mw-100" no-body>
-        <b-list-group>
+      <b-list-group>
         <b-list-group-item>
           <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
-        <DateRangeInput/>
+          <DateRangeInput @input="getSalesReport"/>
         </b-list-group-item>
         <b-list-group-item v-if="totalResults">
           <b-card-text>
-            <h3>Sales Summary for {{totalResults.startDate}} to {{totalResults.endDate}}</h3>
-            <b-row align-h="start" >
+            <h3>Sales Summary for {{ totalResults.startDate }} to {{ totalResults.endDate }}</h3>
+            <b-row align-h="start">
               <b-col cols="4">
-              <h4>{{totalResults.totalPurchases}} Total Items Sold </h4>
+                <h4>{{ totalResults.totalPurchases }} Total Items Sold </h4>
               </b-col>
               <b-col cols="4">
-             <h4> {{ currency.symbol }}{{totalResults.totalValue}} {{currency.code}} Total Value</h4>
+                <h4> {{ currency.symbol }}{{ totalResults.totalValue }} {{ currency.code }} Total Value</h4>
               </b-col>
             </b-row>
           </b-card-text>
         </b-list-group-item>
         <b-list-group-item>
           <b-row>
-          <b-col cols="2"><h3>Sales Details</h3></b-col>
-            <b-col cols="2"><b-select v-model="groupBy" :options="groupByOptions"></b-select></b-col>
+            <b-col cols="2"><h3>Sales Details</h3></b-col>
+            <b-col cols="2">
+              <b-select v-show="!isOneDay" id="periodSelector" v-model="groupBy" :options="groupByOptions"
+                        @change="getSalesReport(dateRange)"></b-select>
+            </b-col>
           </b-row>
           <b-row>
-          <b-col>
-            <b-table striped :items="groupedResults" :fields="fields" bordered>
-            </b-table>
-          </b-col>
+            <b-col class="mt-2">
+              <b-table
+                  ref="salesReportTable"
+                  no-border-collapse
+                  no-local-sorting
+                  striped
+                  :items="groupedResults"
+                  :fields="fields"
+                  :per-page="perPage"
+                  :current-page="currentPage"
+                  responsive
+                  bordered
+                  show-empty>
+                <template #empty>
+                  <h3 class="no-results-overlay">No results to display</h3>
+                </template>
+              </b-table>
+            </b-col>
             <b-col>
               graph
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col b-col cols="4" v-show="groupedResults.length">
+              <b-pagination
+                  v-model="currentPage"
+                  :total-rows="groupedResults.length"
+                  :per-page="perPage"
+                  aria-controls="my-table"
+              ></b-pagination>
             </b-col>
           </b-row>
         </b-list-group-item>
@@ -62,60 +89,38 @@ Date: sprint_6
 <script>
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
+import {formatDate} from "../../util";
+
 export default {
   name: "sales-report-page",
   components: {DateRangeInput},
   data: function () {
     return {
       business: {},
-      currency:{},
-      groupBy:"day",
-      groupByOptions:[
-        {value:"day", text:"Daily"},
-        {value:"week", text:"Weekly"},
-        { value:"month", text:"Monthly"},
-        {value:"year", text:"Yearly"}
+      currency: {},
+      groupBy: "day",
+      groupByOptions: [
+        {value: "day", text: "Daily"},
+        {value: "week", text: "Weekly"},
+        {value: "month", text: "Monthly"},
+        {value: "year", text: "Yearly"}
       ],
-      fields:[
-        { key: 'startDate', sortable: true },
-        { key: 'endDate', sortable: true },
-        { key: 'totalPurchases', sortable: true },
-        { key: 'totalValue', sortable: true }
+      fields: [
+        {key: 'startDate', sortable: true},
+        {key: 'endDate', sortable: true},
+        {key: 'totalPurchases', sortable: true},
+        {key: 'totalValue', sortable: true}
       ],
-      totalResults:{
-        "startDate": "2021-09-01",
-        "endDate": "2021-09-04",
-        "totalPurchases": 999999999999,
-        "totalValue": 99999999999
+      totalResults: {
+        startDate: "",
+        endDate: "",
+        totalPurchases: 0,
+        totalValue: 0
       },
-      groupedResults:
-        [
-            {
-              "startDate": "2021-09-01",
-              "endDate": "2021-09-01",
-              "totalPurchases": 0,
-              "totalValue": 0.0
-            },
-    {
-      "startDate": "2021-09-02",
-        "endDate": "2021-09-02",
-        "totalPurchases": 0,
-        "totalValue": 0.0
-    },
-    {
-      "startDate": "2021-09-03",
-        "endDate": "2021-09-03",
-        "totalPurchases": 0,
-        "totalValue": 0.0
-    },
-    {
-      "startDate": "2021-09-04",
-        "endDate": "2021-09-04",
-        "totalPurchases": 1,
-        "totalValue": 2.5
-    }
-  ]
-      ,
+      groupedResults: [],
+      currentPage: 1,
+      perPage: 12,
+      dateRange: [],
     }
   },
 
@@ -125,7 +130,12 @@ export default {
   },
 
   methods: {
-    getBusiness: function(id){
+    /**
+     * this is a get api which can take Specific business to display on the page
+     * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
+     * @param id
+     **/
+    getBusiness: function (id) {
       api
           .getBusiness(id)
           .then((response) => {
@@ -136,10 +146,55 @@ export default {
             this.$log.debug(error);
           })
     },
+
+    /**
+     * Queries the currencies API to get currency info for the business
+     **/
     async getCurrency(business) {
       this.currency = await api.getUserCurrency(business.address.country);
-    }
+    },
+
+    /**
+     * Uses Api.js to send a get request with the getSalesReport.
+     * This is used to search the sales report.
+     * @param dateRange
+     **/
+    getSalesReport: async function (dateRange) {
+      this.dateRange = dateRange;
+
+      if (this.dateRange != null && this.dateRange.length) {
+        const businessId = this.$route.params.id;
+        const startDate = formatDate(dateRange[0]);
+        const endDate = formatDate(dateRange[1]);
+        await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
+            .then((response) => {
+              this.$log.debug("Data loaded: ", response.data);
+              this.updateTotalResults(startDate, endDate, response.data)
+              this.groupedResults = response.data;
+            }).catch((error) => {
+              this.$log.debug("Error message", error);
+            });
+      }
+    },
+
+    /**
+     * update the Sales Summary from the response data.
+     * @param startDate
+     * @param endDate
+     * @param data response data
+     **/
+    updateTotalResults: function (startDate, endDate, data) {
+      this.totalResults.startDate = startDate;
+      this.totalResults.endDate = endDate;
+      this.totalResults.totalValue = data.reduce((count, item) => {
+        return count + item.totalValue
+      }, 0);
+      this.totalResults.totalPurchases = data.reduce((count, item) => {
+        return count + item.totalPurchases
+      }, 0);
+    },
   },
+
 
   computed: {
     /**
@@ -161,6 +216,15 @@ export default {
       }
       return null;
     },
+
+    /**
+     * True if the data range to one day.
+     */
+    isOneDay: function () {
+      return this.dateRange !== null &&
+          this.dateRange.length === 2 &&
+          this.dateRange[0].toDateString() === this.dateRange[1].toDateString();
+    }
   }
 }
 </script>
