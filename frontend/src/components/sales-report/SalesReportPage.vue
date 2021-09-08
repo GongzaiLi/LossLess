@@ -27,7 +27,7 @@ Date: sprint_6
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
-              <b-select v-model="groupBy" :options="groupByOptions"></b-select>
+              <b-select v-model="groupBy" :options="groupByOptions" @change="getSalesReport(dateRange)"></b-select>
             </b-col>
           </b-row>
           <b-row>
@@ -38,16 +38,28 @@ Date: sprint_6
                   striped
                   :items="groupedResults"
                   :fields="fields"
+                  :per-page="perPage"
+                  :current-page="currentPage"
                   responsive
                   bordered
                   show-empty>
-              <template #empty>
-                <h3 class="no-results-overlay" >No results to display</h3>
-              </template>
+                <template #empty>
+                  <h3 class="no-results-overlay">No results to display</h3>
+                </template>
               </b-table>
             </b-col>
             <b-col>
               graph
+            </b-col>
+          </b-row>
+          <b-row>
+            <b-col b-col cols="4" v-show="groupedResults.length">
+              <b-pagination
+                  v-model="currentPage"
+                  :total-rows="groupedResults.length"
+                  :per-page="perPage"
+                  aria-controls="my-table"
+              ></b-pagination>
             </b-col>
           </b-row>
         </b-list-group-item>
@@ -104,6 +116,9 @@ export default {
         totalValue: 0
       },
       groupedResults: [],
+      currentPage: 1,
+      perPage: 12,
+      dateRange: [],
     }
   },
 
@@ -140,20 +155,42 @@ export default {
     /**
      * Uses Api.js to send a get request with the getSalesReport.
      * This is used to search the sales report.
+     * @param dateRange
      **/
-    getSalesReport: async function(dateRange) {
-      const businessId = this.$route.params.id;
-      const startDate = formatDate(dateRange[0]);
-      const endDate = formatDate(dateRange[1]);
-      await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
-      .then((response) => {
-        this.$log.debug("Data loaded: ", response.data);
-        this.totalResults.startDate = startDate;
-        this.totalResults.endDate = endDate;
-        this.groupedResults = response.data;
-      })
-    }
+    getSalesReport: async function (dateRange) {
+      this.dateRange = dateRange;
+
+      if (this.dateRange != null && this.dateRange.length) {
+        const businessId = this.$route.params.id;
+        const startDate = formatDate(dateRange[0]);
+        const endDate = formatDate(dateRange[1]);
+        await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
+            .then((response) => {
+              this.$log.debug("Data loaded: ", response.data);
+              this.updateTotalResults(startDate, endDate, response.data)
+              this.groupedResults = response.data;
+            })
+      }
+    },
+
+    /**
+     * update the Sales Summary from the response data.
+     * @param startDate
+     * @param endDate
+     * @param data response data
+     **/
+    updateTotalResults: function (startDate, endDate, data) {
+      this.totalResults.startDate = startDate;
+      this.totalResults.endDate = endDate;
+      this.totalResults.totalValue = data.reduce((count, item) => {
+        return count + item.totalValue
+      }, 0);
+      this.totalResults.totalPurchases = data.reduce((count, item) => {
+        return count + item.totalPurchases
+      }, 0);
+    },
   },
+
 
   computed: {
     /**

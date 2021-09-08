@@ -1,59 +1,64 @@
 <template>
   <b-form @submit.prevent="submitPressed">
     <b-row>
-        <b-col lg="2" md="4">
-          <b-form-group label="Filter results by">
-            <b-form-select v-model="dateType" id="dateTypeSelect">
-              <option v-for="[option, name] in Object.entries(dateTypeOptions)" :key="option" :value="option">{{name}}</option>
-            </b-form-select>
-          </b-form-group>
-        </b-col>
+      <b-col lg="2" md="4">
+        <b-form-group label="Filter results by">
+          <b-form-select v-model="dateType" id="dateTypeSelect">
+            <option v-for="[option, name] in Object.entries(dateTypeOptions)" :key="option" :value="option">{{ name }}
+            </option>
+          </b-form-select>
+        </b-form-group>
+      </b-col>
 
-        <b-col lg="2" md="4" v-if="dateType === 'year' || dateType === 'month'">
-          <b-form-group label="Year">
-            <b-form-input v-model="selectedYear" type="number" min="2000" :max="(new Date()).getFullYear()" id="yearSelector"></b-form-input>
-          </b-form-group>
-        </b-col>
+      <b-col lg="2" md="4" v-if="dateType === 'year' || dateType === 'month'">
+        <b-form-group label="Year">
+          <b-form-input v-model="selectedYear" type="number" min="2000" :max="(new Date()).getFullYear()"
+                        id="yearSelector"></b-form-input>
+        </b-form-group>
+      </b-col>
 
-        <b-col lg="2" md="4" v-if="dateType === 'month'">
-          <b-form-group label="Month">
-            <b-form-select v-model="selectedMonth" id="monthSelector">
-              <option v-for="(month, index) in selectableMonths" :key="index" :value="index">{{month}}</option>
-            </b-form-select>
-          </b-form-group>
-        </b-col>
+      <b-col lg="2" md="4" v-if="dateType === 'month'">
+        <b-form-group label="Month">
+          <b-form-select v-model="selectedMonth" id="monthSelector">
+            <option v-for="(month, index) in selectableMonths" :key="index" :value="index">{{ month }}</option>
+          </b-form-select>
+        </b-form-group>
+      </b-col>
 
-        <b-col lg="4" v-if="dateType === 'week'">
-          <b-form-group label="Week starting:">
-            <b-form-datepicker :date-disabled-fn="weekDateDisabled" value-as-date v-model="selectedWeek" class="eric-custom-week-picker"/>
-          </b-form-group>
-        </b-col>
+      <b-col lg="4" v-if="dateType === 'week'">
+        <b-form-group label="Week starting:">
+          <b-form-datepicker :date-disabled-fn="weekDateDisabled" value-as-date v-model="selectedWeek"
+                             class="eric-custom-week-picker"/>
+        </b-form-group>
+      </b-col>
 
-        <b-col lg="4" v-if="dateType === 'day'">
-          <b-form-group label="Select day">
-            <b-form-datepicker :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
-          </b-form-group>
-        </b-col>
+      <b-col lg="4" v-if="dateType === 'day'">
+        <b-form-group label="Select day">
+          <b-form-datepicker :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
+        </b-form-group>
+      </b-col>
 
-        <b-col lg="4" v-if="dateType === 'customRange'">
-          <b-form-group label="Start day">
-            <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="startDay"/>
-          </b-form-group>
-        </b-col>
-        <b-col lg="4" v-if="dateType === 'customRange'">
-          <b-form-group label="End day">
-            <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker" :state="!endDateValidityState"/>
-            <b-form-invalid-feedback>
-              End date must be same as or after starting date.
-            </b-form-invalid-feedback>
-          </b-form-group>
-        </b-col>
+      <b-col lg="4" v-if="dateType === 'customRange'">
+        <b-form-group label="Start day">
+          <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="startDay"/>
+        </b-form-group>
+      </b-col>
+      <b-col lg="4" v-if="dateType === 'customRange'">
+        <b-form-group label="End day">
+          <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker"
+                             :state="!endDateValidityState"/>
+          <b-form-invalid-feedback>
+            End date must be same as or after starting date.
+          </b-form-invalid-feedback>
+        </b-form-group>
+      </b-col>
 
-        <b-col lg="2">
-          <b-button type="submit" :disabled="endDateValidityState" variant="primary" class="mt-4" id="filterDateBtn" :style="endDateValidityState? 'cursor: not-allowed, rad;' : ''">
-            Filter
-          </b-button>
-        </b-col>
+      <b-col lg="2">
+        <b-button type="submit" :disabled="endDateValidityState" variant="primary" class="mt-4" id="filterDateBtn"
+                  :style="endDateValidityState? 'cursor: not-allowed, rad;' : ''">
+          Filter
+        </b-button>
+      </b-col>
     </b-row>
   </b-form>
 </template>
@@ -141,9 +146,9 @@ export default {
         this.dateRange[0].setHours(0, 0, 0, 0);
         this.dateRange[1].setHours(23, 59, 59, 999);
       }
-      if (this.dateRange!= null) {
-        this.getSalesReport(this.dateRange);
-      }
+
+      this.getSalesReport(this.dateRange);
+
     }
   },
   computed: {
@@ -171,21 +176,23 @@ export default {
 }
 </script>
 
-<style >
-  .eric-custom-week-picker .b-calendar-grid [role='button']:hover {
-    background-color: #dddddd;
-  }
-  .eric-custom-week-picker .b-calendar-grid-body [aria-selected='true'] {
-    background-color: #a1ccff;
-  }
-  .eric-custom-week-picker .b-calendar-grid-body [aria-selected='true']:after {
-    content: '';
-    position: absolute;
-    background-color: #a1ccff;
-    opacity: 0.3;
-    width: 15rem;
-    right: -15rem;
-    height: 100%;
-    z-index: 999;
-  }
+<style>
+.eric-custom-week-picker .b-calendar-grid [role='button']:hover {
+  background-color: #dddddd;
+}
+
+.eric-custom-week-picker .b-calendar-grid-body [aria-selected='true'] {
+  background-color: #a1ccff;
+}
+
+.eric-custom-week-picker .b-calendar-grid-body [aria-selected='true']:after {
+  content: '';
+  position: absolute;
+  background-color: #a1ccff;
+  opacity: 0.3;
+  width: 15rem;
+  right: -15rem;
+  height: 100%;
+  z-index: 999;
+}
 </style>
