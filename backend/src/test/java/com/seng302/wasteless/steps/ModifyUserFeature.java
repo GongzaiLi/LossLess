@@ -1,6 +1,9 @@
 package com.seng302.wasteless.steps;
 
+import com.seng302.wasteless.controller.CardController;
 import com.seng302.wasteless.controller.ListingController;
+import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
@@ -8,6 +11,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -43,6 +49,9 @@ public class ModifyUserFeature {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     private ResultActions responseResult;
 
@@ -200,6 +209,27 @@ public class ModifyUserFeature {
             addressService.createAddress(newUser.getHomeAddress());
             userService.createUser(newUser);
         }
+    }
+
+    @When("The User modifies his profile with the country: {string}")
+    public void theUserModifiesHisProfileWithTheCountry(String newCountry) throws Exception {
+        String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
+                        "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
+                "John", "Smith", "1999-04-27", "c@c", newCountry, "streetNumber", "streetName", "suburb", "city", "region", "postcode");
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/"+ currentUserId)
+                .content(jsonInStringForRequest)
+                .contentType(APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @Then("The User who is modifying will have a notification saved")
+    public void theUserWhoIsModifyingWillHaveANotificationSaved() throws Exception {
+        responseResult.andExpect(status().isOk());
+        List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(currentUserDetails.getId());
+        Assertions.assertEquals(1, notificationList.size());
+        Assertions.assertEquals(NotificationType.CURRENCY_CHANGE, notificationList.get(0).getType());
+
     }
 }
 

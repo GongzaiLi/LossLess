@@ -7,9 +7,7 @@ import com.seng302.wasteless.dto.PutUserDto;
 import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
-import com.seng302.wasteless.model.UserSearchSortTypes;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
@@ -370,6 +368,7 @@ public class UserController {
         User userToModify = userService.getUserToModify(userId);
 
         boolean userModifyingThemselves = loggedInUser.getId().equals(userToModify.getId());
+        boolean userCountryChanged = !modifiedUser.getHomeAddress().getCountry().equals(userToModify.getHomeAddress().getCountry());
 
         userService.modifyUserDateOfBirth(userToModify, modifiedUser.getDateOfBirth());
         userService.modifyUserHomeAddress(userToModify, modifiedUser.getHomeAddress());
@@ -423,6 +422,14 @@ public class UserController {
 
         logger.debug("Updating user: {}", modifiedUser.getEmail());
         userService.updateUserDetails(userToModify, modifiedUser);
+
+        if (userCountryChanged) {
+            Notification notification = NotificationService.createNotification(userToModify.getId(), null, NotificationType.CURRENCY_CHANGE,
+                    "You have changed country and therefore your currency may have changed. " +
+                            "This will not affect the currency of products in your administered business unless you " +
+                            "also modify the address of the business.");
+            notificationService.saveNotification(notification);
+        }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
