@@ -67,10 +67,9 @@ public class NotificationController {
     @PatchMapping("/notifications/{id}")
     public ResponseEntity<Object> patchNotificationStatus(@PathVariable("id") Integer notificationId, @Valid @RequestBody PatchNotificationStatusDTO notificationStatusDTO) {
         Notification notification = notificationService.findNotificationById(notificationId);
-        User loggedInUser = userService.getCurrentlyLoggedInUser();
-        if (!notification.getUserId().equals(loggedInUser.getId()) && !loggedInUser.checkUserGlobalAdmin()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the user that this notification belongs to, and you are not an admin.");
-        }
+        String logString = "Cannot update notification " + notification.getId();
+        validateUser(notification, logString);
+
         NotificationTag tag;
         try {
             if (notificationStatusDTO.getTag() == null) {
@@ -83,9 +82,6 @@ public class NotificationController {
         }catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The tag specified is not valid");
         }
-
-        String logString = "Cannot update notification " + notification.getId();
-        validateUser(notification, logString);
 
         notificationStatusDTO.applyToNotification(notification, tag);
         notificationService.saveNotification(notification);

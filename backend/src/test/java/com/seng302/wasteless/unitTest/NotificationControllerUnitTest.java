@@ -175,7 +175,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content(request)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
     
@@ -187,7 +187,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content("{\"tag\": \"VIOLET\"}")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
