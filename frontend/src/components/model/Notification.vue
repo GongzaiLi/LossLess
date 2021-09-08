@@ -10,33 +10,38 @@
       <hr class="unreadHr">
     </div>
 
-    <b-row>
-    <b-col cols="1">
-      <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
-      <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
-      <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
-      <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
-      <b-icon-cart v-else-if="updatedNotification.type==='Purchased listing'"/>
-    </b-col>
-    <b-col cols="7">
-      <h6> {{updatedNotification.type}} </h6>
-    </b-col>
-    <b-col cols="3">
-      <h6> {{updatedNotification.price}} </h6>
-    </b-col>
-  </b-row>
-  <hr class="mt-1 mb-2">
-  <span>{{ updatedNotification.message }}</span>
+    <div>
+      <b-row>
+      <b-col cols="1">
+        <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
+        <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
+        <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
+        <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
+        <b-icon-cart v-else-if="updatedNotification.type==='Purchased listing'"/>
+      </b-col>
+      <b-col cols="6">
+        <h6> {{updatedNotification.type}} </h6>
+      </b-col>
+      <b-col cols="3">
+        <h6> {{updatedNotification.price}} </h6>
+      </b-col>
+      <b-col cols="1" class="float-right">
+          <b-button size="sm" variant="outline-success" @click.stop="archiveNotification" title="Archive this notification"><b-icon-archive></b-icon-archive></b-button>
+      </b-col>
+      </b-row>
+      <hr class="mt-1 mb-2">
+      <span>{{ updatedNotification.message }}</span>
 
-    <b-row>
-      <b-col cols="11">
-        <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
-      </b-col>
-      <b-col v-if="updatedNotification.read"  cols="1">
-        <span class="readLabel">
-         <b-icon-check2-all> </b-icon-check2-all> </span>
-      </b-col>
-    </b-row>
+      <b-row>
+        <b-col cols="11">
+          <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
+        </b-col>
+        <b-col v-if="updatedNotification.read"  cols="1">
+          <span class="readLabel">
+           <b-icon-check2-all> </b-icon-check2-all> </span>
+        </b-col>
+      </b-row>
+    </div>
 
   </div>
 </template>
@@ -65,6 +70,7 @@ span.unreadLabel {
 
 <script>
 import Api from "../../Api";
+import EventBus from "../../util/event-bus";
 
 export default {
   name: "Notification",
@@ -89,7 +95,18 @@ export default {
       notification.price = currency.symbol + purchasedListing.price + " " + currency.code
       notification.message = `${purchasedListing.quantity} x ${purchasedListing.product.name}`
       return notification
+    },
+
+    /**
+     * Calls API archiveNotification patch request
+     * and using an EventBus that emits notificationUpdate so that
+     * other components are refreshed.
+     */
+    async archiveNotification() {
+      await Api.archiveNotification(this.notification.id)
+      EventBus.$emit("notificationUpdate")
     }
+
 
   },
   async mounted() {
