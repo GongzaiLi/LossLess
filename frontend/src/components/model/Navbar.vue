@@ -59,8 +59,8 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <img v-if="userHasProfilePicture" :src="getURL()" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
-        <img  v-else-if="!userHasProfilePicture" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+        <img v-if="userHasProfilePicture&&isActingAsUser" :src="getURL()" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+        <img  v-else-if="!userHasProfilePicture||!isActingAsUser" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
       </template>
 
       <div v-if="!isActingAsUser">
@@ -98,7 +98,6 @@ Date: sprint_1
 <script>
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
 import api from "../../Api";
-import {setCurrentlyActingAs} from '../../auth'
 import NotificationDropdown from "./NotificationDropdown";
 import EventBus from "../../util/event-bus";
 
@@ -139,11 +138,12 @@ export default {
         return this.$currentUser.currentlyActingAs.name;
       }
     },
+    /**
+     * @user user information returned from backend
+     * @return Boolean True if user has a profile picture and False otherwise
+     */
     userHasProfilePicture: function () {
-      if(this.$currentUser.profileImage){
-        return true
-      }
-      return false
+      return !!this.$currentUser.profileImage;
     },
 
     /**

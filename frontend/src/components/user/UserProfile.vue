@@ -14,9 +14,9 @@ Date: 5/3/2021
 
           <b-row>
             <b-col md="2">
-              <img v-if="userHasProfilePicture" :src="getURL()" alt="User Profile Image" width="75" class="rounded-circle"
+              <img v-if="userHasProfilePicture" :src="getURL()" alt="User Profile Image" width="75" height="75" class="rounded-circle"
                    style="margin-left: 5px; position: relative">
-              <img v-else-if="!userHasProfilePicture" src="../../../public/profile-default.jpg" alt="User Profile Image" width="75" class="rounded-circle"
+              <img v-else-if="!userHasProfilePicture" src="../../../public/profile-default.jpg" alt="User Profile Image" width="75" height="75" class="rounded-circle"
                    style="margin-left: 5px; position: relative">
             </b-col>
             <b-col md="10" class="mt-2">
@@ -398,13 +398,13 @@ export default {
           || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     },
 
+    /**
+     * @user user information returned from backend
+     * @return Boolean True if user has a profile picture and False otherwise
+     */
     userHasProfilePicture: function () {
-      if(this.userData.profileImage){
-        return true
-      }
-      return false
+      return !!this.userData.profileImage;
     }
-
 
   },
   watch: {

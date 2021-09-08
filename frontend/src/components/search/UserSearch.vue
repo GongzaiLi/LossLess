@@ -36,8 +36,8 @@ Date: 7/3/2021
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
           <template #cell(name)="data">
-            <img v-if="userHasProfilePicture(data.item)" :src="getURL(data.item)" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
-            <img  v-else-if="!userHasProfilePicture(data.item)" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img v-if="userHasProfilePicture(data.item)" :src="getURL(data.item)" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <img  v-else-if="!userHasProfilePicture(data.item)" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
             {{createUsername(data.item)}}
           </template>
         </b-table>
@@ -172,7 +172,6 @@ export default {
       let tableHeader = {};
       for (const user of data) {
         tableHeader = user;
-        //tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
@@ -196,14 +195,21 @@ export default {
       }
       return roleLabel;
     },
+
+    /**
+     * @user user information returned from backend
+     * @returns String compiled from the user's first name, middle name - if exists and lastname
+     */
     createUsername(user){
       return `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
     },
+
+    /**
+     * @user user information returned from backend
+     * @return Boolean True if user has a profile picture and False otherwise
+     */
     userHasProfilePicture(user) {
-      if(user.profileImage){
-        return true
-      }
-      return false
+      return !!user.profileImage;
     },
     /**
      * Returns the URL required to get the image given the filename
@@ -226,7 +232,6 @@ export default {
       let fields = [
         {
           key: 'name',
-          //label: 'F name',
           sortable: true
         },
         {
