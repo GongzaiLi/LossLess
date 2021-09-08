@@ -42,15 +42,10 @@ public class NotificationController {
     public ResponseEntity<Object> deleteNotification(@PathVariable Integer id) {
         logger.info("Request to delete notification with id: {}", id);
 
-        User user = userService.getCurrentlyLoggedInUser();
         Notification notification = notificationService.findNotificationById(id);
 
-        if (!notification.getUserId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
-            logger.warn("Cannot delete notification {}. It does not belong to user {} and " +
-                    "user is not global admin", id, user.getId());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This notification does not belong to you.");
-        }
-        logger.info("Notification {} retrieved for user with id: {}", notification, user.getId());
+        String logString = "Cannot delete notification " + notification.getId();
+        validateUser(notification, logString);
 
         notificationService.deleteNotification(notification);
         return ResponseEntity.status(HttpStatus.OK).body("Notification deleted successfully");
@@ -70,14 +65,20 @@ public class NotificationController {
     public ResponseEntity<Object> patchNotificationStatus(@PathVariable("id") Integer notificationId, @Valid @RequestBody PatchNotificationStatusDTO notificationStatusDTO) {
         Notification notification = notificationService.findNotificationById(notificationId);
 
-        User loggedInUser = userService.getCurrentlyLoggedInUser();
-        if (!notification.getUserId().equals(loggedInUser.getId()) && !loggedInUser.checkUserGlobalAdmin()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the user that this notification belongs to, and you are not an admin.");
-        }
+        String logString = "Cannot update notification " + notification.getId();
+        validateUser(notification, logString);
 
         notificationStatusDTO.applyToNotification(notification);
         notificationService.saveNotification(notification);
-
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    public void validateUser(Notification notification, String logString) {
+        User user = userService.getCurrentlyLoggedInUser();
+        if (!notification.getUserId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
+            logger.warn("{}. This notification does not belong to user with id: {} and user is not an admin.", logString, user.getId());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This notification does not belong to you.");
+        }
+        logger.info("Notification {} retrieved for user with id: {}", notification, user.getId());
     }
 }
