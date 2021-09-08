@@ -27,12 +27,13 @@ Date: sprint_6
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
-              <b-select v-model="groupBy" :options="groupByOptions" @change="getSalesReport(dateRange)"></b-select>
+              <b-select id="periodSelector" v-model="groupBy" :options="groupByOptions" @change="getSalesReport(dateRange)"></b-select>
             </b-col>
           </b-row>
           <b-row>
-            <b-col>
+            <b-col class="mt-2">
               <b-table
+                  ref="salesReportTable"
                   no-border-collapse
                   no-local-sorting
                   striped
@@ -169,7 +170,9 @@ export default {
               this.$log.debug("Data loaded: ", response.data);
               this.updateTotalResults(startDate, endDate, response.data)
               this.groupedResults = response.data;
-            })
+            }).catch((error) => {
+              this.$log.debug("Error message", error);
+            });
       }
     },
 
