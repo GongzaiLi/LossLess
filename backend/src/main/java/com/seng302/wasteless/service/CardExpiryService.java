@@ -60,7 +60,7 @@ public class CardExpiryService {
         for (Card card : expiredCards) {
             logger.warn("Deleting expired card id={}, created={}, title={}, creator={}", card.getId(), card.getCreated(), card.getTitle(), card.getCreator());
 
-            Notification notification = notificationService.createNotification(card.getCreator().getId(),card.getId(), NotificationType.EXPIRED,String.format("Your card: %s has expired", card.getTitle()));
+            Notification notification = NotificationService.createNotification(card.getCreator().getId(),card.getId(), NotificationType.EXPIRED,String.format("Your card: %s has expired", card.getTitle()));
             notificationService.saveNotification(notification);
 
             cardService.deleteCard(card);

@@ -9,7 +9,7 @@
 
 <script>
 import Login from "./components/user/Login";
-import Register from "./components/user/Register";
+import UserDetailsModal from "./components/user/UserDetailsModal";
 import Navbar from "./components/model/Navbar";
 import UserProfile from "./components/user/UserProfile";
 import SearchPage from "./components/search/SearchPage";
@@ -30,7 +30,7 @@ const app = {
     // list your components here to register them (located under 'components' folder)
     // https://vuejs.org/v2/guide/components-registration.html
     Login,
-    Register,
+    UserDetailsModal,
     UserProfile,
     Navbar,
     HomePage,

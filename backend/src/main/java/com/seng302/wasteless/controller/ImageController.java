@@ -279,7 +279,7 @@ public class ImageController {
     public ResponseEntity<Object> postUserImage(@PathVariable("userId") Integer userId, @RequestParam("filename") MultipartFile file) {
         logger.info("Request to upload user image for user: {}", userId);
 
-        User userForImage = getUserToModify(userId);
+        User userForImage = userService.getUserToModify(userId);
 
         //Delete old user image if they had one
         if (userForImage.getProfileImage() != null) {
@@ -305,7 +305,7 @@ public class ImageController {
      */
     @DeleteMapping("/users/{userId}/image")
     public ResponseEntity<Object> deleteUserImage(@PathVariable("userId") Integer userId) {
-        User userForImage = getUserToModify(userId);
+        User userForImage = userService.getUserToModify(userId);
 
         if (userForImage.getProfileImage() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given user does not have a profile image");
@@ -316,28 +316,5 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    /**
-     * Given the ID of a user to modify, returns a User object with given ID.
-     * Will also check if the user is allowed to modify the user, and if not, throws a
-     * 403 FORBIDDEN exception.
-     * This should really be in the User Controller but that file is wayyy too big so we
-     * decided to put this here for now. Hopefully when the user controller gets refactored
-     * we can chuck it back there.
-     * @param userId ID of user to modify
-     * @return Object of user with given ID
-     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the user with given id,
-     * 406 NOT ACCEPTABLE if given user doesn't exist
-     */
-    private User getUserToModify(Integer userId) {
-        User loggedInUser = userService.getCurrentlyLoggedInUser();
-
-        if (loggedInUser.getId().equals(userId)) {
-            return loggedInUser;
-        } else if (loggedInUser.checkUserGlobalAdmin()) {
-            return userService.findUserById(userId);
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this user");
-        }
-    }
 }
 

@@ -34,14 +34,25 @@ const name = "countdown"
 const description = "Countdown is New Zealand’s leading supermarket brand, serving more than 3 million " +
   "customers every week.";
 const type = "Retail Trade";
-const address = "17 Chappie Place, Hornby, Christchurch 8042";
+const address = {
+  streetNumber: "17",
+  streetName: "Chappie Place",
+  suburb: "Hornby",
+  city: "Christchurch",
+  region: "Christchurch",
+  country: "NZ",
+  postcode: "8042"
+};
 
 
 beforeEach(() => {
   wrapper = mount(CreateBusiness, {
     localVue,
     router,
-    mocks: {$log, $currentUser : JSON.parse(JSON.stringify($currentUser))}
+    props: {
+      value: {}
+    },
+    mocks: {$log, $currentUser: JSON.parse(JSON.stringify($currentUser))}
   });
 });
 
@@ -231,7 +242,7 @@ describe('CreateBusiness HTML testing', () => {
   });
 
   test('Cant create if acting as business', async () => {
-    wrapper.vm.$currentUser.currentlyActingAs = {'balh' : 'blah'};
+    wrapper.vm.$currentUser.currentlyActingAs = {'balh': 'blah'};
 
     await wrapper.vm.$nextTick();
 

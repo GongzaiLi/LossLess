@@ -9,15 +9,12 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -26,11 +23,8 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.seng302.wasteless.TestUtils.createListingWithNameAndPrice;
-import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -182,13 +176,13 @@ public class IndividualFullListingFeature {
 
     @Then("A new notification is created for me telling me I liked the listing with id {string}")
     public void aNewNotificationIsCreatedForMeTellingMeILikedTheListingWithId(String id) {
-        List<Notification> currentUserNotifications = notificationService.findAllNotificationsByUserId(currentUser.getId());
+        List<Notification> currentUserNotifications = notificationService.findAllUnArchivedNotificationsByUserId(currentUser.getId());
         Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals(NotificationType.LIKEDLISTING)));
     }
 
     @Then("A new notification is created for me telling me I unliked the listing with id {string}")
     public void aNewNotificationIsCreatedForMeTellingMeIUnlikedTheListingWithId(String id) {
-        List<Notification> currentUserNotifications = notificationService.findAllNotificationsByUserId(currentUser.getId());
+        List<Notification> currentUserNotifications = notificationService.findAllUnArchivedNotificationsByUserId(currentUser.getId());
         Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals(NotificationType.UNLIKEDLISTING)));
 
     }

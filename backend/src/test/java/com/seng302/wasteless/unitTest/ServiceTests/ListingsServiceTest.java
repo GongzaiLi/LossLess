@@ -51,9 +51,11 @@ class ListingsServiceTest {
 
     private User curUser;
 
+    private Listing savedListing;
+
     @BeforeAll
     void setUp() {
-        TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);
+        savedListing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);
         TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES,LocalDate.of(2099, Month.FEBRUARY, 1), 69, 69);
         TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton", "Peaches and Wonka", BusinessTypes.RETAIL_TRADE, LocalDate.of(2099, Month.MARCH, 1), 69, 69);
         TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10), 69, 69);
@@ -241,7 +243,7 @@ class ListingsServiceTest {
 
     @Test
     void whenGetListingById_andListingExists_thenListingReturned() {
-        Assertions.assertNotNull(listingsService.findFirstById(1));
+        Assertions.assertNotNull(listingsService.findFirstById(savedListing.getId()));
     }
 
     @Test
