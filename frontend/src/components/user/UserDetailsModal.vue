@@ -132,6 +132,7 @@ Date: 3/3/2021
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
 import PasswordInput from "../model/PasswordInput";
+import EventBus from "../../util/event-bus"
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 120;
@@ -279,10 +280,10 @@ export default {
         dateOfBirth: this.userData.dateOfBirth,
         phoneNumber: this.userData.phoneNumber,
         homeAddress: this.userData.homeAddress,
+        password: this.userData.oldPassword
       }
       if (this.userData.newPassword !== "") {
         editData.newPassword = this.userData.newPassword
-        editData.password = this.userData.oldPassword
       }
       return editData;
     },
@@ -341,7 +342,7 @@ export default {
      */
     uploadImageRequest(id) {
       api.uploadProfileImage(id, this.imageFile).then(() => {
-        this.$emit("updatedUser");
+        EventBus.$emit("updatedUser");
       })
       .catch((error) => {
         this.errors = [];
@@ -372,7 +373,7 @@ export default {
             if (this.imageURL) {
               this.uploadImageRequest(this.userData.id)
             } else {
-              this.$emit("updatedUser");
+              EventBus.$emit("updatedUser");
             }
         })
         .catch((error) => {

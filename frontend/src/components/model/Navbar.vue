@@ -95,8 +95,10 @@ Date: sprint_1
 </template>
 
 <script>
-import {setCurrentlyActingAs} from '../../auth'
+import {initializeAuth, setCurrentlyActingAs} from '../../auth'
 import NotificationDropdown from "./NotificationDropdown";
+import EventBus from "../../util/event-bus";
+
 
 /**
  * A navbar for the site that contains a brand link and navs to user profile and logout.
@@ -114,6 +116,9 @@ export default {
       cards: [],
       timer: null,
     }
+  },
+  mounted() {
+    EventBus.$on('updatedUser', this.updatedUserHandler)
   },
   computed: {
     isActingAsUser: function() {
@@ -253,6 +258,15 @@ export default {
       if (this.timer) {
         clearTimeout(this.timer);
       }
+    },
+
+    /**
+     * This is the handler for the event "updatedUser".
+     * The function calls initializeAuth from the Auth plugin
+     * which refreshes Auth
+     */
+    updatedUserHandler: function () {
+      initializeAuth()
     }
   },
 }
