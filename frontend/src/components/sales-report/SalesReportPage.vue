@@ -8,7 +8,7 @@ Date: sprint_6
       <b-list-group>
         <b-list-group-item>
           <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
-          <DateRangeInput :get-sales-report.sync="getSalesReport"/>
+          <DateRangeInput @input="getSalesReport"/>
         </b-list-group-item>
         <b-list-group-item v-if="totalResults">
           <b-card-text>
@@ -27,7 +27,8 @@ Date: sprint_6
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
-              <b-select id="periodSelector" v-model="groupBy" :options="groupByOptions" @change="getSalesReport(dateRange)"></b-select>
+              <b-select v-show="!isOneDay" id="periodSelector" v-model="groupBy" :options="groupByOptions"
+                        @change="getSalesReport(dateRange)"></b-select>
             </b-col>
           </b-row>
           <b-row>
@@ -215,6 +216,15 @@ export default {
       }
       return null;
     },
+
+    /**
+     * True if the data range to one day.
+     */
+    isOneDay: function () {
+      return this.dateRange !== null &&
+          this.dateRange.length === 2 &&
+          this.dateRange[0].toDateString() === this.dateRange[1].toDateString();
+    }
   }
 }
 </script>

@@ -156,3 +156,17 @@ describe('test get request with the getSalesReport', () => {
     expect(Api.getSalesReport).toHaveBeenCalled();
   });
 })
+
+describe('check the date range is the same day', () => {
+
+  it('the date range is the same day', async () => {
+    wrapper.vm.dateRange = [new Date('2021-09-01'), new Date('2021-09-01')];
+    expect(wrapper.vm.isOneDay).toBeTruthy();
+  });
+
+  it('Works if user not admins business', async () => {
+    wrapper.vm.dateRange = [new Date('2021-09-01'), new Date('2021-09-02')];
+    expect(wrapper.vm.isOneDay).toBeFalsy();
+  });
+
+})
