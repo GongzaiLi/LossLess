@@ -31,9 +31,9 @@ afterEach(() => {
   wrapper.destroy();
 });
 
-// const getLastEmitted = function () {
-//   return wrapper.emitted().input[wrapper.emitted().input.length - 1][0];
-// }
+const getLastEmitted = function() {
+  return wrapper.emitted().input[wrapper.emitted().input.length - 1][0];
+}
 
 describe('DateRangeInput', () => {
   test('is a Vue instance', () => {
@@ -43,7 +43,7 @@ describe('DateRangeInput', () => {
   test('emits null by default', async () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.dateRange).toStrictEqual(null);
+    expect(getLastEmitted()).toStrictEqual(null);
   });
 
   test('emits year range when select single year', async () => {

@@ -46,7 +46,7 @@
       <b-col lg="4" v-if="dateType === 'customRange'">
         <b-form-group label="End day">
           <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker"
-                             :state="!endDateValidityState"/>
+                             :state="endDateValidityState"/>
           <b-form-invalid-feedback>
             End date must be same as or after starting date.
           </b-form-invalid-feedback>
@@ -54,8 +54,8 @@
       </b-col>
 
       <b-col lg="2">
-        <b-button type="submit" :disabled="endDateValidityState" variant="primary" class="mt-4" id="filterDateBtn"
-                  :style="endDateValidityState? 'cursor: not-allowed, rad;' : ''">
+        <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4" id="filterDateBtn"
+                  :style="endDateValidityState === false ? 'cursor: not-allowed;' : ''">
           Filter
         </b-button>
       </b-col>
@@ -67,11 +67,6 @@
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export default {
   name: "DateRangeInput",
-  props: {
-    getSalesReport: {
-      type: Function
-    }
-  },
   data() {
     return {
       dateType: "any",
@@ -90,7 +85,6 @@ export default {
       selectedDay: new Date(),
       startDay: new Date(),
       endDay: new Date(),
-      dateRange: [],
     }
   },
   methods: {
@@ -124,32 +118,32 @@ export default {
      * the first and last day of the selected year/month/week/day, of the custom range the user has selected
      */
     submitPressed() {
-
+      let dateRange;
       if (this.dateType === "year") {
-        this.dateRange = [new Date(this.selectedYear, 0, 1), new Date(this.selectedYear, 11, 31)];
+        dateRange = [new Date(this.selectedYear, 0, 1), new Date(this.selectedYear, 11, 31)];
       } else if (this.dateType === "month") {
-        this.dateRange = [new Date(this.selectedYear, this.selectedMonth, 1), new Date(this.selectedYear, this.selectedMonth + 1, 0)];
+        dateRange = [new Date(this.selectedYear, this.selectedMonth, 1), new Date(this.selectedYear, this.selectedMonth + 1, 0)];
       } else if (this.dateType === "week") {
         const endOfWeek = new Date(this.selectedWeek.getTime());
         endOfWeek.setDate(endOfWeek.getDate() + 6);
-        this.dateRange = [this.selectedWeek, endOfWeek];
+        dateRange = [this.selectedWeek, endOfWeek];
       } else if (this.dateType === "day") {
-        this.dateRange = [new Date(this.selectedDay.getTime()), new Date(this.selectedDay.getTime())]; // Have to copy the dates as they will be modified later
+        dateRange = [new Date(this.selectedDay.getTime()), new Date(this.selectedDay.getTime())]; // Have to copy the dates as they will be modified later
       } else if (this.dateType === "customRange") {
-        this.dateRange = [this.startDay, this.endDay];
+        dateRange = [this.startDay, this.endDay];
       }
 
       if (this.dateType === "any") {
-        this.dateRange = null;
+        dateRange = null;
       } else {
         // Set time of start date to start of day, and time of end date to end of day, so the date range includes those two days
-        this.dateRange[0].setHours(0, 0, 0, 0);
-        this.dateRange[1].setHours(23, 59, 59, 999);
+        dateRange[0].setHours(0, 0, 0, 0);
+        dateRange[1].setHours(23, 59, 59, 999);
       }
 
-      this.getSalesReport(this.dateRange);
-
+      this.$emit('input', dateRange);
     }
+
   },
   computed: {
     /**
@@ -170,7 +164,7 @@ export default {
      * the start date, otherwise returns NULL (i.e. no validation state).
      */
     endDateValidityState() {
-      return this.startDay.getTime() > this.endDay.getTime();
+      return (this.startDay.getTime() <= this.endDay.getTime() ? null : false);
     }
   }
 }
