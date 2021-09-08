@@ -5,7 +5,7 @@
  * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
  * Returns data in the format {months: months_elapsed, years: years_elapsed}
  */
-function getMonthsAndYearsBetween(start, end) {
+export function getMonthsAndYearsBetween(start, end) {
   const timeElapsed = end - start;
   const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
   const yearsElapsed = Math.floor(daysElapsed / 365);
@@ -34,7 +34,3 @@ export function getToday() {
 export function formatDate(date) {
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
-
-
-
-export default getMonthsAndYearsBetween;
