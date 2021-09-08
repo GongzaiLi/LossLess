@@ -7,6 +7,10 @@ Feature: U32 Managing my feed
     Given We are logged in as a person with email "a@a"
     And We have a notification
 
+  Scenario: AC1 - I can delete any item from my feed.
+    When I delete the notification with id 1
+    Then The users notification with id 1 is deleted
+
   Scenario: AC2: I can easily distinguish between items I have clicked on (“read”) and those I haven’t (“unread”)
     Given My notification has not been read
     When I mark it as read

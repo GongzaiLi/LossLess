@@ -4,8 +4,6 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.repository.NotificationRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
-    private static final Logger logger = LogManager.getLogger(NotificationService.class.getName());
 
     private final NotificationRepository notificationRepository;
 
@@ -93,19 +90,6 @@ public class NotificationService {
         notificationRepository.saveAll(notifications);
     }
 
-    /**
-     * Get a notification by id for the logged-in user
-     * @param id        The id of the notifications to be retrieved
-     * @return          The found notification or 406 if the notification with given id does not exist
-     */
-    public Notification findNotificationById(Integer id) {
-        Notification possibleNotification = notificationRepository.findFirstById(id);
-        if (possibleNotification == null) {
-            logger.warn("Notification with id: {} does not exist.", id);
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Notification with given ID does not exist");
-        }
-        return notificationRepository.findFirstById(id);
-    }
 
     /**
      * Deletes a Notification object and persists the action in the database
