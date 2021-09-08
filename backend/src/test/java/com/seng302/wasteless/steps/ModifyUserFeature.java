@@ -57,6 +57,8 @@ public class ModifyUserFeature {
 
     private int currentUserId;
 
+    private int notificationListLength;
+
     public ModifyUserFeature(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
@@ -213,6 +215,7 @@ public class ModifyUserFeature {
 
     @When("The User modifies his profile with the country: {string}")
     public void theUserModifiesHisProfileWithTheCountry(String newCountry) throws Exception {
+        notificationListLength = notificationService.findAllUnArchivedNotificationsByUserId(currentUserDetails.getId()).size();
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 "John", "Smith", "1999-04-27", "c@c", newCountry, "streetNumber", "streetName", "suburb", "city", "region", "postcode");
@@ -227,7 +230,7 @@ public class ModifyUserFeature {
     public void theUserWhoIsModifyingWillHaveANotificationSaved() throws Exception {
         responseResult.andExpect(status().isOk());
         List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(currentUserDetails.getId());
-        Assertions.assertEquals(1, notificationList.size());
+        Assertions.assertEquals(notificationListLength+1, notificationList.size());
         Assertions.assertEquals(NotificationType.CURRENCY_CHANGE, notificationList.get(0).getType());
 
     }
