@@ -73,6 +73,11 @@ public class NotificationController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * Checks if a notification belongs to a user.
+     * @param notification The notification to be checked
+     * @param logString The appropriate message to be logged.
+     */
     public void validateUser(Notification notification, String logString) {
         User user = userService.getCurrentlyLoggedInUser();
         if (!notification.getUserId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
