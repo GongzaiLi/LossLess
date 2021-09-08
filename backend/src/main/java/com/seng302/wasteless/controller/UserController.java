@@ -368,11 +368,10 @@ public class UserController {
         User userToModify = userService.getUserToModify(userId);
 
         boolean userModifyingThemselves = loggedInUser.getId().equals(userToModify.getId());
+        boolean userCountryChanged = !modifiedUser.getHomeAddress().getCountry().equals(userToModify.getHomeAddress().getCountry());
 
         userService.modifyUserDateOfBirth(userToModify, modifiedUser.getDateOfBirth());
         userService.modifyUserHomeAddress(userToModify, modifiedUser.getHomeAddress());
-
-        boolean userCountryChanged = !modifiedUser.getHomeAddress().getCountry().equals(currentUser.getHomeAddress().getCountry());
 
         if (!userModifyingThemselves) {
             userService.modifyUserPassword(userToModify, modifiedUser.getNewPassword());
@@ -425,7 +424,7 @@ public class UserController {
         userService.updateUserDetails(userToModify, modifiedUser);
 
         if (userCountryChanged) {
-            Notification notification = notificationService.createNotification(userToModify.getId(), null, NotificationType.CURRENCY_CHANGE,
+            Notification notification = NotificationService.createNotification(userToModify.getId(), null, NotificationType.CURRENCY_CHANGE,
                     "You have changed country and therefore your currency may have changed. " +
                             "This will not affect the currency of products in your administered business unless you " +
                             "also modify the address of the business.");

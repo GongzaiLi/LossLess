@@ -216,7 +216,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 "John", "Smith", "1999-04-27", "c@c", newCountry, "streetNumber", "streetName", "suburb", "city", "region", "postcode");
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/"+ currentUserId)
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -226,7 +226,7 @@ public class ModifyUserFeature {
     @Then("The User who is modifying will have a notification saved")
     public void theUserWhoIsModifyingWillHaveANotificationSaved() throws Exception {
         responseResult.andExpect(status().isOk());
-        List<Notification> notificationList = notificationService.findAllNotificationsByUserId(currentUserDetails.getId());
+        List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(currentUserDetails.getId());
         Assertions.assertEquals(1, notificationList.size());
         Assertions.assertEquals(NotificationType.CURRENCY_CHANGE, notificationList.get(0).getType());
 
