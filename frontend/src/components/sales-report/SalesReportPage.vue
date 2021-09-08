@@ -32,7 +32,18 @@ Date: sprint_6
           </b-row>
           <b-row>
             <b-col>
-              <b-table striped :items="groupedResults" :fields="fields" bordered>
+              <b-table
+                  no-border-collapse
+                  no-local-sorting
+                  striped
+                  :items="groupedResults"
+                  :fields="fields"
+                  responsive
+                  bordered
+                  show-empty>
+              <template #empty>
+                <h3 class="no-results-overlay" >No results to display</h3>
+              </template>
               </b-table>
             </b-col>
             <b-col>
@@ -64,6 +75,7 @@ Date: sprint_6
 <script>
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
+import {formatDate} from "../../util";
 
 export default {
   name: "sales-report-page",
@@ -86,39 +98,12 @@ export default {
         {key: 'totalValue', sortable: true}
       ],
       totalResults: {
-        "startDate": "2021-09-01",
-        "endDate": "2021-09-04",
-        "totalPurchases": 999999999999,
-        "totalValue": 99999999999
+        startDate: "",
+        endDate: "",
+        totalPurchases: 0,
+        totalValue: 0
       },
-      groupedResults:
-          [
-            {
-              "startDate": "2021-09-01",
-              "endDate": "2021-09-01",
-              "totalPurchases": 0,
-              "totalValue": 0.0
-            },
-            {
-              "startDate": "2021-09-02",
-              "endDate": "2021-09-02",
-              "totalPurchases": 0,
-              "totalValue": 0.0
-            },
-            {
-              "startDate": "2021-09-03",
-              "endDate": "2021-09-03",
-              "totalPurchases": 0,
-              "totalValue": 0.0
-            },
-            {
-              "startDate": "2021-09-04",
-              "endDate": "2021-09-04",
-              "totalPurchases": 1,
-              "totalValue": 2.5
-            }
-          ]
-      ,
+      groupedResults: [],
     }
   },
 
@@ -158,11 +143,13 @@ export default {
      **/
     getSalesReport: async function(dateRange) {
       const businessId = this.$route.params.id;
-      const startDate = dateRange[0];
-      const endDate = dateRange[1];
+      const startDate = formatDate(dateRange[0]);
+      const endDate = formatDate(dateRange[1]);
       await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
       .then((response) => {
         this.$log.debug("Data loaded: ", response.data);
+        this.totalResults.startDate = startDate;
+        this.totalResults.endDate = endDate;
         this.groupedResults = response.data;
       })
     }
