@@ -18,8 +18,8 @@ Feature: Modify User
       Then The User who is modifying will receive an error
 
     Scenario: AC2: A user tries to modify his email but his inputted email already exists
-      Given A user exists with the email "a@a"
-      When The User modifies his email to "a@a"
+      Given A user exists with the email "d@d"
+      When The User modifies his email to "d@d"
       Then The User who is modifying will receive an email taken error
 
     Scenario: AC3: A user tries to modify but is missing an email

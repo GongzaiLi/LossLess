@@ -4,11 +4,9 @@ import com.jayway.jsonpath.JsonPath;
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
-import com.seng302.wasteless.repository.UserRepository;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -21,7 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -178,14 +175,14 @@ public class PurchasesFeature {
     public void notifications_are_created_for_the_users_who_have_liked_the_listing_that_was_purchased(Integer numNotification) {
         Assertions.assertEquals(userList.size(), numNotification);
         for (User user : userList) {
-            List<Notification> notificationList = notificationService.findAllNotificationsByUserId(user.getId());
+            List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(user.getId());
             Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.LIKEDLISTING_PURCHASED)));
         }
     }
 
     @Then("A notifications is created telling me I have purchased the listing")
     public void a_notifications_is_created_telling_me_i_have_purchased_the_listing() {
-        List<Notification> notificationList = notificationService.findAllNotificationsByUserId(currentUserDetails.getId());
+        List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(currentUserDetails.getId());
         Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.PURCHASED_LISTING)));
     }
 

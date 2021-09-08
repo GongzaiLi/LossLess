@@ -155,21 +155,21 @@ describe('User Role', () => {
     wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.showUserRole).toBe(true);
+    expect(wrapper.vm.currentUserAdmin).toBe(true);
   });
 
   test('displays-if-current-user-is-dgaa', async () => {
     wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.showUserRole).toBe(true);
+    expect(wrapper.vm.currentUserAdmin).toBe(true);
   });
 
   test('doesnt-display-if-current-user-is-user', async () => {
     wrapper.vm.$currentUser.role = 'user';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.showUserRole).toBe(false);
+    expect(wrapper.vm.currentUserAdmin).toBe(false);
   });
 })
 

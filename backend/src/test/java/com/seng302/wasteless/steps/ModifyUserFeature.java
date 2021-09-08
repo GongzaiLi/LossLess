@@ -55,6 +55,8 @@ public class ModifyUserFeature {
 
     private ResultActions responseResult;
 
+    private int currentUserId;
+
     public ModifyUserFeature(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
@@ -83,6 +85,7 @@ public class ModifyUserFeature {
             userService.saveUserChanges(currentUser);
         }
 
+        currentUserId = currentUser.getId();
         currentUserDetails = new CustomUserDetails(currentUser);
     }
 
@@ -91,7 +94,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"password\": \"%s\", \"newPassword\": \"%s\", \"middleName\": \"%s\", \"nickname\": \"%s\", \"bio\": \"%s\", \"phoneNumber\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 firstName, lastName, dateOfBirth, password, newPassword, middleName, nickname, bio, phoneNumber, email, country, streetNumber, streetName, suburb, city, region, postcode);
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/" + currentUserId)
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -109,7 +112,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 "John", "Smith", dateOfBirth, "c@c", "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode");
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/" + currentUserId)
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -126,7 +129,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 "John", "Smith", "1999-04-27", email, "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode");
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -138,7 +141,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 firstname, "Smith", "1999-04-27", "c@c", "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode");
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -150,7 +153,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 "John", lastname, "1999-04-27", "c@c", "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode");
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/2")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -161,7 +164,7 @@ public class ModifyUserFeature {
     public void theUserModifiesHisProfileWithTheHomeAddress(String homeaddress) throws Exception {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", \"homeAddress\": \"%s\"}",
                 "John", "Smith", "1999-04-27", "c@c", homeaddress);
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/2")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -174,7 +177,7 @@ public class ModifyUserFeature {
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}, " +
                         "\"password\": \"%s\", \"newPassword\": \"%s\", \"confirmPassword\": \"%s\"}",
                 "John", "Smith", "1999-04-27", "c@c", "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode", "wrong", newPassword, newPassword);
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/" + currentUserId)
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -186,7 +189,7 @@ public class ModifyUserFeature {
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}, \"password\": \"%s\"}",
                 "John", "Smith", "1999-04-27", email, "country", "streetNumber", "streetName", "suburb", "city", "region", "postcode", "2145");
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.put("/users/" + currentUserId)
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
