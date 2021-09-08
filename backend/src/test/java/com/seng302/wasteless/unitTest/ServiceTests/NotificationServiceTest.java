@@ -32,21 +32,4 @@ class NotificationServiceTest {
         assertNotNull(notificationService.findNotificationById(createdNotificationId));
     }
 
-    @Test
-    void whenCheckValidTag_ValidTag_ThenReturnEnumTag() {
-        NotificationTag tag = notificationService.checkValidTag("GREEN");
-        assertEquals(NotificationTag.GREEN, tag);
-    }
-
-    @Test
-    void whenCheckValidTag_nullTag_ThenReturnNull() {
-        NotificationTag tag = notificationService.checkValidTag(null);
-        assertNull(tag);
-    }
-
-    @Test
-    void whenCheckValidTag_InvalidTag_ThenReturnEnumTag() {
-        assertThrows(ResponseStatusException.class, () -> notificationService.checkValidTag("VIOLET"));
-    }
-
 }

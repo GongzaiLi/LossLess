@@ -2,6 +2,7 @@ package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.PatchNotificationStatusDTO;
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationTag;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class NotificationController {
 
     /**
      * Handles PATCH requests to change a notification's state, i.e. whether it is read, starred, and/or archived.
+     * if tag is null set tag to null if tag is not sent set tag to current value otherwise update tag to new value
      * @param notificationId Id of the notification to be patched
      * @param notificationStatusDTO Valid DTO containing data on how the notification will be patched
      * @return
@@ -45,7 +47,20 @@ public class NotificationController {
         if (!notification.getUserId().equals(loggedInUser.getId()) && !loggedInUser.checkUserGlobalAdmin()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the user that this notification belongs to, and you are not an admin.");
         }
-        notificationStatusDTO.applyToNotification(notification, notificationService.checkValidTag(notificationStatusDTO.getTag()));
+        NotificationTag tag;
+        try {
+            if (notificationStatusDTO.getTag() == null) {
+                tag = null;
+            } else if (notificationStatusDTO.getTag().equals("")) {
+                tag = notification.getTag();
+            } else{
+                tag = NotificationTag.valueOf(notificationStatusDTO.getTag().toUpperCase());
+            }
+        }catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The tag specified is not valid");
+        }
+
+        notificationStatusDTO.applyToNotification(notification, tag);
         notificationService.saveNotification(notification);
 
         return ResponseEntity.status(HttpStatus.OK).build();

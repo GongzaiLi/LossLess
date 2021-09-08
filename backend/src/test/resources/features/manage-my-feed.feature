@@ -35,4 +35,4 @@ Feature: U32 Managing my feed
   Scenario: AC6: Tags can be removed.
     Given My notification has been tagged as "BLUE"
     When I remove the tag
-    Then My notification has been removed
+    Then My tag has been removed

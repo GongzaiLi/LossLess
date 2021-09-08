@@ -19,7 +19,7 @@ public class PatchNotificationStatusDTO {
     private Boolean read;
     private Boolean starred;
     private Boolean archived;
-    private String tag;
+    private String tag = "";
 
     /**
      * @param notification the notification being updated

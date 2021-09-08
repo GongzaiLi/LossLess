@@ -181,7 +181,7 @@ public class ManageMyFeedFeature {
 
     @Given("My notification has been tagged as {string}")
     public void my_notification_has_been_tagged_as(String string) {
-        notification.setTag(notificationService.checkValidTag(string));
+        notification.setTag(NotificationTag.valueOf(string));
         notificationService.saveNotification(notification);
     }
 
@@ -194,8 +194,8 @@ public class ManageMyFeedFeature {
                 .andExpect(status().isOk());
     }
 
-    @Then("My notification has been removed")
-    public void my_notification_has_been_removed() throws Exception {
+    @Then("My tag has been removed")
+    public void my_tag_has_been_removed() throws Exception {
         getNotifications().andExpect(
                 jsonPath(String.format("$[?(@.id==%d && @.tag==null)]", notification.getId()))
                         .isNotEmpty());
