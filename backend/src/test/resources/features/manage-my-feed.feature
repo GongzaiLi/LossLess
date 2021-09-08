@@ -31,3 +31,17 @@ Feature: U32 Managing my feed
     When I archive it
     Then The notification no longer appears in my feed
 
+  Scenario: AC6: I can “tag” an item.
+    Given My notification has no tag
+    When I add the tag "YELLOW"
+    Then The notification appears as tagged "YELLOW"
+
+  Scenario: AC6: Each item can have at most one tag.
+    Given My notification has been tagged as "BLUE"
+    When I add the tag "YELLOW"
+    Then The notification appears as tagged "YELLOW"
+
+  Scenario: AC6: Tags can be removed.
+    Given My notification has been tagged as "BLUE"
+    When I remove the tag
+    Then My tag has been removed

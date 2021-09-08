@@ -2,10 +2,7 @@ package com.seng302.wasteless.unitTest;
 
 
 import com.seng302.wasteless.controller.NotificationController;
-import com.seng302.wasteless.model.Notification;
-import com.seng302.wasteless.model.NotificationType;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -167,4 +165,33 @@ class NotificationControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"{\"tag\": \"GREEN\"}", "{\"tag\": \"green\"}", "{\"tag\": null}","{}"})
+    void whenPatchRequestToNotification_ValidTag_Then200Response(String request) throws Exception {
+        notification.setUserId(loggedInUser.getId());
+        Mockito.when(notificationService.findNotificationById(any(Integer.class)))
+                .thenReturn(notification);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    void whenPatchRequestToNotification_InvalidTag_Then400Response() throws Exception {
+        notification.setUserId(loggedInUser.getId());
+        Mockito.when(notificationService.findNotificationById(any(Integer.class)))
+                .thenReturn(notification);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
+                .content("{\"tag\": \"VIOLET\"}")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+
+
 }

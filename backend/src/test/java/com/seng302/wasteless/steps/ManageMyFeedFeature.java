@@ -2,6 +2,7 @@ package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationTag;
 import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.security.CustomUserDetails;
@@ -204,5 +205,51 @@ public class ManageMyFeedFeature {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
+    }
+
+
+
+    @Given("My notification has no tag")
+    public void my_notification_has_no_tag() {
+        notification.setTag(null);
+        notificationService.saveNotification(notification);
+    }
+
+    @When("I add the tag {string}")
+    public void i_add_the_tag(String tag) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
+                .content("{\"tag\": \"YELLOW\"}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(currentUserDetails)))
+                .andExpect(status().isOk());
+    }
+
+    @Then("The notification appears as tagged {string}")
+    public void the_notification_appears_as_tagged(String string) throws Exception {
+        getNotifications().andExpect(
+                jsonPath(String.format("$[?(@.id==%d && @.tag==\"" + string + "\")]", notification.getId()))
+                        .isNotEmpty());
+    }
+
+    @Given("My notification has been tagged as {string}")
+    public void my_notification_has_been_tagged_as(String string) {
+        notification.setTag(NotificationTag.valueOf(string));
+        notificationService.saveNotification(notification);
+    }
+
+    @When("I remove the tag")
+    public void i_remove_the_tag() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
+                .content("{\"tag\": null}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(currentUserDetails)))
+                .andExpect(status().isOk());
+    }
+
+    @Then("My tag has been removed")
+    public void my_tag_has_been_removed() throws Exception {
+        getNotifications().andExpect(
+                jsonPath(String.format("$[?(@.id==%d && @.tag==null)]", notification.getId()))
+                        .isNotEmpty());
     }
 }
