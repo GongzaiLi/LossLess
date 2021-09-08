@@ -1,9 +1,15 @@
 package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
+import com.seng302.wasteless.model.Listing;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data transfer object for SalesReport endpoint, used to return the correct data in the correct format.
@@ -15,6 +21,16 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
 public class SalesReportDto {
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Integer totalPurchases;
     private Double totalValue;
+
+    public SalesReportDto(LocalDate startDate, LocalDate endDate, Integer totalPurchases, Double totalValue) {
+        setStartDate(startDate);
+        setEndDate(endDate);
+        setTotalPurchases(totalPurchases);
+        setTotalValue(totalValue);
+    }
+
 }
