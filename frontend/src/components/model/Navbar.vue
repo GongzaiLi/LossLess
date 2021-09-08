@@ -59,7 +59,7 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <b-img :src="$currentUser.profileImage&&isActingAsUser ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+        <b-img :src="showProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
       </template>
 
@@ -99,7 +99,7 @@ Date: sprint_1
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
 import NotificationDropdown from "./NotificationDropdown";
 import EventBus from "../../util/event-bus";
-import api from "@/Api";
+import api from "../../Api";
 
 
 /**
@@ -125,6 +125,13 @@ export default {
   computed: {
     isActingAsUser: function() {
       return this.$currentUser.currentlyActingAs == null;
+    },
+
+    /**
+     * Returns true if we should show the user's profile image. i.e. they are acting as a user and have a profile image
+     */
+    showProfilePicture: function() {
+      return this.$currentUser.profileImage&&this.isActingAsUser
     },
 
     /**
