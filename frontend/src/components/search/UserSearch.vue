@@ -1,7 +1,6 @@
 <!--
 Page that stores table and search bar to search for other users
-Author: Caleb Sim, Gongzai Li
-Date: 7/3/2021
+Date: sprint_1
 -->
 <template>
   <b-card style="max-width: 1200px">
@@ -19,7 +18,7 @@ Date: 7/3/2021
         <b-table striped hover
                  ref="searchTable"
          table-class="text-nowrap"
-         responsive="lg"
+         responsive
          no-border-collapse
          bordered
          no-local-sorting

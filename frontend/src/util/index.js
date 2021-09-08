@@ -26,5 +26,15 @@ export function getToday() {
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
 
+/**
+ * Get any date without the time
+ * need to add one to get correct date
+ * @return date in format yyyy-mm-dd
+ **/
+export function formatDate(date) {
+  return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}
+
+
 
 export default getMonthsAndYearsBetween;

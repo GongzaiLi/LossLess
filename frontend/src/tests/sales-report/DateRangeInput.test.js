@@ -31,9 +31,9 @@ afterEach(() => {
   wrapper.destroy();
 });
 
-const getLastEmitted = function () {
-  return wrapper.emitted().input[wrapper.emitted().input.length - 1][0];
-}
+// const getLastEmitted = function () {
+//   return wrapper.emitted().input[wrapper.emitted().input.length - 1][0];
+// }
 
 describe('DateRangeInput', () => {
   test('is a Vue instance', () => {
@@ -43,7 +43,7 @@ describe('DateRangeInput', () => {
   test('emits null by default', async () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
     await wrapper.vm.$nextTick();
-    expect(getLastEmitted()).toStrictEqual(null);
+    expect(wrapper.vm.dateRange).toStrictEqual(null);
   });
 
   test('emits year range when select single year', async () => {
@@ -52,7 +52,7 @@ describe('DateRangeInput', () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
 
     await wrapper.vm.$nextTick();
-    const [start, end] = getLastEmitted();
+    const [start, end] = wrapper.vm.dateRange;
     expect(start.toLocaleString()).toBe("1/1/2020, 12:00:00 AM");
     expect(end.toLocaleString()).toBe("12/31/2020, 11:59:59 PM");
   });
@@ -64,7 +64,7 @@ describe('DateRangeInput', () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
 
     await wrapper.vm.$nextTick();
-    const [start, end] = getLastEmitted();
+    const [start, end] = wrapper.vm.dateRange;
     expect(start.toLocaleString()).toBe("6/1/2020, 12:00:00 AM");
     expect(end.toLocaleString()).toBe("6/30/2020, 11:59:59 PM");
   });
@@ -75,7 +75,7 @@ describe('DateRangeInput', () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
 
     await wrapper.vm.$nextTick();
-    const [start, end] = getLastEmitted();
+    const [start, end] = wrapper.vm.dateRange;
     expect(start.toLocaleString()).toBe("8/29/2021, 12:00:00 AM");
     expect(end.toLocaleString()).toBe("9/4/2021, 11:59:59 PM");
   });
@@ -86,7 +86,7 @@ describe('DateRangeInput', () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
 
     await wrapper.vm.$nextTick();
-    const [start, end] = getLastEmitted();
+    const [start, end] = wrapper.vm.dateRange;
     expect(start.toLocaleString()).toBe("4/20/2021, 12:00:00 AM");
     expect(end.toLocaleString()).toBe("4/20/2021, 11:59:59 PM");
   });
@@ -98,7 +98,7 @@ describe('DateRangeInput', () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
 
     await wrapper.vm.$nextTick();
-    const [start, end] = getLastEmitted();
+    const [start, end] = wrapper.vm.dateRange;
     expect(start.toLocaleString()).toBe("4/19/2021, 12:00:00 AM");
     expect(end.toLocaleString()).toBe("4/20/2021, 11:59:59 PM");
   });

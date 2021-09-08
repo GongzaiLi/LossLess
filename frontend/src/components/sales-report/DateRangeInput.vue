@@ -85,6 +85,7 @@ export default {
       selectedDay: new Date(),
       startDay: new Date(),
       endDay: new Date(),
+      dateRange: [],
     }
   },
   methods: {
@@ -118,31 +119,30 @@ export default {
      * the first and last day of the selected year/month/week/day, of the custom range the user has selected
      */
     submitPressed() {
-      let dateRange;
+
       if (this.dateType === "year") {
-        dateRange = [new Date(this.selectedYear, 0, 1), new Date(this.selectedYear, 11, 31)];
+        this.dateRange = [new Date(this.selectedYear, 0, 1), new Date(this.selectedYear, 11, 31)];
       } else if (this.dateType === "month") {
-        dateRange = [new Date(this.selectedYear, this.selectedMonth, 1), new Date(this.selectedYear, this.selectedMonth + 1, 0)];
+        this.dateRange = [new Date(this.selectedYear, this.selectedMonth, 1), new Date(this.selectedYear, this.selectedMonth + 1, 0)];
       } else if (this.dateType === "week") {
         const endOfWeek = new Date(this.selectedWeek.getTime());
         endOfWeek.setDate(endOfWeek.getDate() + 6);
-        dateRange = [this.selectedWeek, endOfWeek];
+        this.dateRange = [this.selectedWeek, endOfWeek];
       } else if (this.dateType === "day") {
-        dateRange = [new Date(this.selectedDay.getTime()), new Date(this.selectedDay.getTime())]; // Have to copy the dates as they will be modified later
+        this.dateRange = [new Date(this.selectedDay.getTime()), new Date(this.selectedDay.getTime())]; // Have to copy the dates as they will be modified later
       } else if (this.dateType === "customRange") {
-        dateRange = [this.startDay, this.endDay];
+        this.dateRange = [this.startDay, this.endDay];
       }
 
       if (this.dateType === "any") {
-        dateRange = null;
+        this.dateRange = null;
       } else {
         // Set time of start date to start of day, and time of end date to end of day, so the date range includes those two days
-        dateRange[0].setHours(0, 0, 0, 0);
-        dateRange[1].setHours(23, 59, 59, 999);
+        this.dateRange[0].setHours(0, 0, 0, 0);
+        this.dateRange[1].setHours(23, 59, 59, 999);
       }
-      this.$emit('input', dateRange);
-      if (dateRange!= null) {
-        this.getSalesReport(dateRange);
+      if (this.dateRange!= null) {
+        this.getSalesReport(this.dateRange);
       }
     }
   },
