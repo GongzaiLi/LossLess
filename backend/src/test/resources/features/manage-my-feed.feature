@@ -13,9 +13,14 @@ Feature: U32 Managing my feed
     Then The notification appears as read
 
   Scenario: AC3: I can “star” items to mark them as high importance.
-    Given My notification had not been starred
+    Given My notification had not been starred and is not the newest notification
     When I star it
-    Then The notification appears as starred
+    Then The starred notification is at the top of my feed
+
+  Scenario: AC3: Starred items remain at the top of my feed even when new items arrive.
+    Given My notification has been starred
+    When A new notification arrives
+    Then The starred notification is at the top of my feed
 
   Scenario: AC4: I can archive items. Archived items are removed from the feed.
     Given My notification had not been archived

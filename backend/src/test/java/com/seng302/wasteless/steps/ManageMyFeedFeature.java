@@ -1,5 +1,6 @@
 package com.seng302.wasteless.steps;
 
+import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.Notification;
 import com.seng302.wasteless.model.NotificationTag;
 import com.seng302.wasteless.model.NotificationType;
@@ -12,6 +13,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +30,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+@WebMvcTest(ListingController.class)
+@AutoConfigureWebMvc
 public class ManageMyFeedFeature {
 
     private MockMvc mockMvc;
@@ -104,10 +109,15 @@ public class ManageMyFeedFeature {
             .isNotEmpty());
     }
 
-    @Given("My notification had not been starred")
+    @Given("My notification had not been starred and is not the newest notification")
     public void myNotificationHadNotBeenStarred() {
         notification.setStarred(false);
         notificationService.saveNotification(notification);
+
+        // Create newer notification
+        notificationService.saveNotification(
+                NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "")
+        );
     }
 
     @When("I star it")
@@ -119,11 +129,23 @@ public class ManageMyFeedFeature {
                 .andExpect(status().isOk());
     }
 
-    @Then("The notification appears as starred")
-    public void theNotificationAppearsAsStarred() throws Exception {
-        getNotifications().andExpect(
-            jsonPath(String.format("$[?(@.id==%d && @.starred==true)]", notification.getId()))
-            .isNotEmpty());
+    @Then("The starred notification is at the top of my feed")
+    public void theNotificationAppearsAtTheTopOfMyFeed() throws Exception {
+        getNotifications()
+            .andExpect(jsonPath("$[0].id").value(notification.getId()))
+            .andExpect(jsonPath("$[0].starred").value(true));
+    }
+
+    @Given("My notification has been starred")
+    public void myNotificationHasBeenStarred() throws Exception {
+        iStarIt();
+    }
+
+    @When("A new notification arrives")
+    public void aNewNotificationArrives() {
+        notificationService.saveNotification(
+                NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "")
+        );
     }
 
     @Given("My notification had not been archived")

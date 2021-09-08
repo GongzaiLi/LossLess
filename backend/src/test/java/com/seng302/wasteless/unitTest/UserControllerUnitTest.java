@@ -11,9 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.mockito.Mockito;
+import org.springframework.web.server.ResponseStatusException;
+
 import static org.mockito.ArgumentMatchers.*;
 
 import java.time.LocalDate;
@@ -36,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
 @Import(MockUserServiceConfig.class)
+@AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
 class UserControllerUnitTest {
 
     @Autowired
@@ -61,9 +66,27 @@ class UserControllerUnitTest {
 
     private User user;
 
+    private User admin;
+
+    private User defaultAdmin;
+
     private Address address;
 
     @BeforeEach void setUp() {
+
+        admin = mock(User.class);
+        admin.setId(2);
+        admin.setEmail("GAA@gmail.com");
+        admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+        admin.setDateOfBirth(LocalDate.now().minusYears(20));
+        admin.setPassword("1337");
+
+        defaultAdmin = mock(User.class);
+        defaultAdmin.setId(3);
+        defaultAdmin.setEmail("DGAA@gmail.com");
+        defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
+        defaultAdmin.setDateOfBirth(LocalDate.now().minusYears(20));
+        defaultAdmin.setPassword("1337");
 
         user = mock(User.class);
         user.setId(1);
@@ -134,6 +157,21 @@ class UserControllerUnitTest {
         Mockito
                 .when(userService.findUserById(anyInt()))
                 .thenReturn(user);
+
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(user);
+
+        Mockito
+                .when(userService.getUserToModify(anyInt()))
+                .thenReturn(user);
+
+        Mockito.when(userService.findUserByEmail(anyString()))
+                .thenReturn(user);
+
+        doReturn(1).when(user).getId();
+        doReturn(2).when(admin).getId();
+        doReturn(3).when(defaultAdmin).getId();
     }
 
     @Test
@@ -154,7 +192,7 @@ class UserControllerUnitTest {
                 "  }, " +
                 "\"password\": \"1337\"}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -180,7 +218,7 @@ class UserControllerUnitTest {
                 "\"newPassword\": \"1338\"\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -189,9 +227,9 @@ class UserControllerUnitTest {
     @Test
     void whenPutRequestToUser_andEmailAlreadyTaken_then400Response() throws Exception {
 
-        Mockito
-                .when(userService.checkEmailAlreadyUsed(anyString()))
-                .thenReturn(true);
+        doThrow(new ResponseStatusException(HttpStatus.CONFLICT, "Attempted to update user with already used email"))
+                .when(userService)
+                .updateUserEmail(any(User.class), anyString());
 
         String modifiedUser = "{\"firstName\": \"James\",\n" +
                 "\"lastName\" : \"Harris\",\n" +
@@ -210,7 +248,7 @@ class UserControllerUnitTest {
                 "\"newPassword\": \"1338\"\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
@@ -234,10 +272,145 @@ class UserControllerUnitTest {
                 "\"newPassword\": \"1338\"\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenPutRequestToUser_andNotTheUserOrDGAA_then403Response() throws Exception {
+        Mockito
+                .when(userService.getUserToModify(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this user"));
+
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(modifiedUser)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void whenPutRequestToUser_andRequestToChangePassword_andGAA_then200Response() throws Exception {
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(admin);
+
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(modifiedUser)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void whenPutRequestToUser_andRequestToChangePassword_andDGAA_then200Response() throws Exception {
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(defaultAdmin);
+
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(modifiedUser)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenPutRequestToUser_andRequestToChangeEmail_andGAA_then200Response() throws Exception {
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(admin);
+
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh1281@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(modifiedUser)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenPutRequestToUser_andRequestToChangeEmail_andDGAA_then200Response() throws Exception {
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(defaultAdmin);
+
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh1281@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  }\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                .content(modifiedUser)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -263,7 +436,7 @@ class UserControllerUnitTest {
                 "\"password\": \"1336\",\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -291,7 +464,7 @@ class UserControllerUnitTest {
                 "\"password\": \"1336\",\n" +
                 "}";
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
