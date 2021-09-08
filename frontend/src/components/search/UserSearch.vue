@@ -36,8 +36,8 @@ Date: 7/3/2021
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
           <template #cell(name)="data">
-            <img v-if="userHasProfilePicture(data.item)" :src="getURL(data.item)" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
-            <img  v-else-if="!userHasProfilePicture(data.item)" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/profile-default.jpg')"
+                   alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
             {{createUsername(data.item)}}
           </template>
         </b-table>
@@ -203,19 +203,11 @@ export default {
     createUsername(user){
       return `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
     },
-
-    /**
-     * @user user information returned from backend
-     * @return Boolean True if user has a profile picture and False otherwise
-     */
-    userHasProfilePicture(user) {
-      return !!user.profileImage;
-    },
     /**
      * Returns the URL required to get the image given the filename
      */
-    getURL(user) {
-      return api.getImage(user.profileImage.thumbnailFilename);
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
     },
   },
 

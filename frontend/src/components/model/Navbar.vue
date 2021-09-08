@@ -59,8 +59,8 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <img v-if="userHasProfilePicture&&isActingAsUser" :src="getURL()" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
-        <img  v-else-if="!userHasProfilePicture||!isActingAsUser" src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" height="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+        <b-img :src="$currentUser.profileImage&&isActingAsUser ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+               alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
       </template>
 
       <div v-if="!isActingAsUser">
@@ -97,9 +97,9 @@ Date: sprint_1
 
 <script>
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
-import api from "../../Api";
 import NotificationDropdown from "./NotificationDropdown";
 import EventBus from "../../util/event-bus";
+import api from "@/Api";
 
 
 /**
@@ -138,14 +138,6 @@ export default {
         return this.$currentUser.currentlyActingAs.name;
       }
     },
-    /**
-     * @user user information returned from backend
-     * @return Boolean True if user has a profile picture and False otherwise
-     */
-    userHasProfilePicture: function () {
-      return !!this.$currentUser.profileImage;
-    },
-
     /**
      * The businesses to show in the dropdown for the profile name. Contains
      * all businesses the user can act as, except for the business the user is acting as currently
@@ -280,9 +272,9 @@ export default {
     /**
      * Returns the URL required to get the image given the filename
      */
-    getURL() {
-      return api.getImage(this.$currentUser.profileImage.thumbnailFilename);
-    }
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
   },
 }
 </script>
