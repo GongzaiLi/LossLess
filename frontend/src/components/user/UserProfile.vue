@@ -397,13 +397,6 @@ export default {
           || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     },
 
-    /**
-     * @user user information returned from backend
-     * @return Boolean True if user has a profile picture and False otherwise
-     */
-    userHasProfilePicture: function () {
-      return !!this.userData.profileImage;
-    }
 
   },
   watch: {
