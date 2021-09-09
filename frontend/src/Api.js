@@ -81,6 +81,7 @@ export default {
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiredCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
   getNotifications: () => instance.get(`/users/notifications`, {withCredentials: true}),
+  patchNotification: (id, data) => instance.patch(`/notifications/${id}`, data, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
   searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),

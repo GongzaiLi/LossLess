@@ -42,8 +42,8 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-          <notification :notification="notification"> </notification>
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+          <notification :notification="notification" :in-navbar="false"> </notification>
         </b-card>
       </div>
     </b-card>
@@ -72,7 +72,6 @@
 
 .notification-cards {
   margin-top: 20px;
-  cursor: pointer;
 }
 
 </style>
@@ -147,19 +146,6 @@ export default {
       }
       this.notifications = (await Api.getNotifications()).data;
 
-    },
-
-    /**
-     * Performs an action based on the notification that has been clicked.
-     * When a liked or unliked listing is clicked it routes you to that listing
-     * @param notification the notification that has been clicked
-     */
-    notificationClicked(notification) {
-      if (notification.type === 'Liked Listing' || notification.type === 'Unliked Listing') {
-        if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
-          this.$router.push('/listings/' + notification.subjectId);
-        }
-      }
     },
 
   },

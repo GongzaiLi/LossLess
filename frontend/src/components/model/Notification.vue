@@ -10,27 +10,45 @@
       <hr class="unreadHr">
     </div>
 
-    <div>
-      <b-row>
-      <b-col cols="1">
-        <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
-        <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
-        <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
-        <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
-        <b-icon-cart v-else-if="updatedNotification.type==='Purchased listing'"/>
-      </b-col>
-      <b-col cols="6">
-        <h6> {{updatedNotification.type}} </h6>
-      </b-col>
-      <b-col cols="3">
-        <h6> {{updatedNotification.price}} </h6>
-      </b-col>
-      <b-col cols="1" class="float-right">
-          <b-button size="sm" variant="outline-success" @click.stop=confirmArchive title="Archive this notification"><b-icon-archive></b-icon-archive></b-button>
-      </b-col>
-      </b-row>
-      <hr class="mt-1 mb-2">
-      <span>{{ updatedNotification.message }}</span>
+    <b-row>
+    <b-col cols="2" class="pt-1 pr-0">
+      <b-icon-star-fill class="mr-2 star-icon "  v-if="updatedNotification.starred"/>
+      <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
+      <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
+      <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
+      <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
+      <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
+    </b-col>
+    <b-col class="pl-0 pt-1" cols="5">
+      <h6> {{updatedNotification.type}} </h6>
+    </b-col>
+    <b-col cols="3" class="pt-1">
+      <h6> {{updatedNotification.price}} </h6>
+    </b-col>
+    <b-col cols="2">
+        <b-dropdown right no-caret variant="link" class="float-right" v-if="!this.inNavbar">
+          <template #button-content>
+            <div>
+              <b-icon-three-dots-vertical class="three-dot float-right " ></b-icon-three-dots-vertical>
+            </div>
+          </template>
+          <b-dropdown-item @click="starNotification">
+            <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
+            <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
+          </b-dropdown-item>
+          <b-dropdown-item @click="archiveNotification">
+            <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
+          </b-dropdown-item>
+        </b-dropdown>
+    </b-col>
+  </b-row>
+  <hr class="mt-1 mb-2">
+    <div v-if="updatedNotification.type === 'Liked Listing' || updatedNotification.type === 'Unliked Listing'">
+      <span @click="goToListing" class="listing-link">{{ updatedNotification.message }}</span>
+    </div>
+    <div v-else>
+      <span >{{ updatedNotification.message }}</span>
+    </div>
 
       <b-row>
         <b-col cols="11">
@@ -41,7 +59,6 @@
            <b-icon-check2-all> </b-icon-check2-all> </span>
         </b-col>
       </b-row>
-    </div>
 
     <b-modal ref="confirmArchiveModal" size="sm"
              title="Archive Notification"
@@ -58,6 +75,7 @@
 
 
 <style>
+
 
 .readLabel {
   float: right;
@@ -76,6 +94,32 @@ span.unreadLabel {
   color: orangered;
 }
 
+.star-icon {
+  color: dodgerblue;
+}
+
+.archive-button {
+  color: green;
+}
+
+.three-dot {
+  margin-right: -10px;
+  padding-right: 0;
+
+  color: black;
+}
+
+.listing-link:hover {
+  color: dodgerblue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/*this is being used ignore warning*/
+.dropdown-menu {
+  min-width: 6rem !important;
+}
+
 </style>
 
 <script>
@@ -84,7 +128,7 @@ import EventBus from "../../util/event-bus";
 
 export default {
   name: "Notification",
-  props: ['notification'],
+  props: ['notification', 'inNavbar'],
   data() {
     return {
       updatedNotification: {message:"", type:"", read: false},
@@ -108,6 +152,33 @@ export default {
     },
 
     /**
+     * when called it checks if the notification is currently liked
+     * then sends a toggled api request based on this
+     */
+    starNotification() {
+      if(this.updatedNotification.starred) {
+        this.updatedNotification.starred = false
+        Api.patchNotification(this.updatedNotification.id, {"starred": false})
+      } else {
+        this.updatedNotification.starred = true
+        Api.patchNotification(this.updatedNotification.id, {"starred": true})
+      }
+      EventBus.$emit("notificationUpdate")
+    },
+
+    /**
+     * Performs an action based on the notification that has been clicked.
+     * When a liked or unliked listing is clicked it routes you to that listing
+     */
+    goToListing() {
+      if (this.updatedNotification.type === 'Liked Listing' || this.updatedNotification.type === 'Unliked Listing') {
+        if (this.$route.fullPath !== '/listings/' + this.updatedNotification.subjectId) {
+          this.$router.push('/listings/' + this.updatedNotification.subjectId);
+        }
+      }
+    },
+
+    /**
      * Shows a dialog to confirm archiving the notification.
      * USES REFS NOT ID TO PREVENT DUPLICATION!
      */
@@ -121,7 +192,7 @@ export default {
      * other components are refreshed.
      */
     async archiveNotification() {
-      await Api.archiveNotification(this.notification.id)
+      await Api.archiveNotification(this.updatedNotification.id)
       EventBus.$emit("notificationUpdate")
     }
 
@@ -133,6 +204,8 @@ export default {
     } else {
       this.updatedNotification = this.notification
     }
-  }
+  },
+
+
 }
 </script>
