@@ -44,7 +44,7 @@
     </div>
 
     <b-modal ref="confirmArchiveModal" size="sm"
-             title="<b-icon-check2-all/>Archive Notification"
+             title="Archive Notification"
              ok-variant="success"
              ok-title="Archive"
              @ok="archiveNotification">
