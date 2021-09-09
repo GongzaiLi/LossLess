@@ -13,10 +13,6 @@ Feature: Modify User
       When The User modifies his profile with the date of birth: "2021-04-27"
       Then The User who is modifying will receive an error
 
-    Scenario: AC2: A user tries to modify his password but his inputted current password is wrong
-      When The User modifies his password to "newPassword"
-      Then The User who is modifying will receive an error
-
     Scenario: AC2: A user tries to modify his email but his inputted email already exists
       Given A user exists with the email "d@d"
       When The User modifies his email to "d@d"

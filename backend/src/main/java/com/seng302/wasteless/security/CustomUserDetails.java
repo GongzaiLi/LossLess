@@ -30,6 +30,16 @@ public class CustomUserDetails implements UserDetails {
         return user.getPassword();
     }
 
+    /**
+     * Sets the 'username' of the currently logged in CustomUserDetails object.
+     * In this case the username of a user is just their email.
+     * This method comes in handy when the user changes their email and wants to stay logged in.
+     * @param email The email that the username/email shall be set to
+     */
+    public void setUsername(String email) {
+        this.user.setEmail(email);
+    }
+
     public Integer getId() {
         return user.getId();
     }

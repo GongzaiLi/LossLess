@@ -8,6 +8,7 @@ import com.seng302.wasteless.dto.UserSearchDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
 import com.seng302.wasteless.dto.mapper.UserSearchDtoMapper;
 import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
@@ -372,51 +373,16 @@ public class UserController {
 
         userService.modifyUserDateOfBirth(userToModify, modifiedUser.getDateOfBirth());
         userService.modifyUserHomeAddress(userToModify, modifiedUser.getHomeAddress());
+        userService.modifyUserPassword(userToModify, modifiedUser.getNewPassword());
 
-        if (!userModifyingThemselves) {
-            userService.modifyUserPassword(userToModify, modifiedUser.getNewPassword());
+        if (modifiedUser.getEmail() != null) {
             userService.updateUserEmail(userToModify, modifiedUser.getEmail());
-        } else {
 
-            boolean userPasswordChange = modifiedUser.getNewPassword() != null;
-            boolean userEmailChange = !modifiedUser.getEmail().equals(userToModify.getEmail());
-            boolean userSuppliedOldPassword = modifiedUser.getPassword() != null;
-
-            if (userEmailChange || userPasswordChange) {
-                if (!userSuppliedOldPassword) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password required when updating email or password");
-                }
-                if (!passwordEncoder.matches(modifiedUser.getPassword(), userToModify.getPassword())) {
-                    logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
-                }
-
-                userService.modifyUserPassword(userToModify, modifiedUser.getNewPassword());
-
-                userService.updateUserEmail(userToModify, modifiedUser.getEmail());
-            }
-
-            logger.debug("Updating user: {}", modifiedUser.getEmail());
-            userService.updateUserDetails(userToModify, modifiedUser);
-
-
-            //If user email or password changed, re-authenticate them
-            if (userEmailChange || userPasswordChange) {
-                if (modifiedUser.getNewPassword() != null) { //User has new password
-                    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                            modifiedUser.getEmail(), modifiedUser.getNewPassword());
-
-                    Authentication auth = authenticationManager.authenticate(token);
-
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                } else { //No new password, use old password
-                    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                            modifiedUser.getEmail(), modifiedUser.getPassword());
-
-                    Authentication auth = authenticationManager.authenticate(token);
-
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
+            if (userModifyingThemselves) {
+                // We need to change the 'username' (email) of the current authentication principal otherwise any requests after will result in 401
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                userDetails.setUsername(modifiedUser.getEmail());
             }
         }
 
