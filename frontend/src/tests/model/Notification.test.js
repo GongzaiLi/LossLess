@@ -69,7 +69,8 @@ beforeEach(() => {
 
     Api.getPurchaseListing.mockResolvedValue({data: mockListing});
     Api.getUserCurrency.mockResolvedValue({symbol: '$', code: 'NZD'});
-    Api.patchNotification = jest.fn()
+    Api.patchNotification = jest.fn();
+    Api.deleteNotification = jest.fn();
 
     wrapper = shallowMount(Notification, {
         localVue,
@@ -112,9 +113,10 @@ describe('Checks if API archiveNotification request is called when archiveNotifi
         const response = {
             response: {status: 200}
         }
-        await Api.archiveNotification.mockResolvedValue(response);
+        wrapper.vm.updatedNotification.id = 1;
+        await Api.patchNotification.mockResolvedValue(response);
         await wrapper.vm.archiveNotification();
-        expect(Api.archiveNotification).toHaveBeenCalled();
+        expect(Api.patchNotification).toHaveBeenCalledWith(1, {"archived": true});
     })
 });
 describe('check starring api call is correct', async () => {
@@ -131,9 +133,20 @@ describe('check starring api call is correct', async () => {
         wrapper.vm.updatedNotification.starred = true;
         wrapper.vm.updatedNotification.id = 1;
         await wrapper.vm.$forceUpdate();
-        wrapper.vm.starNotification();
+        await wrapper.vm.starNotification();
         expect(Api.patchNotification).toBeCalledWith(1,{"starred": false})
     });
+});
+
+describe('check deleting api call is correct', async () => {
+
+    test('check api call for delete', async () =>  {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.deleteNotification();
+        expect(Api.deleteNotification).toBeCalledWith(1)
+    });
+
 });
 
 describe('Route based on clicked notification', () => {

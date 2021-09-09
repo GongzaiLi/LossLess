@@ -117,6 +117,7 @@ export default {
 .notifications-tray .dropdown-menu {
   max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .notifications-tray .dropdown-toggle {

@@ -151,13 +151,13 @@ export default {
      * when called it checks if the notification is currently liked
      * then sends a toggled api request based on this
      */
-    starNotification() {
+    async starNotification() {
       if(this.updatedNotification.starred) {
         this.updatedNotification.starred = false
-        Api.patchNotification(this.updatedNotification.id, {"starred": false})
+        await Api.patchNotification(this.updatedNotification.id, {"starred": false})
       } else {
         this.updatedNotification.starred = true
-        Api.patchNotification(this.updatedNotification.id, {"starred": true})
+        await Api.patchNotification(this.updatedNotification.id, {"starred": true})
       }
       EventBus.$emit("notificationUpdate")
     },
