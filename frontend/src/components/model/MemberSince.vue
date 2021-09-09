@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import {getMonthsAndYearsBetween, getMouthName} from '../../util'
+import {getMonthsAndYearsBetween, getMonthName} from '../../util'
 
 export default {
   name: "member-since",
@@ -22,7 +22,7 @@ export default {
       const registeredYears = timeElapsed.years;
       const registeredMonths = timeElapsed.months;
 
-      let message = registeredDate.getDate() + " " + getMouthName(registeredDate.getMonth()) + " " + registeredDate.getFullYear() + " (";
+      let message = registeredDate.getDate() + " " + getMonthName(registeredDate.getMonth()) + " " + registeredDate.getFullYear() + " (";
       if (registeredYears > 0) {
         message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
         if (registeredMonths > 0) {

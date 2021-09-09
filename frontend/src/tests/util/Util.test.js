@@ -1,4 +1,4 @@
-import {getMonthsAndYearsBetween, formatDate, getMouthName} from '../../util';
+import {getMonthsAndYearsBetween, formatDate, getMonthName} from '../../util';
 
 test('same-start-end', () => {
   expect(getMonthsAndYearsBetween(
@@ -52,57 +52,57 @@ describe('test the formatDate method', () => {
   });
 });
 
-describe('test the getMouthName method', () => {
+describe('test the getMonthName method', () => {
   test('number month 0', () => {
-    expect(getMouthName(0)).toEqual("January");
+    expect(getMonthName(0)).toEqual("January");
   });
 
   test('number month 1', () => {
-    expect(getMouthName(1)).toEqual("February");
+    expect(getMonthName(1)).toEqual("February");
   });
 
   test('number month 2', () => {
-    expect(getMouthName(2)).toEqual("March");
+    expect(getMonthName(2)).toEqual("March");
   });
 
   test('number month 3', () => {
-    expect(getMouthName(3)).toEqual("April");
+    expect(getMonthName(3)).toEqual("April");
   });
 
   test('number month 4', () => {
-    expect(getMouthName(4)).toEqual("May");
+    expect(getMonthName(4)).toEqual("May");
   });
 
   test('number month 5', () => {
-    expect(getMouthName(5)).toEqual("June");
+    expect(getMonthName(5)).toEqual("June");
   });
 
   test('number month 6', () => {
-    expect(getMouthName(6)).toEqual("July");
+    expect(getMonthName(6)).toEqual("July");
   });
 
   test('number month 7', () => {
-    expect(getMouthName(7)).toEqual("August");
+    expect(getMonthName(7)).toEqual("August");
   });
 
   test('number month 8', () => {
-    expect(getMouthName(8)).toEqual("September");
+    expect(getMonthName(8)).toEqual("September");
   });
 
   test('number month 9', () => {
-    expect(getMouthName(9)).toEqual("October");
+    expect(getMonthName(9)).toEqual("October");
   });
 
   test('number month 10', () => {
-    expect(getMouthName(10)).toEqual("November");
+    expect(getMonthName(10)).toEqual("November");
   });
 
   test('number month 11', () => {
-    expect(getMouthName(11)).toEqual("December");
+    expect(getMonthName(11)).toEqual("December");
   });
 
   test('number month 12', () => {
-    expect(getMouthName(12)).toEqual(undefined);
+    expect(getMonthName(12)).toEqual(undefined);
   });
 
 });

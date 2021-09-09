@@ -27,8 +27,12 @@ Date: sprint_6
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
-              <b-form-select v-show="!isOneDay" v-model="groupBy" id="periodSelector" @change="getSalesReport(dateRange)">
-                <option v-for="[option, name] in Object.entries(groupByOptions)"  :key="option" :value="option">{{ name }}</option>
+              <b-form-select v-show="!isOneDay" v-model="groupBy" id="periodSelector"
+                             @change="getSalesReport(dateRange)">
+                <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
+                    name
+                  }}
+                </option>
               </b-form-select>
             </b-col>
           </b-row>
@@ -90,7 +94,7 @@ Date: sprint_6
 <script>
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
-import {formatDate, getMouthName} from "../../util";
+import {formatDate, getMonthName} from "../../util";
 
 export default {
   name: "sales-report-page",
@@ -242,9 +246,9 @@ export default {
         case "month" :
           fields.unshift({
             key: 'startDate', sortable: true, label: 'Month', formatter: (value) => {
-              return getMouthName(new Date(value).getMonth());
+              return getMonthName(new Date(value).getMonth());
             }
-          }, {key: 'endDate', sortable: true, label: 'Date'});
+          });
           break;
         case "year" :
           fields.unshift({

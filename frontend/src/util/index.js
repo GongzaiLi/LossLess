@@ -40,7 +40,7 @@ export function formatDate(date) {
  * @param mouthNum
  * @returns string
  */
-export function getMouthName(mouthNum) {
+export function getMonthName(mouthNum) {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   return monthNames[mouthNum];
 }
