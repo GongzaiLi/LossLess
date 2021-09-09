@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -41,8 +42,11 @@ class NotificationControllerUnitTest {
     private NotificationService notificationService;
 
     User loggedInUser;
-
     Notification notification;
+
+    User userForNotificationTwo;
+    User admin;
+
 
     @BeforeEach
     void setUp() {
@@ -55,6 +59,61 @@ class NotificationControllerUnitTest {
 
         Mockito.when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(loggedInUser);
+
+        userForNotificationTwo = newUserWithEmail("notDemo@gmail.com");
+        userForNotificationTwo.setId(2);
+        userForNotificationTwo.setRole(UserRoles.USER);
+
+        admin = newUserWithEmail("admin@gmail.com");
+        admin.setId(10);
+        admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
+
+        Mockito.when(notificationService.findNotificationById(any(Integer.class)))
+                .thenReturn(notification);
+
+    }
+
+    @Test
+    void whenDeleteRequestForNotification_andNotificationExists_AndUserSelf_then200Response() throws Exception {
+        notification.setUserId(1);
+        Mockito.when(notificationService.findNotificationById(1))
+                .thenReturn(notification);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notifications/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenDeleteRequestForNotification_andNotificationExists_AndUserAdmin_then200Response() throws Exception {
+        notification.setUserId(2);
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(admin);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notifications/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenDeleteRequestForNotification_andNotificationDoesNotExist_AndUserSelf_then406Response() throws Exception {
+        Mockito
+                .when(notificationService.findNotificationById(1))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "No notification exists with the given ID"));
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notifications/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void whenDeleteRequestForNotification_andNotificationExists_AndUserOther_then403Response() throws Exception {
+        notification.setUserId(2);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notifications/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -65,7 +124,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content("{\"read\": true}")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 
@@ -78,7 +137,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content("{\"read\": true}")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -91,7 +150,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content(request)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -103,7 +162,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content("{\"read\": \"asdf\"}")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -116,7 +175,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content(request)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
     
@@ -128,7 +187,7 @@ class NotificationControllerUnitTest {
 
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/1")
                 .content("{\"tag\": \"VIOLET\"}")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
