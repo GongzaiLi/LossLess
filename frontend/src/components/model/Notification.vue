@@ -19,13 +19,13 @@
       <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
       <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
     </b-col>
-    <b-col class="pl-0 pt-1" cols="6">
+    <b-col class="pl-0 pt-1" cols="5">
       <h6> {{updatedNotification.type}} </h6>
     </b-col>
     <b-col cols="3" class="pt-1">
       <h6> {{updatedNotification.price}} </h6>
     </b-col>
-    <b-col cols="1">
+    <b-col cols="2">
         <b-dropdown right no-caret variant="link" class="float-right" v-if="!this.inNavbar">
           <template #button-content>
             <div>
@@ -33,17 +33,17 @@
             </div>
           </template>
           <b-dropdown-item @click="starNotification">
-            <b-icon-star-fill class="star-icon" v-if="updatedNotification.starred"></b-icon-star-fill>
-            <b-icon-star class="star-icon"  v-else></b-icon-star>
+            <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
+            <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
           </b-dropdown-item>
-          <b-dropdown-item>
-            <b-button size="sm" variant="outline-success" @click.stop="archiveNotification" title="Archive this notification"><b-icon-archive></b-icon-archive></b-button>
+          <b-dropdown-item @click="archiveNotification">
+            <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
           </b-dropdown-item>
         </b-dropdown>
     </b-col>
   </b-row>
   <hr class="mt-1 mb-2">
-    <div v-if="notification.type === 'Liked Listing' || notification.type === 'Unliked Listing'">
+    <div v-if="updatedNotification.type === 'Liked Listing' || updatedNotification.type === 'Unliked Listing'">
       <span @click="goToListing" class="listing-link">{{ updatedNotification.message }}</span>
     </div>
     <div v-else>
@@ -87,6 +87,10 @@ span.unreadLabel {
   color: dodgerblue;
 }
 
+.archive-button {
+  color: green;
+}
+
 .three-dot {
   margin-right: -10px;
   padding-right: 0;
@@ -102,7 +106,7 @@ span.unreadLabel {
 
 /*this is being used ignore warning*/
 .dropdown-menu {
-  min-width: 1rem !important;
+  min-width: 6rem !important;
 }
 
 </style>
@@ -148,6 +152,7 @@ export default {
         this.updatedNotification.starred = true
         Api.patchNotification(this.updatedNotification.id, {"starred": true})
       }
+      EventBus.$emit("notificationUpdate")
     },
 
     /**
@@ -168,7 +173,7 @@ export default {
      * other components are refreshed.
      */
     async archiveNotification() {
-      await Api.archiveNotification(this.notification.id)
+      await Api.archiveNotification(this.updatedNotification.id)
       EventBus.$emit("notificationUpdate")
     }
 
