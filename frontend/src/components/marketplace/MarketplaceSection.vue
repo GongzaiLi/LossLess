@@ -44,7 +44,8 @@
         </template>
 
         <template v-slot:cell(keywords)="{ item }">
-          <div><b-badge v-for="keyword in item.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge></div>
+          <div v-if="item.keywords.join('').length > 15"><b-badge v-for="keyword in keywordsLimited(item.keywords)" :key="keyword" class="ml-1">{{keyword}}</b-badge></div>
+          <div v-else><b-badge v-for="keyword in item.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge></div>
         </template>
 
         <template v-slot:cell(description)="{ item }">
@@ -56,7 +57,7 @@
         </template>
 
         <template v-slot:cell(location)="{ item }">
-          <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
+          <div>{{shortenText(formatAddress(item.creator.homeAddress), 15)}}</div>
         </template>
 
         <template #empty>
@@ -139,11 +140,11 @@ export default {
         },
         {
           key: 'created',
-          label: "created",
+          label: "Created",
           sortable: true,
           formatter: (value) => {
             const date = new Date(value);
-            return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
           },
         }
 
@@ -218,6 +219,28 @@ export default {
       this.sortOrder = ctx.sortDesc ? 'desc' : 'asc';
       await this.refreshData();
     },
+
+    /**
+     * Limit the display size of keywords to a total of 15 characters. Then adds an ellipse tag to
+     * show additional tags hidden.
+     *
+     * @param keywords  All keywords
+     * @returns limited keywords
+     */
+    keywordsLimited(keywords) {
+      let keywordsLimited = [];
+      let currentLetterCount = 0;
+      for (let keyword of keywords) {
+        currentLetterCount += keyword.length
+        if (currentLetterCount >= 15) {
+          keywordsLimited.push("...")
+          break;
+        }
+        keywordsLimited.push(keyword);
+      }
+      return keywordsLimited;
+    }
   },
+
 }
 </script>
