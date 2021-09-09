@@ -57,3 +57,13 @@ export default getMonthsAndYearsBetween;
 export function formatDate(date) {
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
+
+/**
+ * get a number of mouth the translate to the mouth name
+ * @param mouthNum
+ * @returns string
+ */
+export function getMonthName(mouthNum) {
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  return monthNames[mouthNum];
+}

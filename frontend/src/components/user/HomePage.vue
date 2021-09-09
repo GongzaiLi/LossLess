@@ -42,8 +42,8 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow"  @click="notificationClicked(notification)">
-          <notification :notification="notification"> </notification>
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+          <notification :notification="notification" :in-navbar="false"> </notification>
         </b-card>
       </div>
     </b-card>
@@ -72,7 +72,7 @@
 
 .notification-cards {
   margin-top: 20px;
-  cursor: pointer;
+  /*cursor: pointer;*/
 }
 
 </style>

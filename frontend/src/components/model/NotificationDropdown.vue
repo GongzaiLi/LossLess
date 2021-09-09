@@ -10,15 +10,15 @@
       </div>
     </template>
     <b-dropdown-item disabled>
-      <h4 style="color: #000000">Notifications: <span> {{numberOfNotifications}}</span></h4>
+      <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
     </b-dropdown-item>
     <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
       <h6> Marketplace Card: {{card.title}}</h6>
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
 
-    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
-      <notification :notification="notification"> </notification>
+    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
+      <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
 </template>
@@ -37,6 +37,7 @@ export default {
     return {
       notifications: [],
       expiringCards: [],
+      notificationChange: true,
       notificationUpdate: {
         read: false
       }
@@ -71,7 +72,8 @@ export default {
     async updateNotifications() {
       this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
-
+      // This is needed to re-render a notification when a star icon is needed.
+      this.notificationChange = !this.notificationChange;
      },
 
     /**
@@ -150,6 +152,7 @@ export default {
 .notifications-tray .dropdown-menu {
   max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .notifications-tray .dropdown-toggle {
@@ -158,6 +161,10 @@ export default {
 
 .iconBell {
   font-size: 1.6rem !important;
+}
+
+.notifications-item a:hover {
+  cursor: default;
 }
 
 @media (max-width: 992px) and (min-width: 357px) {
