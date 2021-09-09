@@ -8,11 +8,11 @@ Date: sprint_6
       <b-list-group>
         <b-list-group-item>
           <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
-          <DateRangeInput @input="getSalesReport"/>
+          <DateRangeInput @input="getSalesReport" :all-time-start="new Date(business.created)"/>
         </b-list-group-item>
-        <b-list-group-item v-if="totalResults">
+        <b-list-group-item v-if="totalResults" id="total-results">
           <b-card-text>
-            <h3>Sales Summary for {{ totalResults.startDate }} to {{ totalResults.endDate }}</h3>
+            <h3>Sales Summary for {{ totalResults.startDate }} {{ totalResults.endDate !== totalResults.startDate ? `to ${totalResults.endDate}` : '' }}</h3>
             <b-row align-h="start">
               <b-col cols="4">
                 <h4>{{ totalResults.totalPurchases }} Total Items Sold </h4>
@@ -23,11 +23,11 @@ Date: sprint_6
             </b-row>
           </b-card-text>
         </b-list-group-item>
-        <b-list-group-item>
+        <b-list-group-item v-if="totalResults">
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
-              <b-form-select v-show="!isOneDay" v-model="groupBy" id="periodSelector"
+              <b-form-select v-model="groupBy" id="periodSelector"
                              @change="getSalesReport(dateRange)">
                 <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
                     name
@@ -47,7 +47,7 @@ Date: sprint_6
                   :fields="fields"
                   :per-page="perPage"
                   :current-page="currentPage"
-                  responsive
+                  responsive="lg"
                   bordered
                   show-empty>
                 <template #empty>
@@ -103,22 +103,11 @@ export default {
     return {
       business: {},
       currency: {},
-      groupBy: "day",
-      groupByOptions: {
-        day: 'Daily',
-        week: 'Weekly',
-        month: 'Monthly',
-        year: 'Yearly'
-      },
-      totalResults: {
-        startDate: "",
-        endDate: "",
-        totalPurchases: 0,
-        totalValue: 0
-      },
+      groupBy: "year",
+      totalResults: null,
       groupedResults: [],
       currentPage: 1,
-      perPage: 12,
+      perPage: 10,
       dateRange: [],
     }
   },
@@ -160,6 +149,12 @@ export default {
      **/
     getSalesReport: async function (dateRange) {
       this.dateRange = dateRange;
+      // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
+      // so if the selected option has been invalidated, then select the last available options.
+      if (!this.groupByOptions[this.groupBy]) {
+        const optionNames = Object.keys(this.groupByOptions);
+        this.groupBy = optionNames[optionNames.length - 1];
+      }
 
       if (this.dateRange != null && this.dateRange.length) {
         const businessId = this.$route.params.id;
@@ -167,7 +162,6 @@ export default {
         const endDate = formatDate(dateRange[1]);
         await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
             .then((response) => {
-              this.$log.debug("Data loaded: ", response.data);
               this.updateTotalResults(startDate, endDate, response.data)
               this.groupedResults = response.data;
             }).catch((error) => {
@@ -183,14 +177,16 @@ export default {
      * @param data response data
      **/
     updateTotalResults: function (startDate, endDate, data) {
-      this.totalResults.startDate = startDate;
-      this.totalResults.endDate = endDate;
-      this.totalResults.totalValue = data.reduce((count, item) => {
-        return count + item.totalValue
-      }, 0);
-      this.totalResults.totalPurchases = data.reduce((count, item) => {
-        return count + item.totalPurchases
-      }, 0);
+      this.totalResults = {
+        startDate,
+        endDate,
+        totalValue: data.reduce((count, item) => {
+          return count + item.totalValue
+        }, 0),
+        totalPurchases: data.reduce((count, item) => {
+          return count + item.totalPurchases
+        }, 0)
+      }
     },
   },
 
@@ -217,15 +213,6 @@ export default {
     },
 
     /**
-     * True if the data range to one day.
-     */
-    isOneDay: function () {
-      return this.dateRange !== null &&
-          this.dateRange.length === 2 &&
-          this.dateRange[0].toDateString() === this.dateRange[1].toDateString();
-    },
-
-    /**
      * the table has different column in day, month, year and week.
      * @returns Array
      */
@@ -246,7 +233,7 @@ export default {
         case "month" :
           fields.unshift({
             key: 'startDate', sortable: true, label: 'Month', formatter: (value) => {
-              return getMonthName(new Date(value).getMonth());
+              return `${getMonthName(new Date(value).getMonth())} ${new Date(value).getFullYear()}`;
             }
           });
           break;
@@ -261,6 +248,29 @@ export default {
       }
 
       return fields
+    },
+    /**
+     * Computed value for the options that the user has to group the sales report by.
+     * Doesn't allow users to group by a period that is larger than their selected period.
+     * For example, if the selected range is one month, then the available options are Daily and Weekly.
+     * If the selected range is one day, then the only option is Daily.
+     */
+    groupByOptions: function() {
+      const options = {
+        day: 'Daily',
+      };
+      const dateDiffDays = Math.ceil((this.dateRange[1] - this.dateRange[0]) / (1000 * 60 * 60 * 24));
+      if (dateDiffDays > 7) {
+        options.week = 'Weekly';
+      }
+      if (dateDiffDays > 31) {
+        options.month = 'Monthly';
+      }
+      if (dateDiffDays > 365) {
+        options.year = 'Yearly';
+      }
+
+      return options;
     },
   },
 }
