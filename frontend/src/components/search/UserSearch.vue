@@ -34,6 +34,11 @@ Date: sprint_1
          <template #empty>
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
+          <template #cell(name)="data">
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/profile-default.jpg')"
+                   alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
+            {{createUsername(data.item)}}
+          </template>
         </b-table>
       </b-col>
     </b-row>
@@ -166,7 +171,6 @@ export default {
       let tableHeader = {};
       for (const user of data) {
         tableHeader = user;
-        tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
@@ -189,7 +193,21 @@ export default {
         roleLabel = "USER";
       }
       return roleLabel;
-    }
+    },
+
+    /**
+     * @user user information returned from backend
+     * @returns String compiled from the user's first name, middle name - if exists and lastname
+     */
+    createUsername(user){
+      return `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
+    },
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
   },
 
   computed: {
@@ -205,11 +223,10 @@ export default {
       let fields = [
         {
           key: 'name',
-          //label: 'F name',
           sortable: true
         },
         {
-          key: 'nickName',
+          key: 'nickname',
           sortable: true
         },
         {
@@ -227,7 +244,7 @@ export default {
         });
       }
       return fields;
-    }
+    },
   }
 }
 </script>

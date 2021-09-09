@@ -59,7 +59,8 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="30" class="rounded-circle" style="margin-left: 5px; position: relative">
+        <b-img :src="showProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+               alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
       </template>
 
       <div v-if="!isActingAsUser">
@@ -98,6 +99,7 @@ Date: sprint_1
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
 import NotificationDropdown from "./NotificationDropdown";
 import EventBus from "../../util/event-bus";
+import api from "../../Api";
 
 
 /**
@@ -126,6 +128,13 @@ export default {
     },
 
     /**
+     * Returns true if we should show the user's profile image. i.e. they are acting as a user and have a profile image
+     */
+    showProfilePicture: function() {
+      return this.$currentUser.profileImage&&this.isActingAsUser
+    },
+
+    /**
      * The name to be displayed in the profile area. It is either the first name of the user,
      * or the name of whichever business the user is acting as.
      */
@@ -136,7 +145,6 @@ export default {
         return this.$currentUser.currentlyActingAs.name;
       }
     },
-
     /**
      * The businesses to show in the dropdown for the profile name. Contains
      * all businesses the user can act as, except for the business the user is acting as currently
@@ -267,7 +275,13 @@ export default {
      */
     updatedUserHandler: function () {
       initializeAuth()
-    }
+    },
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
   },
 }
 </script>
