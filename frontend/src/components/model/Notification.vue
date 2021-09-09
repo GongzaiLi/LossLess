@@ -39,6 +39,9 @@
           <b-dropdown-item @click="archiveNotification">
             <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
           </b-dropdown-item>
+          <b-dropdown-item @click="deleteNotification">
+            <p><b-icon-trash class="delete-button" title="Delete this notification"></b-icon-trash>  Delete</p>
+          </b-dropdown-item>
         </b-dropdown>
     </b-col>
   </b-row>
@@ -89,6 +92,10 @@ span.unreadLabel {
 
 .archive-button {
   color: green;
+}
+
+.delete-button {
+  color: red;
 }
 
 .three-dot {
@@ -168,12 +175,22 @@ export default {
     },
 
     /**
+     * Calls API deleteNotification patch request
+     * and using an EventBus that emits notificationUpdate so that
+     * other components are refreshed.
+     */
+    async deleteNotification() {
+      await Api.deleteNotification(this.updatedNotification.id)
+      EventBus.$emit("notificationUpdate")
+    },
+
+    /**
      * Calls API archiveNotification patch request
      * and using an EventBus that emits notificationUpdate so that
      * other components are refreshed.
      */
     async archiveNotification() {
-      await Api.archiveNotification(this.updatedNotification.id)
+      await Api.patchNotification(this.updatedNotification.id, {"archived": true})
       EventBus.$emit("notificationUpdate")
     }
 
