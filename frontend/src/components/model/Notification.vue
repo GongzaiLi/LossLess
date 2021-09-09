@@ -26,7 +26,7 @@
         <h6> {{updatedNotification.price}} </h6>
       </b-col>
       <b-col cols="1" class="float-right">
-          <b-button size="sm" variant="outline-success" @click.stop="archiveNotification" title="Archive this notification"><b-icon-archive></b-icon-archive></b-button>
+          <b-button size="sm" variant="outline-success" @click.stop=confirmArchive title="Archive this notification"><b-icon-archive></b-icon-archive></b-button>
       </b-col>
       </b-row>
       <hr class="mt-1 mb-2">
@@ -42,6 +42,16 @@
         </b-col>
       </b-row>
     </div>
+
+    <b-modal ref="confirmArchiveModal" size="sm"
+             title="<b-icon-check2-all/>Archive Notification"
+             ok-variant="success"
+             ok-title="Archive"
+             @ok="archiveNotification">
+      <h6>
+        Are you sure you want to <strong>archive</strong> this notification?
+      </h6>
+    </b-modal>
 
   </div>
 </template>
@@ -95,6 +105,14 @@ export default {
       notification.price = currency.symbol + purchasedListing.price + " " + currency.code
       notification.message = `${purchasedListing.quantity} x ${purchasedListing.product.name}`
       return notification
+    },
+
+    /**
+     * Shows a dialog to confirm archiving the notification.
+     * USES REFS NOT ID TO PREVENT DUPLICATION!
+     */
+    async confirmArchive() {
+      this.$refs.confirmArchiveModal.show();
     },
 
     /**
