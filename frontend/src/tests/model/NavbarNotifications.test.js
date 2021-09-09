@@ -80,6 +80,11 @@ const notifications = [
   {"id":44,"userId":1,"type":"Unliked Listing","message":"You have unliked listing: Dark Chocolate Bar","subjectId":1}
 ]
 
+const $log = {
+  debug() {
+  }
+};
+
 jest.mock('../../Api');
 
 beforeEach(() => {
@@ -106,11 +111,12 @@ beforeEach(() => {
   Api.getExpiredCards.mockResolvedValue({data: expiringCards});
   Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
   Api.getNotifications.mockResolvedValue({data: []});
+  Api.readNotification.mockResolvedValue({data: ""});
 
   wrapper = mount(NotificationDropdown, {
     localVue,
     propsData: {},
-    mocks: {$route, $router, $currentUser, displayPeriodEnd: { split: 'asd'  }},
+    mocks: {$route, $router, $currentUser, $log, displayPeriodEnd: { split: 'asd'  }},
     stubs: ['router-link'],
     methods: {},
     computed: {},

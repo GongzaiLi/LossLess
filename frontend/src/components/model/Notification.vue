@@ -71,7 +71,7 @@ export default {
   props: ['notification'],
   data() {
     return {
-      updatedNotification: {message:"", type:"", read: false},
+      updatedNotification: {message:"", type:"", read: this.notification.read},
     }
   },
 

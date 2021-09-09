@@ -10,7 +10,7 @@
       </div>
     </template>
     <b-dropdown-item disabled>
-      <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
+      <h4 style="color: #000000">Notifications: <span> {{numberOfNotifications}}</span></h4>
     </b-dropdown-item>
     <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
       <h6> Marketplace Card: {{card.title}}</h6>
@@ -27,6 +27,7 @@
 import api from "../../Api";
 import EventBus from "../../util/event-bus";
 import Notification from "./Notification";
+import {markNotificationRead} from "../../util/index";
 
 
 export default {
@@ -36,6 +37,9 @@ export default {
     return {
       notifications: [],
       expiringCards: [],
+      notificationUpdate: {
+        read: false
+      }
     }
   },
   computed: {
@@ -75,12 +79,24 @@ export default {
      * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
-    notificationClicked(notification) {
-      if (notification.type==='Liked Listing' || notification.type==='Unliked Listing'){
+    async notificationClicked(notification) {
+      const response = await markNotificationRead(notification, this.notificationUpdate);
+      this.$log.debug(response)
+      EventBus.$emit('notificationClickedFromNavBar', notification);
+      if (notification.type==='Liked Listing' || notification.type==='Unliked Listing') {
         if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId.toString())) {
-          this.$router.push('/listings/' + notification.subjectId);
+          await this.$router.push('/listings/' + notification.subjectId);
         }
       }
+    },
+
+    /**
+     * Updates the status of the notification in nav bar when a home feed notification status is updated.
+     * @param notification The notification that the user updated from home feed.
+     */
+    notificationClickedFromHomeFeed(notification) {
+      const updated = this.notifications.find(item => item.id === notification.id);
+      this.notificationClicked(updated);
     }
   },
 
@@ -93,6 +109,13 @@ export default {
      * This mount listens to the notificationUpdate event
      */
     EventBus.$on('notificationUpdate', this.updateNotifications)
+
+    /**
+     * This mount listens to the notificationUpdate event
+     */
+    EventBus.$on('notificationClickedFromHomeFeed', this.notificationClickedFromHomeFeed)
+
+
   }
 }
 

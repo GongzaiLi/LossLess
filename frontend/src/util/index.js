@@ -1,3 +1,5 @@
+import Api from "../Api";
+
 /**
  * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
  * The months elapsed is not the total number of months elapsed, but the number months elapsed in
@@ -24,6 +26,25 @@ function getMonthsAndYearsBetween(start, end) {
 export function getToday() {
   let date = new Date();
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}
+
+/**
+ * Updates a notification if it has been read.
+ * @param notification The notification to be updated.
+ * @param notificationUpdate The updated data of the notification to be sent in the api request.
+ */
+export async function markNotificationRead(notification, notificationUpdate) {
+  notification.read = true;
+  notificationUpdate.read = true;
+  let response;
+  await Api.readNotification(notification.id, notificationUpdate)
+      .then((res) => {
+        response = res.data;
+      })
+      .catch((error) => {
+        response = error;
+      })
+  return response;
 }
 
 

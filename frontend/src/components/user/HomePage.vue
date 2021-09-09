@@ -81,6 +81,8 @@
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
 import Notification from "../model/Notification";
+import {markNotificationRead} from '../../util/index'
+import EventBus from "../../util/event-bus";
 
 export default {
   components: {MarketplaceSection, Notification},
@@ -103,12 +105,20 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
+      notificationUpdate: {
+        read: false
+      }
     }
   },
 
   mounted() {
     const userId = this.$currentUser.id;
     this.getUserInfo(userId);
+
+    /**
+     * This mount listens to the notificationUpdate event
+     */
+    EventBus.$on('notificationClicked', this.notificationClickedFromNavBar)
   },
 
   methods: {
@@ -152,13 +162,25 @@ export default {
      * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
-    notificationClicked(notification) {
+    async notificationClicked(notification) {
+      const response = await markNotificationRead(notification, this.notificationUpdate);
+      this.$log.debug(response)
+      EventBus.$emit('notificationClickedFromHomeFeed', notification);
       if (notification.type === 'Liked Listing' || notification.type === 'Unliked Listing') {
         if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
-          this.$router.push('/listings/' + notification.subjectId);
+          await this.$router.push('/listings/' + notification.subjectId);
         }
       }
     },
+
+    /**
+     * Updates the status of the notification in home feed when a nav bar notification status is updated.
+     * @param notification The notification that the user updated from nav bar.
+     */
+    notificationClickedFromNavBar(notification) {
+      const updated = this.notifications.find(item => item.id === notification.id);
+      this.notificationClicked(updated);
+    }
 
   },
 
