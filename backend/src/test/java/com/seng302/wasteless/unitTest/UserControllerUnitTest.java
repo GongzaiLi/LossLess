@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,9 +59,6 @@ class UserControllerUnitTest {
 
     @MockBean
     private Authentication authentication;
-
-    @MockBean
-    private AuthenticationManager authenticationManager;
 
     @MockBean
     private BCryptPasswordEncoder passwordEncoder;
@@ -106,7 +105,7 @@ class UserControllerUnitTest {
         Notification notification = new Notification();
         notification.setType(NotificationType.EXPIRED);
         notification.setSubjectId(1);
-        notification.setMessage(String.format("Your card has expired"));
+        notification.setMessage("Your card has expired");
         notification.setUserId(1);
         List<Notification> notifs = new ArrayList<>();
         notifs.add(notification);
@@ -115,9 +114,12 @@ class UserControllerUnitTest {
                 .when(notificationService.findAllUnArchivedNotificationsByUserId(anyInt()))
                 .thenReturn(notifs);
 
-        Mockito
-                .when(authentication.getName())
-                .thenReturn("james@gmail.com");
+        // See https://stackoverflow.com/questions/360520/unit-testing-with-spring-security
+        Authentication authentication = Mockito.mock(Authentication.class);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        Mockito.when(authentication.getPrincipal()).thenReturn(new CustomUserDetails(user));
+        SecurityContextHolder.setContext(securityContext);
 
         Mockito
                 .when(userService.getCurrentlyLoggedInUser())
@@ -252,30 +254,6 @@ class UserControllerUnitTest {
                 .content(modifiedUser)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isConflict());
-    }
-
-    @Test
-    void whenPutRequestToUser_andRequestToChangePassword_andNoPasswordField_then400Response() throws Exception {
-        String modifiedUser = "{\"firstName\": \"James\",\n" +
-                "\"lastName\" : \"Harris\",\n" +
-                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
-                "\"dateOfBirth\": \"2000-10-27\",\n" +
-                "\"homeAddress\": {\n" +
-                "    \"streetNumber\": \"3/24\",\n" +
-                "    \"streetName\": \"Ilam Road\",\n" +
-                "    \"suburb\": \"Riccarton\",\n" +
-                "    \"city\": \"Christchurch\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"New Zealand\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  },\n" +
-                "\"newPassword\": \"1338\"\n" +
-                "}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
-                .content(modifiedUser)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
