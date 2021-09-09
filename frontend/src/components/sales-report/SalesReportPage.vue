@@ -27,8 +27,13 @@ Date: sprint_6
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
-              <b-select v-show="!isOneDay" id="periodSelector" v-model="groupBy" :options="groupByOptions"
-                        @change="getSalesReport(dateRange)"></b-select>
+              <b-form-select v-show="!isOneDay" v-model="groupBy" id="periodSelector"
+                             @change="getSalesReport(dateRange)">
+                <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
+                    name
+                  }}
+                </option>
+              </b-form-select>
             </b-col>
           </b-row>
           <b-row>
@@ -89,7 +94,7 @@ Date: sprint_6
 <script>
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
-import {formatDate} from "../../util";
+import {formatDate, getMonthName} from "../../util";
 
 export default {
   name: "sales-report-page",
@@ -99,18 +104,12 @@ export default {
       business: {},
       currency: {},
       groupBy: "day",
-      groupByOptions: [
-        {value: "day", text: "Daily"},
-        {value: "week", text: "Weekly"},
-        {value: "month", text: "Monthly"},
-        {value: "year", text: "Yearly"}
-      ],
-      fields: [
-        {key: 'startDate', sortable: true},
-        {key: 'endDate', sortable: true},
-        {key: 'totalPurchases', sortable: true},
-        {key: 'totalValue', sortable: true}
-      ],
+      groupByOptions: {
+        day: 'Daily',
+        week: 'Weekly',
+        month: 'Monthly',
+        year: 'Yearly'
+      },
       totalResults: {
         startDate: "",
         endDate: "",
@@ -224,7 +223,45 @@ export default {
       return this.dateRange !== null &&
           this.dateRange.length === 2 &&
           this.dateRange[0].toDateString() === this.dateRange[1].toDateString();
-    }
-  }
+    },
+
+    /**
+     * the table has different column in day, month, year and week.
+     * @returns Array
+     */
+    fields: function () {
+
+      let fields = [
+        {key: 'totalPurchases', sortable: true},
+        {key: 'totalValue', sortable: true}
+      ]
+
+      switch (this.groupBy) {
+        case "day" :
+          fields.unshift({key: 'startDate', sortable: true, label: 'Date'});
+          break;
+        case "week" :
+          fields.unshift({key: 'startDate', sortable: true}, {key: 'endDate', sortable: true});
+          break;
+        case "month" :
+          fields.unshift({
+            key: 'startDate', sortable: true, label: 'Month', formatter: (value) => {
+              return getMonthName(new Date(value).getMonth());
+            }
+          });
+          break;
+        case "year" :
+          fields.unshift({
+            key: 'endDate', sortable: true, label: 'Year', formatter: (value) => {
+              return new Date(value).getFullYear();
+            }
+          });
+          break;
+
+      }
+
+      return fields
+    },
+  },
 }
 </script>
