@@ -65,6 +65,11 @@ const normalResponse = {
           "email": "johnsmith99@gmail.com",
           "dateOfBirth": "1999-04-27",
           "phoneNumber": "+64 3 555 0129",
+          "profileImage": {
+            "id": 1,
+            "fileName": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c.jpeg",
+            "thumbnailFilename": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c_thumbnail.jpeg"
+          },
           "homeAddress": {
             "streetNumber": "3/24",
             "streetName": "Ilam Road",
@@ -144,7 +149,7 @@ describe('User Search', () => {
 
     const headers = wrapper.findAll('th');
     expect(headers.at(0).text()).toContain('Name');
-    expect(headers.at(1).text()).toContain('Nick Name');
+    expect(headers.at(1).text()).toContain('Nickname');
     expect(headers.at(2).text()).toContain('Email');
     expect(headers.at(3).text()).toContain('Location');
     expect(headers.at(4).text()).toContain('User Type');
@@ -163,7 +168,7 @@ describe('User Search', () => {
 
     const headers = wrapper.findAll('th');
     expect(headers.at(0).text()).toContain('Name');
-    expect(headers.at(1).text()).toContain('Nick Name');
+    expect(headers.at(1).text()).toContain('Nickname');
     expect(headers.at(2).text()).toContain('Email');
     expect(headers.at(3).text()).toContain('Location');
     expect(headers.at(4).text()).toContain('User Type');

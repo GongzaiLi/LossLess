@@ -1,4 +1,4 @@
-import {config, createLocalVue, shallowMount} from "@vue/test-utils";
+import {config, createLocalVue, mount} from "@vue/test-utils";
 import {BootstrapVue, BootstrapVueIcons} from "bootstrap-vue";
 import Api from "../../Api";
 import SalesReportPage from "../../components/sales-report/SalesReportPage";
@@ -71,7 +71,7 @@ beforeEach(() => {
     name: 'United States Dollar'
   });
 
-  wrapper = shallowMount(SalesReportPage, {
+  wrapper = mount(SalesReportPage, { //shallowMount and mount has different work
     localVue,
     propsData: {},
     mocks: {$route, $currentUser, $log},
@@ -147,26 +147,108 @@ describe('test get request with the getSalesReport', () => {
     await wrapper.vm.$forceUpdate();
 
     expect(wrapper.vm.groupedResults).toStrictEqual([]);
-    expect(wrapper.vm.$refs.salesReportTable.$props.items).toStrictEqual([]);
-
-
-    expect(wrapper.findAll('h4').at(0).text()).toEqual(`0 Total Items Sold`);
-    expect(wrapper.findAll('h4').at(1).text()).toEqual(`$0 USD Total Value`);
+    expect(wrapper.contains('#total-results')).toBeFalsy();
 
     expect(Api.getSalesReport).toHaveBeenCalled();
   });
 })
 
-describe('check the date range is the same day', () => {
 
-  it('the date range is the same day', async () => {
-    wrapper.vm.dateRange = [new Date('2021-09-01'), new Date('2021-09-01')];
-    expect(wrapper.vm.isOneDay).toBeTruthy();
+describe('check the table fields', () => {
+  beforeEach(async () => {
+    const dateRange = [new Date(2010, 1, 1), new Date(2021, 1, 1)];
+    Api.getSalesReport.mockResolvedValue({data: SalesReport});
+    await wrapper.vm.getSalesReport(dateRange);
+    await wrapper.vm.$nextTick();
+  })
+
+  it('the date groupBy day', async () => {
+    await wrapper.find('#periodSelector').findAll('option').at(0).setSelected();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.groupBy).toBe('day');
+
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields.length).toBe(3);
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[0].label).toBe('Date');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[1].key).toBe('totalPurchases');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalValue');
+  });
+  it('the date groupBy week', async () => {
+    await wrapper.find('#periodSelector').findAll('option').at(1).setSelected();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.groupBy).toBe('week');
+
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields.length).toBe(4);
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[0].key).toBe('startDate');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[1].key).toBe('endDate');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalPurchases');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[3].key).toBe('totalValue');
+
   });
 
-  it('Works if user not admins business', async () => {
-    wrapper.vm.dateRange = [new Date('2021-09-01'), new Date('2021-09-02')];
-    expect(wrapper.vm.isOneDay).toBeFalsy();
+  it('the date groupBy month', async () => {
+    await wrapper.find('#periodSelector').findAll('option').at(2).setSelected();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.groupBy).toBe('month');
+
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields.length).toBe(3);
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[0].label).toBe('Month');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[1].key).toBe('totalPurchases');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalValue');
+
   });
 
+  it('the date groupBy year', async () => {
+    await wrapper.find('#periodSelector').findAll('option').at(3).setSelected();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.groupBy).toBe('year');
+
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields.length).toBe(3);
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[0].label).toBe('Year');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[1].key).toBe('totalPurchases');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalValue');
+  });
+
+})
+
+
+describe('check groupBy resets when date range narrowed', () => {
+  beforeAll(async () => {
+    Api.getSalesReport.mockResolvedValue({data: SalesReport});
+  })
+
+  it('Narrows to month when narrow range from several years to one year', async () => {
+    wrapper.vm.groupBy = 'year'
+    const dateRange = [new Date(2021, 0, 1), new Date(2021, 11, 31)];
+    await wrapper.vm.getSalesReport(dateRange);
+
+    expect(wrapper.vm.groupBy).toBe('month');
+    expect(wrapper.vm.groupByOptions).toStrictEqual({day: 'Daily',week: 'Weekly', month: 'Monthly'});
+  });
+
+  it('Narrows to day when narrow range from year to one week', async () => {
+    wrapper.vm.groupBy = 'month'
+    const dateRange = [new Date(2021, 11, 27), new Date(2021, 11, 31)];
+    await wrapper.vm.getSalesReport(dateRange);
+
+    expect(wrapper.vm.groupBy).toBe('day');
+    expect(wrapper.vm.groupByOptions).toStrictEqual({day: 'Daily'});
+  });
+
+  it('Doesnt change groupBy when range increases from one day to two years', async () => {
+    wrapper.vm.groupBy = 'day'
+    const dateRange = [new Date(2020, 0, 1), new Date(2021, 11, 31)];
+    await wrapper.vm.getSalesReport(dateRange);
+
+    expect(wrapper.vm.groupBy).toBe('day');
+    expect(wrapper.vm.groupByOptions).toStrictEqual({
+      "day": "Daily",
+      "month": "Monthly",
+      "week": "Weekly",
+      "year": "Yearly",
+    });
+  });
 })
