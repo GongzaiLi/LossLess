@@ -17,8 +17,8 @@
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
 
-    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
-      <notification :notification="notification"> </notification>
+    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
+      <notification :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
 </template>
@@ -70,18 +70,6 @@ export default {
 
      },
 
-    /**
-     * Performs an action based on the notification that has been clicked.
-     * When a liked or unliked listing is clicked it routes you to that listing
-     * @param notification the notification that has been clicked
-     */
-    notificationClicked(notification) {
-      if (notification.type==='Liked Listing' || notification.type==='Unliked Listing'){
-        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId.toString())) {
-          this.$router.push('/listings/' + notification.subjectId);
-        }
-      }
-    }
   },
 
   created() {
@@ -135,6 +123,10 @@ export default {
 
 .iconBell {
   font-size: 1.6rem !important;
+}
+
+.notifications-item a:hover {
+  cursor: default;
 }
 
 @media (max-width: 992px) and (min-width: 357px) {
