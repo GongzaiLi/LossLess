@@ -2,7 +2,7 @@
   <b-form @submit.prevent="submitPressed">
     <b-row>
       <b-col lg="2" md="4">
-        <b-form-group label="Filter results by">
+        <b-form-group label="Get report for">
           <b-form-select v-model="dateType" id="dateTypeSelect">
             <option v-for="[option, name] in Object.entries(dateTypeOptions)" :key="option" :value="option">{{ name }}
             </option>
@@ -56,7 +56,7 @@
       <b-col lg="2">
         <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4" id="filterDateBtn"
                   :style="endDateValidityState === false ? 'cursor: not-allowed;' : ''">
-          Filter
+          Get Report
         </b-button>
       </b-col>
     </b-row>
@@ -67,11 +67,12 @@
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export default {
   name: "DateRangeInput",
+  props: ["allTimeStart"],
   data() {
     return {
       dateType: "any",
       dateTypeOptions: {
-        any: "No Filter",
+        any: "All Time",
         year: "Year",
         month: "Month",
         week: "Week",
@@ -131,15 +132,12 @@ export default {
         dateRange = [new Date(this.selectedDay.getTime()), new Date(this.selectedDay.getTime())]; // Have to copy the dates as they will be modified later
       } else if (this.dateType === "customRange") {
         dateRange = [this.startDay, this.endDay];
+      } else if (this.dateType === "any") {
+        dateRange = [this.allTimeStart, new Date(Date.now())];
       }
 
-      if (this.dateType === "any") {
-        dateRange = null;
-      } else {
-        // Set time of start date to start of day, and time of end date to end of day, so the date range includes those two days
-        dateRange[0].setHours(0, 0, 0, 0);
-        dateRange[1].setHours(23, 59, 59, 999);
-      }
+      dateRange[0].setHours(0, 0, 0, 0);
+      dateRange[1].setHours(23, 59, 59, 999);
 
       this.$emit('input', dateRange);
     }

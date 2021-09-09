@@ -3,12 +3,11 @@ import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import DateRangeInput from '../../components/sales-report/DateRangeInput';
 
 let wrapper;
-// let mockDateNow = '2019-05-14T23:01:58.135Z';
-// jest
-//   .spyOn(global.Date, 'now')
-//   .mockImplementationOnce(() =>
-//     new Date(mockDateNow).valueOf()
-//   );
+jest
+  .spyOn(global.Date, 'now')
+  .mockImplementationOnce(() =>
+    new Date(2021, 9, 9).valueOf()
+  );
 
 
 beforeEach(() => {
@@ -19,7 +18,9 @@ beforeEach(() => {
 
   wrapper = mount(DateRangeInput, {
     localVue,
-    propsData: {},
+    propsData: {
+      allTimeStart: new Date(2021, 1, 1)
+    },
     mocks: {},
     stubs: {},
     methods: {},
@@ -40,10 +41,12 @@ describe('DateRangeInput', () => {
     expect(wrapper.isVueInstance).toBeTruthy();
   });
 
-  test('emits null by default', async () => {
+  test('emits all time by default', async () => {
     await wrapper.find("#filterDateBtn").trigger("submit");
     await wrapper.vm.$nextTick();
-    expect(getLastEmitted()).toStrictEqual(null);
+    const [start, end] = getLastEmitted();
+    expect(start.getTime()).toBe((new Date(2021, 1, 1, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2021, 9, 9, 23, 59, 59, 999)).getTime());
   });
 
   test('emits year range when select single year', async () => {
