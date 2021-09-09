@@ -39,7 +39,7 @@
           <b-dropdown-item @click="archiveNotification">
             <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
           </b-dropdown-item>
-          <b-dropdown-item @click="deleteNotification">
+          <b-dropdown-item @click="confirmDelete">
             <p><b-icon-trash class="delete-button" title="Delete this notification"></b-icon-trash>  Delete</p>
           </b-dropdown-item>
         </b-dropdown>
@@ -62,6 +62,14 @@
            <b-icon-check2-all> </b-icon-check2-all> </span>
         </b-col>
       </b-row>
+
+    <b-modal ref="confirmDeleteModal" size="sm"
+             title="Delete Notification"
+             ok-variant="danger"
+             ok-title="Delete"
+             @ok="deleteNotification">
+      Are you sure you want to <strong>delete</strong> this notification?
+    </b-modal>
     </div>
 </template>
 
@@ -192,7 +200,16 @@ export default {
     async archiveNotification() {
       await Api.patchNotification(this.updatedNotification.id, {"archived": true})
       EventBus.$emit("notificationUpdate")
-    }
+    },
+
+    /**
+     * Shows a dialog to confirm deleting the notification.
+     * USES REFS NOT ID TO PREVENT DUPLICATION!
+     */
+    async confirmDelete() {
+      this.$refs.confirmDeleteModal.show();
+    },
+
 
 
   },
