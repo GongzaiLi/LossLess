@@ -7,7 +7,7 @@ import Api from "../Api";
  * Assumes that a year is 365 days, and every month is exactly 1/12 of a year.
  * Returns data in the format {months: months_elapsed, years: years_elapsed}
  */
-function getMonthsAndYearsBetween(start, end) {
+export function getMonthsAndYearsBetween(start, end) {
   const timeElapsed = end - start;
   const daysElapsed = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
   const yearsElapsed = Math.floor(daysElapsed / 365);
@@ -49,3 +49,11 @@ export async function markNotificationRead(notification, notificationUpdate) {
 
 
 export default getMonthsAndYearsBetween;
+/**
+ * Get any date without the time
+ * need to add one to get correct date
+ * @return date in format yyyy-mm-dd
+ **/
+export function formatDate(date) {
+  return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+}

@@ -93,4 +93,14 @@ describe('check-purchased-listing-notification', () => {
 
 });
 
+describe('Checks if API archiveNotification request is called when archiveNotification method is called', () => {
+    test('archiveNotification patch request is 200', async () => {
+        const response = {
+            response: {status: 200}
+        }
+        await Api.archiveNotification.mockResolvedValue(response);
 
+        await wrapper.vm.archiveNotification();
+        expect(Api.archiveNotification).toHaveBeenCalled();
+    })
+});

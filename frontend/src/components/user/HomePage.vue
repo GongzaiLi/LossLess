@@ -119,6 +119,7 @@ export default {
      * This mount listens to the notificationUpdate event
      */
     EventBus.$on('notificationClicked', this.notificationClickedFromNavBar)
+    EventBus.$on('notificationUpdate', this.updateNotifications)
   },
 
   methods: {

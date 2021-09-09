@@ -21,6 +21,11 @@ let userData = {
   "dateOfBirth": "1999-04-27",
   "phoneNumber": "+64 3 555 0129",
   currentlyActingAs: null,
+  "profileImage": {
+    "id": 1,
+    "fileName": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c.jpeg",
+    "thumbnailFilename": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c_thumbnail.jpeg"
+  },
   "homeAddress": {
     "streetNumber": "3/24",
     "streetName": "Ilam Road",
@@ -106,7 +111,7 @@ beforeEach(() => {
     mocks: {$route, $router, $currentUser, displayPeriodEnd: { split: 'asd'  }},
     stubs: ['router-link'],
     methods: {},
-    computed: {},
+    computed: {showProfilePicture(){return true}},
   })
 });
 
