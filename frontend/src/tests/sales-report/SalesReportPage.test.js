@@ -205,11 +205,10 @@ describe('check the table fields', () => {
 
     expect(wrapper.vm.groupBy).toBe('month');
 
-    expect(wrapper.vm.$refs.salesReportTable.$props.fields.length).toBe(4);
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields.length).toBe(3);
     expect(wrapper.vm.$refs.salesReportTable.$props.fields[0].label).toBe('Month');
-    expect(wrapper.vm.$refs.salesReportTable.$props.fields[1].key).toBe('endDate');
-    expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalPurchases');
-    expect(wrapper.vm.$refs.salesReportTable.$props.fields[3].key).toBe('totalValue');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[1].key).toBe('totalPurchases');
+    expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalValue');
 
   });
 
