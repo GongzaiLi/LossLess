@@ -1,9 +1,9 @@
-import { mount, createLocalVue } from '@vue/test-utils';
-import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
+import {mount, createLocalVue} from '@vue/test-utils';
+import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import DateRangeInput from '../../components/sales-report/DateRangeInput';
 
 let wrapper;
-// let mockDateNow = '2019-05-14T11:01:58.135Z';
+// let mockDateNow = '2019-05-14T23:01:58.135Z';
 // jest
 //   .spyOn(global.Date, 'now')
 //   .mockImplementationOnce(() =>
@@ -24,6 +24,7 @@ beforeEach(() => {
     stubs: {},
     methods: {},
   });
+  wrapper.setProps({getSalesReport: jest.fn()});
 });
 
 afterEach(() => {
@@ -52,8 +53,8 @@ describe('DateRangeInput', () => {
 
     await wrapper.vm.$nextTick();
     const [start, end] = getLastEmitted();
-    expect(start.toLocaleString()).toBe("1/1/2020, 12:00:00 AM");
-    expect(end.toLocaleString()).toBe("12/31/2020, 11:59:59 PM");
+    expect(start.getTime()).toBe((new Date(2020, 0, 1, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2020, 11, 31, 23, 59, 59, 999)).getTime());
   });
 
   test('emits month range when select single month', async () => {
@@ -64,8 +65,8 @@ describe('DateRangeInput', () => {
 
     await wrapper.vm.$nextTick();
     const [start, end] = getLastEmitted();
-    expect(start.toLocaleString()).toBe("6/1/2020, 12:00:00 AM");
-    expect(end.toLocaleString()).toBe("6/30/2020, 11:59:59 PM");
+    expect(start.getTime()).toBe((new Date(2020, 5, 1, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2020, 5, 30, 23, 59, 59, 999)).getTime());
   });
 
   test('emits week range when select single week', async () => {
@@ -75,8 +76,8 @@ describe('DateRangeInput', () => {
 
     await wrapper.vm.$nextTick();
     const [start, end] = getLastEmitted();
-    expect(start.toLocaleString()).toBe("8/29/2021, 12:00:00 AM");
-    expect(end.toLocaleString()).toBe("9/4/2021, 11:59:59 PM");
+    expect(start.getTime()).toBe((new Date(2021, 7, 29, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2021, 8, 4, 23, 59, 59, 999)).getTime());
   });
 
   test('emits day range when select single day', async () => {
@@ -86,8 +87,8 @@ describe('DateRangeInput', () => {
 
     await wrapper.vm.$nextTick();
     const [start, end] = getLastEmitted();
-    expect(start.toLocaleString()).toBe("4/20/2021, 12:00:00 AM");
-    expect(end.toLocaleString()).toBe("4/20/2021, 11:59:59 PM");
+    expect(start.getTime()).toBe((new Date(2021, 3, 20, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2021, 3, 20, 23, 59, 59, 999)).getTime());
   });
 
   test('emits day range when select range of days', async () => {
@@ -98,14 +99,14 @@ describe('DateRangeInput', () => {
 
     await wrapper.vm.$nextTick();
     const [start, end] = getLastEmitted();
-    expect(start.toLocaleString()).toBe("4/19/2021, 12:00:00 AM");
-    expect(end.toLocaleString()).toBe("4/20/2021, 11:59:59 PM");
+    expect(start.getTime()).toBe((new Date(2021, 3, 19, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2021, 3, 20, 23, 59, 59, 999)).getTime());
   });
 
   test('disables filter button when date range invalid', async () => {
     await wrapper.find('#dateTypeSelect').findAll('option').at(5).setSelected();
-    wrapper.vm.startDay = new Date(2021, 3, 21);
-    wrapper.vm.endDay = new Date(2021, 3, 20);
+    wrapper.vm.startDay = new Date(2021, 2, 21);
+    wrapper.vm.endDay = new Date(2021, 2, 20);
 
     await wrapper.vm.$nextTick();
 

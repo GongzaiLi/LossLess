@@ -14,8 +14,9 @@ Date: 5/3/2021
 
           <b-row>
             <b-col md="2">
-              <img src="../../../public/profile-default.jpg" alt="User Profile Image" width="75" class="rounded-circle"
-                   style="margin-left: 5px; position: relative">
+              <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+                     alt="User Profile Image" width="75" height="75" class="rounded-circle"
+                     style="margin-left: 5px; position: relative"></b-img>
             </b-col>
             <b-col md="10" class="mt-2">
               <b-row>
@@ -256,6 +257,13 @@ export default {
             this.userFound = false;
             this.loading = false;
           })
+    },
+
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
     },
 
     /**

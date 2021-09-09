@@ -7,6 +7,10 @@ Feature: U32 Managing my feed
     Given We are logged in as a person with email "a@a"
     And We have a notification
 
+  Scenario: AC1 - I can delete any item from my feed.
+    When I delete the notification with id 1
+    Then The users notification with id 1 is deleted
+
   Scenario: AC2: I can easily distinguish between items I have clicked on (“read”) and those I haven’t (“unread”)
     Given My notification has not been read
     When I mark it as read
@@ -27,3 +31,17 @@ Feature: U32 Managing my feed
     When I archive it
     Then The notification no longer appears in my feed
 
+  Scenario: AC6: I can “tag” an item.
+    Given My notification has no tag
+    When I add the tag "YELLOW"
+    Then The notification appears as tagged "YELLOW"
+
+  Scenario: AC6: Each item can have at most one tag.
+    Given My notification has been tagged as "BLUE"
+    When I add the tag "YELLOW"
+    Then The notification appears as tagged "YELLOW"
+
+  Scenario: AC6: Tags can be removed.
+    Given My notification has been tagged as "BLUE"
+    When I remove the tag
+    Then My tag has been removed

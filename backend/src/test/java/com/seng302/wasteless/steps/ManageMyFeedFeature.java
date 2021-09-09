@@ -2,6 +2,7 @@ package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.Notification;
+import com.seng302.wasteless.model.NotificationTag;
 import com.seng302.wasteless.model.NotificationType;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.security.CustomUserDetails;
@@ -11,9 +12,11 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,6 +58,11 @@ public class ManageMyFeedFeature {
 
     private ResultActions responseResult;
 
+    private Exception exceptionThrown;
+
+    private final Exception expectedException = new ResponseStatusException(HttpStatus.NOT_FOUND,
+            "No notification exists with the given ID");
+
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
      * We do this manually because @Autowired mockMvc doesn't work.
@@ -90,6 +98,29 @@ public class ManageMyFeedFeature {
     public void myNotificationHasNotBeenRead() {
         notification.setRead(false);
         notificationService.saveNotification(notification);
+    }
+
+    @When("I delete the notification with id {int}")
+    public void iDeleteTheNotificationWithId(Integer int1) throws Exception {
+        notification.setId(int1);
+        notificationService.saveNotification(notification);
+        String url = "/notifications/" + int1;
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.delete(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @Then("The users notification with id {int} is deleted")
+    public void theUsersNotificationWithIdIsDeleted(Integer int1) throws Exception {
+        responseResult.andExpect(status().isOk());
+        try {
+            notificationService.findNotificationById(int1);
+        } catch (Exception e) {
+            exceptionThrown = e;
+        }
+        Assertions.assertEquals(exceptionThrown.getClass(), expectedException.getClass());
+        Assertions.assertEquals(exceptionThrown.getMessage(), expectedException.getMessage());
     }
 
     @When("I mark it as read")
@@ -174,5 +205,51 @@ public class ManageMyFeedFeature {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
+    }
+
+
+
+    @Given("My notification has no tag")
+    public void my_notification_has_no_tag() {
+        notification.setTag(null);
+        notificationService.saveNotification(notification);
+    }
+
+    @When("I add the tag {string}")
+    public void i_add_the_tag(String tag) throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
+                .content("{\"tag\": \"YELLOW\"}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(currentUserDetails)))
+                .andExpect(status().isOk());
+    }
+
+    @Then("The notification appears as tagged {string}")
+    public void the_notification_appears_as_tagged(String string) throws Exception {
+        getNotifications().andExpect(
+                jsonPath(String.format("$[?(@.id==%d && @.tag==\"" + string + "\")]", notification.getId()))
+                        .isNotEmpty());
+    }
+
+    @Given("My notification has been tagged as {string}")
+    public void my_notification_has_been_tagged_as(String string) {
+        notification.setTag(NotificationTag.valueOf(string));
+        notificationService.saveNotification(notification);
+    }
+
+    @When("I remove the tag")
+    public void i_remove_the_tag() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
+                .content("{\"tag\": null}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(currentUserDetails)))
+                .andExpect(status().isOk());
+    }
+
+    @Then("My tag has been removed")
+    public void my_tag_has_been_removed() throws Exception {
+        getNotifications().andExpect(
+                jsonPath(String.format("$[?(@.id==%d && @.tag==null)]", notification.getId()))
+                        .isNotEmpty());
     }
 }

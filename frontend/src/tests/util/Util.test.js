@@ -1,4 +1,4 @@
-import getMonthsAndYearsBetween from '../../util';
+import {getMonthsAndYearsBetween, formatDate} from '../../util';
 
 test('same-start-end', () => {
   expect(getMonthsAndYearsBetween(
@@ -40,4 +40,14 @@ test('5-years-3-months', () => {
     new Date("2016-05-10T00:32:00Z"),
     new Date("2021-10-11T00:32:01Z")
   )).toEqual({years: 5, months: 5});
+});
+
+describe('test the formatDate method', () => {
+  test('"2016-05-10T00:32:00Z" date format to 2016-05-10', () => {
+    expect(formatDate(new Date("2016-05-10T00:32:00Z"))).toEqual("2016-05-10")
+  });
+
+  test('"2016-12-01T00:32:00Z" date format to YYYY-MM-DD', () => {
+    expect(formatDate(new Date("2016-12-01T00:32:00Z"))).toEqual("2016-12-01")
+  });
 });

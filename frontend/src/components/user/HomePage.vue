@@ -80,6 +80,7 @@
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
 import Notification from "../model/Notification";
+import EventBus from "../../util/event-bus"
 
 export default {
   components: {MarketplaceSection, Notification},
@@ -108,6 +109,7 @@ export default {
   mounted() {
     const userId = this.$currentUser.id;
     this.getUserInfo(userId);
+    EventBus.$on('notificationUpdate', this.updateNotifications)
   },
 
   methods: {

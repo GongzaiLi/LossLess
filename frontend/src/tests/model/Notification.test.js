@@ -107,14 +107,24 @@ describe('check-purchased-listing-notification', () => {
 
 });
 
+describe('Checks if API archiveNotification request is called when archiveNotification method is called', () => {
+    test('archiveNotification patch request is 200', async () => {
+        const response = {
+            response: {status: 200}
+        }
+        await Api.archiveNotification.mockResolvedValue(response);
+        await wrapper.vm.archiveNotification();
+        expect(Api.archiveNotification).toHaveBeenCalled();
+    })
+});
 describe('check starring api call is correct', async () => {
 
-   test('check api call sets starred to true if currently false', async () =>  {
-       wrapper.vm.updatedNotification.starred = false;
-       wrapper.vm.updatedNotification.id = 1;
-       await wrapper.vm.$forceUpdate();
-       wrapper.vm.starNotification();
-       expect(Api.patchNotification).toBeCalledWith(1,{"starred": true})
+    test('check api call sets starred to true if currently false', async () =>  {
+        wrapper.vm.updatedNotification.starred = false;
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.$forceUpdate();
+        wrapper.vm.starNotification();
+        expect(Api.patchNotification).toBeCalledWith(1,{"starred": true})
     });
 
     test('check api call sets starred to false if currently true', async () =>  {
@@ -142,5 +152,3 @@ describe('Route based on clicked notification', () => {
         expect($router.push).toHaveBeenCalledTimes(0);
     })
 });
-
-

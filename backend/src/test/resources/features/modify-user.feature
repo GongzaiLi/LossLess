@@ -38,3 +38,7 @@ Feature: Modify User
       When The User modifies his profile with the home address: ""
       Then The User who is modifying will receive an error
 
+  Scenario: AC4: A user changes their country and gets a notification
+      When The User modifies his profile with the country: "Australia"
+      Then The User who is modifying will have a notification saved
+

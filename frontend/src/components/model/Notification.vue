@@ -37,7 +37,7 @@
             <b-icon-star class="star-icon"  v-else></b-icon-star>
           </b-dropdown-item>
           <b-dropdown-item>
-            <b-icon-trash ></b-icon-trash>
+            <b-button size="sm" variant="outline-success" @click.stop="archiveNotification" title="Archive this notification"><b-icon-archive></b-icon-archive></b-button>
           </b-dropdown-item>
         </b-dropdown>
     </b-col>
@@ -50,19 +50,16 @@
       <span >{{ updatedNotification.message }}</span>
     </div>
 
-
-
-    <b-row>
-      <b-col cols="11">
-        <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
-      </b-col>
-      <b-col v-if="updatedNotification.read"  cols="1">
-        <span class="readLabel">
-         <b-icon-check2-all> </b-icon-check2-all> </span>
-      </b-col>
-    </b-row>
-
-  </div>
+      <b-row>
+        <b-col cols="11">
+          <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
+        </b-col>
+        <b-col v-if="updatedNotification.read"  cols="1">
+          <span class="readLabel">
+           <b-icon-check2-all> </b-icon-check2-all> </span>
+        </b-col>
+      </b-row>
+    </div>
 </template>
 
 
@@ -112,6 +109,7 @@ span.unreadLabel {
 
 <script>
 import Api from "../../Api";
+import EventBus from "../../util/event-bus";
 
 export default {
   name: "Notification",
@@ -163,6 +161,17 @@ export default {
         }
       }
     },
+
+    /**
+     * Calls API archiveNotification patch request
+     * and using an EventBus that emits notificationUpdate so that
+     * other components are refreshed.
+     */
+    async archiveNotification() {
+      await Api.archiveNotification(this.notification.id)
+      EventBus.$emit("notificationUpdate")
+    }
+
 
   },
   async mounted() {
