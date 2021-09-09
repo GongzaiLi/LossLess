@@ -71,13 +71,13 @@ describe('DateRangeInput', () => {
 
   test('emits week range when select single week', async () => {
     await wrapper.find('#dateTypeSelect').findAll('option').at(3).setSelected();
-    wrapper.vm.selectedWeek = new Date(2021, 7, 29);
+    wrapper.vm.selectedWeek = new Date(2021, 7, 26);
     await wrapper.find("#filterDateBtn").trigger("submit");
 
     await wrapper.vm.$nextTick();
     const [start, end] = getLastEmitted();
-    expect(start.getTime()).toBe((new Date(2021, 7, 29, 0, 0, 0)).getTime());
-    expect(end.getTime()).toBe((new Date(2021, 8, 4, 23, 59, 59, 999)).getTime());
+    expect(start.getTime()).toBe((new Date(2021, 7, 26, 0, 0, 0)).getTime());
+    expect(end.getTime()).toBe((new Date(2021, 8, 1, 23, 59, 59, 999)).getTime());
   });
 
   test('emits day range when select single day', async () => {

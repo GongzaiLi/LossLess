@@ -27,26 +27,26 @@
 
       <b-col lg="4" v-if="dateType === 'week'">
         <b-form-group label="Week starting:">
-          <b-form-datepicker :date-disabled-fn="weekDateDisabled" value-as-date v-model="selectedWeek"
+          <b-form-datepicker :start-weekday="1" :date-disabled-fn="weekDateDisabled" value-as-date v-model="selectedWeek"
                              class="eric-custom-week-picker"/>
         </b-form-group>
       </b-col>
 
       <b-col lg="4" v-if="dateType === 'day'">
         <b-form-group label="Select day">
-          <b-form-datepicker :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
+          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
         </b-form-group>
       </b-col>
 
       <b-col lg="4" v-if="dateType === 'customRange'">
         <b-form-group label="Start day">
-          <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="startDay"/>
+          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" value-as-date v-model="startDay"/>
         </b-form-group>
       </b-col>
       <b-col lg="4" v-if="dateType === 'customRange'">
         <b-form-group label="End day">
-          <b-form-datepicker :date-disabled-fn="dateInFuture" value-as-date v-model="endDay" id="endDayPicker"
-                             :state="endDateValidityState"/>
+          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" value-as-date v-model="endDay"
+                             id="endDayPicker" :state="endDateValidityState"/>
           <b-form-invalid-feedback>
             End date must be same as or after starting date.
           </b-form-invalid-feedback>
@@ -101,7 +101,7 @@ export default {
      * or if the day is in the future.
      */
     weekDateDisabled(ymd, date) {
-      return this.dateInFuture(ymd, date) || date.getDay() !== 0;
+      return this.dateInFuture(ymd, date) || date.getDay() !== 1;
     },
     /**
      * Convenience function that returns the first day of this week.
