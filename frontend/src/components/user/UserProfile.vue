@@ -182,6 +182,7 @@ import api from "../../Api";
 import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
 import EventBus from "../../util/event-bus";
+import {formatAddress} from "../../util/index";
 
 export default {
   components: {
@@ -332,9 +333,7 @@ export default {
      * Combine fields of address
      */
     getAddress: function () {
-      const address = this.userData.homeAddress;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return formatAddress(this.userData.homeAddress, 3)
     },
     /**
      * Returns the full name of the user, in the format:
