@@ -4,7 +4,7 @@
       <b-row >
         <b-col>
          <span class="unreadLabel">
-         <b-icon-star-fill> </b-icon-star-fill> New Notification</span>
+         <b-icon-envelope-fill> </b-icon-envelope-fill> New Notification</span>
         </b-col>
       </b-row>
       <hr class="unreadHr">
