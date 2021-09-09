@@ -18,7 +18,7 @@
     </b-dropdown-item>
 
     <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
-      <notification :notification="notification" :in-navbar="true"> </notification>
+      <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
 </template>
@@ -36,6 +36,7 @@ export default {
     return {
       notifications: [],
       expiringCards: [],
+      notificationChange: true,
     }
   },
   computed: {
@@ -67,7 +68,8 @@ export default {
     async updateNotifications() {
       this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
-
+      // This is needed to re-render a notification when a star icon is needed.
+      this.notificationChange = !this.notificationChange;
      },
 
   },
@@ -115,6 +117,7 @@ export default {
 .notifications-tray .dropdown-menu {
   max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .notifications-tray .dropdown-toggle {
