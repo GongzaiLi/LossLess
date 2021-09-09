@@ -334,4 +334,19 @@ describe('test the formatAddress method', () => {
     )).toEqual("1 Chocolate Lane, Candyton 1234");
   });
 
+    test('suburb and city only, level 1 privacy, then correct suburb comma', () => {
+        expect(formatAddress(
+            {
+                streetNumber: null,
+                streetName: null,
+                suburb: "Candyton",
+                city: "Chocolatechurch",
+                region: null,
+                country: null,
+                postcode: null
+            },
+            1
+        )).toEqual("Candyton, Chocolatechurch");
+    });
+
 });

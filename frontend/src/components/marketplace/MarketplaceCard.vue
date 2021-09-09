@@ -17,7 +17,7 @@
       <b-card-text>
         <b-icon-person-fill/> {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
         <br>
-        <b-icon-house-door-fill/> {{ formatAddress }}
+        <b-icon-house-door-fill/> {{ getAddress }}
       </b-card-text>
     </b-card>
 </template>
@@ -57,6 +57,8 @@ p.sub-title {
 </style>
 
 <script>
+import {formatAddress} from "../../util";
+
 export default {
   name: "MarketplaceCard",
   props: ["cardInfo"],
@@ -77,13 +79,14 @@ export default {
 
   },
   computed: {
-
     /**
-     * Combine fields of address
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
      */
-    formatAddress: function () {
+    getAddress: function () {
       const address = this.cardInfo.creator.homeAddress;
-      return address.city + (address.suburb ? ' (' + address.suburb + ')' : '');
+      return formatAddress(address, 3);
     },
 
     /**

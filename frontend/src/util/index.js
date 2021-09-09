@@ -69,13 +69,13 @@ export function formatAddress(address, privacyLevel) {
 
   let addressString = "";
 
-  (address.streetNumber != null && privacyLevel <= 1 && address.streetName != null) && (addressString += `${address.streetNumber} `);
-  (address.streetName != null && privacyLevel <= 1) && (addressString += `${address.streetName}, `);
-  (address.suburb && privacyLevel <= 2) && (addressString += address.city || address.country || address.region ? `${address.suburb}, ` : `${address.suburb} ` );
-  (address.city != null && privacyLevel <= 3) && (addressString += `${address.city}, `);
-  (address.region != null && privacyLevel <= 4) && (addressString += address.country != null ? `${address.region}, ` : `${address.region} `);
-  (address.country != null && privacyLevel <= 5) && (addressString += `${address.country} `);
-  (address.postcode != null && privacyLevel <= 2) && (addressString += `${address.postcode}`);
+  (address.streetNumber && privacyLevel <= 1 && address.streetName) && (addressString += `${address.streetNumber} `);
+  (address.streetName && privacyLevel <= 1) && (addressString += `${address.streetName}, `);
+  (address.suburb && privacyLevel <= 2) && (addressString += address.city || address.country || address.region ? `${address.suburb}, ` : `${address.suburb} `);
+  (address.city && privacyLevel <= 3) && (addressString += address.country || address.region ? `${address.city}, ` : `${address.city} `);
+  (address.region && privacyLevel <= 4) && (addressString += address.country ? `${address.region}, ` : `${address.region} `);
+  (address.country && privacyLevel <= 5) && (addressString += `${address.country} `);
+  (address.postcode && privacyLevel <= 2) && (addressString += `${address.postcode}`);
 
   if (addressString === "") {
     addressString = "No address available"
