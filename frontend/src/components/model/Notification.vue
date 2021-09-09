@@ -36,7 +36,7 @@
             <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
             <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
           </b-dropdown-item>
-          <b-dropdown-item @click="archiveNotification">
+          <b-dropdown-item @click="confirmArchive">
             <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
           </b-dropdown-item>
         </b-dropdown>
@@ -65,9 +65,7 @@
              ok-variant="success"
              ok-title="Archive"
              @ok="archiveNotification">
-      <h6>
-        Are you sure you want to <strong>archive</strong> this notification?
-      </h6>
+      Are you sure you want to <strong>archive</strong> this notification?
     </b-modal>
 
   </div>
