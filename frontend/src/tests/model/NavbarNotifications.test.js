@@ -72,13 +72,6 @@ const expiringCards = [
     displayPeriodEnd: currentDateWithin24
   }
 ]
-const notifications = [
-  {"id":40,"userId":1,"type":"Expired Marketplace Card","message":"Your card: Chocolate Mixer has expired","subjectId":42},
-  {"id":41,"userId":1,"type":"Expired Marketplace Card","message":"Your card: Bean Roaster has expired","subjectId":43},
-  {"id":42,"userId":1,"type":"Expired Marketplace Card","message":"Your card: Candy Drop Machine has expired","subjectId":44},
-  {"id":43,"userId":1,"type":"Liked Listing","message":"You have liked listing: Dark Chocolate Bar. This listing closes at 2022-03-27","subjectId":1},
-  {"id":44,"userId":1,"type":"Unliked Listing","message":"You have unliked listing: Dark Chocolate Bar","subjectId":1}
-]
 
 jest.mock('../../Api');
 
@@ -135,20 +128,6 @@ describe('Get expiring cards', () => {
     expect(wrapper.vm.numberOfNotifications).toBe(2);
   })
 
-  describe('Route based on clicked notification', () => {
-
-    test('Routes to correct address', async () => {
-      await wrapper.vm.notificationClicked(notifications[3])
-      //await wrapper.vm.$nextTick();
-      expect($router.push).toHaveBeenCalledWith('/listings/1');
-    })
-
-    test('Routes to correct address', async () => {
-      await wrapper.vm.notificationClicked(notifications[1])
-      //await wrapper.vm.$nextTick();
-      expect($router.push).toHaveBeenCalledTimes(0);
-    })
-  });
 
   describe('Get expiring cards', () => {
     test('cards expiring within 24 hours get added to notifications', async () => {
