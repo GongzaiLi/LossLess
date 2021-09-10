@@ -29,7 +29,22 @@
     <b-col cols="3" class="pt-1">
       <h6> {{updatedNotification.price}} </h6>
     </b-col>
-    <b-col cols="2">
+
+      <b-col cols="1">
+        <b-dropdown variant="none" right no-caret class="float-right" v-if="!this.inNavbar">
+          <template #button-content>
+            <b-icon-tag-fill class="tag-button float-right"/>
+          </template>
+          <b-dropdown-item v-for="tagColor in tagColors" :key="tagColor">
+            <NotificationTag :tag-color=tagColor class="tag"></NotificationTag>
+          </b-dropdown-item>
+          <b-dropdown-item v-if="updatedNotification.tag">
+            <P><b-icon-x-circle-fill class="remove-tag"/> Remove Tag</p>
+          </b-dropdown-item>
+        </b-dropdown>
+      </b-col>
+
+    <b-col cols="1">
         <b-dropdown right no-caret variant="link" class="float-right" v-if="!this.inNavbar">
           <template #button-content>
             <div>
@@ -119,6 +134,19 @@ span.unreadLabel {
   color: red;
 }
 
+.tag-button {
+  color: black;
+}
+
+.tag {
+  padding-top: 2px;
+  padding-bottom: -2px;
+}
+
+.remove-tag {
+  color: red;
+}
+
 .three-dot {
   margin-right: -10px;
   padding-right: 0;
@@ -152,6 +180,7 @@ export default {
   data() {
     return {
       updatedNotification: {message:"", type:"", read: false},
+      tagColors: ["RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "BLACK"]
     }
   },
 
