@@ -46,7 +46,7 @@
             <h3>Notifications</h3>
           </b-col>
           <b-col cols="4">
-            <b-dropdown text="Filter By Tags" class="tag-filter-dropdown" @hide="filterNotificationsByTag">
+            <b-dropdown text="Filter By Tags" class="tag-filter-dropdown">
               <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
@@ -123,7 +123,7 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
-      tagColors: {
+      tagColors: { //Tracks color to selected boolean
         RED: false,
         ORANGE: false,
         YELLOW: false,
@@ -143,17 +143,19 @@ export default {
 
   methods: {
     /**
-     * Toggles a tags presence in the selectedTags set
+     * Toggles a color tags boolean value
      */
     toggleTagColorSelected: function (tagColor) {
       this.tagColors[tagColor] = !this.tagColors[tagColor];
+      this.filterNotificationsByTag();
     },
-
     /**
-     * To be done in future task
+     * Requests the notifications using the tags param to select only those that match the selected tags
      */
-    filterNotificationsByTag: function () {
-      console.log("Filter done in future task");
+    filterNotificationsByTag: async function () {
+      let tags = [];
+      Object.entries(this.tagColors).filter(([, value]) => value).forEach(([tag,]) => tags.push(tag));
+      this.notifications = (await Api.getNotifications(tags.join(","))).data;
     },
     /**
      * this is a get api which can take Specific user to display on the page
