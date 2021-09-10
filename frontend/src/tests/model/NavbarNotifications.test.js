@@ -104,7 +104,7 @@ beforeEach(() => {
   Api.getExpiredCards.mockResolvedValue({data: expiringCards});
   Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
   Api.getNotifications.mockResolvedValue({data: []});
-  Api.readNotification.mockResolvedValue({data: ""});
+  Api.patchNotification.mockResolvedValue({data: ""});
 
   wrapper = mount(NotificationDropdown, {
     localVue,

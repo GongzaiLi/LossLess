@@ -42,7 +42,7 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
           <notification :notification="notification" :in-navbar="false"> </notification>
         </b-card>
       </div>
@@ -81,7 +81,7 @@ import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
 import Notification from "../model/Notification";
 import EventBus from "../../util/event-bus"
-import {markNotificationRead} from '../../util/index'
+// import {markNotificationRead} from '../../util/index'
 
 export default {
   components: {MarketplaceSection, Notification},
@@ -116,9 +116,9 @@ export default {
     EventBus.$on('notificationUpdate', this.updateNotifications)
 
     /**
-     * This mount listens to the notificationUpdate event
+     * This mount listens to the notificationUpdate event from nav bar notifications.
      */
-    EventBus.$on('notificationClicked', this.notificationClickedFromNavBar)
+    EventBus.$on('notificationClickedFromNavBar', this.notificationClickedFromNavBar)
   },
 
   methods: {
@@ -163,14 +163,10 @@ export default {
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-      const response = await markNotificationRead(notification, this.notificationUpdate);
-      this.$log.debug(response)
-      EventBus.$emit('notificationClickedFromHomeFeed', notification);
-      // if (notification.type === 'Liked Listing' || notification.type === 'Unliked Listing') {
-      //   if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
-      //     await this.$router.push('/listings/' + notification.subjectId);
-      //   }
-      // }
+        notification.read = true
+        await Api.patchNotification(notification.id, {"read": notification.read})
+        EventBus.$emit("notificationUpdate")
+
     },
 
     /**
@@ -179,7 +175,9 @@ export default {
      */
     notificationClickedFromNavBar(notification) {
       const updated = this.notifications.find(item => item.id === notification.id);
-      this.notificationClicked(updated);
+      if (updated.read !== notification.read) {
+        this.notificationClicked(updated);
+      }
     }
 
   },
