@@ -80,7 +80,7 @@ export default {
      */
     async updateNotifications() {
       this.expiringCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
-      this.notifications = (await Api.getNotifications(this.$currentUser.id)).data;
+      this.notifications = (await Api.getNotifications()).data;
       // This is needed to re-render a notification when a star icon is needed.
       this.notificationChange = !this.notificationChange;
      },
