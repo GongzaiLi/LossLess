@@ -21,6 +21,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Determine the color of the tag based on the tag value
+     */
     determineTagCSSColor () {
       switch (this.tagColor) {
         case "RED": {
