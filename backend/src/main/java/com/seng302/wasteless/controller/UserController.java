@@ -246,14 +246,16 @@ public class UserController {
     /**
      * Endpoint to GET all notifications of the logged-in user
      * @param tags list of Notification tags to match Notifications (can be null)
+     * @param archived A boolean, true if the user wants archived notifications
      * @return 200 OK if successful request, With all notifications for logged in user
      */
     @GetMapping("/users/notifications")
-    public ResponseEntity<Object> getNotifications(@RequestParam(value = "tags") Optional<List<String>> tags) {
+    public ResponseEntity<Object> getNotifications(@RequestParam(value = "tags") Optional<List<String>> tags,
+                                                   @RequestParam(value = "archived") Optional<Boolean> archived) {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Request to get notifications for user: {}", user.getId());
 
-        List<Notification> getNotifications = notificationService.filterNotifications(user.getId(), tags);
+        List<Notification> getNotifications = notificationService.filterNotifications(user.getId(), tags, archived);
         return ResponseEntity.status(HttpStatus.OK).body(getNotifications);
     }
 

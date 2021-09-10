@@ -212,6 +212,41 @@ public class ManageMyFeedFeature {
                 .andExpect(status().isOk());
     }
 
+    
+    // AC5
+
+    @Given("I have {int} notifications and notifications with even are archived")
+    public void iHaveNotificationsAndNotificationsWithEvenAreArchived(int notificationNum) {
+        for (int i = 0; i < notificationNum; i++) {
+            Notification notification  = NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "");
+            notification.setArchived(i % 2 == 0);
+            notificationService.saveNotification(notification);
+        }
+    }
+    
+    @When("I get archived notifications")
+    public void iGetArchivedNotifications() throws Exception {
+        MultiValueMap<String, String> archived = new LinkedMultiValueMap<>();
+        archived.add("archived", "true");
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
+                .queryParams(archived)
+                .with(user(currentUserDetails))
+                .with(csrf()))
+                .andExpect(status().isOk());
+    }
+
+    @Then("I will receive notifications that are all archived")
+    public void iWillReceiveNotificationsThatAreAllArchived() throws Exception {
+        JSONArray jsonResult = new JSONArray(responseResult.andReturn().getResponse().getContentAsString());
+        for(int i=0; i < jsonResult.length(); i++)
+        {
+            JSONObject object = jsonResult.getJSONObject(i);
+            Assertions.assertEquals(object.getString("archived"), "true");
+        }
+    }
+
+    
+    // AC6
 
     @Given("My notification has no tag")
     public void my_notification_has_no_tag() {
