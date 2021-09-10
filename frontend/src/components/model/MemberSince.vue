@@ -1,14 +1,13 @@
 <!--
   Member since (date calculation)
-  Author: Gongzai Li
-  Date: 04/07/2021
+  Date: Sprint_1
 -->
 <template>
   <span class="mb-1" >{{ memberSince }}</span>
 </template>
 
 <script>
-import getMonthsAndYearsBetween from '../../util'
+import {getMonthsAndYearsBetween, getMonthName} from '../../util'
 
 export default {
   name: "member-since",
@@ -23,8 +22,7 @@ export default {
       const registeredYears = timeElapsed.years;
       const registeredMonths = timeElapsed.months;
 
-      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      let message = registeredDate.getDate() + " " + months[registeredDate.getMonth()] + " " + registeredDate.getFullYear() + " (";
+      let message = registeredDate.getDate() + " " + getMonthName(registeredDate.getMonth()) + " " + registeredDate.getFullYear() + " (";
       if (registeredYears > 0) {
         message += registeredYears + ((registeredYears === 1) ? " Year" : " Years");
         if (registeredMonths > 0) {

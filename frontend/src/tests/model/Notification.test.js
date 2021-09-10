@@ -2,14 +2,15 @@ import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import Api from "../../Api";
-import Router from 'vue-router'
 import Notification from "../../components/model/Notification";
 let wrapper;
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let mockListing;
 let notification;
-let mockExpiredCards;
+
+let $route;
+let $router;
 
 jest.mock('../../Api');
 
@@ -24,7 +25,19 @@ beforeEach(() => {
     localVue.use(BootstrapVueIcons);
 
     notification = {type: "Purchased listing", message: 'y', subjectId: 1}
+    $route = {
+        name: "users",
+        params: {
+            id: 0
+        },
+        query: {}
+    };
 
+    $router = {
+        push: jest.fn(),
+        replace: jest.fn(),
+        go: jest.fn(),
+    }
     mockListing = {
         "id": 1,
         "businessId": 1,
@@ -56,11 +69,13 @@ beforeEach(() => {
 
     Api.getPurchaseListing.mockResolvedValue({data: mockListing});
     Api.getUserCurrency.mockResolvedValue({symbol: '$', code: 'NZD'});
+    Api.patchNotification = jest.fn();
+    Api.deleteNotification = jest.fn();
 
     wrapper = shallowMount(Notification, {
         localVue,
         propsData: {notification: notification},
-        mocks: {$log},
+        mocks: {$log, $router, $route},
         stubs: {},
         methods: {},
     });
@@ -78,7 +93,7 @@ describe('Home-page', () => {
 
 describe('check-purchased-listing-notification', () => {
     const afterUpdate = {
-        location: "Upper Riccarton, Christchurch, Canterbury, New Zealand",
+        location: "Upper Riccarton, Christchurch, Canterbury, New Zealand 90210",
         message: "5 x Watties Baked Beans - 420g can",
         price: "$5.99 NZD",
         subjectId: 1,
@@ -93,4 +108,60 @@ describe('check-purchased-listing-notification', () => {
 
 });
 
+describe('Checks if API archiveNotification request is called when archiveNotification method is called', () => {
+    test('archiveNotification patch request is 200', async () => {
+        const response = {
+            response: {status: 200}
+        }
+        wrapper.vm.updatedNotification.id = 1;
+        await Api.patchNotification.mockResolvedValue(response);
+        await wrapper.vm.archiveNotification();
+        expect(Api.patchNotification).toHaveBeenCalledWith(1, {"archived": true});
+    })
+});
+describe('check starring api call is correct', async () => {
 
+    test('check api call sets starred to true if currently false', async () =>  {
+        wrapper.vm.updatedNotification.starred = false;
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.$forceUpdate();
+        wrapper.vm.starNotification();
+        expect(Api.patchNotification).toBeCalledWith(1,{"starred": true})
+    });
+
+    test('check api call sets starred to false if currently true', async () =>  {
+        wrapper.vm.updatedNotification.starred = true;
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.starNotification();
+        expect(Api.patchNotification).toBeCalledWith(1,{"starred": false})
+    });
+});
+
+describe('check deleting api call is correct', async () => {
+
+    test('check api call for delete', async () =>  {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.deleteNotification();
+        expect(Api.deleteNotification).toBeCalledWith(1)
+    });
+
+});
+
+describe('Route based on clicked notification', () => {
+
+    test('Routes to correct address', async () => {
+        wrapper.vm.updatedNotification.subjectId = 1;
+        wrapper.vm.updatedNotification.type = "Liked Listing";
+        await wrapper.vm.goToListing()
+        expect($router.push).toHaveBeenCalledWith('/listings/1');
+    })
+
+    test('Routes to correct address', async () => {
+        wrapper.vm.updatedNotification.subjectId = 1;
+        wrapper.vm.updatedNotification.type = "Expired Marketplace Card";
+        await wrapper.vm.goToListing()
+        expect($router.push).toHaveBeenCalledTimes(0);
+    })
+});

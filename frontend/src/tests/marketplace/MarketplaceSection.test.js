@@ -108,33 +108,6 @@ describe ("shorten-text", () => {
     })
 })
 
-describe ("format-address", () => {
-    it('normal address, no nulls',  async() => {
-        let address = {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            suburb: "Upper Riccarton",
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-        }
-        expect(wrapper.vm.formatAddress(address)).toStrictEqual("Upper Riccarton, Christchurch");
-    })
-    it('null suburb',  async() => {
-        let address = {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            suburb: null,
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-        }
-        expect(wrapper.vm.formatAddress(address)).toStrictEqual("Christchurch");
-    })
-})
-
 describe ("Page Change handler", () => {
     it('causes page refresh when page changed to 2',  async() => {
         Api.getCardsBySection.mockResolvedValue({data: {

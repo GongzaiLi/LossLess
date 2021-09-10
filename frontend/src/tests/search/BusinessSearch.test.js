@@ -105,33 +105,6 @@ describe('check-api-request-searchBusiness', () => {
 
 });
 
-describe ("format-address", () => {
-    it('normal address, no nulls',  async() => {
-        let address = {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            suburb: "Upper Riccarton",
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-        }
-        expect(wrapper.vm.formatAddress(address)).toStrictEqual("Upper Riccarton, Christchurch, New Zealand");
-    })
-    it('null suburb',  async() => {
-        let address = {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            suburb: null,
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-        }
-        expect(wrapper.vm.formatAddress(address)).toStrictEqual("Christchurch, New Zealand");
-    })
-})
-
 describe('check-formatDescription-function', () => {
     test('description-less-then-20-characters', () => {
         const description = "Chocolate Place";
