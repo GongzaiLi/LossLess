@@ -59,6 +59,7 @@ Page that stores table and search bar to search for businesses
 <script>
 import pagination from "../model/Pagination";
 import api from "../../Api";
+import {formatAddress} from "../../util";
 
 export default {
   components: {
@@ -118,14 +119,13 @@ export default {
     },
 
     /**
-     * Formats the address to show the suburb if one exists, followed by the city and the country
-     * which will always exist. These are combined into a string separeted by commas.
+     * Formats the address using util function and appropriate privacy level.
      *
-     * @param address
-     * @return formattedAddress
+     * @param address The address object.
+     * @return address formatted
      */
-    formatAddress: function (address) {
-      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}, ${address.country}`;
+    getAddress: function (address) {
+      return formatAddress(address, 3);
     },
 
     /**
@@ -215,7 +215,7 @@ export default {
           key: 'address',
           label: 'Location',
           sortable: false,
-          formatter: "formatAddress"
+          formatter: "getAddress"
         }]
     }
   }

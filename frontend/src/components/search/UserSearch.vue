@@ -57,6 +57,7 @@ Date: sprint_1
 <script>
 import api from "../../Api";
 import pagination from "../model/Pagination";
+import {formatAddress} from "../../util";
 
 export default {
   components: {
@@ -174,7 +175,7 @@ export default {
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
-        tableHeader.location = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
+        tableHeader.location = formatAddress(user.homeAddress, 3);
         items.push(tableHeader);
       }
       return items;
@@ -230,9 +231,6 @@ export default {
           sortable: true
         },
         {
-          key: 'email',
-          sortable: true
-        },{
           key: 'location',
           sortable: false
         },

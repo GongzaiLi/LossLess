@@ -72,6 +72,7 @@
 
 <script>
 import api from "../../Api";
+import {formatAddress} from "../../util";
 
 export default {
   name: "CreateCard",
@@ -131,12 +132,7 @@ export default {
             this.$log.debug("Data loaded: ", response.data);
             this.userData = response.data;
             this.cardInfo.fullName = response.data.firstName + " " + response.data.lastName;
-            if (response.data.homeAddress.suburb) {
-              this.cardInfo.location = response.data.homeAddress.suburb + ", ";
-            }
-            if (response.data.homeAddress.city) {
-              this.cardInfo.location += response.data.homeAddress.city;
-            }
+            this.cardInfo.location = formatAddress(response.data.homeAddress, 3);
           })
           .catch((error) => {
             this.$log.debug(error);

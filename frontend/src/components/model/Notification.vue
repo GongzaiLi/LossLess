@@ -36,8 +36,11 @@
             <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
             <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
           </b-dropdown-item>
-          <b-dropdown-item @click="archiveNotification">
+          <b-dropdown-item @click="confirmArchive">
             <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
+          </b-dropdown-item>
+          <b-dropdown-item @click="confirmDelete">
+            <p><b-icon-trash class="delete-button" title="Delete this notification"></b-icon-trash>  Delete</p>
           </b-dropdown-item>
         </b-dropdown>
     </b-col>
@@ -59,7 +62,24 @@
            <b-icon-check2-all> </b-icon-check2-all> </span>
         </b-col>
       </b-row>
-    </div>
+
+    <b-modal ref="confirmDeleteModal" size="sm"
+             title="Delete Notification"
+             ok-variant="danger"
+             ok-title="Delete"
+             @ok="deleteNotification">
+      Are you sure you want to <strong>delete</strong> this notification?
+    </b-modal>
+
+    <b-modal ref="confirmArchiveModal" size="sm"
+             title="Archive Notification"
+             ok-variant="success"
+             ok-title="Archive"
+             @ok="archiveNotification">
+      Are you sure you want to <strong>archive</strong> this notification?
+    </b-modal>
+
+  </div>
 </template>
 
 
@@ -91,6 +111,10 @@ span.unreadLabel {
   color: green;
 }
 
+.delete-button {
+  color: red;
+}
+
 .three-dot {
   margin-right: -10px;
   padding-right: 0;
@@ -114,6 +138,7 @@ span.unreadLabel {
 <script>
 import Api from "../../Api";
 import EventBus from "../../util/event-bus";
+import {formatAddress} from "../../util";
 
 export default {
   name: "Notification",
@@ -133,7 +158,7 @@ export default {
     async updatePurchasedNotifications(notification) {
       const purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
       const address = purchasedListing.business.address;
-      notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+      notification.location = formatAddress(address, 2);
       const currency = await Api.getUserCurrency(address.country);
       notification.price = currency.symbol + purchasedListing.price + " " + currency.code
       notification.message = `${purchasedListing.quantity} x ${purchasedListing.product.name}`
@@ -144,13 +169,13 @@ export default {
      * when called it checks if the notification is currently liked
      * then sends a toggled api request based on this
      */
-    starNotification() {
+    async starNotification() {
       if(this.updatedNotification.starred) {
         this.updatedNotification.starred = false
-        Api.patchNotification(this.updatedNotification.id, {"starred": false})
+        await Api.patchNotification(this.updatedNotification.id, {"starred": false})
       } else {
         this.updatedNotification.starred = true
-        Api.patchNotification(this.updatedNotification.id, {"starred": true})
+        await Api.patchNotification(this.updatedNotification.id, {"starred": true})
       }
       EventBus.$emit("notificationUpdate")
     },
@@ -168,14 +193,41 @@ export default {
     },
 
     /**
+     * Calls API deleteNotification patch request
+     * and using an EventBus that emits notificationUpdate so that
+     * other components are refreshed.
+     */
+    async deleteNotification() {
+      await Api.deleteNotification(this.updatedNotification.id)
+      EventBus.$emit("notificationUpdate")
+    },
+
+    /**
+     * Shows a dialog to confirm archiving the notification.
+     * USES REFS NOT ID TO PREVENT DUPLICATION!
+     */
+    async confirmArchive() {
+      this.$refs.confirmArchiveModal.show();
+    },
+
+    /**
      * Calls API archiveNotification patch request
      * and using an EventBus that emits notificationUpdate so that
      * other components are refreshed.
      */
     async archiveNotification() {
-      await Api.archiveNotification(this.updatedNotification.id)
+      await Api.patchNotification(this.updatedNotification.id, {"archived": true})
       EventBus.$emit("notificationUpdate")
-    }
+    },
+
+    /**
+     * Shows a dialog to confirm deleting the notification.
+     * USES REFS NOT ID TO PREVENT DUPLICATION!
+     */
+    async confirmDelete() {
+      this.$refs.confirmDeleteModal.show();
+    },
+
 
 
   },
