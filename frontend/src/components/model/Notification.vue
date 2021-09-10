@@ -10,7 +10,7 @@
       <hr class="unreadHr">
     </div>
 
-    <div v-if="updatedNotification.tag">
+    <div v-if="updatedNotification.tag" :key="updatedNotification.tag" > <!-- Key makes div refresh on tag color change -->
       <NotificationTag :tag-color=updatedNotification.tag />
     </div>
 
@@ -35,10 +35,10 @@
           <template #button-content>
             <b-icon-tag-fill class="tag-button float-right"/>
           </template>
-          <b-dropdown-item v-for="tagColor in tagColors" :key="tagColor">
+          <b-dropdown-item v-for="tagColor in tagColors" :key="tagColor" @click="setNotificationTagColor(tagColor)">
             <NotificationTag :tag-color=tagColor class="tag"></NotificationTag>
           </b-dropdown-item>
-          <b-dropdown-item v-if="updatedNotification.tag">
+          <b-dropdown-item v-if="updatedNotification.tag" @click="setNotificationTagColor('remove')">
             <P><b-icon-x-circle-fill class="remove-tag"/> Remove Tag</p>
           </b-dropdown-item>
         </b-dropdown>
@@ -185,6 +185,19 @@ export default {
   },
 
   methods: {
+    /**
+     * Update the
+     * @param tagColor  The tag color to set the tag to, or the string 'remove' to remove a tag.
+     */
+    async setNotificationTagColor(tagColor) {
+      if (tagColor === "remove") {
+        this.updatedNotification.tag = null;
+        await Api.patchNotification(this.updatedNotification.id, {"tag": null})
+      } else {
+        this.updatedNotification.tag = tagColor;
+        await Api.patchNotification(this.updatedNotification.id, {"tag": tagColor})
+      }
+    },
     /**
      * Updates the purchase listing notification with the product data
      * @param notification the purchase listing notification
