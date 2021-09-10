@@ -51,7 +51,7 @@ beforeEach(() => {
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
 
-  Api.getUser.mockResolvedValue({data: {firstName: "John",lastName: "Smith", homeAddress:{suburb: "Riccarton", city: "Christchurch"}}});
+  Api.getUser.mockResolvedValue({data: {firstName: "John",lastName: "Smith", homeAddress:{city: "Christchurch", country: "New Zealand"}}});
   wrapper = mount(CreateCard, {
     localVue,
     propsData: {showError: showError},
@@ -76,7 +76,7 @@ describe('check-create-card-form-user-entered-data', () => {
 describe('check-create-card-form-autofill-data', () => {
 
   test('check-the-form-autofill-data-is-correct', () => {
-    const cardInfo = {fullName: "John Smith", location: "Riccarton, Christchurch"};
+    const cardInfo = {fullName: "John Smith", location: "Christchurch, New Zealand"};
     expect(wrapper.vm.cardInfo.fullName).toStrictEqual(cardInfo.fullName);
     expect(wrapper.vm.cardInfo.location).toStrictEqual(cardInfo.location);
   })
