@@ -104,9 +104,6 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
-      notificationUpdate: {
-        read: false
-      }
     }
   },
 
@@ -157,19 +154,9 @@ export default {
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-        EventBus.$emit('notificationClicked', notification);
+      notification.read = true
+      EventBus.$emit('notificationClicked', notification);
     },
-
-    /**
-     * Updates the status of the notification in home feed when a nav bar notification is clicked.
-     * @param notification The notification that the user clicked from nav bar.
-     */
-    notificationClickedFromNavBar(notification) {
-      const updated = this.notifications.find(item => item.id === notification.id);
-      if (updated.read !== notification.read) {
-        this.notificationClicked(updated);
-      }
-    }
 
   },
 

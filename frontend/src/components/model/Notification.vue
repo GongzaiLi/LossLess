@@ -146,6 +146,7 @@ export default {
   data() {
     return {
       updatedNotification: {message:"", type:"", read: this.notification.read},
+      updated: false
     }
   },
 
@@ -233,23 +234,26 @@ export default {
      * @param notification the notification that has been clicked
      */
     async markRead(notification) {
-      if (notification.id === this.notification.id) {
-        this.updatedNotification.read = true;
-        await Api.patchNotification(notification.id, {"read": true});
+      if (notification.id === this.updatedNotification.id && !this.updatedNotification.read &&
+      !this.updated) {
+        this.updatedNotification.read = true
+        await Api.patchNotification(this.updatedNotification.id, {"read": true});
       }
-    }
-
+      this.updated = true
+    },
   },
   async mounted() {
-    EventBus.$on('notificationClicked', this.markRead);
-
     if (this.notification.type === "Purchased listing") {
       this.updatedNotification = await this.updatePurchasedNotifications(this.notification)
     } else {
       this.updatedNotification = this.notification
     }
+
+    /**
+     * This mount listens to the markRead event when a notification click is on home feed.
+     */
+    EventBus.$on('notificationClicked', this.markRead);
+
   },
-
-
 }
 </script>

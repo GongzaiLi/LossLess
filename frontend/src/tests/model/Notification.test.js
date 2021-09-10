@@ -177,11 +177,19 @@ describe('Route based on clicked notification', () => {
 
 describe('Clicking a notification', () => {
 
+    const collarNotificationEmitted = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
+
     test('Notification set to read on click', async () => {
 
-        wrapper.vm.notification = collarNotification;
+        wrapper.vm.updatedNotification = collarNotification;
         await wrapper.vm.$forceUpdate();
-        await wrapper.vm.markRead(collarNotification);
+        await wrapper.vm.markRead(collarNotificationEmitted);
         expect(Api.patchNotification).toBeCalledWith(6,{"read": true})
 
     })

@@ -17,8 +17,8 @@
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
 
-    <b-dropdown-item v-for="notification in unreadNotifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
-      <notification v-if="!notification.read" :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
+    <b-dropdown-item v-for="notification in unreadNotifications" v-bind:key="notification.id" class="notifications-item" @click="goToHomePage">
+      <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
 </template>
@@ -84,14 +84,6 @@ export default {
       // This is needed to re-render a notification when a star icon is needed.
       this.notificationChange = !this.notificationChange;
      },
-
-    /**
-     * Performs an action based on the notification that has been clicked.
-     * @param notification the notification that has been clicked
-     */
-    async notificationClicked(notification) {
-      EventBus.$emit('notificationClicked', notification);
-    },
   },
 
   created() {
@@ -103,6 +95,11 @@ export default {
      * This mount listens to the notificationUpdate event
      */
     EventBus.$on('notificationUpdate', this.updateNotifications)
+
+    /**
+     * This mount listens to the notificationUpdate event on click from home feed.
+     */
+    EventBus.$on('notificationClicked', this.updateNotifications)
   }
 }
 
