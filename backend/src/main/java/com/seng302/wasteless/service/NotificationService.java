@@ -45,10 +45,9 @@ public class NotificationService {
     }
 
     /**
-     * todo findAllUnArchivedNotificationsByUserId
-     * Get notifications for user that have not been archived
-     * @param userId        The id of the user to get notifications for
-     * @return          The found notifications, if any otherwise empty list
+     * Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
+     * @param userId    The id of the user to get notifications for
+     * @return          Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
      */
     public static Specification<Notification> filterAllUnArchivedNotificationsByUserId(Integer userId) {
         //ByStarredDescCreatedDesc
@@ -57,8 +56,9 @@ public class NotificationService {
     }
 
     /**
-     * todo
-     * @return
+     * Returns a Specification that matches all notifications with filter NotificationT ags
+     * @param tags list of Notification tags to match Notifications
+     * @return Returns a Specification that matches all notifications with filter NotificationT ags
      */
     private Specification<Notification> filterNotificationTags(List<String> tags) {
         List<NotificationTag> notificationTags = new ArrayList<>();
@@ -72,10 +72,11 @@ public class NotificationService {
 
 
     /**
-     * todo
-     * @param userId
-     * @param tags
-     * @return
+     * filter Notification by User id and Notification tags
+     *
+     * @param userId The id of the user to get notifications for
+     * @param tags list of Notification tags to match Notifications (can be null)
+     * @return The found notifications, if any otherwise empty list
      */
     public List<Notification> filterNotifications(Integer userId, Optional<List<String>> tags) {
         Specification<Notification> querySpec = filterAllUnArchivedNotificationsByUserId(userId);
