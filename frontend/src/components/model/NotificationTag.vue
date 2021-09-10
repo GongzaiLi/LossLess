@@ -9,13 +9,13 @@
 <script>
 export default {
   name: "NotificationTag",
-  props: ['tagColor'],
+  props: ['tagColor', "tagStyleProp"],
   data() {
     return {
       tagStyle: {
         background: "",
-        width: "100%",
-        height: "1.5rem"
+        height: "100%",
+        width: "1.5rem"
       }
     }
   },
@@ -55,7 +55,7 @@ export default {
           break;
         }
         default: {
-          this.tagStyle.background = "linear-gradient(to left, #ffa500 50%, #292929 50%)";
+          this.tagStyle.background = "linear-gradient(80deg, #ffa500 50%, #292929 50%)";
           break;
         }
       }
@@ -63,6 +63,10 @@ export default {
   },
 
   mounted() {
+    this.tagStyle = {
+      ...this.tagStyle,
+      ...this.tagStyleProp
+    }
     this.determineTagCSSColor()
   }
 
