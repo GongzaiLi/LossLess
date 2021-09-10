@@ -115,11 +115,6 @@
   flex: 10;
 }
 
-.flex-child:first-child {
-  margin-right: 5px;
-  width: 1.5rem;
-}
-
 .readLabel {
   float: right;
   color: green;
@@ -186,7 +181,7 @@ span.unreadLabel {
 import Api from "../../Api";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util";
-import NotificationTag from "@/components/model/NotificationTag";
+import NotificationTag from "../../components/model/NotificationTag";
 
 export default {
   name: "Notification",
