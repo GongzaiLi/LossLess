@@ -136,5 +136,51 @@ describe('check-that-expired-table-only-shows-when-necessary', () => {
 
 });
 
+describe('Clicking a notification', () => {
+
+    test('Notification set to read on click from home feed', async () => {
+
+        const collarNotification = {
+            id: 6,
+            message: "A notification about Pink collars maybe - 69g can",
+            subjectId: 1,
+            type: "Some type",
+            read: false
+        }
+
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.notificationClicked(collarNotification);
+        expect(Api.patchNotification).toBeCalledWith(6,{"read": true})
+
+    })
+
+    test('Notification set to read on click from nav bar', async () => {
+
+        wrapper.vm.notifications = [
+            {
+                id: 6,
+                message: "A notification about Pink collars maybe - 69g can",
+                subjectId: 1,
+                type: "Some type",
+                read: true
+            }
+        ]
+
+        const collarNotification = {
+            id: 6,
+            message: "A notification about Pink collars maybe - 69g can",
+            subjectId: 1,
+            type: "Some type",
+            read: false
+        }
+
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.notificationClickedFromNavBar(collarNotification);
+        expect(Api.patchNotification).toBeCalledWith(6,{"read": true})
+
+    })
+
+});
+
 
 

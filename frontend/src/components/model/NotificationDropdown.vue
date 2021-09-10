@@ -36,9 +36,6 @@ export default {
       notifications: [],
       expiringCards: [],
       notificationChange: true,
-      notificationUpdate: {
-        read: false
-      }
     }
   },
   computed: {

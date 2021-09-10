@@ -170,8 +170,8 @@ export default {
     },
 
     /**
-     * Updates the status of the notification in home feed when a nav bar notification status is updated.
-     * @param notification The notification that the user updated from nav bar.
+     * Updates the status of the notification in home feed when a nav bar notification is clicked.
+     * @param notification The notification that the user clicked from nav bar.
      */
     notificationClickedFromNavBar(notification) {
       const updated = this.notifications.find(item => item.id === notification.id);
