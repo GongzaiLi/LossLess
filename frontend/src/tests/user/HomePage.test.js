@@ -136,5 +136,124 @@ describe('check-that-expired-table-only-shows-when-necessary', () => {
 
 });
 
+describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => {
+    test('no-tags-selected-expect-call-with-empty-string', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.filterNotificationsByTag();
+        expect(Api.getNotifications).toBeCalledWith("")
+    });
+
+    test('all-tags-selected-expect-call-with-all-tags', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: true,
+            ORANGE: true,
+            YELLOW: true,
+            GREEN: true,
+            BLUE: true,
+            PURPLE: true,
+            BLACK: true,
+        };
+
+        await wrapper.vm.filterNotificationsByTag();
+        expect(Api.getNotifications).toBeCalledWith("RED,ORANGE,YELLOW,GREEN,BLUE,PURPLE,BLACK")
+    });
+
+    test('some-tags-selected-expect-call-with-those-tags-only', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: true,
+            YELLOW: true,
+            GREEN: false,
+            BLUE: true,
+            PURPLE: false,
+            BLACK: true,
+        };
+
+        await wrapper.vm.filterNotificationsByTag();
+        expect(Api.getNotifications).toBeCalledWith("ORANGE,YELLOW,BLUE,BLACK")
+    });
+
+});
 
 
+describe('test-toggleTagColorSelected-works-correctly', () => {
+    test('toggle-red-tag-from-true-to-false', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: true,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("RED");
+        expect(wrapper.vm.tagColors.RED).toStrictEqual(false);
+    });
+
+    test('toggle-red-tag-from-false-to-true', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("RED");
+        expect(wrapper.vm.tagColors.RED).toStrictEqual(true);
+    });
+
+    test('toggle-black-and-blue-tags-from-false-to-true', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("BLACK");
+        await wrapper.vm.toggleTagColorSelected("BLUE");
+        expect(wrapper.vm.tagColors.BLACK).toStrictEqual(true);
+        expect(wrapper.vm.tagColors.BLUE).toStrictEqual(true);
+    });
+
+    test('toggle-black-and-blue-tags-from-true-to-false', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: true,
+            PURPLE: false,
+            BLACK: true,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("BLACK");
+        await wrapper.vm.toggleTagColorSelected("BLUE");
+        expect(wrapper.vm.tagColors.BLACK).toStrictEqual(false);
+        expect(wrapper.vm.tagColors.BLUE).toStrictEqual(false);
+    });
+})
