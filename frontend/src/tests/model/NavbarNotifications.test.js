@@ -3,6 +3,7 @@ import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import NotificationDropdown from '../../components/model/NotificationDropdown'; // name of your Vue component
 import Auth from '../../auth'
 import Api from '../../Api'
+import EventBus from "../../util/event-bus";
 
 let wrapper;
 
@@ -182,15 +183,3 @@ describe('Get unread notifications', () => {
 
 });
 
-describe('Clicking a notification', () => {
-
-  test('Notification set to read on click', async () => {
-
-    const collarNotification = notifications[2]
-    await wrapper.vm.$forceUpdate();
-    await wrapper.vm.notificationClicked(collarNotification);
-    expect(Api.patchNotification).toBeCalledWith(6,{"read": true})
-
-  })
-
-});

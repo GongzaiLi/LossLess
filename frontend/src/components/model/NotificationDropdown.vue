@@ -87,13 +87,10 @@ export default {
 
     /**
      * Performs an action based on the notification that has been clicked.
-     * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-      notification.read = true
-      await Api.patchNotification(notification.id, {"read": notification.read})
-      EventBus.$emit('notificationClickedFromNavBar', notification);
+      EventBus.$emit('notificationClicked', notification);
     },
   },
 

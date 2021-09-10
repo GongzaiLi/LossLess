@@ -81,7 +81,6 @@ import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
 import Notification from "../model/Notification";
 import EventBus from "../../util/event-bus"
-// import {markNotificationRead} from '../../util/index'
 
 export default {
   components: {MarketplaceSection, Notification},
@@ -114,11 +113,6 @@ export default {
     const userId = this.$currentUser.id;
     this.getUserInfo(userId);
     EventBus.$on('notificationUpdate', this.updateNotifications)
-
-    /**
-     * This mount listens to the notificationUpdate event from nav bar notifications.
-     */
-    EventBus.$on('notificationClickedFromNavBar', this.notificationClickedFromNavBar)
   },
 
   methods: {
@@ -159,14 +153,10 @@ export default {
 
     /**
      * Performs an action based on the notification that has been clicked.
-     * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-        notification.read = true
-        await Api.patchNotification(notification.id, {"read": notification.read})
-        EventBus.$emit("notificationUpdate")
-
+        EventBus.$emit('notificationClicked', notification);
     },
 
     /**

@@ -228,10 +228,21 @@ export default {
       this.$refs.confirmDeleteModal.show();
     },
 
-
+    /**
+     * Marks a notification as read and makes th api call.
+     * @param notification the notification that has been clicked
+     */
+    async markRead(notification) {
+      if (notification.id === this.notification.id) {
+        this.updatedNotification.read = true;
+        await Api.patchNotification(notification.id, {"read": true});
+      }
+    }
 
   },
   async mounted() {
+    EventBus.$on('notificationClicked', this.markRead);
+
     if (this.notification.type === "Purchased listing") {
       this.updatedNotification = await this.updatePurchasedNotifications(this.notification)
     } else {
