@@ -273,7 +273,7 @@ public class ManageMyFeedFeature {
     public void filter_notifications_by_tags(List<String> tags) throws Exception {
         MultiValueMap<String, String> notificationTags = new LinkedMultiValueMap<>();
         for (String tag : tags) {
-            notificationTags.add("tag", tag);
+            notificationTags.add("tags", tag);
         }
 
         responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")

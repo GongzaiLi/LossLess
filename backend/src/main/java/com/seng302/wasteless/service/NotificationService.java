@@ -50,15 +50,14 @@ public class NotificationService {
      * @return          Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
      */
     public static Specification<Notification> filterAllUnArchivedNotificationsByUserId(Integer userId) {
-        //ByStarredDescCreatedDesc
         Specification<Notification> findUser = (root, query, builder) -> builder.equal(root.get("userId"), userId);
         return findUser.and((root, query, builder) -> builder.isFalse(root.get("archived")));
     }
 
     /**
-     * Returns a Specification that matches all notifications with filter NotificationT ags
+     * Returns a Specification that matches all notifications with filter Notification Tags
      * @param tags list of Notification tags to match Notifications
-     * @return Returns a Specification that matches all notifications with filter NotificationT ags
+     * @return Returns a Specification that matches all notifications with filter Notification Tags
      */
     private Specification<Notification> filterNotificationTags(List<String> tags) {
         List<NotificationTag> notificationTags = new ArrayList<>();
