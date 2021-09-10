@@ -12,18 +12,23 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -126,17 +131,17 @@ public class ManageMyFeedFeature {
     @When("I mark it as read")
     public void iMarkItAsRead() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
-                .content("{\"read\": true}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(currentUserDetails)))
+                        .content("{\"read\": true}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
     }
 
     @Then("The notification appears as read")
     public void theNotificationAppearsAsRead() throws Exception {
         getNotifications().andExpect(
-            jsonPath(String.format("$[?(@.id==%d && @.read==true)]", notification.getId()))   // This JSONPath filters the notifs for only those with id equal to our notif's id and .read property equal to true
-            .isNotEmpty());
+                jsonPath(String.format("$[?(@.id==%d && @.read==true)]", notification.getId()))   // This JSONPath filters the notifs for only those with id equal to our notif's id and .read property equal to true
+                        .isNotEmpty());
     }
 
     @Given("My notification had not been starred and is not the newest notification")
@@ -153,17 +158,17 @@ public class ManageMyFeedFeature {
     @When("I star it")
     public void iStarIt() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
-                .content("{\"starred\": true}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(currentUserDetails)))
+                        .content("{\"starred\": true}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
     }
 
     @Then("The starred notification is at the top of my feed")
     public void theNotificationAppearsAtTheTopOfMyFeed() throws Exception {
         getNotifications()
-            .andExpect(jsonPath("$[0].id").value(notification.getId()))
-            .andExpect(jsonPath("$[0].starred").value(true));
+                .andExpect(jsonPath("$[0].id").value(notification.getId()))
+                .andExpect(jsonPath("$[0].starred").value(true));
     }
 
     @Given("My notification has been starred")
@@ -187,26 +192,25 @@ public class ManageMyFeedFeature {
     @When("I archive it")
     public void iArchiveIt() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
-                .content("{\"archived\": true}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(currentUserDetails)))
+                        .content("{\"archived\": true}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
     }
 
     @Then("The notification no longer appears in my feed")
     public void theNotificationNoLongerAppearsInMyFeed() throws Exception {
         getNotifications().andExpect(
-            jsonPath(String.format("$[?(@.id==%d)]", notification.getId()))
-            .isEmpty());
+                jsonPath(String.format("$[?(@.id==%d)]", notification.getId()))
+                        .isEmpty());
     }
 
     private ResultActions getNotifications() throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(currentUserDetails)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
     }
-
 
 
     @Given("My notification has no tag")
@@ -218,9 +222,9 @@ public class ManageMyFeedFeature {
     @When("I add the tag {string}")
     public void i_add_the_tag(String tag) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
-                .content("{\"tag\": \"YELLOW\"}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(currentUserDetails)))
+                        .content("{\"tag\": \"YELLOW\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
     }
 
@@ -240,9 +244,9 @@ public class ManageMyFeedFeature {
     @When("I remove the tag")
     public void i_remove_the_tag() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.patch("/notifications/" + notification.getId())
-                .content("{\"tag\": null}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .with(user(currentUserDetails)))
+                        .content("{\"tag\": null}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(currentUserDetails)))
                 .andExpect(status().isOk());
     }
 
@@ -252,4 +256,52 @@ public class ManageMyFeedFeature {
                 jsonPath(String.format("$[?(@.id==%d && @.tag==null)]", notification.getId()))
                         .isNotEmpty());
     }
+
+    // AC7
+
+    @Given("We have {int} notifications and notifications with odd are tagged as {string} and notification with even id are tagged as {string}")
+    public void we_have_notifications_and_notifications_with_odd_are_tagged_as_and_notification_with_even_id_are_tagged_as(Integer notificationNum, String tag1, String tag2) throws Exception {
+        for (int i = 0; i < notificationNum; i++) {
+            String tag = i % 2 == 0 ? tag1 : tag2;
+            Notification notification  = NotificationService.createNotification(currentUser.getId(), 1, NotificationType.LIKEDLISTING, "");
+            notification.setTag(NotificationTag.valueOf(tag.toUpperCase()));
+            notificationService.saveNotification(notification);
+        }
+    }
+
+    @When("filter notifications by tags:")
+    public void filter_notifications_by_tags(List<String> tags) throws Exception {
+        MultiValueMap<String, String> notificationTags = new LinkedMultiValueMap<>();
+        for (String tag : tags) {
+            notificationTags.add("tags", tag);
+        }
+
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/users/notifications")
+                .queryParams(notificationTags)
+                .with(user(currentUserDetails))
+                .with(csrf()))
+                .andExpect(status().isOk());
+    }
+
+    @Then("The Filtered notifications result are all tagged as {string}")
+    public void the_filtered_notifications_result_are_all_tagged_as(String tag) throws Exception {
+
+        JSONArray gsonResult = new JSONArray(responseResult.andReturn().getResponse().getContentAsString());
+        for(int i=0; i < gsonResult.length(); i++)
+        {
+            JSONObject object = gsonResult.getJSONObject(i);
+            Assertions.assertEquals(object.getString("tag"), tag);
+        }
+    }
+
+    @Then("The Filtered notifications result are all tagged as tagged {string} or {string}")
+    public void the_filtered_notifications_result_are_all_tagged_as_tagged_or(String tag1, String tag2) throws Exception {
+        JSONArray gsonResult = new JSONArray(responseResult.andReturn().getResponse().getContentAsString());
+        for(int i=0; i < gsonResult.length(); i++)
+        {
+            JSONObject object = gsonResult.getJSONObject(i);
+            Assertions.assertTrue(object.getString("tag").equals(tag1) ||  object.getString("tag").equals(tag2));
+        }
+    }
+
 }

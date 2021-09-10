@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.*;
@@ -111,7 +112,7 @@ class UserControllerUnitTest {
         notifs.add(notification);
 
         Mockito
-                .when(notificationService.findAllUnArchivedNotificationsByUserId(anyInt()))
+                .when(notificationService.filterNotifications(anyInt(), any()))
                 .thenReturn(notifs);
 
         // See https://stackoverflow.com/questions/360520/unit-testing-with-spring-security

@@ -35,7 +35,9 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * UserController is used for mapping all Restful API requests starting with the address "/users".
@@ -242,15 +244,17 @@ public class UserController {
     }
 
     /**
-     * Endpoint to GET all notifications of the logged in user
-     *
-     * @return  200 OK if succesful request, With all notifications for logged in user
+     * Endpoint to GET all notifications of the logged-in user
+     * @param tags list of Notification tags to match Notifications (can be null)
+     * @return 200 OK if successful request, With all notifications for logged in user
      */
     @GetMapping("/users/notifications")
-    public ResponseEntity<Object> getNotifications() {
+    public ResponseEntity<Object> getNotifications(@RequestParam(value = "tags") Optional<List<String>> tags) {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Request to get notifications for user: {}", user.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(notificationService.findAllUnArchivedNotificationsByUserId(user.getId()));
+
+        List<Notification> getNotifications = notificationService.filterNotifications(user.getId(), tags);
+        return ResponseEntity.status(HttpStatus.OK).body(getNotifications);
     }
 
     /**
