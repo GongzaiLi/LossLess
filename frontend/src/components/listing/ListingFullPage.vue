@@ -403,8 +403,7 @@ export default {
      * @return address formatted
      */
     getAddress: function () {
-      const address = this.listingItem.business.address;
-      return formatAddress(address, 2);
+      return formatAddress(this.listingItem.business.address, 2);
     },
     /**
      * Returns the listing like string based on number of likes

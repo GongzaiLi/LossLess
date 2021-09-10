@@ -85,8 +85,7 @@ export default {
      * @return address formatted
      */
     getAddress: function () {
-      const address = this.cardInfo.creator.homeAddress;
-      return formatAddress(address, 3);
+      return formatAddress(this.cardInfo.creator.homeAddress, 3);
     },
 
     /**

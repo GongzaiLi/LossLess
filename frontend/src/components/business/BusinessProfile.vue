@@ -413,8 +413,7 @@ export default {
      * @return address formatted
      */
     getAddress: function () {
-      const address = this.businessData.address;
-      return formatAddress(address, 1);
+      return formatAddress(this.businessData.address, 1);
     },
 
 

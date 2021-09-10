@@ -84,8 +84,7 @@ export default {
      * @return address formatted
      */
     getAddress: function () {
-      const address = this.listing.business.address;
-      return formatAddress(address, 4);
+      return formatAddress(this.listing.business.address, 4);
     },
   },
 

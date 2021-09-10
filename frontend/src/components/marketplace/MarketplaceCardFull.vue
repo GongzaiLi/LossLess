@@ -141,8 +141,7 @@ export default {
      * @return address formatted
      */
     getAddress: function () {
-      const address = this.fullCard.creator.homeAddress;
-      return formatAddress(address, 3);
+      return formatAddress(this.fullCard.creator.homeAddress, 3);
     },
     /**
      * format Expiry date
