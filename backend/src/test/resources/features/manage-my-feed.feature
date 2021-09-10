@@ -45,3 +45,16 @@ Feature: U32 Managing my feed
     Given My notification has been tagged as "BLUE"
     When I remove the tag
     Then My tag has been removed
+
+  Scenario: AC7: Filter notifications by one tag.
+    Given We have 10 notifications and notifications with odd are tagged as "RED" and notification with even id are tagged as "BLACK"
+    When filter notifications by tags:
+      | RED |
+    Then The Filtered notifications result are all tagged as "RED"
+
+  Scenario: AC7: Filter notifications by tags.
+    Given We have 10 notifications and notifications with odd are tagged as "RED" and notification with even id are tagged as "BLACK"
+    When filter notifications by tags:
+      | RED   |
+      | BLACK |
+    Then The Filtered notifications result are all tagged as tagged "RED" or "BLACK"
