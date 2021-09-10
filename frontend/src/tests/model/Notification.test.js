@@ -93,7 +93,7 @@ describe('Home-page', () => {
 
 describe('check-purchased-listing-notification', () => {
     const afterUpdate = {
-        location: "Upper Riccarton, Christchurch, Canterbury, New Zealand",
+        location: "Upper Riccarton, Christchurch, Canterbury, New Zealand 90210",
         message: "5 x Watties Baked Beans - 420g can",
         price: "$5.99 NZD",
         subjectId: 1,

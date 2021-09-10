@@ -138,6 +138,7 @@ span.unreadLabel {
 <script>
 import Api from "../../Api";
 import EventBus from "../../util/event-bus";
+import {formatAddress} from "../../util";
 
 export default {
   name: "Notification",
@@ -157,7 +158,7 @@ export default {
     async updatePurchasedNotifications(notification) {
       const purchasedListing = (await Api.getPurchaseListing(notification.subjectId)).data
       const address = purchasedListing.business.address;
-      notification.location = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
+      notification.location = formatAddress(address, 2);
       const currency = await Api.getUserCurrency(address.country);
       notification.price = currency.symbol + purchasedListing.price + " " + currency.code
       notification.message = `${purchasedListing.quantity} x ${purchasedListing.product.name}`

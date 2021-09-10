@@ -131,7 +131,7 @@
                     </router-link>
                   </label>
                   <br>
-                  <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
+                  <label class="details-text"> <strong> Business Location: </strong> {{ getAddress }} </label>
                 </b-container>
               </b-input-group-text>
             </b-col>
@@ -250,6 +250,7 @@
 <script>
 import Api from "../../Api";
 import EventBus from "../../util/event-bus"
+import {formatAddress} from "../../util";
 
 
 export default {
@@ -258,7 +259,6 @@ export default {
     return {
       slideNumber: 0,
       listingItem: {},
-      address: {},
       currency: {},
       listingLoading: true,
       listingNotExists: false,
@@ -297,7 +297,6 @@ export default {
             }
 
             const address = this.listingItem.business.address;
-            this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
             this.currency = await Api.getUserCurrency(address.country);
             this.listingLoading = false;
           })
@@ -398,6 +397,14 @@ export default {
   },
 
   computed: {
+    /**
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
+     */
+    getAddress: function () {
+      return formatAddress(this.listingItem.business.address, 2);
+    },
     /**
      * Returns the listing like string based on number of likes
      * @returns {string} The string to be returned

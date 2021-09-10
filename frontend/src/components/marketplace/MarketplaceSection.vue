@@ -56,7 +56,7 @@
         </template>
 
         <template v-slot:cell(location)="{ item }">
-          <div>{{shortenText(formatAddress(item.creator.homeAddress), 25)}}</div>
+          <div>{{shortenText(getAddress(item.creator.homeAddress), 25)}}</div>
         </template>
 
         <template #empty>
@@ -91,6 +91,7 @@ import pagination from "../model/Pagination";
 import MarketplaceCard from "./MarketplaceCard";
 import MarketplaceCardFull from "./MarketplaceCardFull";
 import Api from "../../Api";
+import {formatAddress} from "../../util";
 
 export default {
   name: "MarketplaceSection",
@@ -139,7 +140,7 @@ export default {
         },
         {
           key: 'created',
-          label: "created",
+          label: "Created",
           sortable: true,
           formatter: (value) => {
             const date = new Date(value);
@@ -171,10 +172,13 @@ export default {
     },
 
     /**
-     * Combine fields of address
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @param address the address of the card creator
+     * @return address formatted
      */
-    formatAddress: function (address) {
-      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}`;
+    getAddress: function (address) {
+      return formatAddress(address, 4);
     },
 
     /**
