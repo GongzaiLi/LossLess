@@ -10,6 +10,10 @@
       <hr class="unreadHr">
     </div>
 
+    <div v-if="updatedNotification.tag">
+      <NotificationTag :tag-color=updatedNotification.tag />
+    </div>
+
     <b-row>
     <b-col cols="2" class="pt-1 pr-0">
       <b-icon-star-fill class="mr-2 star-icon "  v-if="updatedNotification.starred"/>
@@ -139,9 +143,11 @@ span.unreadLabel {
 import Api from "../../Api";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util";
+import NotificationTag from "@/components/model/NotificationTag";
 
 export default {
   name: "Notification",
+  components: {NotificationTag},
   props: ['notification', 'inNavbar'],
   data() {
     return {
