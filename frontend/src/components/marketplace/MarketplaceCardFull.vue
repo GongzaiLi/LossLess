@@ -10,7 +10,8 @@
 
       <b-card no-body>
         <template #header>
-          <b-card-text> {{ fullCard.description }}</b-card-text>
+          <b-card-text v-if="fullCard.description" > {{ fullCard.description }}</b-card-text>
+          <b-card-text v-else class="text-muted"> <em> No Description </em>  </b-card-text>
         </template>
       </b-card>
       <br>
