@@ -1,5 +1,3 @@
-import Api from "../Api";
-
 /**
  * Takes a starting and ending date, then calculates the integer number of years and months elapsed since that date.
  * The months elapsed is not the total number of months elapsed, but the number months elapsed in
@@ -29,27 +27,6 @@ export function getToday() {
 }
 
 /**
- * Updates a notification if it has been read.
- * @param notification The notification to be updated.
- * @param notificationUpdate The updated data of the notification to be sent in the api request.
- */
-export async function markNotificationRead(notification, notificationUpdate) {
-  notification.read = true;
-  notificationUpdate.read = true;
-  let response;
-  await Api.readNotification(notification.id, notificationUpdate)
-      .then((res) => {
-        response = res.data;
-      })
-      .catch((error) => {
-        response = error;
-      })
-  return response;
-}
-
-
-export default getMonthsAndYearsBetween;
-/**
  * Get any date without the time
  * need to add one to get correct date
  * @return date in format yyyy-mm-dd
@@ -67,3 +44,43 @@ export function getMonthName(mouthNum) {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   return monthNames[mouthNum];
 }
+
+/**
+ * Builds a string containing the address. Takes a privacy level allowing only certain fields to be returned depending on its value.
+ *
+ * Privacy Levels:
+ * 1 and below - All fields returned
+ * 2 - Suburb, city, region, country, postcode are returned
+ * 3 - City, region, country are returned
+ * 4 - Region and city are returned
+ * 5 - Country is returned
+ * 6 or above - Message "Withheld for privacy" returned
+ *
+ * If address ends up empty, message "No address available" returned;
+ *
+ * @param address       Address object containing fields {streetNumber, streetName, suburb, city, region, country, postcode}.
+ *                      All fields theoretically optional
+ * @param privacyLevel  The level of privacy to return the address with
+ * @returns {string}
+ */
+export function formatAddress(address, privacyLevel) {
+
+  if (privacyLevel > 5) return "Withheld for privacy";
+
+  let addressString = "";
+
+  (address.streetNumber && privacyLevel <= 1 && address.streetName) && (addressString += `${address.streetNumber} `);
+  (address.streetName && privacyLevel <= 1) && (addressString += `${address.streetName}, `);
+  (address.suburb && privacyLevel <= 2) && (addressString += address.city || address.country || address.region ? `${address.suburb}, ` : `${address.suburb} `);
+  (address.city && privacyLevel <= 3) && (addressString += address.country || address.region ? `${address.city}, ` : `${address.city} `);
+  (address.region && privacyLevel <= 4) && (addressString += address.country ? `${address.region}, ` : `${address.region} `);
+  (address.country && privacyLevel <= 5) && (addressString += `${address.country} `);
+  (address.postcode && privacyLevel <= 2) && (addressString += `${address.postcode}`);
+
+  if (addressString === "") {
+    addressString = "No address available"
+  }
+
+  return addressString.trimEnd();
+}
+

@@ -42,7 +42,7 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
           <notification :notification="notification" :in-navbar="false"> </notification>
         </b-card>
       </div>
@@ -81,8 +81,7 @@
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
 import Notification from "../model/Notification";
-import {markNotificationRead} from '../../util/index'
-import EventBus from "../../util/event-bus";
+import EventBus from "../../util/event-bus"
 
 export default {
   components: {MarketplaceSection, Notification},
@@ -114,11 +113,6 @@ export default {
   mounted() {
     const userId = this.$currentUser.id;
     this.getUserInfo(userId);
-
-    /**
-     * This mount listens to the notificationUpdate event
-     */
-    EventBus.$on('notificationClicked', this.notificationClickedFromNavBar)
     EventBus.$on('notificationUpdate', this.updateNotifications)
   },
 
@@ -160,27 +154,21 @@ export default {
 
     /**
      * Performs an action based on the notification that has been clicked.
-     * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-      const response = await markNotificationRead(notification, this.notificationUpdate);
-      this.$log.debug(response)
-      EventBus.$emit('notificationClickedFromHomeFeed', notification);
-      if (notification.type === 'Liked Listing' || notification.type === 'Unliked Listing') {
-        if (this.$route.fullPath !== '/listings/' + notification.subjectId) {
-          await this.$router.push('/listings/' + notification.subjectId);
-        }
-      }
+        EventBus.$emit('notificationClicked', notification);
     },
 
     /**
-     * Updates the status of the notification in home feed when a nav bar notification status is updated.
-     * @param notification The notification that the user updated from nav bar.
+     * Updates the status of the notification in home feed when a nav bar notification is clicked.
+     * @param notification The notification that the user clicked from nav bar.
      */
     notificationClickedFromNavBar(notification) {
       const updated = this.notifications.find(item => item.id === notification.id);
-      this.notificationClicked(updated);
+      if (updated.read !== notification.read) {
+        this.notificationClicked(updated);
+      }
     }
 
   },

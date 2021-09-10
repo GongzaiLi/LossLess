@@ -8,6 +8,7 @@ config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let mockListing;
 let notification;
+let collarNotification;
 
 let $route;
 let $router;
@@ -66,6 +67,14 @@ beforeEach(() => {
         "closes": "2021-07-21T23:59:00Z"
     };
 
+    collarNotification = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
+
 
     Api.getPurchaseListing.mockResolvedValue({data: mockListing});
     Api.getUserCurrency.mockResolvedValue({symbol: '$', code: 'NZD'});
@@ -93,7 +102,7 @@ describe('Home-page', () => {
 
 describe('check-purchased-listing-notification', () => {
     const afterUpdate = {
-        location: "Upper Riccarton, Christchurch, Canterbury, New Zealand",
+        location: "Upper Riccarton, Christchurch, Canterbury, New Zealand 90210",
         message: "5 x Watties Baked Beans - 420g can",
         price: "$5.99 NZD",
         subjectId: 1,
@@ -164,4 +173,17 @@ describe('Route based on clicked notification', () => {
         await wrapper.vm.goToListing()
         expect($router.push).toHaveBeenCalledTimes(0);
     })
+});
+
+describe('Clicking a notification', () => {
+
+    test('Notification set to read on click', async () => {
+
+        wrapper.vm.notification = collarNotification;
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.markRead(collarNotification);
+        expect(Api.patchNotification).toBeCalledWith(6,{"read": true})
+
+    })
+
 });

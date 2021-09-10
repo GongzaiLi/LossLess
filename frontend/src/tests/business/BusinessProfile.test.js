@@ -100,23 +100,6 @@ test('get-normal-data', async () => {
   expect(wrapper.vm.businessData).toEqual(response.data);
 });
 
-
-test('get-address', async () => {
-  const address = {
-    streetNumber: "3/24",
-    streetName: "Ilam Road",
-    suburb: "a suburb",
-    city: "Christchurch",
-    region: "Canterbury",
-    country: "New Zealand",
-    postcode: "90210"
-  };
-
-  wrapper.vm.businessData.address = address;
-  await wrapper.vm.$nextTick();
-  expect(wrapper.vm.getAddress).toEqual("3/24 Ilam Road, a suburb, Christchurch Canterbury New Zealand 90210");
-});
-
 test('check-can-revoke-admin-invalid-returns-false', async () => {
 
   const data = {

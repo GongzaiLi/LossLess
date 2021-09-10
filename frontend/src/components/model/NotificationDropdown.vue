@@ -17,18 +17,16 @@
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
 
-    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
-      <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
+    <b-dropdown-item v-for="notification in unreadNotifications" v-bind:key="notification.id" class="notifications-item" @click="notificationClicked(notification)">
+      <notification v-if="!notification.read" :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
 </template>
 
 <script>
-import api from "../../Api";
+import Api from "../../Api";
 import EventBus from "../../util/event-bus";
 import Notification from "./Notification";
-import {markNotificationRead} from "../../util/index";
-
 
 export default {
   name: "NotificationDropdown",
@@ -38,9 +36,6 @@ export default {
       notifications: [],
       expiringCards: [],
       notificationChange: true,
-      notificationUpdate: {
-        read: false
-      }
     }
   },
   computed: {
@@ -52,8 +47,22 @@ export default {
      * @return The number of total notifications
      */
     numberOfNotifications: function () {
-      return this.expiringCards.length + this.notifications.length;
+      return this.expiringCards.length + this.unreadNotifications.length;
     },
+
+    /**
+     * Checks for unread notifications.
+     * @return only the unread notifications from the list of all notifications.
+     */
+    unreadNotifications: function () {
+      let unreadNotifications = []
+      for (const notification of this.notifications) {
+        if (!notification.read) {
+          unreadNotifications.push(notification)
+        }
+      }
+      return unreadNotifications;
+    }
   },
   methods: {
 
@@ -70,36 +79,19 @@ export default {
      *  This is done by adding the expiring card to the list of notifications.
      */
     async updateNotifications() {
-      this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
-      this.notifications = (await api.getNotifications(this.$currentUser.id)).data;
+      this.expiringCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
+      this.notifications = (await Api.getNotifications(this.$currentUser.id)).data;
       // This is needed to re-render a notification when a star icon is needed.
       this.notificationChange = !this.notificationChange;
      },
 
     /**
      * Performs an action based on the notification that has been clicked.
-     * When a liked or unliked listing is clicked it routes you to that listing
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-      const response = await markNotificationRead(notification, this.notificationUpdate);
-      this.$log.debug(response)
-      EventBus.$emit('notificationClickedFromNavBar', notification);
-      if (notification.type==='Liked Listing' || notification.type==='Unliked Listing') {
-        if (!(this.$route.name === 'listings-full' &&  this.$route.params.id === notification.subjectId.toString())) {
-          await this.$router.push('/listings/' + notification.subjectId);
-        }
-      }
+      EventBus.$emit('notificationClicked', notification);
     },
-
-    /**
-     * Updates the status of the notification in nav bar when a home feed notification status is updated.
-     * @param notification The notification that the user updated from home feed.
-     */
-    notificationClickedFromHomeFeed(notification) {
-      const updated = this.notifications.find(item => item.id === notification.id);
-      this.notificationClicked(updated);
-    }
   },
 
   created() {
@@ -111,13 +103,6 @@ export default {
      * This mount listens to the notificationUpdate event
      */
     EventBus.$on('notificationUpdate', this.updateNotifications)
-
-    /**
-     * This mount listens to the notificationUpdate event
-     */
-    EventBus.$on('notificationClickedFromHomeFeed', this.notificationClickedFromHomeFeed)
-
-
   }
 }
 

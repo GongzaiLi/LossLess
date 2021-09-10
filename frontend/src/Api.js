@@ -83,7 +83,6 @@ export default {
   getNotifications: () => instance.get(`/users/notifications`, {withCredentials: true}),
   patchNotification: (id, data) => instance.patch(`/notifications/${id}`, data, {withCredentials: true}),
   deleteNotification: (id) => instance.delete(`/notifications/${id}`, {withCredentials: true}),
-  readNotification: (id, updated) =>  instance.patch(`/notifications/${id}`,updated, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
   searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),
@@ -116,7 +115,6 @@ export default {
   },
   likeListing: (listingId) => instance.put(`/listings/${listingId}/like`, {}, {withCredentials: true}),
   modifyUser: (editUserData, userId) => instance.put(`/users/${userId}`, editUserData, {withCredentials: true}),
-  archiveNotification: (notificationId) => instance.patch(`/notifications/${notificationId}`, {archived: true}, {withCredentials: true}),
   getSalesReport: (businessId, startDate, endDate, period) => instance.get(`/businesses/${businessId}/salesReport/totalPurchases`,
     {
       withCredentials: true,
