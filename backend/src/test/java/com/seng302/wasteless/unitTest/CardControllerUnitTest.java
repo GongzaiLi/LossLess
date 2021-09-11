@@ -239,6 +239,17 @@ class CardControllerUnitTest {
         Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
     }
 
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPutRequestToCard_then200ResponseAndCreatedIsChanged() throws Exception {
+        Card card = cardService.findCardById(1);
+        LocalDateTime expiry = card.getCreated();
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/1/extenddisplayperiod")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+        card = cardService.findCardById(1);
+        Assertions.assertNotEquals(card.getCreated(),expiry);
+    }
 
 
 }
