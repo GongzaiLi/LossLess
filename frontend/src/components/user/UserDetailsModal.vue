@@ -470,6 +470,7 @@ export default {
         } catch(error) {
           this.imageError = error.response.statusText;
           this.$log.debug(error);
+          return;
         }
       }
       this.userData.profileImage = '';
