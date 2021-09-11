@@ -23,7 +23,7 @@ Date: sprint_6
             </b-row>
           </b-card-text>
         </b-list-group-item>
-        <b-list-group-item v-if="totalResults">
+        <b-list-group-item v-show="totalResults">
           <b-row>
             <b-col cols="2"><h3>Sales Details</h3></b-col>
             <b-col cols="2">
@@ -56,7 +56,7 @@ Date: sprint_6
               </b-table>
             </b-col>
             <b-col>
-              graph
+              <canvas id="sales-report-graph"/>
             </b-col>
           </b-row>
           <b-row>
@@ -95,6 +95,7 @@ Date: sprint_6
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
+import Chart from "chart.js/auto";
 
 export default {
   name: "sales-report-page",
@@ -109,6 +110,7 @@ export default {
       currentPage: 1,
       perPage: 10,
       dateRange: [],
+      chart: null
     }
   },
 
@@ -162,11 +164,61 @@ export default {
         const endDate = formatDate(dateRange[1]);
         await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
             .then((response) => {
-              this.updateTotalResults(startDate, endDate, response.data)
+              this.updateTotalResults(startDate, endDate, response.data);
+              this.updateGraph(response.data);
               this.groupedResults = response.data;
             }).catch((error) => {
               this.$log.debug("Error message", error);
             });
+      }
+    },
+
+    updateGraph: function(data) {
+      const cfg = {
+        type: 'bar',
+        data: {
+          datasets: [{
+            label: 'Total Sales',
+            data: data,
+            backgroundColor: ['#005fc5'],
+            parsing: {
+              yAxisKey: 'totalPurchases',
+              xAxisKey: 'startDate'
+            }}]
+        },
+        options: {
+          aspectRatio: 1.4,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                afterLabel: function(t) {
+                  return `Total Value: ${t.raw.totalValue}`;
+                },
+              }
+            },
+          },
+          scales: {
+            yAxis: {
+              type: 'linear',
+              ticks: {
+                // forces step size to be 50 units
+                stepSize: 1
+              }
+            }
+          }
+        }
+      };
+      if (this.chart === null) {
+        this.chart = new Chart(
+                document.getElementById('sales-report-graph').getContext('2d'),
+                cfg,
+            );
+      } else {
+        this.chart.data.labels = [];
+        this.chart.data.datasets.forEach((dataset) => {
+          dataset.data = data;
+        });
+        this.chart.update();
       }
     },
 
