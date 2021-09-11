@@ -230,6 +230,17 @@ describe('Testing-password-validation-for-register', () => {
 });
 
 describe('Testing delete image when modifying user', () => {
+  test('Successfully remove an uploaded image', async () => {
+    wrapper.setProps({isEditUser: true});
+    wrapper.vm.userData.profileImage = '';
+    wrapper.vm.uploaded = true;
+
+    await wrapper.vm.openDeleteConfirmDialog();
+    await wrapper.vm.confirmDeleteImage();
+
+    expect(wrapper.vm.uploaded).toStrictEqual(false);
+    expect(Api.deleteUserProfileImage).not.toHaveBeenCalled();
+  });
   test('Successfully delete a user image when one exists', async () => {
     wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.profileImage = '1'
@@ -240,18 +251,6 @@ describe('Testing delete image when modifying user', () => {
 
     expect(wrapper.vm.userData.profileImage).toStrictEqual('');
     expect(Api.deleteUserProfileImage).toHaveBeenCalled();
-  });
-
-  test('Successfully remove an uploaded image', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.profileImage = '';
-    wrapper.vm.uploaded = true;
-
-    await wrapper.vm.openDeleteConfirmDialog();
-    await wrapper.vm.confirmDeleteImage();
-
-    expect(wrapper.vm.userData.profileImage).toStrictEqual('');
-    expect(Api.deleteUserProfileImage).not.toHaveBeenCalled();
   });
 });
 
