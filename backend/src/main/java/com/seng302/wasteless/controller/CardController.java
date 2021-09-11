@@ -23,6 +23,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -166,7 +167,7 @@ public class CardController {
      */
     @GetMapping("/cards/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> createUser(@PathVariable("id") Integer cardId) {
+    public ResponseEntity<Object> getCard(@PathVariable("id") Integer cardId) {
         logger.info("Request to get card with id: {}", cardId);
 
         userService.getCurrentlyLoggedInUser();
@@ -261,6 +262,7 @@ public class CardController {
         logger.info("User: {} validated as owner of card or global admin.", user);
 
         card.setDisplayPeriodEnd(LocalDateTime.now().plusSeconds(maxDisplayPeriodSeconds));
+        card.setCreated(LocalDateTime.now());
         logger.info("User: {} Extended card: {} by two weeks.", user, card);
 
         cardService.createCard(card);
