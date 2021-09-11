@@ -58,7 +58,7 @@
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
           <notification :notification="notification" :in-navbar="false"> </notification>
         </b-card>
       </div>
@@ -91,6 +91,7 @@
 
 .notification-cards {
   margin-top: 20px;
+  /*cursor: pointer;*/
 }
 
 </style>
@@ -186,6 +187,15 @@ export default {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;
+    },
+
+    /**
+     * Performs an action based on the notification that has been clicked.
+     * @param notification the notification that has been clicked
+     */
+    async notificationClicked(notification) {
+      notification.read = true
+      EventBus.$emit('notificationClicked', notification);
     },
 
   },

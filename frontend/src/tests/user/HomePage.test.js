@@ -257,3 +257,4 @@ describe('test-toggleTagColorSelected-works-correctly', () => {
         expect(wrapper.vm.tagColors.BLUE).toStrictEqual(false);
     });
 })
+

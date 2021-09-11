@@ -187,8 +187,9 @@ export default {
   props: ['notification', 'inNavbar'],
   data() {
     return {
-      updatedNotification: {message:"", type:"", read: false},
-      tagColors: ["RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "BLACK"]
+      updatedNotification: {message:"", type:"", read: this.notification.read},
+      tagColors: ["RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "BLACK"],
+      updated: false
     }
   },
 
@@ -206,6 +207,7 @@ export default {
         await Api.patchNotification(this.updatedNotification.id, {"tag": tagColor})
       }
     },
+
     /**
      * Updates the purchase listing notification with the product data
      * @param notification the purchase listing notification
@@ -284,7 +286,18 @@ export default {
       this.$refs.confirmDeleteModal.show();
     },
 
-
+    /**
+     * Marks a notification as read and makes th api call.
+     * @param notification the notification that has been clicked
+     */
+    async markRead(notification) {
+      if (notification.id === this.updatedNotification.id && !this.updatedNotification.read &&
+      !this.updated) {
+        this.updatedNotification.read = true
+        await Api.patchNotification(this.updatedNotification.id, {"read": true});
+      }
+      this.updated = true
+    },
 
   },
   async mounted() {
@@ -293,8 +306,11 @@ export default {
     } else {
       this.updatedNotification = this.notification
     }
+
+    /**
+     * This mount listens to the markRead event when a notification click is on home feed.
+     */
+    EventBus.$on('notificationClicked', this.markRead);
   },
-
-
 }
 </script>

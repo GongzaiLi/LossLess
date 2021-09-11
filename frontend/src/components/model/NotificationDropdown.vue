@@ -17,17 +17,16 @@
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
 
-    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
+    <b-dropdown-item v-for="notification in unreadNotifications" v-bind:key="notification.id" class="notifications-item" @click="goToHomePage">
       <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
 </template>
 
 <script>
-import api from "../../Api";
+import Api from "../../Api";
 import EventBus from "../../util/event-bus";
 import Notification from "./Notification";
-
 
 export default {
   name: "NotificationDropdown",
@@ -48,8 +47,22 @@ export default {
      * @return The number of total notifications
      */
     numberOfNotifications: function () {
-      return this.expiringCards.length + this.notifications.length;
+      return this.expiringCards.length + this.unreadNotifications.length;
     },
+
+    /**
+     * Checks for unread notifications.
+     * @return only the unread notifications from the list of all notifications.
+     */
+    unreadNotifications: function () {
+      let unreadNotifications = []
+      for (const notification of this.notifications) {
+        if (!notification.read) {
+          unreadNotifications.push(notification)
+        }
+      }
+      return unreadNotifications;
+    }
   },
   methods: {
 
@@ -66,12 +79,11 @@ export default {
      *  This is done by adding the expiring card to the list of notifications.
      */
     async updateNotifications() {
-      this.expiringCards = (await api.getExpiredCards(this.$currentUser.id)).data;
-      this.notifications = (await api.getNotifications()).data;
+      this.expiringCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
+      this.notifications = (await Api.getNotifications()).data;
       // This is needed to re-render a notification when a star icon is needed.
       this.notificationChange = !this.notificationChange;
      },
-
   },
 
   created() {
@@ -83,6 +95,11 @@ export default {
      * This mount listens to the notificationUpdate event
      */
     EventBus.$on('notificationUpdate', this.updateNotifications)
+
+    /**
+     * This mount listens to the notificationUpdate event on click from home feed.
+     */
+    EventBus.$on('notificationClicked', this.updateNotifications)
   }
 }
 
