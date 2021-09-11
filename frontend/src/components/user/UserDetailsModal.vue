@@ -129,14 +129,14 @@ Date: 3/3/2021
     </b-card>
     <br>
 
-    <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Remove" @ok="confirmDeleteImage">
+    <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteImage">
       <h6 v-if="uploaded">
-        Are you sure you want to <strong>remove</strong> this image?
+        Are you sure you want to <strong>delete</strong> this image?
       </h6>
       <h6 v-else>
-        Are you sure you want to <strong>remove</strong> this image?
+        Are you sure you want to <strong>delete</strong> this image?
         <br>
-        You will still need to click confirm after this to permanently delete it.
+        It will be permanently deleted from your account.
       </h6>
     </b-modal>
   </div>
@@ -467,6 +467,7 @@ export default {
       if (this.isEditUser && this.userData.profileImage) {  // Only make Api request if the user exists and is editing
         try {
           await Api.deleteUserProfileImage(userId);
+          EventBus.$emit("updatedImage");
         } catch(error) {
           this.imageError = error.response.statusText;
           this.$log.debug(error);
