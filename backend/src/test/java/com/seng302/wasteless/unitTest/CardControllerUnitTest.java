@@ -122,6 +122,42 @@ class CardControllerUnitTest {
         cardTwo.setTitle("Sale");
         cardTwo.setKeywords(keywords);
 
+        Card card3DaysFromExpiry = new Card();
+        card3DaysFromExpiry.setId(6);
+        card3DaysFromExpiry.setCreator(userForCard);
+        card3DaysFromExpiry.setSection(CardSections.WANTED);
+        card3DaysFromExpiry.setTitle("WANTED");
+        card3DaysFromExpiry.setKeywords(keywords);
+        card3DaysFromExpiry.setDisplayPeriodEnd(LocalDateTime.now().minusDays(3));
+
+        Card card1DaysFromExpiry = new Card();
+        card1DaysFromExpiry.setId(7);
+        card1DaysFromExpiry.setCreator(userForCard);
+        card1DaysFromExpiry.setSection(CardSections.WANTED);
+        card1DaysFromExpiry.setTitle("WANTED");
+        card1DaysFromExpiry.setKeywords(keywords);
+        card1DaysFromExpiry.setDisplayPeriodEnd(LocalDateTime.now().minusDays(1));
+
+        Card card1DaysPastExpiry = new Card();
+        card1DaysPastExpiry.setId(8);
+        card1DaysPastExpiry.setCreator(userForCard);
+        card1DaysPastExpiry.setSection(CardSections.WANTED);
+        card1DaysPastExpiry.setTitle("WANTED");
+        card1DaysPastExpiry.setKeywords(keywords);
+        card1DaysPastExpiry.setDisplayPeriodEnd(LocalDateTime.now().plusDays(1));
+
+
+        Mockito
+                .when(cardService.findCardById(6))
+                .thenReturn(card3DaysFromExpiry);
+
+        Mockito
+                .when(cardService.findCardById(7))
+                .thenReturn(card1DaysFromExpiry);
+
+        Mockito
+                .when(cardService.findCardById(8))
+                .thenReturn(card1DaysPastExpiry);
 
         Mockito
                 .when(cardService.createCard(any(Card.class)))
@@ -154,8 +190,12 @@ class CardControllerUnitTest {
                 .when(cardService.getAllUserCards(1))
                 .thenReturn(userCards);
 
+        doReturn(true).when(cardService).checkUserHasPermissionForCard(any(Card.class), any(User.class));
+
         doReturn(userForCard).when(userService).findUserById(any(Integer.class));
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'")).when(cardService).checkValidSection("Invalid");
+
+        doReturn(true).when(cardService).checkCardWithinExtendDateRange(any(Card.class));
 
         new GetUserDtoMapper(businessService, userService); // This initialises the DTO mapper with our mocked services. The constructor has to be manually called
     }
@@ -230,9 +270,9 @@ class CardControllerUnitTest {
     @Test
     @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
     void whenPutRequestToCard_then200ResponseAndExpiryIsChanged() throws Exception {
-        Card card = cardService.findCardById(1);
+        Card card = cardService.findCardById(7);
         LocalDateTime expiry = card.getDisplayPeriodEnd();
-        mockMvc.perform(MockMvcRequestBuilders.put("/cards/1/extenddisplayperiod")
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/7/extenddisplayperiod")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
         card = cardService.findCardById(1);
@@ -242,14 +282,30 @@ class CardControllerUnitTest {
     @Test
     @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
     void whenPutRequestToCard_then200ResponseAndCreatedIsChanged() throws Exception {
-        Card card = cardService.findCardById(1);
-        LocalDateTime expiry = card.getCreated();
-        mockMvc.perform(MockMvcRequestBuilders.put("/cards/1/extenddisplayperiod")
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/7/extenddisplayperiod")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPutRequestToCard_andMoreThan48HoursBeforeExpiry_then406Response() throws Exception {
+        doReturn(false).when(cardService).checkCardWithinExtendDateRange(any(Card.class));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/6/extenddisplayperiod")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPutRequestToCard_andAfterExpiry_then200Response() throws Exception {
+        Card card = cardService.findCardById(8);
+        LocalDateTime expiry = card.getDisplayPeriodEnd();
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/8/extenddisplayperiod")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
         card = cardService.findCardById(1);
-        Assertions.assertNotEquals(card.getCreated(),expiry);
+        Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
     }
-
 
 }
