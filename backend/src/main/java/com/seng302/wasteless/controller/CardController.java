@@ -223,7 +223,7 @@ public class CardController {
 
         Card card = cardService.findCardById(id);
 
-        if (cardService.checkUserHasPermissionForCard(card, user)) {
+        if (!cardService.checkUserHasPermissionForCard(card, user)) {
             logger.warn("Cannot delete card. User: {} does not own this card and is not global admin", user);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
         }

@@ -137,7 +137,7 @@ public class CardService {
      * @return      True if card allowed to be extended, false otherwise
      */
     public boolean checkCardWithinExtendDateRange(Card card) {
-        return card.getDisplayPeriodEnd().isAfter(LocalDateTime.now().plusDays(2));
+        return LocalDateTime.now().plusHours(48).isAfter(card.getDisplayPeriodEnd());
     }
 
     /**
@@ -148,7 +148,7 @@ public class CardService {
      * @return  True if allowed, false otherwise
      */
     public boolean checkUserHasPermissionForCard(Card card, User user) {
-        return !card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin();
+        return card.getCreator().getId().equals(user.getId()) || user.checkUserGlobalAdmin();
     }
 }
 
