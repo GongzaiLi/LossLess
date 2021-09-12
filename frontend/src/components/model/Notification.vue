@@ -29,7 +29,7 @@
         <h6> {{updatedNotification.price}} </h6>
       </b-col>
       <b-col cols="1">
-        <b-dropdown variant="none" right no-caret class="float-right" v-if="!this.inNavbar">
+        <b-dropdown variant="none" right no-caret class="float-right" v-if="!this.inNavbar && !this.archivedSelected">
           <template #button-content>
             <b-icon-tag-fill class="tag-button float-right"/>
           </template>
@@ -48,11 +48,11 @@
                 <b-icon-three-dots-vertical class="three-dot float-right " ></b-icon-three-dots-vertical>
               </div>
             </template>
-            <b-dropdown-item @click="starNotification">
+            <b-dropdown-item v-if="!archivedSelected" @click="starNotification">
               <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
               <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
             </b-dropdown-item>
-            <b-dropdown-item @click="confirmArchive">
+            <b-dropdown-item v-if="!archivedSelected" @click="confirmArchive">
               <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
             </b-dropdown-item>
             <b-dropdown-item @click="confirmDelete">
@@ -184,7 +184,7 @@ import NotificationTag from "../../components/model/NotificationTag";
 export default {
   name: "Notification",
   components: {NotificationTag},
-  props: ['notification', 'inNavbar'],
+  props: ['notification', 'inNavbar', 'archivedSelected'],
   data() {
     return {
       updatedNotification: {message:"", type:"", read: this.notification.read},
