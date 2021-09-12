@@ -101,7 +101,8 @@ public class CatalogueController {
         logger.info("Successfully created Product Entity");
 
         if (generateSalesData.isPresent() && generateSalesData.get()) {
-            purchasedListingService.purchaseGeneratedProduct(possibleProduct, user, possibleBusiness);
+            purchasedListingService.generatePurchasesForProduct(possibleProduct, user, possibleBusiness);
+            businessService.saveBusinessChanges(possibleBusiness);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }

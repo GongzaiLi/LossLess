@@ -142,17 +142,21 @@ public class PurchasedListingService {
 
     /**
      * Takes a product of a business and saves a purchase listing record on a random day within the last 3 years
-     * this happens a set amount of time fro each prodct, teh values of cost, quantity, closing date and likes are all
-     * randomized
+     * this happens a set amount of time for each product, the values of cost, quantity, closing date and likes are all
+     * randomized.
+     * Additionally, after the method finishes the created date of the business will be guaranteed to be not later
+     * than the earliest listing creation date
      * @param product product to be purchased
      * @param user user that is purchasing the products (user not used in analysis so doesnt matter)
      * @param business business product belongs to
      */
-    public void purchaseGeneratedProduct(Product product, User user, Business business) {
+    public void generatePurchasesForProduct(Product product, User user, Business business) {
         Random generator = ThreadLocalRandom.current();
         int amountOfPurchases = generator.nextInt(20)+1;
         List<PurchasedListing> fakePurchases = new ArrayList<>();
-        for (int i=0; i< amountOfPurchases; i++) {
+        LocalDate earliestListingDate = LocalDate.now();
+
+        for (int i=0; i < amountOfPurchases; i++) {
             PurchasedListing fakeListing = new PurchasedListing();
             fakeListing.setBusiness(business);
             fakeListing.setPurchaser(user);
@@ -166,6 +170,13 @@ public class PurchasedListingService {
             fakeListing.setNumberOfLikes(generator.nextInt(50));
 
             fakePurchases.add(fakeListing);
+
+            if (fakeListing.getListingDate().isBefore(earliestListingDate)) {
+                earliestListingDate = fakeListing.getListingDate();
+            }
+        }
+        if (earliestListingDate.isBefore(business.getCreated())) {
+            business.setCreated(earliestListingDate);
         }
         purchasedListingRepository.saveAll(fakePurchases);
     }

@@ -7,6 +7,7 @@ import com.seng302.wasteless.repository.PurchasedListingRepository;
 import com.seng302.wasteless.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -33,10 +34,6 @@ import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)     // Allows non-static BeforeAll methods. baeldung.com/java-beforeall-afterall-non-static
 public class PurchasedListingServiceTest {
-
-    private static final Logger logger = LogManager.getLogger(com.seng302.wasteless.controller.SalesReportController.class.getName());
-
-
     @Autowired
     private ProductService productService;
 
@@ -58,6 +55,11 @@ public class PurchasedListingServiceTest {
     @Autowired
     private PurchasedListingService purchasedListingService;
 
+    @Autowired
+    private PurchasedListingRepository purchasedListingRepository;
+
+    private Business business;
+
     private User curUser;
 
 
@@ -67,7 +69,7 @@ public class PurchasedListingServiceTest {
         addressService.createAddress(curUser.getHomeAddress());
         curUser = userService.createUser(curUser);
 
-        Business business = new Business();
+        business = new Business();
         business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
         business.setAdministrators(new ArrayList<>());
         business.setName("Wonka Water");
@@ -84,8 +86,6 @@ public class PurchasedListingServiceTest {
         listingsService.purchase(listing2, curUser);
         listingsService.purchase(listing3, curUser);
         listingsService.purchase(listing4, curUser);
-
-
     }
 
 
@@ -117,6 +117,24 @@ public class PurchasedListingServiceTest {
     void whenGetSalesReportData_andPeriodIsYearIn4YearDateRange_thenReturnedDataHasLength4() {
         List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusYears(3), LocalDate.now(), LocalDate.now().plusYears(3), Period.ofYears(1));
         assertEquals(4, salesReportData.size());
+    }
+
+    @Test
+    void whenGeneratePurchasesForProduct_andBusinessCreatedIsNow_thenAllPurchasesHaveDatesInOrder_andBusinessCreatedIsPast() {
+        // Creates a new business
+        business.setId(420);
+        business.setCreated(LocalDate.now());
+        business = businessService.createBusiness(business);
+        Listing listing = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Big Dave's Collar", 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
+
+        purchasedListingService.generatePurchasesForProduct(listing.getInventoryItem().getProduct(), curUser, business);
+
+        List<PurchasedListing> generated = purchasedListingRepository.findAllByBusinessId(business.getId());
+        for (PurchasedListing purchasedListing : generated) {
+            Assertions.assertFalse(business.getCreated().isAfter(purchasedListing.getListingDate()));
+            Assertions.assertFalse(purchasedListing.getListingDate().isAfter(purchasedListing.getSaleDate()));
+            Assertions.assertFalse(purchasedListing.getSaleDate().isAfter(purchasedListing.getClosingDate()));
+        }
     }
 
 }

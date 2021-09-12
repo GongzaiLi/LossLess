@@ -1,11 +1,14 @@
 package com.seng302.wasteless.integrationTest;
 
 
+import com.seng302.wasteless.TestUtils;
 import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.repository.PurchasedListingRepository;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.testconfigs.WithMockCustomUser;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +24,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
@@ -49,6 +56,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Autowired
     private UserService userService;
+
+   @Autowired
+   private PurchasedListingRepository purchasedListingRepository;
 
     private User user;
 
@@ -182,6 +192,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isCreated());
     }
 
+   @Test
+   @WithMockCustomUser(email = "user@test.com", role = UserRoles.GLOBAL_APPLICATION_ADMIN)
+   void whenPostRequestToBusinessProducts_AndGenerateProductSales_thenSalesGenerated() throws Exception {
+      createOneBusiness("Business2", "{\n" +
+              "    \"streetNumber\": \"56\",\n" +
+              "    \"streetName\": \"Clyde Road\",\n" +
+              "    \"suburb\": \"Riccarton\",\n" +
+              "    \"city\": \"Christchurch\",\n" +
+              "    \"region\": \"Canterbury\",\n" +
+              "    \"country\": \"New Zealand\",\n" +
+              "    \"postcode\": \"8041\"\n" +
+              "  }", "Non-profit organisation", "I am a business 2");
+
+      String product = "{\"name\": \"Chocolate Bar Rice\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT_69\"}";
+
+      mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products?generateSalesData=true")
+                      .content(product)
+                      .contentType(APPLICATION_JSON))
+              .andExpect(status().isCreated());
+
+      Assertions.assertFalse(purchasedListingRepository.findAllByBusinessId(1).isEmpty());
+   }
 
     @Test
     @WithMockCustomUser(email = "user@test.com", role = UserRoles.USER)
