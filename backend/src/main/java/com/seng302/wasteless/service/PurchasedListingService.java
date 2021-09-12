@@ -1,7 +1,10 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.PurchasedListing;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * PurchasedListing service applies product logic over the Product JPA repository.
@@ -132,6 +137,26 @@ public class PurchasedListingService {
         responseBody.add(reportDto);
 
         return responseBody;
+    }
+
+
+    public void purchaseGeneratedProduct(Product product, User user, Business business) {
+        Random generator = ThreadLocalRandom.current();
+        int amountOfPurchases = generator.nextInt(10)+1;
+        for (int i=0; i< amountOfPurchases; i++) {
+            PurchasedListing fakeListing = new PurchasedListing();
+            fakeListing.setBusiness(business);
+            fakeListing.setPurchaser(user);
+            fakeListing.setSaleDate(LocalDate.now().minusDays(generator.nextInt(365*3)));
+            fakeListing.setListingDate(fakeListing.getSaleDate().minusDays(generator.nextInt(7)));
+            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)));
+            fakeListing.setProduct(product);
+            fakeListing.setQuantity(generator.nextInt(5) + 1);
+            double price = Math.round(generator.nextDouble()*30);
+            fakeListing.setPrice(price);
+            fakeListing.setNumberOfLikes(generator.nextInt(50));
+            purchasedListingRepository.save(fakeListing);
+        }
     }
 
 }

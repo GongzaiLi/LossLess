@@ -33,7 +33,7 @@ const MAX_CARD_PER_USER = 5;
 const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS)/2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
 const LISTING_ID_OF_MAX_LIKED_LISTING = 1;
 const MAX_PURCHASES_PER_USER = 3;
-const PROB_USER_PURCHASES_LISTING = 0.03;
+const PROB_USER_PURCHASES_LISTING = 0.01;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -471,7 +471,7 @@ async function addProduct(businessId, instance, business) {
     try {
       const product = createProductObject(productNames[i + offset], business);
       const productResponse = await instance
-        .post(`${SERVER_URL}/businesses/${businessId}/products`, product, {
+        .post(`${SERVER_URL}/businesses/${businessId}/products?generateSalesData=true`, product, {
           headers: {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
