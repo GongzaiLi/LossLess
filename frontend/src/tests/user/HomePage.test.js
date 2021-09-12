@@ -258,3 +258,19 @@ describe('test-toggleTagColorSelected-works-correctly', () => {
     });
 })
 
+describe('test-toggle-archived-notifications', () => {
+    beforeEach(()=>{
+        jest.clearAllMocks();
+    })
+    test('toggle-to-archived-notifications', async () => {
+        wrapper.vm.isArchivedSelected = false;
+        await wrapper.vm.toggleArchived();
+        expect(Api.getNotifications).toHaveBeenCalledWith(true);
+    });
+    test('toggle-to-un-archived-notifications', async () => {
+        wrapper.vm.isArchivedSelected = true;
+        await wrapper.vm.toggleArchived();
+        expect(Api.getNotifications).toHaveBeenCalledWith(false);
+    });
+})
+

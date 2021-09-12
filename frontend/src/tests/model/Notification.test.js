@@ -134,7 +134,7 @@ describe('check starring api call is correct', async () => {
         wrapper.vm.updatedNotification.starred = false;
         wrapper.vm.updatedNotification.id = 1;
         await wrapper.vm.$forceUpdate();
-        wrapper.vm.starNotification();
+        await wrapper.vm.starNotification();
         expect(Api.patchNotification).toBeCalledWith(1,{"starred": true})
     });
 
