@@ -31,6 +31,11 @@ Feature: U32 Managing my feed
     When I archive it
     Then The notification no longer appears in my feed
 
+  Scenario: AC5: I can browse archived items.
+    Given I have 10 notifications and notifications with even are archived
+    When I get archived notifications
+    Then I will receive notifications that are all archived
+
   Scenario: AC6: I can “tag” an item.
     Given My notification has no tag
     When I add the tag "YELLOW"

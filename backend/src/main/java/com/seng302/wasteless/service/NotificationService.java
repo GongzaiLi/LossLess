@@ -55,6 +55,16 @@ public class NotificationService {
     }
 
     /**
+     * Returns a Specification that matches all notifications with filter All Archived Notifications By User ID
+     * @param userId    The id of the user to get notifications for
+     * @return          Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
+     */
+    public static Specification<Notification> filterAllArchivedNotificationsByUserId(Integer userId) {
+        Specification<Notification> findUser = (root, query, builder) -> builder.equal(root.get("userId"), userId);
+        return findUser.and((root, query, builder) -> builder.isTrue(root.get("archived")));
+    }
+
+    /**
      * Returns a Specification that matches all notifications with filter Notification Tags
      * @param tags list of Notification tags to match Notifications
      * @return Returns a Specification that matches all notifications with filter Notification Tags
@@ -71,14 +81,17 @@ public class NotificationService {
 
 
     /**
-     * filter Notification by User id and Notification tags
+     * filter Notification by User id and Notification tags.
+     * Finds all archived notifications if archived param is present and true.
      *
      * @param userId The id of the user to get notifications for
      * @param tags list of Notification tags to match Notifications (can be null)
+     * @param archived A boolean, true if the user wants archived notifications
      * @return The found notifications, if any otherwise empty list
      */
-    public List<Notification> filterNotifications(Integer userId, Optional<List<String>> tags) {
+    public List<Notification> filterNotifications(Integer userId, Optional<List<String>> tags, Optional<Boolean> archived) {
         Specification<Notification> querySpec = filterAllUnArchivedNotificationsByUserId(userId);
+        if (archived.isPresent() && archived.get()) querySpec = filterAllArchivedNotificationsByUserId(userId);
         if (tags.isPresent()) querySpec = querySpec.and(filterNotificationTags(tags.get()));
         return notificationRepository.findAll(querySpec, Sort.by("starred").descending().and(Sort.by("created").descending()));
     }

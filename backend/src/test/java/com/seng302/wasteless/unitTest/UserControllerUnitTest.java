@@ -112,7 +112,7 @@ class UserControllerUnitTest {
         notifs.add(notification);
 
         Mockito
-                .when(notificationService.filterNotifications(anyInt(), any()))
+                .when(notificationService.filterNotifications(anyInt(), any(), any()))
                 .thenReturn(notifs);
 
         // See https://stackoverflow.com/questions/360520/unit-testing-with-spring-security

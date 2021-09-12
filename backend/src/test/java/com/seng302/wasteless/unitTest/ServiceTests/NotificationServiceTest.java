@@ -61,7 +61,7 @@ class NotificationServiceTest {
         olderStarredNotification.setStarred(true);
         Integer olderNotificationId = notificationService.saveNotification(olderStarredNotification).getId();
 
-        List<Notification> notifications = notificationService.filterNotifications(1, Optional.empty());
+        List<Notification> notifications = notificationService.filterNotifications(1, Optional.empty(), Optional.empty());
 
         Assertions.assertEquals(oldNotificationId, notifications.get(0).getId());
         Assertions.assertEquals(olderNotificationId, notifications.get(1).getId());
@@ -85,7 +85,7 @@ class NotificationServiceTest {
         List<String> tags = new ArrayList<>();
         tags.add("red");
 
-        List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags));
+        List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags), Optional.empty());
 
         assertEquals(notifications.size(), 1);
         assertEquals(newNotification1.getId(), newNotification1.getId());
@@ -112,7 +112,7 @@ class NotificationServiceTest {
         List<String> tags = new ArrayList<>();
         tags.add("red");
 
-        List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags));
+        List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags), Optional.empty());
 
         assertTrue(notifications.isEmpty());
 
@@ -138,11 +138,33 @@ class NotificationServiceTest {
         tags.add("red");
         tags.add("blue");
 
-        List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags));
+        List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags), Optional.empty());
 
         assertEquals(notifications.size(), 2);
         assertTrue(notifications.stream().allMatch(notification -> notification.getTag().equals(NotificationTag.RED) || notification.getTag().equals(NotificationTag.BLUE)));
 
+    }
+
+    @Test
+    void whenGetArchivedNotificationForUser_ThenReturnAllNotificationsArchived() {
+        notificationRepository.deleteAll();
+
+        Notification newNotification1 = NotificationService.createNotification(1, 1, NotificationType.LIKEDLISTING, "");
+        newNotification1.setArchived(true);
+        notificationService.saveNotification(newNotification1);
+
+        Notification newNotification2 = NotificationService.createNotification(1, 1, NotificationType.LIKEDLISTING, "");
+        newNotification2.setArchived(false);
+        notificationService.saveNotification(newNotification2);
+
+        Notification newNotification3 = NotificationService.createNotification(1, 1, NotificationType.LIKEDLISTING, "");
+        newNotification3.setArchived(false);
+        notificationService.saveNotification(newNotification3);
+
+        List<Notification> notifications = notificationService.filterNotifications(1, Optional.empty(), Optional.of(true));
+
+        assertEquals(notifications.size(), 1);
+        assertTrue(notifications.stream().allMatch(notification -> notification.getArchived().equals(true) || notification.getTag().equals(false)));
     }
 
 }
