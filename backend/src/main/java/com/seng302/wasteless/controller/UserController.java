@@ -375,6 +375,16 @@ public class UserController {
         boolean userModifyingThemselves = loggedInUser.getId().equals(userToModify.getId());
         boolean userCountryChanged = !modifiedUser.getHomeAddress().getCountry().equals(userToModify.getHomeAddress().getCountry());
 
+        if (userModifyingThemselves && modifiedUser.getNewPassword() != null) {
+            if (modifiedUser.getPassword() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password required when updating password");
+            }
+            if (!passwordEncoder.matches(modifiedUser.getPassword(), userToModify.getPassword())) {
+                logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
+        }
+
         userService.modifyUserDateOfBirth(userToModify, modifiedUser.getDateOfBirth());
         userService.modifyUserHomeAddress(userToModify, modifiedUser.getHomeAddress());
         userService.modifyUserPassword(userToModify, modifiedUser.getNewPassword());
