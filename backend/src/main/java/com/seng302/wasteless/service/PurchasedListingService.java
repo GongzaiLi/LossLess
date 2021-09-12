@@ -140,9 +140,18 @@ public class PurchasedListingService {
     }
 
 
+    /**
+     * Takes a product of a business and saves a purchase listing record on a random day within the last 3 years
+     * this happens a set amount of time fro each prodct, teh values of cost, quantity, closing date and likes are all
+     * randomized
+     * @param product product to be purchased
+     * @param user user that is purchasing the products (user not used in analysis so doesnt matter)
+     * @param business business product belongs to
+     */
     public void purchaseGeneratedProduct(Product product, User user, Business business) {
         Random generator = ThreadLocalRandom.current();
-        int amountOfPurchases = generator.nextInt(10)+1;
+        int amountOfPurchases = generator.nextInt(20)+1;
+        List<PurchasedListing> fakePurchases = new ArrayList<>();
         for (int i=0; i< amountOfPurchases; i++) {
             PurchasedListing fakeListing = new PurchasedListing();
             fakeListing.setBusiness(business);
@@ -155,8 +164,10 @@ public class PurchasedListingService {
             double price = Math.round(generator.nextDouble()*30);
             fakeListing.setPrice(price);
             fakeListing.setNumberOfLikes(generator.nextInt(50));
-            purchasedListingRepository.save(fakeListing);
+
+            fakePurchases.add(fakeListing);
         }
+        purchasedListingRepository.saveAll(fakePurchases);
     }
 
 }

@@ -55,6 +55,7 @@ public class CatalogueController {
      *
      * @param businessId      the id of the business that is creating the product
      * @param possibleProduct the product that is trying to be added to the catalogue
+     * @param generateSalesData optional boolean, if true will create and save fake purchase history (used by data gen)
      * @return Http Response:  200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
      */
     @PostMapping("/businesses/{id}/products")

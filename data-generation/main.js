@@ -461,6 +461,7 @@ async function addListing(businessId, instance, inventory, inventoryItemId) {
 
 /**
  *  Add a random number of products to a business using our backend endpoint
+ *  On creation of product a history of purchases is also randomly created
  */
 async function addProduct(businessId, instance, business) {
 
