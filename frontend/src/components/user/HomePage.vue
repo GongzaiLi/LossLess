@@ -53,10 +53,10 @@
             </b-dropdown>
           </b-col>
           <b-col cols="2">
-            <b-icon-archive font-scale="2" v-b-tooltip.hover title="View Archived Notifications"
-                            class="view-archived-button pt-2" v-if="!isArchivedSelected" @click="toggleArchived"></b-icon-archive>
-            <b-icon-archive-fill font-scale="2" variant="success" v-b-tooltip.hover title="View Notifications"
-                                 class="view-archived-button pt-2" v-else @click="toggleArchived"></b-icon-archive-fill>
+            <b-icon-archive v-if="!isArchivedSelected" font-scale="2"  title="View Archived Notifications"
+                            class="view-archived-button pt-2"  @click="toggleArchived" v-b-tooltip.hover></b-icon-archive>
+            <b-icon-archive-fill v-else font-scale="2" variant="success"  title="View Notifications"
+                                 class="view-archived-button pt-2"  @click="toggleArchived" v-b-tooltip.hover></b-icon-archive-fill>
           </b-col>
         </b-row>
       </div>

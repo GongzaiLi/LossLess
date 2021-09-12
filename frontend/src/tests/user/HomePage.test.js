@@ -6,9 +6,10 @@ import Api from "../../Api";
 import Router from 'vue-router'
 import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
 
-let wrapper;
+
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
+let wrapper;
 
 let userData = {
     id: 1,
@@ -265,12 +266,12 @@ describe('test-toggle-archived-notifications', () => {
     test('toggle-to-archived-notifications', async () => {
         wrapper.vm.isArchivedSelected = false;
         await wrapper.vm.toggleArchived();
-        expect(Api.getNotifications).toHaveBeenCalledWith(true);
+        expect(Api.getNotifications).toHaveBeenCalledWith(null, true);
     });
     test('toggle-to-un-archived-notifications', async () => {
         wrapper.vm.isArchivedSelected = true;
         await wrapper.vm.toggleArchived();
-        expect(Api.getNotifications).toHaveBeenCalledWith(false);
+        expect(Api.getNotifications).toHaveBeenCalledWith(null, false);
     });
 })
 

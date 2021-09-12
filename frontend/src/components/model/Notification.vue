@@ -94,7 +94,7 @@
                :title="this.archivedSelected ? 'Un-Archive Notification' :'Archive Notification'"
                ok-variant="success"
                :ok-title="this.archivedSelected ? 'Un-Archive' :'Archive'"
-               @ok="archiveNotification(archivedSelected)">
+               @ok="archiveNotification()">
         Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
       </b-modal>
     </div>
@@ -276,8 +276,8 @@ export default {
      * and using an EventBus that emits notificationUpdate so that
      * other components are refreshed.
      */
-    async archiveNotification(isArchived) {
-      await Api.patchNotification(this.updatedNotification.id, {"archived": !isArchived})
+    async archiveNotification() {
+      await Api.patchNotification(this.updatedNotification.id, {"archived": !this.archivedSelected})
       EventBus.$emit("notificationUpdate")
     },
 
