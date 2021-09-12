@@ -39,16 +39,26 @@
     <b-card v-if="!$currentUser.currentlyActingAs" class="shadow mt-3">
       <h3><b-icon-bell/> Notifications </h3>
       <div class="notification-holder">
-        <b-card v-if="notifications.length === 0" class="notification-cards shadow">
+        <b-card v-if="filteredNotifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
-          <notification :notification="notification" :in-navbar="false"> </notification>
+        <b-card v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" >
+          <notification  :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
         </b-card>
       </div>
     </b-card>
     </b-col>
     </b-row>
+    <div class="undoToastClass">
+    <b-toast id="undoToast" variant="danger" toaster="b-toaster-bottom-right" toast-class="undoToastClass"
+             auto-hide-delay="10000"
+             @hide="deleteNotification"
+    >
+      <template #toast-title>
+        Deleted notification
+      </template> <b-button size="sm" @click="undoDelete">Undo</b-button>
+    </b-toast>
+    </div>
   </div>
 </template>
 
@@ -74,6 +84,11 @@
   margin-top: 20px;
 }
 
+.b-toaster-bottom-right .b-toaster-slot{
+  float: right;
+  max-width: 250px !important;
+}
+
 </style>
 
 <script>
@@ -81,6 +96,12 @@ import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
 import Notification from "../model/Notification";
 import EventBus from "../../util/event-bus"
+
+const beforeUnloadListener = (event) => {
+  event.preventDefault();
+  return event.returnValue = 'Are you sure you want to exit?';
+};
+
 
 export default {
   components: {MarketplaceSection, Notification},
@@ -103,6 +124,8 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
+      pendingDeletedNotification:false,
+      undo:false,
     }
   },
 
@@ -145,14 +168,92 @@ export default {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;
+      this.pendingDeletedNotification = false;
 
     },
 
+    /**
+     * Creates the toast notification to allow user to undo delete within 10 seconds
+     * Sets pendingDeletedNotification so this notification is removed from the list
+     * If there is already a notification waiting to be delete it executes api request to
+     * delete old notification
+     * Adds listener to prevent user from accidentally leaving the page before deletion is confirmed
+     * @param id Id of the notification to delete in 10 seconds
+     */
+    createDeleteToast(id){
+      if (this.pendingDeletedNotification){
+        this.deleteNotification()
+      }
+      addEventListener('beforeunload', beforeUnloadListener, {capture: true});
+      this.undo=false
+      this.pendingDeletedNotification=id
+      this.$bvToast.show('undoToast')
+      EventBus.$emit('notificationTemporarilyRemoved',id)
+    },
+
+    /**
+     * Sends api request to delete the notification
+     * removes listener that prevents user from navigating away
+     * emits to event bus to tell all components to update notifications
+     */
+    async deleteNotification() {
+      removeEventListener('beforeunload', beforeUnloadListener, {capture: true});
+      if (!this.undo&&this.pendingDeletedNotification) {
+        await Api.deleteNotification(this.pendingDeletedNotification)
+        EventBus.$emit("notificationUpdate")
+      }
+    },
+
+    /**
+     * Hides the toast notification and prevents deleteNotification from sending api request
+     * Adds pendingDeletedNotification back into displayed list
+     * removes listener that prevents user from navigating away
+     */
+    undoDelete(){
+      this.undo=true;
+      this.$bvToast.hide('undoToast')
+      this.pendingDeletedNotification=false
+      EventBus.$emit('notificationTemporarilyRemoved',false)
+      removeEventListener('beforeunload', beforeUnloadListener, {capture: true});
+    },
+
+    /**
+     * Creates confirmation window to make sure user wants to leave
+     */
+    confirmLeave(){
+      if (this.pendingDeletedNotification) {
+        return window.confirm('Do you really want to leave? Your notification deletion has not been confirmed')
+      }
+      return true
+    },
+
+  },
+
+  computed: {
+    /**
+     * Filters notifications by removing notification pending deletion from the list
+     * @returns notifications with pendingDeletedNotification removed
+     */
+    filteredNotifications: function(){
+      let removedNotification=this.pendingDeletedNotification
+      let filtered =[]
+      filtered = this.notifications.filter(function(value){
+        return value.id !== removedNotification
+      });
+      return filtered
+    }
   },
 
   created() {
     this.updateNotifications();
   },
+
+  beforeRouteLeave (to, from, next) {
+    if (this.confirmLeave()) {
+      next()
+    } else {
+      next(false)
+    } }
 }
 </script>
 

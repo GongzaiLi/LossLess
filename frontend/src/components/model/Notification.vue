@@ -67,7 +67,7 @@
              title="Delete Notification"
              ok-variant="danger"
              ok-title="Delete"
-             @ok="deleteNotification">
+             @ok="deleteToast">
       Are you sure you want to <strong>delete</strong> this notification?
     </b-modal>
 
@@ -142,7 +142,7 @@ import {formatAddress} from "../../util";
 
 export default {
   name: "Notification",
-  props: ['notification', 'inNavbar'],
+  props: ['notification', 'inNavbar','deleted'],
   data() {
     return {
       updatedNotification: {message:"", type:"", read: false},
@@ -192,14 +192,8 @@ export default {
       }
     },
 
-    /**
-     * Calls API deleteNotification patch request
-     * and using an EventBus that emits notificationUpdate so that
-     * other components are refreshed.
-     */
-    async deleteNotification() {
-      await Api.deleteNotification(this.updatedNotification.id)
-      EventBus.$emit("notificationUpdate")
+    deleteToast() {
+      this.$emit('deleteNotification',this.updatedNotification.id)
     },
 
     /**

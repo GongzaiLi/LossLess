@@ -17,7 +17,7 @@
       <strong>expires within 24 hours</strong>
     </b-dropdown-item>
 
-    <b-dropdown-item v-for="notification in notifications" v-bind:key="notification.id" class="notifications-item">
+    <b-dropdown-item v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notifications-item">
       <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
     </b-dropdown-item>
   </b-dropdown>
@@ -37,6 +37,7 @@ export default {
       notifications: [],
       expiringCards: [],
       notificationChange: true,
+      pendingDeletedNotification:false
     }
   },
   computed: {
@@ -48,8 +49,20 @@ export default {
      * @return The number of total notifications
      */
     numberOfNotifications: function () {
-      return this.expiringCards.length + this.notifications.length;
+      return this.expiringCards.length + this.filteredNotifications.length;
     },
+    /**
+     * Filters notifications by removing notification pending deletion from the list
+     * @returns notifications with pendingDeletedNotification removed
+     */
+    filteredNotifications: function(){
+      let removedNotification=this.pendingDeletedNotification
+      let filtered =[]
+      filtered = this.notifications.filter(function(value){
+        return value.id !== removedNotification
+      });
+      return filtered
+    }
   },
   methods: {
 
@@ -83,6 +96,9 @@ export default {
      * This mount listens to the notificationUpdate event
      */
     EventBus.$on('notificationUpdate', this.updateNotifications)
+    EventBus.$on('notificationTemporarilyRemoved', (pendingDeletedNotification) => {
+      this.pendingDeletedNotification = pendingDeletedNotification;
+    })
   }
 }
 
