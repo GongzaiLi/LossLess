@@ -58,6 +58,8 @@ public class PurchasedListingServiceTest {
     @Autowired
     private PurchasedListingRepository purchasedListingRepository;
 
+    private Listing listing1;
+
     private Business business;
 
     private User curUser;
@@ -77,7 +79,7 @@ public class PurchasedListingServiceTest {
         business.setCreated(LocalDate.now());
         businessService.createBusiness(business);
 
-        Listing listing1 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
+        listing1 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
         Listing listing2 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 2.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
         Listing listing3 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 5.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
         Listing listing4 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 15.0, LocalDate.of(2099, Month.JANUARY, 1),1, 1);
@@ -125,9 +127,7 @@ public class PurchasedListingServiceTest {
         business.setId(420);
         business.setCreated(LocalDate.now());
         business = businessService.createBusiness(business);
-        Listing listing = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Big Dave's Collar", 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
-
-        purchasedListingService.generatePurchasesForProduct(listing.getInventoryItem().getProduct(), curUser, business);
+        purchasedListingService.generatePurchasesForProduct(listing1.getInventoryItem().getProduct(), curUser, business);
 
         List<PurchasedListing> generated = purchasedListingRepository.findAllByBusinessId(business.getId());
         for (PurchasedListing purchasedListing : generated) {

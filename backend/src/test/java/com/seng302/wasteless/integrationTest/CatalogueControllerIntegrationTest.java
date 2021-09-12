@@ -186,7 +186,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
         String product = "{\"name\": \"Chocolate Bar Liquid\", \"description\" : \"Example Product\", \"manufacturer\" : \"example manufacturer\", \"recommendedRetailPrice\": \"2.0\", \"id\": \"PRODUCT-1\"}";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products")
+        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/products?generateSalesData=false")
                 .content(product)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
