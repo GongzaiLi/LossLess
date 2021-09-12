@@ -58,18 +58,15 @@ Date: 3/3/2021
           <b-form-input required type="email" maxLength=50 v-model="userData.email" placeholder="Email"></b-form-input>
         </b-form-group>
 
-        <b-form-group v-if="isEditUser && !currentUserAdminAndEditingAnotherUser">
-          <strong>Old Password</strong>
-          <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser" place-holder="Old Password"/>
+        <b-form-group v-if="isEditUser">
+          <b-form-checkbox v-model="changePassword"><strong>Change Password</strong></b-form-checkbox>
         </b-form-group>
 
-        <b-form-group>
+        <b-form-group v-if="changePassword || !isEditUser">
           <strong>{{isEditUser ? 'New Password' : 'Password *'}}</strong>
-          <password-input v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
-        </b-form-group>
+          <password-input autocomplete="new-password" v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
 
-        <b-form-group>
-          <strong>Confirm {{isEditUser ? 'Confirm New Password' : 'Password *'}}</strong>
+          <strong>Confirm {{isEditUser ? 'New Password' : 'Password *'}}</strong>
           <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
 
@@ -177,10 +174,10 @@ export default {
           country: "",
           postcode: ""
         },
-        oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       },
+      changePassword: false,
       email: '',
       country: '',
       uploaded: false,
@@ -196,7 +193,6 @@ export default {
     //set email and country to compare if the user has altered the values
     if (this.isEditUser) {
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
-      this.userData.oldPassword = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
       this.email = this.userData.email;
@@ -209,22 +205,6 @@ export default {
   },
 
   methods: {
-
-    /**
-     * If in edit mode and user has changed the email without adding the old password return a string
-     * that can be used as the value for a custom validity on the old password field else return empty string
-     * */
-    passwordEmailValidity() {
-      return this.isEditUser && this.userData.email !== this.email && this.userData.oldPassword.length === 0? "Old Password required to change Email" : ""
-    },
-
-    /**
-     * If in edit mode and user has added a new password without adding the old password return a string
-     * that can be used as the value for a custom validity on the old password field else return empty string
-     * */
-    passwordNewPasswordValidity() {
-      return this.isEditUser && this.userData.newPassword.length > 0 && this.userData.oldPassword.length === 0? "Old Password required to change Password" : ""
-    },
 
     /**
      * If new password does not match old pass word return a string
@@ -280,19 +260,16 @@ export default {
         dateOfBirth: this.userData.dateOfBirth,
         phoneNumber: this.userData.phoneNumber,
         homeAddress: this.userData.homeAddress,
-        password: this.userData.oldPassword
       }
-      if (this.userData.newPassword !== "") {
-        editData.newPassword = this.userData.newPassword
+      if (this.changePassword) {
+        editData.newPassword = this.userData.newPassword;
       }
       return editData;
     },
 
     /**
      * Uses HTML constraint validation to set custom validity rules checks:
-     * that the 'password' and 'confirm password' fields match
-     * date of birth is valid
-     * old password present when trying to change new password or email (editing only)
+     * that the 'password' and 'confirm password' fields match and date of birth is valid
      * See below for more info:
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
@@ -302,10 +279,6 @@ export default {
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);
-      if(this.isEditUser  && !this.currentUserAdminAndEditingAnotherUser) {
-        const passwordInput =  document.getElementById('oldPassword');
-        passwordInput.setCustomValidity([this.passwordEmailValidity(), this.passwordNewPasswordValidity()].filter(x => typeof x === 'string' && x.length > 0).join(", "));
-      }
     },
 
     /**
