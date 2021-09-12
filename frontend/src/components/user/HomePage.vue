@@ -200,7 +200,7 @@ export default {
         this.hasExpiredCards = true;
       }
 
-      this.notifications = (await Api.getNotifications(this.isArchivedSelected)).data;
+      this.notifications = (await Api.getNotifications(null, this.isArchivedSelected)).data;
     },
 
     /**

@@ -80,7 +80,7 @@ export default {
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiredCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
-  getNotifications: (archived=false, tags) => instance.get(`/users/notifications?archived=${archived}${tags != null ? `&tags=${tags}`: ''}`, {withCredentials: true}),
+  getNotifications: (tags, archived=false) => instance.get(`/users/notifications?archived=${archived}${tags != null ? `&tags=${tags}`: ''}`, {withCredentials: true}),
   patchNotification: (id, data) => instance.patch(`/notifications/${id}`, data, {withCredentials: true}),
   deleteNotification: (id) => instance.delete(`/notifications/${id}`, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),

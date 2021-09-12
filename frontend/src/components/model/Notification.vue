@@ -52,8 +52,11 @@
               <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
               <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
             </b-dropdown-item>
-            <b-dropdown-item v-if="!archivedSelected" @click="confirmArchive">
-              <p><b-icon-archive class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive</p>
+            <b-dropdown-item @click="confirmArchive">
+              <p v-if="!archivedSelected">
+                <b-icon-archive  class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive </p>
+              <p v-else>
+                <b-icon-archive  class="archive-button" variant="outline-success" title="Un-Archive this notification"></b-icon-archive>  Un-Archive </p>
             </b-dropdown-item>
             <b-dropdown-item @click="confirmDelete">
               <p><b-icon-trash class="delete-button" title="Delete this notification"></b-icon-trash>  Delete</p>
@@ -88,11 +91,11 @@
       </b-modal>
 
       <b-modal ref="confirmArchiveModal" size="sm"
-               title="Archive Notification"
+               :title="this.archivedSelected ? 'Un-Archive Notification' :'Archive Notification'"
                ok-variant="success"
-               ok-title="Archive"
-               @ok="archiveNotification">
-        Are you sure you want to <strong>archive</strong> this notification?
+               :ok-title="this.archivedSelected ? 'Un-Archive' :'Archive'"
+               @ok="archiveNotification(archivedSelected)">
+        Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
       </b-modal>
     </div>
   </div>
@@ -273,8 +276,8 @@ export default {
      * and using an EventBus that emits notificationUpdate so that
      * other components are refreshed.
      */
-    async archiveNotification() {
-      await Api.patchNotification(this.updatedNotification.id, {"archived": true})
+    async archiveNotification(isArchived) {
+      await Api.patchNotification(this.updatedNotification.id, {"archived": !isArchived})
       EventBus.$emit("notificationUpdate")
     },
 
