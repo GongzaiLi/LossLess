@@ -58,8 +58,14 @@ Date: 3/3/2021
           <b-form-input required type="email" maxLength=50 v-model="userData.email" placeholder="Email"></b-form-input>
         </b-form-group>
 
+        <hr v-if="isEditUser">
         <b-form-group v-if="isEditUser">
           <b-form-checkbox v-model="changePassword"><strong>Change Password</strong></b-form-checkbox>
+        </b-form-group>
+
+        <b-form-group v-if="isEditUser && !currentUserAdminAndEditingAnotherUser && changePassword" class="input-group-addon">
+          <strong>Enter Current Password</strong>
+          <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser || changePassword" place-holder="Current Password"/>
         </b-form-group>
 
         <b-form-group v-if="changePassword || !isEditUser">
@@ -69,6 +75,7 @@ Date: 3/3/2021
           <strong>Confirm {{isEditUser ? 'New Password' : 'Password *'}}</strong>
           <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
+        <hr v-if="isEditUser">
 
         <b-form-group
         >
@@ -174,6 +181,7 @@ export default {
           country: "",
           postcode: ""
         },
+        oldPassword: "",
         newPassword: "",
         confirmPassword: "",
       },
@@ -193,6 +201,7 @@ export default {
     //set email and country to compare if the user has altered the values
     if (this.isEditUser) {
       this.userData = JSON.parse(JSON.stringify(this.userDetails));
+      this.userData.oldPassword = '';
       this.userData.newPassword = '';
       this.userData.confirmPassword = '';
       this.email = this.userData.email;
@@ -263,6 +272,7 @@ export default {
       }
       if (this.changePassword) {
         editData.newPassword = this.userData.newPassword;
+        editData.password = this.userData.oldPassword;
       }
       return editData;
     },
@@ -270,6 +280,7 @@ export default {
     /**
      * Uses HTML constraint validation to set custom validity rules checks:
      * that the 'password' and 'confirm password' fields match and date of birth is valid
+     * Old password present when trying to change new password (editing only)
      * See below for more info:
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
