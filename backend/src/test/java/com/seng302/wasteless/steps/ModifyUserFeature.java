@@ -216,7 +216,7 @@ public class ModifyUserFeature {
 
     @When("The User modifies his profile with the country: {string}")
     public void theUserModifiesHisProfileWithTheCountry(String newCountry) throws Exception {
-        notificationListLength = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null)).size();
+        notificationListLength = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null), Optional.ofNullable(null)).size();
         String jsonInStringForRequest = String.format("{\"firstName\": \"%s\", \"lastName\": \"%s\", \"dateOfBirth\": \"%s\", \"email\": \"%s\", " +
                         "\"homeAddress\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 "John", "Smith", "1999-04-27", "c@c", newCountry, "streetNumber", "streetName", "suburb", "city", "region", "postcode");
@@ -230,7 +230,7 @@ public class ModifyUserFeature {
     @Then("The User who is modifying will have a notification saved")
     public void theUserWhoIsModifyingWillHaveANotificationSaved() throws Exception {
         responseResult.andExpect(status().isOk());
-        List<Notification> notificationList = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null));
+        List<Notification> notificationList = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
         Assertions.assertEquals(notificationListLength+1, notificationList.size());
         Assertions.assertEquals(NotificationType.CURRENCY_CHANGE, notificationList.get(0).getType());
 
