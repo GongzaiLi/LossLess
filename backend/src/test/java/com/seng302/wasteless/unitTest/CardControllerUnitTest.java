@@ -305,7 +305,7 @@ class CardControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/cards/8/extenddisplayperiod")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
-        card = cardService.findCardById(1);
+        card = cardService.findCardById(8);
         Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
     }
 
