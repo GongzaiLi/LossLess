@@ -146,3 +146,22 @@ describe('check-api-request-to-delete-cards', () => {
         expect(Api.deleteCard).toHaveBeenCalled();
     })
 });
+
+describe('check-cardWithinExtendPeriod-works-as-intended', () => {
+    test('check-correct-when-before-48-hours', async () => {
+        wrapper.vm.fullCard.displayPeriodEnd = new Date().getTime() + 400000000;
+        expect(wrapper.vm.cardWithinExtendPeriod()).toStrictEqual(false);
+    });
+    test('check-correct-within-before-48-hours', async () => {
+        wrapper.vm.fullCard.displayPeriodEnd = new Date().getTime() + 86400000;
+        expect(wrapper.vm.cardWithinExtendPeriod()).toStrictEqual(true);
+    });
+    test('check-correct-within-after-48-hours', async () => {
+        wrapper.vm.fullCard.displayPeriodEnd = new Date().getTime() - 86400000;
+        expect(wrapper.vm.cardWithinExtendPeriod()).toStrictEqual(true);
+    });
+    test('check-correct-after-after-48-hours', async () => {
+        wrapper.vm.fullCard.displayPeriodEnd = new Date().getTime() - 223000000;
+        expect(wrapper.vm.cardWithinExtendPeriod()).toStrictEqual(true);
+    });
+});

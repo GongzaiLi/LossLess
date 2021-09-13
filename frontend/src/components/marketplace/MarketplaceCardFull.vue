@@ -10,8 +10,7 @@
 
       <b-card no-body>
         <template #header>
-          <b-card-text v-if="fullCard.description" > {{ fullCard.description }}</b-card-text>
-          <b-card-text v-else class="text-muted"> <em> No Description </em>  </b-card-text>
+          <b-card-text>{{ fullCard.description !== "" ? fullCard.description : "No Description" }}</b-card-text>
         </template>
       </b-card>
       <br>
@@ -36,7 +35,7 @@
       <br>
       <div>
         <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger" @click="openDeleteConfirmDialog"> Delete </b-button>
-        <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="success" @click="openExtendConfirmDialog"> Extend <b-icon-alarm/></b-button>
+        <b-button v-if="canDeleteOrExtend && cardWithinExtendPeriod()" style="float: left; margin-left: 1rem" variant="success" @click="openExtendConfirmDialog"> Extend <b-icon-alarm/></b-button>
         <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal"> Close </b-button>
       </div>
 
@@ -93,6 +92,18 @@ export default {
       }).catch((error) => {
           this.$log.debug(error);
       })
+    },
+
+    /**
+     * Returns true if card within 48 hours of expiring, or afterwards. False otherwise
+     */
+    cardWithinExtendPeriod: function() {
+      const millisecondsIn48Hours = 172800000;
+
+      const fortyEightHoursFromNow = new Date((new Date().getTime() + millisecondsIn48Hours));
+      const expiry = new Date(this.fullCard.displayPeriodEnd);
+
+      return (fortyEightHoursFromNow.getTime() >= expiry.getTime());
     },
 
     /**
