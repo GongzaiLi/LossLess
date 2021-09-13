@@ -270,7 +270,7 @@ export default {
      */
     confirmLeave(){
       if (this.pendingDeletedNotification) {
-        return window.confirm('Are you sure you would like to change the page? You will not be unable to undo the pending notification deletion')
+        return window.confirm('Are you sure you would like to change the page? You will not be able to undo the pending notification deletion')
       }
       return true
     },
