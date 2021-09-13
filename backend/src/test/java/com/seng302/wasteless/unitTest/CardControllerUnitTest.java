@@ -275,7 +275,7 @@ class CardControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.put("/cards/7/extenddisplayperiod")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
-        card = cardService.findCardById(1);
+        card = cardService.findCardById(7);
         Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
     }
 
@@ -286,6 +286,7 @@ class CardControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
     @Test
     @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
     void whenPutRequestToCard_andMoreThan48HoursBeforeExpiry_then406Response() throws Exception {
@@ -306,6 +307,17 @@ class CardControllerUnitTest {
                 .andExpect(status().isOk());
         card = cardService.findCardById(1);
         Assertions.assertNotEquals(card.getDisplayPeriodEnd(),expiry);
+    }
+
+    @Test
+    @WithMockUser(username = "demo@gmail.com", password = "pwd", roles = "USER")
+    void whenPutRequestToCard_andNotAuthorisedToExtendCard_then403Response() throws Exception {
+
+        doReturn(false).when(cardService).checkUserHasPermissionForCard(any(Card.class), any(User.class));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/cards/7/extenddisplayperiod")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
 }
