@@ -367,6 +367,82 @@ class UserControllerUnitTest {
     }
 
     @Test
+    void whenPutRequestToUser_andRequestToChangePassword_andNoPasswordField_then400Response() throws Exception {
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                        .content(modifiedUser)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenPutRequestToUser_andRequestToChangePassword_andCurrentPasswordIncorrect_then400Response() throws Exception {
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "\"password\": \"INCORRECTPASSWORD!!!!\",\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                        .content(modifiedUser)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenPutRequestToUser_andRequestToChangePassword_andNoPasswordField_butIsDGAA_then200Response() throws Exception {
+        Mockito.when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(admin);
+
+        String modifiedUser = "{\"firstName\": \"James\",\n" +
+                "\"lastName\" : \"Harris\",\n" +
+                "\"email\": \"jeh128@uclive.ac.nz\",\n" +
+                "\"dateOfBirth\": \"2000-10-27\",\n" +
+                "\"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"New Zealand\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\n" +
+                "\"newPassword\": \"1338\"\n" +
+                "}";
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
+                        .content(modifiedUser)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void whenPutRequestToUser_andRequestToChangeEmail_andDGAA_then200Response() throws Exception {
         Mockito.when(userService.getCurrentlyLoggedInUser())
                 .thenReturn(defaultAdmin);

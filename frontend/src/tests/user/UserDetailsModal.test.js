@@ -122,41 +122,6 @@ describe('Testing-api-post-register', () => {
 
 describe('Testing-password-validation-for-editing', () => {
 
-  test('Invalid if no old password but new password present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("Old Password required to change Password");
-  });
-
-  test('Valid if  old password and new password present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
-  });
-
-
-  test('Invalid if no old password but new email present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.email = 'a new email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("Old Password required to change Email");
-  });
-
-  test('Valid if old password and email not changed present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.email = 'email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
-  });
-
   test('Invalid if password not match confirm password', async () => {
     wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.newPassword = 'bad password';
@@ -176,41 +141,6 @@ describe('Testing-password-validation-for-editing', () => {
 });
 
 describe('Testing-password-validation-for-register', () => {
-
-  test('valid if no old password but new password present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
-  });
-
-  test('Valid if  old password and new password present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
-  });
-
-
-  test('valid if no old password but new email present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.email = 'a new email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
-  });
-
-  test('Valid if old password and email not changed present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.email = 'email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
-  });
 
   test('Invalid if password not match confirm password', async () => {
     wrapper.vm.isEditUser = false;
@@ -320,3 +250,25 @@ describe('Testing-api-post-upload-image-for-user', () => {
   });
 });
 
+
+describe('Testing-changing-password', () => {
+  beforeEach(() =>
+    wrapper.setProps({ isEditUser: true }));
+
+  test('newPassword is undefined if not changing password', async () => {
+    wrapper.vm.userData.newPassword = 'password';
+    wrapper.vm.userData.confirmPassword = 'password';
+    wrapper.vm.changePassword = false;
+
+    expect(wrapper.vm.getEditData().newPassword).toBeUndefined();
+  });
+
+  test('newPassword is set if changing password', async () => {
+    wrapper.vm.userData.newPassword = 'password';
+    wrapper.vm.userData.confirmPassword = 'password';
+    wrapper.vm.changePassword = true;
+
+    expect(wrapper.vm.getEditData().newPassword).toBe('password');
+  });
+
+});
