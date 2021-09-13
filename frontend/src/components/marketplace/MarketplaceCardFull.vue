@@ -10,7 +10,7 @@
 
       <b-card no-body>
         <template #header>
-          <b-card-text> {{ fullCard.description !== "" ? fullCard.description : <em> "No Description" </em>}}</b-card-text>
+          <b-card-text>{{ fullCard.description !== "" ? fullCard.description : "No Description" }}</b-card-text>
         </template>
       </b-card>
       <br>
