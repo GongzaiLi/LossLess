@@ -13,6 +13,9 @@ Date: 3/3/2021
         @submit="submit"
         @input="setCustomValidities"
       >
+        <b-button v-if="uploaded || userData.profileImage" class="position-absolute" variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog">
+          <b-icon-trash-fill/>
+        </b-button>
         <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
              alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
         <b-img v-else :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
@@ -20,9 +23,6 @@ Date: 3/3/2021
                fluid block rounded="circle"
                alt="default image" style="height: 12rem; width: 12rem; display: inline-block">
         </b-img>
-        <b-button v-if="uploaded || userData.profileImage" class="float-right" variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog">
-          <b-icon-trash-fill/>
-        </b-button>
         <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
                accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
         <b-button variant="info" class="w-100 add-image-btn mt-2 mb-4" @click="$refs.userImagePicker.click()">Upload</b-button>
