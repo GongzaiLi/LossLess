@@ -51,6 +51,7 @@
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
             </b-dropdown>
+            <h3 v-else>(Archived)</h3>
           </b-col>
           <b-col cols="2">
             <b-icon-archive v-if="!isArchivedSelected" font-scale="2"  title="View Archived Notifications"
