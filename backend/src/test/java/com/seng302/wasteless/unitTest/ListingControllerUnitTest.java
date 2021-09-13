@@ -280,7 +280,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         new GetBusinessesDtoMapper(businessService, userService);
 
         Mockito
-                .when(notificationService.filterNotifications(anyInt(), any()))
+                .when(notificationService.filterNotifications(anyInt(), any(), any()))
                 .thenReturn(notificationList);
         Mockito
                 .when(notificationService.saveNotification(any(Notification.class)))

@@ -121,6 +121,8 @@ export default {
   },
   mounted() {
     EventBus.$on('updatedUser', this.updatedUserHandler)
+    EventBus.$on('updatedImage', this.updatedUserHandler)
+
   },
   computed: {
     isActingAsUser: function() {

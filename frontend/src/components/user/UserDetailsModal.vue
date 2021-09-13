@@ -13,12 +13,16 @@ Date: 3/3/2021
         @submit="submit"
         @input="setCustomValidities"
       >
+        <b-button v-if="uploaded || userData.profileImage" class="position-absolute" variant="danger" size="sm" v-b-tooltip.hover title="Delete image" @click="openDeleteConfirmDialog">
+          <b-icon-trash-fill/>
+        </b-button>
         <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
              alt="userImage" style="height: 12rem; width: 12rem; display: inline-block" />
         <b-img v-else :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                class="mx-auto"
                fluid block rounded="circle"
-               alt="default image" style="height: 12rem; width: 12rem; display: inline-block" />
+               alt="default image" style="height: 12rem; width: 12rem; display: inline-block">
+        </b-img>
         <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
                accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
         <b-button variant="info" class="w-100 add-image-btn mt-2 mb-4" @click="$refs.userImagePicker.click()">Upload</b-button>
@@ -128,12 +132,19 @@ Date: 3/3/2021
       </h6>
     </b-card>
     <br>
+
+    <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteImage">
+      <h6>
+        Are you sure you want to <strong>delete</strong> this image?
+        <strong><br>{{!uploaded ? "It will be permanently deleted from your account.": ""}}</strong>
+      </h6>
+    </b-modal>
   </div>
 </template>
 
 
 <script>
-import api from "../../Api";
+import Api from "../../Api";
 import AddressInput from "../model/AddressInput";
 import PasswordInput from "../model/PasswordInput";
 import EventBus from "../../util/event-bus"
@@ -300,8 +311,8 @@ export default {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
       if(this.isEditUser) {
         if (this.country !== this.userData.homeAddress.country) {
-          let oldCurrency = await api.getUserCurrency(this.country);
-          let newCurrency = await api.getUserCurrency(this.userData.homeAddress.country);
+          let oldCurrency = await Api.getUserCurrency(this.country);
+          let newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
           if (oldCurrency.code !== newCurrency.code) {
             if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
                 " This will not affect the currency of products in your administered business unless you " +
@@ -325,7 +336,7 @@ export default {
      * @param id Id of user who wants an image to be uploaded.
      */
     uploadImageRequest(id) {
-      api.uploadProfileImage(id, this.imageFile).then(() => {
+      Api.uploadProfileImage(id, this.imageFile).then(() => {
         EventBus.$emit("updatedUser");
       })
       .catch((error) => {
@@ -351,7 +362,7 @@ export default {
      */
     async updateUser() {
       let editData = this.getEditData();
-      await api
+      await Api
         .modifyUser(editData, this.$route.params.id)
           .then(() => {
             if (this.imageURL) {
@@ -375,7 +386,7 @@ export default {
      * Returns the URL required to get the image given the filename
      */
     getURL(imageFileName) {
-      return api.getImage(imageFileName);
+      return Api.getImage(imageFileName);
     },
 
     /**
@@ -395,14 +406,14 @@ export default {
         return
       }
 
-      await api
+      await Api
         .register(registerData)
         .then((loginResponse) => {
           this.$log.debug("Registered");
           if (this.imageURL) {
             this.uploadImageRequest(loginResponse.data.id);
           }
-          return api.getUser(loginResponse.data.id);
+          return Api.getUser(loginResponse.data.id);
         })
         .then((userResponse) => {
           this.$currentUser = userResponse.data;
@@ -417,6 +428,39 @@ export default {
           }
         });
     },
+
+    /**
+     * Opens the dialog to confirm if the image with given id should be deleted.
+     * Stores the given id in this.imageIdToDelete
+     */
+    openDeleteConfirmDialog: function() {
+      this.$refs.confirmDeleteImageModal.show();
+    },
+
+    /**
+     * Deletes the image with the id stored in this.imageIdToDelete. Makes an API call if
+     * the user already exists, otherwise will only remove image from being uploaded.
+     * This should only be called when the user confirms they want to delete the image
+     **/
+    confirmDeleteImage: async function () {
+      const userId = this.$route.params.id;
+      if (this.isEditUser && this.userData.profileImage) {  // Only make Api request if the user exists and is editing
+        try {
+          await Api.deleteUserProfileImage(userId);
+          EventBus.$emit("updatedImage");
+        } catch(error) {
+          this.imageError = error.response.statusText;
+          this.$log.debug(error);
+          return;
+        }
+      }
+      this.userData.profileImage = '';
+      this.imageURL = '';
+      this.imageFile = '';
+      this.uploaded = false;
+      this.imageError = '';
+    },
+
   },
 
   computed: {

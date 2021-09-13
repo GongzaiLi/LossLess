@@ -160,7 +160,7 @@ Date: 5/3/2021
     </div>
 
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
-      <UserDetailsModal :is-edit-user="true" :logged-in-user-admin="loggedInUserAdmin" :user-details="userData" v-on:updatedUser="updatedUserHandler"/>
+      <UserDetailsModal :is-edit-user="true" :logged-in-user-admin="loggedInUserAdmin" :user-details="userData" v-on:updatedUser="updatedUserHandler" v-on:updateImage="updatedImageHandler"/>
     </b-modal>
   </div>
 </template>
@@ -226,6 +226,8 @@ export default {
     this.launchPage(userId);
 
     EventBus.$on('updatedUser', this.updatedUserHandler)
+    EventBus.$on('updatedImage', this.updatedImageHandler)
+
   },
 
   methods: {
@@ -322,6 +324,14 @@ export default {
     updatedUserHandler: function () {
       this.getUserInfo(this.userData.id);
       this.$bvModal.hide('edit-user-profile');
+    },
+
+    /**
+     * refreshes the user's details including their profile without
+     * closing the edit user modal
+     */
+    updatedImageHandler: function () {
+      this.getUserInfo(this.userData.id);
     },
 
   },
