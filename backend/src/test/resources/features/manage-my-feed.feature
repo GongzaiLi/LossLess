@@ -31,6 +31,11 @@ Feature: U32 Managing my feed
     When I archive it
     Then The notification no longer appears in my feed
 
+  Scenario: AC5: I can browse archived items.
+    Given I have 10 notifications and notifications with even are archived
+    When I get archived notifications
+    Then I will receive notifications that are all archived
+
   Scenario: AC6: I can “tag” an item.
     Given My notification has no tag
     When I add the tag "YELLOW"
@@ -45,3 +50,16 @@ Feature: U32 Managing my feed
     Given My notification has been tagged as "BLUE"
     When I remove the tag
     Then My tag has been removed
+
+  Scenario: AC7: Filter notifications by one tag.
+    Given We have 10 notifications and notifications with odd are tagged as "RED" and notification with even id are tagged as "BLACK"
+    When filter notifications by tags:
+      | RED |
+    Then The Filtered notifications result are all tagged as "RED"
+
+  Scenario: AC7: Filter notifications by tags.
+    Given We have 10 notifications and notifications with odd are tagged as "RED" and notification with even id are tagged as "BLACK"
+    When filter notifications by tags:
+      | RED   |
+      | BLACK |
+    Then The Filtered notifications result are all tagged as tagged "RED" or "BLACK"

@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static com.seng302.wasteless.TestUtils.createListingWithNameAndPrice;
@@ -175,14 +176,14 @@ public class PurchasesFeature {
     public void notifications_are_created_for_the_users_who_have_liked_the_listing_that_was_purchased(Integer numNotification) {
         Assertions.assertEquals(userList.size(), numNotification);
         for (User user : userList) {
-            List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(user.getId());
+            List<Notification> notificationList = notificationService.filterNotifications(user.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
             Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.LIKEDLISTING_PURCHASED)));
         }
     }
 
     @Then("A notifications is created telling me I have purchased the listing")
     public void a_notifications_is_created_telling_me_i_have_purchased_the_listing() {
-        List<Notification> notificationList = notificationService.findAllUnArchivedNotificationsByUserId(currentUserDetails.getId());
+        List<Notification> notificationList = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
         Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.PURCHASED_LISTING)));
     }
 

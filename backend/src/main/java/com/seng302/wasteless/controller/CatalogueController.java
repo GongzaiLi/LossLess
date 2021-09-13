@@ -6,6 +6,7 @@ import com.seng302.wasteless.dto.GetProductDTO;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.service.PurchasedListingService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.ProductViews;
 import net.minidev.json.JSONObject;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * ProductController is used for mapping all Restful API requests starting with the address
@@ -38,12 +40,14 @@ public class CatalogueController {
     private final BusinessService businessService;
     private final UserService userService;
     private final ProductService productService;
+    private final PurchasedListingService purchasedListingService;
 
     @Autowired
-    public CatalogueController(BusinessService businessService, UserService userService, ProductService productService) {
+    public CatalogueController(BusinessService businessService, UserService userService, ProductService productService, PurchasedListingService purchasedListingService) {
         this.businessService = businessService;
         this.userService = userService;
         this.productService = productService;
+        this.purchasedListingService = purchasedListingService;
 
     }
     /**
@@ -51,11 +55,12 @@ public class CatalogueController {
      *
      * @param businessId      the id of the business that is creating the product
      * @param possibleProduct the product that is trying to be added to the catalogue
+     * @param generateSalesData optional boolean, if true will create and save fake purchase history (used by data gen)
      * @return Http Response:  200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
      */
     @PostMapping("/businesses/{id}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct) {
+    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct, @RequestParam Optional<Boolean> generateSalesData) {
 
         logger.debug("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
 
@@ -94,6 +99,11 @@ public class CatalogueController {
         responseBody.put("productId", possibleProduct.getId());
 
         logger.info("Successfully created Product Entity");
+
+        if (generateSalesData.isPresent() && generateSalesData.get()) {
+            purchasedListingService.generatePurchasesForProduct(possibleProduct, user, possibleBusiness);
+            businessService.saveBusinessChanges(possibleBusiness);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 

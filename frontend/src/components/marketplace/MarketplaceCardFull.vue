@@ -1,16 +1,17 @@
 <template>
   <b-card>
     <div>
-      <h1><strong> {{fullCard.title}}  </strong></h1>
+      <h1><strong> {{ fullCard.title }}  </strong></h1>
       <b-container>
-        <h6> Card Listed On: {{formatCreated}} </h6>
-        <h6> Card Ends: {{formatExpiry}}</h6>
+        <h6> Card Listed On: {{ formatCreated }} </h6>
+        <h6> Card Ends: {{ formatExpiry }}</h6>
       </b-container>
       <br>
 
       <b-card no-body>
         <template #header>
-          <b-card-text> {{fullCard.description}}</b-card-text>
+          <b-card-text v-if="fullCard.description" > {{ fullCard.description }}</b-card-text>
+          <b-card-text v-else class="text-muted"> <em> No Description </em>  </b-card-text>
         </template>
       </b-card>
       <br>
@@ -27,9 +28,9 @@
       <b-input-group-text>
         <b-container>
           <h6> <strong> Creator Info: </strong></h6>
-          <label> Name: {{fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
+          <label> Name: {{ fullCard.creator.firstName }} {{ fullCard.creator.lastName }}   </label>
           <br>
-          <label> Location: {{fullCard.creator.homeAddress.suburb ? fullCard.creator.homeAddress.suburb + "," : ""}} {{fullCard.creator.homeAddress.city}}</label>
+          <label> Location: {{ getAddress }}</label>
         </b-container>
       </b-input-group-text>
       <br>
@@ -58,6 +59,7 @@
 <script>
 import api from "../../Api";
 import Api from "../../Api";
+import {formatAddress} from "../../util";
 export default {
   name: "full-card",
   props: ["cardId"],
@@ -134,6 +136,14 @@ export default {
   },
 
   computed: {
+    /**
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
+     */
+    getAddress: function () {
+      return formatAddress(this.fullCard.creator.homeAddress, 3);
+    },
     /**
      * format Expiry date
      */

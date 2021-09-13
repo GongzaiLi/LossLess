@@ -22,7 +22,7 @@ Date: 5/3/2021
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
                   <b-icon-pencil-fill
-                      v-if="(userData.id === $currentUser.id || $currentUser.role === 'defaultGlobalApplicationAdmin' || $currentUser.role === 'globalApplicationAdmin') && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
+                      v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
                       v-b-tooltip.hover
                       title="Edit Profile"
                       id="editProfile"
@@ -94,7 +94,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.dateOfBirth }}</b-col>
               </b-row>
             </h6>
-            <h6>
+            <h6 v-show="viewable">
               <b-row>
                 <b-col cols="0">
                   <b-icon-envelope-fill></b-icon-envelope-fill>
@@ -112,7 +112,7 @@ Date: 5/3/2021
                 <b-col>{{ userData.phoneNumber }}</b-col>
               </b-row>
             </h6>
-            <h6 v-show="viewable">
+            <h6>
               <b-row>
                 <b-col cols="0">
                   <b-icon-house-fill></b-icon-house-fill>
@@ -160,7 +160,7 @@ Date: 5/3/2021
     </div>
 
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
-      <UserDetailsModal :is-edit-user="true" :logged-in-user-admin="loggedInUserAdmin" :user-details="userData" v-on:updatedUser="updatedUserHandler"/>
+      <UserDetailsModal :is-edit-user="true" :logged-in-user-admin="loggedInUserAdmin" :user-details="userData" v-on:updatedUser="updatedUserHandler" v-on:updateImage="updatedImageHandler"/>
     </b-modal>
   </div>
 </template>
@@ -182,6 +182,7 @@ import api from "../../Api";
 import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
 import EventBus from "../../util/event-bus";
+import {formatAddress} from "../../util/index";
 
 export default {
   components: {
@@ -225,6 +226,8 @@ export default {
     this.launchPage(userId);
 
     EventBus.$on('updatedUser', this.updatedUserHandler)
+    EventBus.$on('updatedImage', this.updatedImageHandler)
+
   },
 
   methods: {
@@ -323,18 +326,37 @@ export default {
       this.$bvModal.hide('edit-user-profile');
     },
 
+    /**
+     * refreshes the user's details including their profile without
+     * closing the edit user modal
+     */
+    updatedImageHandler: function () {
+      this.getUserInfo(this.userData.id);
+    },
+
   },
   computed: {
+    /**
+     * Return true if the user is looking at their own profile, or is a DGAA/GAA
+     */
+    userLookingAtSelfOrIsAdmin() {
+      return this.userData.id === this.$currentUser.id || this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.role === 'globalApplicationAdmin';
+    },
+
     toggleAdminButtonVariant() {
       return this.userData.role === 'user' ? 'success' : 'danger';
     },
     /**
-     * Combine fields of address
+     * Get correctly formatted address, deals with privacy level to only display partial address if looking at another
+     * users profile and not an admin.
      */
     getAddress: function () {
-      const address = this.userData.homeAddress;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-          `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      if (this.userLookingAtSelfOrIsAdmin) {
+        return formatAddress(this.userData.homeAddress, 1);
+      } else {
+        return formatAddress(this.userData.homeAddress, 3);
+      }
+
     },
     /**
      * Returns the full name of the user, in the format:

@@ -8,8 +8,10 @@
       <p class="sub-title">Ends: {{ formatExpiry }}</p>
       <hr>
       <b-card-text>
-        <p class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+        <p  v-if="cardInfo.description" class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+        <p v-else class="sub-title" style="line-height: 1.2em;">No Description</p>
       </b-card-text>
+
       <hr>
       <b-card-text class="single-line-clamped">
         Tags: <b-badge v-for="keyword in this.cardInfo.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
@@ -17,7 +19,7 @@
       <b-card-text>
         <b-icon-person-fill/> {{cardInfo.creator.firstName}} {{cardInfo.creator.lastName}}
         <br>
-        <b-icon-house-door-fill/> {{ formatAddress }}
+        <b-icon-house-door-fill/> {{ getAddress }}
       </b-card-text>
     </b-card>
 </template>
@@ -57,6 +59,8 @@ p.sub-title {
 </style>
 
 <script>
+import {formatAddress} from "../../util";
+
 export default {
   name: "MarketplaceCard",
   props: ["cardInfo"],
@@ -77,13 +81,13 @@ export default {
 
   },
   computed: {
-
     /**
-     * Combine fields of address
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
      */
-    formatAddress: function () {
-      const address = this.cardInfo.creator.homeAddress;
-      return address.city + (address.suburb ? ' (' + address.suburb + ')' : '');
+    getAddress: function () {
+      return formatAddress(this.cardInfo.creator.homeAddress, 3);
     },
 
     /**
@@ -91,7 +95,7 @@ export default {
      */
     formatExpiry: function () {
       return new Date(this.cardInfo.displayPeriodEnd).toString().split(" ").slice(0, 4).join(" ");
-    }
+    },
   }
 }
 </script>

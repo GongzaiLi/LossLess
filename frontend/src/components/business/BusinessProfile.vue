@@ -190,6 +190,7 @@ h6 {
 import memberSince from "../model/MemberSince";
 import api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
+import {formatAddress} from "../../util";
 
 export default {
   components: {
@@ -407,14 +408,12 @@ export default {
     },
 
     /**
-     * the street number, street name, city, region,
-     * country and postcode join with space between the echo to a string
-     * @return {string}
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
      */
     getAddress: function () {
-      const address = this.businessData.address;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return formatAddress(this.businessData.address, 1);
     },
 
 

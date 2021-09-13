@@ -122,41 +122,6 @@ describe('Testing-api-post-register', () => {
 
 describe('Testing-password-validation-for-editing', () => {
 
-  test('Invalid if no old password but new password present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("Old Password required to change Password");
-  });
-
-  test('Valid if  old password and new password present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
-  });
-
-
-  test('Invalid if no old password but new email present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.email = 'a new email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("Old Password required to change Email");
-  });
-
-  test('Valid if old password and email not changed present', async () => {
-    wrapper.setProps({ isEditUser: true });
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.email = 'email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
-  });
-
   test('Invalid if password not match confirm password', async () => {
     wrapper.setProps({ isEditUser: true });
     wrapper.vm.userData.newPassword = 'bad password';
@@ -177,41 +142,6 @@ describe('Testing-password-validation-for-editing', () => {
 
 describe('Testing-password-validation-for-register', () => {
 
-  test('valid if no old password but new password present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
-  });
-
-  test('Valid if  old password and new password present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.newPassword = 'a password';
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordNewPasswordValidity()).toEqual("");
-  });
-
-
-  test('valid if no old password but new email present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = '';
-    wrapper.vm.userData.email = 'a new email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
-  });
-
-  test('Valid if old password and email not changed present', async () => {
-    wrapper.vm.isEditUser = false;
-    wrapper.vm.userData.oldPassword = 'old password';
-    wrapper.vm.userData.email = 'email';
-    wrapper.vm.email = 'email'
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.passwordEmailValidity()).toEqual("");
-  });
-
   test('Invalid if password not match confirm password', async () => {
     wrapper.vm.isEditUser = false;
     wrapper.vm.userData.newPassword = 'bad password';
@@ -226,6 +156,31 @@ describe('Testing-password-validation-for-register', () => {
     wrapper.vm.userData.confirmPassword = 'password';
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.passwordMatchValidity()).toEqual("");
+  });
+});
+
+describe('Testing delete image when modifying user', () => {
+  test('Successfully remove an uploaded image', async () => {
+    wrapper.setProps({isEditUser: true});
+    wrapper.vm.userData.profileImage = '';
+    wrapper.vm.uploaded = true;
+
+    await wrapper.vm.openDeleteConfirmDialog();
+    await wrapper.vm.confirmDeleteImage();
+
+    expect(wrapper.vm.uploaded).toStrictEqual(false);
+    expect(Api.deleteUserProfileImage).not.toHaveBeenCalled();
+  });
+  test('Successfully delete a user image when one exists', async () => {
+    wrapper.setProps({ isEditUser: true });
+    wrapper.vm.userData.profileImage = '1'
+    wrapper.vm.uploaded = false;
+
+    await wrapper.vm.openDeleteConfirmDialog();
+    await wrapper.vm.confirmDeleteImage();
+
+    expect(wrapper.vm.userData.profileImage).toStrictEqual('');
+    expect(Api.deleteUserProfileImage).toHaveBeenCalled();
   });
 });
 
@@ -293,4 +248,27 @@ describe('Testing-api-post-upload-image-for-user', () => {
 
     expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
   });
+});
+
+
+describe('Testing-changing-password', () => {
+  beforeEach(() =>
+    wrapper.setProps({ isEditUser: true }));
+
+  test('newPassword is undefined if not changing password', async () => {
+    wrapper.vm.userData.newPassword = 'password';
+    wrapper.vm.userData.confirmPassword = 'password';
+    wrapper.vm.changePassword = false;
+
+    expect(wrapper.vm.getEditData().newPassword).toBeUndefined();
+  });
+
+  test('newPassword is set if changing password', async () => {
+    wrapper.vm.userData.newPassword = 'password';
+    wrapper.vm.userData.confirmPassword = 'password';
+    wrapper.vm.changePassword = true;
+
+    expect(wrapper.vm.getEditData().newPassword).toBe('password');
+  });
+
 });

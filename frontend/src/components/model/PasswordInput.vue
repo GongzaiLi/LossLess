@@ -8,7 +8,7 @@
                   class="form-control"
                   :id="id"
                   :placeholder="placeHolder"
-                  autocomplete="off"/>
+                  :autocomplete="autocomplete ? autocomplete : 'off'"/>
     <div class="input-group-prepend">
       <div class="input-group-text" @click="showPassword">
         <b-icon-eye-fill v-if="!visiblePassword"/>
@@ -21,7 +21,7 @@
 <script>
 export default {
   name: "password-input",
-  props:['value', 'id', 'placeHolder', 'isRequired'],
+  props:['value', 'id', 'placeHolder', 'isRequired', 'autocomplete'],
   data() {
     return {
       visiblePassword: false,

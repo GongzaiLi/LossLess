@@ -37,12 +37,28 @@
     </b-col>
     <b-col md="5">
     <b-card v-if="!$currentUser.currentlyActingAs" class="shadow mt-3">
-      <h3><b-icon-bell/> Notifications </h3>
+      <div>
+        <b-row>
+          <b-col cols="1">
+            <h3><b-icon-bell/></h3>
+          </b-col>
+          <b-col cols="6">
+            <h3>Notifications</h3>
+          </b-col>
+          <b-col cols="4">
+            <b-dropdown text="Filter By Tags" class="tag-filter-dropdown">
+              <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
+                <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
+              </b-dropdown-form>
+            </b-dropdown>
+          </b-col>
+        </b-row>
+      </div>
       <div class="notification-holder">
         <b-card v-if="notifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow">
+        <b-card v-for="notification in notifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
           <notification :notification="notification" :in-navbar="false"> </notification>
         </b-card>
       </div>
@@ -69,9 +85,13 @@
   margin-top: -3px;
 }
 
+.selected {
+  background-color: lightgray;
+}
 
 .notification-cards {
   margin-top: 20px;
+  /*cursor: pointer;*/
 }
 
 </style>
@@ -79,11 +99,12 @@
 <script>
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
+import NotificationTag from "../model/NotificationTag";
 import Notification from "../model/Notification";
 import EventBus from "../../util/event-bus"
 
 export default {
-  components: {MarketplaceSection, Notification},
+  components: {MarketplaceSection, Notification, NotificationTag},
   data: function () {
     return {
       userData: {
@@ -103,6 +124,15 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
+      tagColors: { //Tracks color to selected boolean
+        RED: false,
+        ORANGE: false,
+        YELLOW: false,
+        GREEN: false,
+        BLUE: false,
+        PURPLE: false,
+        BLACK: false,
+      },
     }
   },
 
@@ -113,6 +143,21 @@ export default {
   },
 
   methods: {
+    /**
+     * Toggles a color tags boolean value
+     */
+    toggleTagColorSelected: function (tagColor) {
+      this.tagColors[tagColor] = !this.tagColors[tagColor];
+      this.filterNotificationsByTag();
+    },
+    /**
+     * Requests the notifications using the tags param to select only those that match the selected tags
+     */
+    filterNotificationsByTag: async function () {
+      let tags = [];
+      Object.entries(this.tagColors).filter(([, value]) => value).forEach(([tag,]) => tags.push(tag));
+      this.notifications = (await Api.getNotifications(tags.join(","))).data;
+    },
     /**
      * this is a get api which can take Specific user to display on the page
      * The function id means user's id, if the serve find -
@@ -129,12 +174,9 @@ export default {
             this.$log.debug(error);
           })
     },
-
-
     checkExpiredCardsExist(cards) {
       this.hasExpiredCards = cards.length !== 0;
     },
-
     /**
      * Updates the notifications using the notification api requests and updates whether the user has
      * cards that have expired.
@@ -145,7 +187,15 @@ export default {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications()).data;
+    },
 
+    /**
+     * Performs an action based on the notification that has been clicked.
+     * @param notification the notification that has been clicked
+     */
+    async notificationClicked(notification) {
+      notification.read = true
+      EventBus.$emit('notificationClicked', notification);
     },
 
   },
