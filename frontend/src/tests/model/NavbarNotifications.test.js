@@ -3,6 +3,7 @@ import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import NotificationDropdown from '../../components/model/NotificationDropdown'; // name of your Vue component
 import Auth from '../../auth'
 import Api from '../../Api'
+import EventBus from "../../util/event-bus";
 
 let wrapper;
 
@@ -73,6 +74,37 @@ const expiringCards = [
   }
 ]
 
+const notifications = [
+  {
+    id: 4,
+    message: "Some message - 420g can",
+    subjectId: 1,
+    type: "Some type",
+    read: true
+  },
+  {
+    id: 5,
+    message: "5 x Something else - 123g can",
+    price: "$123.99 NZD",
+    subjectId: 1,
+    type: "Some type",
+    read: false
+  },
+
+  {
+    id: 6,
+    message: "A notification about Pink collars maybe - 69g can",
+    subjectId: 1,
+    type: "Some type",
+    read: false
+  }
+]
+
+const $log = {
+  debug() {
+  }
+};
+
 jest.mock('../../Api');
 
 beforeEach(() => {
@@ -98,12 +130,13 @@ beforeEach(() => {
 
   Api.getExpiredCards.mockResolvedValue({data: expiringCards});
   Api.clearHasCardsExpired.mockResolvedValue({response: {status: 200}});
-  Api.getNotifications.mockResolvedValue({data: []});
+  Api.getNotifications.mockResolvedValue({data: notifications});
+  Api.patchNotification.mockResolvedValue({data: ""});
 
   wrapper = mount(NotificationDropdown, {
     localVue,
     propsData: {},
-    mocks: {$route, $router, $currentUser, displayPeriodEnd: { split: 'asd'  }},
+    mocks: {$route, $router, $currentUser, $log, displayPeriodEnd: { split: 'asd'  }},
     stubs: ['router-link'],
     methods: {},
     computed: {},
@@ -125,7 +158,7 @@ describe('Get expiring cards', () => {
   test('cards expiring within 24 hours get added to notifications', async () => {
     await wrapper.vm.updateNotifications();
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numberOfNotifications).toBe(2);
+    expect(wrapper.vm.numberOfNotifications).toBe(4);
   })
 
 
@@ -133,8 +166,20 @@ describe('Get expiring cards', () => {
     test('cards expiring within 24 hours get added to notifications', async () => {
       await wrapper.vm.updateNotifications();
       await wrapper.vm.$nextTick();
-      expect(wrapper.vm.numberOfNotifications).toBe(2);
+      expect(wrapper.vm.numberOfNotifications).toBe(4);
     })
   });
 
 });
+
+
+describe('Get unread notifications', () => {
+
+  test('Unread notifications from the list of all the notifications', async () => {
+    await wrapper.vm.updateNotifications();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.numberOfNotifications).toBe(4);
+  })
+
+});
+

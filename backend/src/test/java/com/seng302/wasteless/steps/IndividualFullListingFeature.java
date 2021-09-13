@@ -23,6 +23,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import static com.seng302.wasteless.TestUtils.createListingWithNameAndPrice;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -176,13 +177,13 @@ public class IndividualFullListingFeature {
 
     @Then("A new notification is created for me telling me I liked the listing with id {string}")
     public void aNewNotificationIsCreatedForMeTellingMeILikedTheListingWithId(String id) {
-        List<Notification> currentUserNotifications = notificationService.findAllUnArchivedNotificationsByUserId(currentUser.getId());
+        List<Notification> currentUserNotifications = notificationService.filterNotifications(currentUser.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
         Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals(NotificationType.LIKEDLISTING)));
     }
 
     @Then("A new notification is created for me telling me I unliked the listing with id {string}")
     public void aNewNotificationIsCreatedForMeTellingMeIUnlikedTheListingWithId(String id) {
-        List<Notification> currentUserNotifications = notificationService.findAllUnArchivedNotificationsByUserId(currentUser.getId());
+        List<Notification> currentUserNotifications = notificationService.filterNotifications(currentUser.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
         Assertions.assertTrue(currentUserNotifications.stream().anyMatch(notification -> notification.getSubjectId().equals(Integer.parseInt(id)) && notification.getType().equals(NotificationType.UNLIKEDLISTING)));
 
     }

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
@@ -54,7 +53,6 @@ public class PurchasedListing {
     private LocalDate listingDate;
 
     @NotNull
-    @FutureOrPresent
     @JoinColumn(name = "closing_date")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private LocalDate closingDate;

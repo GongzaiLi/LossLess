@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -266,6 +267,6 @@ public class CardExpiryFeature {
 
     @Then("I am notified")
     public void iAmNotified() {
-        Assertions.assertEquals(1,notificationService.findAllUnArchivedNotificationsByUserId(user.getId()).size());
+        Assertions.assertEquals(1,notificationService.filterNotifications(user.getId(), Optional.ofNullable(null), Optional.ofNullable(null)).size());
     }
 }

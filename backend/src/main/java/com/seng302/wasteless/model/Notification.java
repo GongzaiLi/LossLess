@@ -47,7 +47,7 @@ public class Notification {
     @Column(name = "created")
     private LocalDateTime created;
 
-    @Column(name = "read")
+    @Column(name = "notification_read") //Was called "read". Which was a reserved word in MariaDB. Had to be renamed!
     private Boolean read = false;
 
     @Column(name = "archived")

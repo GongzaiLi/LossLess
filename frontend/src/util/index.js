@@ -83,3 +83,4 @@ export function formatAddress(address, privacyLevel) {
 
   return addressString.trimEnd();
 }
+

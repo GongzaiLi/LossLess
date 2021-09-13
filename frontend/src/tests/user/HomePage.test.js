@@ -87,6 +87,7 @@ beforeEach(() => {
     Api.getUser.mockResolvedValue(response);
     Api.getNotifications.mockResolvedValue({data: []});
     Api.getExpiredCards.mockResolvedValue({data: []});
+    Api.deleteNotification = jest.fn();
 
     wrapper = shallowMount(homePage, {
         localVue,
@@ -136,5 +137,164 @@ describe('check-that-expired-table-only-shows-when-necessary', () => {
 
 });
 
+describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => {
+    test('no-tags-selected-expect-call-with-empty-string', async () => {
 
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.filterNotificationsByTag();
+        expect(Api.getNotifications).toBeCalledWith("")
+    });
+
+    test('all-tags-selected-expect-call-with-all-tags', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: true,
+            ORANGE: true,
+            YELLOW: true,
+            GREEN: true,
+            BLUE: true,
+            PURPLE: true,
+            BLACK: true,
+        };
+
+        await wrapper.vm.filterNotificationsByTag();
+        expect(Api.getNotifications).toBeCalledWith("RED,ORANGE,YELLOW,GREEN,BLUE,PURPLE,BLACK")
+    });
+
+    test('some-tags-selected-expect-call-with-those-tags-only', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: true,
+            YELLOW: true,
+            GREEN: false,
+            BLUE: true,
+            PURPLE: false,
+            BLACK: true,
+        };
+
+        await wrapper.vm.filterNotificationsByTag();
+        expect(Api.getNotifications).toBeCalledWith("ORANGE,YELLOW,BLUE,BLACK")
+    });
+
+});
+
+describe('check-undo-deleted-functionality', () => {
+    test('if-pendingDeletedNotification-then-pendingDeletedNotification-is-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=1
+        await wrapper.vm.createDeleteToast(1);
+        expect(Api.deleteNotification).toHaveBeenCalled();
+    });
+    test('if-no-pendingDeletedNotification-then-pendingDeletedNotification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=false
+        await wrapper.vm.createDeleteToast(1);
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+    test('if-undoDelete-prevents-from-being-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=1
+        await wrapper.vm.undoDelete();
+        await wrapper.vm.deleteNotification();
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+});
+
+describe('check-router-guard-functionality', () => {
+    test('if-route-is-changed-while-pending-notifications-and-window-is-confirmed-notification-is-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=1
+        window.confirm = jest.fn(() => true)
+        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
+        expect(Api.deleteNotification).toHaveBeenCalled();
+    });
+    test('if-route-is-changed-while-no-pending-notifications-notification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=false
+        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+    test('if-route-is-changed-while-pending-notifications-and-window-is-cancelled-notification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=1
+        window.confirm = jest.fn(() => false)
+        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+});
+
+
+describe('test-toggleTagColorSelected-works-correctly', () => {
+    test('toggle-red-tag-from-true-to-false', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: true,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("RED");
+        expect(wrapper.vm.tagColors.RED).toStrictEqual(false);
+    });
+
+    test('toggle-red-tag-from-false-to-true', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("RED");
+        expect(wrapper.vm.tagColors.RED).toStrictEqual(true);
+    });
+
+    test('toggle-black-and-blue-tags-from-false-to-true', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: false,
+            PURPLE: false,
+            BLACK: false,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("BLACK");
+        await wrapper.vm.toggleTagColorSelected("BLUE");
+        expect(wrapper.vm.tagColors.BLACK).toStrictEqual(true);
+        expect(wrapper.vm.tagColors.BLUE).toStrictEqual(true);
+    });
+
+    test('toggle-black-and-blue-tags-from-true-to-false', async () => {
+
+        wrapper.vm.tagColors = {
+            RED: false,
+            ORANGE: false,
+            YELLOW: false,
+            GREEN: false,
+            BLUE: true,
+            PURPLE: false,
+            BLACK: true,
+        };
+
+        await wrapper.vm.toggleTagColorSelected("BLACK");
+        await wrapper.vm.toggleTagColorSelected("BLUE");
+        expect(wrapper.vm.tagColors.BLACK).toStrictEqual(false);
+        expect(wrapper.vm.tagColors.BLUE).toStrictEqual(false);
+    });
+})
 

@@ -37,13 +37,29 @@
     </b-col>
     <b-col md="5">
     <b-card v-if="!$currentUser.currentlyActingAs" class="shadow mt-3">
-      <h3><b-icon-bell/> Notifications </h3>
+      <div>
+        <b-row>
+          <b-col cols="1">
+            <h3><b-icon-bell/></h3>
+          </b-col>
+          <b-col cols="6">
+            <h3>Notifications</h3>
+          </b-col>
+          <b-col cols="4">
+            <b-dropdown text="Filter By Tags" class="tag-filter-dropdown">
+              <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
+                <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
+              </b-dropdown-form>
+            </b-dropdown>
+          </b-col>
+        </b-row>
+      </div>
       <div class="notification-holder">
         <b-card v-if="filteredNotifications.length === 0" class="notification-cards shadow">
           <h6> You have no notifications </h6>
         </b-card>
-        <b-card v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" >
-          <notification  :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
+        <b-card v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
+          <notification :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
         </b-card>
       </div>
     </b-card>
@@ -79,9 +95,13 @@
   margin-top: -3px;
 }
 
+.selected {
+  background-color: lightgray;
+}
 
 .notification-cards {
   margin-top: 20px;
+  /*cursor: pointer;*/
 }
 
 .b-toaster-bottom-right .b-toaster-slot{
@@ -94,6 +114,7 @@
 <script>
 import Api from "../../Api";
 import MarketplaceSection from "../marketplace/MarketplaceSection";
+import NotificationTag from "../model/NotificationTag";
 import Notification from "../model/Notification";
 import EventBus from "../../util/event-bus"
 
@@ -104,7 +125,7 @@ const beforeUnloadListener = (event) => {
 
 
 export default {
-  components: {MarketplaceSection, Notification},
+  components: {MarketplaceSection, Notification, NotificationTag},
   data: function () {
     return {
       userData: {
@@ -124,6 +145,15 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
+      tagColors: { //Tracks color to selected boolean
+        RED: false,
+        ORANGE: false,
+        YELLOW: false,
+        GREEN: false,
+        BLUE: false,
+        PURPLE: false,
+        BLACK: false,
+      },
       pendingDeletedNotification:false,
       undo:false,
     }
@@ -136,6 +166,21 @@ export default {
   },
 
   methods: {
+    /**
+     * Toggles a color tags boolean value
+     */
+    toggleTagColorSelected: function (tagColor) {
+      this.tagColors[tagColor] = !this.tagColors[tagColor];
+      this.filterNotificationsByTag();
+    },
+    /**
+     * Requests the notifications using the tags param to select only those that match the selected tags
+     */
+    filterNotificationsByTag: async function () {
+      let tags = [];
+      Object.entries(this.tagColors).filter(([, value]) => value).forEach(([tag,]) => tags.push(tag));
+      this.notifications = (await Api.getNotifications(tags.join(","))).data;
+    },
     /**
      * this is a get api which can take Specific user to display on the page
      * The function id means user's id, if the serve find -
@@ -152,12 +197,9 @@ export default {
             this.$log.debug(error);
           })
     },
-
-
     checkExpiredCardsExist(cards) {
       this.hasExpiredCards = cards.length !== 0;
     },
-
     /**
      * Updates the notifications using the notification api requests and updates whether the user has
      * cards that have expired.
@@ -169,9 +211,7 @@ export default {
       }
       this.notifications = (await Api.getNotifications()).data;
       this.pendingDeletedNotification = false;
-
     },
-
     /**
      * Creates the toast notification to allow user to undo delete within 10 seconds
      * Sets pendingDeletedNotification so this notification is removed from the list
@@ -205,6 +245,14 @@ export default {
     },
 
     /**
+     * Performs an action based on the notification that has been clicked.
+     * @param notification the notification that has been clicked
+     */
+    async notificationClicked(notification) {
+      notification.read = true
+      EventBus.$emit('notificationClicked', notification);
+    },
+    /**
      * Hides the toast notification and prevents deleteNotification from sending api request
      * Adds pendingDeletedNotification back into displayed list
      * removes listener that prevents user from navigating away
@@ -222,7 +270,7 @@ export default {
      */
     confirmLeave(){
       if (this.pendingDeletedNotification) {
-        return window.confirm('Do you really want to leave? Your notification deletion has not been confirmed')
+        return window.confirm('Are you sure you would like to change the page? You will not be unable to undo the pending notification deletion')
       }
       return true
     },
@@ -250,6 +298,7 @@ export default {
 
   beforeRouteLeave (to, from, next) {
     if (this.confirmLeave()) {
+      this.deleteNotification()
       next()
     } else {
       next(false)

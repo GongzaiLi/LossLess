@@ -8,8 +8,10 @@
       <p class="sub-title">Ends: {{ formatExpiry }}</p>
       <hr>
       <b-card-text>
-        <p class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+        <p  v-if="cardInfo.description" class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+        <p v-else class="sub-title" style="line-height: 1.2em;">No Description</p>
       </b-card-text>
+
       <hr>
       <b-card-text class="single-line-clamped">
         Tags: <b-badge v-for="keyword in this.cardInfo.keywords" :key="keyword" class="ml-1">{{keyword}}</b-badge>
@@ -93,7 +95,7 @@ export default {
      */
     formatExpiry: function () {
       return new Date(this.cardInfo.displayPeriodEnd).toString().split(" ").slice(0, 4).join(" ");
-    }
+    },
   }
 }
 </script>

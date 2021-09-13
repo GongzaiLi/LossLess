@@ -8,6 +8,7 @@ config.showDeprecationWarnings = false  //to disable deprecation warnings
 
 let mockListing;
 let notification;
+let collarNotification;
 
 let $route;
 let $router;
@@ -65,6 +66,14 @@ beforeEach(() => {
         "created": "2000-07-14T11:44:00Z",
         "closes": "2021-07-21T23:59:00Z"
     };
+
+    collarNotification = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
 
 
     Api.getPurchaseListing.mockResolvedValue({data: mockListing});
@@ -143,7 +152,7 @@ describe('check deleting api call is correct', async () => {
     test('check emitted correctly', async () =>  {
         wrapper.vm.updatedNotification.id = 1;
         await wrapper.vm.$forceUpdate();
-        await wrapper.vm.deleteToast();
+        await wrapper.vm.notificationDeleted();
         expect(wrapper.emitted().deleteNotification[0]).toEqual([1])
     });
 
@@ -165,3 +174,76 @@ describe('Route based on clicked notification', () => {
         expect($router.push).toHaveBeenCalledTimes(0);
     })
 });
+
+describe('Clicking a notification', () => {
+
+    const collarNotificationEmitted = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
+
+    test('Notification set to read on click', async () => {
+
+        wrapper.vm.updatedNotification = collarNotification;
+        await wrapper.vm.$forceUpdate();
+        await wrapper.vm.markRead(collarNotificationEmitted);
+        expect(Api.patchNotification).toBeCalledWith(6,{"read": true})
+
+    })
+
+});
+
+describe('Add/alter/remove notification tag color api call correct', () => {
+
+    test('Change color to red', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("RED");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "RED"})
+    });
+
+    test('Change color to orange', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("ORANGE");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "ORANGE"})
+    });
+
+    test('Change color to yellow', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("YELLOW");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "YELLOW"})
+    });
+
+    test('Change color to green', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("GREEN");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "GREEN"})
+    });
+
+    test('Change color to blue', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("BLUE");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "BLUE"})
+    });
+
+    test('Change color to purple', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("PURPLE");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "PURPLE"})
+    });
+
+    test('Change color to black', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("BLACK");
+        expect(Api.patchNotification).toBeCalledWith( 1,{"tag": "BLACK"})
+    });
+
+    test('Remove color', async () => {
+        wrapper.vm.updatedNotification.id = 1;
+        await wrapper.vm.setNotificationTagColor("remove");
+        expect(Api.patchNotification).toBeCalledWith(1,{"tag": null})
+    });
+});
+

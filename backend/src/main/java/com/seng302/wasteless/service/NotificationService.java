@@ -1,17 +1,19 @@
 package com.seng302.wasteless.service;
 
 
-import com.seng302.wasteless.model.Notification;
-import com.seng302.wasteless.model.NotificationType;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.NotificationRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,12 +45,55 @@ public class NotificationService {
     }
 
     /**
-     * Get notifications for user that have not been archived
-     * @param userId        The id of the user to get notifications for
-     * @return          The found notifications, if any otherwise empty list
+     * Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
+     * @param userId    The id of the user to get notifications for
+     * @return          Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
      */
-    public List<Notification> findAllUnArchivedNotificationsByUserId(Integer userId) {
-        return  notificationRepository.findByUserIdAndArchivedOrderByStarredDescCreatedDesc(userId, false);
+    public static Specification<Notification> filterAllUnArchivedNotificationsByUserId(Integer userId) {
+        Specification<Notification> findUser = (root, query, builder) -> builder.equal(root.get("userId"), userId);
+        return findUser.and((root, query, builder) -> builder.isFalse(root.get("archived")));
+    }
+
+    /**
+     * Returns a Specification that matches all notifications with filter All Archived Notifications By User ID
+     * @param userId    The id of the user to get notifications for
+     * @return          Returns a Specification that matches all notifications with filter All UnArchived Notifications By User ID
+     */
+    public static Specification<Notification> filterAllArchivedNotificationsByUserId(Integer userId) {
+        Specification<Notification> findUser = (root, query, builder) -> builder.equal(root.get("userId"), userId);
+        return findUser.and((root, query, builder) -> builder.isTrue(root.get("archived")));
+    }
+
+    /**
+     * Returns a Specification that matches all notifications with filter Notification Tags
+     * @param tags list of Notification tags to match Notifications
+     * @return Returns a Specification that matches all notifications with filter Notification Tags
+     */
+    private Specification<Notification> filterNotificationTags(List<String> tags) {
+        List<NotificationTag> notificationTags = new ArrayList<>();
+        for (String tag : tags) {
+            if (!tag.isEmpty()) {
+                notificationTags.add(NotificationTag.valueOf(tag.toUpperCase()));
+            }
+        }
+        return (root, query, builder) -> root.get("tag").in(notificationTags);
+    }
+
+
+    /**
+     * filter Notification by User id and Notification tags.
+     * Finds all archived notifications if archived param is present and true.
+     *
+     * @param userId The id of the user to get notifications for
+     * @param tags list of Notification tags to match Notifications (can be null)
+     * @param archived A boolean, true if the user wants archived notifications
+     * @return The found notifications, if any otherwise empty list
+     */
+    public List<Notification> filterNotifications(Integer userId, Optional<List<String>> tags, Optional<Boolean> archived) {
+        Specification<Notification> querySpec = filterAllUnArchivedNotificationsByUserId(userId);
+        if (archived.isPresent() && archived.get()) querySpec = filterAllArchivedNotificationsByUserId(userId);
+        if (tags.isPresent()) querySpec = querySpec.and(filterNotificationTags(tags.get()));
+        return notificationRepository.findAll(querySpec, Sort.by("starred").descending().and(Sort.by("created").descending()));
     }
 
     /**

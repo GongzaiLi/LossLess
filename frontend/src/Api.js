@@ -80,7 +80,7 @@ export default {
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiredCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
-  getNotifications: () => instance.get(`/users/notifications`, {withCredentials: true}),
+  getNotifications: (tags) => instance.get(`/users/notifications${tags != null ? `?tags=${tags}`: ''}`, {withCredentials: true}),
   patchNotification: (id, data) => instance.patch(`/notifications/${id}`, data, {withCredentials: true}),
   deleteNotification: (id) => instance.delete(`/notifications/${id}`, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
@@ -115,6 +115,7 @@ export default {
   },
   likeListing: (listingId) => instance.put(`/listings/${listingId}/like`, {}, {withCredentials: true}),
   modifyUser: (editUserData, userId) => instance.put(`/users/${userId}`, editUserData, {withCredentials: true}),
+  deleteUserProfileImage: (userId) => instance.delete(`/users/${userId}/image`, {withCredentials: true}),
   getSalesReport: (businessId, startDate, endDate, period) => instance.get(`/businesses/${businessId}/salesReport/totalPurchases`,
     {
       withCredentials: true,

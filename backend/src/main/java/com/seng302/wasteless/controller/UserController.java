@@ -35,7 +35,9 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * UserController is used for mapping all Restful API requests starting with the address "/users".
@@ -242,15 +244,19 @@ public class UserController {
     }
 
     /**
-     * Endpoint to GET all notifications of the logged in user
-     *
-     * @return  200 OK if succesful request, With all notifications for logged in user
+     * Endpoint to GET all notifications of the logged-in user
+     * @param tags list of Notification tags to match Notifications (can be null)
+     * @param archived A boolean, true if the user wants archived notifications
+     * @return 200 OK if successful request, With all notifications for logged in user
      */
     @GetMapping("/users/notifications")
-    public ResponseEntity<Object> getNotifications() {
+    public ResponseEntity<Object> getNotifications(@RequestParam(value = "tags") Optional<List<String>> tags,
+                                                   @RequestParam(value = "archived") Optional<Boolean> archived) {
         User user = userService.getCurrentlyLoggedInUser();
         logger.info("Request to get notifications for user: {}", user.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(notificationService.findAllUnArchivedNotificationsByUserId(user.getId()));
+
+        List<Notification> getNotifications = notificationService.filterNotifications(user.getId(), tags, archived);
+        return ResponseEntity.status(HttpStatus.OK).body(getNotifications);
     }
 
     /**
@@ -370,6 +376,16 @@ public class UserController {
 
         boolean userModifyingThemselves = loggedInUser.getId().equals(userToModify.getId());
         boolean userCountryChanged = !modifiedUser.getHomeAddress().getCountry().equals(userToModify.getHomeAddress().getCountry());
+
+        if (userModifyingThemselves && modifiedUser.getNewPassword() != null) {
+            if (modifiedUser.getPassword() == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password required when updating password");
+            }
+            if (!passwordEncoder.matches(modifiedUser.getPassword(), userToModify.getPassword())) {
+                logger.warn("Attempted to update user but password is incorrect, dropping request: {}", modifiedUser);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+            }
+        }
 
         userService.modifyUserDateOfBirth(userToModify, modifiedUser.getDateOfBirth());
         userService.modifyUserHomeAddress(userToModify, modifiedUser.getHomeAddress());

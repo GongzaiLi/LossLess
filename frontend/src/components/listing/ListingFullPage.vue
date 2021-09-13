@@ -29,7 +29,7 @@
                   id="carousel-1"
                   :controls="listingItem.inventoryItem.product.images.length > 1"
                   indicators
-                  no-animation="true"
+                  :no-animation="true"
                   aria-busy="false"
                   :interval="0"
                   ref="image_carousel"
