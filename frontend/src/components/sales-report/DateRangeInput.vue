@@ -106,11 +106,11 @@ export default {
     },
     /**
      * Convenience function that returns the first day of this week.
-     * Weeks start on Sundays.
+     * Weeks start on Mondays.
      */
     currentWeek() {
       const today = new Date();
-      today.setDate(today.getDate() - today.getDay());
+      today.setDate(today.getDate() - today.getDay() + 1);
       return today;
     },
     /**
