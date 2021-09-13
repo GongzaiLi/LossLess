@@ -130,13 +130,9 @@ Date: 3/3/2021
     <br>
 
     <b-modal ref="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete" @ok="confirmDeleteImage">
-      <h6 v-if="uploaded">
+      <h6>
         Are you sure you want to <strong>delete</strong> this image?
-      </h6>
-      <h6 v-else>
-        Are you sure you want to <strong>delete</strong> this image?
-        <br>
-        It will be permanently deleted from your account.
+        <strong><br>{{!uploaded ? "It will be permanently deleted from your account.": ""}}</strong>
       </h6>
     </b-modal>
   </div>
