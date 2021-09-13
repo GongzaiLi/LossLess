@@ -238,12 +238,30 @@ describe('check groupBy resets when date range narrowed', () => {
     expect(wrapper.vm.groupByOptions).toStrictEqual({day: 'Daily'});
   });
 
-  it('Doesnt change groupBy when range increases from one day to two years', async () => {
+  it('Goes to year when range increases from one day to two years', async () => {
     wrapper.vm.groupBy = 'day'
     const dateRange = [new Date(2020, 0, 1), new Date(2021, 11, 31)];
     await wrapper.vm.getSalesReport(dateRange);
 
-    expect(wrapper.vm.groupBy).toBe('day');
+    expect(wrapper.vm.groupBy).toBe('year');
+    expect(wrapper.vm.groupByOptions).toStrictEqual({
+      "day": "Daily",
+      "month": "Monthly",
+      "week": "Weekly",
+      "year": "Yearly",
+    });
+  });
+
+  it('Does not change when only groupBy changes', async () => {
+    wrapper.vm.groupBy = 'year';
+    const dateRange = [new Date(2020, 0, 1), new Date(2021, 11, 31)];
+    wrapper.vm.dateRange = dateRange;
+    await wrapper.vm.getSalesReport(dateRange);
+
+    wrapper.vm.groupBy = 'month';
+    await wrapper.vm.getSalesReport(dateRange);
+
+    expect(wrapper.vm.groupBy).toBe('month');
     expect(wrapper.vm.groupByOptions).toStrictEqual({
       "day": "Daily",
       "month": "Monthly",

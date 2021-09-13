@@ -150,10 +150,10 @@ export default {
      * @param dateRange
      **/
     getSalesReport: async function (dateRange) {
-      this.dateRange = dateRange;
-      // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
-      // so if the selected option has been invalidated, then select the last available options.
-      if (!this.groupByOptions[this.groupBy]) {
+      if (this.dateRange !== dateRange) {
+        this.dateRange = dateRange;
+        // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
+        // so if the selected option has been invalidated, then select the last available options.
         const optionNames = Object.keys(this.groupByOptions);
         this.groupBy = optionNames[optionNames.length - 1];
       }
