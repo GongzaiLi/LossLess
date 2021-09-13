@@ -57,8 +57,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Autowired
     private UserService userService;
 
-   @Autowired
-   private PurchasedListingRepository purchasedListingRepository;
+    @Autowired
+    private PurchasedListingRepository purchasedListingRepository;
 
     private User user;
 
