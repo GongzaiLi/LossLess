@@ -56,7 +56,6 @@
 </template>
 
 <script>
-import api from "../../Api";
 import Api from "../../Api";
 import {formatAddress} from "../../util";
 export default {
@@ -85,9 +84,8 @@ export default {
      * determined by the given cardId.
      */
     getCard() {
-      api.getFullCard(this.cardId)
+      Api.getFullCard(this.cardId)
         .then((resp) => {
-          this.$log.debug("Data loaded: ", resp.data);
           this.fullCard = resp.data;
       }).catch((error) => {
           this.$log.debug(error);
