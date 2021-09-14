@@ -275,3 +275,21 @@ describe('test-toggle-archived-notifications', () => {
     });
 })
 
+describe('Test notification clicked', () => {
+
+    const collarNotification = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
+
+    test('Notification set to read on click', async () => {
+        await wrapper.vm.notificationClicked(collarNotification);
+        expect(collarNotification.read).toBeTruthy();
+
+    })
+
+});
+

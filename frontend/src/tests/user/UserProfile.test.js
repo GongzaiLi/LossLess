@@ -80,17 +80,17 @@ describe('fullname-computed', () => {
     wrapper.vm.userData.firstName = "First";
     wrapper.vm.userData.lastName = "Last";
     wrapper.vm.userData.middleName = "Middle";
-    wrapper.vm.userData.nickName = "Nick";
+
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Middle Last (Nick)");
+    expect(wrapper.vm.fullName).toEqual("First Middle Last");
   });
 
   test('first-and-last-and-nick-name', async () => {
     wrapper.vm.userData.firstName = "First";
     wrapper.vm.userData.lastName = "Last";
-    wrapper.vm.userData.nickName = "Nick";
+
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Last (Nick)");
+    expect(wrapper.vm.fullName).toEqual("First Last");
   });
 })
 
