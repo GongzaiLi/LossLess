@@ -188,7 +188,6 @@ export default {
      * @return image    The primary image thumbnail
      **/
     getThumbnail: function (product) {
-      console.log(product.primaryImage)
       const primaryImageFileName = product.primaryImage.thumbnailFilename;
       return api.getImage(primaryImageFileName);
     }
