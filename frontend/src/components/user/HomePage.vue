@@ -320,7 +320,9 @@ export default {
 
   beforeRouteLeave (to, from, next) {
     if (this.confirmLeave()) {
-      this.deleteNotification()
+      this.pendingDeletedNotifications.forEach(notif =>
+      this.deleteNotification(notif)
+      )
       next()
     } else {
       next(false)
