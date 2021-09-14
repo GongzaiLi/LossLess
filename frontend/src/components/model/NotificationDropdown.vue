@@ -36,7 +36,7 @@ export default {
       notifications: [],
       expiringCards: [],
       notificationChange: true,
-      pendingDeletedNotification:false
+      pendingDeletedNotification:[]
     }
   },
   computed: {
@@ -58,7 +58,7 @@ export default {
     unreadNotifications: function () {
       let unreadNotifications = []
       for (const notification of this.notifications) {
-        if (!notification.read&&notification.id!=this.pendingDeletedNotification) {
+        if (!notification.read&&!this.pendingDeletedNotification.includes(notification.id)) {
           unreadNotifications.push(notification)
         }
       }
