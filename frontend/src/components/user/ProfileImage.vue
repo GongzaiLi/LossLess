@@ -18,7 +18,7 @@
       <b-button v-if="!profileImage" variant="info" class="w-100 mt-2 mb-4" size="sm" @click="$refs.userImagePicker.click()">
         <b-icon-image/> Add profile photo
       </b-button>
-      <b-button v-if="profileImage" class="w-50 mt-2 mb-4" variant="danger" size="sm" title="Delete image" @click="$bvModal.show('confirmDeleteImageModal')">
+      <b-button v-if="profileImage" class="w-50 mt-2 mb-4" variant="danger" size="sm" @click="$bvModal.show('confirmDeleteImageModal')">
         <b-icon-trash-fill/> Delete
       </b-button>
       <b-button v-if="profileImage" variant="info" class="w-50 mt-2 mb-4" size="sm" @click="$refs.userImagePicker.click()">
