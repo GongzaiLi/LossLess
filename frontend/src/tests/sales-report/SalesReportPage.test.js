@@ -55,6 +55,9 @@ const $currentUser = {
   ]
 };
 
+// This 'mocks' out the html canvas as it's not implemented by the jsdom by default
+// CALEB IS A GENIUS
+document.getElementById = () => document.createElement('canvas');
 
 jest.mock('../../Api');
 

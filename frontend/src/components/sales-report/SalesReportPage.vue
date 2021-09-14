@@ -25,38 +25,42 @@ Date: sprint_6
         </b-list-group-item>
         <b-list-group-item v-show="totalResults">
           <b-row>
-            <b-col cols="2"><h3>Sales Details</h3></b-col>
-            <b-col cols="2">
-              <b-form-select v-model="groupBy" id="periodSelector"
-                             @change="getSalesReport(dateRange)">
-                <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
-                    name
-                  }}
-                </option>
-              </b-form-select>
-            </b-col>
-          </b-row>
-          <b-row>
             <b-col class="mt-2">
-              <b-table
-                  ref="salesReportTable"
-                  no-border-collapse
-                  no-local-sorting
-                  striped
-                  :items="groupedResults"
-                  :fields="fields"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  responsive="lg"
-                  bordered
-                  show-empty>
-                <template #empty>
-                  <h3 class="no-results-overlay">No results to display</h3>
-                </template>
-              </b-table>
+              <b-row>
+                <b-col cols="4"><h3>Sales Details</h3></b-col>
+                <b-col cols="4">
+                  <b-form-select v-model="groupBy" id="periodSelector"
+                                 @change="getSalesReport(dateRange)">
+                    <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
+                        name
+                      }}
+                    </option>
+                  </b-form-select>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col>
+                  <b-table
+                      ref="salesReportTable"
+                      no-border-collapse
+                      no-local-sorting
+                      striped
+                      :items="groupedResults"
+                      :fields="fields"
+                      :per-page="perPage"
+                      :current-page="currentPage"
+                      responsive="lg"
+                      bordered
+                      show-empty>
+                    <template #empty>
+                      <h3 class="no-results-overlay">No results to display</h3>
+                    </template>
+                  </b-table>
+                </b-col>
+              </b-row>
             </b-col>
             <b-col>
-              <canvas id="sales-report-graph"/>
+              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy"></SalesReportGraph>
             </b-col>
           </b-row>
           <b-row>
@@ -95,11 +99,11 @@ Date: sprint_6
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
-import Chart from "chart.js/auto";
+import SalesReportGraph from "./SalesReportGraph";
 
 export default {
   name: "sales-report-page",
-  components: {DateRangeInput},
+  components: {SalesReportGraph, DateRangeInput},
   data: function () {
     return {
       business: {},
@@ -110,7 +114,6 @@ export default {
       currentPage: 1,
       perPage: 10,
       dateRange: [],
-      chart: null
     }
   },
 
@@ -165,60 +168,10 @@ export default {
         await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
             .then((response) => {
               this.updateTotalResults(startDate, endDate, response.data);
-              this.updateGraph(response.data);
               this.groupedResults = response.data;
             }).catch((error) => {
               this.$log.debug("Error message", error);
             });
-      }
-    },
-
-    updateGraph: function(data) {
-      const cfg = {
-        type: 'bar',
-        data: {
-          datasets: [{
-            label: 'Total Sales',
-            data: data,
-            backgroundColor: ['#005fc5'],
-            parsing: {
-              yAxisKey: 'totalPurchases',
-              xAxisKey: 'startDate'
-            }}]
-        },
-        options: {
-          aspectRatio: 1.4,
-          plugins: {
-            tooltip: {
-              callbacks: {
-                afterLabel: function(t) {
-                  return `Total Value: ${t.raw.totalValue}`;
-                },
-              }
-            },
-          },
-          scales: {
-            yAxis: {
-              type: 'linear',
-              ticks: {
-                // forces step size to be 50 units
-                stepSize: 1
-              }
-            }
-          }
-        }
-      };
-      if (this.chart === null) {
-        this.chart = new Chart(
-                document.getElementById('sales-report-graph').getContext('2d'),
-                cfg,
-            );
-      } else {
-        this.chart.data.labels = [];
-        this.chart.data.datasets.forEach((dataset) => {
-          dataset.data = data;
-        });
-        this.chart.update();
       }
     },
 
