@@ -16,7 +16,10 @@ Date: 5/3/2021
             <b-col md="2">
               <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                      alt="User Profile Image" width="75" height="75" class="rounded-circle"
-                     style="margin-left: 5px; position: relative"></b-img>
+                     id="profile-image"
+                     title="View profile image"
+                     @click="$bvModal.show('edit-profile-image')"
+              />
             </b-col>
             <b-col md="10" class="mt-2">
               <b-row>
@@ -24,7 +27,7 @@ Date: 5/3/2021
                   <b-icon-pencil-fill
                       v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
                       v-b-tooltip.hover
-                      title="Edit Profile"
+                      title="Edit Profile Details"
                       id="editProfile"
                       @click="editUserModel"
                       style="cursor: pointer;"
@@ -162,6 +165,10 @@ Date: 5/3/2021
     <b-modal id="edit-user-profile" title="Update User Profile" hide-footer scrollable>
       <UserDetailsModal :is-edit-user="true" :logged-in-user-admin="loggedInUserAdmin" :user-details="userData" v-on:updatedUser="updatedUserHandler" v-on:updateImage="updatedImageHandler"/>
     </b-modal>
+
+    <b-modal id="edit-profile-image" title="Profile Image" hide-footer>
+      <ProfileImage :details="userData.profileImage" :userLookingAtSelfOrIsAdmin=userLookingAtSelfOrIsAdmin />
+    </b-modal>
   </div>
 </template>
 
@@ -175,19 +182,33 @@ Date: 5/3/2021
 h6 {
   line-height: 1.4;
 }
+
+#profile-image {
+  margin-left: 5px;
+  position: relative
+}
+
+#profile-image:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+
 </style>
 
 <script>
 import api from "../../Api";
 import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
+import ProfileImage from "./ProfileImage";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util/index";
 
 export default {
   components: {
     UserDetailsModal,
-    memberSince
+    memberSince,
+    ProfileImage,
   },
 
   data: function () {
@@ -322,8 +343,9 @@ export default {
      * This hides the edit user modal and refreshes the user's details
      */
     updatedUserHandler: function () {
-      this.getUserInfo(this.userData.id);
       this.$bvModal.hide('edit-user-profile');
+      this.$bvModal.hide('edit-profile-image');
+      this.getUserInfo(this.userData.id);
     },
 
     /**
