@@ -76,7 +76,7 @@ import {formatAddress} from "../../util";
 
 export default {
   name: "CreateCard",
-  props: ['cancelAction', 'showError'],
+  props: ['cancelAction', 'showError', 'defaultSection'],
   data() {
     return {
       tagRequired: false,
@@ -96,6 +96,7 @@ export default {
   mounted() {
     const userId = this.$currentUser.id;
     this.setAutofillData(userId);
+    this.createCardForm.section = this.defaultSection || '';
   },
   methods: {
 
