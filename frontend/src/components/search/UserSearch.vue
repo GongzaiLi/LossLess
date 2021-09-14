@@ -134,7 +134,7 @@ export default {
             case "name":
               sortByParam = "NAME";
               break;
-            case "nickName":
+            case "nickname":
               sortByParam = "NICKNAME";
               break;
 
@@ -164,7 +164,7 @@ export default {
 
     /**
      * The getUserInfoIntoTable function to read the data from the APi response.Date then put a array (item)
-     * The Array hold the an object {name: 'name', nickname: 'nickName', email: 'Email', homeAddress: 'address'}.
+     * The Array hold the an object {name: 'name', nickname: 'nickname', email: 'Email', homeAddress: 'address'}.
      * @returns [{name: 'name', nickname: 'nickName', email: 'Email', homeAddress: 'address'}, .......]
      */
     getUserInfoIntoTable: function (data) {
