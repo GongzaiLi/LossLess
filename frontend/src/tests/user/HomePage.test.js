@@ -6,9 +6,10 @@ import Api from "../../Api";
 import Router from 'vue-router'
 import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
 
-let wrapper;
+
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
+let wrapper;
 
 let userData = {
     id: 1,
@@ -255,6 +256,22 @@ describe('test-toggleTagColorSelected-works-correctly', () => {
         await wrapper.vm.toggleTagColorSelected("BLUE");
         expect(wrapper.vm.tagColors.BLACK).toStrictEqual(false);
         expect(wrapper.vm.tagColors.BLUE).toStrictEqual(false);
+    });
+})
+
+describe('test-toggle-archived-notifications', () => {
+    beforeEach(()=>{
+        jest.clearAllMocks();
+    })
+    test('toggle-to-archived-notifications', async () => {
+        wrapper.vm.isArchivedSelected = false;
+        await wrapper.vm.toggleArchived();
+        expect(Api.getNotifications).toHaveBeenCalledWith(null, true);
+    });
+    test('toggle-to-un-archived-notifications', async () => {
+        wrapper.vm.isArchivedSelected = true;
+        await wrapper.vm.toggleArchived();
+        expect(Api.getNotifications).toHaveBeenCalledWith(null, false);
     });
 })
 
