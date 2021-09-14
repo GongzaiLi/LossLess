@@ -209,8 +209,11 @@ export default {
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-      notification.read = true
-      EventBus.$emit('notificationClicked', notification);
+      if (!notification.read) {
+        notification.read = true
+        EventBus.$emit('notificationClicked', notification);
+      }
+
     },
 
     /**
