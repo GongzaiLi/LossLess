@@ -296,8 +296,10 @@ export default {
      * https://stackoverflow.com/questions/49943610/can-i-check-password-confirmation-in-bootstrap-4-with-default-validation-options
      */
     setCustomValidities() {
-      const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-      confirmPasswordInput.setCustomValidity(this.passwordMatchValidity());
+      if (this.changePassword || !this.isEditUser) {
+        const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+        confirmPasswordInput.setCustomValidity(this.passwordMatchValidity());
+      }
 
       const dateOfBirthInput = document.getElementById('dateOfBirthInput');
       dateOfBirthInput.setCustomValidity(this.dateOfBirthCustomValidity);

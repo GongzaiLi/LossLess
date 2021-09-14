@@ -94,7 +94,7 @@
                :title="this.archivedSelected ? 'Un-Archive Notification' :'Archive Notification'"
                ok-variant="success"
                :ok-title="this.archivedSelected ? 'Un-Archive' :'Archive'"
-               @ok="archiveNotification()">
+               @ok="archiveNotification">
         Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
       </b-modal>
     </div>

@@ -1,4 +1,4 @@
-import {mount, createLocalVue, config} from '@vue/test-utils';
+import {shallowMount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
 import UserDetailsModal from '../../components/user/UserDetailsModal';
 import VueRouter from 'vue-router';
@@ -8,8 +8,10 @@ const $log = {
   debug: jest.fn(),
 };
 
+
 jest.mock('../../Api');
-jest.mock("../../../public/profile-default.jpg", ()=>{}) // mock image
+jest.mock("../../../public/profile-default.jpg", () => {
+}) // mock image
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -28,7 +30,7 @@ beforeEach(() => {
       new Date('04/12/2021').valueOf()
     );
   jest.mock('../../../public/profile-default.jpg');
-  wrapper = mount(UserDetailsModal, {
+  wrapper = shallowMount(UserDetailsModal, {
     localVue,
     router,
     mocks: {$log}
@@ -105,10 +107,12 @@ describe('Testing-api-post-register', () => {
   });
 
   it('400-error-register-testing', async () => {
-    Api.register.mockRejectedValue({response: {
-      data:  {message: "Email address already in use"},
-      status: 409
-    }});
+    Api.register.mockRejectedValue({
+      response: {
+        data: {message: "Email address already in use"},
+        status: 409
+      }
+    });
     await wrapper.vm.register(event);
     expect(wrapper.vm.errors).toStrictEqual(["Registration failed: Email address already in use"]);
   });
@@ -123,7 +127,7 @@ describe('Testing-api-post-register', () => {
 describe('Testing-password-validation-for-editing', () => {
 
   test('Invalid if password not match confirm password', async () => {
-    wrapper.setProps({ isEditUser: true });
+    wrapper.setProps({isEditUser: true});
     wrapper.vm.userData.newPassword = 'bad password';
     wrapper.vm.userData.confirmPassword = 'other password';
     await wrapper.vm.$nextTick();
@@ -131,7 +135,7 @@ describe('Testing-password-validation-for-editing', () => {
   });
 
   test('Valid if password match confirm password', async () => {
-    wrapper.setProps({ isEditUser: true });
+    wrapper.setProps({isEditUser: true});
     wrapper.vm.userData.newPassword = 'password';
     wrapper.vm.userData.confirmPassword = 'password';
     await wrapper.vm.$nextTick();
@@ -165,18 +169,18 @@ describe('Testing delete image when modifying user', () => {
     wrapper.vm.userData.profileImage = '';
     wrapper.vm.uploaded = true;
 
-    await wrapper.vm.openDeleteConfirmDialog();
+    await wrapper.vm.openDeleteConfirmDialog;
     await wrapper.vm.confirmDeleteImage();
 
     expect(wrapper.vm.uploaded).toStrictEqual(false);
     expect(Api.deleteUserProfileImage).not.toHaveBeenCalled();
   });
   test('Successfully delete a user image when one exists', async () => {
-    wrapper.setProps({ isEditUser: true });
+    wrapper.setProps({isEditUser: true});
     wrapper.vm.userData.profileImage = '1'
     wrapper.vm.uploaded = false;
 
-    await wrapper.vm.openDeleteConfirmDialog();
+    await wrapper.vm.openDeleteConfirmDialog;
     await wrapper.vm.confirmDeleteImage();
 
     expect(wrapper.vm.userData.profileImage).toStrictEqual('');
@@ -194,19 +198,21 @@ describe('Testing-api-put-updating-user', () => {
       status: 200
     });
     Api.uploadProfileImage.mockResolvedValue(
-        {
-          status: 201
-        })
+      {
+        status: 201
+      })
 
     await wrapper.vm.updateUser(event);
     expect(wrapper.vm.errors).toStrictEqual([]);
   });
 
   it('409-error-update-user-testing', async () => {
-    Api.modifyUser.mockRejectedValue({response: {
-        data:  {message: "Email address already in use"},
+    Api.modifyUser.mockRejectedValue({
+      response: {
+        data: {message: "Email address already in use"},
         status: 409
-      }});
+      }
+    });
     await wrapper.vm.updateUser(event);
     expect(wrapper.vm.errors).toStrictEqual(["Updating user failed: Email address already in use"]);
   });
@@ -221,19 +227,21 @@ describe('Testing-api-put-updating-user', () => {
 describe('Testing-api-post-upload-image-for-user', () => {
   it('Successful-upload-image', async () => {
     Api.uploadProfileImage.mockResolvedValue(
-        {
-          status: 201
-        })
+      {
+        status: 201
+      })
 
     await wrapper.vm.uploadImageRequest(1);
     expect(wrapper.vm.errors).toStrictEqual([]);
   });
 
   it('413-error-upload-image', async () => {
-    Api.uploadProfileImage.mockRejectedValue({response: {
-        data:  {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
+    Api.uploadProfileImage.mockRejectedValue({
+      response: {
+        data: {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
         status: 413
-      }});
+      }
+    });
     await wrapper.vm.uploadImageRequest(1);
     await wrapper.vm.$nextTick();
 
@@ -253,7 +261,7 @@ describe('Testing-api-post-upload-image-for-user', () => {
 
 describe('Testing-changing-password', () => {
   beforeEach(() =>
-    wrapper.setProps({ isEditUser: true }));
+    wrapper.setProps({isEditUser: true}));
 
   test('newPassword is undefined if not changing password', async () => {
     wrapper.vm.userData.newPassword = 'password';
@@ -270,5 +278,56 @@ describe('Testing-changing-password', () => {
 
     expect(wrapper.vm.getEditData().newPassword).toBe('password');
   });
+
+});
+
+
+describe('Testing-beforeMount-when-is-edit-user-modal', () => {
+
+  let wrapperNew;
+
+  const userDetail = {
+    firstName: "Leonard",
+    "lastName": "Frazier",
+    "bio": "occaecat sunt irure non ut culpa sunt mollit ex et commodo do sit nostrud voluptate culpa occaecat duis est qui",
+    "email": "leonard.frazier@essensia.com",
+    "dateOfBirth": "2001-05-16",
+    homeAddress: {
+      "streetNumber": 481,
+      "streetName": "Schroeders Avenue",
+      "city": "Fairview",
+      "region": "Nevada",
+      "country": "Sierra Leone",
+      "postcode": 4740
+    }
+  };
+
+  beforeEach(() => {
+    wrapperNew = shallowMount(UserDetailsModal, {
+      localVue,
+      router,
+      propsData: {isEditUser: true, userDetails: userDetail},
+      mocks: {$log}
+    });
+  })
+
+  afterEach(() => {
+    wrapperNew.destroy();
+  });
+
+  test('Testing-beforeMount-when-is-edit-user-modal-userDetails-set-up',  () => {
+
+    expect(wrapperNew.vm.userData.firstName).toStrictEqual(userDetail.firstName);
+    expect(wrapperNew.vm.userData.lastName).toStrictEqual(userDetail.lastName);
+    expect(wrapperNew.vm.userData.bio).toStrictEqual(userDetail.bio);
+    expect(wrapperNew.vm.userData.email).toStrictEqual(userDetail.email);
+    expect(wrapperNew.vm.userData.dateOfBirth).toStrictEqual(userDetail.dateOfBirth);
+    expect(wrapperNew.vm.userData.homeAddress).toStrictEqual(userDetail.homeAddress);
+    expect(wrapperNew.vm.userData.oldPassword).toStrictEqual("");
+    expect(wrapperNew.vm.userData.newPassword).toStrictEqual("");
+    expect(wrapperNew.vm.userData.confirmPassword).toStrictEqual("");
+  });
+
+
 
 });

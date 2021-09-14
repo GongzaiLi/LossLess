@@ -76,13 +76,13 @@ Date: 5/3/2021
                 <b-col>{{ fullName }}</b-col>
               </b-row>
             </h6>
-            <h6 v-if="userData.nickName">
-              <b-row v-show="userData.nickName.length">
+            <h6 v-if="userData.nickname">
+              <b-row v-show="userData.nickname.length">
                 <b-col cols="0">
                   <b-icon-emoji-smile-fill></b-icon-emoji-smile-fill>
                 </b-col>
                 <b-col cols="4"><strong>Nickname:</strong></b-col>
-                <b-col>{{ userData.nickName }}</b-col>
+                <b-col>{{ userData.nickname }}</b-col>
               </b-row>
             </h6>
             <h6 v-show="viewable">
@@ -198,7 +198,7 @@ export default {
         firstName: "",
         lastName: "",
         middleName: "",
-        nickName: "",
+        nickname: "",
         bio: "",
         email: "",
         dateOfBirth: "",
@@ -363,15 +363,8 @@ export default {
      * Firstname Middlename Lastname (Nickname)
      */
     fullName: function () {
-      let fullName = this.userData.firstName;
-      if (this.userData.middleName) {
-        fullName += ' ' + this.userData.middleName;
-      }
-      fullName += ' ' + this.userData.lastName;
-      if (this.userData.nickName) {
-        fullName += ` (${this.userData.nickName})`
-      }
-      return fullName;
+      let middleName = this.userData.middleName ? ` ${this.userData.middleName} ` : ' ';
+      return  `${this.userData.firstName}${middleName}${this.userData.lastName}`;
     },
     /**
      * User friendly display string for the user role. Converts the user role
