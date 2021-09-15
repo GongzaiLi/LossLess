@@ -1,6 +1,7 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportPurchaseTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
@@ -116,4 +117,22 @@ public class SalesReportController {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
+    /**
+     * Get the total quantity, value, likes of all sales for each product of a business.
+     *
+     * @param businessId    The id of the business to get purchases for
+     * @return              The total quantity, value, likes of all purchases for each product of a business
+     */
+    @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
+    public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId){
+        User user = userService.getCurrentlyLoggedInUser();
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+        logger.info("Successfully retrieved business with ID: {}.", businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
+
+        List<SalesReportPurchaseTotalsDto> productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
+
+    }
 }

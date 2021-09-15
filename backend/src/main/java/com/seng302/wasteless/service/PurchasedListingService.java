@@ -1,10 +1,12 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportPurchaseTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.repository.ProductRepository;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PurchasedListingService {
 
     private final PurchasedListingRepository purchasedListingRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public PurchasedListingService(PurchasedListingRepository purchasedListingRepository) {
+    public PurchasedListingService(PurchasedListingRepository purchasedListingRepository, ProductRepository productRepository) {
         this.purchasedListingRepository = purchasedListingRepository;
+        this.productRepository = productRepository;
     }
 
 
@@ -179,6 +183,49 @@ public class PurchasedListingService {
             business.setCreated(earliestListingDate);
         }
         purchasedListingRepository.saveAll(fakePurchases);
+    }
+
+
+    /**
+     * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
+     * and return a list of SalesReportPurchaseTotalsDto. Each SalesReportPurchaseTotalsDto contains information about
+     * a given sold product, including the number of the product sold, the total value all products sold for, and the
+     * total number of likes.
+     *
+     * @param businessId    The id of the business
+     * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
+     */
+    public List<SalesReportPurchaseTotalsDto> getProductsPurchasedTotals(int businessId) {
+
+        List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
+
+        List<SalesReportPurchaseTotalsDto> salesReportPurchaseTotalsDtos = new ArrayList<>();
+
+        for (Long productId: allSoldProductsOfBusiness) {
+            salesReportPurchaseTotalsDtos.add(getTotalsForProduct(productId));
+        }
+
+        return salesReportPurchaseTotalsDtos;
+    }
+
+    /**
+     * For a given product, create a SalesReportPurchaseTotalsDto populate it with the correct information.
+     *
+     * @param productId     The id of the product
+     * @return              SalesReportPurchaseTotalsDto populated with information about product sales
+     */
+    private SalesReportPurchaseTotalsDto getTotalsForProduct(Long productId) {
+        Integer totalPurchases = purchasedListingRepository.sumProductsSoldByProduct_DatabaseId(productId);
+        Double totalValue = purchasedListingRepository.sumPriceByProduct_DatabaseId(productId);
+        Integer totalLikes = purchasedListingRepository.sumTotalLikesByProduct_DatabaseId(productId);
+
+        if (totalValue == null) {
+            totalValue = 0.0;
+        }
+
+        Product product = productRepository.findFirstByDatabaseId(productId);
+
+        return new SalesReportPurchaseTotalsDto(product, totalPurchases, totalValue, totalLikes);
     }
 
 }
