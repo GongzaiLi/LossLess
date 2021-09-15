@@ -227,7 +227,7 @@ export default {
       if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
       }
-      this.notifications = (await Api.getNotifications()).data;
+      this.notifications = (await Api.getNotifications(null, this.isArchivedSelected)).data;
     },
     /**
      * Creates the toast notification to allow user to undo delete within 10 seconds
