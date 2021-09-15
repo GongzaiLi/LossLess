@@ -39,7 +39,8 @@ Date: 21/5/21
       <b-modal id="create-card" hide-header hide-footer>
         <CreateCard @createAction="createCard($event)"
                     :cancelAction="closeCreateCardModal"
-                    :showError="error"> </CreateCard>
+                    :showError="error"
+                    :default-section="selectedSection"> </CreateCard>
       </b-modal>
     </b-card>
   </div>
@@ -63,19 +64,11 @@ export default {
       marketplaceCards: [],
       dismissSecs: 5,
       dismissCountDown: 0,
-      showDismissibleAlert: false
+      showDismissibleAlert: false,
     }
   },
 
   methods: {
-    /**
-     * Pushes errors to errors list to be displayed as response on the screen,
-     * if there are any.
-     */
-    pushErrors(error) {
-      this.errors.push(error.message);
-    },
-
     /**
      * Opens the create card modal when create button pressed.
      */
@@ -107,14 +100,12 @@ export default {
         // Also, you have to index into the ref because... reasons: https://forum.vuejs.org/t/this-refs-theid-returns-an-array/31995/10
 
         this.$refs[cardData.section][0].refreshData();
+        this.activeTabIndex = this.sections.map(x => x[0]).findIndex(x => x === cardData.section); // Switch to the section of the created card
       })
       .catch(error => {
         this.$log.debug(error);
         this.error = this.getErrorMessageFromApiError(error);
       })
-    },
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown
     },
 
     /**
@@ -137,7 +128,14 @@ export default {
       }
     },
   },
-
+  computed: {
+    /**
+     * @returns the string name (eg 'ForSale') of the marketplace section currently on.
+     */
+    selectedSection: function() {
+      return this.sections[this.activeTabIndex][0];
+    }
+  }
 }
 </script>
 

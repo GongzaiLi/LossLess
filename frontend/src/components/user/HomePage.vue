@@ -42,24 +42,32 @@
           <b-col cols="1">
             <h3><b-icon-bell/></h3>
           </b-col>
-          <b-col cols="6">
+          <b-col cols="5">
             <h3>Notifications</h3>
           </b-col>
           <b-col cols="4">
-            <b-dropdown text="Filter By Tags" class="tag-filter-dropdown">
+            <b-dropdown v-if="!isArchivedSelected" text="Filter By Tags" class="tag-filter-dropdown">
               <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
             </b-dropdown>
+            <h3 v-else>(Archived)</h3>
+          </b-col>
+          <b-col cols="2">
+            <b-icon-archive v-if="!isArchivedSelected" font-scale="2"  title="View Archived Notifications"
+                            class="view-archived-button pt-2"  @click="toggleArchived" v-b-tooltip.hover></b-icon-archive>
+            <b-icon-archive-fill v-else font-scale="2" variant="success"  title="View Notifications"
+                                 class="view-archived-button pt-2"  @click="toggleArchived" v-b-tooltip.hover></b-icon-archive-fill>
           </b-col>
         </b-row>
       </div>
       <div class="notification-holder">
         <b-card v-if="filteredNotifications.length === 0" class="notification-cards shadow">
-          <h6> You have no notifications </h6>
+          <h6 v-if="!isArchivedSelected"> You have no notifications </h6>
+          <h6 v-else> You have no archived notifications </h6>
         </b-card>
         <b-card v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
-          <notification :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
+          <notification :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast" :archived-selected="isArchivedSelected"> </notification>
         </b-card>
       </div>
     </b-card>
@@ -104,6 +112,11 @@
   /*cursor: pointer;*/
 }
 
+.view-archived-button {
+  cursor: pointer;
+  color: green;
+}
+
 .b-toaster-bottom-right .b-toaster-slot{
   float: right;
   max-width: 250px !important;
@@ -145,6 +158,7 @@ export default {
       isCardFormat: true,
       hasExpiredCards: false,
       notifications: [],
+      isArchivedSelected: false,
       tagColors: { //Tracks color to selected boolean
         RED: false,
         ORANGE: false,
@@ -209,7 +223,7 @@ export default {
       if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
       }
-      this.notifications = (await Api.getNotifications()).data;
+      this.notifications = (await Api.getNotifications(null, this.isArchivedSelected)).data;
       this.pendingDeletedNotification = false;
     },
     /**
@@ -242,6 +256,8 @@ export default {
         await Api.deleteNotification(this.pendingDeletedNotification)
         EventBus.$emit("notificationUpdate")
       }
+
+
     },
 
     /**
@@ -249,9 +265,22 @@ export default {
      * @param notification the notification that has been clicked
      */
     async notificationClicked(notification) {
-      notification.read = true
-      EventBus.$emit('notificationClicked', notification);
+      if (!notification.read) {
+        notification.read = true
+        EventBus.$emit('notificationClicked', notification);
+      }
+
     },
+
+    /**
+     * Updates the notifications to show either the archived or non-archived notifications.
+     * This is toggle by a button.
+     *
+     */
+    async toggleArchived() {
+      this.isArchivedSelected = !this.isArchivedSelected;
+      await this.updateNotifications();
+    }
     /**
      * Hides the toast notification and prevents deleteNotification from sending api request
      * Adds pendingDeletedNotification back into displayed list

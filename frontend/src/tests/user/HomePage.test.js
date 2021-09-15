@@ -6,9 +6,10 @@ import Api from "../../Api";
 import Router from 'vue-router'
 import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
 
-let wrapper;
+
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
+let wrapper;
 
 let userData = {
     id: 1,
@@ -297,4 +298,38 @@ describe('test-toggleTagColorSelected-works-correctly', () => {
         expect(wrapper.vm.tagColors.BLUE).toStrictEqual(false);
     });
 })
+
+describe('test-toggle-archived-notifications', () => {
+    beforeEach(()=>{
+        jest.clearAllMocks();
+    })
+    test('toggle-to-archived-notifications', async () => {
+        wrapper.vm.isArchivedSelected = false;
+        await wrapper.vm.toggleArchived();
+        expect(Api.getNotifications).toHaveBeenCalledWith(null, true);
+    });
+    test('toggle-to-un-archived-notifications', async () => {
+        wrapper.vm.isArchivedSelected = true;
+        await wrapper.vm.toggleArchived();
+        expect(Api.getNotifications).toHaveBeenCalledWith(null, false);
+    });
+})
+
+describe('Test notification clicked', () => {
+
+    const collarNotification = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
+
+    test('Notification set to read on click', async () => {
+        await wrapper.vm.notificationClicked(collarNotification);
+        expect(collarNotification.read).toBeTruthy();
+
+    })
+
+});
 
