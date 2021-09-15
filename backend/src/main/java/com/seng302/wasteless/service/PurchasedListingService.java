@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -193,16 +191,36 @@ public class PurchasedListingService {
      * total number of likes.
      *
      * @param businessId    The id of the business
+     * @param sortBy the attribute to be sorted by
+     * @param order the order to sort the list in
      * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
      */
-    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId) {
-
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId, String sortBy, String order) {
         List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
 
         List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
 
         for (Long productId: allSoldProductsOfBusiness) {
             salesReportProductTotalsDtos.add(getTotalsForProduct(productId));
+        }
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "value":
+                    salesReportProductTotalsDtos.sort(Comparator.comparing(SalesReportProductTotalsDto::getTotalValue));
+                    break;
+                case "quantity":
+                    salesReportProductTotalsDtos.sort(Comparator.comparing(SalesReportProductTotalsDto::getTotalProductPurchases));
+                    break;
+                case "likes":
+                    salesReportProductTotalsDtos.sort(Comparator.comparing(SalesReportProductTotalsDto::getTotalLikes));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (order.equals("DESC")) {
+            Collections.reverse(salesReportProductTotalsDtos);
         }
 
         return salesReportProductTotalsDtos;

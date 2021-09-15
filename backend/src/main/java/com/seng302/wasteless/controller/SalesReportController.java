@@ -122,13 +122,21 @@ public class SalesReportController {
      * @return              The total quantity, value, likes of all purchases for each product of a business
      */
     @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
-    public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId){
+    public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
+                                                                         @RequestParam(value = "sortBy", required = false) String sortBy,
+                                                                         @RequestParam(value = "order", required = false, defaultValue = "DESC") String order) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-        List<SalesReportProductTotalsDto> productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId);
+        List<SalesReportProductTotalsDto> productsPurchasedTotals;
+        if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
+        } else {
+            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, sortBy, order);
+        }
+
 
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
 

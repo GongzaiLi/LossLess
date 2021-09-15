@@ -183,27 +183,27 @@ public class PurchasedListingServiceTest {
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfDtosReturned() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, null, "ASC");
         assertEquals(2, purchasedTotalsData.size());
     }
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfTotalProductPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, null, "ASC");
         assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(16, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, null, "ASC");
         assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
     }
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfLikesOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, null, "ASC");
         assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
     }
