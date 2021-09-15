@@ -88,6 +88,7 @@ beforeEach(() => {
     Api.getUser.mockResolvedValue(response);
     Api.getNotifications.mockResolvedValue({data: []});
     Api.getExpiredCards.mockResolvedValue({data: []});
+    Api.deleteNotification = jest.fn();
 
     wrapper = shallowMount(homePage, {
         localVue,
@@ -186,6 +187,22 @@ describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => 
         expect(Api.getNotifications).toBeCalledWith("ORANGE,YELLOW,BLUE,BLACK")
     });
 
+});
+
+describe('check-deleted-functionality', () => {
+    test('if-no-pendingDeletedNotification-then-pendingDeletedNotification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=[]
+        await wrapper.vm.createDeleteToast(1);
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+});
+
+describe('check-router-guard-functionality', () => {
+    test('if-route-is-changed-while-no-pending-notifications-notification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotifications=[]
+        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
 });
 
 

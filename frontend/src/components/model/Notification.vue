@@ -86,7 +86,7 @@
                title="Delete Notification"
                ok-variant="danger"
                ok-title="Delete"
-               @ok="deleteNotification">
+               @ok="notificationDeleted">
         Are you sure you want to <strong>delete</strong> this notification?
       </b-modal>
 
@@ -187,7 +187,7 @@ import NotificationTag from "../../components/model/NotificationTag";
 export default {
   name: "Notification",
   components: {NotificationTag},
-  props: ['notification', 'inNavbar', 'archivedSelected'],
+  props: ['notification', 'inNavbar', 'archivedSelected','deleted'],
   data() {
     return {
       updatedNotification: {message:"", type:"", read: this.notification.read},
@@ -254,13 +254,10 @@ export default {
     },
 
     /**
-     * Calls API deleteNotification patch request
-     * and using an EventBus that emits notificationUpdate so that
-     * other components are refreshed.
+     * Emits to parent deleteNotification with Id of selected notification
      */
-    async deleteNotification() {
-      await Api.deleteNotification(this.updatedNotification.id)
-      EventBus.$emit("notificationUpdate")
+    notificationDeleted(){
+      this.$emit('deleteNotification',this.updatedNotification.id,this.updatedNotification.type)
     },
 
     /**
