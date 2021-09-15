@@ -119,19 +119,26 @@ public class SalesReportController {
      * Get the total quantity, value, likes of all sales for each product of a business.
      *
      * @param businessId    The id of the business to get purchases for
+     * @param sortBy        The value to sort the products by
+     * @param order         The order to sort the products in
      * @return              The total quantity, value, likes of all purchases for each product of a business
      */
     @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
     public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
                                                                          @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false, defaultValue = "DESC") String order) {
+                                                                         @RequestParam(value = "order", required = false) String order) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
         List<SalesReportProductTotalsDto> productsPurchasedTotals;
-        if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
+
+        if (sortBy == null && order != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
+        } else if (order != null && !order.equals("ASC") && !order.equals("DESC")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value for order.");
+        } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {
             productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, sortBy, order);
