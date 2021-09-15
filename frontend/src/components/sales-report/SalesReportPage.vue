@@ -24,6 +24,7 @@ Date: sprint_6
           </b-card-text>
         </b-list-group-item>
         <b-list-group-item v-show="totalResults">
+          <b-overlay :show="loading" rounded="sm">
           <b-row>
             <b-col class="mt-2">
               <b-row>
@@ -60,7 +61,8 @@ Date: sprint_6
               </b-row>
             </b-col>
             <b-col>
-              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy"></SalesReportGraph>
+              <h3>Sales Graph</h3>
+              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" v-on:finishedLoading="finishedLoadingGraph"/>
             </b-col>
           </b-row>
           <b-row>
@@ -73,6 +75,7 @@ Date: sprint_6
               ></b-pagination>
             </b-col>
           </b-row>
+          </b-overlay>
         </b-list-group-item>
       </b-list-group>
     </b-card>
@@ -92,7 +95,6 @@ Date: sprint_6
       </h6>
     </b-card>
   </div>
-
 </template>
 
 <script>
@@ -100,6 +102,7 @@ import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
 import SalesReportGraph from "./SalesReportGraph";
+import EventBus from "../../util/event-bus";
 
 export default {
   name: "sales-report-page",
@@ -114,12 +117,14 @@ export default {
       currentPage: 1,
       perPage: 10,
       dateRange: [],
+      loading: false,
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
     this.getBusiness(businessId);
+    EventBus.$on('finishedLoading', this.finishedLoadingGraph)
   },
 
   methods: {
@@ -128,7 +133,7 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
      **/
-    getBusiness: function (id) {
+    getBusiness: function (id) {              this.loadingTable = false;
       api
           .getBusiness(id)
           .then((response) => {
@@ -153,6 +158,7 @@ export default {
      * @param dateRange
      **/
     getSalesReport: async function (dateRange) {
+      this.loading = true;
       if (this.dateRange !== dateRange) {
         this.dateRange = dateRange;
         // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
@@ -192,6 +198,13 @@ export default {
           return count + item.totalPurchases
         }, 0)
       }
+    },
+
+    /**
+     * This shows the graph now that it has finished loading.
+     */
+    finishedLoadingGraph: function () {
+      this.loading = false;
     },
   },
 
