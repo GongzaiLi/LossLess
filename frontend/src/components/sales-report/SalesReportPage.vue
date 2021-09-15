@@ -24,6 +24,7 @@ Date: sprint_6
           </b-card-text>
         </b-list-group-item>
         <b-list-group-item v-show="totalResults">
+          <b-overlay :show="loading" rounded="sm">
           <b-row>
             <b-col class="mt-2">
               <b-row>
@@ -42,7 +43,6 @@ Date: sprint_6
                 <b-col>
                   <b-table
                       ref="salesReportTable"
-                      v-if="!loadingTable"
                       no-border-collapse
                       no-local-sorting
                       striped
@@ -50,21 +50,19 @@ Date: sprint_6
                       :fields="fields"
                       :per-page="perPage"
                       :current-page="currentPage"
-                      responsive="lg"
+                      rshowesponsive="lg"
                       bordered
                       show-empty>
                     <template #empty>
                       <h3 class="no-results-overlay">No results to display</h3>
                     </template>
                   </b-table>
-                  <h1 v-else>Loading...</h1>
                 </b-col>
               </b-row>
             </b-col>
             <b-col>
               <h3>Sales Graph</h3>
-              <h1 v-if="loadingGraph">Loading...</h1>
-              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" :style="{opacity: graphOpacity}" v-on:finishedLoading="finishedLoadingGraph"/>
+              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" v-on:finishedLoading="finishedLoadingGraph"/>
             </b-col>
           </b-row>
           <b-row>
@@ -77,6 +75,7 @@ Date: sprint_6
               ></b-pagination>
             </b-col>
           </b-row>
+          </b-overlay>
         </b-list-group-item>
       </b-list-group>
     </b-card>
@@ -93,7 +92,7 @@ Date: sprint_6
         administrators of the business. <br>
         Return to the business profile page
         <router-link :to="'/businesses/' + $route.params.id">here.</router-link>
-      </h6>
+      </h6>              this.loadingTable = false;
     </b-card>
   </div>
 </template>
@@ -118,9 +117,7 @@ export default {
       currentPage: 1,
       perPage: 10,
       dateRange: [],
-      loadingTable: false,
-      loadingGraph: false,
-      graphOpacity: 100,
+      loading: false,
     }
   },
 
@@ -136,7 +133,7 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
      **/
-    getBusiness: function (id) {
+    getBusiness: function (id) {              this.loadingTable = false;
       api
           .getBusiness(id)
           .then((response) => {
@@ -161,9 +158,7 @@ export default {
      * @param dateRange
      **/
     getSalesReport: async function (dateRange) {
-      this.loadingTable = true;
-      this.loadingGraph = true;
-      this.graphOpacity = 0;
+      this.loading = true;
       if (this.dateRange !== dateRange) {
         this.dateRange = dateRange;
         // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
@@ -180,7 +175,6 @@ export default {
             .then((response) => {
               this.updateTotalResults(startDate, endDate, response.data);
               this.groupedResults = response.data;
-              this.loadingTable = false;
             }).catch((error) => {
               this.$log.debug("Error message", error);
             });
@@ -210,8 +204,7 @@ export default {
      * This shows the graph now that it has finished loading.
      */
     finishedLoadingGraph: function () {
-      this.loadingGraph = false;
-      this.graphOpacity = 100;
+      this.loading = false;
     },
   },
 
