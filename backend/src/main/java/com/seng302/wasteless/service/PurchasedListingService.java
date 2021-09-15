@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,7 +163,7 @@ public class PurchasedListingService {
             fakeListing.setPurchaser(user);
             fakeListing.setSaleDate(LocalDate.now().minusDays(generator.nextInt(365*3)));
             fakeListing.setListingDate(fakeListing.getSaleDate().minusDays(generator.nextInt(7)));
-            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)));
+            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)).atTime(LocalTime.now()));
             fakeListing.setProduct(product);
             fakeListing.setQuantity(generator.nextInt(5) + 1);
             double price = Math.round(generator.nextDouble()*30);

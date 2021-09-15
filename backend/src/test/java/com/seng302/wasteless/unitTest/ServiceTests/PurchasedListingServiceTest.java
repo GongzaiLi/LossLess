@@ -133,7 +133,7 @@ public class PurchasedListingServiceTest {
         for (PurchasedListing purchasedListing : generated) {
             Assertions.assertFalse(business.getCreated().isAfter(purchasedListing.getListingDate()));
             Assertions.assertFalse(purchasedListing.getListingDate().isAfter(purchasedListing.getSaleDate()));
-            Assertions.assertFalse(purchasedListing.getSaleDate().isAfter(purchasedListing.getClosingDate()));
+            Assertions.assertTrue(purchasedListing.getSaleDate().isBefore(purchasedListing.getClosingDate().toLocalDate()));
         }
     }
 

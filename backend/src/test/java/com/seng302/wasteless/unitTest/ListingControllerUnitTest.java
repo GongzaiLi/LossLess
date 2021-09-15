@@ -151,7 +151,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
-                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1));
+                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1).atTime(23,59));
 
 
         listingList = new ArrayList<>();
@@ -163,7 +163,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
-                .setCloses(LocalDate.of(2021, Month.JULY, 14)));
+                .setCloses(LocalDate.of(2021, Month.JULY, 14).atTime(23,59)));
 
         listingList.add(
                 listing = new Listing()
@@ -173,7 +173,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .setQuantity(3)
                         .setPrice(17.99)
                         .setMoreInfo("Seller may be willing to consider near offers")
-                        .setCloses(LocalDate.of(2021, Month.MARCH, 27)));
+                        .setCloses(LocalDate.of(2021, Month.MARCH, 27).atTime(23,59)));
 
         listingList.add(
                 listing = new Listing()
@@ -183,7 +183,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                         .setQuantity(3)
                         .setPrice(17.99)
                         .setMoreInfo("Seller may be willing to consider near offers")
-                        .setCloses(LocalDate.of(2022, Month.JANUARY, 1)));
+                        .setCloses(LocalDate.of(2022, Month.JANUARY, 1).atTime(23,59)));
 
 
         user = mock(User.class);
@@ -311,7 +311,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
@@ -324,7 +324,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andLoggedInUser_andNotBusinessAdmin_butAppAdmin_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
@@ -339,7 +339,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andValidUserAndValidBusiness_butInvalidInventory_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item with given id does not exist")).when(inventoryService).findInventoryById(1);
 
@@ -353,7 +353,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andValidRequest_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -365,7 +365,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andValidRequest_inventoryItemBestBeforeInPast_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -377,7 +377,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andValidRequest_inventoryItemSellByInPast_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -389,7 +389,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andValidRequest_inventoryItemExpiryInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -400,7 +400,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12 23:59\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -423,7 +423,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12 23:59\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -594,7 +594,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         purchasedListing.setBusiness(business);
         purchasedListing.setPurchaser(user);
         purchasedListing.setListingDate(LocalDate.now());
-        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now().atTime(23,59));
         purchasedListing.setPrice(1.0);
         purchasedListing.setNumberOfLikes(1);
         purchasedListing.setQuantity(1);
@@ -621,7 +621,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
                 .andExpect(status().isBadRequest())
                 .andReturn();
-        Assertions.assertEquals(result.getResponse().getContentAsString(), "purchase Id does not exist.");
+        Assertions.assertEquals("purchase Id does not exist.", result.getResponse().getContentAsString());
     }
 
 
@@ -634,7 +634,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         purchasedListing.setBusiness(business);
         purchasedListing.setPurchaser(user);
         purchasedListing.setListingDate(LocalDate.now());
-        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now().atTime(23,59));
         purchasedListing.setPrice(1.0);
         purchasedListing.setNumberOfLikes(1);
         purchasedListing.setQuantity(1);
@@ -654,7 +654,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
                 .andExpect(status().isForbidden())
                 .andReturn();
-        Assertions.assertEquals(result.getResponse().getContentAsString(), "You are not allowed to make this request");
+        Assertions.assertEquals("You are not allowed to make this request", result.getResponse().getContentAsString());
     }
 
     @Test
@@ -666,7 +666,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         purchasedListing.setBusiness(business);
         purchasedListing.setPurchaser(user);
         purchasedListing.setListingDate(LocalDate.now());
-        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now().atTime(23,59));
         purchasedListing.setPrice(1.0);
         purchasedListing.setNumberOfLikes(1);
         purchasedListing.setQuantity(1);
@@ -690,7 +690,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/purchase/1"))
                 .andExpect(status().isForbidden())
                 .andReturn();
-        Assertions.assertEquals(result.getResponse().getContentAsString(), "You are not allowed to make this request");
+        Assertions.assertEquals("You are not allowed to make this request", result.getResponse().getContentAsString());
     }
 
     @Test
@@ -703,7 +703,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         user.setId(1);
         purchasedListing.setPurchaser(user);
         purchasedListing.setListingDate(LocalDate.now());
-        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now().atTime(23,59));
         purchasedListing.setPrice(1.0);
         purchasedListing.setNumberOfLikes(1);
         purchasedListing.setQuantity(1);
@@ -737,7 +737,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         purchasedListing.setBusiness(business);
         purchasedListing.setPurchaser(user);
         purchasedListing.setListingDate(LocalDate.now());
-        purchasedListing.setClosingDate(LocalDate.now());
+        purchasedListing.setClosingDate(LocalDate.now().atTime(23,59));
         purchasedListing.setPrice(1.0);
         purchasedListing.setNumberOfLikes(1);
         purchasedListing.setQuantity(1);

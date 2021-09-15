@@ -41,7 +41,7 @@ public class TestUtils {
     public static Listing createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService,
                                                         ListingsService listingsService, BusinessService businessService,
                                                         AddressService addressService, String name, Double price,
-                                                        String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDateTime closes,
+                                                        String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDate closes,
                                                         Integer listingQuantity, Integer inventoryQuantity) {
 
         Address address = new Address();
@@ -78,7 +78,7 @@ public class TestUtils {
         newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
-        newListing.setCloses(closes);
+        newListing.setCloses(closes.atTime(23,59));
         newListing.setCreated(LocalDate.now());
         newListing.setUsersLiked(0);
         newListing = listingsService.createListing(newListing);
@@ -92,7 +92,7 @@ public class TestUtils {
      */
     public static Listing createListingForSameBusiness(ProductService productService, InventoryService inventoryService,
                                                         ListingsService listingsService,
-                                                        Business business, String name, Double price, LocalDateTime closes,
+                                                        Business business, String name, Double price, LocalDate closes,
                                                         Integer listingQuantity, Integer inventoryQuantity) {
 
         Product product = new Product();
@@ -112,7 +112,7 @@ public class TestUtils {
         newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
-        newListing.setCloses(closes);
+        newListing.setCloses(closes.atTime(23,59));
         newListing.setCreated(LocalDate.now());
         newListing.setUsersLiked(0);
         newListing = listingsService.createListing(newListing);
