@@ -10,15 +10,15 @@ Date: 3/3/2021
 
       <h1 v-if="!isEditUser">Sign Up to Wasteless</h1>
       <div v-else>
+        <h5>Profile Image</h5>
         <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
-               class="mx-auto"
+               class="profile-image mx-auto"
                fluid block rounded="circle"
-               alt="default image" style="height: 12rem; width: 12rem; display: inline-block"/>
-        <b-link @click="$bvModal.show('edit-profile-image'); $bvModal.hide('edit-user-profile')"
-                style="text-align: center"><h5>Change Profile Picture</h5></b-link>
+               alt="default image"/>
+        <b-link id="profile-image-link" @click="$bvModal.show('edit-profile-image')"><p>Change Profile Picture</p></b-link>
+        <hr>
+        <h5>User Details</h5>
       </div>
-      <br>
-
       <b-form
         @submit="submit"
         @input="setCustomValidities"
@@ -103,7 +103,7 @@ Date: 3/3/2021
             <b-button v-else variant="primary" type="submit" class="button"  id="register-btn">Register</b-button>
           </b-col>
           <b-col cols="auto" class="p-3">
-            <b-button v-show="isEditUser" class="button"   @click="$bvModal.hide('edit-user-profile')" style="align-self: end">Cancel</b-button>
+            <b-button v-show="isEditUser" class="button" id="cancel-button" @click="$bvModal.hide('edit-user-profile')">Cancel</b-button>
           </b-col>
         </b-row>
       </b-form>
@@ -123,6 +123,21 @@ Date: 3/3/2021
   </div>
 </template>
 
+<style scoped>
+#cancel-button {
+  align-self: end
+}
+
+#profile-image-link {
+  text-align: center;
+}
+
+.profile-image {
+  height: 12rem;
+  width: 12rem;
+  display: inline-block
+}
+</style>
 
 <script>
 import Api from "../../Api";

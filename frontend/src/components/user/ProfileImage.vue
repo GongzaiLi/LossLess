@@ -1,33 +1,29 @@
 <template>
   <div>
-    <b-img v-if="uploaded" :src="imageURL" class="mx-auto" fluid block rounded="circle"
-           alt="userImage" style="height: 12rem; width: 12rem; display: inline-block"/>
-    <b-img v-else :src="profileImage ? getURL(profileImage.fileName) : require('../../../public/profile-default.jpg')"
-           class="mx-auto"
+    <b-img :src="profileImage ? getURL(profileImage.fileName) : require('../../../public/profile-default.jpg')"
+           class="profile-image mx-auto"
            fluid block rounded="circle"
-           alt="default image" style="height: 12rem; width: 12rem; display: inline-block"/>
-    <input @change="openImage($event)" type="file" style="display:none" ref="userImagePicker"
-           accept="image/png, image/jpeg, image/gif, image/jpg" class="py-2 mb-2">
+           alt="default image"/>
+    <input @change="openImage($event)" type="file" ref="userImagePicker"
+           accept="image/png, image/jpeg, image/gif, image/jpg" class="upload-image py-2 mb-2">
     <div v-if="errors.length">
       <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}
       </b-alert>
     </div>
 
     <div v-if="userLookingAtSelfOrIsAdmin && !$currentUser.currentlyActingAs">
-      <h6 style="text-align: center"> A picture helps people recognize you. </h6>
+      <h6> A picture helps people recognize you. </h6>
       <b-button v-if="!profileImage" variant="info" class="w-100 mt-2 mb-4" size="sm"
                 @click="$refs.userImagePicker.click()">
         <b-icon-image/>
         Add profile photo
       </b-button>
-      <b-button v-if="profileImage" class="mt-2 mb-4" variant="danger" size="sm"
-                style="width: 48%; margin-right: 1%"
+      <b-button id="deleteButton" v-if="profileImage" class="mt-2 mb-4" variant="danger" size="sm"
                 @click="$bvModal.show('confirmDeleteImageModal')">
         <b-icon-trash-fill/>
         Delete
       </b-button>
-      <b-button v-if="profileImage" variant="info" class="w-50 mt-2 mb-4" size="sm"
-                style="width: 48%; margin-left: 1%"
+      <b-button id="changeButton" v-if="profileImage" variant="info" class="w-50 mt-2 mb-4" size="sm"
                 @click="$refs.userImagePicker.click()">
         <b-icon-pencil-fill/>
         Change
@@ -43,6 +39,34 @@
     </b-modal>
   </div>
 </template>
+
+<style scoped>
+
+#changeButton {
+  width: 48%;
+  margin-left: 1%;
+}
+
+#deleteButton {
+  width: 48%;
+  margin-right: 1%;
+}
+
+h6 {
+  text-align: center;
+}
+
+.profile-image {
+  height: 16rem;
+  width: 16rem;
+  display: inline-block
+}
+
+.upload-image {
+  display: none
+}
+
+</style>
 
 <script>
 import Api from "../../Api";
@@ -62,9 +86,7 @@ export default {
   data: function () {
     return {
       profileImage: this.details,
-      uploaded: false,
       errors: [],
-      imageURL: '',
       imageFile: '',
     }
   },
@@ -82,9 +104,7 @@ export default {
     openImage(event) {
       if (event.target.files[0]) {
         this.imageFile = event.target.files[0];
-        this.imageURL = window.URL.createObjectURL(event.target.files[0]);
         this.uploadImageRequest()
-        this.uploaded = true;
       }
     },
 
@@ -107,7 +127,8 @@ export default {
               if (error.response.status === 413) {
                 this.errors.push("The image you tried to upload is too large. Images must be less than 1MB in size.");
               } else {
-              this.errors.push(`Uploading image failed: ${error.response.data.message}`);}
+                this.errors.push(`Uploading image failed: ${error.response.data.message}`);
+              }
             } else {
               this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
             }
@@ -133,9 +154,7 @@ export default {
         Api.deleteUserProfileImage(userId).then(() => {
           EventBus.$emit("updatedImage");
           this.profileImage = null
-          this.imageURL = '';
           this.imageFile = '';
-          this.uploaded = false;
           this.imageError = '';
         }).catch((error) => {
           this.errors = [];
