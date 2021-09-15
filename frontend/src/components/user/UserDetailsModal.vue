@@ -135,7 +135,8 @@ Date: 3/3/2021
 .profile-image {
   height: 12rem;
   width: 12rem;
-  display: inline-block
+  display: inline-block;
+  object-fit: cover;
 }
 </style>
 

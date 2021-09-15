@@ -185,7 +185,8 @@ h6 {
 
 #profile-image {
   margin-left: 5px;
-  position: relative
+  position: relative;
+  object-fit: cover;
 }
 
 #profile-image:hover {

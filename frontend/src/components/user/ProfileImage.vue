@@ -34,7 +34,7 @@
              @ok="confirmDeleteImage">
       <h6>
         Are you sure you want to <strong>delete</strong> this image?
-        <strong><br>{{ !uploaded ? "It will be permanently deleted from your account." : "" }}</strong>
+        <strong><br>It will be permanently deleted from your account.</strong>
       </h6>
     </b-modal>
   </div>
@@ -59,6 +59,7 @@ h6 {
 .profile-image {
   height: 16rem;
   width: 16rem;
+  object-fit: cover;
   display: inline-block
 }
 
