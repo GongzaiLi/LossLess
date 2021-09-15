@@ -20,7 +20,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
@@ -28,8 +27,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 public class SalesReportFeature {
@@ -50,19 +48,13 @@ public class SalesReportFeature {
     private ProductService productService;
 
     @Autowired
-    private InventoryService inventoryService;
-
-    @Autowired
-    private ListingsService listingsService;
-
-    @Autowired
     private BusinessService businessService;
 
     @Autowired
     private PurchasedListingRepository purchasedListingRepository;
 
     private ResultActions responseResult;
-    private static Boolean initilised = Boolean.FALSE;
+    private static Boolean initialised = Boolean.FALSE;
     private static Product productToPurchase = new Product();
 
     /**
@@ -80,7 +72,7 @@ public class SalesReportFeature {
 
     @And("the following purchases have been made:")
     public void theFollowingPurchasesHaveBeenMade(List<List<String>> purchases) {
-        if (!initilised) {
+        if (!initialised) {
             for (var purchaseInfo : purchases) {
                 PurchasedListing purchaseRecord = new PurchasedListing();
                 purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
@@ -94,7 +86,7 @@ public class SalesReportFeature {
                 purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
                 purchasedListingRepository.save(purchaseRecord);
             }
-            initilised = Boolean.TRUE;
+            initialised = Boolean.TRUE;
         }
     }
 
@@ -167,6 +159,23 @@ public class SalesReportFeature {
                     .andExpect(jsonPath("["+i+"].totalPurchases", is(Integer.parseInt(purchaseArray.get(2)))))
                     .andExpect(jsonPath("["+i+"].totalValue", is(Double.parseDouble(purchaseArray.get(3)))));
             i++;
+        }
+    }
+
+    @When("I view the extended sales report starting {string} and ending {string}")
+    public void iViewTheExtendedSalesReportStartingAndEnding(String startDate, String endDate) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/listingDurations")
+                .with(user(currentUserDetails))
+                .queryParam("startDate",startDate)
+                .queryParam("endDate",endDate)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Then("The counts of listings grouped by duration are:")
+    public void theCountsOfListingsGroupedByDurationAre(List<List<String>> counts) throws Exception {
+        for (List<String> count : counts) {
+            responseResult.andExpect(jsonPath(count.get(0), is(Integer.parseInt(count.get(1)))));
         }
     }
 }

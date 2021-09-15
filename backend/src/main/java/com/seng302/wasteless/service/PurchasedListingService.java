@@ -11,9 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -179,6 +178,26 @@ public class PurchasedListingService {
             business.setCreated(earliestListingDate);
         }
         purchasedListingRepository.saveAll(fakePurchases);
+    }
+
+
+    /**
+     * @param businessId Business to get purchases for
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
+     * @return Map where the keys are the durations in days between the listings’ purchase and closing dates,
+     * and the values are the number of sales listings
+     */
+    public Map<Long, Integer> countSalesByDurationBetweenSaleAndClose(Integer businessId, LocalDate startDate, LocalDate endDate) {
+        Map<Long, Integer> durationCounts = new HashMap<>();
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetween(businessId, startDate, endDate);
+
+        for (PurchasedListing purchase: purchases) {
+            Long daysBetweenSaleAndClose = ChronoUnit.DAYS.between(purchase.getSaleDate(), purchase.getClosingDate());
+            durationCounts.merge(daysBetweenSaleAndClose, 1, Integer::sum);
+        }
+
+        return durationCounts;
     }
 
 }

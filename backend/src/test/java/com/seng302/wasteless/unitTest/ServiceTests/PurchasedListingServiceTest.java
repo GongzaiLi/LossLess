@@ -23,9 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 
@@ -79,15 +77,17 @@ public class PurchasedListingServiceTest {
         business.setCreated(LocalDate.now());
         businessService.createBusiness(business);
 
-        listing1 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
-        Listing listing2 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 2.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
-        Listing listing3 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 5.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1);
-        Listing listing4 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 15.0, LocalDate.of(2099, Month.JANUARY, 1),1, 1);
+        listing1 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 1.0, LocalDate.of(2022, Month.JANUARY, 1), 1, 1);
+        Listing listing2 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 2.0, LocalDate.of(2022, Month.JANUARY, 2), 1, 1);
+        Listing listing3 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 5.0, LocalDate.of(2022, Month.SEPTEMBER, 15), 1, 1);
+        Listing listing4 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 15.0, LocalDate.of(2022, Month.JANUARY, 1),1, 1);
+        Listing listing5 = TestUtils.createListingForSameBusiness(this.productService, this.inventoryService, this.listingsService, business, "Black Water No Sugar", 5.0, LocalDate.of(2022, Month.SEPTEMBER, 15), 1, 1);
 
-        listingsService.purchase(listing1, curUser);
-        listingsService.purchase(listing2, curUser);
-        listingsService.purchase(listing3, curUser);
-        listingsService.purchase(listing4, curUser);
+        purchasedListingRepository.save(listingsService.purchase(listing1, curUser).setSaleDate(LocalDate.of(2021, Month.FEBRUARY, 1)));
+        purchasedListingRepository.save(listingsService.purchase(listing2, curUser).setSaleDate(LocalDate.of(2021, Month.FEBRUARY, 2)));
+        purchasedListingRepository.save(listingsService.purchase(listing3, curUser).setSaleDate(LocalDate.of(2022, Month.SEPTEMBER, 15)));
+        purchasedListingRepository.save(listingsService.purchase(listing4, curUser).setSaleDate(LocalDate.of(2020, Month.FEBRUARY, 29)));
+        purchasedListingRepository.save(listingsService.purchase(listing5, curUser).setSaleDate(LocalDate.of(2022, Month.SEPTEMBER, 14)));
     }
 
 
@@ -111,7 +111,7 @@ public class PurchasedListingServiceTest {
 
     @Test
     void whenGetSalesReportData_andPeriodIsMonthIn3MonthDateRange_thenReturnedDataHasLength3() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusMonths(2), LocalDate.now(), LocalDate.now().plusMonths(2), Period.ofMonths(1));
+        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusMonths(2), LocalDate.now().minusDays(1), LocalDate.now().plusMonths(2), Period.ofMonths(1));
         assertEquals(3, salesReportData.size());
     }
 
@@ -119,6 +119,32 @@ public class PurchasedListingServiceTest {
     void whenGetSalesReportData_andPeriodIsYearIn4YearDateRange_thenReturnedDataHasLength4() {
         List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusYears(3), LocalDate.now(), LocalDate.now().plusYears(3), Period.ofYears(1));
         assertEquals(4, salesReportData.size());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andAllSalesWithinDuration_thenCorrectCountsReturned() {
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().plusYears(3));
+        Assertions.assertEquals(1, salesReportData.get(0L));
+        Assertions.assertEquals(1, salesReportData.get(1L));
+        Assertions.assertEquals(1, salesReportData.get(672L));
+        Assertions.assertEquals(2, salesReportData.get(334L));
+
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(672L, 0L, 1L, 334L)), salesReportData.keySet());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andTwoSalesWithinDuration_thenCountOfTwoReturned() {
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2021, Month.FEBRUARY, 2));
+        Assertions.assertEquals(2, salesReportData.get(334L));
+
+        Assertions.assertEquals(new HashSet<>(Collections.singletonList(334L)), salesReportData.keySet());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andNoSalesWithinDuration_thenNoCountsReturned() {
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().minusYears(3));
+
+        Assertions.assertTrue(salesReportData.isEmpty());
     }
 
     @Test

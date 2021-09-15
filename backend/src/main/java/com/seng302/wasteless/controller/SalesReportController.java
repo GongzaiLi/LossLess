@@ -4,7 +4,6 @@ import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
-import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -116,4 +114,25 @@ public class SalesReportController {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
+    /**
+     * Endpoint that gets the number of sales listings, grouped by the duration between the
+     * listings’ purchase and closing dates.
+     * @param businessId    The id of the business to get purchases for
+     * @param startDate     The start date for the date range. Format yyyy-MM-dd
+     * @param endDate       The end date for the date range. Format yyyy-MM-dd
+     * @return JSON object where the keys are the durations in days between the
+     *  listings’ purchase and closing dates, and the values are the number of sales listings
+     */
+    @GetMapping("/businesses/{id}/salesReport/listingDurations")
+    public ResponseEntity<Object> getPurchaseDataOfBusiness(@PathVariable("id") Integer businessId,
+                                                            @RequestParam(value = "startDate") LocalDate startDate,
+                                                            @RequestParam(value = "endDate") LocalDate endDate) {
+        User user = userService.getCurrentlyLoggedInUser();
+        Business business = businessService.findBusinessById(businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(business,user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                purchasedListingService.countSalesByDurationBetweenSaleAndClose(business.getId(), startDate, endDate)
+        );
+    }
 }
