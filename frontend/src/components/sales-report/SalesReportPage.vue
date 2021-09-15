@@ -50,7 +50,7 @@ Date: sprint_6
                       :fields="fields"
                       :per-page="perPage"
                       :current-page="currentPage"
-                      rshowesponsive="lg"
+                      responsive="lg"
                       bordered
                       show-empty>
                     <template #empty>
@@ -92,7 +92,7 @@ Date: sprint_6
         administrators of the business. <br>
         Return to the business profile page
         <router-link :to="'/businesses/' + $route.params.id">here.</router-link>
-      </h6>              this.loadingTable = false;
+      </h6>
     </b-card>
   </div>
 </template>
