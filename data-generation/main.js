@@ -559,7 +559,7 @@ async function addProductImages(businessId, instance, productId) {
 async function uploadProductImage (businessId, productId, instance, startImageId) {
   // See https://github.com/axios/axios/issues/710 for how this works
   let formData = new FormData();
-  formData.append("filename", fs.createReadStream(`./exampleImages/${startImageId}.jpg`));
+  formData.append("filename", fs.createReadStream(`./exampleImages/product/${startImageId}.jpg`));
   return instance.post(`${SERVER_URL}/businesses/${businessId}/products/${productId}/images`, formData,
       {headers: formData.getHeaders()});
 }
