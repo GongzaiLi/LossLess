@@ -30,10 +30,11 @@ const MIN_QUANTITY_PRODUCT_IN_INVENTORY = 1;
 const CHANCE_OF_INVENTORY_FOR_PRODUCT = 0.8;
 const MIN_QUANTITY_INVENTORY_IN_LISTING = 1;
 const MAX_CARD_PER_USER = 5;
-const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS)/2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
+const APPROX_NUM_LISTINGS = NUM_BUSINESSES * ((MAX_PRODUCTS_PER_BUSINESS + MIN_PRODUCTS_PER_BUSINESS) / 2) * CHANCE_OF_INVENTORY_FOR_PRODUCT * 0.8;  // Fudge factor
 const LISTING_ID_OF_MAX_LIKED_LISTING = 1;
 const MAX_PURCHASES_PER_USER = 3;
 const PROB_USER_PURCHASES_LISTING = 0.01;
+const NUMBER_OF_USER_IMAGES = 15;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -54,8 +55,8 @@ async function getApiRandomUserInfo() {
   let users = [];
   for (let i = 0; i < NUM_USERS / MAX_GENERATED_USERS_PER_REQUEST; i++) {
     let usersBatch = (await Axios
-        .get(`https://randomuser.me//api/?results=${MAX_GENERATED_USERS_PER_REQUEST}`))
-        .data.results;
+      .get(`https://randomuser.me//api/?results=${MAX_GENERATED_USERS_PER_REQUEST}`))
+      .data.results;
     console.log(`Got ${(i + 1) * MAX_GENERATED_USERS_PER_REQUEST} / ${NUM_USERS} users from API`)
     users = users.concat(usersBatch);
   }
@@ -114,7 +115,7 @@ async function getUsers() {
     users.push({
       firstName: user.name.first,
       lastName: user.name.last,
-      nickname: (Math.random() < HAS_NICKNAME_PROB) ? user.login.username.replace(/[0-9]/g, ''): undefined,
+      nickname: (Math.random() < HAS_NICKNAME_PROB) ? user.login.username.replace(/[0-9]/g, '') : undefined,
       bio: userBios[Math.floor(Math.random() * userBios.length)],
       email: user.email.replace('\'', '').replace('..', '.'),  // some data comes back malformed with ' (single quote) characters or .. (double dots), so we remove them here
       dateOfBirth: user.dob.date,
@@ -148,11 +149,11 @@ async function getBusinesses() {
 
   const businesses = []
 
-  for (let i=0; i < NUM_BUSINESSES; i++) {
+  for (let i = 0; i < NUM_BUSINESSES; i++) {
 
     const businessTypesHolder = businessTypes[Math.floor(Math.random() * NUM_BUSINESSTYPES)];
     const desc = businessNames[i] + " is a high quality business in the field of " + businessTypesHolder + ". We " +
-        "have a wide variety of products for you to view and purchase."
+      "have a wide variety of products for you to view and purchase."
 
     businesses.push({
       primaryAdministratorId: null,
@@ -174,18 +175,18 @@ async function getBusinesses() {
  * @returns {Promise<void>}
  */
 async function likeListings(instance) {
-    try {
-        await instance.put(`${SERVER_URL}/listings/${LISTING_ID_OF_MAX_LIKED_LISTING}/like`, null, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-            }
-        });
-    } catch(e) {
-        console.log(`Tried to like listing Id ${LISTING_ID_OF_MAX_LIKED_LISTING} for max liked listing, but listing does not exist.`);
-        console.log(`Error message was: ${e}`)
-    }
-    if (Math.random() < PROB_USER_LIKES_LISTINGS) {
+  try {
+    await instance.put(`${SERVER_URL}/listings/${LISTING_ID_OF_MAX_LIKED_LISTING}/like`, null, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+      }
+    });
+  } catch (e) {
+    console.log(`Tried to like listing Id ${LISTING_ID_OF_MAX_LIKED_LISTING} for max liked listing, but listing does not exist.`);
+    console.log(`Error message was: ${e}`)
+  }
+  if (Math.random() < PROB_USER_LIKES_LISTINGS) {
     for (let i = 0; i <= Math.random() * MAX_LIKED_LISTINGS_PER_USER; i++) {
       const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
       try {
@@ -195,9 +196,9 @@ async function likeListings(instance) {
             'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
           }
         });
-      } catch(err) {
-          if (err.response.status !== 406) {
-            console.log(err.message, err.response.data);
+      } catch (err) {
+        if (err.response.status !== 406) {
+          console.log(err.message, err.response.data);
         }
       }
     }
@@ -213,73 +214,75 @@ async function likeListings(instance) {
  * @param instance for sending api requests
  * @returns {Promise<void>}
  */
-async function purchaseListing(instance){
+async function purchaseListing(instance) {
 
-    for (let i = 0; i <= Math.random() * MAX_PURCHASES_PER_USER; i++) {
-        if (Math.random() < PROB_USER_PURCHASES_LISTING) {
-            const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
-            try {
-                await instance.post(`${SERVER_URL}/listings/${listingId}/purchase`, null, {
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-                    }
-                });
-            } catch(err) {
-                if (err.response.status !== 406) {
-                    console.log(err.message, err.response.data);
-                }
-            }
+  for (let i = 0; i <= Math.random() * MAX_PURCHASES_PER_USER; i++) {
+    if (Math.random() < PROB_USER_PURCHASES_LISTING) {
+      const listingId = Math.floor(Math.random() * APPROX_NUM_LISTINGS) + 1;
+      try {
+        await instance.post(`${SERVER_URL}/listings/${listingId}/purchase`, null, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+          }
+        });
+      } catch (err) {
+        if (err.response.status !== 406) {
+          console.log(err.message, err.response.data);
         }
+      }
     }
+  }
 }
 
 /**
  * Uses axios to make a post request to our backend to create a new user.
  */
-async function registerUser(user, listingsReady=true) {
-    const instance = Axios.create({
-        baseURL: SERVER_URL,
-        timeout: 180000,// set 2 mins
-        withCredentials: true
-    });
+async function registerUser(user, listingsReady = true) {
+  const instance = Axios.create({
+    baseURL: SERVER_URL,
+    timeout: 180000,// set 2 mins
+    withCredentials: true
+  });
 
-    const response = await instance.post(`${SERVER_URL}/users`, user, {
-        headers: {
-            'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-        }
-    });
-    instance.defaults.headers.Cookie = response.headers["set-cookie"];
+  const response = await instance.post(`${SERVER_URL}/users`, user, {
+    headers: {
+      'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+    }
+  });
+  instance.defaults.headers.Cookie = response.headers["set-cookie"];
 
-    await addCard(instance);
-    if (listingsReady) await likeListings(instance);
-    if (listingsReady) await purchaseListing(instance);
-    return [response, instance];
+  await uploadUserImage(response.data.id, instance);
+
+  await addCard(instance);
+  if (listingsReady) await likeListings(instance);
+  if (listingsReady) await purchaseListing(instance);
+  return [response, instance];
 }
 
 /**
  * Uses axios to make a post request to our backend to create a new user and a number of businesses with that user
  */
 async function registerUserWithBusinesses(user, businesses, numBusinesses) {
-    const [response, instance] = await registerUser(user, false);
-    for (let i = 0; i < numBusinesses; i++) {
-        const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
-        await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+  const [response, instance] = await registerUser(user, false);
+  for (let i = 0; i < numBusinesses; i++) {
+    const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
+    await addProduct(businessResponse.data.businessId, instance, businesses[i]);
 
-        let adminIds = [];
-        for (let j = 0; j < Math.min(Math.floor(Math.random() * (6)) + 1, response.data.id - 1); j++) {
-            const id = (Math.floor(Math.random() * (response.data.id)) + 1);
-            if (id !== response.data.id && !adminIds.includes(id)) {
-                adminIds.push(id);
-            }
-        }
-
-        for (const adminId of adminIds) {
-            await makeUserBusinessAdmin(businessResponse.data.businessId, instance, adminId);
-        }
-
-        console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
+    let adminIds = [];
+    for (let j = 0; j < Math.min(Math.floor(Math.random() * (6)) + 1, response.data.id - 1); j++) {
+      const id = (Math.floor(Math.random() * (response.data.id)) + 1);
+      if (id !== response.data.id && !adminIds.includes(id)) {
+        adminIds.push(id);
+      }
     }
+
+    for (const adminId of adminIds) {
+      await makeUserBusinessAdmin(businessResponse.data.businessId, instance, adminId);
+    }
+
+    console.log(`Registered business with products and inventory and listings. Id: ${businessResponse.data.businessId}`);
+  }
 
 }
 
@@ -291,25 +294,25 @@ async function registerUsers(users, businesses) {
 
   let businessesRegistered = 0;
 
-  for (let i=0; i < users.length / MAX_USERS_PER_API_REQUEST; i++) {
+  for (let i = 0; i < users.length / MAX_USERS_PER_API_REQUEST; i++) {
     const promises = []
     if (businessesRegistered < NUM_BUSINESSES) {
-        for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
-            let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
-            if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
-              numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
-            }
-            promises.push(registerUserWithBusinesses(users[i*MAX_USERS_PER_API_REQUEST+j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
-            businessesRegistered += numBusinessesForUser;
+      for (let j = 0; j < MAX_USERS_PER_API_REQUEST; j++) {
+        let numBusinessesForUser = Math.floor(Math.random() * MAX_BUSSINESSES_PER_USER)
+        if (businessesRegistered + numBusinessesForUser > NUM_BUSINESSES) {
+          numBusinessesForUser = NUM_BUSINESSES - businessesRegistered;
         }
+        promises.push(registerUserWithBusinesses(users[i * MAX_USERS_PER_API_REQUEST + j], businesses.slice(businessesRegistered, businessesRegistered + numBusinessesForUser), numBusinessesForUser))
+        businessesRegistered += numBusinessesForUser;
+      }
     } else {
-        for (let j=0; j < MAX_USERS_PER_API_REQUEST; j++) {
-            promises.push(registerUser(users[i*MAX_USERS_PER_API_REQUEST+j]));
-        }
+      for (let j = 0; j < MAX_USERS_PER_API_REQUEST; j++) {
+        promises.push(registerUser(users[i * MAX_USERS_PER_API_REQUEST + j]));
+      }
     }
     try {
       await Promise.all(promises);
-    } catch(e) {
+    } catch (e) {
       console.log(e.message, e.response.data);
       throw e;
     }
@@ -344,14 +347,14 @@ async function makeUserBusinessAdmin(businessId, instance, userId) {
   }
 
   return await instance
-      .put(`${SERVER_URL}/businesses/${businessId}/makeAdministrator`,
-          data,
-          {
-            headers: {
-              'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-            }
-          }
-      )
+    .put(`${SERVER_URL}/businesses/${businessId}/makeAdministrator`,
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+        }
+      }
+    )
 }
 
 /**
@@ -362,7 +365,7 @@ function createProductObject(name, business) {
 
   const productId = name.replace(/\s/g, "-").replace(/\'/g, "").toUpperCase();
   const desc = "This is a very tasty product called " + name + ". It is well priced and a high quality is ensured by " +
-      business.name + "."
+    business.name + "."
 
   return {
     id: productId,
@@ -386,8 +389,8 @@ function createInventoryObject(product) {
   const sellBy = new Date(now.getTime() + Math.random() * (end.getTime() - now.getTime()));
   const bestBefore = new Date(sellBy.getTime() + Math.random() * (end.getTime() - sellBy.getTime()));
   const expires = new Date(bestBefore.getTime() + Math.random() * (end.getTime() - bestBefore.getTime()));
-  const quantity = Math.floor(Math.random() * (MAX_QUANTITY_PRODUCT_IN_INVENTORY-MIN_QUANTITY_PRODUCT_IN_INVENTORY) +
-      MIN_QUANTITY_PRODUCT_IN_INVENTORY);
+  const quantity = Math.floor(Math.random() * (MAX_QUANTITY_PRODUCT_IN_INVENTORY - MIN_QUANTITY_PRODUCT_IN_INVENTORY) +
+    MIN_QUANTITY_PRODUCT_IN_INVENTORY);
   const totalPrice = quantity * product.recommendedRetailPrice;
 
   return {
@@ -499,18 +502,18 @@ async function addProduct(businessId, instance, business) {
  */
 function createCardObject() {
 
-    const sections = ["ForSale", "Wanted", "Exchange"];
-    const section = sections[Math.floor(Math.random() * sections.length)];
-    const title = productNames[Math.floor(Math.random() * productNames.length)];
-    const description = cardDes[Math.floor(Math.random() * cardDes.length)]
-    const keywords = ["food", "hungry", "delicious", "yummy", "fresh"]
+  const sections = ["ForSale", "Wanted", "Exchange"];
+  const section = sections[Math.floor(Math.random() * sections.length)];
+  const title = productNames[Math.floor(Math.random() * productNames.length)];
+  const description = cardDes[Math.floor(Math.random() * cardDes.length)]
+  const keywords = ["food", "hungry", "delicious", "yummy", "fresh"]
 
-    return {
-        section: section,
-        title: title,
-        description: description,
-        keywords: keywords.slice(0, Math.floor(Math.random() * keywords.length)),
-    };
+  return {
+    section: section,
+    title: title,
+    description: description,
+    keywords: keywords.slice(0, Math.floor(Math.random() * keywords.length)),
+  };
 }
 
 
@@ -521,15 +524,15 @@ function createCardObject() {
  */
 async function addCard(instance) {
 
-    for (let i = 0; i < Math.floor(Math.random() * MAX_CARD_PER_USER); i++) {
-        const card = createCardObject();
-        await instance.post(`${SERVER_URL}/cards`, card, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
-            }
-        });
-    }
+  for (let i = 0; i < Math.floor(Math.random() * MAX_CARD_PER_USER); i++) {
+    const card = createCardObject();
+    await instance.post(`${SERVER_URL}/cards`, card, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json', // For some reason Axios will make the content type something else by default
+      }
+    });
+  }
 
 }
 
@@ -556,12 +559,26 @@ async function addProductImages(businessId, instance, productId) {
 /**
  * Uploads an image for a product.
  */
-async function uploadProductImage (businessId, productId, instance, startImageId) {
+async function uploadProductImage(businessId, productId, instance, startImageId) {
   // See https://github.com/axios/axios/issues/710 for how this works
   let formData = new FormData();
   formData.append("filename", fs.createReadStream(`./exampleImages/product/${startImageId}.jpg`));
   return instance.post(`${SERVER_URL}/businesses/${businessId}/products/${productId}/images`, formData,
+    {headers: formData.getHeaders()});
+}
+
+
+/**
+ * Uploads an image for a user.
+ */
+async function uploadUserImage(userId, instance) {
+  if (Math.random() > 0.25) {
+    let formData = new FormData();
+    const imageIndex = Math.floor(Math.random() * (NUMBER_OF_USER_IMAGES - 1) + 1); // 15 is number of images in user file
+    formData.append("filename", fs.createReadStream(`./exampleImages/user/${imageIndex}.png`));
+    return instance.post(`${SERVER_URL}/users/${userId}/image`, formData,
       {headers: formData.getHeaders()});
+  }
 }
 
 async function main() {
@@ -579,9 +596,9 @@ async function main() {
     }
   } else {
     console.log("Invalid command line arguments passed.\n" +
-        "Usage: \n" +
-        "'npm run start regenerateData' to re-generate random user data (requires internet connection to https://randomuser.me)\n" +
-        "'npm run start' to run normally (re-uses user data if generate previously)");
+      "Usage: \n" +
+      "'npm run start regenerateData' to re-generate random user data (requires internet connection to https://randomuser.me)\n" +
+      "'npm run start' to run normally (re-uses user data if generate previously)");
     process.exit();
   }
 
