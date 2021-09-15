@@ -199,41 +199,6 @@ describe('Testing-api-put-updating-user', () => {
   });
 });
 
-describe('Testing-api-post-upload-image-for-user', () => {
-  it('Successful-upload-image', async () => {
-    Api.uploadProfileImage.mockResolvedValue(
-      {
-        status: 201
-      })
-
-    await wrapper.vm.uploadImageRequest(1);
-    expect(wrapper.vm.errors).toStrictEqual([]);
-  });
-
-  it('413-error-upload-image', async () => {
-    Api.uploadProfileImage.mockRejectedValue({
-      response: {
-        data: {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
-        status: 413
-      }
-    });
-    await wrapper.vm.uploadImageRequest(1);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.errors).toStrictEqual(["The image you tried to upload is too large. Images must be less than 1MB in size."]);
-  });
-
-  it('500-error-upload-image', async () => {
-    Api.uploadProfileImage.mockRejectedValue({});
-
-    await wrapper.vm.uploadImageRequest(1);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
-  });
-});
-
-
 describe('Testing-changing-password', () => {
   beforeEach(() =>
     wrapper.setProps({isEditUser: true}));

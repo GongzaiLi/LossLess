@@ -42,17 +42,12 @@ afterEach(() => {
 });
 
 describe('Testing delete image when modifying user', () => {
-    test('Successfully remove an uploaded image', async () => {
-        wrapper.vm.details = null;
-        wrapper.vm.uploaded = true;
-
-        await wrapper.vm.confirmDeleteImage();
-
-        expect(wrapper.vm.uploaded).toStrictEqual(false);
-        expect(Api.deleteUserProfileImage).not.toHaveBeenCalled();
-    });
-
     test('Successfully delete a user image when one exists', async () => {
+        Api.deleteUserProfileImage.mockResolvedValue(
+            {
+                status: 201
+            })
+
         wrapper.vm.profileImage = details;
         wrapper.vm.uploaded = false;
 
@@ -61,6 +56,33 @@ describe('Testing delete image when modifying user', () => {
 
         expect(wrapper.vm.profileImage).toStrictEqual(null)
         expect(Api.deleteUserProfileImage).toHaveBeenCalled();
+    });
+
+    test('4xx-error-delete-user-image', async () => {
+        Api.deleteUserProfileImage.mockRejectedValue({
+            response: {
+                data: {message: "User given does not have a profile image"},
+                status: 400
+            }
+        });
+
+        wrapper.vm.profileImage = details;
+        await wrapper.vm.confirmDeleteImage();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.errors).toStrictEqual(["Deleting image failed: User given does not have a profile image"]);
+    });
+
+    test('500-error-delete-user-image', async () => {
+        Api.deleteUserProfileImage.mockRejectedValue({})
+
+        wrapper.vm.profileImage = details;
+        wrapper.vm.confirmDeleteImage();
+
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
     });
 });
 
@@ -75,27 +97,30 @@ describe('Testing-api-post-upload-image-for-user', () => {
         expect(wrapper.vm.errors).toStrictEqual([]);
     });
 
-    it('400-error-upload-image', async () => {
-        Api.uploadProfileImage.mockRejectedValue({response: {
-                data:  {message: "Error Uploading Image"},
-                status: 400
-            }});
-        await wrapper.vm.uploadImageRequest();
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.errors).toStrictEqual(["Uploading images failed: Error Uploading Image"]);
-    });
-
-
     it('413-error-upload-image', async () => {
-        Api.uploadProfileImage.mockRejectedValue({response: {
-                data:  {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
+        Api.uploadProfileImage.mockRejectedValue({
+            response: {
+                data: {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
                 status: 413
-            }});
+            }
+        });
         await wrapper.vm.uploadImageRequest();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.errors).toStrictEqual(["The image you tried to upload is too large. Images must be less than 1MB in size."]);
+    });
+
+    it('4xx-error-upload-image', async () => {
+        Api.uploadProfileImage.mockRejectedValue({
+            response: {
+                data: {message: "Error Uploading"},
+                status: 400
+            }
+        });
+        await wrapper.vm.uploadImageRequest();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.errors).toStrictEqual(["Uploading image failed: Error Uploading"]);
     });
 
     it('500-error-upload-image', async () => {
