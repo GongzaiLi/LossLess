@@ -54,7 +54,7 @@
       </b-col>
 
       <b-col lg="2">
-        <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" class="mt-4" id="filterDateBtn"
+        <b-button type="submit" :disabled="endDateValidityState === false" variant="primary" style="margin-top: 1.9rem" id="filterDateBtn"
                   :style="endDateValidityState === false ? 'cursor: not-allowed;' : ''">
           Get Report
         </b-button>
