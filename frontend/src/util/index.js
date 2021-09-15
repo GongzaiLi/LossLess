@@ -35,6 +35,11 @@ export function formatDate(date) {
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
 
+export function formatDateTime(dateTimeString) {
+  let dateTime = dateTimeString.split("T")
+  return dateTime[0] + " @ " + dateTime[1].slice(0,5)
+}
+
 /**
  * get a number of mouth the translate to the mouth name
  * @param mouthNum

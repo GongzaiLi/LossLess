@@ -230,6 +230,15 @@ export default {
         this.currentPage = 1;
         this.$refs.listingsSearchPag.currentPage = 1; // We have to do this because the v-model doesn't update when we only set data.currentPage
       }
+      let closesStartDate = this.search.closesStartDate
+      if (this.search.closesStartDate) {
+        closesStartDate = this.search.closesStartDate.toString() + " 00:00:00";
+      }
+      let closesEndDate = this.search.closesEndDate
+      if (this.search.closesEndDate) {
+        closesEndDate = this.search.closesEndDate + " 23:59:59"
+      }
+
       const resp = (await Api.searchListings(
           this.search.productName,
           this.search.priceMin,
@@ -237,8 +246,8 @@ export default {
           this.search.businessName,
           this.search.businessTypes,
           this.search.businessLocation,
-          this.search.closesStartDate,
-          this.search.closesEndDate,
+          closesStartDate,
+          closesEndDate,
           this.sortOrdersForAPI,
           this.perPage,
           this.currentPage - 1)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue

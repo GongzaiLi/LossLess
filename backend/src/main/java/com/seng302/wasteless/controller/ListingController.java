@@ -24,6 +24,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -73,7 +75,6 @@ public class ListingController {
     @PostMapping("/businesses/{id}/listings")
     public ResponseEntity<Object> postBusinessListings(@PathVariable("id") Integer businessId, @Valid @RequestBody PostListingsDto listingsDtoRequest) {
         logger.info("Post request to create business LISTING, business id: {}", businessId);
-
         User user = userService.getCurrentlyLoggedInUser();
 
         logger.info("Retrieving business with id: {}", businessId);
@@ -179,8 +180,8 @@ public class ListingController {
      * @param priceUpper       Upper inclusive bound for listing prices
      * @param businessName     Business name to match against listings
      * @param businessTypes    List of business types to match against listings
-     * @param closingDateStart A date string to filter listings with. This sets the start range to filter listings by closing date. String should be converted to date via Spring magic.
-     * @param closingDateEnd   A date string to filter listings with. This sets the end range to filter listings by closing date. String should be converted to date via Spring magic.
+     * @param closingDateStart A date time string to filter listings with. This sets the start range to filter listings by closing date. String is parse through a formatter to get a local date time object.
+     * @param closingDateEnd   A date time string to filter listings with. This sets the end range to filter listings by closing date. String is parse through a formatter to get a local date time object.
      * @param address          Address to match against suburb, city, and country of lister of listing
      * @param pageable         pagination and sorting params
      * @return Http Status 200 if valid query, 401 if unauthorised
@@ -192,16 +193,26 @@ public class ListingController {
             @RequestParam Optional<Double> priceUpper,
             @RequestParam Optional<String> businessName,
             @RequestParam Optional<List<String>> businessTypes,
-            @RequestParam Optional<LocalDate> closingDateStart,
-            @RequestParam Optional<LocalDate> closingDateEnd,
+            @RequestParam Optional<String> closingDateStart,
+            @RequestParam Optional<String> closingDateEnd,
             @RequestParam Optional<String> address,
             Pageable pageable) {
 
+        Optional<LocalDateTime> closingDateTimeStart = Optional.empty();
+        Optional<LocalDateTime> closingDateTimeEnd =  Optional.empty();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if(closingDateStart.isPresent() && !closingDateStart.get().equals("")){
+            closingDateTimeStart = Optional.of(LocalDateTime.parse(closingDateStart.get(), formatter));
+        }
+        if(closingDateEnd.isPresent()&& !closingDateEnd.get().equals("")) {
+            closingDateTimeEnd =  Optional.of(LocalDateTime.parse(closingDateEnd.get(), formatter));
+        }
+
         logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, closingDateStart: {} closingDateEnd: {}, address: {}",
-                searchQuery, priceLower, priceUpper, businessName, businessTypes, closingDateStart, closingDateEnd, address);
+                searchQuery, priceLower, priceUpper, businessName, businessTypes, closingDateTimeStart, closingDateTimeEnd, address);
 
 
-        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address,closingDateStart, closingDateEnd, pageable);
+        Page<Listing> listings = listingsService.searchListings(searchQuery, priceLower, priceUpper, businessName, businessTypes, address, closingDateTimeStart, closingDateTimeEnd, pageable);
         User user = userService.getCurrentlyLoggedInUser();
         GetListingsDto getListingsDto = new GetListingsDto(listings.getContent(), listings.getTotalElements(), user);
         logger.info(getListingsDto);

@@ -64,7 +64,7 @@ describe('Testing watcher for current page change', () => {
   test('check-get-listings-is-called-when-current-page-updated', async () => {
     wrapper.vm.currentPage = 3
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", ["inventoryItem.product.name,asc"], 9, 2);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12 00:00:00", "", ["inventoryItem.product.name,asc"], 9, 2);
   });
 
 });

@@ -5,6 +5,7 @@ import com.seng302.wasteless.service.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class TestUtils {
@@ -40,7 +41,7 @@ public class TestUtils {
     public static Listing createListingWithNameAndPrice(ProductService productService, InventoryService inventoryService,
                                                         ListingsService listingsService, BusinessService businessService,
                                                         AddressService addressService, String name, Double price,
-                                                        String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDate closes,
+                                                        String country, String city, String suburb, String businessName, BusinessTypes businessTypes, LocalDateTime closes,
                                                         Integer listingQuantity, Integer inventoryQuantity) {
 
         Address address = new Address();
@@ -91,7 +92,7 @@ public class TestUtils {
      */
     public static Listing createListingForSameBusiness(ProductService productService, InventoryService inventoryService,
                                                         ListingsService listingsService,
-                                                        Business business, String name, Double price, LocalDate closes,
+                                                        Business business, String name, Double price, LocalDateTime closes,
                                                         Integer listingQuantity, Integer inventoryQuantity) {
 
         Product product = new Product();
