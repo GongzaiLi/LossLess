@@ -1,7 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.dto.SalesReportDto;
-import com.seng302.wasteless.dto.SalesReportPurchaseTotalsDto;
+import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.PurchasedListing;
@@ -195,17 +195,17 @@ public class PurchasedListingService {
      * @param businessId    The id of the business
      * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
      */
-    public List<SalesReportPurchaseTotalsDto> getProductsPurchasedTotals(int businessId) {
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId) {
 
         List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
 
-        List<SalesReportPurchaseTotalsDto> salesReportPurchaseTotalsDtos = new ArrayList<>();
+        List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
 
         for (Long productId: allSoldProductsOfBusiness) {
-            salesReportPurchaseTotalsDtos.add(getTotalsForProduct(productId));
+            salesReportProductTotalsDtos.add(getTotalsForProduct(productId));
         }
 
-        return salesReportPurchaseTotalsDtos;
+        return salesReportProductTotalsDtos;
     }
 
     /**
@@ -214,7 +214,7 @@ public class PurchasedListingService {
      * @param productId     The id of the product
      * @return              SalesReportPurchaseTotalsDto populated with information about product sales
      */
-    private SalesReportPurchaseTotalsDto getTotalsForProduct(Long productId) {
+    private SalesReportProductTotalsDto getTotalsForProduct(Long productId) {
         Integer totalPurchases = purchasedListingRepository.sumProductsSoldByProduct_DatabaseId(productId);
         Double totalValue = purchasedListingRepository.sumPriceByProduct_DatabaseId(productId);
         Integer totalLikes = purchasedListingRepository.sumTotalLikesByProduct_DatabaseId(productId);
@@ -225,7 +225,7 @@ public class PurchasedListingService {
 
         Product product = productRepository.findFirstByDatabaseId(productId);
 
-        return new SalesReportPurchaseTotalsDto(product, totalPurchases, totalValue, totalLikes);
+        return new SalesReportProductTotalsDto(product, totalPurchases, totalValue, totalLikes);
     }
 
 }

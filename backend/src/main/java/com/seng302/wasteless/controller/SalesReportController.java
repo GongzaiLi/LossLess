@@ -1,11 +1,10 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.SalesReportDto;
-import com.seng302.wasteless.dto.SalesReportPurchaseTotalsDto;
+import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
-import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -130,7 +128,7 @@ public class SalesReportController {
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-        List<SalesReportPurchaseTotalsDto> productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId);
+        List<SalesReportProductTotalsDto> productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId);
 
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
 
