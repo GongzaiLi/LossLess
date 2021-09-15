@@ -2,6 +2,7 @@ package com.seng302.wasteless.unitTest.ServiceTests;
 
 import com.seng302.wasteless.TestUtils;
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import com.seng302.wasteless.service.*;
@@ -88,6 +89,49 @@ public class PurchasedListingServiceTest {
         listingsService.purchase(listing2, curUser);
         listingsService.purchase(listing3, curUser);
         listingsService.purchase(listing4, curUser);
+
+        Business business2 = new Business();
+        business2.setBusinessType(BusinessTypes.RETAIL_TRADE);
+        business2.setAdministrators(new ArrayList<>());
+        business2.setName("Wonka Milk");
+        business2.setAddress(curUser.getHomeAddress());
+        business2.setCreated(LocalDate.now());
+        businessService.createBusiness(business2);
+
+        Product product1 = new Product();
+        product1.setId("Clown-Shows");
+        product1.setBusinessId(2);
+        product1.setName("Clown Shows");
+        product1.setCreated(LocalDate.now());
+        product1.setDescription("For you feet");
+        product1.setManufacturer("James");
+        product1.setRecommendedRetailPrice(1.0);
+        productService.createProduct(product1);
+
+        Product product2 = new Product();
+        product2.setId("Clown-Hats");
+        product2.setBusinessId(2);
+        product2.setName("Clown Hats");
+        product2.setCreated(LocalDate.now());
+        product2.setDescription("For you head");
+        product2.setManufacturer("James");
+        product2.setRecommendedRetailPrice(2.0);
+        productService.createProduct(product2);
+
+        Listing listingWith5Quantity5LikesForProduct1 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product1, business2, 3.0, LocalDate.of(2099, Month.JANUARY, 1), 5, 10, 5);
+        Listing listingWith2Quantity2LikesForProduct1 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product1, business2, 2.0, LocalDate.of(2099, Month.JANUARY, 1), 2, 10, 2);
+        Listing listingWith1Quantity1LikesForProduct1 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product1, business2, 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 10, 1);
+
+        Listing listingWith10Quantity10LikesForProduct2 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product2, business2, 5.0, LocalDate.of(2099, Month.JANUARY, 1), 10, 10, 10);
+        Listing listingWith5Quantity5LikesForProduct2 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product2, business2, 4.0, LocalDate.of(2099, Month.JANUARY, 1), 5, 10, 5);
+        Listing listingWith1Quantity1LikesForProduct2 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product2, business2, 3.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 10, 1);
+
+        listingsService.purchase(listingWith5Quantity5LikesForProduct1, curUser);
+        listingsService.purchase(listingWith2Quantity2LikesForProduct1, curUser);
+        listingsService.purchase(listingWith1Quantity1LikesForProduct1, curUser);
+        listingsService.purchase(listingWith10Quantity10LikesForProduct2, curUser);
+        listingsService.purchase(listingWith5Quantity5LikesForProduct2, curUser);
+        listingsService.purchase(listingWith1Quantity1LikesForProduct2, curUser);
     }
 
 
@@ -135,6 +179,33 @@ public class PurchasedListingServiceTest {
             Assertions.assertFalse(purchasedListing.getListingDate().isAfter(purchasedListing.getSaleDate()));
             Assertions.assertFalse(purchasedListing.getSaleDate().isAfter(purchasedListing.getClosingDate()));
         }
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotals_thenCorrectNumberOfDtosReturned() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        assertEquals(2, purchasedTotalsData.size());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotals_thenCorrectNumberOfTotalProductPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(16, purchasedTotalsData.get(1).getTotalProductPurchases());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotals_thenCorrectNumberOfLikesOfPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2);
+        assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
     }
 
 }
