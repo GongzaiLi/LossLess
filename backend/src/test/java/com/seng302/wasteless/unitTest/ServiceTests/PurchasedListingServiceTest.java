@@ -118,6 +118,16 @@ public class PurchasedListingServiceTest {
         product2.setRecommendedRetailPrice(2.0);
         productService.createProduct(product2);
 
+        Product product3 = new Product();
+        product3.setId("Clown-Nose");
+        product3.setBusinessId(2);
+        product3.setName("Clown Nose");
+        product3.setCreated(LocalDate.now());
+        product3.setDescription("For you Face");
+        product3.setManufacturer("James");
+        product3.setRecommendedRetailPrice(3.0);
+        productService.createProduct(product3);
+
         Listing listingWith5Quantity5LikesForProduct1 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product1, business2, 3.0, LocalDate.of(2099, Month.JANUARY, 1), 5, 10, 5);
         Listing listingWith2Quantity2LikesForProduct1 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product1, business2, 2.0, LocalDate.of(2099, Month.JANUARY, 1), 2, 10, 2);
         Listing listingWith1Quantity1LikesForProduct1 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product1, business2, 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 10, 1);
@@ -126,12 +136,16 @@ public class PurchasedListingServiceTest {
         Listing listingWith5Quantity5LikesForProduct2 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product2, business2, 4.0, LocalDate.of(2099, Month.JANUARY, 1), 5, 10, 5);
         Listing listingWith1Quantity1LikesForProduct2 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product2, business2, 3.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 10, 1);
 
+        Listing listingWith10Quantity10LikesForProduct3 = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product3, business2, 1.0, LocalDate.of(2099, Month.JANUARY, 1), 10, 10, 10);
+
         listingsService.purchase(listingWith5Quantity5LikesForProduct1, curUser);
         listingsService.purchase(listingWith2Quantity2LikesForProduct1, curUser);
         listingsService.purchase(listingWith1Quantity1LikesForProduct1, curUser);
         listingsService.purchase(listingWith10Quantity10LikesForProduct2, curUser);
         listingsService.purchase(listingWith5Quantity5LikesForProduct2, curUser);
         listingsService.purchase(listingWith1Quantity1LikesForProduct2, curUser);
+        listingsService.purchase(listingWith10Quantity10LikesForProduct3, curUser);
+
     }
 
 
@@ -184,7 +198,7 @@ public class PurchasedListingServiceTest {
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfDtosReturned() {
         List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, null, "ASC");
-        assertEquals(2, purchasedTotalsData.size());
+        assertEquals(3, purchasedTotalsData.size());
     }
 
     @Test
@@ -206,6 +220,39 @@ public class PurchasedListingServiceTest {
         List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, null, "ASC");
         assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotalsAndSortQuantity_ASC_thenCorrectNumberOfTotalProductPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, "quantity", "ASC");
+        assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(10, purchasedTotalsData.get(1).getTotalProductPurchases());
+        assertEquals(16, purchasedTotalsData.get(2).getTotalProductPurchases());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, "value", "ASC");
+        assertEquals(1, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(6, purchasedTotalsData.get(1).getTotalValue());
+        assertEquals(12, purchasedTotalsData.get(2).getTotalValue());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotalsAndSortLikes_ASC_thenCorrectOrderOfPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, "likes", "ASC");
+        assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(10, purchasedTotalsData.get(1).getTotalLikes());
+        assertEquals(16, purchasedTotalsData.get(2).getTotalLikes());
+    }
+
+    @Test
+    void whenGetProductsPurchasedTotalsAndSortLikes_DESC_thenCorrectOrderOfPurchasesInDtos() {
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, "likes", "DESC");
+        assertEquals(16, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(10, purchasedTotalsData.get(1).getTotalLikes());
+        assertEquals(8, purchasedTotalsData.get(2).getTotalLikes());
+
     }
 
 }
