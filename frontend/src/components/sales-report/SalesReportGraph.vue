@@ -17,6 +17,7 @@
 <script>
 import Chart from "chart.js/auto";
 import {getMonthName} from "../../util";
+import EventBus from "../../util/event-bus";
 
 export default {
   name: "SalesReportGraph",
@@ -103,6 +104,7 @@ export default {
         dataset.parsing.yAxisKey = this.showTotalValue ? 'totalValue' : 'totalPurchases';
       });
       this.chart.update();
+      EventBus.$emit("finishedLoading");
     }
   },
   watch: {

@@ -42,6 +42,7 @@ Date: sprint_6
                 <b-col>
                   <b-table
                       ref="salesReportTable"
+                      v-if="!loadingTable"
                       no-border-collapse
                       no-local-sorting
                       striped
@@ -56,11 +57,14 @@ Date: sprint_6
                       <h3 class="no-results-overlay">No results to display</h3>
                     </template>
                   </b-table>
+                  <h1 v-else>Loading...</h1>
                 </b-col>
               </b-row>
             </b-col>
             <b-col>
-              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy"></SalesReportGraph>
+              <h3>Sales Graph</h3>
+              <h1 v-if="loadingGraph">Loading...</h1>
+              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" :style="{opacity: graphOpacity}" v-on:finishedLoading="finishedLoadingGraph"/>
             </b-col>
           </b-row>
           <b-row>
@@ -92,7 +96,6 @@ Date: sprint_6
       </h6>
     </b-card>
   </div>
-
 </template>
 
 <script>
@@ -100,6 +103,7 @@ import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
 import SalesReportGraph from "./SalesReportGraph";
+import EventBus from "../../util/event-bus";
 
 export default {
   name: "sales-report-page",
@@ -114,12 +118,16 @@ export default {
       currentPage: 1,
       perPage: 10,
       dateRange: [],
+      loadingTable: false,
+      loadingGraph: false,
+      graphOpacity: 100,
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
     this.getBusiness(businessId);
+    EventBus.$on('finishedLoading', this.finishedLoadingGraph)
   },
 
   methods: {
@@ -153,6 +161,9 @@ export default {
      * @param dateRange
      **/
     getSalesReport: async function (dateRange) {
+      this.loadingTable = true;
+      this.loadingGraph = true;
+      this.graphOpacity = 0;
       if (this.dateRange !== dateRange) {
         this.dateRange = dateRange;
         // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
@@ -169,6 +180,7 @@ export default {
             .then((response) => {
               this.updateTotalResults(startDate, endDate, response.data);
               this.groupedResults = response.data;
+              this.loadingTable = false;
             }).catch((error) => {
               this.$log.debug("Error message", error);
             });
@@ -192,6 +204,14 @@ export default {
           return count + item.totalPurchases
         }, 0)
       }
+    },
+
+    /**
+     * This shows the graph now that it has finished loading.
+     */
+    finishedLoadingGraph: function () {
+      this.loadingGraph = false;
+      this.graphOpacity = 100;
     },
   },
 
