@@ -153,9 +153,10 @@ describe('check deleting api call is correct',  () => {
 
     test('check emitted correctly', async () =>  {
         wrapper.vm.updatedNotification.id = 1;
+        wrapper.vm.updatedNotification.type="Liked"
         await wrapper.vm.$forceUpdate();
         await wrapper.vm.notificationDeleted();
-        expect(wrapper.emitted().deleteNotification[0]).toEqual([1])
+        expect(wrapper.emitted().deleteNotification[0]).toEqual([1,"Liked"])
     });
 
 });

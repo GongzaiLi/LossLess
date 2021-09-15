@@ -257,7 +257,7 @@ export default {
      * Emits to parent deleteNotification with Id of selected notification
      */
     notificationDeleted(){
-      this.$emit('deleteNotification',this.updatedNotification.id)
+      this.$emit('deleteNotification',this.updatedNotification.id,this.updatedNotification.type)
     },
 
     /**

@@ -189,40 +189,17 @@ describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => 
 
 });
 
-describe('check-undo-deleted-functionality', () => {
-    test('if-pendingDeletedNotification-then-pendingDeletedNotification-is-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=1
-        await wrapper.vm.createDeleteToast(1);
-        expect(Api.deleteNotification).toHaveBeenCalled();
-    });
+describe('check-deleted-functionality', () => {
     test('if-no-pendingDeletedNotification-then-pendingDeletedNotification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=false
+        wrapper.vm.pendingDeletedNotification=[]
         await wrapper.vm.createDeleteToast(1);
-        expect(Api.deleteNotification).toBeCalledTimes(0);
-    });
-    test('if-undoDelete-prevents-from-being-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=1
-        await wrapper.vm.undoDelete();
-        await wrapper.vm.deleteNotification();
         expect(Api.deleteNotification).toBeCalledTimes(0);
     });
 });
 
 describe('check-router-guard-functionality', () => {
-    test('if-route-is-changed-while-pending-notifications-and-window-is-confirmed-notification-is-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=1
-        window.confirm = jest.fn(() => true)
-        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
-        expect(Api.deleteNotification).toHaveBeenCalled();
-    });
     test('if-route-is-changed-while-no-pending-notifications-notification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=false
-        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
-        expect(Api.deleteNotification).toBeCalledTimes(0);
-    });
-    test('if-route-is-changed-while-pending-notifications-and-window-is-cancelled-notification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=1
-        window.confirm = jest.fn(() => false)
+        wrapper.vm.pendingDeletedNotifications=[]
         await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
         expect(Api.deleteNotification).toBeCalledTimes(0);
     });
