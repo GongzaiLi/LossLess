@@ -63,7 +63,6 @@ public class PurchasesFeature {
     @Autowired
     private BusinessService businessService;
 
-
     @Autowired
     private NotificationService notificationService;
 
@@ -77,6 +76,8 @@ public class PurchasesFeature {
     private List<User> userList;
 
     private ResultActions responseResult;
+
+    private static Integer numPurchases = 0;
 
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
@@ -112,6 +113,7 @@ public class PurchasesFeature {
 
     @When("I purchase that listing")
     public void iPurchaseThatListing() throws Exception {
+        numPurchases++;
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/listings/%d/purchase", curListing.getId()))
                 .with(user(currentUserDetails))
                 .with(csrf()))
@@ -201,7 +203,7 @@ public class PurchasesFeature {
 
     @When("I try and get information about the sale")
     public void i_try_and_get_information_about_the_sale() throws Exception {
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/purchase/%d", 1))
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/purchase/%d", numPurchases))
                 .with(user(currentUserDetails))
                 .with(csrf()))
                 .andExpect(status().isOk());

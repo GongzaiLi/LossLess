@@ -1,5 +1,6 @@
 package com.seng302.wasteless.steps;
 
+import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.User;
@@ -13,6 +14,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import static org.hamcrest.CoreMatchers.is;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -20,7 +22,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
@@ -28,10 +29,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+@SpringBootTest
 public class SalesReportFeature {
     private MockMvc mockMvc;
 
@@ -50,19 +51,13 @@ public class SalesReportFeature {
     private ProductService productService;
 
     @Autowired
-    private InventoryService inventoryService;
-
-    @Autowired
-    private ListingsService listingsService;
-
-    @Autowired
     private BusinessService businessService;
 
     @Autowired
     private PurchasedListingRepository purchasedListingRepository;
 
     private ResultActions responseResult;
-    private static Boolean initilised = Boolean.FALSE;
+    private static Boolean initialised = Boolean.FALSE;
     private static Product productToPurchase = new Product();
 
     /**
@@ -80,22 +75,21 @@ public class SalesReportFeature {
 
     @And("the following purchases have been made:")
     public void theFollowingPurchasesHaveBeenMade(List<List<String>> purchases) {
-        if (!initilised) {
-            for (var purchaseInfo : purchases) {
-                PurchasedListing purchaseRecord = new PurchasedListing();
-                purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
-                purchaseRecord.setPurchaser(userService.findUserById(Integer.parseInt(purchaseInfo.get(1))));
-                purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
-                purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
-                purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
-                purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
-                purchaseRecord.setProduct(productToPurchase);
-                purchaseRecord.setManufacturer(productToPurchase.getManufacturer());
-                purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
-                purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
-                purchasedListingRepository.save(purchaseRecord);
-            }
-            initilised = Boolean.TRUE;
+        purchasedListingRepository.deleteAll();
+
+        for (var purchaseInfo : purchases) {
+            PurchasedListing purchaseRecord = new PurchasedListing();
+            purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
+            purchaseRecord.setPurchaser(userService.findUserById(Integer.parseInt(purchaseInfo.get(1))));
+            purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
+            purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
+            purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
+            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
+            purchaseRecord.setProduct(productToPurchase);
+            purchaseRecord.setManufacturer(productToPurchase.getManufacturer());
+            purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
+            purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
+            purchasedListingRepository.save(purchaseRecord);
         }
     }
 
@@ -146,6 +140,7 @@ public class SalesReportFeature {
             productToPurchase = productService.createProduct(newProduct);
         }
 }
+
     @Given("We are logged in as the individual user with email  {string}")
     public void weAreLoggedInAsTheIndividualUserWithEmail(String email) {
         User currentUser = userService.findUserByEmail(email);
@@ -169,6 +164,23 @@ public class SalesReportFeature {
                     .andExpect(jsonPath("["+i+"].totalPurchases", is(Integer.parseInt(purchaseArray.get(2)))))
                     .andExpect(jsonPath("["+i+"].totalValue", is(Double.parseDouble(purchaseArray.get(3)))));
             i++;
+        }
+    }
+
+    @When("I view the extended sales report starting {string} and ending {string}")
+    public void iViewTheExtendedSalesReportStartingAndEnding(String startDate, String endDate) throws Exception {
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/listingDurations")
+                .with(user(currentUserDetails))
+                .queryParam("startDate",startDate)
+                .queryParam("endDate",endDate)
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Then("The counts of listings grouped by duration are:")
+    public void theCountsOfListingsGroupedByDurationAre(List<List<String>> counts) throws Exception {
+        for (List<String> count : counts) {
+            responseResult.andExpect(jsonPath(count.get(0), is(Integer.parseInt(count.get(1)))));
         }
     }
 }

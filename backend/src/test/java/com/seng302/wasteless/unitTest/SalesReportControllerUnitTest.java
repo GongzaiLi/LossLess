@@ -461,4 +461,25 @@ public class SalesReportControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void whenCountSalesByDuration_andCountsValid_thenCorrectCountsReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations?startDate=2020-02-29&endDate=2021-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andStartDateNotProvided_then400() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations?endDate=2021-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andNoDatesProvided_then400() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
