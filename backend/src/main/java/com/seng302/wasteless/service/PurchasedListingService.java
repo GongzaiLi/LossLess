@@ -219,7 +219,6 @@ public class PurchasedListingService {
                     break;
             }
         }
-
         if (order != null  && order.isDescending()) {
             Collections.reverse(salesReportProductTotalsDtos);
         }

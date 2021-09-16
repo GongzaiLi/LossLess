@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -102,7 +103,7 @@ public class SalesReportControllerUnitTest {
                 .thenReturn(salesData);
 
         Mockito
-                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), anyString(), anyString()))
+                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), anyString(), any(Sort.Direction.class)))
                 .thenReturn(salesPurchaseTotalsData);
 
 
