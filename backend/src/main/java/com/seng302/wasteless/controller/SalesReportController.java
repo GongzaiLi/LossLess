@@ -8,6 +8,7 @@ import com.seng302.wasteless.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -126,7 +127,7 @@ public class SalesReportController {
     @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
     public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
                                                                          @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false) String order) {
+                                                                         @RequestParam(value = "order", required = false) Sort.Direction order) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
@@ -136,8 +137,6 @@ public class SalesReportController {
 
         if (sortBy == null && order != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
-        } else if (order != null && !order.equals("ASC") && !order.equals("DESC")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value for order.");
         } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {

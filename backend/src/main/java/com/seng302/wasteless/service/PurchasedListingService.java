@@ -9,6 +9,7 @@ import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.ProductRepository;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -195,7 +196,7 @@ public class PurchasedListingService {
      * @param order the order to sort the list in
      * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
      */
-    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId, String sortBy, String order) {
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
         List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
 
         List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
@@ -219,7 +220,7 @@ public class PurchasedListingService {
             }
         }
 
-        if (order != null  && order.equals("DESC")) {
+        if (order != null  && order.isDescending()) {
             Collections.reverse(salesReportProductTotalsDtos);
         }
 
