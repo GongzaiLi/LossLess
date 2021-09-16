@@ -163,31 +163,6 @@ describe('Testing-password-validation-for-register', () => {
   });
 });
 
-describe('Testing delete image when modifying user', () => {
-  test('Successfully remove an uploaded image', async () => {
-    wrapper.setProps({isEditUser: true});
-    wrapper.vm.userData.profileImage = '';
-    wrapper.vm.uploaded = true;
-
-    await wrapper.vm.openDeleteConfirmDialog;
-    await wrapper.vm.confirmDeleteImage();
-
-    expect(wrapper.vm.uploaded).toStrictEqual(false);
-    expect(Api.deleteUserProfileImage).not.toHaveBeenCalled();
-  });
-  test('Successfully delete a user image when one exists', async () => {
-    wrapper.setProps({isEditUser: true});
-    wrapper.vm.userData.profileImage = '1'
-    wrapper.vm.uploaded = false;
-
-    await wrapper.vm.openDeleteConfirmDialog;
-    await wrapper.vm.confirmDeleteImage();
-
-    expect(wrapper.vm.userData.profileImage).toStrictEqual('');
-    expect(Api.deleteUserProfileImage).toHaveBeenCalled();
-  });
-});
-
 describe('Testing-api-put-updating-user', () => {
   const event = {
     preventDefault: () => {
@@ -223,41 +198,6 @@ describe('Testing-api-put-updating-user', () => {
     expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
   });
 });
-
-describe('Testing-api-post-upload-image-for-user', () => {
-  it('Successful-upload-image', async () => {
-    Api.uploadProfileImage.mockResolvedValue(
-      {
-        status: 201
-      })
-
-    await wrapper.vm.uploadImageRequest(1);
-    expect(wrapper.vm.errors).toStrictEqual([]);
-  });
-
-  it('413-error-upload-image', async () => {
-    Api.uploadProfileImage.mockRejectedValue({
-      response: {
-        data: {message: "The image you tried to upload is too large. Images must be less than 1MB in size."},
-        status: 413
-      }
-    });
-    await wrapper.vm.uploadImageRequest(1);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.errors).toStrictEqual(["The image you tried to upload is too large. Images must be less than 1MB in size."]);
-  });
-
-  it('500-error-upload-image', async () => {
-    Api.uploadProfileImage.mockRejectedValue({});
-
-    await wrapper.vm.uploadImageRequest(1);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
-  });
-});
-
 
 describe('Testing-changing-password', () => {
   beforeEach(() =>
