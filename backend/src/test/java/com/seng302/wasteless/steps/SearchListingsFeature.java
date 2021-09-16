@@ -185,7 +185,7 @@ public class SearchListingsFeature {
     public void iSearchForListingsWithClosingDatesOnOrBefore(String closingDateEnd) throws Exception {
         responseResult = mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
                 .queryParam("closingDateEnd", closingDateEnd)
-                .queryParam("closingDateStart", "2049-01-03")
+                .queryParam("closingDateStart", "2049-01-03 00:00:00")
                 .with(user(currentUserDetails))
                 .with(csrf()));
     }

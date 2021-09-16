@@ -1,4 +1,4 @@
-import {getMonthsAndYearsBetween, formatDate, getMonthName, formatAddress} from '../../util';
+import {getMonthsAndYearsBetween, formatDate, formatDateTime, getMonthName, formatAddress} from '../../util';
 
 test('same-start-end', () => {
   expect(getMonthsAndYearsBetween(
