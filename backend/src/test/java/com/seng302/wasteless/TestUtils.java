@@ -142,7 +142,7 @@ public class TestUtils {
         newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
-        newListing.setCloses(closes);
+        newListing.setCloses(closes.atTime(23,59));
         newListing.setCreated(LocalDate.now());
         newListing.setUsersLiked(numOfLikes);
         newListing = listingsService.createListing(newListing);
