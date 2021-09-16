@@ -380,4 +380,85 @@ public class SalesReportControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportManufacturerPurchasedTotals_andBusinessDoesntExist_then406Response() throws Exception{
+
+        Mockito
+                .when(businessService.findBusinessById(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/salesReport/manufacturersPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportManufacturerPurchasedTotals_andUserNotAllowedToAccessInformationOfBusiness_then403Response() throws Exception{
+
+        Mockito
+                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportManufacturerPurchasedTotals_andValidRequest_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportManufacturerPurchasedTotals_andValidRequest_SortByValue_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals?sortBy=value")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportManufacturerPurchasedTotals_andValidRequest_SortByIsInvalid_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals?sortBy=invalid")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportManufacturerPurchasedTotals_andValidRequest_SortByAndOrderCorrect_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals?sortBy=quantity&order=ASC")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductManufacturerTotals_andValidRequest_OrderSpecifiedWithoutSort_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals?order=ASC")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductManufacturerTotals_andValidRequest_OrderIsInvalid_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals?sortBy=quantity&order=invalid")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class TestUtils {
     public static Address newThrowawayAddress() {
@@ -62,6 +63,7 @@ public class TestUtils {
 
         Product product = new Product();
         product.setName(name);
+        product.setManufacturer(businessName);
         productService.createProduct(product);
 
         Inventory inventory = new Inventory();
@@ -96,6 +98,7 @@ public class TestUtils {
 
         Product product = new Product();
         product.setName(name);
+        product.setManufacturer(name);
         productService.createProduct(product);
 
         Inventory inventory = new Inventory();

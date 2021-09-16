@@ -77,6 +77,11 @@ public class PurchasedListing {
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Double price;
 
+    @NotNull
+    @Column(name = "manufacturer")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
+    private String manufacturer;
+
     /**
      * Creates a new Purchased Listing record from a Listing that was purchased
      * and the User that purchased it.
@@ -94,6 +99,7 @@ public class PurchasedListing {
         setQuantity(listing.getQuantity());
         setPrice(listing.getPrice());
         setNumberOfLikes(listing.getUsersLiked());
+        setManufacturer(listing.getInventoryItem().getProduct().getManufacturer());
     }
 }
 
