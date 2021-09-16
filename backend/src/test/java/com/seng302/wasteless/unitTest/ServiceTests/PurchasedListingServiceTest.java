@@ -30,8 +30,9 @@ import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)     // Allows non-static BeforeAll methods. baeldung.com/java-beforeall-afterall-non-static
-public class PurchasedListingServiceTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        // Allows non-static BeforeAll methods. baeldung.com/java-beforeall-afterall-non-static
+class PurchasedListingServiceTest {
     @Autowired
     private ProductService productService;
 
