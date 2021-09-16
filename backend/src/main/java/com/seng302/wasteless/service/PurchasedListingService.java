@@ -219,7 +219,7 @@ public class PurchasedListingService {
             }
         }
 
-        if (order.equals("DESC")) {
+        if (order != null  && order.equals("DESC")) {
             Collections.reverse(salesReportProductTotalsDtos);
         }
 
