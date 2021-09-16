@@ -1,13 +1,14 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
-import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -116,4 +116,35 @@ public class SalesReportController {
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
+    /**
+     * Get the total quantity, value, likes of all sales for each product of a business.
+     *
+     * @param businessId    The id of the business to get purchases for
+     * @param sortBy        The value to sort the products by
+     * @param order         The order to sort the products in
+     * @return              The total quantity, value, likes of all purchases for each product of a business
+     */
+    @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
+    public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
+                                                                         @RequestParam(value = "sortBy", required = false) String sortBy,
+                                                                         @RequestParam(value = "order", required = false) Sort.Direction order) {
+        User user = userService.getCurrentlyLoggedInUser();
+        Business possibleBusiness = businessService.findBusinessById(businessId);
+        logger.info("Successfully retrieved business with ID: {}.", businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
+
+        List<SalesReportProductTotalsDto> productsPurchasedTotals;
+
+        if (sortBy == null && order != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
+        } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
+        } else {
+            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, sortBy, order);
+        }
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
+
+    }
 }
