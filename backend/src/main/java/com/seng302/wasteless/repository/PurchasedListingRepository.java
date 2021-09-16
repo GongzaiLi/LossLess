@@ -22,6 +22,13 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      */
     List<PurchasedListing> findAllByBusinessId(Integer businessId);
 
+    /**
+     * @param businessId Id of business to get purchases for
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
+     * @return All Purchased Listing records that belong to a given business, and were purchased between the start and end dates
+     */
+    List<PurchasedListing> findAllByBusinessIdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Returns a Purchased Listing records that belong to a given purchaseListing Id

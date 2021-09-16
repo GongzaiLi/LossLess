@@ -143,8 +143,29 @@ public class SalesReportController {
             productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, sortBy, order);
         }
 
-
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
+    }
 
+    /**
+     * Endpoint that gets the number of sales listings, grouped by the duration between the
+     * listings’ purchase and closing dates.
+     *
+     * @param businessId The id of the business to get purchases for
+     * @param startDate  The start date for the date range. Format yyyy-MM-dd
+     * @param endDate    The end date for the date range. Format yyyy-MM-dd
+     * @return JSON object where the keys are the durations in days between the
+     * listings’ purchase and closing dates, and the values are the number of sales listings
+     */
+    @GetMapping("/businesses/{id}/salesReport/listingDurations")
+    public ResponseEntity<Object> getListingsGroupedByDuration(@PathVariable("id") Integer businessId,
+                                                               @RequestParam(value = "startDate") LocalDate startDate,
+                                                               @RequestParam(value = "endDate") LocalDate endDate) {
+        User user = userService.getCurrentlyLoggedInUser();
+        Business business = businessService.findBusinessById(businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(business, user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                purchasedListingService.countSalesByDurationBetweenSaleAndClose(business.getId(), startDate, endDate)
+        );
     }
 }
