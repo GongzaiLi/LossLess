@@ -36,6 +36,7 @@ export default {
       notifications: [],
       expiringCards: [],
       notificationChange: true,
+      pendingDeletedNotification:[]
     }
   },
   computed: {
@@ -57,7 +58,7 @@ export default {
     unreadNotifications: function () {
       let unreadNotifications = []
       for (const notification of this.notifications) {
-        if (!notification.read) {
+        if (!notification.read&&!this.pendingDeletedNotification.includes(notification.id)) {
           unreadNotifications.push(notification)
         }
       }
@@ -100,6 +101,15 @@ export default {
      * This mount listens to the notificationUpdate event on click from home feed.
      */
     EventBus.$on('notificationClicked', this.updateNotifications)
+
+    /**
+    * This mount listens to the notificationTemporarilyRemoved event.
+    * when notificationTemporarilyRemoved is called it sets pendingDeletedNotification to the received value to remove
+    * it from the list of notifications
+     */
+    EventBus.$on('notificationTemporarilyRemoved', (pendingDeletedNotification) => {
+      this.pendingDeletedNotification = pendingDeletedNotification;
+    })
   }
 }
 

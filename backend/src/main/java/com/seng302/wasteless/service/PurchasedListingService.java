@@ -1,20 +1,22 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.repository.ProductRepository;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -24,10 +26,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PurchasedListingService {
 
     private final PurchasedListingRepository purchasedListingRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public PurchasedListingService(PurchasedListingRepository purchasedListingRepository) {
+    public PurchasedListingService(PurchasedListingRepository purchasedListingRepository, ProductRepository productRepository) {
         this.purchasedListingRepository = purchasedListingRepository;
+        this.productRepository = productRepository;
     }
 
 
@@ -180,6 +184,88 @@ public class PurchasedListingService {
             business.setCreated(earliestListingDate);
         }
         purchasedListingRepository.saveAll(fakePurchases);
+    }
+
+
+    /**
+     * @param businessId Business to get purchases for
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
+     * @return Map where the keys are the durations in days between the listings’ purchase and closing dates,
+     * and the values are the number of sales listings
+     */
+    public Map<Long, Integer> countSalesByDurationBetweenSaleAndClose(Integer businessId, LocalDate startDate, LocalDate endDate) {
+        Map<Long, Integer> durationCounts = new HashMap<>();
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetween(businessId, startDate, endDate);
+
+        for (PurchasedListing purchase: purchases) {
+            Long daysBetweenSaleAndClose = ChronoUnit.DAYS.between(purchase.getSaleDate(), purchase.getClosingDate());
+            durationCounts.merge(daysBetweenSaleAndClose, 1, Integer::sum);
+        }
+
+        return durationCounts;
+    }
+
+
+    /**
+     * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
+     * and return a list of SalesReportPurchaseTotalsDto. Each SalesReportPurchaseTotalsDto contains information about
+     * a given sold product, including the number of the product sold, the total value all products sold for, and the
+     * total number of likes.
+     *
+     * @param businessId    The id of the business
+     * @param sortBy the attribute to be sorted by
+     * @param order the order to sort the list in
+     * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
+     */
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
+        List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
+
+        List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
+
+        for (Long productId: allSoldProductsOfBusiness) {
+            salesReportProductTotalsDtos.add(getTotalsForProduct(productId));
+        }
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "value":
+                    salesReportProductTotalsDtos.sort(Comparator.comparing(SalesReportProductTotalsDto::getTotalValue));
+                    break;
+                case "quantity":
+                    salesReportProductTotalsDtos.sort(Comparator.comparing(SalesReportProductTotalsDto::getTotalProductPurchases));
+                    break;
+                case "likes":
+                    salesReportProductTotalsDtos.sort(Comparator.comparing(SalesReportProductTotalsDto::getTotalLikes));
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (order != null  && order.isDescending()) {
+            Collections.reverse(salesReportProductTotalsDtos);
+        }
+
+        return salesReportProductTotalsDtos;
+    }
+
+    /**
+     * For a given product, create a SalesReportPurchaseTotalsDto populate it with the correct information.
+     *
+     * @param productId     The id of the product
+     * @return              SalesReportPurchaseTotalsDto populated with information about product sales
+     */
+    private SalesReportProductTotalsDto getTotalsForProduct(Long productId) {
+        Integer totalPurchases = purchasedListingRepository.sumProductsSoldByProduct_DatabaseId(productId);
+        Double totalValue = purchasedListingRepository.sumPriceByProduct_DatabaseId(productId);
+        Integer totalLikes = purchasedListingRepository.sumTotalLikesByProduct_DatabaseId(productId);
+
+        if (totalValue == null) {
+            totalValue = 0.0;
+        }
+
+        Product product = productRepository.findFirstByDatabaseId(productId);
+
+        return new SalesReportProductTotalsDto(product, totalPurchases, totalValue, totalLikes);
     }
 
 }

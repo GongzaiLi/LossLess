@@ -150,3 +150,19 @@ describe('Testing search filters clearing functionality', () => {
   })
 
 })
+
+describe('Testing date range for valid and invalid case', () => {
+
+  test('Date range invalid when closes start date is after closes end date', () => {
+    wrapper.vm.search.closesStartDate = "2021-12-10"
+    wrapper.vm.search.closesEndDate = "2020-12-10"
+    expect(wrapper.vm.invalidDateRange).toBeTruthy();
+  })
+
+  test('Date range valid when closes start date is before closes end date', () => {
+    wrapper.vm.search.closesStartDate = "2020-12-10"
+    wrapper.vm.search.closesEndDate = "2021-12-10"
+    expect(wrapper.vm.invalidDateRange).toBeFalsy();
+  })
+
+})

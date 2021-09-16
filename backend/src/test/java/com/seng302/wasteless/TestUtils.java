@@ -119,4 +119,34 @@ public class TestUtils {
 
         return newListing;
     }
+
+    /**
+     * Creates a Listing with the given price. This method is re-used in other tests so we need
+     * to take in the services and parameters.
+     */
+    public static Listing createListingForSameProductAndBusinessWithLikes (InventoryService inventoryService,
+                                                                           ListingsService listingsService,
+                                                                           Product product, Business business, Double price, LocalDate closes,
+                                                                           Integer listingQuantity, Integer inventoryQuantity, Integer numOfLikes) {
+
+        Inventory inventory = new Inventory();
+        inventory.setProduct(product);
+        inventory.setExpires(LocalDate.MAX);
+        inventory.setBusinessId(0);
+        inventory.setQuantityUnlisted(inventoryQuantity - listingQuantity);
+        inventory.setQuantity(inventoryQuantity);
+        inventoryService.createInventory(inventory);
+
+        Listing newListing = new Listing();
+        newListing.setInventoryItem(inventory);
+        newListing.setQuantity(listingQuantity);
+        newListing.setBusiness(business);
+        newListing.setPrice(price);
+        newListing.setCloses(closes);
+        newListing.setCreated(LocalDate.now());
+        newListing.setUsersLiked(numOfLikes);
+        newListing = listingsService.createListing(newListing);
+
+        return newListing;
+    }
 }

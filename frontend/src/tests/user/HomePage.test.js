@@ -88,6 +88,7 @@ beforeEach(() => {
     Api.getUser.mockResolvedValue(response);
     Api.getNotifications.mockResolvedValue({data: []});
     Api.getExpiredCards.mockResolvedValue({data: []});
+    Api.deleteNotification = jest.fn();
 
     wrapper = shallowMount(homePage, {
         localVue,
@@ -188,6 +189,22 @@ describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => 
 
 });
 
+describe('check-deleted-functionality', () => {
+    test('if-no-pendingDeletedNotification-then-pendingDeletedNotification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotification=[]
+        await wrapper.vm.createDeleteToast(1);
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+});
+
+describe('check-router-guard-functionality', () => {
+    test('if-route-is-changed-while-no-pending-notifications-notification-is-not-deleted', async () => {
+        wrapper.vm.pendingDeletedNotifications=[]
+        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+    });
+});
+
 
 describe('test-toggleTagColorSelected-works-correctly', () => {
     test('toggle-red-tag-from-true-to-false', async () => {
@@ -274,4 +291,22 @@ describe('test-toggle-archived-notifications', () => {
         expect(Api.getNotifications).toHaveBeenCalledWith(null, false);
     });
 })
+
+describe('Test notification clicked', () => {
+
+    const collarNotification = {
+        id: 6,
+        message: "A notification about Pink collars maybe - 69g can",
+        subjectId: 1,
+        type: "Some type",
+        read: false
+    }
+
+    test('Notification set to read on click', async () => {
+        await wrapper.vm.notificationClicked(collarNotification);
+        expect(collarNotification.read).toBeTruthy();
+
+    })
+
+});
 

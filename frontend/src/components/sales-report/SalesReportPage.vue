@@ -23,40 +23,46 @@ Date: sprint_6
             </b-row>
           </b-card-text>
         </b-list-group-item>
-        <b-list-group-item v-if="totalResults">
-          <b-row>
-            <b-col cols="2"><h3>Sales Details</h3></b-col>
-            <b-col cols="2">
-              <b-form-select v-model="groupBy" id="periodSelector"
-                             @change="getSalesReport(dateRange)">
-                <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
-                    name
-                  }}
-                </option>
-              </b-form-select>
-            </b-col>
-          </b-row>
+        <b-list-group-item v-show="totalResults">
+          <b-overlay :show="loading" rounded="sm">
           <b-row>
             <b-col class="mt-2">
-              <b-table
-                  ref="salesReportTable"
-                  no-border-collapse
-                  no-local-sorting
-                  striped
-                  :items="groupedResults"
-                  :fields="fields"
-                  :per-page="perPage"
-                  :current-page="currentPage"
-                  responsive="lg"
-                  bordered
-                  show-empty>
-                <template #empty>
-                  <h3 class="no-results-overlay">No results to display</h3>
-                </template>
-              </b-table>
+              <b-row>
+                <b-col cols="4"><h3>Sales Details</h3></b-col>
+                <b-col cols="4">
+                  <b-form-select v-model="groupBy" id="periodSelector"
+                                 @change="getSalesReport(dateRange)">
+                    <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
+                        name
+                      }}
+                    </option>
+                  </b-form-select>
+                </b-col>
+              </b-row>
+              <b-row>
+                <b-col>
+                  <b-table
+                      ref="salesReportTable"
+                      no-border-collapse
+                      no-local-sorting
+                      striped
+                      :items="groupedResults"
+                      :fields="fields"
+                      :per-page="perPage"
+                      :current-page="currentPage"
+                      responsive="lg"
+                      bordered
+                      show-empty>
+                    <template #empty>
+                      <h3 class="no-results-overlay">No results to display</h3>
+                    </template>
+                  </b-table>
+                </b-col>
+              </b-row>
             </b-col>
             <b-col>
-              graph
+              <h3>Sales Graph</h3>
+              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" v-on:finishedLoading="finishedLoadingGraph"/>
             </b-col>
           </b-row>
           <b-row>
@@ -69,6 +75,7 @@ Date: sprint_6
               ></b-pagination>
             </b-col>
           </b-row>
+          </b-overlay>
         </b-list-group-item>
       </b-list-group>
     </b-card>
@@ -88,17 +95,18 @@ Date: sprint_6
       </h6>
     </b-card>
   </div>
-
 </template>
 
 <script>
 import api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
+import SalesReportGraph from "./SalesReportGraph";
+import EventBus from "../../util/event-bus";
 
 export default {
   name: "sales-report-page",
-  components: {DateRangeInput},
+  components: {SalesReportGraph, DateRangeInput},
   data: function () {
     return {
       business: {},
@@ -109,12 +117,14 @@ export default {
       currentPage: 1,
       perPage: 10,
       dateRange: [],
+      loading: false,
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
     this.getBusiness(businessId);
+    EventBus.$on('finishedLoading', this.finishedLoadingGraph)
   },
 
   methods: {
@@ -123,7 +133,7 @@ export default {
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
      **/
-    getBusiness: function (id) {
+    getBusiness: function (id) {              this.loadingTable = false;
       api
           .getBusiness(id)
           .then((response) => {
@@ -148,10 +158,11 @@ export default {
      * @param dateRange
      **/
     getSalesReport: async function (dateRange) {
-      this.dateRange = dateRange;
-      // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
-      // so if the selected option has been invalidated, then select the last available options.
-      if (!this.groupByOptions[this.groupBy]) {
+      this.loading = true;
+      if (this.dateRange !== dateRange) {
+        this.dateRange = dateRange;
+        // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
+        // so if the selected option has been invalidated, then select the last available options.
         const optionNames = Object.keys(this.groupByOptions);
         this.groupBy = optionNames[optionNames.length - 1];
       }
@@ -162,7 +173,7 @@ export default {
         const endDate = formatDate(dateRange[1]);
         await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
             .then((response) => {
-              this.updateTotalResults(startDate, endDate, response.data)
+              this.updateTotalResults(startDate, endDate, response.data);
               this.groupedResults = response.data;
             }).catch((error) => {
               this.$log.debug("Error message", error);
@@ -187,6 +198,13 @@ export default {
           return count + item.totalPurchases
         }, 0)
       }
+    },
+
+    /**
+     * This shows the graph now that it has finished loading.
+     */
+    finishedLoadingGraph: function () {
+      this.loading = false;
     },
   },
 

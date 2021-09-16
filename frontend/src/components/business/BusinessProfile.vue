@@ -222,7 +222,7 @@ export default {
             firstName: '',
             lastName: '',
             middleName: '',
-            nickName: '',
+            nickname: '',
             bio: '',
             email: '',
             dateOfBirth: '',

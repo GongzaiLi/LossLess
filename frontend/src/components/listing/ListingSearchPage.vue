@@ -98,6 +98,9 @@
                   <b-input placeholder="Any" type="date" v-model="search.closesEndDate"></b-input>
                 </div>
                 <label class="any_label">(Any if blank)</label>
+                <label v-if="invalidDateRange" class="rangeWarning mb-2 ml-2">
+                  <b-icon icon="exclamation-circle-fill"></b-icon> Date range wrong way around
+                </label>
               </div>
             </b-col>
             <b-col cols="12" md="4">
@@ -139,6 +142,10 @@
 </template>
 
 <style>
+
+.rangeWarning {
+  color: orangered
+}
 
 .search_button {
   text-align: right;
@@ -302,6 +309,17 @@ export default {
 
 
   computed: {
+
+    /**
+     *  Compares the listing closes start and end date for filtering listings.
+     *  This is used to show a warning if the date range is the wrong way around.
+     *
+     * @return True if closes start date is after closes end date. False otherwise.
+     */
+    invalidDateRange() {
+        return new Date(this.search.closesStartDate) > new Date(this.search.closesEndDate);
+    },
+
     /**
      * Returns a list of sort orders that should be passed to the API call to search listings.
      * This exists mainly because we need special sort orders for sorting by location (as we

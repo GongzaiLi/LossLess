@@ -1,8 +1,8 @@
 package com.seng302.wasteless.unitTest;
 
-import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.controller.SalesReportController;
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.User;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -78,6 +79,7 @@ public class SalesReportControllerUnitTest {
 
 
         List<SalesReportDto> salesData = new ArrayList<>();
+        List<SalesReportProductTotalsDto> salesPurchaseTotalsData = new ArrayList<>();
 
         Mockito
                 .when(authentication.getName())
@@ -100,7 +102,9 @@ public class SalesReportControllerUnitTest {
                         any(LocalDate.class), any(LocalDate.class), any(Period.class)))
                 .thenReturn(salesData);
 
-
+        Mockito
+                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), anyString(), any(Sort.Direction.class)))
+                .thenReturn(salesPurchaseTotalsData);
 
 
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
@@ -293,6 +297,108 @@ public class SalesReportControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2020-02-29&endDate=2021-10-01&period=month")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andBusinessDoesntExist_then406Response() throws Exception{
+
+        Mockito
+                .when(businessService.findBusinessById(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/salesReport/productsPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andUserNotAllowedToAccessInformationOfBusiness_then403Response() throws Exception{
+
+        Mockito
+                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_SortByValue_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?sortBy=value")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_SortByIsInvalid_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?sortBy=invalid")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_SortByAndOrderCorrect_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?sortBy=quantity&order=ASC")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_OrderSpecifiedWithoutSort_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?order=ASC")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_OrderIsInvalid_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?sortBy=quantity&order=invalid")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andCountsValid_thenCorrectCountsReturned() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations?startDate=2020-02-29&endDate=2021-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andStartDateNotProvided_then400() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations?endDate=2021-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andNoDatesProvided_then400() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
 }
