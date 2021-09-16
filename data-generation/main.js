@@ -570,6 +570,8 @@ async function uploadProductImage(businessId, productId, instance, startImageId)
 
 /**
  * Uploads an image for a user.
+ * https://commons.wikimedia.org/w/index.php?search=profile&title=Special:MediaSearch&go=Go&type=image
+ * The user images come from the link.
  */
 async function uploadUserImage(userId, instance) {
   if (Math.random() > 0.25) {
