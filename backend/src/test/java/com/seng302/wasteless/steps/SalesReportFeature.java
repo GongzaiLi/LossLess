@@ -1,5 +1,6 @@
 package com.seng302.wasteless.steps;
 
+import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.Product;
 import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.User;
@@ -12,7 +13,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import static org.hamcrest.CoreMatchers.is;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -30,6 +33,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+@SpringBootTest
 public class SalesReportFeature {
     private MockMvc mockMvc;
 
@@ -72,21 +76,20 @@ public class SalesReportFeature {
 
     @And("the following purchases have been made:")
     public void theFollowingPurchasesHaveBeenMade(List<List<String>> purchases) {
-        if (!initialised) {
-            for (var purchaseInfo : purchases) {
-                PurchasedListing purchaseRecord = new PurchasedListing();
-                purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
-                purchaseRecord.setPurchaser(userService.findUserById(Integer.parseInt(purchaseInfo.get(1))));
-                purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
-                purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
-                purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
-                purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
-                purchaseRecord.setProduct(productToPurchase);
-                purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
-                purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
-                purchasedListingRepository.save(purchaseRecord);
-            }
-            initialised = Boolean.TRUE;
+        purchasedListingRepository.deleteAll();
+
+        for (var purchaseInfo : purchases) {
+            PurchasedListing purchaseRecord = new PurchasedListing();
+            purchaseRecord.setBusiness(businessService.findBusinessById(Integer.parseInt(purchaseInfo.get(0))));
+            purchaseRecord.setPurchaser(userService.findUserById(Integer.parseInt(purchaseInfo.get(1))));
+            purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
+            purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
+            purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
+            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
+            purchaseRecord.setProduct(productToPurchase);
+            purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
+            purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
+            purchasedListingRepository.save(purchaseRecord);
         }
     }
 
@@ -136,6 +139,7 @@ public class SalesReportFeature {
             productToPurchase = productService.createProduct(newProduct);
         }
 }
+
     @Given("We are logged in as the individual user with email  {string}")
     public void weAreLoggedInAsTheIndividualUserWithEmail(String email) {
         User currentUser = userService.findUserByEmail(email);

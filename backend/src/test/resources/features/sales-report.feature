@@ -7,11 +7,11 @@ Feature: U41 Sales report
     And The user "a@a" is an administrator for business 1
     And The following product "b" exists
     And the following purchases have been made:
-    |1       |1        |2050-01-01|1             |2050-01-01  |2050-01-01  |1      |1       |1      |
-    |1       |1        |2050-01-02|1             |2050-01-01  |2050-01-01  |1      |2       |10    |
-    |1       |1        |2050-02-01|1             |2050-01-01  |2050-01-01  |1      |3       |100    |
-    |1       |1        |2050-02-03|1             |2050-01-01  |2050-01-01  |1      |4       |1000   |
-    |1       |1        |2051-01-01|1             |2050-01-01  |2050-01-01  |1      |5       |10000  |
+      | 1 | 1 | 2050-01-01 | 1 | 2050-01-01 | 2050-01-01 | 1 | 1 | 1     |
+      | 1 | 1 | 2050-01-02 | 1 | 2050-01-01 | 2050-01-01 | 1 | 2 | 10    |
+      | 1 | 1 | 2050-02-01 | 1 | 2050-01-01 | 2050-01-01 | 1 | 3 | 100   |
+      | 1 | 1 | 2050-02-03 | 1 | 2050-01-01 | 2050-01-01 | 1 | 4 | 1000  |
+      | 1 | 1 | 2051-01-01 | 1 | 2050-01-01 | 2050-01-01 | 1 | 5 | 10000 |
 
   Scenario:AC3: I can also specify a custom period by selecting when it starts and ends.
     When I search for a sales report starting "2050-02-01" and ending "2050-02-03" with period "day"
