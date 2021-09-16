@@ -90,6 +90,7 @@ public class SalesReportFeature {
                 purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
                 purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
                 purchaseRecord.setProduct(productToPurchase);
+                purchaseRecord.setManufacturer(productToPurchase.getManufacturer());
                 purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
                 purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
                 purchasedListingRepository.save(purchaseRecord);
@@ -141,6 +142,7 @@ public class SalesReportFeature {
         if (productToPurchase.getName()!=product) {
             Product newProduct = new Product();
             newProduct.setName(product);
+            newProduct.setManufacturer("manufacturer");
             productToPurchase = productService.createProduct(newProduct);
         }
 }
