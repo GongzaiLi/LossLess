@@ -166,3 +166,25 @@ describe('Testing date range for valid and invalid case', () => {
   })
 
 })
+
+describe('Testing price range for valid and invalid case', () => {
+
+  test('Price range invalid when price min is greater than price max', () => {
+    wrapper.vm.search.priceMin = "3"
+    wrapper.vm.search.priceMax = "2"
+    expect(wrapper.vm.invalidPriceRange).toBeTruthy();
+  })
+
+  test('Price range valid when price max is greater than price min', () => {
+    wrapper.vm.search.priceMin = "2"
+    wrapper.vm.search.priceMax = "3"
+    expect(wrapper.vm.invalidPriceRange).toBeFalsy();
+  })
+
+  test('Price range valid when there is a price min and price max is empty', () => {
+    wrapper.vm.search.priceMin = "15"
+    wrapper.vm.search.priceMax = ""
+    expect(wrapper.vm.invalidPriceRange).toBeFalsy();
+  })
+
+})

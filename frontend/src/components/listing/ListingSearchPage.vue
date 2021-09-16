@@ -95,7 +95,7 @@
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input placeholder="Any" type="date" v-model="search.closesEndDate"></b-input>
+                  <b-input placeholder="Any" :min=search.closesStartDate type="date" v-model="search.closesEndDate"></b-input>
                 </div>
                 <label class="any_label">(Any if blank)</label>
                 <label v-if="invalidDateRange" class="rangeWarning mb-2 ml-2">
@@ -110,12 +110,15 @@
                   <div class="input-group-text">Price:</div>
                 </div>
                 <div>
-                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="Any" v-model="search.priceMin"></b-input>
+                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="0" v-model="search.priceMin"></b-input>
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input class="price_max" step="0.01" min="0.01" max="1000000.00" type="number" placeholder="Any" v-model="search.priceMax"></b-input>
+                  <b-input class="price_max" step="0.01" :min=search.priceMin max="1000000.00" type="number" placeholder="Any" v-model="search.priceMax"></b-input>
                 </div>
+                <label v-if="invalidPriceRange" class="rangeWarning mb-2 ml-2">
+                  <b-icon icon="exclamation-circle-fill"></b-icon> Price range wrong way around
+                </label>
               </div>
 
             </b-col>
@@ -310,6 +313,17 @@ export default {
     invalidDateRange() {
         return new Date(this.search.closesStartDate) > new Date(this.search.closesEndDate);
     },
+
+    /**
+     *  Compares the listing price and end date for filtering listings.
+     *  This is used to show a warning if the price range is the wrong way around.
+     *
+     * @return True if closes start date is after closes end date. False otherwise.
+     */
+    invalidPriceRange() {
+      return (this.search.priceMin > this.search.priceMax) && this.search.priceMax;
+    },
+
 
     /**
      * Returns a list of sort orders that should be passed to the API call to search listings.
