@@ -294,7 +294,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andNotLoggedIn_then401Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         Mockito
                 .when(userService.getCurrentlyLoggedInUser())
@@ -311,7 +311,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andLoggedInUser_butNotBusinessAdminOrAppAdmin_then403Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         doThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request")).when(businessService).checkUserAdminOfBusinessOrGAA(business, user);
 
@@ -324,7 +324,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andLoggedInUser_andNotBusinessAdmin_butAppAdmin_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
         doReturn(false).when(business).checkUserIsPrimaryAdministrator(user);
@@ -339,7 +339,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andValidUserAndValidBusiness_butInvalidInventory_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 1, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         doThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inventory item with given id does not exist")).when(inventoryService).findInventoryById(1);
 
@@ -353,7 +353,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
      void whenPostRequestToCreateListing_andValidRequest_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -365,7 +365,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andValidRequest_inventoryItemBestBeforeInPast_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -377,7 +377,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andValidRequest_inventoryItemSellByInPast_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -389,7 +389,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andValidRequest_inventoryItemExpiryInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\": 5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)
@@ -400,7 +400,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12 23:59\"}";
+        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12T23:59:59Z\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
                 .content(jsonInStringForRequest)

@@ -29,12 +29,18 @@ export function getToday() {
 /**
  * Get any date without the time
  * need to add one to get correct date
+ * @param date the date to be formatted
  * @return date in format yyyy-mm-dd
  **/
 export function formatDate(date) {
   return date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
 }
 
+/**
+ * Turns a datetime string into a printable format of "yyyy-mm-dd @ HH:MM"
+ * @param dateTimeString a string in format yyyy-mm-ddTHH:MM:SSZ
+ * @return formatted date and time as sting
+ */
 export function formatDateTime(dateTimeString) {
   let dateTime = dateTimeString.split("T")
   return dateTime[0] + " @ " + dateTime[1].slice(0,5)

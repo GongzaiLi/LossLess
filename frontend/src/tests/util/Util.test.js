@@ -52,6 +52,18 @@ describe('test the formatDate method', () => {
   });
 });
 
+describe('test the formatDateTime method', () => {
+    test('"2016-05-10T00:32:00Z" date time String format to 2016-05-10 @ 00:32', () => {
+        expect(formatDateTime("2016-05-10T00:32:00Z")).toEqual("2016-05-10 @ 00:32")
+    });
+
+    test('"2016-12-01T16:01:00Z" date time string format to YYYY-MM-DD @ HH:MM', () => {
+        expect(formatDateTime("2016-12-01T16:01:00Z")).toEqual("2016-12-01 @ 16:01")
+    });
+});
+
+
+
 describe('test the getMonthName method', () => {
   test('number month 0', () => {
     expect(getMonthName(0)).toEqual("January");
