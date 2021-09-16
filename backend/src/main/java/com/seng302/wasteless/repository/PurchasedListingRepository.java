@@ -69,4 +69,44 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
     Double sumPriceByBusiness_IdAndSaleDateBetween(@Param("businessId") Integer businessId,
                                                     @Param("startDate") LocalDate startDate,
                                                     @Param("endDate") LocalDate endDate);
+
+    /**
+     * Returns total number of sales for a given product.
+     *
+     * Business id does not need to be supplied as all product database ids are unique and this method
+     * is not accessed without user being authenticated as a owner of a business of which this product
+     * was created.
+     *
+     * @param productId     The database id of the product
+     * @return              total number of sales for a given product of a business.
+     */
+    @Query(value = "select sum(PL.quantity) from PurchasedListing PL where PL.product = :productId", nativeQuery = true)
+    Integer sumProductsSoldByProduct_DatabaseId(@Param("productId") Long productId);
+
+    /**
+     * Returns total price of all sales for a given product
+     *
+     * @param productId     The database id of the product
+     * @return              total price of all sales for a given product
+     */
+    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.product = :productId", nativeQuery = true)
+    Double sumPriceByProduct_DatabaseId(@Param("productId") Long productId);
+
+    /**
+     * Returns total likes of all sales for a given product
+     *
+     * @param productId     The database id of the product
+     * @return              total likes of all sales for a given product
+     */
+    @Query(value = "select sum(PL.numberoflikes) from PurchasedListing PL where PL.product = :productId", nativeQuery = true)
+    Integer sumTotalLikesByProduct_DatabaseId(@Param("productId") Long productId);
+
+    /**
+     * Returns list of database ids of all products that a business has sold any amount of
+     *
+     * @param businessId    the id of the business
+     */
+    @Query(value = "select distinct(PL.product) from PurchasedListing PL where PL.business = :businessId", nativeQuery = true)
+    List<Long> getAllProductDatabaseIdsBySalesOfBusiness(@Param("businessId") Integer businessId);
+
 }
