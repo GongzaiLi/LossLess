@@ -93,7 +93,7 @@ describe('Testing-api-post-upload-image-for-user', () => {
                 status: 201
             })
 
-        await wrapper.vm.uploadImageRequest();
+        await wrapper.vm.confirmUploadImageRequest();
         expect(wrapper.vm.errors).toStrictEqual([]);
     });
 
@@ -104,7 +104,7 @@ describe('Testing-api-post-upload-image-for-user', () => {
                 status: 413
             }
         });
-        await wrapper.vm.uploadImageRequest();
+        await wrapper.vm.confirmUploadImageRequest();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.errors).toStrictEqual(["The image you tried to upload is too large. Images must be less than 1MB in size."]);
@@ -117,7 +117,7 @@ describe('Testing-api-post-upload-image-for-user', () => {
                 status: 400
             }
         });
-        await wrapper.vm.uploadImageRequest();
+        await wrapper.vm.confirmUploadImageRequest();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.errors).toStrictEqual(["Uploading image failed: Error Uploading"]);
@@ -126,7 +126,7 @@ describe('Testing-api-post-upload-image-for-user', () => {
     it('500-error-upload-image', async () => {
         Api.uploadProfileImage.mockRejectedValue({});
 
-        await wrapper.vm.uploadImageRequest();
+        await wrapper.vm.confirmUploadImageRequest();
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);

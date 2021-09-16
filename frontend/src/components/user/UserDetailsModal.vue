@@ -6,24 +6,19 @@ Date: 3/3/2021
 
 <template>
   <div>
-    <b-card class="shadow">
-
-      <h1 v-if="!isEditUser">Sign Up to Wasteless</h1>
-      <div v-else>
+      <b-card v-if="isEditUser" class="shadow">
         <h5>Profile Image</h5>
-        <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
-               class="profile-image mx-auto"
-               fluid block rounded="circle"
-               alt="default image"/>
-        <b-link id="profile-image-link" @click="$bvModal.show('edit-profile-image')"><p>Change Profile Picture</p></b-link>
-        <hr>
-        <h5>User Details</h5>
-      </div>
-      <b-form
+        <ProfileImage :details="userData.profileImage" :userLookingAtSelfOrIsAdmin="isEditUser"/>
+      </b-card>
+    <br>
+    <b-card class="shadow">
+    <b-form
         @submit="submit"
         @input="setCustomValidities"
       >
-        <b-form-group>
+      <h1 v-if="!isEditUser">Sign Up to Wasteless</h1>
+      <h5 v-else>User Details</h5>
+      <b-form-group>
           <strong>First Name *</strong>
           <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
         </b-form-group>
@@ -107,7 +102,6 @@ Date: 3/3/2021
           </b-col>
         </b-row>
       </b-form>
-      <br>
       <div v-if="errors.length">
         <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{
             error
@@ -127,17 +121,6 @@ Date: 3/3/2021
 #cancel-button {
   align-self: end
 }
-
-#profile-image-link {
-  text-align: center;
-}
-
-.profile-image {
-  height: 12rem;
-  width: 12rem;
-  display: inline-block;
-  object-fit: cover;
-}
 </style>
 
 <script>
@@ -145,6 +128,7 @@ import Api from "../../Api";
 import AddressInput from "../model/AddressInput";
 import PasswordInput from "../model/PasswordInput";
 import EventBus from "../../util/event-bus"
+import ProfileImage from "./ProfileImage";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 120;
@@ -152,6 +136,7 @@ const UNIX_EPOCH_YEAR = 1970;
 
 export default {
   components: {
+    ProfileImage,
     PasswordInput,
     AddressInput,
   },
@@ -229,19 +214,6 @@ export default {
      * */
     passwordMatchValidity() {
       return this.userData.newPassword !== this.userData.confirmPassword ? "Passwords do not match." : ""
-    },
-
-    /**
-     * when user uploads image display the image as a preview
-     * @param event object for image uploaded
-     **/
-    openImage(event) {
-      if (event.target.files[0]) {
-        this.imageFile = event.target.files[0];
-        this.imageURL = window.URL.createObjectURL(event.target.files[0]);
-        event.target.value = '';
-        this.uploaded = true;
-      }
     },
 
     /**
