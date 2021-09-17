@@ -66,7 +66,7 @@ Date: sprint_6
             </b-col>
           </b-row>
           <b-row>
-            <b-col b-col cols="4" v-show="groupedResults.length">
+            <b-col b-col lg="4" md="5" sm="12" v-show="groupedResults.length">
               <b-pagination
                   v-model="currentPage"
                   :total-rows="groupedResults.length"
@@ -74,10 +74,16 @@ Date: sprint_6
                   aria-controls="my-table"
               ></b-pagination>
             </b-col>
+            <b-col lg="4" md="4" sm="12">
+              <b-button variant="primary" class="w-100" v-if="!extendedReportShown" @click="showExtendedReport">Show extended sales report</b-button>
+            </b-col>
           </b-row>
           </b-overlay>
         </b-list-group-item>
       </b-list-group>
+      <b-list-group-item v-show="totalResults">
+        <extended-sales-report v-if="extendedReportShown" id="extended-sales-report"></extended-sales-report>
+      </b-list-group-item>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
       <b-card-title>
@@ -103,10 +109,11 @@ import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
 import SalesReportGraph from "./SalesReportGraph";
 import EventBus from "../../util/event-bus";
+import ExtendedSalesReport from "@/components/sales-report/ExtendedSalesReport";
 
 export default {
   name: "sales-report-page",
-  components: {SalesReportGraph, DateRangeInput},
+  components: {ExtendedSalesReport, SalesReportGraph, DateRangeInput},
   data: function () {
     return {
       business: {},
@@ -118,6 +125,7 @@ export default {
       perPage: 10,
       dateRange: [],
       loading: false,
+      extendedReportShown: false
     }
   },
 
@@ -206,6 +214,13 @@ export default {
     finishedLoadingGraph: function () {
       this.loading = false;
     },
+
+    showExtendedReport: async function () {
+      this.extendedReportShown = true;
+      await this.$nextTick(); // Wait for v-if to take effect and extended report to be shown
+
+      document.getElementById('extended-sales-report').scrollIntoView({behavior: 'smooth'});
+    }
   },
 
 
