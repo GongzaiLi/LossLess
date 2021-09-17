@@ -229,7 +229,7 @@ describe('check groupBy resets when date range narrowed', () => {
     await wrapper.vm.getSalesReport(dateRange);
 
     expect(wrapper.vm.groupBy).toBe('month');
-    expect(wrapper.vm.groupByOptions).toStrictEqual({day: 'Daily',week: 'Weekly', month: 'Monthly'});
+    expect(wrapper.vm.groupByOptions).toStrictEqual({day: 'Daily', week: 'Weekly', month: 'Monthly'});
   });
 
   it('Narrows to day when narrow range from year to one week', async () => {

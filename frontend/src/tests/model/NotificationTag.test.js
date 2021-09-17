@@ -1,7 +1,5 @@
 import {shallowMount, createLocalVue, config} from '@vue/test-utils';
-
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import Api from "../../Api";
 import NotificationTag from "../../components/model/NotificationTag";
 
 let wrapper;
