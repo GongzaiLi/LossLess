@@ -82,7 +82,7 @@ Date: sprint_6
         </b-list-group-item>
       </b-list-group>
       <b-list-group-item v-show="totalResults">
-        <extended-sales-report :dateRange="dateRange" v-if="extendedReportShown" id="extended-sales-report"></extended-sales-report>
+        <extended-sales-report :dateRange="dateRange" :currency="currency" v-if="extendedReportShown" id="extended-sales-report"></extended-sales-report>
       </b-list-group-item>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
@@ -109,7 +109,7 @@ import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
 import SalesReportGraph from "./SalesReportGraph";
 import EventBus from "../../util/event-bus";
-import ExtendedSalesReport from "@/components/sales-report/ExtendedSalesReport";
+import ExtendedSalesReport from "./ExtendedSalesReport";
 
 export default {
   name: "sales-report-page",
