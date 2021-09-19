@@ -81,8 +81,8 @@ Date: sprint_6
           </b-overlay>
         </b-list-group-item>
       </b-list-group>
-      <b-list-group-item v-show="totalResults">
-        <extended-sales-report :dateRange="dateRange" :currency="currency" v-if="extendedReportShown" id="extended-sales-report"></extended-sales-report>
+      <b-list-group-item v-show="totalResults" id="extended-sales-report">
+        <extended-sales-report :dateRange="dateRange" :currency="currency" v-if="extendedReportShown"></extended-sales-report>
       </b-list-group-item>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
