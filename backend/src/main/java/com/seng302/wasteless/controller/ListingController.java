@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 
@@ -184,7 +185,7 @@ public class ListingController {
      * @param closingDateEnd   A date time string to filter listings with. This sets the end range to filter listings by closing date. String is parse through a formatter to get a local date time object.
      * @param address          Address to match against suburb, city, and country of lister of listing
      * @param pageable         pagination and sorting params
-     * @return Http Status 200 if valid query, 401 if unauthorised
+     * @return Http Status 200 if valid query, 400 if bad request i.e closing dates not of type date, 401 if unauthorised
      */
     @GetMapping("/listings/search")
     public ResponseEntity<Object> getListingsOfBusiness(
@@ -202,10 +203,19 @@ public class ListingController {
         Optional<LocalDateTime> closingDateTimeEnd =  Optional.empty();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if(closingDateStart.isPresent() && !closingDateStart.get().equals("")){
-            closingDateTimeStart = Optional.of(LocalDateTime.parse(closingDateStart.get(), formatter));
+            try {
+                closingDateTimeStart = Optional.of(LocalDateTime.parse(closingDateStart.get(), formatter));
+            } catch (DateTimeParseException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Closing Date Start not of type Date.");
+            }
         }
         if(closingDateEnd.isPresent()&& !closingDateEnd.get().equals("")) {
-            closingDateTimeEnd =  Optional.of(LocalDateTime.parse(closingDateEnd.get(), formatter));
+            try {
+                closingDateTimeEnd =  Optional.of(LocalDateTime.parse(closingDateEnd.get(), formatter));
+            } catch (DateTimeParseException e) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Closing Date End not of type Date.");
+            }
+
         }
 
         logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, closingDateStart: {} closingDateEnd: {}, address: {}",

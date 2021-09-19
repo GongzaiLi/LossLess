@@ -452,6 +452,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andClosingDateStartInvalid_then400Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", "blah")
+                .contentType(APPLICATION_JSON));
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andClosingDateEndInvalid_then400Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateEnd", "blah")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPutRequestToLikeAListing_andListingNotAlreadyLiked_then200Response() throws Exception {
         Mockito.when(listingsService.findFirstById(1)).thenReturn(listing);
         Mockito.when(user.toggleListingLike(listing)).thenReturn(true);
