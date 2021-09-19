@@ -74,14 +74,15 @@ public class SalesReportController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
         }
 
-        Period periodOfData;
-        LocalDate firstPeriodStart = startDate;
-        LocalDate lastPeriodEnd = endDate;
 
         if (period == null) {
             List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataNoPeriod(businessId, startDate, endDate);
             return ResponseEntity.status(HttpStatus.OK).body(responseBody);
         }
+
+        Period periodOfData;
+        LocalDate firstPeriodStart = startDate;
+        LocalDate lastPeriodEnd = endDate;
 
         switch (period) {
             case "day":
@@ -120,14 +121,21 @@ public class SalesReportController {
      * Get the total quantity, value, likes of all sales for each product of a business.
      *
      * @param businessId    The id of the business to get purchases for
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
      * @param sortBy        The value to sort the products by
      * @param order         The order to sort the products in
      * @return              The total quantity, value, likes of all purchases for each product of a business
      */
     @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
     public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
+                                                                         @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                                         @RequestParam(value = "endDate", required = false) LocalDate endDate,
                                                                          @RequestParam(value = "sortBy", required = false) String sortBy,
                                                                          @RequestParam(value = "order", required = false) Sort.Direction order) {
+
+        logger.info("Request to get reports for all the purchased products in the given period.");
+
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
@@ -135,12 +143,23 @@ public class SalesReportController {
 
         List<SalesReportProductTotalsDto> productsPurchasedTotals;
 
+        if (startDate == null && endDate == null) {
+            startDate = possibleBusiness.getCreated();
+            endDate = LocalDate.now();
+        } else if (startDate == null || endDate == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
+        } else if (endDate.isBefore(startDate)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
+        }
+
+
         if (sortBy == null && order != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
         } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {
-            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, sortBy, order);
+            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, startDate,
+                    endDate, sortBy, order);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);

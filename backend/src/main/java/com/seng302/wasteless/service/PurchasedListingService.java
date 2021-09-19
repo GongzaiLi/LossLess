@@ -205,7 +205,6 @@ public class PurchasedListingService {
         return durationCounts;
     }
 
-
     /**
      * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
      * and return a list of SalesReportPurchaseTotalsDto. Each SalesReportPurchaseTotalsDto contains information about
@@ -213,12 +212,16 @@ public class PurchasedListingService {
      * total number of likes.
      *
      * @param businessId    The id of the business
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
      * @param sortBy the attribute to be sorted by
      * @param order the order to sort the list in
      * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
      */
-    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
-        List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
+
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId,LocalDate startDate, LocalDate endDate, String sortBy, Sort.Direction order) {
+
+        List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId, startDate, endDate);
 
         List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
 

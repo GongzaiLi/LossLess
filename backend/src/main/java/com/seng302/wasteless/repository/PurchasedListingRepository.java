@@ -64,8 +64,8 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @param startDate     The start date for the date range. Format yyyy-MM-dd
      * @param endDate       The end date for the date range. Format yyyy-MM-dd
      */
-    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.business = :businessId and PL.saledate >= :startDate" +
-            " and PL.saledate <= :endDate ", nativeQuery = true)
+    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.business = :businessId and PL.saleDate >= :startDate" +
+            " and PL.saleDate <= :endDate ", nativeQuery = true)
     Double sumPriceByBusiness_IdAndSaleDateBetween(@Param("businessId") Integer businessId,
                                                     @Param("startDate") LocalDate startDate,
                                                     @Param("endDate") LocalDate endDate);
@@ -106,7 +106,9 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      *
      * @param businessId    the id of the business
      */
-    @Query(value = "select distinct(PL.product) from PurchasedListing PL where PL.business = :businessId", nativeQuery = true)
-    List<Long> getAllProductDatabaseIdsBySalesOfBusiness(@Param("businessId") Integer businessId);
+    @Query(value = "select distinct(PL.product) from PurchasedListing PL where PL.business = :businessId and PL.saleDate >= :startDate" +
+            " and PL.saleDate <= :endDate ", nativeQuery = true)
+    List<Long> getAllProductDatabaseIdsBySalesOfBusiness(@Param("businessId") Integer businessId,@Param("startDate") LocalDate startDate,
+                                                         @Param("endDate") LocalDate endDate);
 
 }
