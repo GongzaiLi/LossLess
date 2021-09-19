@@ -455,7 +455,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     void whenGetRequestToSearchListings_andClosingDateStartInvalid_then400Response() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
                 .queryParam("closingDateStart", "blah")
-                .contentType(APPLICATION_JSON));
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
