@@ -16,7 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -96,25 +101,26 @@ class UserServiceTest {
     }
 
     @Test
-    void whenCheckUserEmailWithoutAT_AndInValidEmail_ReturnTrue() {
+    void whenCheckUserEmailWithoutAT_AndInValidEmail_ReturnFalse() {
         String userEmail = "a.com";
         Assertions.assertFalse(userService.checkEmailValid(userEmail));
     }
 
     @Test
-    void whenCheckUserEmailWithoutATAndCOM_AndInValidEmail_ReturnTrue() {
+    void whenCheckUserEmailWithoutATAndCOM_AndInValidEmail_ReturnFalse() {
         String userEmail = "a";
         Assertions.assertFalse(userService.checkEmailValid(userEmail));
     }
 
+
     @Test
-    void whenCheckUserEmailIsEmpty_AndInValidEmail_ReturnTrue() {
+    void whenCheckUserEmailIsEmpty_AndInValidEmail_ReturnFalse() {
         String userEmail = "";
         Assertions.assertFalse(userService.checkEmailValid(userEmail));
     }
 
     @Test
-    void whenCheckUserEmailIsComponentBySymbol_AndInValidEmail_ReturnTrue() {
+    void whenCheckUserEmailIsComponentBySymbol_AndInValidEmail_ReturnFalse() {
         String userEmail = "#@#";
         Assertions.assertFalse(userService.checkEmailValid(userEmail));
     }
@@ -129,7 +135,7 @@ class UserServiceTest {
     }
 
     @Test
-    void whenUserRegister_andEmailHasNotAlreadyUser_ReturnTrue() {
+    void whenUserRegister_andEmailHasNotAlreadyUser_ReturnFalse() {
 
         User user = new User();
         user.setEmail("a@a");
@@ -152,7 +158,7 @@ class UserServiceTest {
         } catch (ResponseStatusException e) {
             Assertions.assertEquals("409 CONFLICT \"Attempted to update user with already used email\"", e.getMessage());
         }
-        Assertions.assertFalse(user2.getEmail().equals(newEmail));
+        Assertions.assertNotEquals(user2.getEmail(), newEmail);
     }
 
     @Test
@@ -169,7 +175,7 @@ class UserServiceTest {
         } catch (ResponseStatusException e) {
             Assertions.assertEquals("400 BAD_REQUEST \"Email address is invalid\"", e.getMessage());
         }
-        Assertions.assertFalse(user1.getEmail().equals(newEmail));
+        Assertions.assertNotEquals(user1.getEmail(), newEmail);
     }
 
     @Test
@@ -182,7 +188,7 @@ class UserServiceTest {
         Mockito.when(userRepository.findFirstByEmail(newEmail)).thenReturn(null);
 
         userService.updateUserEmail(user1, newEmail);
-        Assertions.assertTrue(user1.getEmail().equals(newEmail));
+        Assertions.assertEquals(user1.getEmail(), newEmail);
     }
 
 
@@ -236,11 +242,11 @@ class UserServiceTest {
             user.setDateOfBirth(birth);
             Assertions.assertEquals("400 BAD_REQUEST \"Date out of expected range\"", e.getMessage());
         }
-        Assertions.assertFalse(user.getDateOfBirth().equals(newBirth));
+        Assertions.assertNotEquals(user.getDateOfBirth(), newBirth);
     }
 
     @Test
-    void whenUserUpdateUserDateOfBirth_TheDateOfBirthUnder120_Return400() {
+    void whenUserUpdateUserDateOfBirth_TheDateOfBirthIsOver120_Return400() {
         LocalDate birth = LocalDate.parse("1998-05-09");
         LocalDate newBirth = LocalDate.parse("1770-07-07");
         User user = new User();
@@ -253,7 +259,7 @@ class UserServiceTest {
             user.setDateOfBirth(birth);
             Assertions.assertEquals("400 BAD_REQUEST \"Date out of expected range\"", e.getMessage());
         }
-        Assertions.assertFalse(user.getDateOfBirth().equals(newBirth));
+        Assertions.assertNotEquals(user.getDateOfBirth(), newBirth);
     }
 
     @Test
@@ -266,7 +272,7 @@ class UserServiceTest {
 
 
         userService.modifyUserDateOfBirth(user, newBirth);
-        Assertions.assertTrue(user.getDateOfBirth().equals(newBirth));
+        Assertions.assertEquals(user.getDateOfBirth(), newBirth);
     }
 
 
@@ -282,7 +288,7 @@ class UserServiceTest {
         user.setHomeAddress(address);
 
         userService.modifyUserHomeAddress(user, newAddress);
-        Assertions.assertTrue(user.getHomeAddress().equals(newAddress));
+        Assertions.assertEquals(user.getHomeAddress(), newAddress);
 
     }
 
@@ -295,7 +301,7 @@ class UserServiceTest {
         user.setPassword(password);
 
         userService.modifyUserPassword(user, newPassword);
-        Assertions.assertTrue(user.getPassword().equals(password));
+        Assertions.assertEquals(user.getPassword(), password);
 
     }
 
@@ -308,7 +314,7 @@ class UserServiceTest {
         user.setPassword(password);
 
         userService.modifyUserPassword(user, newPassword);
-        Assertions.assertTrue(user.getPassword().equals(password));
+        Assertions.assertEquals(user.getPassword(), password);
     }
 
 
@@ -324,7 +330,21 @@ class UserServiceTest {
 
         userService.modifyUserPassword(user, newPassword);
         System.out.println(user.getPassword());
-        Assertions.assertTrue(user.getPassword().equals(newPassword));
+        Assertions.assertEquals(user.getPassword(), newPassword);
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenCheckCurrentlyLoggedInUser_andUserIsNull_ThenReturn401() {
+        Mockito.when(userService.findUserByEmail(any())).thenReturn(null);
+        boolean success = true;
+        try {
+            userService.getCurrentlyLoggedInUser();
+        } catch (ResponseStatusException e) {
+            success = false;
+            Assertions.assertEquals("401 UNAUTHORIZED \"Session token is invalid\"", e.getMessage());
+        }
+        Assertions.assertFalse(success);
     }
 }
 
