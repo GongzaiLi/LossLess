@@ -4,6 +4,7 @@
       <top-products-report :date-range="dateRange" :currency="currency" class="mt-4"></top-products-report>
     </b-tab>
     <b-tab title="Manufacturers">
+      <top-manufacturers-report :date-range="dateRange" :currency="currency" class="mt-4"></top-manufacturers-report>
     </b-tab>
     <b-tab title="Listings">
     </b-tab>
@@ -14,10 +15,11 @@
 <script>
 
 import TopProductsReport from "./TopProductsReport";
+import TopManufacturersReport from "./TopManufacturersReport";
 
 export default {
   name: "extended-sales-report",
-  components: {TopProductsReport},
+  components: {TopManufacturersReport, TopProductsReport},
   props: ["dateRange", "currency"],
 }
 

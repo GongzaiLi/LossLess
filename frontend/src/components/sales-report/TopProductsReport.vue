@@ -22,7 +22,7 @@
         <b-col cols="auto">
           <h3>Top Products Graph</h3>
         </b-col>
-        <b-col cols="4">
+        <b-col cols="5">
           <b-select v-model="doughnutOption" @input="updateChart" :options="doughnutOptions"/>
         </b-col>
       </b-row>
