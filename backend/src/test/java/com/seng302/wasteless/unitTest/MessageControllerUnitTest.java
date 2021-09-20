@@ -151,8 +151,12 @@ public class MessageControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToCreateMessage__andSenderIsReceiver_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"receiverId\": 1, \"messageText\": \"Hello\", \"cardId\": 1}";
+    void whenPostRequestToCreateMessage_andSenderIsReceiver_then400Response() throws Exception {
+        String jsonInStringForRequest = "{\"receiverId\": 2, \"messageText\": \"Hello\", \"cardId\": 1}";
+
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(userForCard);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/messages")
                 .content(jsonInStringForRequest)
