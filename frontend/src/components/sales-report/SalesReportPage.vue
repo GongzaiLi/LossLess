@@ -65,7 +65,7 @@ Date: sprint_6
             </b-col>
           </b-row>
           <b-row>
-            <b-col b-col cols="4" v-show="groupedResults.length">
+            <b-col b-col lg="4" md="5" sm="12" v-show="groupedResults.length">
               <b-pagination
                   v-model="currentPage"
                   :total-rows="groupedResults.length"
@@ -73,10 +73,16 @@ Date: sprint_6
                   aria-controls="my-table"
               ></b-pagination>
             </b-col>
+            <b-col lg="4" md="4" sm="12">
+              <b-button variant="primary" class="w-100" v-if="!extendedReportShown" @click="showExtendedReport">Show extended sales report</b-button>
+            </b-col>
           </b-row>
           </b-overlay>
         </b-list-group-item>
       </b-list-group>
+      <b-list-group-item v-show="totalResults" id="extended-sales-report">
+        <extended-sales-report :dateRange="dateRange" :currency="currency" v-if="extendedReportShown"></extended-sales-report>
+      </b-list-group-item>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
       <b-card-title>
@@ -97,15 +103,16 @@ Date: sprint_6
 </template>
 
 <script>
-import api from "../../Api";
+import Api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
 import {formatDate, getMonthName} from "../../util";
 import SalesReportGraph from "./SalesReportGraph";
 import EventBus from "../../util/event-bus";
+import ExtendedSalesReport from "./ExtendedSalesReport";
 
 export default {
   name: "sales-report-page",
-  components: {SalesReportGraph, DateRangeInput},
+  components: {ExtendedSalesReport, SalesReportGraph, DateRangeInput},
   data: function () {
     return {
       business: {},
@@ -117,6 +124,7 @@ export default {
       perPage: 10,
       dateRange: [],
       loading: false,
+      extendedReportShown: false
     }
   },
 
@@ -128,12 +136,12 @@ export default {
 
   methods: {
     /**
-     * this is a get api which can take Specific business to display on the page
+     * this is a get Api which can take Specific business to display on the page
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
      * @param id
      **/
     getBusiness: function (id) {              this.loadingTable = false;
-      api
+      Api
           .getBusiness(id)
           .then((response) => {
             this.business = response.data;
@@ -148,7 +156,7 @@ export default {
      * Queries the currencies API to get currency info for the business
      **/
     async getCurrency(business) {
-      this.currency = await api.getUserCurrency(business.address.country);
+      this.currency = await Api.getUserCurrency(business.address.country);
     },
 
     /**
@@ -170,7 +178,7 @@ export default {
         const businessId = this.$route.params.id;
         const startDate = formatDate(dateRange[0]);
         const endDate = formatDate(dateRange[1]);
-        await api.getSalesReport(businessId, startDate, endDate, this.groupBy)
+        await Api.getSalesReport(businessId, startDate, endDate, this.groupBy)
             .then((response) => {
               this.updateTotalResults(startDate, endDate, response.data);
               this.groupedResults = response.data;
@@ -205,6 +213,13 @@ export default {
     finishedLoadingGraph: function () {
       this.loading = false;
     },
+
+    showExtendedReport: async function () {
+      this.extendedReportShown = true;
+      await this.$nextTick(); // Wait for v-if to take effect and extended report to be shown
+
+      document.getElementById('extended-sales-report').scrollIntoView({behavior: 'smooth'});
+    }
   },
 
 

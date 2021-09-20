@@ -1,6 +1,7 @@
 package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.Product;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -166,9 +168,10 @@ public class PurchasedListingService {
             fakeListing.setPurchaser(user);
             fakeListing.setSaleDate(LocalDate.now().minusDays(generator.nextInt(365*3)));
             fakeListing.setListingDate(fakeListing.getSaleDate().minusDays(generator.nextInt(7)));
-            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)));
+            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)+1).atTime(LocalTime.now()));
             fakeListing.setProduct(product);
             fakeListing.setQuantity(generator.nextInt(5) + 1);
+            fakeListing.setManufacturer(business.getName()+(i%3));
             double price = Math.round(generator.nextDouble()*30);
             fakeListing.setPrice(price);
             fakeListing.setNumberOfLikes(generator.nextInt(50));
@@ -265,6 +268,65 @@ public class PurchasedListingService {
         Product product = productRepository.findFirstByDatabaseId(productId);
 
         return new SalesReportProductTotalsDto(product, totalPurchases, totalValue, totalLikes);
+    }
+
+    /**
+     * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
+     * and return a list of allSoldManufacturersOfBusiness. Each allSoldManufacturersOfBusiness contains information about
+     * a given manufacturer, including the number of the product sold, the total value all products sold for, and the
+     * total number of likes.
+     *
+     * @param businessId    The id of the business
+     * @param sortBy the attribute to be sorted by
+     * @param order the order to sort the list in
+     * @return              List of allSoldManufacturersOfBusiness populated with sale information for each manufacturer.
+     */
+    public List<SalesReportManufacturerTotalsDto> getManufacturersPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
+        List<String> allSoldManufacturersOfBusiness = purchasedListingRepository.getAllManufacturersBySalesOfBusiness(businessId);
+
+        List<SalesReportManufacturerTotalsDto> salesReportManufacturerTotalsDtos = new ArrayList<>();
+
+        for (String manufacturer: allSoldManufacturersOfBusiness) {
+            salesReportManufacturerTotalsDtos.add(getTotalsForManufacturer(manufacturer));
+        }
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "value":
+                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalValue));
+                    break;
+                case "quantity":
+                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalProductPurchases));
+                    break;
+                case "likes":
+                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalLikes));
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (order != null  && order.isDescending()) {
+            Collections.reverse(salesReportManufacturerTotalsDtos);
+        }
+
+        return salesReportManufacturerTotalsDtos;
+    }
+
+    /**
+     * For a given product, create a SalesReportManufacturerTotalsDto populate it with the correct information.
+     *
+     * @param manufacturer     The String of the manufacturer
+     * @return              SalesReportManufacturerTotalsDto populated with information about product sales
+     */
+    private SalesReportManufacturerTotalsDto getTotalsForManufacturer(String manufacturer) {
+        Integer totalPurchases = purchasedListingRepository.sumProductsSoldByManufacturer(manufacturer);
+        Double totalValue = purchasedListingRepository.sumPriceByManufacturer(manufacturer);
+        Integer totalLikes = purchasedListingRepository.sumTotalLikesByManufacturer(manufacturer);
+
+        if (totalValue == null) {
+            totalValue = 0.0;
+        }
+
+        return new SalesReportManufacturerTotalsDto(manufacturer, totalPurchases, totalValue, totalLikes);
     }
 
 }

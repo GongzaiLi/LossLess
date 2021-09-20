@@ -64,7 +64,7 @@ describe('Testing watcher for current page change', () => {
   test('check-get-listings-is-called-when-current-page-updated', async () => {
     wrapper.vm.currentPage = 3
     await wrapper.vm.$nextTick();
-    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12", "", ["inventoryItem.product.name,asc"], 9, 2);
+    expect(Api.searchListings).toHaveBeenLastCalledWith('',"", "", "", [], "", "2021-08-12 00:00:00", "", ["inventoryItem.product.name,asc"], 9, 2);
   });
 
 });
@@ -163,6 +163,28 @@ describe('Testing date range for valid and invalid case', () => {
     wrapper.vm.search.closesStartDate = "2020-12-10"
     wrapper.vm.search.closesEndDate = "2021-12-10"
     expect(wrapper.vm.invalidDateRange).toBeFalsy();
+  })
+
+})
+
+describe('Testing price range for valid and invalid case', () => {
+
+  test('Price range invalid when price min is greater than price max', () => {
+    wrapper.vm.search.priceMin = "3"
+    wrapper.vm.search.priceMax = "2"
+    expect(wrapper.vm.invalidPriceRange).toBeTruthy();
+  })
+
+  test('Price range valid when price max is greater than price min', () => {
+    wrapper.vm.search.priceMin = "2"
+    wrapper.vm.search.priceMax = "3"
+    expect(wrapper.vm.invalidPriceRange).toBeFalsy();
+  })
+
+  test('Price range valid when there is a price min and price max is empty', () => {
+    wrapper.vm.search.priceMin = "15"
+    wrapper.vm.search.priceMax = ""
+    expect(wrapper.vm.invalidPriceRange).toBeFalsy();
   })
 
 })
