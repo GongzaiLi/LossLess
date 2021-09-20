@@ -79,7 +79,7 @@ public class MessageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID is invalid.");
         }
 
-        if (! messageService.checkOneUserOwnsCard(currentlyLoggedInUser.getId(), receiver.getId(), cardForMessage)) {
+        if (!messageService.checkOneUserOwnsCard(currentlyLoggedInUser.getId(), receiver.getId(), cardForMessage)) {
             logger.debug("Cannot save message, neither sender with id {} or receiver with id {} owns card with id {}",
                     currentlyLoggedInUser.getId(), messageDTO.getReceiverId(), cardForMessage.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Neither sender nor receiver owns this card.");
