@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -63,7 +64,6 @@ public class SalesReportController {
                                                               @RequestParam(value = "period", required = false) String period) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
         if (startDate == null && endDate == null) {
@@ -151,22 +151,26 @@ public class SalesReportController {
      * Endpoint that gets the number of sales listings, grouped by the duration between the
      * listings’ purchase and closing dates.
      *
-     * @param businessId The id of the business to get purchases for
-     * @param startDate  The start date for the date range. Format yyyy-MM-dd
-     * @param endDate    The end date for the date range. Format yyyy-MM-dd
+     * @param businessId  The id of the business to get purchases for
+     * @param startDate   The start date for the date range. Format yyyy-MM-dd
+     * @param endDate     The end date for the date range. Format yyyy-MM-dd
+     * @param granularity The granularity of the groupings of listings, i.e. the duration of a single group (in days).
+     *                    Defaults to 1, and should not be 0 or less.
      * @return JSON object where the keys are the durations in days between the
      * listings’ purchase and closing dates, and the values are the number of sales listings
+     * @throws ResponseStatusException If granularity is less than or equal to 0
      */
     @GetMapping("/businesses/{id}/salesReport/listingDurations")
     public ResponseEntity<Object> getListingsGroupedByDuration(@PathVariable("id") Integer businessId,
                                                                @RequestParam(value = "startDate") LocalDate startDate,
-                                                               @RequestParam(value = "endDate") LocalDate endDate) {
+                                                               @RequestParam(value = "endDate") LocalDate endDate,
+                                                               @RequestParam(defaultValue = "1") Integer granularity) {
         User user = userService.getCurrentlyLoggedInUser();
         Business business = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(business, user);
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                purchasedListingService.countSalesByDurationBetweenSaleAndClose(business.getId(), startDate, endDate)
+                purchasedListingService.countSalesByDurationBetweenSaleAndClose(business.getId(), startDate, endDate, granularity)
         );
     }
 
