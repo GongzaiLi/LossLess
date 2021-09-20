@@ -2,6 +2,7 @@ package com.seng302.wasteless.unitTest.ServiceTests;
 
 import com.seng302.wasteless.TestUtils;
 import com.seng302.wasteless.dto.SalesReportDto;
+import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
@@ -110,7 +111,7 @@ class PurchasedListingServiceTest {
 
         Product product1 = new Product();
         product1.setId("Clown-Shows");
-        product1.setBusinessId(20);
+        product1.setBusinessId(business2.getId());
         product1.setName("Clown Shows");
         product1.setCreated(LocalDate.now());
         product1.setDescription("For you feet");
@@ -120,17 +121,17 @@ class PurchasedListingServiceTest {
 
         Product product2 = new Product();
         product2.setId("Clown-Hats");
-        product2.setBusinessId(20);
+        product2.setBusinessId(business2.getId());
         product2.setName("Clown Hats");
         product2.setCreated(LocalDate.now());
         product2.setDescription("For you head");
-        product2.setManufacturer("James");
+        product2.setManufacturer("Not James");
         product2.setRecommendedRetailPrice(2.0);
         productService.createProduct(product2);
 
         Product product3 = new Product();
         product3.setId("Clown-Nose");
-        product3.setBusinessId(20);
+        product3.setBusinessId(business2.getId());
         product3.setName("Clown Nose");
         product3.setCreated(LocalDate.now());
         product3.setDescription("For you Face");
@@ -155,7 +156,7 @@ class PurchasedListingServiceTest {
         listingsService.purchase(listingWith5Quantity5LikesForProduct2, curUser);
         listingsService.purchase(listingWith1Quantity1LikesForProduct2, curUser);
         listingsService.purchase(listingWith10Quantity10LikesForProduct3, curUser);
-        
+
 
         pageable = PageRequest.of(0, 100);
 
@@ -164,31 +165,31 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetSalesReportData_andNoPeriodSet_thenReturnedDataHasLength1() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataNoPeriod(1, LocalDate.now().minusDays(3), LocalDate.now().plusDays(3));
+        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataNoPeriod(business.getId(), LocalDate.now().minusDays(3), LocalDate.now().plusDays(3));
         assertEquals(1, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsDayIn5DayDateRange_thenReturnedDataHasLength5() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusDays(4), LocalDate.now(), LocalDate.now().plusDays(4), Period.ofDays(1));
+        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusDays(4), LocalDate.now(), LocalDate.now().plusDays(4), Period.ofDays(1));
         assertEquals(5, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsWeekIn7WeekDateRange_thenReturnedDataHasLength7() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusWeeks(6), LocalDate.now(), LocalDate.now().plusWeeks(6), Period.ofWeeks(1));
+        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusWeeks(6), LocalDate.now(), LocalDate.now().plusWeeks(6), Period.ofWeeks(1));
         assertEquals(7, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsMonthIn3MonthDateRange_thenReturnedDataHasLength3() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusMonths(2), LocalDate.now().minusDays(1), LocalDate.now().plusMonths(2), Period.ofMonths(1));
+        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusMonths(2), LocalDate.now().minusDays(1), LocalDate.now().plusMonths(2), Period.ofMonths(1));
         assertEquals(3, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsYearIn4YearDateRange_thenReturnedDataHasLength4() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(1, LocalDate.now(), LocalDate.now().plusYears(3), LocalDate.now(), LocalDate.now().plusYears(3), Period.ofYears(1));
+        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusYears(3), LocalDate.now(), LocalDate.now().plusYears(3), Period.ofYears(1));
         assertEquals(4, salesReportData.size());
     }
 
@@ -272,7 +273,6 @@ class PurchasedListingServiceTest {
     @Test
     void whenGetProductsPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
         List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), "value", Sort.Direction.ASC, pageable);
-        System.out.println(purchasedTotalsData);
         assertEquals(1, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(6, purchasedTotalsData.get(1).getTotalValue());
         assertEquals(12, purchasedTotalsData.get(2).getTotalValue());
@@ -302,6 +302,62 @@ class PurchasedListingServiceTest {
         List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), "likes", Sort.Direction.DESC, pageableLocal);
         assertEquals("Clown-Nose", purchasedTotalsData.get(0).getProduct().getId());
         assertEquals(1, purchasedTotalsData.size());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfDtosReturned() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        assertEquals(2, purchasedTotalsData.size());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        assertEquals(18, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(16, purchasedTotalsData.get(1).getTotalProductPurchases());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfLikesOfPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        assertEquals(18, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotalsAndSortQuantity_ASC_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "quantity", Sort.Direction.ASC);
+        assertEquals(16, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(18, purchasedTotalsData.get(1).getTotalProductPurchases());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "value", Sort.Direction.ASC);
+        assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotalsAndSortLikes_ASC_thenCorrectOrderOfPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "likes", Sort.Direction.ASC);
+        assertEquals(16, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(18, purchasedTotalsData.get(1).getTotalLikes());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotalsAndSortLikes_DESC_thenCorrectOrderOfPurchasesInDtos() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "likes", Sort.Direction.DESC);
+        assertEquals(18, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
+
     }
 
 }

@@ -111,4 +111,43 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
     List<Long> getAllProductDatabaseIdsBySalesOfBusiness(@Param("businessId") Integer businessId,@Param("startDate") LocalDate startDate,
                                                          @Param("endDate") LocalDate endDate);
 
+    /**
+     * Returns total number of sales for a given manufacturer.
+     *
+     * Business id does not need to be supplied as all product database ids are unique and this method
+     * is not accessed without user being authenticated as a owner of a business of which this product
+     * was created.
+     *
+     * @param manufacturer     The Sting of the manufacturer
+     * @return              total number of sales for a given manufacturer of products sold by a business.
+     */
+    @Query(value = "select sum(PL.quantity) from PurchasedListing PL where PL.manufacturer = :manufacturer", nativeQuery = true)
+    Integer sumProductsSoldByManufacturer(@Param("manufacturer") String manufacturer);
+
+    /**
+     * Returns total price of all sales for a given manufacturer
+     *
+     * @param manufacturer     The String of the manufacturer
+     * @return              total price of all sales for a given manufacturer
+     */
+    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.manufacturer = :manufacturer", nativeQuery = true)
+    Double sumPriceByManufacturer(@Param("manufacturer") String manufacturer);
+
+    /**
+     * Returns total likes of all sales for a given manufacturer
+     *
+     * @param manufacturer     The String of the manufacturer
+     * @return              total likes of all sales for a given manufacturer
+     */
+    @Query(value = "select sum(PL.numberoflikes) from PurchasedListing PL where PL.manufacturer = :manufacturer", nativeQuery = true)
+    Integer sumTotalLikesByManufacturer(@Param("manufacturer") String manufacturer);
+
+    /**
+     * Returns list of manufacturer of all products that a business has sold any amount of
+     *
+     * @param businessId    the id of the business
+     */
+    @Query(value = "select distinct(PL.manufacturer) from PurchasedListing PL where PL.business = :businessId", nativeQuery = true)
+    List<String> getAllManufacturersBySalesOfBusiness(@Param("businessId") Integer businessId);
+
 }
