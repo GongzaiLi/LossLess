@@ -99,7 +99,7 @@
                 </div>
                 <label class="any_label">(Any if blank)</label>
                 <label v-if="invalidDateRange" class="rangeWarning mb-2 ml-2">
-                  <b-icon icon="exclamation-circle-fill"></b-icon> Date range wrong way around
+                  <b-icon icon="exclamation-circle-fill"></b-icon> The dates may be the wrong way around
                 </label>
               </div>
             </b-col>
@@ -117,7 +117,7 @@
                   <b-input class="price_max" step="0.01" :min=search.priceMin max="1000000.00" type="number" placeholder="Any" v-model="search.priceMax"></b-input>
                 </div>
                 <label v-if="invalidPriceRange" class="rangeWarning mb-2 ml-2">
-                  <b-icon icon="exclamation-circle-fill"></b-icon> Price range wrong way around
+                  <b-icon icon="exclamation-circle-fill"></b-icon> Lowest price must come before highest price
                 </label>
               </div>
 
