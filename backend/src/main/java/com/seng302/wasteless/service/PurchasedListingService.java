@@ -9,6 +9,7 @@ import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.ProductRepository;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -219,13 +220,13 @@ public class PurchasedListingService {
      * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
      */
 
-    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId,LocalDate startDate, LocalDate endDate, String sortBy, Sort.Direction order) {
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId,LocalDate startDate, LocalDate endDate, String sortBy, Sort.Direction order, Pageable pageable) {
 
         List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId, startDate, endDate);
 
         List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
 
-        for (Long productId: allSoldProductsOfBusiness) {
+        for (Long productId : allSoldProductsOfBusiness) {
             salesReportProductTotalsDtos.add(getTotalsForProduct(productId));
         }
         if (sortBy != null) {
@@ -243,11 +244,13 @@ public class PurchasedListingService {
                     break;
             }
         }
-        if (order != null  && order.isDescending()) {
+        if (order != null && order.isDescending()) {
             Collections.reverse(salesReportProductTotalsDtos);
         }
+        int firstItemIndex = pageable.getPageNumber() * pageable.getPageSize();
+        int lastItemIndex = Math.min(firstItemIndex + pageable.getPageSize(), salesReportProductTotalsDtos.size());
+        return salesReportProductTotalsDtos.subList(firstItemIndex, lastItemIndex);
 
-        return salesReportProductTotalsDtos;
     }
 
     /**

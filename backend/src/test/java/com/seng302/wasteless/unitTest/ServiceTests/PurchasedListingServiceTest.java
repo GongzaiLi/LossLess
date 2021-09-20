@@ -13,10 +13,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -28,6 +31,7 @@ import java.time.Period;
 import java.util.*;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
+import static org.mockito.ArgumentMatchers.any;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -65,6 +69,7 @@ class PurchasedListingServiceTest {
 
     private Business business2;
 
+    private Pageable pageable;
 
     private User curUser;
 
@@ -150,7 +155,9 @@ class PurchasedListingServiceTest {
         listingsService.purchase(listingWith5Quantity5LikesForProduct2, curUser);
         listingsService.purchase(listingWith1Quantity1LikesForProduct2, curUser);
         listingsService.purchase(listingWith10Quantity10LikesForProduct3, curUser);
+        
 
+        pageable = PageRequest.of(0, 100);
 
     }
 
@@ -229,34 +236,34 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfDtosReturned() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC, pageable);
         assertEquals(3, purchasedTotalsData.size());
     }
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfTotalProductPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC, pageable);
         assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(16, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC, pageable);
         assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
     }
 
     @Test
     void whenGetProductsPurchasedTotals_thenCorrectNumberOfLikesOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), null, Sort.Direction.ASC, pageable);
         assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
     }
 
     @Test
     void whenGetProductsPurchasedTotalsAndSortQuantity_ASC_thenCorrectNumberOfTotalProductPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "quantity", Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "quantity", Sort.Direction.ASC, pageable);
         assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(10, purchasedTotalsData.get(1).getTotalProductPurchases());
         assertEquals(16, purchasedTotalsData.get(2).getTotalProductPurchases());
@@ -264,7 +271,7 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetProductsPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "value", Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "value", Sort.Direction.ASC, pageable);
         assertEquals(1, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(6, purchasedTotalsData.get(1).getTotalValue());
         assertEquals(12, purchasedTotalsData.get(2).getTotalValue());
@@ -272,7 +279,7 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetProductsPurchasedTotalsAndSortLikes_ASC_thenCorrectOrderOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "likes", Sort.Direction.ASC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "likes", Sort.Direction.ASC, pageable);
         assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(10, purchasedTotalsData.get(1).getTotalLikes());
         assertEquals(16, purchasedTotalsData.get(2).getTotalLikes());
@@ -280,10 +287,20 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetProductsPurchasedTotalsAndSortLikes_DESC_thenCorrectOrderOfPurchasesInDtos() {
-        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "likes", Sort.Direction.DESC);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "likes", Sort.Direction.DESC, pageable);
         assertEquals(16, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(10, purchasedTotalsData.get(1).getTotalLikes());
         assertEquals(8, purchasedTotalsData.get(2).getTotalLikes());
+
+    }
+
+
+    @Test
+    void whenGetProductsPurchasedTotalsAndPageAndSize_thenCorrectPurchasesInDtos() {
+        pageable = PageRequest.of(1, 1);
+        List<SalesReportProductTotalsDto> purchasedTotalsData = purchasedListingService.getProductsPurchasedTotals(2, LocalDate.now(), LocalDate.now(), "likes", Sort.Direction.DESC, pageable);
+        assertEquals("Clown-Nose", purchasedTotalsData.get(0).getProduct().getId());
+        assertEquals(1, purchasedTotalsData.size());
 
     }
 

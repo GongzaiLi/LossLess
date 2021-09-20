@@ -8,6 +8,7 @@ import com.seng302.wasteless.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,9 +67,10 @@ public class SalesReportController {
         logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
-        validateDate(startDate, endDate);
-        startDate = possibleBusiness.getCreated();
-        endDate = LocalDate.now();
+        if (!validateDate(startDate, endDate)) {
+            startDate = possibleBusiness.getCreated();
+            endDate = LocalDate.now();
+        }
 
         if (period == null) {
             List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataNoPeriod(businessId, startDate, endDate);
@@ -127,7 +129,8 @@ public class SalesReportController {
                                                                          @RequestParam(value = "startDate", required = false) LocalDate startDate,
                                                                          @RequestParam(value = "endDate", required = false) LocalDate endDate,
                                                                          @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false) Sort.Direction order) {
+                                                                         @RequestParam(value = "order", required = false) Sort.Direction order,
+                                                                         Pageable pageable) {
 
         logger.info("Request to get reports for all the purchased products in the given period.");
 
@@ -138,9 +141,10 @@ public class SalesReportController {
 
         List<SalesReportProductTotalsDto> productsPurchasedTotals;
 
-        validateDate(startDate, endDate);
-        startDate = possibleBusiness.getCreated();
-        endDate = LocalDate.now();
+        if (!validateDate(startDate, endDate)) {
+            startDate = possibleBusiness.getCreated();
+            endDate = LocalDate.now();
+        }
 
         if (sortBy == null && order != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
@@ -148,7 +152,7 @@ public class SalesReportController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {
             productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, startDate,
-                    endDate, sortBy, order);
+                    endDate, sortBy, order, pageable);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
@@ -184,13 +188,15 @@ public class SalesReportController {
      * @param startDate The start date provided.
      * @param endDate The end date provided.
      */
-    public void validateDate(LocalDate startDate, LocalDate endDate) {
+    public Boolean validateDate(LocalDate startDate, LocalDate endDate) {
         if (startDate == null && endDate == null) {
             logger.info("No date range specified. Getting report from business creation up to now.");
+            return false;
         } else if (startDate == null || endDate == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must specify a start date and an end date, or neither.");
         } else if (endDate.isBefore(startDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date must be before end date.");
         }
+        return true;
     }
 }
