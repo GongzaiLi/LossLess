@@ -468,6 +468,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andClosingDateStartValid_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateStart", "2015-09-15 15:02:32")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetRequestToSearchListings_andClosingDateEndValid_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/listings/search")
+                .queryParam("closingDateEnd", "2015-09-15 15:02:32")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenPutRequestToLikeAListing_andListingNotAlreadyLiked_then200Response() throws Exception {
