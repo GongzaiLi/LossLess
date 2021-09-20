@@ -8,6 +8,8 @@
           :fields="fields"
           no-border-collapse
           no-local-sorting
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
           striped
           responsive="lg"
           bordered
@@ -45,6 +47,8 @@ export default {
       businessId: '',
       totalResults: null,
       results: [],
+      sortBy: '',
+      sortDesc: true,
       loading: false,
       doughnutOptions: {
         totalProductPurchases: "Total Quantity Sold",
@@ -52,7 +56,7 @@ export default {
         totalLikes: "Number of Likes"
       },
       fields: [
-        {label: 'Manufacturer', key: 'manufacturer', sortable: true},
+        {label: 'Manufacturer', key: 'manufacturer', sortable: false},
         {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
         {key: 'totalValue', sortable: true},
         {key: 'totalLikes', sortable: true}
@@ -113,14 +117,36 @@ export default {
   methods: {
 
     /**
-     * Uses Api.js to send a get request with the getProductsReport.
+     * Uses Api.js to send a get request with the getTopManufacturers.
      * This is used to retrieve the data of the business's products to form a report.
      * @param dateRange
      **/
     getManufacturersReport: async function (dateRange) {
       const startDate = formatDate(dateRange[0]);
       const endDate = formatDate(dateRange[1]);
-      await Api.getManufacturersReport(this.businessId, startDate, endDate)
+
+      let sortByParam;
+      switch (this.sortBy) {
+        case "totalProductPurchases":
+          sortByParam = "quantity";
+          this.doughnutOption = "totalProductPurchases";
+          break;
+
+        case "totalLikes":
+          sortByParam = "likes";
+          this.doughnutOption = "totalLikes";
+          break;
+
+        case "totalValue":
+          sortByParam = "value";
+          this.doughnutOption = "totalValue";
+          break;
+
+        default:
+          sortByParam = "quantity";
+      }
+
+      await Api.getManufacturersReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "DESC" : "ASC")
           .then((response) => {
             this.results = response.data;
           }).catch((error) => {
@@ -136,6 +162,29 @@ export default {
       this.chart.data.labels = this.results.map(record => record.product.id.split(/-(.+)/)[1]);
 
       this.chart.update();
+    }
+  },
+
+  watch: {
+    /**
+     * Watch for sortBy change, refresh table when it happens.
+     */
+    '$data.sortBy': {
+      handler: function() {
+        this.getManufacturersReport(this.dateRange);
+        this.updateChart();
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortDesc change, refresh table when it happens.
+     */
+    '$data.sortDesc': {
+      handler: function() {
+        this.getManufacturersReport(this.dateRange);
+        this.updateChart();
+      },
+      deep: true
     }
   }
 }
