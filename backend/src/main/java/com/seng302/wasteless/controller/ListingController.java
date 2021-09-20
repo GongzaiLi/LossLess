@@ -217,7 +217,6 @@ public class ListingController {
             }
 
         }
-
         logger.info("Get request to search LISTING, query param: {}, price lower: {}, price upper: {}, business name: {}, business types: {}, closingDateStart: {} closingDateEnd: {}, address: {}",
                 searchQuery, priceLower, priceUpper, businessName, businessTypes, closingDateTimeStart, closingDateTimeEnd, address);
 
