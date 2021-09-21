@@ -3,10 +3,7 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.SalesReportController;
 import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.BusinessTypes;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(SalesReportController.class)
 @AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
-public class SalesReportControllerUnitTest {
+class SalesReportControllerUnitTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -78,7 +75,7 @@ public class SalesReportControllerUnitTest {
         user.setRole(UserRoles.USER);
 
 
-        List<SalesReportDto> salesData = new ArrayList<>();
+        List<SalesReportSinglePeriod> salesData = new ArrayList<>();
         List<SalesReportProductTotalsDto> salesPurchaseTotalsData = new ArrayList<>();
 
         Mockito
@@ -297,6 +294,15 @@ public class SalesReportControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2020-02-29&endDate=2021-10-01&period=month")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andPeriodIsAasdsad_then400Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2020-02-29&endDate=2021-10-01&period=asdasd")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
