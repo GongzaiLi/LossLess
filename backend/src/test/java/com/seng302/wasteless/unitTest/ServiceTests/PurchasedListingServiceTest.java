@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -185,7 +186,7 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenCountSalesByDuration_andAllSalesWithinDuration_thenCorrectCountsReturned() {
-        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().plusYears(3));
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().plusYears(3), 1);
         Assertions.assertEquals(1, salesReportData.get(0L));
         Assertions.assertEquals(1, salesReportData.get(1L));
         Assertions.assertEquals(1, salesReportData.get(672L));
@@ -196,7 +197,7 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenCountSalesByDuration_andTwoSalesWithinDuration_thenCountOfTwoReturned() {
-        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2021, Month.FEBRUARY, 2));
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2021, Month.FEBRUARY, 2), 1);
         Assertions.assertEquals(2, salesReportData.get(334L));
 
         Assertions.assertEquals(new HashSet<>(Collections.singletonList(334L)), salesReportData.keySet());
@@ -204,9 +205,35 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenCountSalesByDuration_andNoSalesWithinDuration_thenNoCountsReturned() {
-        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().minusYears(3));
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().minusYears(3), 1);
 
         Assertions.assertTrue(salesReportData.isEmpty());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andAllSalesWithinDuration_AndGranularityIsTwo_thenCorrectCountsReturned() {
+        Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().plusYears(3), 2);
+        Assertions.assertEquals(2, salesReportData.get(0L));
+        Assertions.assertEquals(1, salesReportData.get(672L));
+        Assertions.assertEquals(2, salesReportData.get(334L));
+
+        Assertions.assertEquals(new HashSet<>(Arrays.asList(672L, 0L, 334L)), salesReportData.keySet());
+    }
+
+    @Test
+    void whenCountSalesByDuration_andGranularityIsZero_then400Thrown() {
+        LocalDate startDate = LocalDate.now().minusYears(3);
+        LocalDate endDate = LocalDate.now().minusYears(3);
+        Assertions.assertThrows(ResponseStatusException.class,
+                () -> purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, startDate, endDate, 0));
+    }
+
+    @Test
+    void whenCountSalesByDuration_andGranularityIsNegative_then400Thrown() {
+        LocalDate startDate = LocalDate.now().minusYears(3);
+        LocalDate endDate = LocalDate.now().minusYears(3);
+        Assertions.assertThrows(ResponseStatusException.class,
+                () -> purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, startDate, endDate, -1));
     }
 
     @Test
