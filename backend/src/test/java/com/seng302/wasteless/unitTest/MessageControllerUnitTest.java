@@ -194,7 +194,7 @@ public class MessageControllerUnitTest {
                 .when(messageService.checkOneUserOwnsCard(anyInt(), anyInt(), any(Card.class)))
                 .thenReturn(false);
 
-        String jsonInStringForRequest = "{\"receiverId\": 2, \"messageText\": \"Hello\", \"cardId\": 4}";
+        String jsonInStringForRequest = "{\"receiverId\": 2, \"messageText\": \"Hello\", \"cardId\": 1}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/messages")
                 .content(jsonInStringForRequest)

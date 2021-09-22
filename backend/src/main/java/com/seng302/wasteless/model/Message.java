@@ -1,5 +1,6 @@
 package com.seng302.wasteless.model;
 
+import com.seng302.wasteless.dto.PostMessageDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -44,6 +45,14 @@ public class Message {
 
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
+
+    public Message(int cardId, int senderId, int receiverId, String messageText, LocalDateTime timestamp) {
+        this.cardId = cardId;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.messageText = messageText;
+        this.timestamp = timestamp;
+    }
 
 }
 

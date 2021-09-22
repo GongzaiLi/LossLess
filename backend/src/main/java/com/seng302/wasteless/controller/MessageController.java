@@ -68,16 +68,8 @@ public class MessageController {
         }
 
         Card cardForMessage = cardService.findCardById(messageDTO.getCardId());
-        if (cardForMessage == null) {
-            logger.debug("Cannot save message, card with id {} does not exist", messageDTO.getCardId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Card ID is invalid.");
-        }
 
         User receiver = userService.findUserById(messageDTO.getReceiverId());
-        if (receiver == null) {
-            logger.debug("Cannot save message, user with id {} does not exist", messageDTO.getReceiverId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID is invalid.");
-        }
 
         if (!messageService.checkOneUserOwnsCard(currentlyLoggedInUser.getId(), receiver.getId(), cardForMessage)) {
             logger.debug("Cannot save message, neither sender with id {} or receiver with id {} owns card with id {}",
@@ -85,12 +77,7 @@ public class MessageController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Neither sender nor receiver owns this card.");
         }
 
-        Message message = new Message();
-        message.setCardId(cardForMessage.getId());
-        message.setSenderId(currentlyLoggedInUser.getId());
-        message.setReceiverId(receiver.getId());
-        message.setMessageText(messageDTO.getMessageText());
-        message.setTimestamp(LocalDateTime.now());
+        Message message = new Message(cardForMessage.getId(), currentlyLoggedInUser.getId(), receiver.getId(), messageDTO.getMessageText(), LocalDateTime.now());
 
         message = messageService.createMessage(message);
 
