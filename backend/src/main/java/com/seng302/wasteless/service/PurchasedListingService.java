@@ -170,7 +170,7 @@ public class PurchasedListingService {
             fakeListing.setPurchaser(user);
             fakeListing.setSaleDate(LocalDate.now().minusDays(generator.nextInt(365*3)));
             fakeListing.setListingDate(fakeListing.getSaleDate().minusDays(generator.nextInt(7)));
-            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)+1).atTime(LocalTime.now()));
+            fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)+1L).atTime(LocalTime.now()));
             fakeListing.setProduct(product);
             fakeListing.setQuantity(generator.nextInt(5) + 1);
             fakeListing.setManufacturer(business.getName()+(i%3));

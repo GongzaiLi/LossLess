@@ -241,7 +241,7 @@ public class ManageMyFeedFeature {
         for(int i=0; i < jsonResult.length(); i++)
         {
             JSONObject object = jsonResult.getJSONObject(i);
-            Assertions.assertEquals(object.getString("archived"), "true");
+            Assertions.assertEquals("true", object.getString("archived"));
         }
     }
 

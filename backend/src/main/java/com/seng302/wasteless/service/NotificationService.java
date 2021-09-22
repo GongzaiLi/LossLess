@@ -91,7 +91,7 @@ public class NotificationService {
      */
     public List<Notification> filterNotifications(Integer userId, Optional<List<String>> tags, Optional<Boolean> archived) {
         Specification<Notification> querySpec = filterAllUnArchivedNotificationsByUserId(userId);
-        if (archived.isPresent() && archived.get()) querySpec = filterAllArchivedNotificationsByUserId(userId);
+        if (archived.isPresent() && Boolean.TRUE.equals(archived.get())) querySpec = filterAllArchivedNotificationsByUserId(userId);
         if (tags.isPresent()) querySpec = querySpec.and(filterNotificationTags(tags.get()));
         return notificationRepository.findAll(querySpec, Sort.by("starred").descending().and(Sort.by("created").descending()));
     }
