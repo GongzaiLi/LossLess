@@ -103,6 +103,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .setPricePerItem(10)
                 .setSellBy(expiry.minusMonths(2))
                 .setQuantity(5)
+                .setQuantityUnlisted(5)
                 .setManufactured(expiry.minusMonths(4))
                 .setBestBefore(expiry.minusMonths(1))
                 .setProduct(productForInventory);
@@ -375,14 +376,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
      * Test 1: inventoryItemExpiryInPast
      * Test 2: ClosesInPast
      * Test 3: ClosesOfNotTypeDate
-     * Test 4: InvalidQuantity
+     * Test 4: InvalidQuantityFormat
+     * Test 4: Quantity of Listing to large
      */
     @ParameterizedTest
     @ValueSource(strings = {
             "{\"inventoryItemId\":5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}",
-            "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12T23:59:59Z\"}",
-            "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}",
-            "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12 23:59\"}"})
+            "{\"inventoryItemId\":2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12T23:59:59Z\"}",
+            "{\"inventoryItemId\":2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}",
+            "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12T23:59\"}",
+            "{\"inventoryItemId\":2, \"quantity\": 10, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12T23:59\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateListing_andInValidRequest_then400Response(String request) throws Exception {
 
