@@ -43,7 +43,7 @@ beforeEach(() => {
     // CALEB IS A GENIUS
     document.getElementById = () => document.createElement('canvas');
 
-    wrapper = shallowMount(SalesReportGraph, { //shallowMount and mount has different work
+    wrapper = shallowMount(SalesReportGraph, {
         localVue,
         propsData: {
             currency,

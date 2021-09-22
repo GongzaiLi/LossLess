@@ -12,6 +12,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * The DTO used to return data representing a single purchasedListing object.
@@ -31,7 +32,7 @@ public class GetPurchasedListingDto {
     private LocalDate saleDate;
     private Integer numberOfLikes;
     private LocalDate listingDate;
-    private LocalDate closingDate;
+    private LocalDateTime closingDate;
     private Product product;
     private Integer quantity;
     private Double price;

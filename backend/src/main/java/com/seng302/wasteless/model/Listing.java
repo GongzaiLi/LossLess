@@ -12,6 +12,7 @@ import org.hibernate.annotations.Formula;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 /**
@@ -69,7 +70,7 @@ public class Listing {
     @FutureOrPresent
     @Column(name = "closes")
     @JsonView(ListingViews.GetListingView.class)
-    private LocalDate closes;
+    private LocalDateTime closes;
 
     @JsonView(ListingViews.GetListingView.class)
     @Formula("(select count(*) from User_listingsLiked ul where ul.listingsLiked_id=id)")

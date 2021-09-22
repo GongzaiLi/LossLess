@@ -13,7 +13,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import static org.hamcrest.CoreMatchers.is;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
@@ -85,8 +84,9 @@ public class SalesReportFeature {
             purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
             purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
             purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
-            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
+            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)).atTime(23,59));
             purchaseRecord.setProduct(productToPurchase);
+            purchaseRecord.setManufacturer(productToPurchase.getManufacturer());
             purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
             purchaseRecord.setPrice(Double.parseDouble(purchaseInfo.get(8)));
             purchasedListingRepository.save(purchaseRecord);
@@ -136,6 +136,7 @@ public class SalesReportFeature {
         if (productToPurchase.getName()!=product) {
             Product newProduct = new Product();
             newProduct.setName(product);
+            newProduct.setManufacturer("manufacturer");
             productToPurchase = productService.createProduct(newProduct);
         }
 }
@@ -155,7 +156,7 @@ public class SalesReportFeature {
 
     @Then("The following is returned:")
     public void theFollowingIsReturned(List<List<String>> purchases) throws Exception {
-        Integer i = 0;
+        int i = 0;
         for (List<String> purchaseArray:purchases) {
             responseResult
                     .andExpect(jsonPath("["+i+"].startDate", is(purchaseArray.get(0))))

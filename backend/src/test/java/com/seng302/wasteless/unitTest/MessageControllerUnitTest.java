@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -100,7 +102,7 @@ public class MessageControllerUnitTest {
 
         Mockito
                 .when(cardService.findCardById(2))
-                .thenReturn(null);
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Card with given ID does not exist"));
 
         Mockito
                 .when(userService.findUserById(1))
@@ -112,7 +114,7 @@ public class MessageControllerUnitTest {
 
         Mockito
                 .when(userService.findUserById(3))
-                .thenReturn(null);
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "User does not exist"));
 
         Mockito
                 .when(messageService.checkOneUserOwnsCard(anyInt(), anyInt(), any(Card.class)))
@@ -167,12 +169,14 @@ public class MessageControllerUnitTest {
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
     void whenPostRequestToCreateMessage__andReceiverDoesNotExist_then400Response() throws Exception {
+
+
         String jsonInStringForRequest = "{\"receiverId\": 3, \"messageText\": \"Hello\", \"cardId\": 1}";
 
         mockMvc.perform(MockMvcRequestBuilders.post("/messages")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotAcceptable());
     }
 
     @Test
@@ -183,7 +187,7 @@ public class MessageControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/messages")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotAcceptable());
     }
 
     @Test
