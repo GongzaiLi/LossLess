@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * MessageController is used for mapping all Restful API requests starting with the address "/messages".
@@ -86,6 +87,19 @@ public class MessageController {
     }
 
 
+    /**
+     * Get all messages for a user relating to a card.
+     *
+     * returns:
+     *  200 and Either one GetMessageDto representing a conversation between the logged in user and the owner of a card, or
+     *  a list of GetMessageDto representing a all conversations between the logged in user (who owns the card) and all
+     *  users who have messaged the card.
+     *  401 Unauthorised: Currently logged in user does not exist.
+     *  406 Not Acceptable: if card does not exist.
+     *
+     * @param cardId    The id of the card to get messages for
+     * @return          See above.
+     */
     @GetMapping("/messages/{cardId}")
     public ResponseEntity<Object> getMessage(@PathVariable("cardId") Integer cardId) {
         User currentlyLoggedInUser = userService.getCurrentlyLoggedInUser();
@@ -94,13 +108,12 @@ public class MessageController {
 
         if (cardForMessage.getCreator().getId().equals(currentlyLoggedInUser.getId())) { //Card owner
 
-            //If card owner, get all messages and split into list of DTOs
-            //If getting multiple conversations. Return list of DTO
+            List<GetMessageDto> messagesDtos = messageService.findAllMessagesForUserOnCardTheyDoOwn(currentlyLoggedInUser.getId(), cardForMessage);
 
-            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Haven't dont this yet");
+            return ResponseEntity.status(HttpStatus.OK).body(messagesDtos);
         } else {    //Not card owner
-            GetMessageDto messageDto = messageService.findAllMessagesForUserAboutCard(currentlyLoggedInUser.getId(), cardForMessage);
-            return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
+            GetMessageDto messageDto = messageService.findAllMessagesForUserOnCardTheyDontOwn(currentlyLoggedInUser.getId(), cardForMessage);
+            return ResponseEntity.status(HttpStatus.OK).body(messageDto);
         }
 
 
