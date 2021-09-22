@@ -253,7 +253,7 @@
 <script>
 import Api from "../../Api";
 import EventBus from "../../util/event-bus"
-import {formatAddress} from "../../util";
+import {formatAddress, formatDateTime} from "../../util";
 
 
 export default {
@@ -274,6 +274,7 @@ export default {
   async mounted() {
     this.queryHistory = this.$route.query.queryHistory
     await this.setListingData();
+    this.listingItem.closes = await formatDateTime(this.listingItem.closes);
   },
 
   methods: {
@@ -395,7 +396,8 @@ export default {
      */
     openErrorModal() {
       this.$refs.purchaseErrorModal.show();
-    }
+    },
+
 
   },
 

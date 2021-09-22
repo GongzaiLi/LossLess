@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.validation.constraints.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Dto for post inventory endpoint.
@@ -43,5 +43,5 @@ public class PostListingsDto {
 
     @Future(message = "The listing close date must be in the future.")
     @Column(name = "closes")
-    private LocalDate closes;
+    private LocalDateTime closes;
 }

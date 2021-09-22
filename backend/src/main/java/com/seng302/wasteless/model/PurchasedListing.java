@@ -12,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
@@ -55,7 +56,7 @@ public class PurchasedListing {
     @NotNull
     @JoinColumn(name = "closing_date")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
-    private LocalDate closingDate;
+    private LocalDateTime closingDate;
 
 
     @NotNull
@@ -77,6 +78,11 @@ public class PurchasedListing {
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Double price;
 
+    @NotNull
+    @Column(name = "manufacturer")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
+    private String manufacturer;
+
     /**
      * Creates a new Purchased Listing record from a Listing that was purchased
      * and the User that purchased it.
@@ -94,6 +100,7 @@ public class PurchasedListing {
         setQuantity(listing.getQuantity());
         setPrice(listing.getPrice());
         setNumberOfLikes(listing.getUsersLiked());
+        setManufacturer(listing.getInventoryItem().getProduct().getManufacturer());
     }
 }
 

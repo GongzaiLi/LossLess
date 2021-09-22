@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -57,7 +57,7 @@ public class ListingsService {
      * @param date Upper inclusive bound for close date
      * @return Returns a Specification that matches all listings with close dates before or equal to the given close date
      */
-    public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
+    public static Specification<Listing> closesLessThanOrEqualTo(LocalDateTime date) {
         return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
     }
 
@@ -67,7 +67,7 @@ public class ListingsService {
      * @param date Lower inclusive bound for close date
      * @return Returns a Specification that matches all listings with close dates after or equal to the given close date
      */
-    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
+    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDateTime date) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
     }
 
@@ -235,8 +235,8 @@ public class ListingsService {
             Optional<String> businessName,
             Optional<List<String>> businessTypes,
             Optional<String> address,
-            Optional<LocalDate> closingDateStart,
-            Optional<LocalDate> closingDateEnd,
+            Optional<LocalDateTime> closingDateStart,
+            Optional<LocalDateTime> closingDateEnd,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 
