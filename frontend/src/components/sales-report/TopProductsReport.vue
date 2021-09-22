@@ -71,7 +71,18 @@ export default {
         datasets: [{
           label: 'Top Products By Quantity',
           data: this.results.map(record => record.totalProductPurchases),
-          backgroundColor: ['#1105c1', '#0e2fcb', '#0c4ad2', '#0a62d8', '#0979dd', '#078fe3', '#06a5e8', '#04bbee', '#03d1f3', '#01e8f9', '#00feff']        ,
+          backgroundColor: [
+            '#332288',
+            '#88ccee',
+            '#44aa99',
+            '#117733',
+            '#999933',
+            '#ddcc77',
+            '#661100',
+            '#cc6677',
+            '#882255',
+            '#aa4499',
+          ]
         },],
         labels: this.results.map(record => record.product.id.split(/-(.+)/)[1])
       },

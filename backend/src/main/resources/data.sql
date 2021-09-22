@@ -29,6 +29,12 @@ VALUES (1, '2017-08-08', 'An exploding candy', 'The Chocolate Factory', 'Explodi
 INSERT INTO Product(business_id, created, description, manufacturer, name, recommended_retail_price, code)
 VALUES (1, '2017-08-08', 'A treat that never ends', 'The Chocolate Factory', 'Ever-Lasting Gobstopper', 8.99,
         '1-WONKA-ELG');
+INSERT INTO Product(business_id, created, description, manufacturer, name, recommended_retail_price, code)
+VALUES (1, '2017-08-08', 'NO SUGAR?!?!?!', 'The Chocolate Factory', 'Black Water No Sugar', 8.99,
+        '1-WONKA-BLACK-WATER');
+INSERT INTO Product(business_id, created, description, manufacturer, name, recommended_retail_price, code)
+VALUES (1, '2017-08-08', 'Easter Egg', 'The Chocolate Factory', 'Easter Egg', 8.99,
+        '1-WONKA-EGG');
 
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)

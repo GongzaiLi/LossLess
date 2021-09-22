@@ -12,29 +12,33 @@ export default {
   async mounted() {
     const businessId = this.$route.params.id;
     const durationsData = (await Api.getListingDurations(businessId, ...this.dateRange)).data;
+    const newData = {};
+    for (const val of Object.keys(durationsData)) {
+      newData[parseInt(val) + 0.5] = durationsData[val];
+    }
     const cfg = {
       type: 'bar',
       data: {
         datasets: [{
           label: 'Durations',
-          data: durationsData,
-          backgroundColor: ['#005fc5']
+          data: newData,
+          backgroundColor: ['#0f8d39'],
         }]
       },
       options: {
-        barPercentage: 1.25,
+        categoryPercentage: 1,
         scales: {
-          xAxes: [{
+          xAxis: {
+            type: 'linear',
             display: true,
+            offset: false,
+            grid: {
+              offset: false
+            },
             ticks: {
-              max: 3,
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              beginAtZero:true
-            }
-          }]
+              stepSize: 1,
+            },
+          },
         }
       }
     };
