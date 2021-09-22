@@ -1,10 +1,12 @@
 package com.seng302.wasteless.model;
 
+import com.seng302.wasteless.dto.PostMessageDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -28,17 +30,29 @@ public class Message {
     @NotNull(message = "Card ID is mandatory")
     private Integer cardId;
 
-    @Column(name = "user_id")
-    @NotNull(message = "User ID is mandatory")
-    private Integer userId;
+    @Column(name = "receiver_id")
+    @NotNull(message = "Receiver ID is mandatory")
+    private Integer receiverId;
+
+    @Column(name = "sender_id")
+    @NotNull(message = "Sender ID is mandatory")
+    private Integer senderId;
 
     @Column(name = "message_text")
-    @NotNull(message = "Message is mandatory")
+    @NotEmpty(message = "Message is mandatory")
     @Size(max = 250)
     private String messageText;
 
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
+
+    public Message(int cardId, int senderId, int receiverId, String messageText, LocalDateTime timestamp) {
+        this.cardId = cardId;
+        this.senderId = senderId;
+        this.receiverId = receiverId;
+        this.messageText = messageText;
+        this.timestamp = timestamp;
+    }
 
 }
 
