@@ -1,10 +1,14 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Message;
 import com.seng302.wasteless.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 /**
  * MessageService applies message logic over the card JPA repository.
  */
@@ -43,5 +47,12 @@ public class MessageService {
         return card.getCreator().getId().equals(senderId) || card.getCreator().getId().equals(receiverId);
     }
 
+
+    public GetMessageDto findAllMessagesForUserAboutCard(Integer userId, Card card) {
+
+        List<Message> messages = messageRepository.findAllByUserIdAndCardId(userId, card.getId());
+
+        return new GetMessageDto(card.getId(), userId, card.getCreator().getId(), messages);
+    }
 }
 

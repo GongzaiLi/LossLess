@@ -1,6 +1,6 @@
 package com.seng302.wasteless.controller;
 
-import com.seng302.wasteless.dto.LoginDto;
+import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.dto.PostMessageDto;
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Message;
@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -85,5 +83,26 @@ public class MessageController {
         responseBody.put("messageId", message.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
+    }
+
+
+    @GetMapping("/messages/{cardId}")
+    public ResponseEntity<Object> getMessage(@PathVariable("cardId") Integer cardId) {
+        User currentlyLoggedInUser = userService.getCurrentlyLoggedInUser();
+
+        Card cardForMessage = cardService.findCardById(cardId);
+
+        if (cardForMessage.getCreator().getId().equals(currentlyLoggedInUser.getId())) { //Card owner
+
+            //If card owner, get all messages and split into list of DTOs
+            //If getting multiple conversations. Return list of DTO
+
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body("Haven't dont this yet");
+        } else {    //Not card owner
+            GetMessageDto messageDto = messageService.findAllMessagesForUserAboutCard(currentlyLoggedInUser.getId(), cardForMessage);
+            return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
+        }
+
+
     }
 }
