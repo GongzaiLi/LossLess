@@ -146,9 +146,10 @@ export default {
           sortByParam = "quantity";
       }
 
-      await Api.getManufacturersReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "DESC" : "ASC")
+      await Api.getManufacturersReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "ASC" : "DESC")
           .then((response) => {
             this.results = response.data;
+            this.updateChart();
           }).catch((error) => {
             this.$log.debug("Error message", error);
           });
@@ -158,8 +159,8 @@ export default {
      * Updates the chart data when different options are selected
      */
     updateChart: function() {
-      this.chart.data.datasets[0].data = this.results.map((record) => record[this.doughnutOption]);
-      this.chart.data.labels = this.results.map(record => record.product.id.split(/-(.+)/)[1]);
+      this.chart.data.datasets[0].data = this.results.map(record => record[this.doughnutOption]);
+      this.chart.data.labels = this.results.map(record => record.manufacturer);
 
       this.chart.update();
     }
@@ -172,7 +173,6 @@ export default {
     '$data.sortBy': {
       handler: function() {
         this.getManufacturersReport(this.dateRange);
-        this.updateChart();
       },
       deep: true
     },
@@ -182,7 +182,6 @@ export default {
     '$data.sortDesc': {
       handler: function() {
         this.getManufacturersReport(this.dateRange);
-        this.updateChart();
       },
       deep: true
     }
