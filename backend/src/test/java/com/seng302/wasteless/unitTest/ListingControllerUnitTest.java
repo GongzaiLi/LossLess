@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -350,83 +352,42 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
 
 
-    @Test
+    /**
+     * Testing with Best before in past id=3, sell by in past id=4 and both future id=2
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}",
+            "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}",
+            "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToCreateListing_andValidRequest_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 2, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
+     void whenPostRequestToCreateListing_andValidRequest_then201Response(String request) throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
+                .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("listingId", is(1)));
     }
 
-    @Test
+
+    /**
+     * Test 1: inventoryItemExpiryInPast
+     * Test 2: ClosesInPast
+     * Test 3: ClosesOfNotTypeDate
+     * Test 4: InvalidQuantity
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{\"inventoryItemId\":5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}",
+            "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12T23:59:59Z\"}",
+            "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}",
+            "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12 23:59\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToCreateListing_andValidRequest_inventoryItemBestBeforeInPast_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 3, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
+    void whenPostRequestToCreateListing_andInValidRequest_then400Response(String request) throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("listingId", is(1)));
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToCreateListing_andValidRequest_inventoryItemSellByInPast_then201Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 4, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("listingId", is(1)));
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToCreateListing_andValidRequest_inventoryItemExpiryInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\": 5, \"quantity\": 4, \"price\": 6.5, \"moreInfo\": 21.99, \"closes\": \"2022-05-12T23:59:59Z\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenPostRequestToCreateListing_andClosesInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2019-05-12T23:59:59Z\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenPostRequestToCreateListing_andClosesOfNotTypeDate_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": 4.5, \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": 5}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenPostRequestToCreateListing_andInvalidQuantity_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"inventoryItemId\":2, \"quantity\": \"4.5\", \"price\": 6.5, \"moreInfo\": \"Something\", \"closes\": \"2022-05-12 23:59\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/listings")
-                .content(jsonInStringForRequest)
+                .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

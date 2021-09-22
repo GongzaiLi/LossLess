@@ -10,6 +10,8 @@ import com.seng302.wasteless.service.ImageService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,30 +102,12 @@ class UserServiceTest {
         Assertions.assertTrue(userService.checkEmailValid(userEmail));
     }
 
-    @Test
-    void whenCheckUserEmailWithoutAT_AndInValidEmail_ReturnFalse() {
-        String userEmail = "a.com";
+    @ParameterizedTest
+    @ValueSource(strings = {"a.com", "a", "", "#@#"})
+    void whenCheckUserEmailWithoutAT_AndInValidEmail_ReturnFalse(String userEmail) {
         Assertions.assertFalse(userService.checkEmailValid(userEmail));
     }
 
-    @Test
-    void whenCheckUserEmailWithoutATAndCOM_AndInValidEmail_ReturnFalse() {
-        String userEmail = "a";
-        Assertions.assertFalse(userService.checkEmailValid(userEmail));
-    }
-
-
-    @Test
-    void whenCheckUserEmailIsEmpty_AndInValidEmail_ReturnFalse() {
-        String userEmail = "";
-        Assertions.assertFalse(userService.checkEmailValid(userEmail));
-    }
-
-    @Test
-    void whenCheckUserEmailIsComponentBySymbol_AndInValidEmail_ReturnFalse() {
-        String userEmail = "#@#";
-        Assertions.assertFalse(userService.checkEmailValid(userEmail));
-    }
 
     @Test
     void whenUserRegister_andEmailHasAlreadyUser_ReturnFalse() {
