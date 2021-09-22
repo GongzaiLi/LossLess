@@ -112,15 +112,7 @@ public class ListingController {
 
         listing = listingsService.createListing(listing);
 
-        Integer updateQuantityResult = inventoryService.updateInventoryItemQuantity(quantityRemaining, possibleInventoryItem.getId());
-
-        if (updateQuantityResult == 0) {
-            logger.error("No inventory item quantity value was updated when this listing was created.");
-        } else if (updateQuantityResult > 1) {
-            logger.error("More than one inventory item quantity value was updated when this listing was created.");
-        } else if (updateQuantityResult == 1) {
-            logger.info("Inventory item quantity value was updated when this listing was created.");
-        }
+        inventoryService.updateInventoryItemQuantity(quantityRemaining, possibleInventoryItem.getId());
 
         logger.info("Created new Listing with Id {}", listing.getId());
 
