@@ -67,19 +67,22 @@
       </b-card>
 
       <b-collapse id="messageBox" style="margin-top: 1rem">
-        <b-card>
-          Work in progress...
-        </b-card>
+          <messages></messages>
       </b-collapse>
   </div>
 </template>
 
+<style>
+</style>
+
 <script>
 import Api from "../../Api";
 import {formatAddress} from "../../util";
+import Messages from "../../components/model/Messages"
 
 export default {
   name: "full-card",
+  components: {Messages},
   props: ["cardId"],
   data() {
     return {
@@ -89,9 +92,41 @@ export default {
           homeAddress: {
             suburb: ""
           }
-
         }
       },
+
+      conversations: [
+        {
+          userId: 0,
+          userName: "James",
+          possibleOtherUserInfo: "You decide these fields",
+        },
+        {
+          userId: 1,
+          userName: "Phil",
+          possibleOtherUserInfo: "You decide these fields",
+        },
+        {
+          userId: 2,
+          userName: "Joseph",
+          possibleOtherUserInfo: "You decide these fields",
+        },
+        {
+          userId: 3,
+          userName: "John",
+          possibleOtherUserInfo: "You decide these fields",
+        },
+        {
+          userId: 4,
+          userName: "Chris",
+          possibleOtherUserInfo: "You decide these fields",
+        },
+        {
+          userId: 5,
+          userName: "Mickey",
+          possibleOtherUserInfo: "You decide these fields",
+        },
+      ]
     }
   },
   mounted() {
