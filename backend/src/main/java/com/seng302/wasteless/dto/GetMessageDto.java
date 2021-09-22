@@ -20,16 +20,16 @@ public class GetMessageDto {
 
     private Integer cardId;
 
-    private Integer receiverId;
+    private Integer cardOwnerId;
 
-    private Integer senderId;
+    private Integer otherUserId;
 
     private List<Message> messages;
 
-    public GetMessageDto(Integer cardId, Integer receiverId, Integer senderId, List<Message> messages) {
+    public GetMessageDto(Integer cardId, Integer otherUserId, Integer cardOwnerId, List<Message> messages) {
         this.cardId = cardId;
-        this.receiverId = receiverId;
-        this.senderId = senderId;
+        this.cardOwnerId = cardOwnerId;
+        this.otherUserId = otherUserId;
         this.messages = messages;
     }
 }

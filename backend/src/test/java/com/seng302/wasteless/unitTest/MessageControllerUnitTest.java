@@ -1,6 +1,7 @@
 package com.seng302.wasteless.unitTest;
 
 import com.seng302.wasteless.controller.MessageController;
+import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.MessageService;
@@ -26,10 +27,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -123,6 +126,28 @@ public class MessageControllerUnitTest {
         Mockito
                 .when(messageService.createMessage(any(Message.class)))
                 .thenReturn(message);
+
+
+
+        List<Message> messages = new ArrayList<>();
+        messages.add(message);
+        messages.add(message);
+        messages.add(message);
+
+        GetMessageDto messageDto1 = new GetMessageDto(1, 1, 2, messages);
+        GetMessageDto messageDto2 = new GetMessageDto(1, 3, 2, messages);
+
+        List<GetMessageDto> messageDtos = new ArrayList<>();
+        messageDtos.add(messageDto1);
+        messageDtos.add(messageDto2);
+
+        Mockito
+                .when(messageService.findAllMessagesForUserOnCardTheyDontOwn(anyInt(), any(Card.class)))
+                .thenReturn(messageDto1);
+
+        Mockito
+                .when(messageService.findAllMessagesForUserOnCardTheyDoOwn(anyInt(), any(Card.class)))
+                .thenReturn(messageDtos);
     }
 
     @Test
@@ -205,4 +230,62 @@ public class MessageControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    void whenGetRequestToMessagesEndpoint_andUserIsNotCardOwner_thenUserGetMessagesForCorrectCard() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("cardId", is(1)));
+    }
+
+
+
+    @Test
+    void whenGetRequestToMessagesEndpoint_andCardDoesntExist() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/2")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    void whenGetRequestToMessagesEndpoint_andUserDoesNotExist() throws Exception {
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void whenGetRequestToMessagesEndpoint_andUserIsNotCardOwner_thenUserGetMessagesBetweenThemAndCardOwnerForTheGivenCard() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("cardId", is(1)))
+                .andExpect(jsonPath("messages[0].messageText", is("Hello")))
+                .andExpect(jsonPath("messages[1].messageText", is("Hello")))
+                .andExpect(jsonPath("messages[2].messageText", is("Hello")));
+    }
+
+    @Test
+    void whenGetRequestToMessagesEndpoint_andUserIsCardOwner_thenUserGetMessagesBetweenThemAndAllUsersWhoHaveMessaged_forTheGivenCard() throws Exception {
+
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenReturn(userForCard);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/messages/1")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].cardOwnerId", is(2)))
+                .andExpect(jsonPath("[0].otherUserId", is(1)))
+                .andExpect(jsonPath("[1].cardOwnerId", is(2)))
+                .andExpect(jsonPath("[1].otherUserId", is(3)));
+    }
+
 }
