@@ -206,7 +206,6 @@ name: "add-listing-card",
         moreInfo: this.listingData.moreInfo,
         closes: this.listingData.closes + "T" + this.listingData.closesTime + "Z"
       };
-
       await api.createListing(this.$route.params.id, listingRequest)
           .then((listingResponse) => {
             this.$log.debug("Listing Created", listingResponse);

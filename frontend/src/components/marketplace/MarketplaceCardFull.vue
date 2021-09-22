@@ -35,15 +35,15 @@
           </b-input-group-text>
           <br>
           <div>
-            <b-button v-if="canDeleteOrExtend" style="float: left; margin-left: 1rem" variant="danger"
+            <b-button v-if="canDeleteOrExtend" class="button-left" variant="danger"
                       @click="openDeleteConfirmDialog"> Delete
             </b-button>
-            <b-button v-if="canDeleteOrExtend && cardWithinExtendPeriod()" style="float: left; margin-left: 1rem"
+            <b-button v-if="canDeleteOrExtend && cardWithinExtendPeriod()" class="button-left"
                       variant="success" @click="openExtendConfirmDialog"> Extend
               <b-icon-alarm/>
             </b-button>
-            <b-button style="margin-left: 1rem" variant="primary" v-b-toggle.messageBox> Open Messages</b-button>
-            <b-button style="float: right; margin-right: 1rem" variant="secondary" @click="closeFullViewCardModal">
+            <b-button class="button-middle" variant="primary" v-b-toggle.messageBox> Open Messages</b-button>
+            <b-button class="button-right" variant="secondary" @click="closeFullViewCardModal">
               Close
             </b-button>
           </div>
@@ -66,13 +66,31 @@
         </div>
       </b-card>
 
-      <b-collapse id="messageBox" style="margin-top: 1rem">
-          <messages></messages>
+      <b-collapse id="messageBox" class="collapse">
+        <messages></messages>
       </b-collapse>
   </div>
 </template>
 
 <style>
+.button-left{
+  float: left;
+  margin-left: 1rem;
+}
+
+.button-middle{
+  margin-left: 1rem;
+}
+
+.button-right{
+  float: right;
+  margin-right: 1rem;
+}
+
+.collapse{
+  margin-top: 1rem
+}
+
 </style>
 
 <script>
@@ -92,41 +110,9 @@ export default {
           homeAddress: {
             suburb: ""
           }
+
         }
       },
-
-      conversations: [
-        {
-          userId: 0,
-          userName: "James",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 1,
-          userName: "Phil",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 2,
-          userName: "Joseph",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 3,
-          userName: "John",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 4,
-          userName: "Chris",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 5,
-          userName: "Mickey",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-      ]
     }
   },
   mounted() {

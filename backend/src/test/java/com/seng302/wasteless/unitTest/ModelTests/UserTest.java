@@ -42,7 +42,7 @@ class UserTest {
                 .setQuantity(3)
                 .setPrice(17.99)
                 .setMoreInfo("Seller may be willing to consider near offers")
-                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1))
+                .setCloses(LocalDate.of(2021, Month.DECEMBER, 1).atTime(23,59))
                 .setUsersLiked(0);
 
     }

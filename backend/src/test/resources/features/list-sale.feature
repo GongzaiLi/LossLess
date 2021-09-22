@@ -8,7 +8,7 @@ Feature: U22 - List sale
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a listing with the inventory item ID 1, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
+    When The user creates a listing with the inventory item ID 1, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23T23:59:59Z"
     Then The user will be able to see the new listing
 
 
@@ -16,7 +16,7 @@ Feature: U22 - List sale
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a listing without inventory item ID but has quantity 1, price 20.0, moreInfo "Seller may be willing to consider near offers" and closes "2022-05-23"
+    When The user creates a listing without inventory item ID but has quantity 1, price 20.0, moreInfo "Seller may be willing to consider near offers" and closes "2022-05-23T23:59:59Z"
     Then The user will receive a bad request error
 
 
@@ -24,7 +24,7 @@ Feature: U22 - List sale
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a listing with a nonexistent inventory item Id 999, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
+    When The user creates a listing with a nonexistent inventory item Id 999, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23T23:59:59Z"
     Then The user will receive a bad request error and a message "Inventory item with given id does not exist"
 
 
@@ -32,7 +32,7 @@ Feature: U22 - List sale
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a Listing with inventory item Id 2, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and close date in the past "2020-03-21"
+    When The user creates a Listing with inventory item Id 2, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and close date in the past "2020-03-21T23:59:59Z"
     Then The user will receive a bad request error
 
 
@@ -40,7 +40,7 @@ Feature: U22 - List sale
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a listing with quantity over the inventory quantity, inputting inventory item Id 1, quantity 15, price 20.00, moreInfo "Seller may be willing to consider near offers", closes "2022-05-23"
+    When The user creates a listing with quantity over the inventory quantity, inputting inventory item Id 1, quantity 15, price 20.00, moreInfo "Seller may be willing to consider near offers", closes "2022-05-23T23:59:59Z"
     Then The user will receive a bad request error and a message "Listing quantity greater than available inventory quantity."
 
 
@@ -48,18 +48,18 @@ Feature: U22 - List sale
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a listing without quantity and inputs inventory item Id 1, price 20.0, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
+    When The user creates a listing without quantity and inputs inventory item Id 1, price 20.0, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23T23:59:59Z"
     Then The user will receive a bad request error
 
   Scenario: User creates a Sale Listing but the quantity is 0
     Given The user with email "a@a" is logged in
     And The user with email "a@a" is an administrator for business 1
     And There is an inventory item with an inventory id 1 and productId "1-PRODUCT-1"
-    When The user creates a listing with the quantity being zero, inputting inventory item Id 1, quantity 0, price 20.00, moreInfo "Seller may be willing to consider near offers", closes "2022-05-23"
+    When The user creates a listing with the quantity being zero, inputting inventory item Id 1, quantity 0, price 20.00, moreInfo "Seller may be willing to consider near offers", closes "2022-05-23T23:59:59Z"
     Then The user will receive a bad request error
 
   Scenario: User can see other business's listings
     Given The business with id 2 exists
-    And The business with id 2 has a listing with the inventory item ID 2, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23"
+    And The business with id 2 has a listing with the inventory item ID 2, quantity 1, price 20.00, moreInfo "Seller may be willing to consider near offers", and closes "2022-05-23T23:59:59Z"
     And The user with email "b@b" is not an administrator for business 2
     Then The user with email "b@b" can see that listing
