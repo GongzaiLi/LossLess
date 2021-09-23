@@ -3,10 +3,7 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.SalesReportController;
 import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.BusinessTypes;
-import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.model.UserRoles;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -32,11 +30,9 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -79,7 +75,6 @@ class SalesReportControllerUnitTest {
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
 
-
         List<SalesReportDto> salesData = new ArrayList<>();
         List<SalesReportProductTotalsDto> salesPurchaseTotalsData = new ArrayList<>();
 
@@ -105,7 +100,7 @@ class SalesReportControllerUnitTest {
                 .thenReturn(salesData);
 
         Mockito
-                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), anyString(), any(Sort.Direction.class)))
+                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), any(LocalDate.class), any(LocalDate.class), anyString(), any(Sort.Direction.class), any(Pageable.class)))
                 .thenReturn(salesPurchaseTotalsData);
 
 
@@ -456,6 +451,69 @@ class SalesReportControllerUnitTest {
     @Test
     void whenCountSalesByDuration_andNoDatesProvided_then400() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/listingDurations")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_andInvalidPeriodProvided_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/2/salesReport/totalPurchases?period=invalid")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_OrderSpecifiedWithoutStartDate_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?endDate=2021-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_OrderSpecifiedWithoutEndDate_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?startDate=2021-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_AndStartDateAfterEndDate_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?startDate=2021-10-01&endDate=2020-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_AndStartDateBeforeEndDate_then400Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?startDate=2021-10-01&endDate=2022-10-01")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_OrderSpecifiedWithoutAnyDates_then200Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportProductPurchasedTotals_andValidRequest_then200Response_withValidData() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals?startDate=2021-10-01&endDate=2020-10-01")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

@@ -132,7 +132,8 @@ public class DefaultAdminCreatorService {
      */
     @Scheduled(fixedDelayString = "${check-default-admin-period-ms}")
     public void scheduleCheckDefaultAdmin() {
-        log.info("[SERVER] DGAA Check: {}", dateFormat.format(new Date()));
+        var date = dateFormat.format(new Date());
+        log.info("[SERVER] DGAA Check: {}", date);
         this.count.incrementAndGet();
         if (!userService.checkRoleAlreadyExists(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN)) {
             log.info("[SERVER] DGAA (404), creating DGAA...");
