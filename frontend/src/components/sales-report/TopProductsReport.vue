@@ -10,6 +10,8 @@
           no-local-sorting
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
+          :per-page="perPage"
+          :current-page="currentPage"
           striped
           responsive="lg"
           bordered
@@ -18,6 +20,12 @@
           <h3 class="no-results-overlay">No results to display</h3>
         </template>
       </b-table>
+      <b-pagination
+          v-model="currentPage"
+          :total-rows="results.length"
+          :per-page="perPage"
+          aria-controls="my-table"/>
+
     </b-col>
     <b-col cols="6">
       <b-row>
@@ -47,6 +55,9 @@ export default {
       businessId: '',
       totalResults: null,
       results: [],
+      topTenResults: [],
+      currentPage: 1,
+      perPage: 10,
       sortBy: '',
       sortDesc: true,
       loading: false,
@@ -56,7 +67,7 @@ export default {
         totalLikes: "Number of Likes"
       },
       fields: [
-        {label: 'Product Code', key: 'product.id', sortable: false, formatter: value => value.split(/-(.+)/)[1] },
+        {label: 'Product Code', key: 'product.id', sortable: false, formatter: value => value.split(/-(.+)/)[1]},
         {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
         {key: 'totalValue', sortable: true},
         {key: 'totalLikes', sortable: true}
@@ -69,12 +80,13 @@ export default {
   async mounted() {
     this.businessId = this.$route.params.id;
     await this.getProductsReport(this.dateRange);
+    this.filterResults();
     const cfg = {
       type: 'doughnut',
       data: {
         datasets: [{
           label: 'Top Products By Quantity',
-          data: this.results.map(record => record.totalProductPurchases),
+          data: this.topTenResults.map(record => record.totalProductPurchases),
           backgroundColor: [
             '#332288',
             '#88ccee',
@@ -86,9 +98,10 @@ export default {
             '#cc6677',
             '#882255',
             '#aa4499',
-          ]
+            '#989898'
+          ],
         },],
-        labels: this.results.map(record => record.product.id.split(/-(.+)/)[1])
+        labels: this.topTenResults.map(record => record.product.name)
       },
       options: {
         elements: {
@@ -140,17 +153,14 @@ export default {
       switch (this.sortBy) {
         case "totalProductPurchases":
           sortByParam = "quantity";
-          this.doughnutOption = "totalProductPurchases";
           break;
 
         case "totalLikes":
           sortByParam = "likes";
-          this.doughnutOption = "totalLikes";
           break;
 
         case "totalValue":
           sortByParam = "value";
-          this.doughnutOption = "totalValue";
           break;
 
         default:
@@ -160,7 +170,6 @@ export default {
       await Api.getProductsReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "DESC" : "ASC")
           .then((response) => {
             this.results = response.data;
-            this.updateChart();
           }).catch((error) => {
             this.$log.debug("Error message", error);
           });
@@ -169,20 +178,53 @@ export default {
     /**
      * Updates the chart data when different options are selected
      */
-    updateChart: function() {
-      this.chart.data.datasets[0].data = this.results.map((record) => record[this.doughnutOption]);
-      this.chart.data.labels = this.results.map(record => record.product.id.split(/-(.+)/)[1]);
+    updateChart: function () {
+      this.chart.data.datasets[0].data = this.topTenResults.map((record) => record[this.doughnutOption]);
+      this.chart.data.labels = this.topTenResults.map(record => record.product.name);
 
       this.chart.update();
+    },
+
+    /**
+     * filter Products Report results.
+     * if Products Report results are more then ten, filter the top ten product then combine to the Other
+     **/
+    filterResults: function () {
+      const topTenResults = this.results.slice(0, 10);
+      const otherResults = this.results.slice(10);
+      const other = {
+        product: {
+          name: `Other`
+        },
+        totalLikes: otherResults.reduce((totalLike, item) => {
+          return totalLike + item.totalLikes
+        }, 0),
+        totalProductPurchases: otherResults.reduce((totalLike, item) => {
+          return totalLike + item.totalProductPurchases
+        }, 0),
+        totalValue: otherResults.reduce((totalLike, item) => {
+          return totalLike + item.totalValue
+        }, 0)
+      }
+      if (otherResults.length > 0) {
+        topTenResults.push(other)
+      }
+      this.topTenResults = topTenResults;
     }
   },
-
   watch: {
+    /**
+     * this watches for a change in the date range and if so calls api request again then reloads chart
+     */
+    dateRange: async function () {
+      await this.getProductsReport(this.dateRange);
+      this.updateChart();
+    },
     /**
      * Watch for sortBy change, refresh table when it happens.
      */
     '$data.sortBy': {
-      handler: function() {
+      handler: function () {
         this.getProductsReport(this.dateRange);
       },
       deep: true
@@ -191,17 +233,14 @@ export default {
      * Watch for sortDesc change, refresh table when it happens.
      */
     '$data.sortDesc': {
-      handler: function() {
+      handler: function () {
         this.getProductsReport(this.dateRange);
       },
       deep: true
     }
-  }
+  },
+
 }
 
 
 </script>
-
-<style scoped>
-
-</style>
