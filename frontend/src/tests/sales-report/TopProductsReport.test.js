@@ -127,10 +127,11 @@ describe('Update Chart', () => {
 
 describe('test watch date range', () => {
   test('check-get-listings-is-called-when-current-page-updated', async () => {
-    let date = new Date("2020-09-22")
-    await wrapper.setProps({dateRange: [date, date]})
+    let date = new Date("2020-09-22");
+    await wrapper.setProps({dateRange: [date, date]});
     await wrapper.vm.$nextTick();
-    expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22");
+
+    expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
   });
 })
 
