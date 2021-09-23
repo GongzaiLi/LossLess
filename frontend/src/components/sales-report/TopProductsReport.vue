@@ -8,6 +8,8 @@
           :fields="fields"
           no-border-collapse
           no-local-sorting
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
           striped
           responsive="lg"
           bordered
@@ -45,6 +47,8 @@ export default {
       businessId: '',
       totalResults: null,
       results: [],
+      sortBy: '',
+      sortDesc: true,
       loading: false,
       doughnutOptions: {
         totalProductPurchases: "Total Quantity Sold",
@@ -52,7 +56,7 @@ export default {
         totalLikes: "Number of Likes"
       },
       fields: [
-        {label: 'Product Code', key: 'product.id', sortable: true, formatter: value => value.split(/-(.+)/)[1] },
+        {label: 'Product Code', key: 'product.id', sortable: false, formatter: value => value.split(/-(.+)/)[1] },
         {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
         {key: 'totalValue', sortable: true},
         {key: 'totalLikes', sortable: true}
@@ -120,9 +124,32 @@ export default {
     getProductsReport: async function (dateRange) {
       const startDate = formatDate(dateRange[0]);
       const endDate = formatDate(dateRange[1]);
-      await Api.getProductsReport(this.businessId, startDate, endDate)
+
+      let sortByParam;
+      switch (this.sortBy) {
+        case "totalProductPurchases":
+          sortByParam = "quantity";
+          this.doughnutOption = "totalProductPurchases";
+          break;
+
+        case "totalLikes":
+          sortByParam = "likes";
+          this.doughnutOption = "totalLikes";
+          break;
+
+        case "totalValue":
+          sortByParam = "value";
+          this.doughnutOption = "totalValue";
+          break;
+
+        default:
+          sortByParam = "quantity";
+      }
+
+      await Api.getProductsReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "DESC" : "ASC")
           .then((response) => {
             this.results = response.data;
+            this.updateChart();
           }).catch((error) => {
             this.$log.debug("Error message", error);
           });
@@ -136,6 +163,27 @@ export default {
       this.chart.data.labels = this.results.map(record => record.product.id.split(/-(.+)/)[1]);
 
       this.chart.update();
+    }
+  },
+
+  watch: {
+    /**
+     * Watch for sortBy change, refresh table when it happens.
+     */
+    '$data.sortBy': {
+      handler: function() {
+        this.getProductsReport(this.dateRange);
+      },
+      deep: true
+    },
+    /**
+     * Watch for sortDesc change, refresh table when it happens.
+     */
+    '$data.sortDesc': {
+      handler: function() {
+        this.getProductsReport(this.dateRange);
+      },
+      deep: true
     }
   }
 }
