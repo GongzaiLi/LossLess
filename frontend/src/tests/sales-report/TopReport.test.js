@@ -1,6 +1,6 @@
 import {config, createLocalVue, shallowMount} from "@vue/test-utils";
 import {BootstrapVue} from "bootstrap-vue";
-import TopProductsReport from "../../components/sales-report/TopProductsReport";
+import TopProductsReport from "../../components/sales-report/TopReport";
 import Api from "../../Api";
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -43,6 +43,13 @@ beforeEach(async () => {
     totalLikes: 666
   }]});
 
+  Api.getManufacturersReport.mockResolvedValue({data: [{
+      manufacturer: "The Maker",
+      totalProductPurchases: 420,
+      totalValue: 69,
+      totalLikes: 666
+    }]});
+
   const currency = {
     symbol: '$',
     code: 'USD',
@@ -57,7 +64,8 @@ beforeEach(async () => {
     localVue,
     propsData: {
       currency,
-      dateRange: [new Date(), new Date()]
+      dateRange: [new Date(), new Date()],
+      isTopProducts: true
     },
     mocks: {$route, $currentUser, $log},
     methods: {},
@@ -125,14 +133,30 @@ describe('Update Chart', () => {
   });
 })
 
-describe('test watch date range', () => {
-    test('check-get-listings-is-called-when-current-page-updated', async () => {
-        let date = new Date("2020-09-22");
-        await wrapper.setProps({dateRange: [date, date]});
-        await wrapper.vm.$nextTick();
+describe('test watches', () => {
+  test('check-get-listings-is-called-when-current-page-updated', async () => {
+    let date = new Date("2020-09-22");
+    await wrapper.setProps({dateRange: [date, date]});
+    await wrapper.vm.$nextTick();
 
-        expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
-    });
+    expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
+  });
+  test('check results updated when sort direction changes', async () => {
+    wrapper.vm.sortDesc = false;
+    await wrapper.vm.$nextTick();
+
+    expect(Api.getProductsReport).toHaveBeenCalled();
+  });
+
+  test('check results updated when sort option changes', async () => {
+    wrapper.vm.sortBy = 'totalValue';
+    await wrapper.vm.$nextTick();
+
+    expect(Api.getProductsReport).toHaveBeenCalled();
+  });
+
+
+
 })
 
 describe('Check filter Products Report results.', () => {
@@ -153,6 +177,19 @@ describe('Check filter Products Report results.', () => {
     expect(wrapper.vm.topTenResults[10]).toStrictEqual({"product": {"name": "Other"}, "totalLikes": 2, "totalProductPurchases": 2, "totalValue": 2})
   });
 
+  it('Manufacturer Report results are more then ten', async () => {
+    await wrapper.setProps({
+      isTopProducts: false,
+    });
+    wrapper.vm.results = new Array(12).fill(product);
+
+    wrapper.vm.filterResults();
+
+    expect(wrapper.vm.topTenResults.length).toBe(11);
+    expect(wrapper.vm.topTenResults[10]).toStrictEqual({"manufacturer": "Other", "totalLikes": 2, "totalProductPurchases": 2, "totalValue": 2})
+  });
+
+
 
   it('Products Report results do not have "other" when 10 results', () => {
     wrapper.vm.results = new Array(10).fill(product);
@@ -170,4 +207,38 @@ describe('Check filter Products Report results.', () => {
     expect(wrapper.vm.topTenResults[8]).toStrictEqual(product);
   });
 
+})
+
+describe('Check correct tab is shown based on prop', () => {
+
+  it('Products Report prop is true so products are shown', async () => {
+    let date = new Date("2020-09-22");
+
+    await wrapper.setProps({
+      isTopProducts: true,
+      dateRange: [date, date]
+    });
+    await wrapper.vm.$nextTick();
+
+    wrapper.vm.getFields()
+
+    expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
+    expect(wrapper.vm.fields[0].label).toStrictEqual('Product Code')
+  });
+
+
+  it('Products Report prop is false so manufacturers are shown', async () => {
+    let date = new Date("2020-09-22");
+
+    await wrapper.setProps({
+      isTopProducts: false,
+      dateRange: [date, date]
+    });
+    await wrapper.vm.$nextTick();
+
+    wrapper.vm.getFields()
+
+    expect(Api.getManufacturersReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
+    expect(wrapper.vm.fields[0].label).toStrictEqual('Manufacturer')
+  });
 })
