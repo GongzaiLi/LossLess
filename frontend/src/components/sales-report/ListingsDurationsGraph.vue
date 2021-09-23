@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Api from "@/Api";
+import Api from "../../Api";
 import Chart from "chart.js/auto";
 
 export default {
@@ -15,15 +15,16 @@ export default {
   async mounted() {
     const businessId = this.$route.params.id;
     const durationsData = (await Api.getListingDurations(businessId, ...this.dateRange)).data;
-    const newData = {};
-    for (const val of Object.keys(durationsData)) {
-      newData[parseInt(val) + 0.5] = durationsData[val];
+
+    const offsetData = {}; // We offset all durations by 0.5, this is a hack to make the data line up on the histogram properly
+    for (const duration in durationsData) {
+      offsetData[parseInt(duration) + 0.5] = durationsData[duration];
     }
     const cfg = {
       type: 'bar',
       data: {
         datasets: [{
-          data: newData,
+          data: offsetData,
           backgroundColor: ['#0f8d39'],
         }]
       },
@@ -64,8 +65,8 @@ export default {
           tooltip: {
             callbacks: {
               title: (t) => {
-                const daysValue = t[0].parsed.x;
-                return ` Sold ${Math.floor(daysValue)} - ${Math.ceil(daysValue)} days before closing`;
+                const daysValue = Math.floor(t[0].parsed.x); // The days is set to 0.5 higher than the base value (see mounted)
+                return ` Sold ${daysValue} - ${daysValue + 1} days before closing`;
               },
               label: (t) => {
                 return ` ${t.parsed.y} listings`;
@@ -78,6 +79,11 @@ export default {
     this.chart = new Chart(
         document.getElementById('listings-durations-graph').getContext('2d'),
         cfg);
+  },
+  data() {
+    return {
+      chart: null
+    }
   }
 }
 </script>

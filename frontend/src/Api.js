@@ -29,7 +29,7 @@
  * Declare all available services here
  */
 import axios from 'axios'
-import {formatDate} from "@/util";
+import {formatDate} from "./util";
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
