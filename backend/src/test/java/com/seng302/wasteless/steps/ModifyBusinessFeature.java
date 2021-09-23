@@ -12,6 +12,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -99,6 +100,12 @@ public class ModifyBusinessFeature {
 
     @When("The User modifies his business with name: {string}, description: {string}, business type: {string}, address with the details, country {string},  streetNumber {string},  streetName {string},  suburb {string}, city {string},  region {string},  postcode {string}")
     public void theUserModifiesHisBusinessWithNameDescriptionBusinessTypeAddressWithTheDetailsCountryStreetNumberStreetNameSuburbCityRegionPostcode(String name, String description, String type, String country, String streetNumber, String streetName, String suburb, String city, String region, String postcode) throws Exception {
+        Business businessToModify = businessService.findBusinessById(currentBusiness.getId());
+        Assert.assertEquals(businessToModify.getName(), currentBusiness.getName());
+        Assert.assertEquals(businessToModify.getAddress(), currentBusiness.getAddress());
+        Assert.assertEquals(businessToModify.getDescription(), currentBusiness.getDescription());
+        Assert.assertEquals(businessToModify.getBusinessType(), currentBusiness.getBusinessType());
+
         String jsonInStringForRequest = String.format("{\"name\": \"%s\", \"description\": \"%s\", \"businessType\": \"%s\", " +
                         "\"address\": {\n \"country\": \"%s\", \"streetNumber\": \"%s\", \"streetName\": \"%s\", \"suburb\": \"%s\", \"city\": \"%s\", \"region\": \"%s\", \"postcode\": \"%s\"}}",
                 name, description, type,  country, streetNumber, streetName, suburb, city, region, postcode);
@@ -111,6 +118,12 @@ public class ModifyBusinessFeature {
 
     @Then("The business is modified with an ok result")
     public void theBusinessIsModifiedWithAnOkResult() throws Exception {
+        Business modifiedBusiness = businessService.findBusinessById(currentBusiness.getId());
+        Assert.assertNotEquals(modifiedBusiness.getName(), currentBusiness.getName());
+        Assert.assertNotEquals(modifiedBusiness.getAddress(), currentBusiness.getAddress());
+        Assert.assertNotEquals(modifiedBusiness.getDescription(), currentBusiness.getDescription());
+        Assert.assertNotEquals(modifiedBusiness.getBusinessType(), currentBusiness.getBusinessType());
+
         responseResult.andExpect(status().isOk());
     }
 
