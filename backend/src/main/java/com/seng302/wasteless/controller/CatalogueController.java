@@ -100,7 +100,7 @@ public class CatalogueController {
 
         logger.info("Successfully created Product Entity");
 
-        if (generateSalesData.isPresent() && generateSalesData.get()) {
+        if (generateSalesData.isPresent() && Boolean.TRUE.equals(generateSalesData.get())) {
             purchasedListingService.generatePurchasesForProduct(possibleProduct, user, possibleBusiness);
             businessService.saveBusinessChanges(possibleBusiness);
         }

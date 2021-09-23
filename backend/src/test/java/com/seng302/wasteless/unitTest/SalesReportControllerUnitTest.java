@@ -7,6 +7,8 @@ import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +100,7 @@ class SalesReportControllerUnitTest {
                 .thenReturn(salesData);
 
         Mockito
-                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), any(LocalDate.class), any(LocalDate.class), anyString(), any(Sort.Direction.class), any(Pageable.class)))
+                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
                 .thenReturn(salesPurchaseTotalsData);
 
 
@@ -146,18 +148,20 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"/businesses/1/salesReport/totalPurchases?period=day", "/businesses/99/salesReport/productsPurchasedTotals", "/businesses/99/salesReport/manufacturersPurchasedTotals"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSaleReportTotalCount_andBusinessDoesntExist_then403Response() throws Exception {
+    void whenGetSaleReportEndpoints_andBusinessDoesntExist_then406Response(String request) throws Exception {
 
         Mockito
                 .when(businessService.findBusinessById(anyInt()))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/totalPurchases?period=day")
+        mockMvc.perform(MockMvcRequestBuilders.get(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable());
     }
+
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -294,19 +298,6 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSalesReportProductPurchasedTotals_andBusinessDoesntExist_then406Response() throws Exception{
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
-
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/salesReport/productsPurchasedTotals")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -375,19 +366,6 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSalesReportManufacturerPurchasedTotals_andBusinessDoesntExist_then406Response() throws Exception{
-
-        Mockito
-                .when(businessService.findBusinessById(anyInt()))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
-
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/salesReport/manufacturersPurchasedTotals")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isNotAcceptable());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null

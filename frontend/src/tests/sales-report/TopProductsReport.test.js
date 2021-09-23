@@ -34,16 +34,14 @@ beforeEach(async () => {
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
 
-  Api.getProductsReport.mockResolvedValue({
-    data: [{
-      product: {
-        id: "YEET",
-      },
-      totalProductPurchases: 420,
-      totalValue: 69,
-      totalLikes: 666
-    }]
-  });
+  Api.getProductsReport.mockResolvedValue({data: [{
+    product: {
+      id: "YEET",
+    },
+    totalProductPurchases: 420,
+    totalValue: 69,
+    totalLikes: 666
+  }]});
 
   const currency = {
     symbol: '$',
@@ -125,6 +123,16 @@ describe('Update Chart', () => {
 
     expect(wrapper.vm.chart.data.datasets[0].data).toStrictEqual([666]);
   });
+})
+
+describe('test watch date range', () => {
+    test('check-get-listings-is-called-when-current-page-updated', async () => {
+        let date = new Date("2020-09-22");
+        await wrapper.setProps({dateRange: [date, date]});
+        await wrapper.vm.$nextTick();
+
+        expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
+    });
 })
 
 describe('Check filter Products Report results.', () => {
