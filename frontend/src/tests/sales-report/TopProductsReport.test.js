@@ -124,3 +124,28 @@ describe('Update Chart', () => {
     expect(wrapper.vm.chart.data.datasets[0].data).toStrictEqual([666]);
   });
 })
+
+
+describe('Check correct graph option for each sort product option.', () => {
+
+  it('Displays quantities when sorted by quantity', () => {
+    wrapper.vm.sortBy = "totalProductPurchases";
+    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+
+    expect(wrapper.vm.doughnutOption).toStrictEqual("totalProductPurchases");
+  });
+
+  it('Displays values when sorted by values', () => {
+    wrapper.vm.sortBy = "totalValue";
+    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+
+    expect(wrapper.vm.doughnutOption).toStrictEqual("totalValue");
+  });
+
+  it('Displays likes when sorted by likes', () => {
+    wrapper.vm.sortBy = "totalLikes";
+    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+
+    expect(wrapper.vm.doughnutOption).toStrictEqual("totalLikes");
+  });
+})

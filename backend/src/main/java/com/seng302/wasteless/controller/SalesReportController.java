@@ -9,6 +9,7 @@ import com.seng302.wasteless.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ import java.util.List;
  */
 @RestController
 public class SalesReportController {
-    private static final Logger logger = LogManager.getLogger(com.seng302.wasteless.controller.SalesReportController.class.getName());
+    private static final Logger logger = LogManager.getLogger(SalesReportController.class.getName());
     private static final DayOfWeek START_OF_WEEK = DayOfWeek.MONDAY;
 
     private final BusinessService businessService;
@@ -66,23 +67,19 @@ public class SalesReportController {
         Business possibleBusiness = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
-        if (startDate == null && endDate == null) {
+        if (!validateDate(startDate, endDate)) {
             startDate = possibleBusiness.getCreated();
             endDate = LocalDate.now();
-        } else if (startDate == null || endDate == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You must specify a start date and an end date, or neither.");
-        } else if (endDate.isBefore(startDate)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date.");
         }
-
-        Period periodOfData;
-        LocalDate firstPeriodStart = startDate;
-        LocalDate lastPeriodEnd = endDate;
 
         if (period == null) {
             List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataNoPeriod(businessId, startDate, endDate);
             return ResponseEntity.status(HttpStatus.OK).body(responseBody);
         }
+
+        Period periodOfData;
+        LocalDate firstPeriodStart = startDate;
+        LocalDate lastPeriodEnd = endDate;
 
         switch (period) {
             case "day":
@@ -118,17 +115,25 @@ public class SalesReportController {
     }
 
     /**
-     * Get the total quantity, value, likes of all sales for each product of a business.
+     * Get the total quantity, value, likes of all sales for each product of a business in the given period.
      *
      * @param businessId    The id of the business to get purchases for
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
      * @param sortBy        The value to sort the products by
      * @param order         The order to sort the products in
      * @return              The total quantity, value, likes of all purchases for each product of a business
      */
     @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
     public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
+                                                                         @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                                         @RequestParam(value = "endDate", required = false) LocalDate endDate,
                                                                          @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false) Sort.Direction order) {
+                                                                         @RequestParam(value = "order", required = false) Sort.Direction order,
+                                                                         Pageable pageable) {
+
+        logger.info("Request to get reports for all the purchased products in the given period.");
+
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
@@ -136,12 +141,18 @@ public class SalesReportController {
 
         List<SalesReportProductTotalsDto> productsPurchasedTotals;
 
+        if (!validateDate(startDate, endDate)) {
+            startDate = possibleBusiness.getCreated();
+            endDate = LocalDate.now();
+        }
+
         if (sortBy == null && order != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
         } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {
-            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, sortBy, order);
+            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, startDate,
+                    endDate, sortBy, order, pageable);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
@@ -204,5 +215,24 @@ public class SalesReportController {
 
         return ResponseEntity.status(HttpStatus.OK).body(manufacturersPurchasedTotals);
 
+    }
+
+    /**
+     * Checks if given date ranges are valid for the request to be proceeded further.
+     * Throws Bad Http Request Exception if date ranges are invalid.
+     *
+     * @param startDate The start date provided.
+     * @param endDate The end date provided.
+     */
+    public Boolean validateDate(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null && endDate == null) {
+            logger.info("No date range specified. Getting report from business creation up to now.");
+            return false;
+        } else if (startDate == null || endDate == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must specify a start date and an end date, or neither.");
+        } else if (endDate.isBefore(startDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date must be before end date.");
+        }
+        return true;
     }
 }

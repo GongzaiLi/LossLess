@@ -10,6 +10,7 @@ import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.ProductRepository;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -221,7 +222,6 @@ public class PurchasedListingService {
         return durationCounts;
     }
 
-
     /**
      * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
      * and return a list of SalesReportPurchaseTotalsDto. Each SalesReportPurchaseTotalsDto contains information about
@@ -229,16 +229,20 @@ public class PurchasedListingService {
      * total number of likes.
      *
      * @param businessId    The id of the business
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
      * @param sortBy the attribute to be sorted by
      * @param order the order to sort the list in
      * @return              List of SalesReportPurchaseTotalsDto populated with sale information for each product.
      */
-    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
-        List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId);
+
+    public List<SalesReportProductTotalsDto> getProductsPurchasedTotals(int businessId,LocalDate startDate, LocalDate endDate, String sortBy, Sort.Direction order, Pageable pageable) {
+
+        List<Long> allSoldProductsOfBusiness = purchasedListingRepository.getAllProductDatabaseIdsBySalesOfBusiness(businessId, startDate, endDate);
 
         List<SalesReportProductTotalsDto> salesReportProductTotalsDtos = new ArrayList<>();
 
-        for (Long productId: allSoldProductsOfBusiness) {
+        for (Long productId : allSoldProductsOfBusiness) {
             salesReportProductTotalsDtos.add(getTotalsForProduct(productId));
         }
         if (sortBy != null) {
@@ -256,11 +260,13 @@ public class PurchasedListingService {
                     break;
             }
         }
-        if (order != null  && order.isDescending()) {
+        if (order != null && order.isDescending()) {
             Collections.reverse(salesReportProductTotalsDtos);
         }
+        int firstItemIndex = pageable.getPageNumber() * pageable.getPageSize();
+        int lastItemIndex = Math.min(firstItemIndex + pageable.getPageSize(), salesReportProductTotalsDtos.size());
+        return salesReportProductTotalsDtos.subList(firstItemIndex, lastItemIndex);
 
-        return salesReportProductTotalsDtos;
     }
 
     /**

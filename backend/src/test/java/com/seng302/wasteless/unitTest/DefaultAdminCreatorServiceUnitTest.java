@@ -7,6 +7,8 @@ import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -49,32 +51,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         Assertions.assertEquals(60, ReflectionTestUtils.getField(creatorService, "defaultTimeout"));
     }
 
-    @Test
-     void throwsInvalidParameterExceptionWhenPeriodNotANumber() {
-        String config = "check-default-admin-period-ms=asdf\n" +
-                "default-admin-username=admin@sengmail.com\n" +
-                "default-admin-password=supersecurepassword";
-
+   /**
+    * Test 1: PeriodNotANumber
+    * Test 2: PeriodIsZero
+    * Test 3: PeriodIsNegative
+    */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "check-default-admin-period-ms=asdf\ndefault-admin-username=admin@sengmail.com\ndefault-admin-password=supersecurepassword",
+            "check-default-admin-period-ms=0\ndefault-admin-username=admin@sengmail.com\ndefault-admin-password=supersecurepassword",
+            "check-default-admin-period-ms=-5\ndefault-admin-username=admin@sengmail.com\ndefault-admin-password=supersecurepassword"})
+     void throwsInvalidParameterExceptionWhenPeriodInvalid(String config) {
         assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
     }
 
-    @Test
-     void throwsInvalidParameterExceptionWhenPeriodIsZero() {
-        String config = "check-default-admin-period-ms=0\n" +
-                "default-admin-username=admin@sengmail.com\n" +
-                "default-admin-password=supersecurepassword";
-
-        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
-    }
-
-    @Test
-     void throwsInvalidParameterExceptionWhenPeriodIsNegative() {
-        String config = "check-default-admin-period-ms=-5\n" +
-                "default-admin-username=admin@sengmail.com\n" +
-                "default-admin-password=supersecurepassword";
-
-        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
-    }
 
     @Test
      void throwsInvalidParameterExceptionWhenConfigEmpty() {
