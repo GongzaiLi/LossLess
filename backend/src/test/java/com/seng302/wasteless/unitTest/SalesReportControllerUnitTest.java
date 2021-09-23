@@ -100,7 +100,7 @@ class SalesReportControllerUnitTest {
                 .thenReturn(salesData);
 
         Mockito
-                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), any(LocalDate.class), any(LocalDate.class), anyString(), any(Sort.Direction.class), any(Pageable.class)))
+                .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
                 .thenReturn(salesPurchaseTotalsData);
 
 
