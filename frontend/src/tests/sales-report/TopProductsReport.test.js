@@ -126,35 +126,48 @@ describe('Update Chart', () => {
 })
 
 describe('test watch date range', () => {
-  test('check-get-listings-is-called-when-current-page-updated', async () => {
-    let date = new Date("2020-09-22");
-    await wrapper.setProps({dateRange: [date, date]});
-    await wrapper.vm.$nextTick();
+    test('check-get-listings-is-called-when-current-page-updated', async () => {
+        let date = new Date("2020-09-22");
+        await wrapper.setProps({dateRange: [date, date]});
+        await wrapper.vm.$nextTick();
 
-    expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
-  });
+        expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22", "quantity", "DESC");
+    });
 })
 
-describe('Check correct graph option for each sort product option.', () => {
+describe('Check filter Products Report results.', () => {
+  const product = {
+    product: {
+      name: 'product'
+    },
+    totalLikes: 1,
+    totalProductPurchases: 1,
+    totalValue: 1
+  }
+  it('Products Report results are more then ten', () => {
+    wrapper.vm.results = new Array(12).fill(product);
 
-  it('Displays quantities when sorted by quantity', () => {
-    wrapper.vm.sortBy = "totalProductPurchases";
-    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+    wrapper.vm.filterResults();
 
-    expect(wrapper.vm.doughnutOption).toStrictEqual("totalProductPurchases");
+    expect(wrapper.vm.topTenResults.length).toBe(11);
+    expect(wrapper.vm.topTenResults[10]).toStrictEqual({"product": {"name": "Other"}, "totalLikes": 2, "totalProductPurchases": 2, "totalValue": 2})
   });
 
-  it('Displays values when sorted by values', () => {
-    wrapper.vm.sortBy = "totalValue";
-    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
 
-    expect(wrapper.vm.doughnutOption).toStrictEqual("totalValue");
+  it('Products Report results do not have "other" when 10 results', () => {
+    wrapper.vm.results = new Array(10).fill(product);
+    wrapper.vm.filterResults();
+
+    expect(wrapper.vm.topTenResults.length).toBe(10);
+    expect(wrapper.vm.topTenResults[9]).toStrictEqual(product);
   });
 
-  it('Displays likes when sorted by likes', () => {
-    wrapper.vm.sortBy = "totalLikes";
-    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+  it('Products Report results do not have "other" when 9 results', () => {
+    wrapper.vm.results = new Array(9).fill(product);
+    wrapper.vm.filterResults();
 
-    expect(wrapper.vm.doughnutOption).toStrictEqual("totalLikes");
+    expect(wrapper.vm.topTenResults.length).toBe(9);
+    expect(wrapper.vm.topTenResults[8]).toStrictEqual(product);
   });
+
 })
