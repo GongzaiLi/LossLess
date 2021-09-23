@@ -2,7 +2,9 @@
   <div>
       <b-card class=profile-card>
         <div>
-          <h1><strong> {{ fullCard.title }} </strong></h1>
+          <h1><strong> {{ fullCard.title }} </strong>
+            <b-icon-x class="float-right close" @click="closeFullViewCardModal">
+            </b-icon-x></h1>
           <b-container>
             <h6> Card Listed On: {{ formatCreated }} </h6>
             <h6> Card Ends: {{ formatExpiry }}</h6>
@@ -24,27 +26,24 @@
           </b-card>
           <br>
 
-
-          <b-input-group-text>
-            <b-container>
-              <h6><strong> Creator Info: </strong></h6>
-              <label> Name: {{ fullCard.creator.firstName }} {{ fullCard.creator.lastName }} </label>
-              <br>
-              <label> Location: {{ getAddress }}</label>
-            </b-container>
-          </b-input-group-text>
+          <b-container class="creator-info">
+            <h6><strong> Creator Info: </strong></h6>
+            <label> Name: {{ fullCard.creator.firstName }} {{ fullCard.creator.lastName }} </label>
+            <br>
+            <label> Location: {{ getAddress }}</label>
+          </b-container>
           <br>
           <div>
             <b-button v-if="canDeleteOrExtend" class="button-left" variant="danger"
-                      @click="openDeleteConfirmDialog"> Delete
+                      @click="openDeleteConfirmDialog" title="Delete Card">
+              <b-icon-trash-fill/>
             </b-button>
             <b-button v-if="canDeleteOrExtend && cardWithinExtendPeriod()" class="button-left"
-                      variant="success" @click="openExtendConfirmDialog"> Extend
-              <b-icon-alarm/>
+                      variant="success" @click="openExtendConfirmDialog" title="Extend Expiry">
+              <b-icon-alarm-fill/>
             </b-button>
-            <b-button class="button-middle" variant="primary" v-b-toggle.messageBox> Open Messages</b-button>
-            <b-button class="button-right" variant="secondary" @click="closeFullViewCardModal">
-              Close
+            <b-button class="button-right" variant="primary" v-b-toggle.messageBox title="Open Messages">
+              <b-icon-chat-quote-fill/> Open Messages
             </b-button>
           </div>
 
@@ -66,19 +65,15 @@
         </div>
       </b-card>
 
-      <b-collapse id="messageBox" class="collapse">
+      <b-collapse id="messageBox">
         <messages></messages>
       </b-collapse>
   </div>
 </template>
 
-<style>
+<style scoped>
 .button-left{
   float: left;
-  margin-left: 1rem;
-}
-
-.button-middle{
   margin-left: 1rem;
 }
 
@@ -87,8 +82,22 @@
   margin-right: 1rem;
 }
 
-.collapse{
+.creator-info{
+  width: 100%;
+  text-align: center;
+  background-color: #e9ecef;
+  padding: 0.6rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  color: #495057
+}
+
+#messageBox{
   margin-top: 1rem
+}
+
+label{
+  word-wrap: break-word;
 }
 
 </style>

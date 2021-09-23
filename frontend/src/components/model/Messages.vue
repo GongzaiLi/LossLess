@@ -1,19 +1,19 @@
 <template>
-<div>
-  <b-row no-gutters>
-    <b-col lg="3" sm="12">
-      <b-list-group class="chat-list">
-        <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead">
-          <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/profile-default.jpg')" />
-          {{item.userName}}
-        </b-list-group-item>
-      </b-list-group>
-    </b-col>
-    <b-col lg="9">
-      <b-card class="message-box"></b-card>
-    </b-col>
-  </b-row>
-</div>
+  <div>
+    <b-row no-gutters>
+      <b-col lg="3" sm="12">
+        <b-list-group class="chat-list">
+          <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead">
+            <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/profile-default.jpg')" />
+            {{item.userName}}
+          </b-list-group-item>
+        </b-list-group>
+      </b-col>
+      <b-col lg="9">
+        <b-card class="message-box"></b-card>
+      </b-col>
+    </b-row>
+  </div>
 </template>
 
 <style scoped>
@@ -98,6 +98,7 @@ export default {
     }
   },
   methods: {
+
     /**
      * When a chat-head is clicked it adds an active class to the clicked list-group-item and removes it from
      * the list group item that has the old active tag.
