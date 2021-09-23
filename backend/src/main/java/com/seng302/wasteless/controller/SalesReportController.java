@@ -152,6 +152,9 @@ public class SalesReportController {
         } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {
+            if (order == null) {
+                order = Sort.Direction.ASC;
+            }
             Sort sort = (sortBy == null) ? Sort.unsorted() : Sort.by(order, sortBy);
             productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, startDate,
                     endDate, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));

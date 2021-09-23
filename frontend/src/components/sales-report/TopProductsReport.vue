@@ -165,7 +165,6 @@ export default {
       this.chart.update();
     }
   },
-<<<<<<< frontend/src/components/sales-report/TopProductsReport.vue
   watch: {
     /**
      * this watches for a change in the date range and if so calls api request again then reloads chart
