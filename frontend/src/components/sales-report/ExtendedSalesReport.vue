@@ -15,7 +15,7 @@
 <script>
 
 import TopProductsReport from "./TopProductsReport";
-import ListingsDurationsGraph from "@/components/sales-report/ListingsDurationsGraph";
+import ListingsDurationsGraph from "./ListingsDurationsGraph";
 
 export default {
   name: "extended-sales-report",
