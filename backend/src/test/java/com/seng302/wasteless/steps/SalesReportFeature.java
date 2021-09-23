@@ -84,7 +84,7 @@ public class SalesReportFeature {
             purchaseRecord.setSaleDate(LocalDate.parse(purchaseInfo.get(2)));
             purchaseRecord.setNumberOfLikes(Integer.parseInt(purchaseInfo.get(3)));
             purchaseRecord.setListingDate(LocalDate.parse(purchaseInfo.get(4)));
-            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)));
+            purchaseRecord.setClosingDate(LocalDate.parse(purchaseInfo.get(5)).atTime(23,59));
             purchaseRecord.setProduct(productToPurchase);
             purchaseRecord.setManufacturer(productToPurchase.getManufacturer());
             purchaseRecord.setQuantity(Integer.parseInt(purchaseInfo.get(7)));
@@ -156,7 +156,7 @@ public class SalesReportFeature {
 
     @Then("The following is returned:")
     public void theFollowingIsReturned(List<List<String>> purchases) throws Exception {
-        Integer i = 0;
+        int i = 0;
         for (List<String> purchaseArray:purchases) {
             responseResult
                     .andExpect(jsonPath("["+i+"].startDate", is(purchaseArray.get(0))))

@@ -42,10 +42,9 @@ Date: sprint_6
               <b-row>
                 <b-col>
                   <b-table
+                      striped hovers
                       ref="salesReportTable"
                       no-border-collapse
-                      no-local-sorting
-                      striped
                       :items="groupedResults"
                       :fields="fields"
                       :per-page="perPage"
@@ -277,7 +276,6 @@ export default {
             }
           });
           break;
-
       }
 
       return fields

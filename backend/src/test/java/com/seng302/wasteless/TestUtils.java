@@ -5,6 +5,7 @@ import com.seng302.wasteless.service.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -79,7 +80,7 @@ public class TestUtils {
         newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
-        newListing.setCloses(closes);
+        newListing.setCloses(closes.atTime(23,59));
         newListing.setCreated(LocalDate.now());
         newListing.setUsersLiked(0);
         newListing = listingsService.createListing(newListing);
@@ -114,7 +115,7 @@ public class TestUtils {
         newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
-        newListing.setCloses(closes);
+        newListing.setCloses(closes.atTime(23,59));
         newListing.setCreated(LocalDate.now());
         newListing.setUsersLiked(0);
         newListing = listingsService.createListing(newListing);
@@ -144,7 +145,7 @@ public class TestUtils {
         newListing.setQuantity(listingQuantity);
         newListing.setBusiness(business);
         newListing.setPrice(price);
-        newListing.setCloses(closes);
+        newListing.setCloses(closes.atTime(23,59));
         newListing.setCreated(LocalDate.now());
         newListing.setUsersLiked(numOfLikes);
         newListing = listingsService.createListing(newListing);

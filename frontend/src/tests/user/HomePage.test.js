@@ -9,6 +9,7 @@ import MarketplaceSection from "../../components/marketplace/MarketplaceSection"
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 
+
 let wrapper;
 
 let userData = {
@@ -85,6 +86,7 @@ beforeEach(() => {
     localVue.use(mockUserAuthPlugin);
     localVue.use(Router);
 
+
     Api.getUser.mockResolvedValue(response);
     Api.getNotifications.mockResolvedValue({data: []});
     Api.getExpiredCards.mockResolvedValue({data: []});
@@ -97,6 +99,9 @@ beforeEach(() => {
         stubs: {},
         methods: {},
     });
+
+    global.console = {warn: jest.fn()}
+
 });
 
 afterEach(() => {
@@ -191,7 +196,7 @@ describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => 
 
 describe('check-deleted-functionality', () => {
     test('if-no-pendingDeletedNotification-then-pendingDeletedNotification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification=[]
+        wrapper.vm.pendingDeletedNotification = []
         await wrapper.vm.createDeleteToast(1);
         expect(Api.deleteNotification).toBeCalledTimes(0);
     });
@@ -199,8 +204,8 @@ describe('check-deleted-functionality', () => {
 
 describe('check-router-guard-functionality', () => {
     test('if-route-is-changed-while-no-pending-notifications-notification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotifications=[]
-        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm , "toObj", "fromObj", jest.fn());
+        wrapper.vm.pendingDeletedNotifications = []
+        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm, "toObj", "fromObj", jest.fn());
         expect(Api.deleteNotification).toBeCalledTimes(0);
     });
 });
@@ -277,7 +282,7 @@ describe('test-toggleTagColorSelected-works-correctly', () => {
 })
 
 describe('test-toggle-archived-notifications', () => {
-    beforeEach(()=>{
+    beforeEach(() => {
         jest.clearAllMocks();
     })
     test('toggle-to-archived-notifications', async () => {
