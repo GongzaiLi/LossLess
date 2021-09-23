@@ -135,6 +135,17 @@ export default {
         }
       }),
 
+  getManufacturersReport: (businessId, startDate, endDate, sortBy, order) => instance.get(`/businesses/${businessId}/salesReport/manufacturersPurchasedTotals`,
+      {
+        withCredentials: true,
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          sortBy: sortBy,
+          order: order
+        }
+      }),
+
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
    * endpoint. Each image is sent as multipart/form-data with the param name "file".
