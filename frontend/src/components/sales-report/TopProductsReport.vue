@@ -165,8 +165,14 @@ export default {
       this.chart.update();
     }
   },
-
   watch: {
+    /**
+     * this watches for a change in the date range and if so calls api request again then reloads chart
+     */
+    dateRange: async function () {
+      await this.getProductsReport(this.dateRange);
+      this.updateChart();
+    },
     /**
      * Watch for sortBy change, refresh table when it happens.
      */
@@ -190,7 +196,3 @@ export default {
 
 
 </script>
-
-<style scoped>
-
-</style>

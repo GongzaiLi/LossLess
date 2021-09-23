@@ -9,6 +9,7 @@ import com.seng302.wasteless.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -151,8 +152,12 @@ public class SalesReportController {
         } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
         } else {
+            if (order == null) {
+                order = Sort.Direction.ASC;
+            }
+            Sort sort = (sortBy == null) ? Sort.unsorted() : Sort.by(order, sortBy);
             productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, startDate,
-                    endDate, sortBy, order, pageable);
+                    endDate, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
