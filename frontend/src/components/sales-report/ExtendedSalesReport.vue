@@ -7,6 +7,7 @@
       <top-manufacturers-report :date-range="dateRange" :currency="currency" class="mt-4"></top-manufacturers-report>
     </b-tab>
     <b-tab title="Listings">
+      <listings-durations-graph :date-range="dateRange"/>
     </b-tab>
   </b-tabs>
 
@@ -15,11 +16,12 @@
 <script>
 
 import TopProductsReport from "./TopProductsReport";
+import ListingsDurationsGraph from "./ListingsDurationsGraph";
 import TopManufacturersReport from "./TopManufacturersReport";
 
 export default {
   name: "extended-sales-report",
-  components: {TopManufacturersReport, TopProductsReport},
+  components: {ListingsDurationsGraph, TopProductsReport, TopManufacturersReport},
   props: ["dateRange", "currency"],
 }
 

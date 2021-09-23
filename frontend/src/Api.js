@@ -29,6 +29,7 @@
  * Declare all available services here
  */
 import axios from 'axios'
+import {formatDate} from "./util";
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
@@ -147,6 +148,15 @@ export default {
           order: order
         }
       }),
+
+  getListingDurations: (businessId, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
+    {
+      withCredentials: true,
+      params: {
+        startDate: formatDate(startDate),
+        endDate: formatDate(endDate),
+      }
+    }),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
