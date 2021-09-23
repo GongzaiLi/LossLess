@@ -133,3 +133,27 @@ describe('test watch date range', () => {
     expect(Api.getProductsReport).toHaveBeenLastCalledWith(0,"2020-09-22", "2020-09-22");
   });
 })
+
+describe('Check correct graph option for each sort product option.', () => {
+
+  it('Displays quantities when sorted by quantity', () => {
+    wrapper.vm.sortBy = "totalProductPurchases";
+    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+
+    expect(wrapper.vm.doughnutOption).toStrictEqual("totalProductPurchases");
+  });
+
+  it('Displays values when sorted by values', () => {
+    wrapper.vm.sortBy = "totalValue";
+    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+
+    expect(wrapper.vm.doughnutOption).toStrictEqual("totalValue");
+  });
+
+  it('Displays likes when sorted by likes', () => {
+    wrapper.vm.sortBy = "totalLikes";
+    wrapper.vm.getProductsReport(wrapper.vm.dateRange);
+
+    expect(wrapper.vm.doughnutOption).toStrictEqual("totalLikes");
+  });
+})
