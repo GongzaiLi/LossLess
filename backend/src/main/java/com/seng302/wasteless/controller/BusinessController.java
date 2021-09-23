@@ -1,9 +1,7 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.dto.GetBusinessesDto;
-import com.seng302.wasteless.dto.GetSearchBusinessDto;
-import com.seng302.wasteless.dto.PutBusinessesAdminDto;
+import com.seng302.wasteless.dto.*;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
@@ -250,6 +248,29 @@ public class BusinessController {
 
         businessService.removeAdministratorFromBusiness(possibleBusiness, userToRevoke);
         businessService.saveBusinessChanges(possibleBusiness);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/businesses/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Object> modifyBusiness(@Valid @RequestBody PutBusinessDto modifiedBusiness, @PathVariable("id") Integer businessId) {
+
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
+
+        Business businessToModify = businessService.findBusinessById(businessId);
+        if (!businessToModify.checkUserIsAdministrator(loggedInUser) && !loggedInUser.checkUserGlobalAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this business");
+        }
+
+        if (!businessToModify.getAddress().equals(modifiedBusiness.getAddress())) {
+            logger.debug("Creating new Address Entity for business with ID {}", businessToModify.getId());
+            addressService.createAddress(modifiedBusiness.getAddress());
+        }
+        businessToModify.setAddress(modifiedBusiness.getAddress());
+
+        logger.debug("Updating business: {}", modifiedBusiness.getName());
+        businessService.updateBusinessDetails(businessToModify, modifiedBusiness);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
