@@ -87,7 +87,7 @@ class NotificationServiceTest {
 
         List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags), Optional.empty());
 
-        assertEquals(notifications.size(), 1);
+        assertEquals(1, notifications.size());
         assertEquals(newNotification1.getId(), newNotification1.getId());
         assertTrue(notifications.stream().allMatch(notification -> notification.getTag().equals(NotificationTag.RED)));
 
@@ -140,7 +140,7 @@ class NotificationServiceTest {
 
         List<Notification> notifications = notificationService.filterNotifications(1, Optional.of(tags), Optional.empty());
 
-        assertEquals(notifications.size(), 2);
+        assertEquals(2, notifications.size());
         assertTrue(notifications.stream().allMatch(notification -> notification.getTag().equals(NotificationTag.RED) || notification.getTag().equals(NotificationTag.BLUE)));
 
     }
@@ -163,7 +163,7 @@ class NotificationServiceTest {
 
         List<Notification> notifications = notificationService.filterNotifications(1, Optional.empty(), Optional.of(true));
 
-        assertEquals(notifications.size(), 1);
+        assertEquals(1,notifications.size());
         assertTrue(notifications.stream().allMatch(notification -> notification.getArchived().equals(true) || notification.getTag().equals(false)));
     }
 

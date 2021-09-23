@@ -126,12 +126,25 @@ export default {
       }
     }),
 
-  getProductsReport: (businessId, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/productsPurchasedTotals`,
+  getProductsReport: (businessId, startDate, endDate, sortBy, order) => instance.get(`/businesses/${businessId}/salesReport/productsPurchasedTotals`,
       {
         withCredentials: true,
         params: {
           startDate: startDate,
           endDate: endDate,
+          sortBy: sortBy,
+          order: order
+        }
+      }),
+
+  getManufacturersReport: (businessId, startDate, endDate, sortBy, order) => instance.get(`/businesses/${businessId}/salesReport/manufacturersPurchasedTotals`,
+      {
+        withCredentials: true,
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          sortBy: sortBy,
+          order: order
         }
       }),
 

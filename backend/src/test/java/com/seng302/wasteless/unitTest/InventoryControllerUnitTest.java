@@ -11,6 +11,8 @@ import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -323,90 +325,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(jsonPath("[0]").doesNotExist());
     }
 
-
-    @Test
+    /**
+     * Test 1: ExpiryDateInPast
+     * Test 2: BestBeforeDateInPast
+     * Test 3: manufacturedInFuture
+     * Test 4: sellByInPast
+     * Test 5: quantityNegative
+     * Test 6: pricePerItemNegative
+     * Test 7: totalPriceNegative
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"2020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"2020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"3020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": -1, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": -6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": 6.5, \"totalPrice\": -21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_ExpiryDateInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"2020-05-12\"}";
+     void whenPostRequestToInventory_andInvalidRequest_then400Response(String request) throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
+                .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_BestBeforeDateInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"2020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_manufacturedInFuture_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"3020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_sellByInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_quantityNegative_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": -1, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_pricePerItemNegative_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": -6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPostRequestToInventory_andInvalidRequest_totalPriceNegative_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": 6.5, \"totalPrice\": -21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/businesses/1/inventory")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
 
 
     @Test
@@ -497,85 +441,29 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    /**
+     * Test 1: ExpiryDateInPast
+     * Test 2: BestBeforeDateInPast
+     * Test 3: manufacturedInFuture
+     * Test 4: sellByInPast
+     * Test 5: quantityNegative
+     * Test 6: pricePerItemNegative
+     * Test 7: totalPriceNegative
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"2020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"2020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"3020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": -1, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": -6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}",
+            "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": 6.5, \"totalPrice\": -21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_ExpiryDateInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"3021-05-12\",\"expires\": \"2020-05-12\"}";
+     void whenPutRequestToInventory_andInvalidRequest_then400Response(String request) throws Exception {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_BestBeforeDateInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3021-05-12\",\"bestBefore\": \"2020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_manufacturedInFuture_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"3020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_sellByInPast_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 4, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_quantityNegative_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": -1, \"pricePerItem\": 6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"3020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_pricePerItemNegative_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": -6.5, \"totalPrice\": 21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-     void whenPutRequestToInventory_andInvalidRequest_totalPriceNegative_then400Response() throws Exception {
-        String jsonInStringForRequest = "{\"productId\": \"WATT-420-BEANS\", \"quantity\": 1, \"pricePerItem\": 6.5, \"totalPrice\": -21.99, \"manufactured\": \"2020-05-12\", \"sellBy\": \"2020-05-12\",\"bestBefore\": \"3020-05-12\",\"expires\": \"3020-05-12\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1/inventory/1")
-                .content(jsonInStringForRequest)
+                .content(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

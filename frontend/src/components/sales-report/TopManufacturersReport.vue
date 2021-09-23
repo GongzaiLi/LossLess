@@ -1,17 +1,15 @@
 <template>
   <b-row>
     <b-col cols="6">
-      <h3>Top Products</h3>
+      <h3>Top Manufacturers</h3>
       <b-table
-          ref="productsReportTable"
+          ref="manufacturersReportTable"
           :items="results"
           :fields="fields"
           no-border-collapse
           no-local-sorting
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
-          :per-page="perPage"
-          :current-page="currentPage"
           striped
           responsive="lg"
           bordered
@@ -20,23 +18,17 @@
           <h3 class="no-results-overlay">No results to display</h3>
         </template>
       </b-table>
-      <b-pagination
-          v-model="currentPage"
-          :total-rows="results.length"
-          :per-page="perPage"
-          aria-controls="my-table"/>
-
     </b-col>
     <b-col cols="6">
       <b-row>
         <b-col cols="auto">
-          <h3>Top Products Graph</h3>
+          <h3>Top Manufacturers Graph</h3>
         </b-col>
         <b-col cols="5">
           <b-select v-model="doughnutOption" @input="updateChart" :options="doughnutOptions"/>
         </b-col>
       </b-row>
-      <canvas id="top-products-graph"></canvas>
+      <canvas id="top-manufacturers-graph"></canvas>
     </b-col>
   </b-row>
 </template>
@@ -48,16 +40,13 @@ import {formatDate} from "../../util";
 import Chart from "chart.js/auto";
 
 export default {
-  name: "top-products-report",
+  name: "top-manufacturers-report",
   props: ["dateRange", "currency"],
   data: function () {
     return {
       businessId: '',
       totalResults: null,
       results: [],
-      topTenResults: [],
-      currentPage: 1,
-      perPage: 10,
       sortBy: '',
       sortDesc: true,
       loading: false,
@@ -67,7 +56,7 @@ export default {
         totalLikes: "Number of Likes"
       },
       fields: [
-        {label: 'Product Code', key: 'product.id', sortable: false, formatter: value => value.split(/-(.+)/)[1]},
+        {label: 'Manufacturer', key: 'manufacturer', sortable: false},
         {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
         {key: 'totalValue', sortable: true},
         {key: 'totalLikes', sortable: true}
@@ -79,29 +68,16 @@ export default {
 
   async mounted() {
     this.businessId = this.$route.params.id;
-    await this.getProductsReport(this.dateRange);
-    this.filterResults();
+    await this.getManufacturersReport(this.dateRange);
     const cfg = {
       type: 'doughnut',
       data: {
         datasets: [{
           label: 'Top Products By Quantity',
-          data: this.topTenResults.map(record => record.totalProductPurchases),
-          backgroundColor: [
-            '#332288',
-            '#88ccee',
-            '#44aa99',
-            '#117733',
-            '#999933',
-            '#ddcc77',
-            '#661100',
-            '#cc6677',
-            '#882255',
-            '#aa4499',
-            '#989898'
-          ],
+          data: this.results.map(record => record.totalProductPurchases),
+          backgroundColor: ['#1105c1', '#0e2fcb', '#0c4ad2', '#0a62d8', '#0979dd', '#078fe3', '#06a5e8', '#04bbee', '#03d1f3', '#01e8f9', '#00feff']        ,
         },],
-        labels: this.topTenResults.map(record => record.product.name)
+        labels: this.results.map(record => record.manufacturer)
       },
       options: {
         elements: {
@@ -134,18 +110,18 @@ export default {
       }
     };
     this.chart = new Chart(
-        document.getElementById('top-products-graph').getContext('2d'),
+        document.getElementById('top-manufacturers-graph').getContext('2d'),
         cfg);
   },
 
   methods: {
 
     /**
-     * Uses Api.js to send a get request with the getProductsReport.
+     * Uses Api.js to send a get request with the getTopManufacturers.
      * This is used to retrieve the data of the business's products to form a report.
      * @param dateRange
      **/
-    getProductsReport: async function (dateRange) {
+    getManufacturersReport: async function (dateRange) {
       const startDate = formatDate(dateRange[0]);
       const endDate = formatDate(dateRange[1]);
 
@@ -153,23 +129,27 @@ export default {
       switch (this.sortBy) {
         case "totalProductPurchases":
           sortByParam = "quantity";
+          this.doughnutOption = "totalProductPurchases";
           break;
 
         case "totalLikes":
           sortByParam = "likes";
+          this.doughnutOption = "totalLikes";
           break;
 
         case "totalValue":
           sortByParam = "value";
+          this.doughnutOption = "totalValue";
           break;
 
         default:
           sortByParam = "quantity";
       }
 
-      await Api.getProductsReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "DESC" : "ASC")
+      await Api.getManufacturersReport(this.businessId, startDate, endDate, sortByParam, this.sortDesc ? "ASC" : "DESC")
           .then((response) => {
             this.results = response.data;
+            this.updateChart();
           }).catch((error) => {
             this.$log.debug("Error message", error);
           });
@@ -178,54 +158,21 @@ export default {
     /**
      * Updates the chart data when different options are selected
      */
-    updateChart: function () {
-      this.chart.data.datasets[0].data = this.topTenResults.map((record) => record[this.doughnutOption]);
-      this.chart.data.labels = this.topTenResults.map(record => record.product.name);
+    updateChart: function() {
+      this.chart.data.datasets[0].data = this.results.map(record => record[this.doughnutOption]);
+      this.chart.data.labels = this.results.map(record => record.manufacturer);
 
       this.chart.update();
-    },
-
-    /**
-     * filter Products Report results.
-     * if Products Report results are more then ten, filter the top ten product then combine to the Other
-     **/
-    filterResults: function () {
-      const topTenResults = this.results.slice(0, 10);
-      const otherResults = this.results.slice(10);
-      const other = {
-        product: {
-          name: `Other`
-        },
-        totalLikes: otherResults.reduce((totalLike, item) => {
-          return totalLike + item.totalLikes
-        }, 0),
-        totalProductPurchases: otherResults.reduce((totalLike, item) => {
-          return totalLike + item.totalProductPurchases
-        }, 0),
-        totalValue: otherResults.reduce((totalLike, item) => {
-          return totalLike + item.totalValue
-        }, 0)
-      }
-      if (otherResults.length > 0) {
-        topTenResults.push(other)
-      }
-      this.topTenResults = topTenResults;
     }
   },
+
   watch: {
-    /**
-     * this watches for a change in the date range and if so calls api request again then reloads chart
-     */
-    dateRange: async function () {
-      await this.getProductsReport(this.dateRange);
-      this.updateChart();
-    },
     /**
      * Watch for sortBy change, refresh table when it happens.
      */
     '$data.sortBy': {
-      handler: function () {
-        this.getProductsReport(this.dateRange);
+      handler: function() {
+        this.getManufacturersReport(this.dateRange);
       },
       deep: true
     },
@@ -233,14 +180,17 @@ export default {
      * Watch for sortDesc change, refresh table when it happens.
      */
     '$data.sortDesc': {
-      handler: function () {
-        this.getProductsReport(this.dateRange);
+      handler: function() {
+        this.getManufacturersReport(this.dateRange);
       },
       deep: true
     }
-  },
-
+  }
 }
 
 
 </script>
+
+<style scoped>
+
+</style>
