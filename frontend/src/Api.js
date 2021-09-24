@@ -149,10 +149,11 @@ export default {
         }
       }),
 
-  getListingDurations: (businessId, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
+  getListingDurations: (businessId, granularity, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
     {
       withCredentials: true,
       params: {
+        granularity,
         startDate: formatDate(startDate),
         endDate: formatDate(endDate),
       }
