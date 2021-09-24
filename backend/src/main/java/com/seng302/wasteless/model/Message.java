@@ -1,6 +1,7 @@
 package com.seng302.wasteless.model;
 
-import com.seng302.wasteless.dto.PostMessageDto;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.MessageViews;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
 @ToString // generate a toString method
 @Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@JsonView({MessageViews.GetMessageView.class})
 public class Message {
 
     @Id // this field (attribute) is the table primary key
