@@ -42,7 +42,9 @@
                       variant="success" @click="openExtendConfirmDialog"> Extend
               <b-icon-alarm/>
             </b-button>
-            <b-button class="button-middle" variant="primary" v-b-toggle.messageBox> Open Messages</b-button>
+            <b-button v-if="!messageVisible" class="button-middle" variant="primary" @click="messageVisible = true"> Open Messages</b-button>
+            <b-button v-else class="button-middle" variant="primary"  @click="messageVisible = false"> Close Messages</b-button>
+
             <b-button class="button-right" variant="secondary" @click="closeFullViewCardModal">
               Close
             </b-button>
@@ -66,27 +68,50 @@
         </div>
       </b-card>
 
-      <b-collapse id="messageBox" class="collapse">
+      <b-collapse v-model="messageVisible" class="collapse">
         <b-card>
-          Work in progress...
+          <b-textarea
+              maxlength="250" max-rows="4"
+              type="text" class="messageInputBox mr-4 mb-1"
+              placeholder="Type Message..."
+              v-model="messageText"> Enter message </b-textarea>
+          <b-button variant="primary" @click="sendMessage"> Send </b-button>
         </b-card>
       </b-collapse>
   </div>
 </template>
 
-<style>
+<style scoped>
+
+.messageInputBox {
+  max-width: 100%;
+  float: left;
+}
+
+@media(min-width: 992px) {
+  .messageInputBox {
+    max-width: 85%;
+    float: left;
+  }
+}
+
 .button-left{
   float: left;
   margin-left: 1rem;
+  margin-bottom: 3px;
 }
 
 .button-middle{
   margin-left: 1rem;
+  margin-bottom: 3px;
+
 }
 
 .button-right{
   float: right;
   margin-right: 1rem;
+  margin-bottom: 3px;
+
 }
 
 .collapse{
@@ -113,6 +138,8 @@ export default {
 
         }
       },
+      messageText: '',
+      messageVisible: false,
     }
   },
   mounted() {
@@ -183,6 +210,13 @@ export default {
     closeFullViewCardModal() {
       this.$emit('closeModal', this.fullCard);
     },
+
+    /**
+     *  TODO
+     */
+    sendMessage() {
+      console.log(this.messageText, this.messageText.length); //TODO
+    }
   },
 
   computed: {
