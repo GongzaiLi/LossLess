@@ -10,7 +10,6 @@
         </b-list-group>
       </b-col>
       <b-col :lg="isCardCreator?9:12">
-        <div style="border-bottom: #7f7f7f">
         <b-card class="message-box">
         </b-card>
           <b-textarea
@@ -20,7 +19,6 @@
               placeholder="Type Message..."
               v-model="messageText"> Enter message </b-textarea>
           <b-button variant="primary" @click="sendMessage"> Send </b-button>
-        </div>
       </b-col>
     </b-row>
   </div>
@@ -80,7 +78,7 @@ div.chat-head:last-child {
 
 export default {
   props: ['isCardCreator'],
-  name: "Messages.vue",
+  name: "Messages",
   data() {
     return {
       targetChatHead: null,
