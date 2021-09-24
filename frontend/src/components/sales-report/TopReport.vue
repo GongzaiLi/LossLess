@@ -1,7 +1,7 @@
 <template>
   <b-row>
     <b-col cols="6">
-      <h3>Top Products</h3>
+      <h3>Sales by {{ isTopProducts ? "Product" : "Manufacturer" }}</h3>
       <b-table
           ref="productsReportTable"
           :items="results"
@@ -30,7 +30,7 @@
     <b-col cols="6">
       <b-row>
         <b-col cols="auto">
-          <h3>Top Products Graph</h3>
+          <h3>Top {{ isTopProducts ? "Products" : "Manufacturers" }}</h3>
         </b-col>
         <b-col cols="5">
           <b-select v-model="doughnutOption" @input="updateChart" :options="doughnutOptions"/>
@@ -87,20 +87,15 @@ export default {
      * Defines the fields dependent on whether it is the manufacuters or products page
      **/
     getFields() {
+      this.fields = [
+        {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
+        {key: 'totalValue', sortable: true},
+        {key: 'totalLikes', sortable: true}
+      ];
       if (this.isTopProducts) {
-        this.fields = [
-          {label: 'Product Code', key: 'product.id', sortable: false, formatter: value => value.split(/-(.+)/)[1]},
-          {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
-          {key: 'totalValue', sortable: true},
-          {key: 'totalLikes', sortable: true}
-        ]
+        this.fields.unshift({label: 'Product Code', key: 'product.id', sortable: false, formatter: value => value.split(/-(.+)/)[1]});
       } else {
-        this.fields = [
-          {label: 'Manufacturer', key: 'manufacturer', sortable: false},
-          {label: 'Quantity', key: 'totalProductPurchases', sortable: true},
-          {key: 'totalValue', sortable: true},
-          {key: 'totalLikes', sortable: true}
-        ]
+        this.fields.unshift({label: 'Manufacturer', key: 'manufacturer', sortable: false});
       }
     },
 
@@ -161,15 +156,10 @@ export default {
         }
       };
 
-      if (this.isTopProducts) {
+      const chartId = this.isTopProducts ? 'top-products-graph' : 'top-manufacturers-graph';
       this.chart = new Chart(
-          document.getElementById('top-products-graph').getContext('2d'),
+          document.getElementById(chartId).getContext('2d'),
           cfg);
-      } else {
-      this.chart = new Chart(
-          document.getElementById('top-manufacturers-graph').getContext('2d'),
-          cfg);
-      }
     },
 
     /**
@@ -238,35 +228,23 @@ export default {
     filterResults: function () {
       const topTenResults = this.results.slice(0, 10);
       const otherResults = this.results.slice(10);
-      let other;
+      let other = {
+        totalLikes: otherResults.reduce((totalLike, item) => {
+          return totalLike + item.totalLikes
+        }, 0),
+        totalProductPurchases: otherResults.reduce((totalLike, item) => {
+          return totalLike + item.totalProductPurchases
+        }, 0),
+        totalValue: otherResults.reduce((totalLike, item) => {
+          return totalLike + item.totalValue
+        }, 0)
+      };
       if (this.isTopProducts) {
-        other = {
-          product: {
-            name: `Other`
-          },
-          totalLikes: otherResults.reduce((totalLike, item) => {
-            return totalLike + item.totalLikes
-          }, 0),
-          totalProductPurchases: otherResults.reduce((totalLike, item) => {
-            return totalLike + item.totalProductPurchases
-          }, 0),
-          totalValue: otherResults.reduce((totalLike, item) => {
-            return totalLike + item.totalValue
-          }, 0)
+        other.product = {
+          name: `Other`
         }
       } else {
-        other = {
-          manufacturer: `Other`,
-          totalLikes: otherResults.reduce((totalLike, item) => {
-            return totalLike + item.totalLikes
-          }, 0),
-          totalProductPurchases: otherResults.reduce((totalLike, item) => {
-            return totalLike + item.totalProductPurchases
-          }, 0),
-          totalValue: otherResults.reduce((totalLike, item) => {
-            return totalLike + item.totalValue
-          }, 0)
-        }
+        other.manufacturer = `Other`;
       }
       if (otherResults.length > 0) {
         topTenResults.push(other)
