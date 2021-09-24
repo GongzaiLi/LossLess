@@ -252,16 +252,27 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * Handle put request modify business
+     * Validates inputted data using same validation as creating a business.
+     *
+     * Returns 200 on success
+     * Returns 400 if invalid modifications
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 403 if forbidden, user tried to make request to a business they are not admin of or is not a DGAA/GAA
+     *
+     * @param modifiedBusiness Dto containing information needed to update a user
+     * @param businessId ID of the business to be modified
+     * @return Response code with message, see above for codes
+     */
     @PutMapping("/businesses/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> modifyBusiness(@Valid @RequestBody PutBusinessDto modifiedBusiness, @PathVariable("id") Integer businessId) {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
         Business businessToModify = businessService.findBusinessById(businessId);
-        if (!businessToModify.checkUserIsAdministrator(loggedInUser) && !loggedInUser.checkUserGlobalAdmin()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this business");
-        }
+        businessService.checkUserAdminOfBusinessOrGAA(businessToModify, loggedInUser);
 
         if (!businessToModify.getAddress().equals(modifiedBusiness.getAddress())) {
             logger.debug("Creating new Address Entity for business with ID {}", businessToModify.getId());

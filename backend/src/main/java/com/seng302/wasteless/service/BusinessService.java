@@ -102,7 +102,7 @@ public class BusinessService {
      */
     public Boolean checkUserAdminOfBusinessOrGAA(Business business, User user) {
         if (!(user.checkUserGlobalAdmin() || business.checkUserIsPrimaryAdministrator(user) || business.checkUserIsAdministrator(user))) {
-            logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, business);
+            logger.warn("User: {} is not global admin or admin of business: {}", user, business);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request");
         }
         return true;

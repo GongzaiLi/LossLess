@@ -129,12 +129,6 @@ class BusinessControllerUnitTest {
                 .when(userService.checkUserAdminsBusiness(anyInt(), anyInt()))
                 .thenReturn(false);
 
-        Mockito
-                .when(business.checkUserIsAdministrator(any(User.class)))
-                .thenReturn(true);
-
-
-        doReturn(true).when(user).checkUserGlobalAdmin();
         doReturn(UserRoles.USER).when(user).getRole();
         doReturn(LocalDate.now().minusYears(20)).when(user).getDateOfBirth();
         doReturn(true).when(user).checkDateOfBirthValid();
@@ -340,31 +334,4 @@ class BusinessControllerUnitTest {
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPutRequestToBusiness_andUserIsNotAdminOfBusinessAndNotDGAA_then403Response() throws Exception {
-        doReturn(false).when(user).checkUserGlobalAdmin();
-        Mockito
-                .when(business.checkUserIsAdministrator(any(User.class)))
-                .thenReturn(false);
-        String request = "{\"name\": \"John's Peanut Store\", \"address\" : {\n" +
-                "    \"streetNumber\": \"5\",\n" +
-                "    \"streetName\": \"Fitz Road\",\n" +
-                "    \"suburb\": \"Auckland City\",\n" +
-                "    \"city\": \"Auckland\",\n" +
-                "    \"region\": \"Canterbury\",\n" +
-                "    \"country\": \"America\",\n" +
-                "    \"postcode\": \"90210\"\n" +
-                "  }, \"description\": \"Peanuts\", \"businessType\": \"Retail Trade\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/1")
-                .with(csrf())
-                .content(request)
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-
-
 }
