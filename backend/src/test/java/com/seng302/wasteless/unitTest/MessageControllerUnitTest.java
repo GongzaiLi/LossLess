@@ -56,6 +56,7 @@ public class MessageControllerUnitTest {
 
     private User user;
 
+
     private User userForCard;
 
     @BeforeEach
@@ -64,6 +65,7 @@ public class MessageControllerUnitTest {
         user.setId(1);
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
+
 
         userForCard = new User();
         userForCard.setId(2);
@@ -134,15 +136,20 @@ public class MessageControllerUnitTest {
         messages.add(message);
         messages.add(message);
 
-        GetMessageDto messageDto1 = new GetMessageDto(1, 1, 2, messages);
-        GetMessageDto messageDto2 = new GetMessageDto(1, 3, 2, messages);
+        User user1 = new User();
+        user1.setId(1);
+        User user3 = new User();
+        user3.setId(3);
+
+        GetMessageDto messageDto1 = new GetMessageDto(1, user1, userForCard, messages);
+        GetMessageDto messageDto2 = new GetMessageDto(1, user3, userForCard, messages);
 
         List<GetMessageDto> messageDtos = new ArrayList<>();
         messageDtos.add(messageDto1);
         messageDtos.add(messageDto2);
 
         Mockito
-                .when(messageService.findAllMessagesForUserOnCardTheyDontOwn(anyInt(), any(Card.class)))
+                .when(messageService.findAllMessagesForUserOnCardTheyDontOwn(any(User.class), any(Card.class)))
                 .thenReturn(messageDto1);
 
         Mockito
@@ -282,10 +289,10 @@ public class MessageControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/messages/1")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("[0].cardOwnerId", is(2)))
-                .andExpect(jsonPath("[0].otherUserId", is(1)))
-                .andExpect(jsonPath("[1].cardOwnerId", is(2)))
-                .andExpect(jsonPath("[1].otherUserId", is(3)));
+                .andExpect(jsonPath("[0].cardOwner.id", is(2)))
+                .andExpect(jsonPath("[0].otherUser.id", is(1)))
+                .andExpect(jsonPath("[1].cardOwner.id", is(2)))
+                .andExpect(jsonPath("[1].otherUser.id", is(3)));
     }
 
 }

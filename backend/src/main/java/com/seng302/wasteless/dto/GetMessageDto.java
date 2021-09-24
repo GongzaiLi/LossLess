@@ -1,6 +1,7 @@
 package com.seng302.wasteless.dto;
 
 import com.seng302.wasteless.model.Message;
+import com.seng302.wasteless.model.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -20,16 +21,16 @@ public class GetMessageDto {
 
     private Integer cardId;
 
-    private Integer cardOwnerId;
+    private User cardOwner;
 
-    private Integer otherUserId;
+    private User otherUser;
 
     private List<Message> messages;
 
-    public GetMessageDto(Integer cardId, Integer otherUserId, Integer cardOwnerId, List<Message> messages) {
+    public GetMessageDto(Integer cardId, User otherUser, User cardOwner, List<Message> messages) {
         this.cardId = cardId;
-        this.cardOwnerId = cardOwnerId;
-        this.otherUserId = otherUserId;
+        this.otherUser = otherUser;
+        this.cardOwner = cardOwner;
         this.messages = messages;
     }
 }

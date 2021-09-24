@@ -112,7 +112,7 @@ public class MessageController {
 
             return ResponseEntity.status(HttpStatus.OK).body(messagesDtos);
         } else {    //Not card owner
-            GetMessageDto messageDto = messageService.findAllMessagesForUserOnCardTheyDontOwn(currentlyLoggedInUser.getId(), cardForMessage);
+            GetMessageDto messageDto = messageService.findAllMessagesForUserOnCardTheyDontOwn(currentlyLoggedInUser, cardForMessage);
             return ResponseEntity.status(HttpStatus.OK).body(messageDto);
         }
 

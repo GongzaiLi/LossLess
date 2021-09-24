@@ -1,20 +1,28 @@
 package com.seng302.wasteless.unitTest.ServiceTests;
 
 import com.seng302.wasteless.dto.GetMessageDto;
+import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Message;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.MessageRepository;
+import com.seng302.wasteless.repository.UserRepository;
+import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.MessageService;
+import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +38,19 @@ public class MessageServiceTest {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AddressService addressService;
+
+
     @BeforeAll
     void setup() {
+
         Message message1 = new Message(1, 1, 2, "Hello 1 1 2", LocalDateTime.now());
         messageService.createMessage(message1);
         Message message2 = new Message(1, 1, 2, "Hello 1 1 2 Again", LocalDateTime.now());
@@ -48,10 +67,46 @@ public class MessageServiceTest {
         messageService.createMessage(message7);
         Message message8 = new Message(1, 1, 4, "Hello 1 1 4", LocalDateTime.now());
         messageService.createMessage(message8);
-        Message message9 = new Message(4, 9, 8, "Hello 4 9 8", LocalDateTime.now());
+        Message message9 = new Message(4, 7, 8, "Hello 4 9 8", LocalDateTime.now());
         messageService.createMessage(message9);
-        Message message10 = new Message(4, 8, 9, "Hello 4 8 9", LocalDateTime.now());
+        Message message10 = new Message(4, 8, 7, "Hello 4 8 9", LocalDateTime.now());
         messageService.createMessage(message10);
+
+
+        createUser(1);
+        createUser(2);
+        createUser(3);
+        createUser(4);
+        createUser(5);
+        createUser(6);
+        createUser(7);
+        createUser(8);
+
+
+    }
+
+    void createUser(Integer userId) {
+        User user = new User();
+        user.setId(userId);
+        Address address = new Address();
+        address.setCountry("NZ");
+        address.setSuburb("Riccarton");
+        address.setCity("Christchurch");
+        address.setStreetNumber("1");
+        address.setStreetName("Ilam Rd");
+        address.setPostcode("8041");
+        addressService.createAddress(address);
+        user.setHomeAddress(address);
+        user.setEmail(String.format("scottLi%d@a.com", userId));
+        user.setFirstName("a");
+        user.setLastName("b");
+        user.setDateOfBirth(LocalDate.parse("1998-05-09"));
+        user.setPassword("a");
+
+        if (userRepository.findFirstById(userId) == null) {
+            userService.createUser(user);
+        }
+
     }
 
     @Test
@@ -95,11 +150,12 @@ public class MessageServiceTest {
     void whenFindAllMessagesForUserOnCardTheyDontOwn_thenGetCorrectMessages() {
         User cardCreator = new User();
         cardCreator.setId(2);
-
-        GetMessageDto messageDto = messageService.findAllMessagesForUserOnCardTheyDontOwn(1, new Card().setId(1).setCreator(cardCreator));
+        User user = new User();
+        user.setId(1);
+        GetMessageDto messageDto = messageService.findAllMessagesForUserOnCardTheyDontOwn(user, new Card().setId(1).setCreator(cardCreator));
         assertEquals(1, messageDto.getCardId());
-        assertEquals(2, messageDto.getCardOwnerId());
-        assertEquals(1, messageDto.getOtherUserId());
+        assertEquals(2, messageDto.getCardOwner().getId());
+        assertEquals(1, messageDto.getOtherUser().getId());
         assertEquals(8, messageDto.getMessages().size());
         assertEquals("Hello 1 1 2 Again", messageDto.getMessages().get(1).getMessageText());
     }

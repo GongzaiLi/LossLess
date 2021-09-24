@@ -3,6 +3,7 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.Message;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,12 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
 
+    private final UserService userService;
+
     @Autowired
-    public MessageService (MessageRepository messageRepository) {
+    public MessageService (MessageRepository messageRepository, UserService userService) {
         this.messageRepository = messageRepository;
+        this.userService = userService;
     }
 
     /**
@@ -53,15 +57,15 @@ public class MessageService {
     /**
      * Find all messages for a user for a given card. Given that the user does not own the card
      *
-     * @param userId    The id of the user to get messages for
+     * @param user    The id of the user to get messages for
      * @param card      The id of the card to get messages for
      * @return          All messages relating to the user for that card.
      */
-    public GetMessageDto findAllMessagesForUserOnCardTheyDontOwn(Integer userId, Card card) {
+    public GetMessageDto findAllMessagesForUserOnCardTheyDontOwn(User user, Card card) {
 
-        List<Message> messages = messageRepository.findAllByUserIdAndCardId(userId, card.getId());
+        List<Message> messages = messageRepository.findAllByUserIdAndCardId(user.getId(), card.getId());
 
-        return new GetMessageDto(card.getId(), userId, card.getCreator().getId(), messages);
+        return new GetMessageDto(card.getId(), user, card.getCreator(), messages);
     }
 
 
@@ -77,16 +81,17 @@ public class MessageService {
 
         List<GetMessageDto> messageDtos = new ArrayList<>();
 
-        List<Integer> receiverIds = messageRepository.findAllIdsOfUsersWhoHaveMessagedOwnerOfCard(card.getId());
-        List<Integer> senderIds = messageRepository.findAllIdsOfUsersWhoHaveReceivedMessageFromOwnerOfCard(card.getId());
+        List<Integer> senderIds = messageRepository.findAllIdsOfUsersWhoHaveMessagedOwnerOfCard(card.getId());
+        List<Integer> receiverIds = messageRepository.findAllIdsOfUsersWhoHaveReceivedMessageFromOwnerOfCard(card.getId());
 
         HashSet<Integer> messagers = new HashSet<>();
-        messagers.addAll(receiverIds);
         messagers.addAll(senderIds);
+        messagers.addAll(receiverIds);
         messagers.remove(userId);
 
         for (Integer messagerId: messagers) {
-            messageDtos.add(this.findAllMessagesForUserOnCardTheyDontOwn(messagerId, card));
+            User messager = userService.findUserById(messagerId);
+            messageDtos.add(this.findAllMessagesForUserOnCardTheyDontOwn(messager, card));
         }
 
         return messageDtos;
