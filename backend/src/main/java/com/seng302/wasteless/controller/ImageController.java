@@ -351,7 +351,28 @@ public class ImageController {
 
     }
 
+    /**
+     * Handles requests to delete a business's image.
+     * @param businessId Id of business to delete image for
+     * @return 200 OK response if deleted successfully
+     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the business with given id,
+     * 406 NOT ACCEPTABLE if given business doesn't exist
+     */
+    @DeleteMapping("/businesses/{businessId}/image")
+    public ResponseEntity<Object> deleteBusinessImage(@PathVariable("businessId") Integer businessId) {
+        User currentUser = userService.getCurrentlyLoggedInUser();
+        Business businessForImage = businessService.findBusinessById(businessId);
 
+        businessService.checkUserAdminOfBusinessOrGAA(businessForImage, currentUser);
+
+        if (businessForImage.getProfileImage() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given business does not have a profile image");
+        }
+
+        businessService.deleteBusinessImage(businessForImage);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 }
 
