@@ -2,7 +2,9 @@
   <div>
       <b-card class=profile-card>
         <div>
-          <h1><strong> {{ fullCard.title }} </strong></h1>
+          <h1><strong> {{ fullCard.title }} </strong>
+            <b-icon-x class="float-right close" @click="closeFullViewCardModal">
+            </b-icon-x></h1>
           <b-container>
             <h6> Card Listed On: {{ formatCreated }} </h6>
             <h6> Card Ends: {{ formatExpiry }}</h6>
@@ -24,30 +26,29 @@
           </b-card>
           <br>
 
-
-          <b-input-group-text>
-            <b-container>
-              <h6><strong> Creator Info: </strong></h6>
-              <label> Name: {{ fullCard.creator.firstName }} {{ fullCard.creator.lastName }} </label>
-              <br>
-              <label> Location: {{ getAddress }}</label>
-            </b-container>
-          </b-input-group-text>
+          <b-container class="creator-info">
+            <h6><strong> Creator Info: </strong></h6>
+            <label> Name: {{ fullCard.creator.firstName }} {{ fullCard.creator.lastName }} </label>
+            <br>
+            <label> Location: {{ getAddress }}</label>
+          </b-container>
           <br>
           <div>
             <b-button v-if="canDeleteOrExtend" class="button-left" variant="danger"
-                      @click="openDeleteConfirmDialog"> Delete
+                      @click="openDeleteConfirmDialog" title="Delete Card">
+              <b-icon-trash-fill/>
             </b-button>
             <b-button v-if="canDeleteOrExtend && cardWithinExtendPeriod()" class="button-left"
                       variant="success" @click="openExtendConfirmDialog"> Extend
               <b-icon-alarm/>
             </b-button>
-            <b-button v-if="!messageVisible" class="button-middle" variant="primary" @click="messageVisible = true"> Open Messages</b-button>
-            <b-button v-else class="button-middle" variant="primary"  @click="messageVisible = false"> Close Messages</b-button>
-
-            <b-button class="button-right" variant="secondary" @click="closeFullViewCardModal">
-              Close
+            <b-button v-if="!messageVisible" class="button-right" variant="primary" @click="messageVisible = true" title="Open Messages">
+              <b-icon-chat-quote-fill/> Open Messages
             </b-button>
+            <b-button v-else class="button-right" variant="primary"  @click="messageVisible = false" title="Close Messages">
+              <b-icon-chat-quote-fill/> Close Messages
+            </b-button>
+
           </div>
 
 
@@ -68,54 +69,40 @@
         </div>
       </b-card>
 
-      <b-collapse v-model="messageVisible" class="collapse">
-        <b-card>
-          <b-textarea
-              maxlength="250" max-rows="4"
-              type="text" class="messageInputBox mr-4 mb-1"
-              placeholder="Type Message..."
-              v-model="messageText"> Enter message </b-textarea>
-          <b-button variant="primary" @click="sendMessage"> Send </b-button>
-        </b-card>
+      <b-collapse v-model="messageVisible" id="messageBox">
+        <messages :is-card-creator="isCardCreator"></messages>
       </b-collapse>
   </div>
 </template>
 
 <style scoped>
 
-.messageInputBox {
-  max-width: 100%;
-  float: left;
-}
-
-@media(min-width: 992px) {
-  .messageInputBox {
-    max-width: 85%;
-    float: left;
-  }
-}
-
 .button-left{
   float: left;
   margin-left: 1rem;
-  margin-bottom: 3px;
-}
-
-.button-middle{
-  margin-left: 1rem;
-  margin-bottom: 3px;
-
 }
 
 .button-right{
   float: right;
   margin-right: 1rem;
-  margin-bottom: 3px;
-
 }
 
-.collapse{
+.creator-info{
+  width: 100%;
+  text-align: center;
+  background-color: #e9ecef;
+  padding: 0.6rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  color: #495057
+}
+
+#messageBox{
   margin-top: 1rem
+}
+
+label{
+  word-wrap: break-word;
 }
 
 </style>
@@ -123,9 +110,11 @@
 <script>
 import Api from "../../Api";
 import {formatAddress} from "../../util";
+import Messages from "../../components/model/Messages"
 
 export default {
   name: "full-card",
+  components: {Messages},
   props: ["cardId"],
   data() {
     return {
@@ -210,13 +199,6 @@ export default {
     closeFullViewCardModal() {
       this.$emit('closeModal', this.fullCard);
     },
-
-    /**
-     *  TODO
-     */
-    sendMessage() {
-      console.log(this.messageText, this.messageText.length); //TODO
-    }
   },
 
   computed: {
@@ -248,6 +230,14 @@ export default {
      */
     canDeleteOrExtend: function () {
       return (this.fullCard.creator.id === this.$currentUser.id || this.$currentUser.role !== 'user');
+    },
+
+    /**
+     * Returns true if user is creator of the card
+     * @returns {boolean}
+     */
+    isCardCreator: function () {
+      return (this.fullCard.creator.id === this.$currentUser.id);
     }
   }
 }
