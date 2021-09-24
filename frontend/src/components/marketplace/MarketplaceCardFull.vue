@@ -39,12 +39,16 @@
               <b-icon-trash-fill/>
             </b-button>
             <b-button v-if="canDeleteOrExtend && cardWithinExtendPeriod()" class="button-left"
-                      variant="success" @click="openExtendConfirmDialog" title="Extend Expiry">
-              <b-icon-alarm-fill/>
+                      variant="success" @click="openExtendConfirmDialog"> Extend
+              <b-icon-alarm/>
             </b-button>
-            <b-button class="button-right" variant="primary" v-b-toggle.messageBox title="Open Messages">
+            <b-button v-if="!messageVisible" class="button-right" variant="primary" @click="messageVisible = true" title="Open Messages">
               <b-icon-chat-quote-fill/> Open Messages
             </b-button>
+            <b-button v-else class="button-right" variant="primary"  @click="messageVisible = false" title="Close Messages">
+              <b-icon-chat-quote-fill/> Close Messages
+            </b-button>
+
           </div>
 
 
@@ -65,13 +69,34 @@
         </div>
       </b-card>
 
-      <b-collapse id="messageBox">
+      <b-collapse v-model="messageVisible" id="messageBox">
         <messages></messages>
+        <b-card>
+          <b-textarea
+              maxlength="250" max-rows="4"
+              type="text" class="messageInputBox mr-4 mb-1"
+              placeholder="Type Message..."
+              v-model="messageText"> Enter message </b-textarea>
+          <b-button variant="primary" @click="sendMessage"> Send </b-button>
+        </b-card>
       </b-collapse>
   </div>
 </template>
 
 <style scoped>
+
+.messageInputBox {
+  max-width: 100%;
+  float: left;
+}
+
+@media(min-width: 992px) {
+  .messageInputBox {
+    max-width: 85%;
+    float: left;
+  }
+}
+
 .button-left{
   float: left;
   margin-left: 1rem;
@@ -122,6 +147,8 @@ export default {
 
         }
       },
+      messageText: '',
+      messageVisible: false,
     }
   },
   mounted() {
@@ -192,6 +219,13 @@ export default {
     closeFullViewCardModal() {
       this.$emit('closeModal', this.fullCard);
     },
+
+    /**
+     *  TODO
+     */
+    sendMessage() {
+      console.log(this.messageText, this.messageText.length); //TODO
+    }
   },
 
   computed: {
