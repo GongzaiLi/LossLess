@@ -70,12 +70,20 @@
 
       <b-collapse v-model="messageVisible" class="collapse">
         <b-card>
-          <b-textarea
-              maxlength="250" max-rows="4"
-              type="text" class="messageInputBox mr-4 mb-1"
-              placeholder="Type Message..."
-              v-model="messageText"> Enter message </b-textarea>
-          <b-button variant="primary" @click="sendMessage"> Send </b-button>
+          <b-input-group>
+            <b-form-textarea maxlength="250" max-rows="4"
+                             type="text" class="messageInputBox"
+                             placeholder="Type Message..." v-model="messageText">
+            </b-form-textarea>
+            <b-input-group-append @click="messageText=''">
+              <b-input-group-text>
+                <b-icon icon="X" variant="danger"/>
+              </b-input-group-text>
+            </b-input-group-append>
+            <b-input-group-append @click="sendMessage" class="ml-2">
+              <b-button variant="primary"> Send</b-button>
+            </b-input-group-append>
+          </b-input-group>
         </b-card>
       </b-collapse>
   </div>
