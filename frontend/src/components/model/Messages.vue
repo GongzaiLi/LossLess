@@ -12,13 +12,17 @@
       <b-col :lg="isCardCreator?9:12">
         <b-card class="message-box">
         </b-card>
+        <b-input-group>
           <b-textarea
               maxlength=250 max-rows="2"
               no-resize
-              type="text" class="messageInputBox mr-4 mb-1"
+              type="text" class="messageInputBox"
               placeholder="Type Message..."
               v-model="messageText"> Enter message </b-textarea>
-          <b-button variant="primary" @click="sendMessage"> Send </b-button>
+          <b-input-group-append @click="sendMessage">
+            <b-button variant="primary"> Send </b-button>
+          </b-input-group-append>
+        </b-input-group>
       </b-col>
     </b-row>
   </div>
@@ -38,6 +42,7 @@
 }
 
 .messageInputBox {
+  height: 4rem;
   max-width: 100%;
   float: left;
   bottom: 0;
@@ -46,11 +51,6 @@
 @media (min-width: 992px) {
   .chat-list {
     height: 15rem;
-  }
-
-  .messageInputBox {
-    max-width: 83%;
-    float: left;
   }
 }
 
