@@ -52,8 +52,8 @@ public class SalesReportController {
 
     @Autowired
     public SalesReportController(BusinessService businessService,
-                             UserService userService,
-                             PurchasedListingService purchasedListingService) {
+                                 UserService userService,
+                                 PurchasedListingService purchasedListingService) {
         this.businessService = businessService;
         this.userService = userService;
         this.purchasedListingService = purchasedListingService;
@@ -72,9 +72,9 @@ public class SalesReportController {
      */
     @GetMapping("/businesses/{id}/salesReport/totalPurchases")
     public ResponseEntity<Object> getPurchaseDataOfBusiness(@PathVariable("id") Integer businessId,
-                                                              @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                              @RequestParam(value = "endDate", required = false) LocalDate endDate,
-                                                              @RequestParam(value = "period", required = false) String period) {
+                                                            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                                            @RequestParam(value = "period", required = false) String period) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
@@ -211,8 +211,8 @@ public class SalesReportController {
      */
     @GetMapping("/businesses/{id}/salesReport/manufacturersPurchasedTotals")
     public ResponseEntity<Object> getManufacturerPurchasedTotalsOfBusiness(@PathVariable("id") Integer businessId,
-                                                                         @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false) Sort.Direction order) {
+                                                                           @RequestParam(value = "sortBy", required = false) String sortBy,
+                                                                           @RequestParam(value = "order", required = false) Sort.Direction order) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         logger.info("Successfully retrieved business with ID: {}.", businessId);
@@ -251,10 +251,9 @@ public class SalesReportController {
         Business business = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(business, user);
 
-        InputStreamResource fileInputStream = new InputStreamResource(purchasedListingService.getSalesReportCSVByteSteam(business));
+        InputStreamResource fileInputStream = new InputStreamResource(purchasedListingService.getSalesReportCSVByteSteam(business.getId()));
 
         String csvFileName = "salesReport.csv";
-
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + csvFileName);
         headers.set(HttpHeaders.CONTENT_TYPE, "text/csv");

@@ -323,11 +323,11 @@ public class PurchasedListingService {
     /**
      * Get all the sales report data in a as a csv in a ByteArrayInputStream
      *
-     * @param business  The id of the business
+     * @param businessId  The id of the business
      * @return          ByteArrayInputStream of csv file of all the data.
      */
-    public ByteArrayInputStream getSalesReportCSVByteSteam(Business business) {
-        List<PurchasedListing> allPurchasedListings = this.getAllPurchasedListingsForBusiness(business.getId());
+    public ByteArrayInputStream getSalesReportCSVByteSteam(Integer businessId) {
+        List<PurchasedListing> allPurchasedListings = this.getAllPurchasedListingsForBusiness(businessId);
 
         String[] csvHeader = {
                 "saleDate", "numberOfLikes", "listingDate", "closingDate", "productName", "productId", "quantity", "price", "manufacturer"
