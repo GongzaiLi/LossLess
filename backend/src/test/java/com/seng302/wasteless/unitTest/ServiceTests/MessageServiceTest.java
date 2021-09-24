@@ -160,9 +160,9 @@ public class MessageServiceTest {
     @Test
     void whenFindAllMessagesForUserOnCardTheyDoOwn_andOnlyOneConversation_thenGetCorrectMessages() {
         User cardCreator = new User();
-        cardCreator.setId(8);
+        cardCreator.setId(6);
 
-        List<GetMessageDto> messageDto = messageService.findAllMessagesForUserOnCardTheyDoOwn(8, new Card().setId(4).setCreator(cardCreator));
+        List<GetMessageDto> messageDto = messageService.findAllMessagesForUserOnCardTheyDoOwn(6, new Card().setId(4).setCreator(cardCreator));
         assertEquals(1, messageDto.size());
     }
 
