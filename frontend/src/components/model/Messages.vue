@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-row no-gutters>
-      <b-col lg="3" sm="12">
+      <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
           <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead">
             <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/profile-default.jpg')" />
@@ -9,8 +9,18 @@
           </b-list-group-item>
         </b-list-group>
       </b-col>
-      <b-col lg="9">
-        <b-card class="message-box"></b-card>
+      <b-col :lg="isCardCreator?9:12">
+        <div style="border-bottom: #7f7f7f">
+        <b-card class="message-box">
+        </b-card>
+          <b-textarea
+              maxlength=250 max-rows="2"
+              no-resize
+              type="text" class="messageInputBox mr-4 mb-1"
+              placeholder="Type Message..."
+              v-model="messageText"> Enter message </b-textarea>
+          <b-button variant="primary" @click="sendMessage"> Send </b-button>
+        </div>
       </b-col>
     </b-row>
   </div>
@@ -26,12 +36,23 @@
 }
 
 .message-box {
-  height: 15rem;
+  height: 11rem;
+}
+
+.messageInputBox {
+  max-width: 100%;
+  float: left;
+  bottom: 0;
 }
 
 @media (min-width: 992px) {
   .chat-list {
     height: 15rem;
+  }
+
+  .messageInputBox {
+    max-width: 83%;
+    float: left;
   }
 }
 
@@ -58,11 +79,12 @@ div.chat-head:last-child {
 <script>
 
 export default {
-  props: [],
+  props: ['isCardCreator'],
   name: "Messages.vue",
   data() {
     return {
       targetChatHead: null,
+      messageText: '',
       conversations: [
         {
           userId: 0,
@@ -113,6 +135,13 @@ export default {
       this.targetChatHead = event.currentTarget
       this.targetChatHead.classList.add('active')
     },
+
+    /**
+     *  TODO
+     */
+    sendMessage() {
+      console.log(this.messageText, this.messageText.length); //TODO
+    }
   },
 }
 </script>

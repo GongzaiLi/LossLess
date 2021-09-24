@@ -70,32 +70,12 @@
       </b-card>
 
       <b-collapse v-model="messageVisible" id="messageBox">
-        <messages></messages>
-        <b-card>
-          <b-textarea
-              maxlength="250" max-rows="4"
-              type="text" class="messageInputBox mr-4 mb-1"
-              placeholder="Type Message..."
-              v-model="messageText"> Enter message </b-textarea>
-          <b-button variant="primary" @click="sendMessage"> Send </b-button>
-        </b-card>
+        <messages :is-card-creator="isCardCreator"></messages>
       </b-collapse>
   </div>
 </template>
 
 <style scoped>
-
-.messageInputBox {
-  max-width: 100%;
-  float: left;
-}
-
-@media(min-width: 992px) {
-  .messageInputBox {
-    max-width: 85%;
-    float: left;
-  }
-}
 
 .button-left{
   float: left;
@@ -219,13 +199,6 @@ export default {
     closeFullViewCardModal() {
       this.$emit('closeModal', this.fullCard);
     },
-
-    /**
-     *  TODO
-     */
-    sendMessage() {
-      console.log(this.messageText, this.messageText.length); //TODO
-    }
   },
 
   computed: {
@@ -257,6 +230,14 @@ export default {
      */
     canDeleteOrExtend: function () {
       return (this.fullCard.creator.id === this.$currentUser.id || this.$currentUser.role !== 'user');
+    },
+
+    /**
+     * Returns true if user is creator of the card
+     * @returns {boolean}
+     */
+    isCardCreator: function () {
+      return (this.fullCard.creator.id === this.$currentUser.id);
     }
   }
 }
