@@ -1,5 +1,6 @@
 package com.seng302.wasteless.service;
 
+import com.seng302.wasteless.dto.PutBusinessDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.BusinessTypes;
 import com.seng302.wasteless.model.User;
@@ -101,7 +102,7 @@ public class BusinessService {
      */
     public Boolean checkUserAdminOfBusinessOrGAA(Business business, User user) {
         if (!(user.checkUserGlobalAdmin() || business.checkUserIsPrimaryAdministrator(user) || business.checkUserIsAdministrator(user))) {
-            logger.warn("Cannot edit product. User: {} is not global admin or admin of business: {}", user, business);
+            logger.warn("User: {} is not global admin or admin of business: {}", user, business);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request");
         }
         return true;
@@ -154,6 +155,19 @@ public class BusinessService {
 
     }
 
-
-
+    /**
+     * Sets the business details to the modified business details
+     * and updates the database.
+     *
+     * Does not handle address.
+     *
+     * @param business Business to be updated
+     * @param modifiedBusiness Dto containing information needed to update a business
+     */
+    public void updateBusinessDetails(Business business, PutBusinessDto modifiedBusiness) {
+        business.setBusinessType(modifiedBusiness.getBusinessType());
+        business.setName(modifiedBusiness.getName());
+        business.setDescription(modifiedBusiness.getDescription());
+        saveBusinessChanges(business);
+    }
 }

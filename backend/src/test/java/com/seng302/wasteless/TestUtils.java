@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 public class TestUtils {
@@ -33,6 +34,21 @@ public class TestUtils {
         newUser.setHomeAddress(newThrowawayAddress());
         newUser.setCreated(LocalDate.now());
         return newUser;
+    }
+
+    /**
+     * Creates a new business with a given business ID
+     * @param name
+     * @return newBusiness the new created business
+     */
+    public static Business newBusinessWithName(String name) {
+        var newBusiness = new Business();
+        newBusiness.setName(name);
+        newBusiness.setAddress(newThrowawayAddress());
+        newBusiness.setCreated(LocalDate.now());
+        newBusiness.setBusinessType(BusinessTypes.RETAIL_TRADE);
+        newBusiness.setDescription("Description");
+        return newBusiness;
     }
 
     /**
