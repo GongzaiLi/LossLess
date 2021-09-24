@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-card class=profile-card>
+      <b-card>
         <div>
           <h1><strong> {{ fullCard.title }} </strong>
             <b-icon-x class="float-right close" @click="closeFullViewCardModal">
@@ -70,22 +70,6 @@
 
       <b-collapse v-model="messageVisible" id="messageBox">
         <messages :is-card-creator="isCardCreator"></messages>
-        <b-card>
-          <b-input-group>
-            <b-form-textarea maxlength="250" max-rows="4"
-                             type="text" class="messageInputBox"
-                             placeholder="Type Message..." v-model="messageText">
-            </b-form-textarea>
-            <b-input-group-append @click="messageText=''">
-              <b-input-group-text>
-                <b-icon icon="X" variant="danger"/>
-              </b-input-group-text>
-            </b-input-group-append>
-            <b-input-group-append @click="sendMessage" class="ml-2">
-              <b-button variant="primary"> Send</b-button>
-            </b-input-group-append>
-          </b-input-group>
-        </b-card>
       </b-collapse>
   </div>
 </template>
@@ -113,12 +97,16 @@
 }
 
 #messageBox{
-  margin-top: 1rem
+  margin-top: 1rem;
+  transition-duration: 0.15s !important;
 }
 
 label{
   word-wrap: break-word;
 }
+
+
+
 
 </style>
 

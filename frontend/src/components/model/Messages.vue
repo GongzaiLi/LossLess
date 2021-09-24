@@ -12,45 +12,65 @@
       <b-col :lg="isCardCreator?9:12">
         <b-card class="message-box">
         </b-card>
-        <b-input-group>
-          <b-textarea
-              maxlength=250 max-rows="2"
-              no-resize
-              type="text" class="messageInputBox"
-              placeholder="Type Message..."
-              v-model="messageText"> Enter message </b-textarea>
-          <b-input-group-append @click="sendMessage">
-            <b-button variant="primary"> Send </b-button>
-          </b-input-group-append>
-        </b-input-group>
+          <b-input-group>
+            <b-form-textarea no-resize maxlength="250" max-rows="2"
+                             type="text" class="messageInputBox sendMessageGroup"
+                             placeholder="Type Message..." v-model="messageText">
+            </b-form-textarea>
+            <b-input-group-append v-if="messageText" @click="messageText=''">
+              <b-button class="clearButton">
+                <b-icon icon="X" variant="dark"/>
+              </b-button>
+            </b-input-group-append>
+            <b-input-group-append @click="sendMessage" class="ml-2">
+              <b-button class="sendMessageGroup" variant="primary"> Send</b-button>
+            </b-input-group-append>
+          </b-input-group>
       </b-col>
     </b-row>
   </div>
 </template>
 
 <style scoped>
+
+.clearButton {
+  background-color: lightgrey;
+  border-color: lightgrey;
+}
+
 .chat-list {
   height: 7rem;
-  max-height: 15rem;
+  max-height: 18rem;
   overflow-y: auto;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .message-box {
-  height: 11rem;
+  height: 14rem;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom: 0;
 }
+
+.sendMessageGroup {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 
 .messageInputBox {
   height: 4rem;
   max-width: 100%;
   float: left;
   bottom: 0;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
 }
 
 @media (min-width: 992px) {
   .chat-list {
-    height: 15rem;
+    height: 18rem;
   }
 }
 
