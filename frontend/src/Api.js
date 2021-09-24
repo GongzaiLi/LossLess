@@ -204,7 +204,7 @@ export default {
       name: 'United States Dollar'
     };
 
-    return fetch(`https://restcountries.eu/rest/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
+    return fetch(`https://restcountries.com/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 404 || !data[0].currencies || data[0].currencies.length === 0) {
