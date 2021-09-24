@@ -134,7 +134,8 @@ export default {
           startDate: startDate,
           endDate: endDate,
           sortBy: sortBy,
-          order: order
+          order: order,
+          size: 100000 // For some reason pagination defaults to a size of 20, but we want all results
         }
       }),
 
@@ -145,7 +146,8 @@ export default {
           startDate: startDate,
           endDate: endDate,
           sortBy: sortBy,
-          order: order
+          order: order,
+          size: 100000
         }
       }),
 
@@ -204,7 +206,7 @@ export default {
       name: 'United States Dollar'
     };
 
-    return fetch(`https://restcountries.eu/rest/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
+    return fetch(`https://restcountries.com/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 404 || !data[0].currencies || data[0].currencies.length === 0) {
