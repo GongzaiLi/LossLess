@@ -1,10 +1,10 @@
 <template>
   <b-tabs fill>
     <b-tab title="Products" >
-      <top-products-report :date-range="dateRange" :currency="currency" class="mt-4"></top-products-report>
+      <top-report :is-top-products="true" :date-range="dateRange" :currency="currency" class="mt-4"></top-report>
     </b-tab>
     <b-tab title="Manufacturers">
-      <top-manufacturers-report :date-range="dateRange" :currency="currency" class="mt-4"></top-manufacturers-report>
+      <top-report :is-top-products="false" :date-range="dateRange" :currency="currency" class="mt-4"></top-report>
     </b-tab>
     <b-tab title="Listings">
       <listings-durations-graph :date-range="dateRange"/>
@@ -15,13 +15,12 @@
 
 <script>
 
-import TopProductsReport from "./TopProductsReport";
+import TopReport from "./TopReport";
 import ListingsDurationsGraph from "./ListingsDurationsGraph";
-import TopManufacturersReport from "./TopManufacturersReport";
 
 export default {
   name: "extended-sales-report",
-  components: {ListingsDurationsGraph, TopProductsReport, TopManufacturersReport},
+  components: {TopReport, ListingsDurationsGraph},
   props: ["dateRange", "currency"],
 }
 
