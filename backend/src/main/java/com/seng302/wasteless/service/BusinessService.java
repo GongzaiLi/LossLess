@@ -3,6 +3,7 @@ package com.seng302.wasteless.service;
 import com.seng302.wasteless.dto.PutBusinessDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.BusinessTypes;
+import com.seng302.wasteless.model.Image;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.BusinessRepository;
 import org.apache.logging.log4j.LogManager;
@@ -23,10 +24,12 @@ public class BusinessService {
     private static final Logger logger = LogManager.getLogger(BusinessService.class.getName());
 
     private final BusinessRepository businessRepository;
+    private ImageService imageService;
 
     @Autowired
-    public BusinessService(BusinessRepository businessRepository) {
+    public BusinessService(BusinessRepository businessRepository, ImageService imageService) {
         this.businessRepository = businessRepository;
+        this.imageService = imageService;
     }
 
     /**
@@ -153,6 +156,34 @@ public class BusinessService {
     public Integer getTotalBusinessesCountWithQueryAndType(String searchQuery, BusinessTypes businessType) {
         return businessRepository.countBusinessByNameContainsAndBusinessTypeAllIgnoreCase(searchQuery, businessType);
 
+    }
+
+    /**
+     * Add image to a business
+     * Calling the method in this way allows for mocking during automated testing
+     * @param business Business that image is to be added to
+     * @param image image that is to be added to user
+     */
+    public void addImageToBusiness(Business business, Image image) {
+        business.setProfileImage(image);
+        saveBusinessChanges(business);
+    }
+
+    /**
+     * Delete profile image of a business, leaving it null.
+     * The actual image file will also get deleted from the filesystem.
+     * Make sure that the business must have a profile image, otherwise this method will crash.
+     * @param business Business for whom image is to be deleted
+     */
+    public void deleteBusinessImage(Business business) {
+        Image oldBusinessImage = business.getProfileImage();
+
+        // Have to do this before deleting image otherwise we violate a foreign key constraint
+        business.setProfileImage(null);
+        saveBusinessChanges(business);
+
+        imageService.deleteImageRecordFromDB(oldBusinessImage);
+        imageService.deleteImageFile(oldBusinessImage);
     }
 
     /**

@@ -316,5 +316,42 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * Handle request for uploading images for businesses
+     * Allows for GAA/DGAA to upload an image for a business
+     *
+     * 401                      If not currently authenticated
+     * 403 Forbidden            If attempting to make a request to change another businesses image and not DGAA, GAA or business admin
+     * 400 Bad Request          No file content, Bad file type
+     * 406 Not Acceptable       businessId not found
+     *
+     * @param businessId    The id of the business to upload the image for
+     * @param file          The image to upload
+     * @return              The image after uploading, or one of the error codes detailed above.
+     */
+    @PostMapping("/businesses/{businessId}/image")
+    public ResponseEntity<Object> postBusinessImage(@PathVariable("businessId") Integer businessId, @RequestParam("filename") MultipartFile file) {
+        logger.info("Request to upload business image for business: {}", businessId);
+
+        User currentUser = userService.getCurrentlyLoggedInUser();
+        Business businessForImage = businessService.findBusinessById(businessId);
+
+        businessService.checkUserAdminOfBusinessOrGAA(businessForImage, currentUser);
+
+        //Delete old user image if they had one
+        if (businessForImage.getProfileImage() != null) {
+            businessService.deleteBusinessImage(businessForImage);
+        }
+
+        Image newImage = imageService.saveImageWithThumbnail(file);
+
+        businessService.addImageToBusiness(businessForImage, newImage);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
+
+    }
+
+
+
 }
 

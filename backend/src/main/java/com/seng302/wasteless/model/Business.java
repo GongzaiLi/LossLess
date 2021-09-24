@@ -3,6 +3,7 @@ package com.seng302.wasteless.model;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.view.BusinessViews;
 import com.seng302.wasteless.view.ListingViews;
+import com.seng302.wasteless.view.MessageViews;
 import com.seng302.wasteless.view.PurchasedListingView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -62,6 +63,10 @@ public class Business {
 
     @Column(name = "created")
     private LocalDate created;
+
+    @JoinColumn(name = "profile_image")
+    @OneToOne
+    private Image profileImage;
 
     /**
      * Add an administrator to a business
