@@ -55,6 +55,7 @@ beforeEach(() => {
   const localVue = createLocalVue()
   localVue.use(BootstrapVue);
   localVue.use(BootstrapVueIcons);
+  Api.getSalesReport.mockResolvedValue({data: SalesReport});
 
   wrapper = mount(SalesReportTab, { //shallowMount and mount has different work
     localVue,
@@ -131,7 +132,7 @@ describe('check the table fields', () => {
     expect(wrapper.vm.$refs.salesReportTable.$props.fields[2].key).toBe('totalValue');
   });
   it('the date groupBy week', async () => {
-    console.log(wrapper.html());
+
     await wrapper.find('#periodSelector').findAll('option').at(1).setSelected();
     await wrapper.vm.$nextTick();
 
