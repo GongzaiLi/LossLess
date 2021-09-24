@@ -4,14 +4,19 @@ import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +25,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -221,6 +232,41 @@ public class SalesReportController {
         return ResponseEntity.status(HttpStatus.OK).body(manufacturersPurchasedTotals);
 
     }
+
+
+    /**
+     * Create and return a CSV file containing all sales report information (all purchased listings) for a given business
+     *
+     * Returns
+     * 200 and CSV file if okay
+     * 401 if unauthorised
+     * 403 if forbidden from accessing business
+     *
+     * @param businessId    The id of the business to get sales report information for
+     * @return              CSV file of all sales report information
+     */
+    @GetMapping("/businesses/{id}/salesReport/csv")
+    public ResponseEntity<Object> getSalesReportCSV(@PathVariable("id") Integer businessId) {
+        User user = userService.getCurrentlyLoggedInUser();
+        Business business = businessService.findBusinessById(businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(business, user);
+
+        InputStreamResource fileInputStream = new InputStreamResource(purchasedListingService.getSalesReportCSVByteSteam(business));
+
+        String csvFileName = "salesReport.csv";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + csvFileName);
+        headers.set(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+        return new ResponseEntity<>(
+                fileInputStream,
+                headers,
+                HttpStatus.OK
+        );
+    }
+
+
 
     /**
      * Checks if given date ranges are valid for the request to be proceeded further.
