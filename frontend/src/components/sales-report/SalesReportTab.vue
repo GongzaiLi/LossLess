@@ -128,12 +128,13 @@ export default {
      * @param data response data
      **/
     updateTotalResults: function (startDate, endDate, data) {
+      const totalValue = data.reduce((count, item) => {
+        return count + item.totalValue
+      }, 0);
       this.totalResults = {
         startDate,
         endDate,
-        totalValue: data.reduce((count, item) => {
-          return count + item.totalValue
-        }, 0),
+        totalValue: Math.round(totalValue * 100) / 100,
         totalPurchases: data.reduce((count, item) => {
           return count + item.totalPurchases
         }, 0)
