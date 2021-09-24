@@ -70,20 +70,30 @@
 
       <b-collapse v-model="messageVisible" class="collapse">
         <b-card>
-          <b-input type="text" class="messageInputBox mr-4 mb-1" placeholder="Type Message" v-model="messageText"> Enter message </b-input>
+          <b-textarea
+              maxlength="250" max-rows="4"
+              type="text" class="messageInputBox mr-4 mb-1"
+              placeholder="Type Message..."
+              v-model="messageText"> Enter message </b-textarea>
           <b-button variant="primary" @click="sendMessage"> Send </b-button>
         </b-card>
       </b-collapse>
   </div>
 </template>
 
-<style>
+<style scoped>
 
 .messageInputBox {
-  max-width: 85%;
+  max-width: 100%;
   float: left;
 }
 
+@media(min-width: 992px) {
+  .messageInputBox {
+    max-width: 85%;
+    float: left;
+  }
+}
 
 .button-left{
   float: left;
@@ -205,7 +215,7 @@ export default {
      *  TODO
      */
     sendMessage() {
-      console.log(this.messageText); //TODO
+      console.log(this.messageText, this.messageText.length); //TODO
     }
   },
 
