@@ -1,5 +1,6 @@
 package com.seng302.wasteless.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.dto.PostMessageDto;
 import com.seng302.wasteless.model.Card;
@@ -8,6 +9,7 @@ import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.MessageService;
 import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.view.MessageViews;
 import net.minidev.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -100,6 +102,7 @@ public class MessageController {
      * @param cardId    The id of the card to get messages for
      * @return          See above.
      */
+    @JsonView({MessageViews.GetMessageView.class})
     @GetMapping("/messages/{cardId}")
     public ResponseEntity<Object> getMessage(@PathVariable("cardId") Integer cardId) {
         User currentlyLoggedInUser = userService.getCurrentlyLoggedInUser();
@@ -109,7 +112,6 @@ public class MessageController {
         if (cardForMessage.getCreator().getId().equals(currentlyLoggedInUser.getId())) { //Card owner
 
             List<GetMessageDto> messagesDtos = messageService.findAllMessagesForUserOnCardTheyDoOwn(currentlyLoggedInUser.getId(), cardForMessage);
-
             return ResponseEntity.status(HttpStatus.OK).body(messagesDtos);
         } else {    //Not card owner
             GetMessageDto messageDto = messageService.findAllMessagesForUserOnCardTheyDontOwn(currentlyLoggedInUser, cardForMessage);
