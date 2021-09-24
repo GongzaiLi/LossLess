@@ -8,81 +8,23 @@ Date: sprint_6
       <b-list-group>
         <b-list-group-item>
           <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
-          <DateRangeInput @input="getSalesReport" :all-time-start="new Date(business.created)"/>
+          <DateRangeInput v-model="dateRange" @input="gotReport=true" :all-time-start="new Date(business.created)"/>
         </b-list-group-item>
-        <b-list-group-item v-if="totalResults" id="total-results">
-          <b-card-text>
-            <h3>Sales Summary for {{ totalResults.startDate }} {{ totalResults.endDate !== totalResults.startDate ? `to ${totalResults.endDate}` : '' }}</h3>
-            <b-row align-h="start">
-              <b-col cols="4">
-                <h4>{{ totalResults.totalPurchases }} Total Items Sold </h4>
-              </b-col>
-              <b-col cols="4">
-                <h4> {{ currency.symbol }}{{ totalResults.totalValue }} {{ currency.code }} Total Value</h4>
-              </b-col>
-            </b-row>
-          </b-card-text>
-        </b-list-group-item>
-        <b-list-group-item v-show="totalResults">
-          <b-overlay :show="loading" rounded="sm">
-          <b-row>
-            <b-col class="mt-2">
-              <b-row>
-                <b-col cols="4"><h3>Sales Details</h3></b-col>
-                <b-col cols="4">
-                  <b-form-select v-model="groupBy" id="periodSelector"
-                                 @change="getSalesReport(dateRange)">
-                    <option v-for="[option, name] in Object.entries(groupByOptions)" :key="option" :value="option">{{
-                        name
-                      }}
-                    </option>
-                  </b-form-select>
-                </b-col>
-              </b-row>
-              <b-row>
-                <b-col>
-                  <b-table
-                      striped hovers
-                      ref="salesReportTable"
-                      no-border-collapse
-                      :items="groupedResults"
-                      :fields="fields"
-                      :per-page="perPage"
-                      :current-page="currentPage"
-                      responsive="lg"
-                      bordered
-                      show-empty>
-                    <template #empty>
-                      <h3 class="no-results-overlay">No results to display</h3>
-                    </template>
-                  </b-table>
-                </b-col>
-              </b-row>
-            </b-col>
-            <b-col>
-              <h3>Sales Graph</h3>
-              <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" v-on:finishedLoading="finishedLoadingGraph"/>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col b-col lg="4" md="5" sm="12" v-show="groupedResults.length">
-              <b-pagination
-                  v-model="currentPage"
-                  :total-rows="groupedResults.length"
-                  :per-page="perPage"
-                  aria-controls="my-table"
-              ></b-pagination>
-            </b-col>
-            <b-col lg="4" md="4" sm="12">
-              <b-button variant="primary" class="w-100" v-if="!extendedReportShown" @click="showExtendedReport">Show extended sales report</b-button>
-            </b-col>
-          </b-row>
-          </b-overlay>
-        </b-list-group-item>
+      <b-tabs fill v-if="gotReport">
+        <b-tab title="Sales">
+          <sales-report-tab :date-range="dateRange" :currency="currency"/>
+        </b-tab>
+        <b-tab title="Products" >
+          <top-report :is-top-products="true" :date-range="dateRange" :currency="currency"></top-report>
+        </b-tab>
+        <b-tab title="Manufacturers">
+          <top-report :is-top-products="false" :date-range="dateRange" :currency="currency"></top-report>
+        </b-tab>
+        <b-tab title="Listings">
+          <listings-durations-graph :date-range="dateRange"/>
+        </b-tab>
+      </b-tabs>
       </b-list-group>
-      <b-list-group-item v-show="totalResults" id="extended-sales-report">
-        <extended-sales-report :dateRange="dateRange" :currency="currency" v-if="extendedReportShown"></extended-sales-report>
-      </b-list-group-item>
     </b-card>
     <b-card id="inventory-locked-card" v-if="!canViewReport">
       <b-card-title>
@@ -105,33 +47,27 @@ Date: sprint_6
 <script>
 import Api from "../../Api";
 import DateRangeInput from "./DateRangeInput";
-import {formatDate, getMonthName} from "../../util";
-import SalesReportGraph from "./SalesReportGraph";
-import EventBus from "../../util/event-bus";
-import ExtendedSalesReport from "./ExtendedSalesReport";
+import SalesReportTab from "./SalesReportTab";
+import TopReport from "./TopReport";
+import ListingsDurationsGraph from "./ListingsDurationsGraph";
+
 
 export default {
   name: "sales-report-page",
-  components: {ExtendedSalesReport, SalesReportGraph, DateRangeInput},
+  components: {SalesReportTab, DateRangeInput, TopReport, ListingsDurationsGraph},
   data: function () {
     return {
       business: {},
       currency: {},
-      groupBy: "year",
-      totalResults: null,
-      groupedResults: [],
-      currentPage: 1,
-      perPage: 10,
       dateRange: [],
       loading: false,
-      extendedReportShown: false
+      gotReport: false
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
     this.getBusiness(businessId);
-    EventBus.$on('finishedLoading', this.finishedLoadingGraph)
   },
 
   methods: {
@@ -158,70 +94,7 @@ export default {
     async getCurrency(business) {
       this.currency = await Api.getUserCurrency(business.address.country);
     },
-
-    /**
-     * Uses Api.js to send a get request with the getSalesReport.
-     * This is used to search the sales report.
-     * @param dateRange
-     **/
-    getSalesReport: async function (dateRange) {
-      this.loading = true;
-      if (this.dateRange !== dateRange) {
-        this.dateRange = dateRange;
-        // The group by options may have changed due to the changed date range (see the groupByOptions computed property)
-        // so if the selected option has been invalidated, then select the last available options.
-        const optionNames = Object.keys(this.groupByOptions);
-        this.groupBy = optionNames[optionNames.length - 1];
-      }
-
-      if (this.dateRange != null && this.dateRange.length) {
-        const businessId = this.$route.params.id;
-        const startDate = formatDate(dateRange[0]);
-        const endDate = formatDate(dateRange[1]);
-        await Api.getSalesReport(businessId, startDate, endDate, this.groupBy)
-            .then((response) => {
-              this.updateTotalResults(startDate, endDate, response.data);
-              this.groupedResults = response.data;
-            }).catch((error) => {
-              this.$log.debug("Error message", error);
-            });
-      }
-    },
-
-    /**
-     * update the Sales Summary from the response data.
-     * @param startDate
-     * @param endDate
-     * @param data response data
-     **/
-    updateTotalResults: function (startDate, endDate, data) {
-      this.totalResults = {
-        startDate,
-        endDate,
-        totalValue: data.reduce((count, item) => {
-          return count + item.totalValue
-        }, 0),
-        totalPurchases: data.reduce((count, item) => {
-          return count + item.totalPurchases
-        }, 0)
-      }
-    },
-
-    /**
-     * This shows the graph now that it has finished loading.
-     */
-    finishedLoadingGraph: function () {
-      this.loading = false;
-    },
-
-    showExtendedReport: async function () {
-      this.extendedReportShown = true;
-      await this.$nextTick(); // Wait for v-if to take effect and extended report to be shown
-
-      document.getElementById('extended-sales-report').scrollIntoView({behavior: 'smooth'});
-    }
   },
-
 
   computed: {
     /**
@@ -242,66 +115,6 @@ export default {
         }
       }
       return null;
-    },
-
-    /**
-     * the table has different column in day, month, year and week.
-     * @returns Array
-     */
-    fields: function () {
-
-      let fields = [
-        {key: 'totalPurchases', sortable: true},
-        {key: 'totalValue', sortable: true}
-      ]
-
-      switch (this.groupBy) {
-        case "day" :
-          fields.unshift({key: 'startDate', sortable: true, label: 'Date'});
-          break;
-        case "week" :
-          fields.unshift({key: 'startDate', sortable: true}, {key: 'endDate', sortable: true});
-          break;
-        case "month" :
-          fields.unshift({
-            key: 'startDate', sortable: true, label: 'Month', formatter: (value) => {
-              return `${getMonthName(new Date(value).getMonth())} ${new Date(value).getFullYear()}`;
-            }
-          });
-          break;
-        case "year" :
-          fields.unshift({
-            key: 'endDate', sortable: true, label: 'Year', formatter: (value) => {
-              return new Date(value).getFullYear();
-            }
-          });
-          break;
-      }
-
-      return fields
-    },
-    /**
-     * Computed value for the options that the user has to group the sales report by.
-     * Doesn't allow users to group by a period that is larger than their selected period.
-     * For example, if the selected range is one month, then the available options are Daily and Weekly.
-     * If the selected range is one day, then the only option is Daily.
-     */
-    groupByOptions: function() {
-      const options = {
-        day: 'Daily',
-      };
-      const dateDiffDays = Math.ceil((this.dateRange[1] - this.dateRange[0]) / (1000 * 60 * 60 * 24));
-      if (dateDiffDays > 7) {
-        options.week = 'Weekly';
-      }
-      if (dateDiffDays > 31) {
-        options.month = 'Monthly';
-      }
-      if (dateDiffDays > 365) {
-        options.year = 'Yearly';
-      }
-
-      return options;
     },
   },
 }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-2">
     <b-row class="mt-3">
       <b-col offset-lg="2"><h3 class="text-center">Durations between sale and closing dates</h3></b-col>
       <b-col lg="3">
@@ -133,6 +133,11 @@ export default {
         this.chart.options.scales.xAxis.max = maxDuration + this.granularity;
         this.chart.update();
        }
+    }
+  },
+  watch: {
+    dateRange() {
+      this.updateChart();
     }
   }
 }
