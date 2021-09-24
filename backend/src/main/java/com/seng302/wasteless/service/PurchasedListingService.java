@@ -172,7 +172,7 @@ public class PurchasedListingService {
             fakeListing.setClosingDate(fakeListing.getSaleDate().plusDays(generator.nextInt(7)+1L).atTime(LocalTime.now()));
             fakeListing.setProduct(product);
             fakeListing.setQuantity(generator.nextInt(5) + 1);
-            fakeListing.setManufacturer(business.getName()+(i%3));
+            fakeListing.setManufacturer(product.getManufacturer());
             double price = Math.round(generator.nextDouble()*30);
             fakeListing.setPrice(price);
             fakeListing.setNumberOfLikes(generator.nextInt(50));
