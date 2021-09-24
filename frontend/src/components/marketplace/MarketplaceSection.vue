@@ -66,7 +66,7 @@
       </b-table>
     </div>
     <pagination @input="pageChanged" :per-page="perPage" :total-items="totalItems" v-show="totalItems > 0"/>
-    <b-modal :id="`full-card-${this.section}`" hide-header hide-footer>
+    <b-modal :id="`full-card-${this.section}`" size="lg" hide-header hide-footer>
       <MarketplaceCardFull
           :cardId = "cardId"
           v-on:cardChanged="refreshData"

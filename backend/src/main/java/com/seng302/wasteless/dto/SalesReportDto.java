@@ -1,15 +1,10 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
-import com.seng302.wasteless.model.Listing;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Data transfer object for SalesReport endpoint, used to return the correct data in the correct format.

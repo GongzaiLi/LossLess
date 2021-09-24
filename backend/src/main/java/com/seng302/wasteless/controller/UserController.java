@@ -368,7 +368,7 @@ public class UserController {
      * @return  Response code with message, see above for codes
      */
     @PutMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> modifyUser(@Valid @RequestBody PutUserDto modifiedUser, @PathVariable("id") Integer userId) {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
