@@ -67,9 +67,9 @@ public class MessageServiceTest {
         messageService.createMessage(message7);
         Message message8 = new Message(1, 1, 4, "Hello 1 1 4", LocalDateTime.now());
         messageService.createMessage(message8);
-        Message message9 = new Message(4, 7, 8, "Hello 4 9 8", LocalDateTime.now());
+        Message message9 = new Message(4, 5, 6, "Hello 4 9 8", LocalDateTime.now());
         messageService.createMessage(message9);
-        Message message10 = new Message(4, 8, 7, "Hello 4 8 9", LocalDateTime.now());
+        Message message10 = new Message(4, 6, 5, "Hello 4 8 9", LocalDateTime.now());
         messageService.createMessage(message10);
 
 
@@ -79,9 +79,6 @@ public class MessageServiceTest {
         createUser(4);
         createUser(5);
         createUser(6);
-        createUser(7);
-        createUser(8);
-
 
     }
 
