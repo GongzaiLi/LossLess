@@ -59,11 +59,19 @@
           Get Report
         </b-button>
       </b-col>
+
+      <b-col lg="10">
+        <b-button @click="downloadCSV('salesreport.csv')">
+          Download All Sales Report Data As CSV
+        </b-button>
+      </b-col>
     </b-row>
   </b-form>
 </template>
 
 <script>
+import Api from "@/Api";
+
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export default {
   name: "DateRangeInput",
@@ -89,6 +97,23 @@ export default {
     }
   },
   methods: {
+    /**
+     * Download all report data as CSV. Gets CSV from backend for this business
+     * then downloads it to users device.
+     *
+     * @param filename name to give the file
+     */
+    async downloadCSV(filename) {
+      await Api.getSalesReportCsv(this.$route.params.id)
+          .then(response => {
+            const blob = new Blob([response.data], { type: 'text/csv' })
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.download = filename
+            link.click()
+            URL.revokeObjectURL(link.href)
+          }).catch(console.error);
+    },
     /**
      * Returns true if the day is in the future. This function is used for the date-disabled-fn prop
      * in the day pickers.
