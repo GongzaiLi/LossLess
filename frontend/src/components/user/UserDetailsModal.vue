@@ -128,7 +128,7 @@ import Api from "../../Api";
 import AddressInput from "../model/AddressInput";
 import PasswordInput from "../model/PasswordInput";
 import EventBus from "../../util/event-bus"
-import ProfileImage from "./ProfileImage";
+import ProfileImage from "../model/ProfileImage";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 120;

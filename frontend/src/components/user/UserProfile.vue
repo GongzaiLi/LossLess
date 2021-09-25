@@ -201,7 +201,7 @@ h6 {
 import api from "../../Api";
 import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
-import ProfileImage from "./ProfileImage";
+import ProfileImage from "../model/ProfileImage";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util/index";
 

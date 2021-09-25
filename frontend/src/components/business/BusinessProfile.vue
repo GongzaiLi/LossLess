@@ -13,10 +13,16 @@ Date: 29/03/2021
     >
       <template #header>
         <b-row>
-          <b-col>
+          <b-img :src="businessData.profileImage ? getURL(businessData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+                 alt="User Profile Image" width="75" height="75" class="rounded-circle"
+                 id="profile-image"
+                 title="View profile image"
+          />
+          <b-col class="mt-2">
             <h4 class="mb-1">{{ businessData.name }}</h4>
             Registered on: <member-since :date="businessData.created"/>
           </b-col>
+          <b-icon-pencil-fill class="close" @click="$bvModal.show('edit-business-profile')" title="Update Business Profile"></b-icon-pencil-fill>
         </b-row>
       </template>
 
@@ -169,6 +175,11 @@ Date: 29/03/2021
       <make-admin-modal :make-admin-action="this.makeAdminAction"/>
       <b-alert :show="makeAdminError.length > 0 ? 120 : 0" variant="danger">{{ makeAdminError }}</b-alert>
     </b-modal>
+
+    <b-modal id="edit-business-profile" title="Update Business Profile" hide-footer scrollable>
+      <CreateBusiness :is-edit-business="true" :business-details="businessData"/>
+    </b-modal>
+
   </div>
 
 
@@ -181,6 +192,12 @@ Date: 29/03/2021
   margin-right: auto;
 }
 
+#profile-image {
+  margin-left: 1rem;
+  position: relative;
+  object-fit: cover;
+}
+
 h6 {
   line-height: 1.4;
 }
@@ -191,9 +208,11 @@ import memberSince from "../model/MemberSince";
 import api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
 import {formatAddress} from "../../util";
+import CreateBusiness from "./CreateEditBusiness";
 
 export default {
   components: {
+    CreateBusiness,
     memberSince,
     makeAdminModal
   },
