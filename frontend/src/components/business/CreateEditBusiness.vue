@@ -176,7 +176,7 @@ export default {
   methods: {
 
     /**
-     * Wh
+     * Handles submit event if isEditBusiness then updateBusiness is called else createBusiness is called
      */
     async submit(event) {
       event.preventDefault();
