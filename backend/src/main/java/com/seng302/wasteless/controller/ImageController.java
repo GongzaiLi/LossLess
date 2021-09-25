@@ -338,7 +338,7 @@ public class ImageController {
 
         businessService.checkUserAdminOfBusinessOrGAA(businessForImage, currentUser);
 
-        //Delete old user image if they had one
+        //Delete old business image if they had one
         if (businessForImage.getProfileImage() != null) {
             businessService.deleteBusinessImage(businessForImage);
         }
