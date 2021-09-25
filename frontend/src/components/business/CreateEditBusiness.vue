@@ -14,7 +14,7 @@ Date: 26/3/2021
     <br>
     <b-card class="shadow" v-if="canCreateBusiness || isEditBusiness">
       <b-form
-          @submit="(isEditBusiness)?updateBusiness:createBusiness"
+          @submit="submit"
       >
         <h1 v-if="!isEditBusiness"> Create a Business </h1>
         <h5 v-else> Business Details</h5>
@@ -53,7 +53,7 @@ Date: 26/3/2021
 
         <b-row>
           <b-col cols="auto" class="mr-auto p-3">
-            <b-button variant="primary" type="submit" id="create-btn">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
+            <b-button variant="primary" type="submit" id="submit-button">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
           </b-col>
           <b-col cols="auto" class="p-3">
             <b-button v-show="isEditBusiness" id="cancel-button" @click="$bvModal.hide('edit-business-profile')" >Cancel</b-button>
@@ -117,7 +117,7 @@ Date: 26/3/2021
   margin-top: 0.7rem;
 }
 
-#create-btn {
+#submit-button {
   margin-top: 0.7rem;
 }
 </style>
@@ -174,6 +174,18 @@ export default {
   },
 
   methods: {
+
+    /**
+     * Wh
+     */
+    async submit(event) {
+      event.preventDefault();
+      if (this.isEditBusiness) {
+        await this.updateBusiness()
+      } else {
+        await this.createBusiness()
+      }
+    },
 
     /**
      * Makes a request to the API to register a business with the form input.

@@ -1,18 +1,35 @@
-import {mount, createLocalVue, config} from '@vue/test-utils';
+import {mount, createLocalVue, config, shallowMount} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import CreateBusiness from '../../components/business/CreateEditBusiness';
+import CreateEditBusiness from '../../components/business/CreateEditBusiness';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
 
 jest.mock('../../Api');
+jest.mock("../../../public/profile-default.jpg", () => {
+}) // mock image
 
 let $currentUser = {
   id: 1,
   dateOfBirth: '01/01/2001',
   currentlyActingAs: null
 }
+
 const $log = {
   debug: jest.fn(),
+};
+
+const businessDetails = {
+  name: "Wonka Water",
+  description: "Water yum water",
+  type: "Retail trade",
+  address: {
+    streetNumber: 481,
+    streetName: "Schroeders Avenue",
+    city: "Fairview",
+    region: "Nevada",
+    country: "Sierra Leone",
+    postcode: 4740
+  }
 };
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -29,24 +46,8 @@ let wrapper;
 
 const router = new VueRouter();
 
-
-const name = "countdown"
-const description = "Countdown is New Zealand’s leading supermarket brand, serving more than 3 million " +
-  "customers every week.";
-const type = "Retail Trade";
-const address = {
-  streetNumber: "17",
-  streetName: "Chappie Place",
-  suburb: "Hornby",
-  city: "Christchurch",
-  region: "Christchurch",
-  country: "NZ",
-  postcode: "8042"
-};
-
-
 beforeEach(() => {
-  wrapper = mount(CreateBusiness, {
+  wrapper = mount(CreateEditBusiness, {
     localVue,
     router,
     props: {
@@ -60,31 +61,81 @@ afterEach(() => {
   wrapper.destroy();
 });
 
-describe('CreateBusiness Script Testing', () => {
+describe('CreateEditBusiness Script Testing', () => {
   test('is a Vue instance', () => {
     expect(wrapper.isVueInstance).toBeTruthy();
   });
 
-  // test('Create button exists and gets called', async () => {
-  //   const createBusiness = jest.fn();
-  //
-  //   wrapper = mount(CreateBusiness, {
-  //     localVue,
-  //     methods: {
-  //       createBusiness
-  //     },
-  //     mocks: {$log, $currentUser}
-  //   });
-  //
-  //
-  //   const button = wrapper.find("button");
-  //
-  //   button.trigger("submit");
-  //   expect(createBusiness).toHaveBeenCalledTimes(1);
-  //
-  //   button.trigger("submit");
-  //   expect(createBusiness).toHaveBeenCalledTimes(2);
-  // });
+  test('Submit button exists, and not edit business then createBusiness method is called', async () => {
+    const createBusiness = jest.fn();
+    const updateBusiness = jest.fn();
+
+    wrapper = mount(CreateEditBusiness, {
+      localVue,
+      propsData: {
+        isEditBusiness: false
+      },
+      methods: {
+        createBusiness,
+        updateBusiness
+      },
+      mocks: {$log, $currentUser}
+    });
+
+    const button = wrapper.find("#submit-button");
+
+    button.trigger("submit");
+    expect(createBusiness).toHaveBeenCalledTimes(1);
+
+    button.trigger("submit");
+    expect(createBusiness).toHaveBeenCalledTimes(2);
+  });
+
+  test('Submit button exists, and is edit business then updateBusiness method is called', async () => {
+    const createBusiness = jest.fn();
+    const updateBusiness = jest.fn();
+
+    wrapper = mount(CreateEditBusiness, {
+      localVue,
+      propsData: {
+        isEditBusiness: true, businessDetails: businessDetails
+      },
+      methods: {
+        createBusiness,
+        updateBusiness
+      },
+      mocks: {$log, $currentUser}
+    });
+
+    const button = wrapper.find("#submit-button");
+
+    button.trigger("submit");
+    expect(updateBusiness).toHaveBeenCalledTimes(1);
+
+    button.trigger("submit");
+    expect(updateBusiness).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('Testing-beforeMount-when-is-edit-business-modal', () => {
+  let wrapperNew;
+
+  beforeEach(() => {
+    wrapperNew = shallowMount(CreateEditBusiness, {
+      localVue,
+      router,
+      propsData: {isEditBusiness: true, businessDetails: businessDetails},
+      mocks: {$log, $currentUser: JSON.parse(JSON.stringify($currentUser))}
+    });
+  })
+
+  afterEach(() => {
+    wrapperNew.destroy();
+  });
+
+  test('Testing-beforeMount-when-is-edit-business-modal-businessData-is-set-up',  () => {
+    expect(wrapperNew.vm.businessData).toStrictEqual(businessDetails);
+  });
 });
 
 describe('Testing api post request and the response method with errors', () => {

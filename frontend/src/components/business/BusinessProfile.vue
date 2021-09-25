@@ -177,7 +177,7 @@ Date: 29/03/2021
     </b-modal>
 
     <b-modal id="edit-business-profile" title="Update Business Profile" hide-footer scrollable>
-      <CreateBusiness :is-edit-business="true" :business-details="businessData"/>
+      <CreateEditBusiness :is-edit-business="true" :business-details="businessData"/>
     </b-modal>
 
   </div>
@@ -208,11 +208,11 @@ import memberSince from "../model/MemberSince";
 import api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
 import {formatAddress} from "../../util";
-import CreateBusiness from "./CreateEditBusiness";
+import CreateEditBusiness from "./CreateEditBusiness";
 
 export default {
   components: {
-    CreateBusiness,
+    CreateEditBusiness,
     memberSince,
     makeAdminModal
   },
