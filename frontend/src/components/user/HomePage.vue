@@ -67,7 +67,7 @@
           <h6 v-else> You have no archived notifications </h6>
         </b-card>
         <b-card v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)" visible>
-          <notification :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
+          <notification :archived-selected="isArchivedSelected" :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
         </b-card>
       </div>
     </b-card>

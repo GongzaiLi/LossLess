@@ -8,6 +8,8 @@ import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,171 +102,59 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .thenReturn(currentUser);
     }
 
-    @Test
-     void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromDGAA_thenOk() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/users/1/makeAdmin", "/users/2/makeAdmin", "/users/2/revokeAdmin", "/users/1/revokeAdmin"})
+     void whenTryMakeOrRevokeUserAdmin_andUserIsUserOrGAARole_andRequestFromDGAA_thenOk(String request) throws Exception {
         login(defaultAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
+        mockMvc.perform(MockMvcRequestBuilders.put(request)
                 .with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
-     void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
-        login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-     void whenTryMakeUserAdmin_andUserIsUserRole_andRequestFromUser_thenForbidden() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-
-
-
-    @Test
-     void whenTryMakeUserAdmin_andUserDoesNotExist_andRequestFromUser_then406Response() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/4/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-     void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then406Response() throws Exception {
+    void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then406Response() throws Exception {
         login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isNotAcceptable());
     }
 
-    @Test
-     void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromGAA_then403Response() throws Exception {
-        login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
-     void whenTryMakeUserAdmin_andUserIsDGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-     void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
-        login(defaultAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-     void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
-        login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-     void whenTryMakeUserAdmin_andUserIsGAARole_andRequestFromUser_then403Response_insteadOf400_becauseForbiddenTakesPrecedence() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-     void whenTryRevokeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then409Response_asAdminCannotRevokeOwnRights() throws Exception {
+    void whenTryRevokeUserAdmin_andUserIsDGAARole_andRequestFromDGAA_then409Response_asAdminCannotRevokeOwnRights() throws Exception {
         login(defaultAdmin);
         mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
                 .with(csrf()))
                 .andExpect(status().isConflict());
     }
 
-
     @Test
-     void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromDGAA_then200Response() throws Exception {
-        login(defaultAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-     void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromDGAA_then200Response() throws Exception {
-        login(defaultAdmin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isOk());
-    }
-
-
-    @Test
-     void whenTryRevokeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
+    void whenTryMakeOrRevokeUserAdmin_andUserIsGAARole_andRequestFromGAA_then403Response() throws Exception {
         login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
+        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/makeAdmin")
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-     void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromGAA_then403Response() throws Exception {
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/users/1/makeAdmin","/users/3/makeAdmin", "/users/2/revokeAdmin", "/users/3/revokeAdmin", "/users/1/revokeAdmin"})
+    void whenTryMakeUserAdmin_andUserIsUserOrDGAARole_andRequestFromGAA_then403Response(String request) throws Exception {
         login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
+        mockMvc.perform(MockMvcRequestBuilders.put(request)
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-     void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromGAA_then403Response() throws Exception {
-        login(admin);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-
-    @Test
-     void whenTryRevokeUserAdmin_andUserGAARole_andRequestFromUser_then403Response() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/users/1/makeAdmin", "/users/4/makeAdmin", "/users/3/makeAdmin", "/users/2/makeAdmin",
+            "/users/2/revokeAdmin", "/users/3/revokeAdmin", "/users/4/revokeAdmin", "/users/1/revokeAdmin"})
+     void whenTryMakeOrRevokeUserAdmin_andUserIsAnyRole_andRequestFromUser_thenForbidden(String request) throws Exception {
         login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/2/revokeAdmin")
+        mockMvc.perform(MockMvcRequestBuilders.put(request)
                 .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
-    @Test
-     void whenTryRevokeUserAdmin_andUserDGAARole_andRequestFromUser_then403Response() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/3/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-
-    @Test
-     void whenTryRevokeUserAdmin_andDoesNotExist_andRequestFromUser_then403Response() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/4/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-
-    @Test
-     void whenTryRevokeUserAdmin_andUserIsUserRole_andRequestFromUser_then403Response() throws Exception {
-        login(user);
-        mockMvc.perform(MockMvcRequestBuilders.put("/users/1/revokeAdmin")
-                .with(csrf()))
-                .andExpect(status().isForbidden());
-    }
 }

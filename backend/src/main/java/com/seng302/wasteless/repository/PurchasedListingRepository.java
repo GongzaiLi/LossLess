@@ -1,6 +1,8 @@
 package com.seng302.wasteless.repository;
 
+import com.seng302.wasteless.model.ProductSummary;
 import com.seng302.wasteless.model.PurchasedListing;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -64,50 +66,27 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @param startDate     The start date for the date range. Format yyyy-MM-dd
      * @param endDate       The end date for the date range. Format yyyy-MM-dd
      */
-    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.business = :businessId and PL.saledate >= :startDate" +
-            " and PL.saledate <= :endDate ", nativeQuery = true)
+    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.business = :businessId and PL.saleDate >= :startDate" +
+            " and PL.saleDate <= :endDate ", nativeQuery = true)
     Double sumPriceByBusiness_IdAndSaleDateBetween(@Param("businessId") Integer businessId,
                                                     @Param("startDate") LocalDate startDate,
                                                     @Param("endDate") LocalDate endDate);
 
     /**
-     * Returns total number of sales for a given product.
+     * Returns total sales, value and likes for purchases of a business, grouped by product
      *
-     * Business id does not need to be supplied as all product database ids are unique and this method
-     * is not accessed without user being authenticated as a owner of a business of which this product
-     * was created.
-     *
-     * @param productId     The database id of the product
-     * @return              total number of sales for a given product of a business.
+     * @param businessId Id of business to get purchases for
+     * @param startDate  Start of date range to get purchases for
+     * @param endDate    End of date range to get purchases for
+     * @param pageable   Pageable object representing pagination and sorting
+     * @return total sales, value and likes for purchases of a business, grouped by product
      */
-    @Query(value = "select sum(PL.quantity) from PurchasedListing PL where PL.product = :productId", nativeQuery = true)
-    Integer sumProductsSoldByProduct_DatabaseId(@Param("productId") Long productId);
-
-    /**
-     * Returns total price of all sales for a given product
-     *
-     * @param productId     The database id of the product
-     * @return              total price of all sales for a given product
-     */
-    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.product = :productId", nativeQuery = true)
-    Double sumPriceByProduct_DatabaseId(@Param("productId") Long productId);
-
-    /**
-     * Returns total likes of all sales for a given product
-     *
-     * @param productId     The database id of the product
-     * @return              total likes of all sales for a given product
-     */
-    @Query(value = "select sum(PL.numberoflikes) from PurchasedListing PL where PL.product = :productId", nativeQuery = true)
-    Integer sumTotalLikesByProduct_DatabaseId(@Param("productId") Long productId);
-
-    /**
-     * Returns list of database ids of all products that a business has sold any amount of
-     *
-     * @param businessId    the id of the business
-     */
-    @Query(value = "select distinct(PL.product) from PurchasedListing PL where PL.business = :businessId", nativeQuery = true)
-    List<Long> getAllProductDatabaseIdsBySalesOfBusiness(@Param("businessId") Integer businessId);
+    @Query(value = "SELECT PL.product AS productId, SUM(PL.price) AS value, SUM(PL.numberoflikes) AS likes, SUM(PL.quantity) AS quantity " +
+            "from PurchasedListing PL " +
+            "where PL.business = :businessId and PL.saleDate >= :startDate and PL.saleDate <= :endDate " +
+            "GROUP BY PRODUCT ", nativeQuery = true)
+    List<ProductSummary> getPurchasesGroupedByProduct(Integer businessId, LocalDate startDate,
+                                                      LocalDate endDate, Pageable pageable);
 
     /**
      * Returns total number of sales for a given manufacturer.
