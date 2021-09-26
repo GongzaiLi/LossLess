@@ -166,31 +166,31 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetSalesReportData_andNoPeriodSet_thenReturnedDataHasLength1() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataNoPeriod(business.getId(), LocalDate.now().minusDays(3), LocalDate.now().plusDays(3));
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataNoPeriod(business.getId(), LocalDate.now().minusDays(3), LocalDate.now().plusDays(3));
         assertEquals(1, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsDayIn5DayDateRange_thenReturnedDataHasLength5() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusDays(4), LocalDate.now(), LocalDate.now().plusDays(4), Period.ofDays(1));
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusDays(4), LocalDate.now(), LocalDate.now().plusDays(4), Period.ofDays(1));
         assertEquals(5, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsWeekIn7WeekDateRange_thenReturnedDataHasLength7() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusWeeks(6), LocalDate.now(), LocalDate.now().plusWeeks(6), Period.ofWeeks(1));
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusWeeks(6), LocalDate.now(), LocalDate.now().plusWeeks(6), Period.ofWeeks(1));
         assertEquals(7, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsMonthIn3MonthDateRange_thenReturnedDataHasLength3() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusMonths(2), LocalDate.now().minusDays(1), LocalDate.now().plusMonths(2), Period.ofMonths(1));
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusMonths(2), LocalDate.now().minusDays(1), LocalDate.now().plusMonths(2), Period.ofMonths(1));
         assertEquals(3, salesReportData.size());
     }
 
     @Test
     void whenGetSalesReportData_andPeriodIsYearIn4YearDateRange_thenReturnedDataHasLength4() {
-        List<SalesReportDto> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusYears(3), LocalDate.now(), LocalDate.now().plusYears(3), Period.ofYears(1));
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.now(), LocalDate.now().plusYears(3), LocalDate.now(), LocalDate.now().plusYears(3), Period.ofYears(1));
         assertEquals(4, salesReportData.size());
     }
 

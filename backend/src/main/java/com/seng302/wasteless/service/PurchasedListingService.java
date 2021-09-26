@@ -94,8 +94,8 @@ public class PurchasedListingService {
      * @param periodOfData the specified period for datta
      * @return a list of SalesReportDtos to be sent to the frontend
      */
-    public List<SalesReportDto> getSalesReportDataWithPeriod(Integer businessId, LocalDate startDate, LocalDate endDate, LocalDate firstPeriodStart, LocalDate lastPeriodEnd, Period periodOfData) {
-        List<SalesReportDto> responseBody = new ArrayList<>();
+    public List<SalesReportSinglePeriod> getSalesReportDataWithPeriod(Integer businessId, LocalDate startDate, LocalDate endDate, LocalDate firstPeriodStart, LocalDate lastPeriodEnd, Period periodOfData) {
+        List<SalesReportSinglePeriod> salesReport = new ArrayList<>();
 
         LocalDate searchStart;
         LocalDate searchEnd;
@@ -115,10 +115,10 @@ public class PurchasedListingService {
                 totalValue = 0.0;
             }
 
-            SalesReportDto reportDto = new SalesReportDto(searchStart, searchEnd, totalPurchases, totalValue);
-            responseBody.add(reportDto);
+            SalesReportSinglePeriod singlePeriodData = new SalesReportSinglePeriod(searchStart, searchEnd, totalPurchases, totalValue);
+            salesReport.add(singlePeriodData);
         }
-        return responseBody;
+        return salesReport;
     }
 
     /**
@@ -130,7 +130,7 @@ public class PurchasedListingService {
      * @param endDate the end date of the date range
      * @return a list with a single SalesReportDto to be sent to the frontend
      */
-    public List<SalesReportDto> getSalesReportDataNoPeriod(Integer businessId, LocalDate startDate, LocalDate endDate) {
+    public List<SalesReportSinglePeriod> getSalesReportDataNoPeriod(Integer businessId, LocalDate startDate, LocalDate endDate) {
 
         Integer totalPurchases = this.countPurchasedListingForBusinessInDateRange(businessId, startDate, endDate);
         Double totalValue = this.totalPurchasedListingValueForBusinessInDateRange(businessId, startDate, endDate);
@@ -139,11 +139,11 @@ public class PurchasedListingService {
             totalValue = 0.0;
         }
 
-        SalesReportDto reportDto = new SalesReportDto(startDate, endDate, totalPurchases, totalValue);
-        List<SalesReportDto> responseBody = new ArrayList<>();
-        responseBody.add(reportDto);
+        SalesReportSinglePeriod reportDto = new SalesReportSinglePeriod(startDate, endDate, totalPurchases, totalValue);
+        List<SalesReportSinglePeriod> salesReport = new ArrayList<>();
+        salesReport.add(reportDto);
 
-        return responseBody;
+        return salesReport;
     }
 
 

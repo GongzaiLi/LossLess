@@ -75,7 +75,8 @@ class SalesReportControllerUnitTest {
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
 
-        List<SalesReportDto> salesData = new ArrayList<>();
+
+        List<SalesReportSinglePeriod> salesData = new ArrayList<>();
         List<SalesReportProductTotalsDto> salesPurchaseTotalsData = new ArrayList<>();
 
         Mockito
@@ -298,6 +299,28 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSaleReportTotalCount_andPeriodIsAasdsad_then400Response() throws Exception {
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/5/salesReport/totalPurchases?startDate=2020-02-29&endDate=2021-10-01&period=asdasd")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReportProductPurchasedTotals_andBusinessDoesntExist_then406Response() throws Exception{
+
+        Mockito
+                .when(businessService.findBusinessById(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/99/salesReport/productsPurchasedTotals")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
