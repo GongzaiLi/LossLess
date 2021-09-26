@@ -79,7 +79,7 @@ div.chat-head:last-child {
 
 <script>
 
-import Api from "@/Api";
+import Api from "../../Api";
 
 export default {
   props: ['isCardCreator', 'cardId'],
@@ -151,7 +151,6 @@ export default {
                         receiverId: this.sendToUserId,
                         messageText: this.messageText
                       }
-      console.log(message)
       Api.postMessage(message)
       .then(res => {
         this.$log.debug(res.data);
@@ -162,6 +161,7 @@ export default {
     },
 
   },
+
   mounted() {
     this.myId = this.$currentUser.id;
   }
