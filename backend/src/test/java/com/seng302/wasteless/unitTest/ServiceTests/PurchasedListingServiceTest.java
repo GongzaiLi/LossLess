@@ -195,6 +195,18 @@ class PurchasedListingServiceTest {
     }
 
     @Test
+    void whenGetSalesReportData_andPeriodIsMonth_andDataSpansThreeMonths_thenReturnedDataHasEntriesInThreeMonths() {
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2022, Month.SEPTEMBER, 14), LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2022, Month.SEPTEMBER, 30), Period.ofMonths(1));
+        assertEquals(20, salesReportData.size());
+
+        assertEquals(2, salesReportData.get(0).getTotalPurchases());
+        assertEquals(3.0, salesReportData.get(0).getTotalValue());
+
+        assertEquals(1, salesReportData.get(19).getTotalPurchases());
+        assertEquals(5.0, salesReportData.get(19).getTotalValue());
+    }
+
+    @Test
     void whenCountSalesByDuration_andAllSalesWithinDuration_thenCorrectCountsReturned() {
         Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().plusYears(3), 1);
         Assertions.assertEquals(1, salesReportData.get(0L));
