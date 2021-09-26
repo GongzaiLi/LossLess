@@ -3,7 +3,7 @@
     <b-row no-gutters>
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
-          <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead">
+          <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead($event, item.userId)">
             <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/profile-default.jpg')" />
             {{item.userName}}
           </b-list-group-item>
@@ -12,17 +12,20 @@
       <b-col :lg="isCardCreator?9:12">
         <b-card class="message-box">
         </b-card>
-        <b-input-group>
-          <b-textarea
+        <b-form v-if="sendToUserId && sendToUserId !== myId" @submit.prevent="sendMessage">
+        <b-input-group >
+          <b-form-textarea
+              required
               maxlength=250 max-rows="2"
               no-resize
               type="text" class="messageInputBox"
               placeholder="Type Message..."
-              v-model="messageText"> Enter message </b-textarea>
-          <b-input-group-append @click="sendMessage">
-            <b-button variant="primary"> Send </b-button>
+              v-model="messageText"> Enter message </b-form-textarea>
+          <b-input-group-append>
+            <b-button type="submit" variant="primary"> Send </b-button>
           </b-input-group-append>
         </b-input-group>
+        </b-form>
       </b-col>
     </b-row>
   </div>
@@ -76,13 +79,18 @@ div.chat-head:last-child {
 
 <script>
 
+import Api from "../../Api";
+
 export default {
-  props: ['isCardCreator'],
+  props: ['isCardCreator', 'cardId'],
   name: "Messages",
   data() {
     return {
       targetChatHead: null,
       messageText: '',
+      sendToUserId: null,
+      messageRequired: false,
+      myId: null,
       conversations: [
         {
           userId: 0,
@@ -126,20 +134,36 @@ export default {
      * https://stackoverflow.com/questions/40153194/how-to-remove-class-from-siblings-of-an-element-without-jquery
      * @param event
      */
-    clickedChatHead(event) {
+    clickedChatHead(event, userId) {
       if (this.targetChatHead) {
-        this.targetChatHead.classList.remove('active')
+        this.targetChatHead.classList.remove('active');
       }
-      this.targetChatHead = event.currentTarget
-      this.targetChatHead.classList.add('active')
+      this.targetChatHead = event.currentTarget;
+      this.targetChatHead.classList.add('active');
+      this.sendToUserId = userId;
     },
 
     /**
-     *  TODO
+     *  Creates a message object and sends as body in the api request when send button clicked.
      */
     sendMessage() {
-      console.log(this.messageText, this.messageText.length); //TODO
-    }
+      const message = { cardId: this.cardId,
+                        receiverId: this.sendToUserId,
+                        messageText: this.messageText
+                      }
+      Api.postMessage(message)
+      .then(res => {
+        this.$log.debug(res.data);
+      })
+      .catch(err => {
+        this.$log.debug(err);
+      })
+    },
+
   },
+
+  mounted() {
+    this.myId = this.$currentUser.id;
+  }
 }
 </script>
