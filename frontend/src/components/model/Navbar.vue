@@ -28,8 +28,6 @@ Date: sprint_1
         <b-nav-item to="/search">Search Accounts</b-nav-item>
         <b-nav-item to="/listingSearch">Search Listings</b-nav-item>
         <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/marketPlace"> Marketplace </b-nav-item>
-        <b-nav-item v-if="!$currentUser.currentlyActingAs" to="/businesses/">Create Business</b-nav-item>
-
 
         <b-nav-item-dropdown
             v-if="$currentUser.currentlyActingAs"
@@ -50,11 +48,12 @@ Date: sprint_1
             <b-icon-graph-up/> Sales Report
           </b-dropdown-item>
         </b-nav-item-dropdown>
+
+        <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="float-right ml-2" variant="secondary">Create Business</b-button>
       </b-navbar-nav>
     </b-collapse>
 
     <NotificationDropdown class="ml-auto"/>
-
     <b-dropdown right variant="link" toggle-class="text-decoration-none">
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>

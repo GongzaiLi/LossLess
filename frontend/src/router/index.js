@@ -6,7 +6,7 @@ import UserProfile from '../components/user/UserProfile'
 import SearchPage from "../components/search/SearchPage";
 import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
-import CreateBusiness from "../components/business/CreateBusiness";
+import CreateBusiness from "../components/business/CreateEditBusiness";
 import ListingsPage from "../components/listing/BusinessListingsPage";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
