@@ -11,32 +11,36 @@ const $log = {
   }
 };
 
-const SalesReport = [
-  {
-    "startDate": "2021-09-01",
-    "endDate": "2021-09-01",
-    "totalPurchases": 1,
-    "totalValue": 1.0
-  },
-  {
-    "startDate": "2021-09-02",
-    "endDate": "2021-09-02",
-    "totalPurchases": 2,
-    "totalValue": 2.0
-  },
-  {
-    "startDate": "2021-09-03",
-    "endDate": "2021-09-03",
-    "totalPurchases": 3,
-    "totalValue": 3.0
-  },
-  {
-    "startDate": "2021-09-04",
-    "endDate": "2021-09-04",
-    "totalPurchases": 4,
-    "totalValue": 4
-  }
-]
+const SalesReport = {
+  reportData: [
+    {
+      "startDate": "2021-09-01",
+      "endDate": "2021-09-01",
+      "totalPurchases": 1,
+      "totalValue": 1.0
+    },
+    {
+      "startDate": "2021-09-02",
+      "endDate": "2021-09-02",
+      "totalPurchases": 2,
+      "totalValue": 2.0
+    },
+    {
+      "startDate": "2021-09-03",
+      "endDate": "2021-09-03",
+      "totalPurchases": 3,
+      "totalValue": 3.0
+    },
+    {
+      "startDate": "2021-09-04",
+      "endDate": "2021-09-04",
+      "totalPurchases": 4,
+      "totalValue": 4
+    }
+  ],
+  startTruncated: false,
+  endTruncated: false,
+}
 
 const $route = {
   params: {
@@ -90,22 +94,14 @@ describe('test get request with the getSalesReport', () => {
 
     await wrapper.vm.$forceUpdate();
 
-    expect(wrapper.vm.groupedResults).toStrictEqual(SalesReport);
-    expect(wrapper.vm.$refs.salesReportTable.$props.items[0]).toStrictEqual(SalesReport[0]);
-    expect(wrapper.vm.$refs.salesReportTable.$props.items[1]).toStrictEqual(SalesReport[1]);
-    expect(wrapper.vm.$refs.salesReportTable.$props.items[2]).toStrictEqual(SalesReport[2]);
-    expect(wrapper.vm.$refs.salesReportTable.$props.items[3]).toStrictEqual(SalesReport[3]);
+    expect(wrapper.vm.reportDataList).toStrictEqual(SalesReport.reportData);
+    expect(wrapper.vm.$refs.salesReportTable.$props.items[0]).toStrictEqual(SalesReport.reportData[0]);
+    expect(wrapper.vm.$refs.salesReportTable.$props.items[1]).toStrictEqual(SalesReport.reportData[1]);
+    expect(wrapper.vm.$refs.salesReportTable.$props.items[2]).toStrictEqual(SalesReport.reportData[2]);
+    expect(wrapper.vm.$refs.salesReportTable.$props.items[3]).toStrictEqual(SalesReport.reportData[3]);
 
-    let totalPurchases = SalesReport.reduce((count, item) => {
-      return count + item.totalValue
-    }, 0);
-
-    let totalValue = SalesReport.reduce((count, item) => {
-      return count + item.totalValue
-    }, 0);
-
-    expect(wrapper.findAll('h4').at(0).text()).toEqual(`${totalPurchases} Total Items Sold`);
-    expect(wrapper.findAll('h4').at(1).text()).toEqual(`$${totalValue} USD Total Value`);
+    expect(wrapper.findAll('h4').at(0).text()).toEqual(`10 Total Items Sold`);
+    expect(wrapper.findAll('h4').at(1).text()).toEqual(`$10 USD Total Value`);
 
     expect(Api.getSalesReport).toHaveBeenCalled();
   });
@@ -239,4 +235,47 @@ describe('check groupBy resets when date range narrowed', () => {
       "year": "Yearly",
     });
   });
+})
+
+describe('Date truncated message', () => {
+  beforeAll(async () => {
+    Api.getSalesReport.mockResolvedValue({data: SalesReport});
+  })
+
+  it('Does not exist if periods align', async () => {
+    wrapper.vm.startTruncated = false;
+    wrapper.vm.endTruncated = false;
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.dateTruncatedMessage).toBeFalsy();
+  });
+
+  it('Shows correct message when start date truncates', async () => {
+    wrapper.vm.startTruncated = true;
+    wrapper.vm.endTruncated = false;
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.dateTruncatedMessage).toBe("The report does not start on the first day of a year, so the first year in the data will be truncated by the start date.");
+  });
+
+  it('Shows correct message when end date truncates', async () => {
+    wrapper.vm.startTruncated = false;
+    wrapper.vm.endTruncated = true;
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.dateTruncatedMessage).toBe("The report does not end on the last day of a year, so the last year in the data will be truncated by the end date.");
+  });
+
+  it('Shows correct message when start and end date truncates', async () => {
+    wrapper.vm.startTruncated = true;
+    wrapper.vm.endTruncated = true;
+
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.dateTruncatedMessage).toBe("The report does not start on the first day of a year or end on the last day of a year, so the first and last years will be truncated by the start and end dates.");
+  });
+
 })

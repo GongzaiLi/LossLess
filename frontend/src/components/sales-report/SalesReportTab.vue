@@ -35,7 +35,7 @@
                     striped hovers
                     ref="salesReportTable"
                     no-border-collapse
-                    :items="groupedResults"
+                    :items="reportDataList"
                     :fields="fields"
                     :per-page="perPage"
                     :current-page="currentPage"
@@ -51,19 +51,20 @@
           </b-col>
           <b-col>
             <h3>Sales Graph</h3>
-            <SalesReportGraph :report-data="groupedResults" :currency="currency" :group-by="groupBy" v-on:finishedLoading="finishedLoadingGraph"/>
+            <SalesReportGraph :report-data="reportDataList" :currency="currency" :group-by="groupBy" v-on:finishedLoading="finishedLoadingGraph"/>
           </b-col>
         </b-row>
         <b-row>
-          <b-col b-col lg="4" md="5" sm="12" v-show="groupedResults.length">
+          <b-col b-col lg="4" md="5" sm="12" v-show="reportDataList.length">
             <b-pagination
                 v-model="currentPage"
-                :total-rows="groupedResults.length"
+                :total-rows="reportDataList.length"
                 :per-page="perPage"
                 aria-controls="my-table"
             ></b-pagination>
           </b-col>
         </b-row>
+        <div v-if="this.dateTruncatedMessage"><b-icon-info-circle/> Note: {{this.dateTruncatedMessage}}</div>
       </b-overlay>
     </b-list-group-item>
   </div>
@@ -84,7 +85,9 @@ export default {
       business: {},
       groupBy: "year",
       totalResults: null,
-      groupedResults: [],
+      reportDataList: [],
+      startTruncated: false,
+      endTruncated: false,
       currentPage: 1,
       perPage: 10,
       loading: false,
@@ -116,7 +119,9 @@ export default {
         await Api.getSalesReport(businessId, startDate, endDate, this.groupBy)
           .then((response) => {
             this.updateTotalResults(startDate, endDate, response.data);
-            this.groupedResults = response.data;
+            this.reportDataList = response.data.reportData;
+            this.startTruncated = response.data.startTruncated;
+            this.endTruncated = response.data.endTruncated;
           });
       }
     },
@@ -128,14 +133,14 @@ export default {
      * @param data response data
      **/
     updateTotalResults: function (startDate, endDate, data) {
-      const totalValue = data.reduce((count, item) => {
-        return count + item.totalValue
-      }, 0);
+      const reportList = data.reportData;
       this.totalResults = {
         startDate,
         endDate,
-        totalValue: Math.round(totalValue * 100) / 100,
-        totalPurchases: data.reduce((count, item) => {
+        totalValue: reportList.reduce((count, item) => {
+          return count + item.totalValue
+        }, 0),
+        totalPurchases: reportList.reduce((count, item) => {
           return count + item.totalPurchases
         }, 0)
       }
@@ -209,6 +214,24 @@ export default {
 
       return options;
     },
+
+    /**
+     * Message that lets the user know if the sales report date range doesn't align with selected period, so the first
+     * and/or last periods will be truncated.
+     * Null if the date range lines up perfectly with start and end.
+     */
+    dateTruncatedMessage: function() {
+      let message = null;
+      if (this.startTruncated && this.endTruncated) {
+        message = `The report does not start on the first day of a ${this.groupBy} or end on the last day of a ${this.groupBy}, so the first and last ${this.groupBy}s will be truncated by the start and end dates.`;
+      } else if (this.endTruncated) {
+        message = `The report does not end on the last day of a ${this.groupBy}, so the last ${this.groupBy} in the data will be truncated by the end date.`;
+      } else if (this.startTruncated) {
+        message = `The report does not start on the first day of a ${this.groupBy}, so the first ${this.groupBy} in the data will be truncated by the start date.`;
+      }
+      return message;
+    }
+
   },
   watch: {
     dateRange(newVal) {

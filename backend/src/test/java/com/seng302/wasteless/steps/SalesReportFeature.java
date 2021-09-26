@@ -106,8 +106,7 @@ public class SalesReportFeature {
 
     @Then("{int} items are returned")
     public void itemsAreReturned(int numItems) throws Exception {
-        responseResult.andExpect(jsonPath("$", hasSize(numItems)));
-
+        responseResult.andExpect(jsonPath("$.reportData", hasSize(numItems)));
     }
 
     @When("I search for a sales report starting {string} and ending {string} with no period specified")
@@ -124,10 +123,10 @@ public class SalesReportFeature {
     public void iGetAResponseWith(List<List<String>> purchases) throws Exception {
         List<String> purchaseArray = purchases.get(0);
         responseResult
-                .andExpect(jsonPath("[0].startDate", is(purchaseArray.get(0))))
-                .andExpect(jsonPath("[0].endDate", is(purchaseArray.get(1))))
-                .andExpect(jsonPath("[0].totalPurchases", is(Integer.parseInt(purchaseArray.get(2)))))
-                .andExpect(jsonPath("[0].totalValue", is(Double.parseDouble(purchaseArray.get(3)))));
+                .andExpect(jsonPath("$.reportData[0].startDate", is(purchaseArray.get(0))))
+                .andExpect(jsonPath("$.reportData[0].endDate", is(purchaseArray.get(1))))
+                .andExpect(jsonPath("$.reportData[0].totalPurchases", is(Integer.parseInt(purchaseArray.get(2)))))
+                .andExpect(jsonPath("$.reportData[0].totalValue", is(Double.parseDouble(purchaseArray.get(3)))));
     }
 
 
@@ -159,10 +158,10 @@ public class SalesReportFeature {
         int i = 0;
         for (List<String> purchaseArray:purchases) {
             responseResult
-                    .andExpect(jsonPath("["+i+"].startDate", is(purchaseArray.get(0))))
-                    .andExpect(jsonPath("["+i+"].endDate", is(purchaseArray.get(1))))
-                    .andExpect(jsonPath("["+i+"].totalPurchases", is(Integer.parseInt(purchaseArray.get(2)))))
-                    .andExpect(jsonPath("["+i+"].totalValue", is(Double.parseDouble(purchaseArray.get(3)))));
+                    .andExpect(jsonPath("$.reportData["+i+"].startDate", is(purchaseArray.get(0))))
+                    .andExpect(jsonPath("$.reportData["+i+"].endDate", is(purchaseArray.get(1))))
+                    .andExpect(jsonPath("$.reportData["+i+"].totalPurchases", is(Integer.parseInt(purchaseArray.get(2)))))
+                    .andExpect(jsonPath("$.reportData["+i+"].totalValue", is(Double.parseDouble(purchaseArray.get(3)))));
             i++;
         }
     }

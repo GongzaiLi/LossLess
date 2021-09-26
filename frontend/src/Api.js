@@ -134,7 +134,8 @@ export default {
           startDate: startDate,
           endDate: endDate,
           sortBy: sortBy,
-          order: order
+          order: order,
+          size: 100000 // For some reason pagination defaults to a size of 20, but we want all results
         }
       }),
 
@@ -145,7 +146,8 @@ export default {
           startDate: startDate,
           endDate: endDate,
           sortBy: sortBy,
-          order: order
+          order: order,
+          size: 100000
         }
       }),
 
