@@ -24,9 +24,7 @@ Date: sprint_6
           </b-card-text>
         </b-list-group-item>
         <b-list-group-item v-show="totalResults">
-          <b-overlay :show="loading" rounded="sm">
-          <b-alert v-model="showDateTruncatedAlert" dismissible variant="warning" v-if="this.dateTruncatedMessage" id="date-truncated-alert"><b-icon-info-circle/> {{this.dateTruncatedMessage}}</b-alert>
-          <b-row>
+          <b-overlay :show="loading" rounded="sm"><b-row>
             <b-col class="mt-2">
               <b-row>
                 <b-col cols="4"><h3>Sales Details</h3></b-col>
@@ -78,6 +76,7 @@ Date: sprint_6
               <b-button variant="primary" class="w-100" v-if="!extendedReportShown" @click="showExtendedReport">Show extended sales report</b-button>
             </b-col>
           </b-row>
+          <div v-if="this.dateTruncatedMessage"><b-icon-info-circle/> Note: {{this.dateTruncatedMessage}}</div>
           </b-overlay>
         </b-list-group-item>
       </b-list-group>
@@ -102,16 +101,6 @@ Date: sprint_6
     </b-card>
   </div>
 </template>
-
-<style>
-#date-truncated-alert {
-  padding: 0.3em 2em 0.3em 0.6em;
-  margin-bottom: 0;
-}
-#date-truncated-alert button {
-  padding: 0.3rem 1rem;
-}
-</style>
 
 <script>
 import Api from "../../Api";
