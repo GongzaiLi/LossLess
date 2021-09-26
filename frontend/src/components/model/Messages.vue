@@ -19,13 +19,17 @@
                              placeholder="Type Message..." v-model="messageText">
             </b-form-textarea>
 
-            <b-input-group-append v-if="messageText" @click="messageText=''">
-              <b-button class="clearButton">
+            <b-input-group-append>
+              <b-button v-if="messageText"  class="clearButton" @click="messageText=''">
+                <b-icon icon="X" variant="dark"/>
+              </b-button>
+              <b-button v-else disabled class="clearButton">
                 <b-icon icon="X" variant="dark"/>
               </b-button>
             </b-input-group-append>
-            <b-input-group-append v-if="messageText" @click="sendMessage" class="ml-2">
-              <b-button class="sendMessageGroup" variant="primary"> Send</b-button>
+            <b-input-group-append class="ml-2">
+              <b-button v-if="messageText" class="sendMessageGroup" variant="primary" @click="sendMessage"> Send</b-button>
+              <b-button v-else disabled class="sendMessageGroup" variant="primary"> Send</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form>
