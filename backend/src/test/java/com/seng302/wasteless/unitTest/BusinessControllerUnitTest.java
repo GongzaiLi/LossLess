@@ -4,10 +4,7 @@ package com.seng302.wasteless.unitTest;
 import com.seng302.wasteless.controller.BusinessController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
-import com.seng302.wasteless.service.AddressService;
-import com.seng302.wasteless.service.BusinessService;
-import com.seng302.wasteless.service.ProductService;
-import com.seng302.wasteless.service.UserService;
+import com.seng302.wasteless.service.*;
 import com.seng302.wasteless.testconfigs.MockBusinessServiceConfig;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +54,9 @@ class BusinessControllerUnitTest {
 
     @MockBean
     private AddressService addressService;
+
+    @MockBean
+    private NotificationService notificationService;
 
     private User user;
 

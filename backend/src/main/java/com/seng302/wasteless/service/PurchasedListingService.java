@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
@@ -51,7 +50,7 @@ public class PurchasedListingService {
      * @param businessId Id of the business
      * @return The count of purchased listings
      */
-    public Integer countPurchasedListingForBusiness(Integer businessId) {return purchasedListingRepository.countAllByBusiness_Id(businessId);}
+    public Integer countPurchasedListingForBusiness(Integer businessId) {return purchasedListingRepository.countAllByBusinessId(businessId);}
 
     /**
      * Returns the total number of purchased listings for a business
@@ -62,7 +61,7 @@ public class PurchasedListingService {
      * @return The count of purchased listings
      */
     public Integer countPurchasedListingForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
-        return purchasedListingRepository.countAllByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
+        return purchasedListingRepository.countAllByBusinessIdAndSaleDateBetween(businessId, startDate, endDate);}
 
     /**
      * Returns the total value of purchased listings for a business.
@@ -70,7 +69,7 @@ public class PurchasedListingService {
      * @return The count of purchased listings
      */
     public Integer totalPurchasedListingValueForBusiness(Integer businessId) {
-        return purchasedListingRepository.sumPriceByBusiness_Id(businessId);}
+        return purchasedListingRepository.sumPriceByBusinessId(businessId);}
 
     /**
      * Returns the total value of purchased listings for a business.
@@ -80,7 +79,7 @@ public class PurchasedListingService {
      * @return The count of purchased listings
      */
     public Double totalPurchasedListingValueForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
-        return purchasedListingRepository.sumPriceByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
+        return purchasedListingRepository.sumPriceByBusinessIdAndSaleDateBetween(businessId, startDate, endDate);}
 
     /**
      * For loops through each specified period in a date range and returns the total number of purchases and the total

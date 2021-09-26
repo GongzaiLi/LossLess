@@ -46,7 +46,7 @@
             <h3>Notifications</h3>
           </b-col>
           <b-col cols="4">
-            <b-dropdown v-if="!isArchivedSelected" text="Filter By Tags" class="tag-filter-dropdown">
+            <b-dropdown v-if="!isArchivedSelected" text="Filter By Tag" class="tag-filter-dropdown">
               <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
@@ -311,7 +311,7 @@ export default {
      * Countdown timer that deletes the notification after 10 seconds
      */
     toastCountdown(id){
-      if(this.countdowns[id].count >= 0&&this.pendingDeletedNotifications.includes(id)) {
+      if(this.countdowns[id].count > 0&&this.pendingDeletedNotifications.includes(id)) {
         setTimeout(() => {
           this.countdowns[id].count-=1
           this.toastCountdown(id)

@@ -7,11 +7,8 @@ Date: 5/3/2021
 
   <div>
     <div v-show="!loading">
-      <b-card class="profile-card shadow" no-body
-              v-if="userFound"
-      >
+      <b-card class="profile-card shadow" no-body v-if="userFound">
         <template #header>
-
           <b-row>
             <b-col md="2">
               <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
@@ -33,7 +30,6 @@ Date: 5/3/2021
                       style="cursor: pointer;"
                   />
                 </h4>
-
               </b-row>
               <b-row>
                 Member since:
@@ -49,25 +45,19 @@ Date: 5/3/2021
                   @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
-
           </b-row>
-
           <b-row>
-
             <b-col cols="">
-
             </b-col>
           </b-row>
         </template>
-
-        <b-list-group>
+        <b-list-group v-if="userData.bio">
           <b-list-group-item style="border-radius: 0">
             <b-card-text style="text-align: justify">
               {{ userData.bio }}
             </b-card-text>
           </b-list-group-item>
         </b-list-group>
-
         <b-card-body>
           <b-container>
             <h6>
@@ -137,9 +127,7 @@ Date: 5/3/2021
                   </router-link>
                 </b-col>
               </b-row>
-
             </h6>
-
           </b-container>
         </b-card-body>
       </b-card>
