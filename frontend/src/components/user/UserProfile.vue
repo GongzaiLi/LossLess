@@ -32,8 +32,9 @@ Date: 5/3/2021
                 </h4>
               </b-row>
               <b-row>
-                Member since:
-                <member-since :date="userData.created"/>
+                <p>
+                  Member since: <member-since :date="userData.created"/>
+                </p>
               </b-row>
             </b-col>
             <b-col cols="2" sm="auto"
