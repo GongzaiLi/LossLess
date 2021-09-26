@@ -87,13 +87,17 @@ public class PurchasedListingService {
             int totalPurchases = 0;
             double totalValue = 0.0;
 
+            // Add up all purchases within current period
             while (curPurchaseIndex < purchases.size() && !purchases.get(curPurchaseIndex).getSaleDate().isAfter(curPeriodEnd)) {
                 totalPurchases++;
                 totalValue += purchases.get(curPurchaseIndex).getPrice();
                 curPurchaseIndex++;
             }
 
-            salesReport.add(new SalesReportSinglePeriod(curPeriodStart, curPeriodEnd, totalPurchases, totalValue));
+            salesReport.add(new SalesReportSinglePeriod(
+                    curPeriodStart.isBefore(startDate) ? startDate : curPeriodStart, // We still want to show original (filter) start date rather than the start of the period of the start date
+                    curPeriodEnd.isAfter(endDate) ? endDate : curPeriodEnd,
+                    totalPurchases, totalValue));
         }
         return salesReport;
     }
