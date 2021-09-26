@@ -12,18 +12,19 @@
       <b-col :lg="isCardCreator?9:12">
         <b-card class="message-box">
         </b-card>
-        <b-form v-if="sendToUserId && sendToUserId !== myId" @submit.prevent="sendMessage">
+        <b-form v-if="sendToUserId && sendToUserId !== myId">
         <b-input-group>
             <b-form-textarea required no-resize maxlength="250" max-rows="2"
                              type="text" class="messageInputBox sendMessageGroup"
                              placeholder="Type Message..." v-model="messageText">
             </b-form-textarea>
+
             <b-input-group-append v-if="messageText" @click="messageText=''">
               <b-button class="clearButton">
                 <b-icon icon="X" variant="dark"/>
               </b-button>
             </b-input-group-append>
-            <b-input-group-append @click="sendMessage" class="ml-2">
+            <b-input-group-append v-if="messageText" @click="sendMessage" class="ml-2">
               <b-button class="sendMessageGroup" variant="primary"> Send</b-button>
             </b-input-group-append>
           </b-input-group>
