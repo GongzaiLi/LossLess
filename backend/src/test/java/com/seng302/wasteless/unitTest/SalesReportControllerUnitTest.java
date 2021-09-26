@@ -518,4 +518,13 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReport_andValidReportType_then404Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/reportthatdoesntexist")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
