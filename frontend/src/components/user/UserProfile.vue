@@ -12,7 +12,8 @@ Date: 5/3/2021
       >
         <template #header>
           <b-row>
-            <div class="profile-image-container ml-3 mr-3">
+            <b-col lg="2" class="p-0">
+            <div class="profile-image-container">
             <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                      alt="User Profile Image" width="75" height="75" class="rounded-circle"
                      id="profile-image"
@@ -22,6 +23,7 @@ Date: 5/3/2021
                         v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
                         class="edit-business-image" size="sm"><b-icon-image/> Edit </b-button>
             </div>
+            </b-col>
             <b-col class="mt-2">
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
@@ -187,7 +189,8 @@ Date: 5/3/2021
 
 .profile-image-container {
   position: relative;
-  text-align: center;
+  margin-left: 1rem;
+  text-align: left;
 }
 
 h6 {
