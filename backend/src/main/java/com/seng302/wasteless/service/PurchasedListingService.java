@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
@@ -47,13 +46,6 @@ public class PurchasedListingService {
     }
 
     /**
-     * Returns the total number of purchased listings for a business.
-     * @param businessId Id of the business
-     * @return The count of purchased listings
-     */
-    public Integer countPurchasedListingForBusiness(Integer businessId) {return purchasedListingRepository.countAllByBusiness_Id(businessId);}
-
-    /**
      * Returns the total number of purchased listings for a business
      * in a specified date range
      * @param businessId Id of the business
@@ -63,14 +55,6 @@ public class PurchasedListingService {
      */
     public Integer countPurchasedListingForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
         return purchasedListingRepository.countAllByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
-
-    /**
-     * Returns the total value of purchased listings for a business.
-     * @param businessId Id of the business
-     * @return The count of purchased listings
-     */
-    public Integer totalPurchasedListingValueForBusiness(Integer businessId) {
-        return purchasedListingRepository.sumPriceByBusiness_Id(businessId);}
 
     /**
      * Returns the total value of purchased listings for a business.
@@ -96,27 +80,20 @@ public class PurchasedListingService {
      */
     public List<SalesReportSinglePeriod> getSalesReportDataWithPeriod(Integer businessId, LocalDate startDate, LocalDate endDate, LocalDate firstPeriodStart, LocalDate lastPeriodEnd, Period periodOfData) {
         List<SalesReportSinglePeriod> salesReport = new ArrayList<>();
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetweenOrderBySaleDate(businessId, startDate, endDate);
+        int curPurchaseIndex = 0;
+        for (LocalDate curPeriodStart = firstPeriodStart; curPeriodStart.isBefore(lastPeriodEnd.plusDays(1)); curPeriodStart = curPeriodStart.plus(periodOfData)) {
+            LocalDate curPeriodEnd = curPeriodStart.plus(periodOfData).minusDays(1);
+            int totalPurchases = 0;
+            double totalValue = 0.0;
 
-        LocalDate searchStart;
-        LocalDate searchEnd;
-        for (LocalDate date = firstPeriodStart; date.isBefore(lastPeriodEnd.plusDays(1)); date = date.plus(periodOfData)) {
-            searchStart = date;
-            searchEnd = searchStart.plus(periodOfData).minusDays(1);
-            if (searchStart.isBefore(startDate)) {
-                searchStart = startDate;
-            }
-            if (searchEnd.isAfter(endDate)) {
-                searchEnd = endDate;
-            }
-            Integer totalPurchases = this.countPurchasedListingForBusinessInDateRange(businessId, searchStart, searchEnd);
-            Double totalValue = this.totalPurchasedListingValueForBusinessInDateRange(businessId, searchStart, searchEnd);
-
-            if (totalValue == null) {
-                totalValue = 0.0;
+            while (curPurchaseIndex < purchases.size() && !purchases.get(curPurchaseIndex).getSaleDate().isAfter(curPeriodEnd)) {
+                totalPurchases++;
+                totalValue += purchases.get(curPurchaseIndex).getPrice();
+                curPurchaseIndex++;
             }
 
-            SalesReportSinglePeriod singlePeriodData = new SalesReportSinglePeriod(searchStart, searchEnd, totalPurchases, totalValue);
-            salesReport.add(singlePeriodData);
+            salesReport.add(new SalesReportSinglePeriod(curPeriodStart, curPeriodEnd, totalPurchases, totalValue));
         }
         return salesReport;
     }
@@ -209,7 +186,7 @@ public class PurchasedListingService {
         }
 
         Map<Long, Integer> durationCounts = new HashMap<>();
-        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetween(businessId, startDate, endDate);
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetweenOrderBySaleDate(businessId, startDate, endDate);
 
         for (PurchasedListing purchase : purchases) {
             long daysBetweenSaleAndClose = ChronoUnit.DAYS.between(purchase.getSaleDate(), purchase.getClosingDate());
