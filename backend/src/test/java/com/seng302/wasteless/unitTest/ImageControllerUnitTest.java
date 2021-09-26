@@ -589,7 +589,7 @@ class ImageControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToAddBusinessImage_andValidRequest_then201Response() throws Exception {
+    void whenPutRequestToAddBusinessImage_andValidRequest_then201Response() throws Exception {
 
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
 
@@ -601,7 +601,7 @@ class ImageControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToAddBusinessImage_andValidRequest_AndImageAlreadyExists_then201Response() throws Exception {
+    void whenPutRequestToAddBusinessImage_andValidRequest_AndImageAlreadyExists_then201Response() throws Exception {
         Mockito.when(business.getProfileImage()).thenReturn(image);
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
 
@@ -613,7 +613,7 @@ class ImageControllerUnitTest {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToAddBusinessImage_andEmptyFile_then400Response() throws Exception {
+    void whenPutRequestToAddBusinessImage_andEmptyFile_then400Response() throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" , (byte[]) null);
 
         Mockito
@@ -627,7 +627,22 @@ class ImageControllerUnitTest {
     }
 
     @Test
-    void whenPostRequestToAddBusinessImage_andUserNotBusinessAdminOrGlobalAdmin_then403Response() throws Exception {
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPutRequestToAddBusinessImage_andInvalidFileType_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.txt", "text/plain" ,"image example".getBytes());
+
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type"));
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/image")
+                .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenPutRequestToAddBusinessImage_andUserNotBusinessAdminOrGlobalAdmin_then403Response() throws Exception {
         Mockito.when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this business"));
 
