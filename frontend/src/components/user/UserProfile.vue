@@ -11,52 +11,47 @@ Date: 5/3/2021
               v-if="userFound"
       >
         <template #header>
-
           <b-row>
-            <b-col md="2">
-              <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+            <div class="profile-image-container ml-3 mr-3">
+            <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                      alt="User Profile Image" width="75" height="75" class="rounded-circle"
                      id="profile-image"
                      title="View profile image"
-                     @click="$bvModal.show('edit-profile-image')"
               />
-            </b-col>
-            <b-col md="10" class="mt-2">
+              <b-button @click="$bvModal.show('edit-profile-image')"
+                        v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
+                        class="edit-business-image" size="sm"><b-icon-image/> Edit </b-button>
+            </div>
+            <b-col class="mt-2">
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
-                  <b-icon-pencil-fill
-                      v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
-                      v-b-tooltip.hover
-                      title="Edit Profile Details"
-                      id="editProfile"
-                      @click="editUserModel"
-                      style="cursor: pointer;"
-                  />
                 </h4>
-
               </b-row>
               <b-row>
                 Member since:
                 <member-since :date="userData.created"/>
               </b-row>
             </b-col>
-            <b-col cols="2" sm="auto"
-                   v-if="currentUserAdmin">
-              <h4>{{ userRoleDisplayString }}</h4>
+            <b-col lg="3" sm="12"
+                   v-if="currentUserAdmin"
+                   class="p-0">
+              <b-icon-pencil-fill class="close edit-details"
+                                  v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
+                                  @click="editUserModel"
+                                  title="Update Profile Details">
+              </b-icon-pencil-fill>
+              <h5>{{ userRoleDisplayString }}</h5>
               <b-button
                   v-bind:variant="toggleAdminButtonVariant"
                   v-if="showToggleAdminButton"
                   @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
-
-          </b-row>
-
-          <b-row>
-
-            <b-col cols="">
-
-            </b-col>
+            <b-icon-pencil-fill class="close edit-details"
+                                v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs && !currentUserAdmin"
+                                @click="editUserModel"
+                                title="Update Profile Details">
+            </b-icon-pencil-fill>
           </b-row>
         </template>
 
@@ -179,6 +174,22 @@ Date: 5/3/2021
   margin-right: auto;
 }
 
+.edit-business-image {
+  position: absolute;
+  bottom: 0px;
+  left: 3px;
+  font-size: 0.7rem
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.profile-image-container {
+  position: relative;
+  text-align: center;
+}
+
 h6 {
   line-height: 1.4;
 }
@@ -188,12 +199,6 @@ h6 {
   position: relative;
   object-fit: cover;
 }
-
-#profile-image:hover {
-  cursor: pointer;
-  opacity: 0.8;
-}
-
 
 </style>
 

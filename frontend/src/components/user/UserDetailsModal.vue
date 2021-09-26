@@ -6,11 +6,6 @@ Date: 3/3/2021
 
 <template>
   <div>
-      <b-card v-if="isEditUser" class="shadow">
-        <h5>Profile Image</h5>
-        <ProfileImage :details="userData.profileImage" :userLookingAtSelfOrIsAdmin="isEditUser"/>
-      </b-card>
-    <br>
     <b-card class="shadow">
     <b-form
         @submit="submit"
@@ -128,7 +123,6 @@ import Api from "../../Api";
 import AddressInput from "../model/AddressInput";
 import PasswordInput from "../model/PasswordInput";
 import EventBus from "../../util/event-bus"
-import ProfileImage from "../model/ProfileImage";
 
 const MIN_AGE_YEARS = 13;
 const MAX_AGE_YEARS = 120;
@@ -136,7 +130,6 @@ const UNIX_EPOCH_YEAR = 1970;
 
 export default {
   components: {
-    ProfileImage,
     PasswordInput,
     AddressInput,
   },

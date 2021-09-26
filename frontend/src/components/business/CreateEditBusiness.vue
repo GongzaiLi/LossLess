@@ -7,11 +7,6 @@ Date: 26/3/2021
 
 <template>
   <div>
-    <b-card v-if="isEditBusiness" class="shadow">
-      <h5>Profile Image</h5>
-      <ProfileImage :details="businessData.profileImage" :userLookingAtSelfOrIsAdmin="isEditBusiness"/>
-    </b-card>
-    <br>
     <b-card class="shadow" v-if="canCreateBusiness || isEditBusiness">
       <b-form
           @submit="submit"
@@ -125,15 +120,13 @@ Date: 26/3/2021
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
-import ProfileImage from "../model/ProfileImage";
 import {getMonthsAndYearsBetween} from '../../util';
 
 const MIN_AGE_TO_CREATE_BUSINESS = 16;
 
 export default {
   components: {
-    AddressInput,
-    ProfileImage
+    AddressInput
   },
 
   props: {
@@ -194,9 +187,7 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    async createBusiness(event) {
-      event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
-
+    async createBusiness() {
       try {
         const businessResponse = (await api.postBusiness(this.businessData)).data;
         this.$currentUser = (await api.getUser(this.$currentUser.id)).data;
