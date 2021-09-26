@@ -13,10 +13,22 @@ Date: 29/03/2021
     >
       <template #header>
         <b-row>
-          <b-col>
+          <div class="profile-image-container">
+            <b-img :src="businessData.profileImage ? getURL(businessData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+                   alt="User Profile Image" width="75" height="75" class="rounded-circle"
+                   id="profile-image"
+                   title="View profile image"
+            />
+            <b-button v-if="isAdminOfThisBusiness && isAdmin || $currentUser.role !== 'user'"
+                      class="edit-business-image" size="sm"
+                      @click="$bvModal.show('edit-business-image')"
+            ><b-icon-image/> Edit </b-button>
+          </div>
+          <b-col class="mt-2">
             <h4 class="mb-1">{{ businessData.name }}</h4>
             Registered on: <member-since :date="businessData.created"/>
           </b-col>
+          <b-icon-pencil-fill v-if="isAdminOfThisBusiness && isAdmin || $currentUser.role !== 'user'" class="close edit-details" @click="$bvModal.show('edit-business-profile')" title="Update Business Details"></b-icon-pencil-fill>
         </b-row>
       </template>
 
@@ -169,6 +181,14 @@ Date: 29/03/2021
       <make-admin-modal :make-admin-action="this.makeAdminAction"/>
       <b-alert :show="makeAdminError.length > 0 ? 120 : 0" variant="danger">{{ makeAdminError }}</b-alert>
     </b-modal>
+
+    <b-modal id="edit-business-profile" title="Update Business Profile" hide-footer scrollable>
+      <CreateEditBusiness :is-edit-business="true" :business-details="businessData"/>
+    </b-modal>
+
+    <b-modal id="edit-business-image" title="Profile Image" hide-footer>
+      <ProfileImage :details="businessData.profileImage"/>
+    </b-modal>
   </div>
 
 
@@ -181,6 +201,28 @@ Date: 29/03/2021
   margin-right: auto;
 }
 
+.edit-business-image {
+  position: absolute;
+  bottom: 0px;
+  left: 15px;
+  font-size: 0.7rem
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.profile-image-container {
+  position: relative;
+  text-align: center;
+}
+
+#profile-image {
+  margin-left: 1rem;
+  position: relative;
+  object-fit: cover;
+}
+
 h6 {
   line-height: 1.4;
 }
@@ -191,11 +233,15 @@ import memberSince from "../model/MemberSince";
 import api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
 import {formatAddress} from "../../util";
+import CreateEditBusiness from "./CreateEditBusiness";
+import ProfileImage from "../model/ProfileImage";
 
 export default {
   components: {
+    CreateEditBusiness,
     memberSince,
-    makeAdminModal
+    makeAdminModal,
+    ProfileImage
   },
   data: function () {
     return {

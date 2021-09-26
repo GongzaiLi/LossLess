@@ -134,7 +134,8 @@ export default {
           startDate: startDate,
           endDate: endDate,
           sortBy: sortBy,
-          order: order
+          order: order,
+          size: 100000 // For some reason pagination defaults to a size of 20, but we want all results
         }
       }),
 
@@ -145,18 +146,21 @@ export default {
           startDate: startDate,
           endDate: endDate,
           sortBy: sortBy,
-          order: order
+          order: order,
+          size: 100000
         }
       }),
 
-  getListingDurations: (businessId, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
+  getListingDurations: (businessId, granularity, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
     {
       withCredentials: true,
       params: {
+        granularity,
         startDate: formatDate(startDate),
         endDate: formatDate(endDate),
       }
     }),
+  postMessage: (message) => instance.post(`/messages`, message,{withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images

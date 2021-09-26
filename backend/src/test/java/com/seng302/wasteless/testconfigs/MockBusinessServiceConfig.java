@@ -29,7 +29,7 @@ public class MockBusinessServiceConfig {
         ArrayList<Business> businesses = new ArrayList<>();
 
         public MockBusinessService () {
-            super(null);
+            super(null, null);
 
             User user = new User();
             user.setRole(UserRoles.USER);

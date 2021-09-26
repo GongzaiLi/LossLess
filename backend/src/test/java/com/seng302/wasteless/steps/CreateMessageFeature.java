@@ -1,17 +1,19 @@
 package com.seng302.wasteless.steps;
 
 import com.seng302.wasteless.controller.UserController;
-import com.seng302.wasteless.model.Card;
-import com.seng302.wasteless.model.CardSections;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.CardService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import io.cucumber.java.Before;
+import io.cucumber.java.bs.A;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,6 +21,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.Optional;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static org.hamcrest.CoreMatchers.is;
@@ -41,6 +47,8 @@ public class CreateMessageFeature {
 
     private User cardOwner;
 
+    private Integer referredCardId;
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -52,6 +60,9 @@ public class CreateMessageFeature {
 
     @Autowired
     private CardService cardService;
+
+    @Autowired
+    private NotificationService notificationService;
 
 
     /**
@@ -86,7 +97,7 @@ public class CreateMessageFeature {
         card.setSection(CardSections.fromString(section));
         card.setTitle(title);
         card.setCreator(cardOwner);
-        cardService.createCard(card);
+        referredCardId = cardService.createCard(card).getId();
 
 
     }
@@ -107,10 +118,10 @@ public class CreateMessageFeature {
 
     @When("the user send a message to the user {string} regarding card with id {int}, with the text {string}")
     public void the_user_send_a_message_to_the_user_regarding_card_with_id_with_the_text(String email, Integer cardId, String message) throws Exception {
-        Assertions.assertEquals(cardOwner.getEmail(), email);
-        String jsonInStringForRequest = String.format("{\"cardId\": %d, \"receiverId\": %d, \"messageText\": \"%s\"}", cardId, cardOwner.getId(), message);
-
-        result = mockMvc.perform(MockMvcRequestBuilders.post(String.format("/messages"))
+        User currentUser = userService.findUserByEmail(email);
+        String jsonInStringForRequest = String.format("{\"cardId\": %d, \"receiverId\": %d, \"messageText\": \"%s\"}", referredCardId, currentUser.getId(), message);
+        String jsonInStringForRequest2 = String.format("{\"cardId\": %d, \"receiverId\": %d, \"messageText\": \"%s\"}", cardId, currentUser.getId(), message);
+        result = mockMvc.perform(MockMvcRequestBuilders.post("/messages")
                 .content(jsonInStringForRequest)
                 .contentType(APPLICATION_JSON)
                 .with(user(currentUserDetails))
@@ -119,7 +130,56 @@ public class CreateMessageFeature {
 
     @Then("A message is created")
     public void a_message_is_created() throws Exception {
-        result.andExpect(status().isCreated()).andExpect(jsonPath("messageId", is(1)));
+        result.andExpect(status().isCreated());
     }
 
+    @When("the user read messages with card id {int}")
+    public void the_user_read_messages_with_card_id(Integer cardId) throws Exception {
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/messages/" + referredCardId)
+                .with(user(currentUserDetails))
+                .with(csrf()));
+    }
+
+    @Then("The user {string} get all message")
+    public void the_user_get_all_message(String email, List<String> messages) throws Exception {
+        User currentUser = userService.findUserByEmail(email);
+        JSONObject jsonResult = new JSONObject(result.andReturn().getResponse().getContentAsString());
+        JSONArray messagesArray = new JSONArray(jsonResult.getString("messages"));
+        JSONObject sender = messagesArray.getJSONObject(0);
+        Assertions.assertEquals(currentUser.getId().toString(), sender.getString("senderId"));
+        Assertions.assertEquals(cardOwner.getId().toString(), sender.getString("receiverId"));
+        Assertions.assertEquals(messages.get(0), sender.getString("messageText"));
+
+        JSONObject receiver = messagesArray.getJSONObject(1);
+        Assertions.assertEquals(cardOwner.getId().toString(), receiver.getString("senderId"));
+        Assertions.assertEquals(currentUser.getId().toString(), receiver.getString("receiverId"));
+        Assertions.assertEquals(messages.get(1), receiver.getString("messageText"));
+
+
+
+    }
+
+    @Then("The card owner {string} get all message")
+    public void the_card_owner_get_all_message(String email, List<String> messages) throws Exception {
+        User currentUser = userService.findUserByEmail(email);
+        JSONArray allMessages = new JSONArray(result.andReturn().getResponse().getContentAsString());
+
+        JSONObject jsonResult = allMessages.getJSONObject(0);
+        JSONArray messagesArray = new JSONArray(jsonResult.getString("messages"));
+        JSONObject receiver = messagesArray.getJSONObject(0);
+        Assertions.assertEquals(currentUser.getId().toString(), receiver.getString("receiverId"));
+        Assertions.assertEquals(messages.get(0), receiver.getString("messageText"));
+
+        JSONObject sender = messagesArray.getJSONObject(1);
+        Assertions.assertEquals(currentUser.getId().toString(), sender.getString("senderId"));
+        Assertions.assertEquals(messages.get(1), sender.getString("messageText"));
+    }
+
+    @Then("The user {string} receives the notification {string}")
+    public void theUserReceivesTheNotification(String email, String notificationMessage) {
+        User currentUser = userService.findUserByEmail(email);
+        List<Notification> notificationList = notificationService.filterNotifications(currentUser.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
+        Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getMessage().equals(notificationMessage)));
+
+    }
 }

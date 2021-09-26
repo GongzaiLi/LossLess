@@ -201,7 +201,7 @@ public class ProductImagesFeature {
                 MockMvcRequestBuilders.multipart(String.format("/businesses/%d/products/%s/images", business.getId(), productId))
                         .file(image)
                         .with(user(currentUserDetails))
-                        .with(csrf()));;
+                        .with(csrf()));
 
         product = productService.findProductById(productId);
     }
@@ -218,12 +218,6 @@ public class ProductImagesFeature {
     }
 
     // AC1,2,3 - Upload an image and a thumbnail for the product with a correct type
-
-    @Then("The user will be able to see having {int} image with the id {int} from the product.")
-    public void the_user_will_be_able_to_see_having_image_with_the_id_from_the_product(Integer imageSize, Integer imageId) {
-        Assertions.assertEquals(imageSize, product.getImages().size());
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId)));
-    }
 
     @And("The current primary image is this product's image id: {int}")
     public void the_current_primary_image_is_this_product_s_image_id(Integer primaryImageId) {
@@ -255,20 +249,10 @@ public class ProductImagesFeature {
                     MockMvcRequestBuilders.multipart(String.format("/businesses/%d/products/%s/images", business.getId(), productId))
                             .file(image)
                             .with(user(currentUserDetails))
-                            .with(csrf())).andExpect(status().isCreated());;
+                            .with(csrf())).andExpect(status().isCreated());
         }
 
         product = productService.findProductById(productId);
-    }
-
-
-    @Then("The user will be able to see having {int} images with the id {int}, {int}, {int}, {int} from the product.")
-    public void the_user_will_be_able_to_see_having_images_with_the_id_from_the_product(Integer imageSize, Integer imageId1, Integer imageId2, Integer imageId3, Integer imageId4) {
-        Assertions.assertEquals(imageSize, product.getImages().size());
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId1)));
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId2)));
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId3)));
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId4)));
     }
 
     // AC2 - Change the primary image in the product

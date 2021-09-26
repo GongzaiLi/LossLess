@@ -16,7 +16,7 @@ import Navbar from "./components/model/Navbar";
 import UserProfile from "./components/user/UserProfile";
 import SearchPage from "./components/search/SearchPage";
 import HomePage from "./components/user/HomePage";
-import CreateBusiness from "./components/business/CreateBusiness";
+import CreateEditBusiness from "./components/business/CreateEditBusiness";
 import BusinessProfile from "./components/business/BusinessProfile";
 import InventoryPage from "./components/inventory/InventoryPage";
 import ListingSearchPage from "./components/listing/ListingSearchPage";
@@ -36,7 +36,7 @@ const app = {
     UserProfile,
     Navbar,
     HomePage,
-    CreateBusiness,
+    CreateEditBusiness,
     SearchPage,
     BusinessProfile,
     InventoryPage,

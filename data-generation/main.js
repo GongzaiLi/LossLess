@@ -364,14 +364,15 @@ async function makeUserBusinessAdmin(businessId, instance, userId) {
 function createProductObject(name, business) {
 
   const productId = name.replace(/\s/g, "-").replace(/\'/g, "").toUpperCase();
+  const manufacturer = businessNames[Math.floor(Math.random() * businessNames.length)]
   const desc = "This is a very tasty product called " + name + ". It is well priced and a high quality is ensured by " +
-    business.name + "."
+    manufacturer + "."
 
   return {
     id: productId,
     name: name,
     description: desc,
-    manufacturer: business.name,
+    manufacturer: manufacturer,
     recommendedRetailPrice: (Math.random() * MAX_PRODUCT_PRICE).toFixed(2),
   };
 }

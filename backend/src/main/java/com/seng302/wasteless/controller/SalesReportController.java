@@ -5,6 +5,7 @@ import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
 import com.seng302.wasteless.model.PurchasedListing;
+import com.seng302.wasteless.model.SalesReportSinglePeriod;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
 import org.apache.commons.csv.CSVFormat;
@@ -85,8 +86,8 @@ public class SalesReportController {
         }
 
         if (period == null) {
-            List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataNoPeriod(businessId, startDate, endDate);
-            return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+            List<SalesReportSinglePeriod> reportData = purchasedListingService.getSalesReportDataNoPeriod(businessId, startDate, endDate);
+            return ResponseEntity.status(HttpStatus.OK).body(new SalesReportDto(reportData));
         }
 
         Period periodOfData;
@@ -99,12 +100,8 @@ public class SalesReportController {
                 break;
             case "week":
                 periodOfData = Period.ofDays(7);
-                while (firstPeriodStart.getDayOfWeek() != START_OF_WEEK) {
-                    firstPeriodStart = firstPeriodStart.minusDays(1);
-                }
-                while (lastPeriodEnd.getDayOfWeek() != START_OF_WEEK.minus(1)) {
-                    lastPeriodEnd = lastPeriodEnd.plusDays(1);
-                }
+                firstPeriodStart = firstPeriodStart.with(START_OF_WEEK);
+                lastPeriodEnd = lastPeriodEnd.with(START_OF_WEEK);
                 break;
             case "month":
                 periodOfData = Period.ofMonths(1);
@@ -120,8 +117,11 @@ public class SalesReportController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct period.");
         }
 
-        List<SalesReportDto> responseBody = purchasedListingService.getSalesReportDataWithPeriod(businessId, startDate,
-                endDate, firstPeriodStart, lastPeriodEnd, periodOfData);
+        SalesReportDto responseBody = new SalesReportDto(
+            purchasedListingService.getSalesReportDataWithPeriod(businessId, startDate, endDate, firstPeriodStart, lastPeriodEnd, periodOfData)
+        );
+        responseBody.setStartTruncated(!firstPeriodStart.equals(startDate));
+        responseBody.setEndTruncated(!lastPeriodEnd.equals(endDate));
 
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }

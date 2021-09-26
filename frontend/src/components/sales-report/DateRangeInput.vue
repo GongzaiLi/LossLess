@@ -34,7 +34,7 @@
 
       <b-col lg="4" v-if="dateType === 'day'">
         <b-form-group label="Select day">
-          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
+          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" value-as-date v-model="selectedDay"/>
         </b-form-group>
       </b-col>
 
