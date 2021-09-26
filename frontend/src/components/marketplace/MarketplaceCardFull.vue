@@ -70,7 +70,7 @@
       </b-card>
 
       <b-collapse v-model="messageVisible" id="messageBox">
-        <messages :is-card-creator="isCardCreator"></messages>
+        <messages :cardId="cardId" :is-card-creator="isCardCreator"></messages>
       </b-collapse>
   </div>
 </template>

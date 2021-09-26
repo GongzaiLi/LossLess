@@ -1,6 +1,6 @@
 import {mount, createLocalVue, config} from '@vue/test-utils';
 import {BootstrapVue, BootstrapVueIcons} from 'bootstrap-vue';
-import ProfileImage from '../../components/user/ProfileImage';
+import ProfileImage from '../../components/model/ProfileImage';
 import VueRouter from 'vue-router';
 import Api from "../../Api";
 

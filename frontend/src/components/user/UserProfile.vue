@@ -10,25 +10,21 @@ Date: 5/3/2021
       <b-card class="profile-card shadow" no-body v-if="userFound">
         <template #header>
           <b-row>
-            <b-col md="2">
-              <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+            <b-col lg="2" class="p-0">
+            <div class="profile-image-container">
+            <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                      alt="User Profile Image" width="75" height="75" class="rounded-circle"
                      id="profile-image"
                      title="View profile image"
-                     @click="$bvModal.show('edit-profile-image')"
               />
+              <b-button @click="$bvModal.show('edit-profile-image')"
+                        v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
+                        class="edit-business-image" size="sm"><b-icon-image/> Edit </b-button>
+            </div>
             </b-col>
-            <b-col md="10" class="mt-2">
+            <b-col class="mt-2">
               <b-row>
                 <h4 class="md">{{ userData.firstName + " " + userData.lastName }}
-                  <b-icon-pencil-fill
-                      v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
-                      v-b-tooltip.hover
-                      title="Edit Profile Details"
-                      id="editProfile"
-                      @click="editUserModel"
-                      style="cursor: pointer;"
-                  />
                 </h4>
               </b-row>
               <b-row>
@@ -37,19 +33,26 @@ Date: 5/3/2021
                 </p>
               </b-row>
             </b-col>
-            <b-col cols="2" sm="auto"
-                   v-if="currentUserAdmin">
-              <h4>{{ userRoleDisplayString }}</h4>
+            <b-col lg="3" sm="12"
+                   v-if="currentUserAdmin"
+                   class="p-0">
+              <b-icon-pencil-fill class="close edit-details"
+                                  v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs"
+                                  @click="editUserModel"
+                                  title="Update Profile Details">
+              </b-icon-pencil-fill>
+              <h5>{{ userRoleDisplayString }}</h5>
               <b-button
                   v-bind:variant="toggleAdminButtonVariant"
                   v-if="showToggleAdminButton"
                   @click="toggleAdmin">{{ adminButtonText }}
               </b-button>
             </b-col>
-          </b-row>
-          <b-row>
-            <b-col cols="">
-            </b-col>
+            <b-icon-pencil-fill class="close edit-details"
+                                v-if="userLookingAtSelfOrIsAdmin && userData.role !== 'defaultGlobalApplicationAdmin' && !$currentUser.currentlyActingAs && !currentUserAdmin"
+                                @click="editUserModel"
+                                title="Update Profile Details">
+            </b-icon-pencil-fill>
           </b-row>
         </template>
         <b-list-group v-if="userData.bio">
@@ -168,6 +171,23 @@ Date: 5/3/2021
   margin-right: auto;
 }
 
+.edit-business-image {
+  position: absolute;
+  bottom: 0px;
+  left: 3px;
+  font-size: 0.7rem
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.profile-image-container {
+  position: relative;
+  margin-left: 1rem;
+  text-align: left;
+}
+
 h6 {
   line-height: 1.4;
 }
@@ -178,19 +198,13 @@ h6 {
   object-fit: cover;
 }
 
-#profile-image:hover {
-  cursor: pointer;
-  opacity: 0.8;
-}
-
-
 </style>
 
 <script>
 import api from "../../Api";
 import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
-import ProfileImage from "./ProfileImage";
+import ProfileImage from "../model/ProfileImage";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util/index";
 

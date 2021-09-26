@@ -7,27 +7,26 @@ Date: 26/3/2021
 
 <template>
   <div>
-    <b-card class="shadow" v-if="canCreateBusiness">
-      <h1> Create a Business </h1>
-      <br>
+    <b-card class="shadow" v-if="canCreateBusiness || isEditBusiness">
       <b-form
-          @submit="createBusiness"
+          @submit="submit"
       >
-        <b-form-group
-        >
+        <h1 v-if="!isEditBusiness"> Create a Business </h1>
+        <h5 v-else> Business Details</h5>
+
+        <b-form-group>
           <strong>Business name *</strong>
-          <b-form-input v-model="name" required placeholder="Business Name" maxlength="50" autofocus></b-form-input>
+          <b-form-input v-model="businessData.name" required placeholder="Business Name" maxlength="50" autofocus></b-form-input>
         </b-form-group>
 
-        <b-form-group
-        >
+        <b-form-group>
           <strong>Description</strong>
-          <b-form-textarea v-model="description" placeholder="Description" maxlength="250"></b-form-textarea>
+          <b-form-textarea v-model="businessData.description" placeholder="Description" maxlength="250"></b-form-textarea>
         </b-form-group>
 
         <b-form-group>
           <strong>Business Address *</strong>
-          <address-input v-model="address" required/>
+          <address-input v-model="businessData.address" :address="businessData.address"/>
         </b-form-group>
 
         <b-form-group>
@@ -35,7 +34,7 @@ Date: 26/3/2021
           </strong>
           <div class="input-group mb-xl-5">
 
-            <b-select v-model="businessType" required>
+            <b-select v-model="businessData.businessType" required>
               <option disabled value=""> Choose ...</option>
               <option> Accommodation and Food Services</option>
               <option> Retail Trade</option>
@@ -45,23 +44,26 @@ Date: 26/3/2021
             </b-select>
 
           </div>
-
         </b-form-group>
 
-        <br>
-
-        <b-button variant="primary" type="submit" style="margin-top:0.7em" id="create-btn">Create</b-button>
+        <b-row>
+          <b-col cols="auto" class="mr-auto p-3">
+            <b-button variant="primary" type="submit" id="submit-button">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
+          </b-col>
+          <b-col cols="auto" class="p-3">
+            <b-button v-show="isEditBusiness" id="cancel-button" @click="$bvModal.hide('edit-business-profile')" >Cancel</b-button>
+          </b-col>
+        </b-row>
       </b-form>
-      <br>
+
       <div v-if="errors.length">
-        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{
-            error
-          }}
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">
+          {{ error }}
         </b-alert>
       </div>
     </b-card>
 
-    <b-card id="create-business-locked-card" v-else-if="this.$currentUser.currentlyActingAs">
+    <b-card id="create-business-locked-card" v-else-if="this.$currentUser.currentlyActingAs && !isEditBusiness">
       <b-card-title>
         <b-icon-lock/>
         Can't create business while acting as a business
@@ -104,6 +106,17 @@ Date: 26/3/2021
   </div>
 </template>
 
+<style>
+#cancel-button {
+  align-self: end;
+  margin-top: 0.7rem;
+}
+
+#submit-button {
+  margin-top: 0.7rem;
+}
+</style>
+
 <script>
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
@@ -115,31 +128,56 @@ export default {
   components: {
     AddressInput
   },
+
+  props: {
+    isEditBusiness: {
+      type: Boolean,
+      default: false,
+    },
+    businessDetails: {
+      type: Object
+    }
+  },
+
   data: function () {
     return {
-      "name": "",
-      "description": "",
-      "address": {
-        streetNumber: "",
-        streetName: "",
-        suburb: "",
-        city: "",
-        region: "",
-        country: "",
-        postcode: ""
+      businessData: {
+        name: "",
+        description: "",
+        address: {
+          streetNumber: "",
+          streetName: "",
+          suburb: "",
+          city: "",
+          region: "",
+          country: "",
+          postcode: ""
+        },
+        businessType: "",
       },
-      "businessType": "",
       errors: [],
     }
   },
+
+  beforeMount() {
+    this.$log.debug(this.businessDetails)
+    if (this.isEditBusiness) {
+      this.businessData = JSON.parse(JSON.stringify(this.businessDetails));
+    }
+  },
+
   methods: {
-    getBusinessData() {
-      return {
-        name: this.name,
-        description: this.description,
-        address: this.address,
-        businessType: this.businessType
-      };
+
+    /**
+     * Handles submit event if isEditBusiness then updateBusiness is called else createBusiness is called
+     */
+    async submit(event) {
+      event.preventDefault();
+      if (this.isEditBusiness) {
+        await this.updateBusiness()
+      } else {
+        await this.createBusiness()
+      }
     },
 
     /**
@@ -149,19 +187,23 @@ export default {
      * Thus, this method should only ever be used as the @submit property of a form.
      * The parameter event is passed
      */
-    async createBusiness(event) {
-      event.preventDefault();   // HTML forms will by default reload the page, so prevent that from happening
-
-      let businessData = this.getBusinessData();
-
+    async createBusiness() {
       try {
-        const businessResponse = (await api.postBusiness(businessData)).data;
+        const businessResponse = (await api.postBusiness(this.businessData)).data;
         this.$currentUser = (await api.getUser(this.$currentUser.id)).data;
         await this.$router.push({path: `/businesses/${businessResponse.businessId}`});
       } catch (error) {
         this.pushErrors(error);
       }
     },
+
+    /**
+     * TODO
+     */
+    async updateBusiness() {
+      //TODO
+    },
+
     /**
      * Pushes errors to errors list to be displayed as response on the screen,
      * if there are any.

@@ -159,6 +159,7 @@ export default {
         endDate: formatDate(endDate),
       }
     }),
+  postMessage: (message) => instance.post(`/messages`, message,{withCredentials: true}),
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
