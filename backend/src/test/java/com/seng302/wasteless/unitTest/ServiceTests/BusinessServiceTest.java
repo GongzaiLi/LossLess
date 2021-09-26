@@ -26,6 +26,9 @@ class BusinessServiceTest {
     private MockMvc mockMvc;
 
     @MockBean
+    private ImageService imageService;
+
+    @MockBean
     private BusinessRepository businessRepository;
 
     @MockBean
@@ -38,7 +41,7 @@ class BusinessServiceTest {
         Mockito.when(businessRepository.findFirstById(1)).thenReturn(null);
         boolean success = true;
         try {
-            BusinessService businessService = new BusinessService(businessRepository);
+            BusinessService businessService = new BusinessService(businessRepository, imageService);
             businessService.findBusinessById(1);
         } catch (ResponseStatusException e) {
             success = false;
@@ -53,7 +56,7 @@ class BusinessServiceTest {
     void whenCheckUUserAdminOfBusinessOrGAA_AndNeither_ThrowException() {
         boolean success = true;
         try {
-            BusinessService businessService = new BusinessService(businessRepository);
+            BusinessService businessService = new BusinessService(businessRepository, imageService);
             Business business = new Business();
             User user = new User();
             user.setRole(UserRoles.USER);
@@ -75,7 +78,7 @@ class BusinessServiceTest {
     void whenCheckUUserAdminOfBusinessOrGAA_AndUserAdmin_ThrowException() {
         boolean success = true;
         try {
-            BusinessService businessService = new BusinessService(businessRepository);
+            BusinessService businessService = new BusinessService(businessRepository, imageService);
             Business business = new Business();
             User user = new User();
             user.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
@@ -95,7 +98,7 @@ class BusinessServiceTest {
     void whenCheckUUserAdminOfBusinessOrGAA_AndUserBusinessAdmin_ThrowException() {
         boolean success = true;
         try {
-            BusinessService businessService = new BusinessService(businessRepository);
+            BusinessService businessService = new BusinessService(businessRepository, imageService);
             Business business = new Business();
             User user = new User();
             user.setRole(UserRoles.USER);
@@ -113,7 +116,7 @@ class BusinessServiceTest {
     void whenCheckUUserAdminOfBusinessOrGAA_AndBoth_ThrowException() {
         boolean success = true;
         try {
-            BusinessService businessService = new BusinessService(businessRepository);
+            BusinessService businessService = new BusinessService(businessRepository, imageService);
             Business business = new Business();
             User user = new User();
             user.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
