@@ -28,3 +28,8 @@ Feature: UCM8 - Contacting other marketplace
     Then The card owner "x@x" get all message
       | Hi, Scott  |
       | Hi, Nitish |
+
+  Scenario: AC3 - Sending a message results in a new item on the recipient’s feed on their home page
+    Given A user logged in as a user with email "x@x"
+    When the user send a message to the user "d@d" regarding card with id 10, with the text "Hi, Nitish"
+    Then The user "d@d" receives the notification "You have received a new message from FirstName LastName about the marketplace item: 10982 Lada Samara."
