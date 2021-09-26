@@ -331,7 +331,7 @@ public class ImageController {
      * @param file          The image to upload
      * @return              The image after uploading, or one of the error codes detailed above.
      */
-    @PutMapping("/businesses/{businessId}/image")
+    @PostMapping("/businesses/{businessId}/image")
     public ResponseEntity<Object> postBusinessImage(@PathVariable("businessId") Integer businessId, @RequestParam("filename") MultipartFile file) {
         logger.info("Request to upload business image for business: {}", businessId);
 
