@@ -22,6 +22,7 @@
         <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
         <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
         <b-icon-globe v-else-if="updatedNotification.type==='Currency Changed'"/>
+        <b-icon-chat-square-dots-fill v-else-if="updatedNotification.type==='Message Received'"/>
       </b-col>
       <b-col class="pl-0 pt-1" cols="5">
         <h6> {{updatedNotification.type}} </h6>
