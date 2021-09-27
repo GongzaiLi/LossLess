@@ -3,19 +3,18 @@
     <b-row no-gutters>
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
-          <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.id
-                             @click="clickedChatHead($event, item.otherUser.id)">
-            <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.otherUser.profileImage"
+          <b-list-group-item class="chat-head" v-for="conversation in conversations" :key=conversation.id
+                             @click="clickedChatHead($event, conversation.otherUser.id)">
+            <b-img class="rounded-circle avatar" width="30" height="30" :alt="conversation.otherUser.profileImage"
                    :src="require('../../../public/profile-default.jpg')"/>
-            {{ item.otherUser.firstName }}
+            {{ conversation.otherUser.firstName }}
           </b-list-group-item>
         </b-list-group>
       </b-col>
-      <b-col :lg="isCardCreator?9:12">
+      <b-col :lg="isCardCreator?9:12" :key="timesMessagesUpdates">
         <div class="message-box">
-
-          <b-card v-for="message in messages" :key="message.id">
-            <b-card-text :style="message.senderId == myId ? 'float: right' : 'float: left'">
+          <b-card v-for="message in current_displayed_messages" :key="message.id">
+            <b-card-text :style="message.senderId === currentUserId ? 'float: right' : 'float: left'">
               {{ message.messageText }}
             </b-card-text>
           </b-card>
@@ -29,10 +28,11 @@
                 no-resize
                 type="text" class="messageInputBox"
                 placeholder="Type Message..."
-                v-model="messageText"> Enter message
+                v-model="messageText"
+            >
             </b-form-textarea>
             <b-input-group-append>
-              <b-button type="submit" variant="primary"> Send</b-button>
+              <b-button type="submit" :disabled="targetChatHead == null && isCardCreator" variant="primary"> Send</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form>
@@ -102,10 +102,11 @@ export default {
       targetChatHead: null,
       messageText: '',
       sendToUserId: null,
-      messageRequired: false,
-      myId: null,
+      otherUserId: null,
+      currentUserId: null,
       conversations: [],
-      messages: []
+      timesMessagesUpdates: 0,
+      current_displayed_messages: []
     }
   },
   methods: {
@@ -116,6 +117,7 @@ export default {
      *
      * https://stackoverflow.com/questions/40153194/how-to-remove-class-from-siblings-of-an-element-without-jquery
      * @param event
+     * @param userId
      */
     clickedChatHead(event, userId) {
       if (this.targetChatHead) {
@@ -123,16 +125,19 @@ export default {
       }
       this.targetChatHead = event.currentTarget;
       this.targetChatHead.classList.add('active');
-      this.sendToUserId = userId
+
+      this.sendToUserId = userId;
+      this.otherUserId = userId;
+
       this.setCurrentMessages()
-
-
     },
 
+    /**
+     * Find the messages for the conversation with the current otherUser (selected chat head or card owner)
+     */
     setCurrentMessages() {
-      this.conversations.forEach(conversation => {
-        if (conversation.otherUser.id !== this.my) this.messages = conversation.messages
-      })
+      const correctConversation = this.conversations.find(c => this.otherUserId === c.otherUser.id);
+      this.current_displayed_messages = correctConversation.messages;
     },
 
     /**
@@ -151,36 +156,39 @@ export default {
       await Api.postMessage(message)
           .then(async (res) => {
             this.$log.debug(res.data);
-            this.messageText = ''
-            await this.getMessages()
-            this.setCurrentMessages()
+            this.messageText = '';
+            await this.getMessages();
+            this.setCurrentMessages();
           })
           .catch(err => {
             this.$log.debug(err);
           })
     },
 
+    /**
+     * Get messages from the backend for a user
+     * Set conversation data depending on whether user owns card or not.
+     */
     async getMessages() {
       await Api.getMessages(this.cardId)
           .then(res => {
-            this.setUpMessages(res.data);
-            console.log("Messages", res.data)
-          })
+            if (this.isCardCreator) {
+              this.conversations = res.data
+            } else {
+              this.conversations = [];
+              this.conversations.push(res.data);
+              this.otherUserId = this.conversations[0].otherUser.id;
+              this.setCurrentMessages();
+            }
+          }).catch(err => {
+            console.error(err);
+          });
     },
-
-    setUpMessages(messages) {
-      if (this.isCardCreator) {
-        this.conversations = messages
-      } else {
-        this.conversations.push(messages)
-        this.setCurrentMessages()
-      }
-    }
   },
 
 
   mounted() {
-    this.myId = this.$currentUser.id;
+    this.currentUserId = this.$currentUser.id;
     this.getMessages()
   }
 }
