@@ -30,9 +30,10 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @param businessId Id of business to get purchases for
      * @param startDate  The start date for the date range.
      * @param endDate    The end date for the date range.
-     * @return All Purchased Listing records that belong to a given business, and were purchased between the start and end dates
+     * @return All Purchased Listing records that belong to a given business, and were purchased between the start and end dates.
+     * This will be sorted by the sale dates of the purchases
      */
-    List<PurchasedListing> findAllByBusinessIdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
+    List<PurchasedListing> findAllByBusinessIdAndSaleDateBetweenOrderBySaleDate(Integer businessId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Returns a Purchased Listing records that belong to a given purchaseListing Id
@@ -43,23 +44,10 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
 
     /**
      * Returns the total number of purchases for a specified business
-     * @param businessId the id of the business
-     */
-    Integer countAllByBusiness_Id(Integer businessId);
-
-    /**
-     * Returns the total number of purchases for a specified business
      * in a specified date range
      * @param businessId the id of the business
      */
     Integer countAllByBusiness_IdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
-
-    /**
-     * Returns the total value of purchases for a specified business
-     * @param businessId the id of the business
-     */
-    @Query(value = "Select sum(PL.price from PurchasedListing PL where PL.business_id = :businessId)", nativeQuery = true)
-    Integer sumPriceByBusiness_Id(@Param("businessId") Integer businessId);
 
     /**
      * Returns the total value of purchases for a specified business
