@@ -310,7 +310,7 @@ export default {
       await Api
         .modifyUser(editData, this.$route.params.id)
           .then(() => {
-            EventBus.$emit("updatedUser");
+            EventBus.$emit("updatedUserDetails");
         })
         .catch((error) => {
           this.errors = [];

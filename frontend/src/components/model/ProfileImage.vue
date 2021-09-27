@@ -136,7 +136,7 @@ export default {
         this.imageURL = window.URL.createObjectURL(this.imageFile)
         this.isUploadingFile = false;
         this.uploaded = true;
-        EventBus.$emit("updatedImage", this.imageURL);
+        EventBus.$emit("updatedUserImage", this.imageURL);
       })
           .catch((error) => {
             this.errors = [];

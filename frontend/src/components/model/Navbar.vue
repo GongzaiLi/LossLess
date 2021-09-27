@@ -125,8 +125,10 @@ export default {
     }
   },
   mounted() {
-    EventBus.$on('updatedUser', this.updatedUserHandler)
-    EventBus.$on('updatedImage', this.updatedUserHandler)
+    EventBus.$on('updatedUserDetails', this.updatedAccountHandler)
+    EventBus.$on('updatedUserImage', this.updatedAccountHandler)
+    EventBus.$on('updatedBusinessDetails', this.updatedAccountHandler)
+    EventBus.$on('updatedBusinessImage', this.updatedAccountHandler)
 
   },
   computed: {
@@ -276,11 +278,11 @@ export default {
     },
 
     /**
-     * This is the handler for the event "updatedUser".
+     * This is the handler for the events "updatedUserDetails", "updatedBusinessDetails", "updatedUserImage", "updatedBusinessImage".
      * The function calls initializeAuth from the Auth plugin
      * which refreshes Auth
      */
-    updatedUserHandler: function () {
+    updatedAccountHandler: function () {
       initializeAuth()
     },
     /**

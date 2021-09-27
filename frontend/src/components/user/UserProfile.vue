@@ -250,8 +250,8 @@ export default {
     const userId = this.$route.params.id;
     this.launchPage(userId);
 
-    EventBus.$on('updatedUser', this.updatedUserHandler)
-    EventBus.$on('updatedImage', this.updatedImageHandler)
+    EventBus.$on('updatedUserDetails', this.updatedUserHandler)
+    EventBus.$on('updatedUserImage', this.updatedImageHandler)
 
   },
 

@@ -303,7 +303,7 @@ export default {
   mounted() {
     const businessId = this.$route.params.id;
     this.launchPage(businessId);
-    EventBus.$on('updatedBusiness', this.updateBusinessHandler);
+    EventBus.$on('updatedBusinessDetails', this.updateBusinessHandler);
   },
 
   methods: {
@@ -434,7 +434,7 @@ export default {
     },
 
     /**
-     * Handles the EventBus emit for 'updatedBusiness'.
+     * Handles the EventBus emit for 'updatedBusinessDetails'.
      * This hides the edit business modal and refreshes the business's details.
      */
     updateBusinessHandler(businessId) {
