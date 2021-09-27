@@ -204,6 +204,36 @@ describe('Testing api post request and the response method with errors', () => {
 
 });
 
+describe('Testing-api-put-business', () => {
+
+  it('Successful-update-business', async () => {
+    Api.modifyBusiness.mockResolvedValue({
+      status: 200
+    });
+
+    await wrapper.vm.updateBusiness();
+    expect(wrapper.vm.errors).toStrictEqual([]);
+  });
+
+  it('400-error-update-user-testing', async () => {
+    Api.modifyBusiness.mockRejectedValue({
+      response: {
+        data: {message: "Bad request"},
+        status: 400
+      }
+    });
+    await wrapper.vm.updateBusiness();
+    expect(wrapper.vm.errors).toStrictEqual(["Updating business failed: Bad request"]);
+  });
+
+  it('500-error-update-user-testing', async () => {
+    Api.modifyBusiness.mockRejectedValue({});
+    await wrapper.vm.updateBusiness();
+    expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
+  });
+});
+
+
 
 // HTML TESTING ----------------------------------------------------------------
 describe('CreateBusiness HTML testing', () => {
@@ -257,8 +287,8 @@ describe('CreateBusiness HTML testing', () => {
     expect(wrapper.findAll("select option").at(4).text()).toEqual(option4);
   });
 
-  test('Create button renders', () => {
-    const buttonLabel = "Create";
+  test('Cancel button renders', () => {
+    const buttonLabel = "Cancel";
     expect(wrapper.findAll("button").at(1).text()).toEqual(buttonLabel);
   });
 

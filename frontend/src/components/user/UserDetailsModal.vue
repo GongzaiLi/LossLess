@@ -89,11 +89,11 @@ Date: 3/3/2021
         </b-form-group>
         <b-row>
           <b-col cols="auto" class="mr-auto p-3">
-            <b-button v-if="isEditUser" variant="primary" class="button" type="submit" id="confirm-btn">Confirm</b-button>
-            <b-button v-else variant="primary" type="submit" class="button"  id="register-btn">Register</b-button>
+            <b-button v-show="isEditUser" class="button" id="cancel-button m-0" @click="$bvModal.hide('edit-user-profile')">Cancel</b-button>
           </b-col>
           <b-col cols="auto" class="p-3">
-            <b-button v-show="isEditUser" class="button" id="cancel-button" @click="$bvModal.hide('edit-user-profile')">Cancel</b-button>
+            <b-button v-if="isEditUser" variant="primary" class="button m-0" type="submit" id="confirm-btn">Confirm</b-button>
+            <b-button v-else variant="primary" type="submit" class="button m-0"  id="register-btn">Register</b-button>
           </b-col>
         </b-row>
       </b-form>
@@ -103,7 +103,7 @@ Date: 3/3/2021
           }}
         </b-alert>
       </div>
-      <h6 v-if="!isEditUser">
+      <h6 v-if="!isEditUser" class="float-right">
         Already have an account?
         <router-link to="/login">Login here</router-link>
       </h6>
