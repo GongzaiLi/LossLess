@@ -3,28 +3,38 @@
     <b-row no-gutters>
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
-          <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead($event, item.userId)">
-            <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/profile-default.jpg')" />
-            {{item.userName}}
+          <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.id
+                             @click="clickedChatHead($event, item.otherUser.id)">
+            <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.otherUser.profileImage"
+                   :src="require('../../../public/profile-default.jpg')"/>
+            {{ item.otherUser.firstName }}
           </b-list-group-item>
         </b-list-group>
       </b-col>
       <b-col :lg="isCardCreator?9:12">
-        <b-card class="message-box">
-        </b-card>
-        <b-form v-if="sendToUserId && sendToUserId !== myId" @submit.prevent="sendMessage">
-        <b-input-group >
-          <b-form-textarea
-              required
-              maxlength=250 max-rows="2"
-              no-resize
-              type="text" class="messageInputBox"
-              placeholder="Type Message..."
-              v-model="messageText"> Enter message </b-form-textarea>
-          <b-input-group-append>
-            <b-button type="submit" variant="primary"> Send </b-button>
-          </b-input-group-append>
-        </b-input-group>
+        <div class="message-box">
+
+          <b-card v-for="message in messages" :key="message.id">
+            <b-card-text :style="message.senderId == myId ? 'float: right' : 'float: left'">
+              {{ message.messageText }}
+            </b-card-text>
+          </b-card>
+
+        </div>
+        <b-form @submit.prevent="sendMessage">
+          <b-input-group>
+            <b-form-textarea
+                required
+                maxlength=250 max-rows="2"
+                no-resize
+                type="text" class="messageInputBox"
+                placeholder="Type Message..."
+                v-model="messageText"> Enter message
+            </b-form-textarea>
+            <b-input-group-append>
+              <b-button type="submit" variant="primary"> Send</b-button>
+            </b-input-group-append>
+          </b-input-group>
         </b-form>
       </b-col>
     </b-row>
@@ -42,6 +52,7 @@
 
 .message-box {
   height: 11rem;
+  overflow-y: auto;
 }
 
 .messageInputBox {
@@ -69,9 +80,11 @@
 div.chat-head {
   border-left: none;
 }
+
 div.chat-head:first-child {
   border-top: none;
 }
+
 div.chat-head:last-child {
   border-bottom: none;
 }
@@ -82,7 +95,7 @@ div.chat-head:last-child {
 import Api from "../../Api";
 
 export default {
-  props: ['isCardCreator', 'cardId'],
+  props: ['isCardCreator', 'cardId', 'cardCreatorId'],
   name: "Messages",
   data() {
     return {
@@ -91,38 +104,8 @@ export default {
       sendToUserId: null,
       messageRequired: false,
       myId: null,
-      conversations: [
-        {
-          userId: 0,
-          userName: "James",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 1,
-          userName: "Phil",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 2,
-          userName: "Joseph",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 3,
-          userName: "John",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 4,
-          userName: "Chris",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-        {
-          userId: 5,
-          userName: "Mickey",
-          possibleOtherUserInfo: "You decide these fields",
-        },
-      ]
+      conversations: [],
+      messages: []
     }
   },
   methods: {
@@ -140,30 +123,65 @@ export default {
       }
       this.targetChatHead = event.currentTarget;
       this.targetChatHead.classList.add('active');
-      this.sendToUserId = userId;
+      this.sendToUserId = userId
+      this.setCurrentMessages()
+
+
+    },
+
+    setCurrentMessages() {
+      this.conversations.forEach(conversation => {
+        if (conversation.otherUser.id !== this.my) this.messages = conversation.messages
+      })
     },
 
     /**
      *  Creates a message object and sends as body in the api request when send button clicked.
      */
-    sendMessage() {
-      const message = { cardId: this.cardId,
-                        receiverId: this.sendToUserId,
-                        messageText: this.messageText
-                      }
-      Api.postMessage(message)
-      .then(res => {
-        this.$log.debug(res.data);
-      })
-      .catch(err => {
-        this.$log.debug(err);
-      })
+    async sendMessage() {
+      if (!this.sendToUserId) {
+        this.sendToUserId = this.cardCreatorId
+      }
+
+      const message = {
+        cardId: this.cardId,
+        receiverId: this.sendToUserId,
+        messageText: this.messageText
+      }
+      await Api.postMessage(message)
+          .then(async (res) => {
+            this.$log.debug(res.data);
+            this.messageText = ''
+            await this.getMessages()
+            this.setCurrentMessages()
+          })
+          .catch(err => {
+            this.$log.debug(err);
+          })
     },
 
+    async getMessages() {
+      await Api.getMessages(this.cardId)
+          .then(res => {
+            this.setUpMessages(res.data);
+            console.log("Messages", res.data)
+          })
+    },
+
+    setUpMessages(messages) {
+      if (this.isCardCreator) {
+        this.conversations = messages
+      } else {
+        this.conversations.push(messages)
+        this.setCurrentMessages()
+      }
+    }
   },
+
 
   mounted() {
     this.myId = this.$currentUser.id;
+    this.getMessages()
   }
 }
 </script>
