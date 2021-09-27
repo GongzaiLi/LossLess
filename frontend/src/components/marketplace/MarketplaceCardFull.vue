@@ -1,6 +1,6 @@
 <template>
   <div>
-      <b-card class=profile-card>
+      <b-card>
         <div>
           <h1><strong> {{ fullCard.title }} </strong>
             <b-icon-x class="float-right close" @click="closeFullViewCardModal">
@@ -48,7 +48,6 @@
             <b-button v-else class="button-right" variant="primary"  @click="messageVisible = false" title="Close Messages">
               <b-icon-chat-quote-fill/> Close Messages
             </b-button>
-
           </div>
 
 
@@ -98,12 +97,16 @@
 }
 
 #messageBox{
-  margin-top: 1rem
+  margin-top: 1rem;
+  transition-duration: 0.15s !important;
 }
 
 label{
   word-wrap: break-word;
 }
+
+
+
 
 </style>
 
