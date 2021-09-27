@@ -48,10 +48,10 @@ Date: 26/3/2021
 
         <b-row>
           <b-col cols="auto" class="mr-auto p-3">
-            <b-button variant="primary" type="submit" id="submit-button">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
+            <b-button v-show="isEditBusiness" id="cancel-button" @click="$bvModal.hide('edit-business-profile')" >Cancel</b-button>
           </b-col>
           <b-col cols="auto" class="p-3">
-            <b-button v-show="isEditBusiness" id="cancel-button" @click="$bvModal.hide('edit-business-profile')" >Cancel</b-button>
+            <b-button variant="primary" type="submit" id="submit-button">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
           </b-col>
         </b-row>
       </b-form>
