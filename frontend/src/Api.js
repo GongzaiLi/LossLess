@@ -191,6 +191,8 @@ export default {
     return instance.post(`/users/${userId}/image`, formData, {withCredentials: true});
   },
 
+  getSalesReportCsv: (businessId) => instance.get(`/businesses/${businessId}/salesReport/csv`, {withCredentials: true, responseType: 'blob' }),
+
   /**
    * Given the name of the user's country, gets currency data for that country.
    * Uses the restcountries API. Currency data is a JS object in the format:

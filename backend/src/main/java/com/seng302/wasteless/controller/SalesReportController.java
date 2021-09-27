@@ -4,15 +4,20 @@ import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.SalesReportSinglePeriod;
 import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +26,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -42,8 +53,8 @@ public class SalesReportController {
 
     @Autowired
     public SalesReportController(BusinessService businessService,
-                             UserService userService,
-                             PurchasedListingService purchasedListingService) {
+                                 UserService userService,
+                                 PurchasedListingService purchasedListingService) {
         this.businessService = businessService;
         this.userService = userService;
         this.purchasedListingService = purchasedListingService;
@@ -62,9 +73,9 @@ public class SalesReportController {
      */
     @GetMapping("/businesses/{id}/salesReport/totalPurchases")
     public ResponseEntity<Object> getPurchaseDataOfBusiness(@PathVariable("id") Integer businessId,
-                                                              @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                              @RequestParam(value = "endDate", required = false) LocalDate endDate,
-                                                              @RequestParam(value = "period", required = false) String period) {
+                                                            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                            @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                                            @RequestParam(value = "period", required = false) String period) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
@@ -116,51 +127,52 @@ public class SalesReportController {
     }
 
     /**
-     * Get the total quantity, value, likes of all sales for each product of a business in the given period.
+     * Get the total quantity, value, likes of all sales, grouped by either product or manufacturer, of a business in the given period.
+     *
+     * Note that we don't use a Pageable here as we want to have our own custom sort attributes that use
+     * difference validation from the default Pageable. For example, we throw a custom error message if the
+     * sortBy parameter is not one of a few allowed values.
      *
      * @param businessId    The id of the business to get purchases for
+     * @param reportType The type of report to get ("productsPurchasedTotals" for products or "manufacturerPurchasedTotals" for manufacturers).
      * @param startDate  The start date for the date range.
      * @param endDate    The end date for the date range.
      * @param sortBy        The value to sort the products by
      * @param order         The order to sort the products in
+     * @param size The size of each page to return
+     * @param page The number of the page to return (0 for first page, 1 for second page etc).
      * @return              The total quantity, value, likes of all purchases for each product of a business
      */
-    @GetMapping("/businesses/{id}/salesReport/productsPurchasedTotals")
-    public ResponseEntity<Object> getProductPurchaseTotalsDataOfBusiness(@PathVariable("id") Integer businessId,
-                                                                         @RequestParam(value = "startDate", required = false) LocalDate startDate,
-                                                                         @RequestParam(value = "endDate", required = false) LocalDate endDate,
-                                                                         @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false) Sort.Direction order,
-                                                                         Pageable pageable) {
-
-        logger.info("Request to get reports for all the purchased products in the given period.");
-
+    @GetMapping("/businesses/{id}/salesReport/{reportType}")
+    public ResponseEntity<Object> getGroupedPurchaseDataOfBusiness(@PathVariable("id") Integer businessId,
+                                                                   @PathVariable("reportType") String reportType,
+                                                                   @RequestParam(value = "startDate", required = false) LocalDate startDate,
+                                                                   @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                                                                   @RequestParam(value = "sortBy", required = false) String sortBy,
+                                                                   @RequestParam(value = "order", required = false) Sort.Direction order,
+                                                                   @RequestParam(required = false, defaultValue = "100000") Integer size,
+                                                                   @RequestParam(required = false, defaultValue = "0") Integer page) {
         User user = userService.getCurrentlyLoggedInUser();
         Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("Successfully retrieved business with ID: {}.", businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
-
-        List<SalesReportProductTotalsDto> productsPurchasedTotals;
 
         if (!validateDate(startDate, endDate)) {
             startDate = possibleBusiness.getCreated();
             endDate = LocalDate.now();
         }
 
-        if (sortBy == null && order != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
-        } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
-        } else {
-            if (order == null) {
-                order = Sort.Direction.ASC;
-            }
-            Sort sort = (sortBy == null) ? Sort.unsorted() : Sort.by(order, sortBy);
-            productsPurchasedTotals = purchasedListingService.getProductsPurchasedTotals(businessId, startDate,
-                    endDate, PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
-        }
+        Pageable sortedPageable = getSortedPageable(page, size, sortBy, order);
 
-        return ResponseEntity.status(HttpStatus.OK).body(productsPurchasedTotals);
+        switch (reportType) {
+            case "productsPurchasedTotals":
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        purchasedListingService.getProductsPurchasedTotals(businessId, startDate, endDate, sortedPageable));
+            case "manufacturersPurchasedTotals":
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        purchasedListingService.getManufacturersPurchasedTotals(businessId, startDate, endDate, sortedPageable));
+            default:
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
@@ -191,35 +203,34 @@ public class SalesReportController {
     }
 
     /**
-     * Get the total quantity, value, likes of all sales for each manufacturer of items sold by a business.
+     * Create and return a CSV file containing all sales report information (all purchased listings) for a given business
      *
-     * @param businessId    The id of the business to get purchases for
-     * @param sortBy        The value to sort the products by
-     * @param order         The order to sort the products in
-     * @return              The total quantity, value, likes of all purchases for each manufacturer of a business
+     * Returns
+     * 200 and CSV file if okay
+     * 401 if unauthorised
+     * 403 if forbidden from accessing business
+     *
+     * @param businessId    The id of the business to get sales report information for
+     * @return              CSV file of all sales report information
      */
-    @GetMapping("/businesses/{id}/salesReport/manufacturersPurchasedTotals")
-    public ResponseEntity<Object> getManufacturerPurchasedTotalsOfBusiness(@PathVariable("id") Integer businessId,
-                                                                         @RequestParam(value = "sortBy", required = false) String sortBy,
-                                                                         @RequestParam(value = "order", required = false) Sort.Direction order) {
+    @GetMapping("/businesses/{id}/salesReport/csv")
+    public ResponseEntity<Object> getSalesReportCSV(@PathVariable("id") Integer businessId) {
         User user = userService.getCurrentlyLoggedInUser();
-        Business possibleBusiness = businessService.findBusinessById(businessId);
-        logger.info("Successfully retrieved business with ID: {}.", businessId);
-        businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
+        Business business = businessService.findBusinessById(businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(business, user);
 
-        List<SalesReportManufacturerTotalsDto> manufacturersPurchasedTotals;
+        InputStreamResource fileInputStream = new InputStreamResource(purchasedListingService.getSalesReportCSVByteSteam(business.getId()));
 
-        if (sortBy == null && order != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You can't have an order without specifying sort.");
-        } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have not specified a correct value to sort by.");
-        } else {
-            manufacturersPurchasedTotals = purchasedListingService.getManufacturersPurchasedTotals(businessId, sortBy, order);
-        }
+        String csvFileName = "salesReport.csv";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + csvFileName);
+        headers.set(HttpHeaders.CONTENT_TYPE, "text/csv");
 
-
-        return ResponseEntity.status(HttpStatus.OK).body(manufacturersPurchasedTotals);
-
+        return new ResponseEntity<>(
+                fileInputStream,
+                headers,
+                HttpStatus.OK
+        );
     }
 
     /**
@@ -229,7 +240,7 @@ public class SalesReportController {
      * @param startDate The start date provided.
      * @param endDate The end date provided.
      */
-    public Boolean validateDate(LocalDate startDate, LocalDate endDate) {
+    public boolean validateDate(LocalDate startDate, LocalDate endDate) {
         if (startDate == null && endDate == null) {
             logger.info("No date range specified. Getting report from business creation up to now.");
             return false;
@@ -239,5 +250,29 @@ public class SalesReportController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start date must be before end date.");
         }
         return true;
+    }
+
+    /**
+     * Creates a Pageable object given pagination information, and sorting information specific to sales reports.
+     * Also carries out validation for the sorting information.
+     * @param sortBy The key to sort by (one of "value", "quantity" or "likes")
+     * @param order  The order to sort (asc or desc)
+     * @param size   The size of each page to return
+     * @param page   The number of the page to return (0 for first page, 1 for second page etc).
+     * @return A Pageable object containing given pagination and sorting information
+     * @throws ResponseStatusException 400 if order is not null but sortBy is, or if sortBy is not one of the valid values
+     */
+    public Pageable getSortedPageable(Integer page, Integer size, String sortBy, Sort.Direction order) {
+        if (sortBy == null && order != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can't have an order without specifying sort.");
+        } else if (sortBy != null && !sortBy.equals("value") && !sortBy.equals("quantity") && !sortBy.equals("likes")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have not specified a correct value to sort by.");
+        } else {
+            if (order == null) {
+                order = Sort.Direction.ASC;
+            }
+            Sort sort = (sortBy == null) ? Sort.unsorted() : Sort.by(order, sortBy);
+            return PageRequest.of(page, size, sort);
+        }
     }
 }
