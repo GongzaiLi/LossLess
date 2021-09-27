@@ -369,21 +369,21 @@ class PurchasedListingServiceTest {
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
-        assertEquals(9, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(26, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
-        assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(13, purchasedTotalsData.get(1).getTotalValue());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfLikesOfPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
-        assertEquals(9, purchasedTotalsData.get(0).getTotalLikes());
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
+        assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(26, purchasedTotalsData.get(1).getTotalLikes());
     }
 
@@ -391,7 +391,7 @@ class PurchasedListingServiceTest {
     void whenGetManufacturersPurchasedTotalsAndSortQuantity_ASC_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "quantity")));
-        assertEquals(9, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(26, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
@@ -399,7 +399,7 @@ class PurchasedListingServiceTest {
     void whenGetManufacturersPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "value")));
-        assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(13, purchasedTotalsData.get(1).getTotalValue());
     }
 
@@ -407,7 +407,7 @@ class PurchasedListingServiceTest {
     void whenGetManufacturersPurchasedTotalsAndSortLikes_ASC_thenCorrectOrderOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "likes")));
-        assertEquals(9, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(26, purchasedTotalsData.get(1).getTotalLikes());
     }
 
@@ -416,7 +416,7 @@ class PurchasedListingServiceTest {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "likes")));
         assertEquals(26, purchasedTotalsData.get(0).getTotalLikes());
-        assertEquals(9, purchasedTotalsData.get(1).getTotalLikes());
+        assertEquals(8, purchasedTotalsData.get(1).getTotalLikes());
 
     }
 

@@ -248,22 +248,15 @@ public class PurchasedListingService {
     }
 
     /**
-     * For a given product, create a SalesReportManufacturerTotalsDto populate it with the correct information.
+     * Get all purchased listings for a business.
      *
-     * @param manufacturer     The String of the manufacturer
-     * @return              SalesReportManufacturerTotalsDto populated with information about product sales
+     * @param businessId    The id of the business
+     * @return              all purchased listings of given business
      */
-    private SalesReportManufacturerTotalsDto getTotalsForManufacturer(String manufacturer) {
-        Integer totalPurchases = purchasedListingRepository.sumProductsSoldByManufacturer(manufacturer);
-        Double totalValue = purchasedListingRepository.sumPriceByManufacturer(manufacturer);
-        Integer totalLikes = purchasedListingRepository.sumTotalLikesByManufacturer(manufacturer);
-
-        if (totalValue == null) {
-            totalValue = 0.0;
-        }
-
-        return new SalesReportManufacturerTotalsDto(manufacturer, totalPurchases, totalValue, totalLikes);
+    public List<PurchasedListing> getAllPurchasedListingsForBusiness(Integer businessId) {
+        return purchasedListingRepository.findAllByBusinessId(businessId);
     }
+
 
     /**
      * Get all the sales report data in a as a csv in a ByteArrayInputStream
