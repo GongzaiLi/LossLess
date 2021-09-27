@@ -49,7 +49,7 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
 
-        <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="float-right ml-2" variant="secondary">Create Business</b-button>
+        <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="float-right ml-2 navbar-button" variant="secondary">Create Business</b-button>
       </b-navbar-nav>
     </b-collapse>
 
@@ -93,6 +93,12 @@ Date: sprint_1
     </b-dropdown>
   </b-navbar>
 </template>
+
+<style>
+.navbar-button {
+  max-width: 9rem;
+}
+</style>
 
 <script>
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
