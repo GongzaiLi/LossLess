@@ -1,36 +1,15 @@
 <template>
-  <b-dropdown right class="notifications-tray" v-if="isActingAsUser" no-caret variant="link" toggle-class="text-decoration-none">
-    <template #button-content>
-      <div class="icon mr-1">
-        <b-icon v-if="numberOfNotifications" icon="bell" class="iconBell" variant="danger"></b-icon>
-        <b-icon v-else icon="bell" class="iconBell" variant="light"></b-icon>
-        <span v-if="numberOfNotifications" style="position: absolute; transform: translateY(5px); color: red">
-                {{numberOfNotifications}}
-              </span>
-      </div>
-    </template>
-    <b-dropdown-item disabled>
-      <h4 style="color: black">Notifications: <span> {{numberOfNotifications}}</span></h4>
-    </b-dropdown-item>
-    <b-dropdown-item class="notifications-item expiring-notifications-item" v-for="card in expiringCards" v-bind:key="card.id + card.title" @click="goToHomePage">
-      <h6> Marketplace Card: {{card.title}}</h6>
-      <strong>expires within 24 hours</strong>
-    </b-dropdown-item>
-
-    <b-dropdown-item v-for="notification in unreadNotifications" v-bind:key="notification.id" class="notifications-item" @click="goToHomePage">
-      <notification :key="notificationChange" :notification="notification" :in-navbar="true"> </notification>
-    </b-dropdown-item>
-  </b-dropdown>
+    <b-badge variant="danger" v-if="numberOfNotifications">
+            {{numberOfNotifications}}
+    </b-badge>
 </template>
 
 <script>
 import Api from "../../Api";
 import EventBus from "../../util/event-bus";
-import Notification from "./Notification";
 
 export default {
   name: "NotificationDropdown",
-  components: {Notification},
   data() {
     return {
       notifications: [],
@@ -58,7 +37,9 @@ export default {
     unreadNotifications: function () {
       let unreadNotifications = []
       for (const notification of this.notifications) {
-        if (!notification.read&&!this.pendingDeletedNotification.includes(notification.id)) {
+        if (!notification.read && !this.pendingDeletedNotification.includes(notification.id)
+          && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed' ||
+              !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')) {
           unreadNotifications.push(notification)
         }
       }
@@ -114,55 +95,3 @@ export default {
 }
 
 </script>
-
-<style>
-.notifications-item {
-  border-top: 1px solid #aaa;
-  width: 26rem;
-  max-width: 80vw;
-  padding-top: 2px;
-}
-
-.notifications-item h6 {
-  margin-top: 3px;
-}
-
-.notifications-item * {
-  white-space:normal;
-  word-wrap:break-word;
-}
-
-.notifications-item .dropdown-item:active {
-  color: initial;
-  background-color: #cccccc;
-}
-
-.expiring-notifications-item * {
-  color: orangered;
-}
-
-.notifications-tray .dropdown-menu {
-  max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.notifications-tray .dropdown-toggle {
-  padding: 0;
-}
-
-.iconBell {
-  font-size: 1.6rem !important;
-}
-
-.notifications-item a:hover {
-  cursor: default;
-}
-
-@media (max-width: 992px) and (min-width: 357px) {
-  .notifications-tray .dropdown-menu {
-      right: -7rem;
-      left: auto;
-  }
-}
-</style>
