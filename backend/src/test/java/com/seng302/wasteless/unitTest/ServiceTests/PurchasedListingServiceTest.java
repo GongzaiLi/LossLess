@@ -412,8 +412,13 @@ class PurchasedListingServiceTest {
         byteArrayInputStream.read(bytes, 0, n);
         String stringFromBytes = new String(bytes, StandardCharsets.UTF_8);
 
-        assertEquals("saleDate,numberOfLikes,listingDate,closingDate,productName,productId,quantity,price,manufacturer\n" +
-                "2021-09-24,1,2021-09-24,2099-01-01T23:59,Clown Hats,Clown-Shirts,1,1.0,James", stringFromBytes.trim().replace("\r",""));
+        List<String> splitResult = Arrays.asList(stringFromBytes.trim().replace("\r","").split("\\s*,\\s*"));
+
+        assertEquals("saleDate", splitResult.get(0));
+        assertEquals("Clown Hats", splitResult.get(12));
+        assertEquals("Clown-Shirts", splitResult.get(13));
+        assertEquals("1", splitResult.get(14));
+        assertEquals("James", splitResult.get(16));
     }
 
     @Test
