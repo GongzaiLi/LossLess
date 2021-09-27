@@ -245,62 +245,17 @@ public class PurchasedListingService {
     }
 
     /**
-     * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
-     * and return a list of allSoldManufacturersOfBusiness. Each allSoldManufacturersOfBusiness contains information about
-     * a given manufacturer, including the number of the product sold, the total value all products sold for, and the
-     * total number of likes.
-     *
-     * @param businessId    The id of the business
-     * @param sortBy the attribute to be sorted by
-     * @param order the order to sort the list in
-     * @return              List of allSoldManufacturersOfBusiness populated with sale information for each manufacturer.
+     * For a given business, and date range, find all the manufacturers whose products have been sold at least once
+     * and return data for each. Data includes the number of sales of a manufacturer's products, the total value all
+     * @param businessId The id of the business
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
+     * @param pageable   An object specifying pagination and sorting data
+     * @return List of SalesReportManufacturerTotalsDto populated with sale information for each manufacturer.
      */
-    public List<SalesReportManufacturerTotalsDto> getManufacturersPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
-        List<String> allSoldManufacturersOfBusiness = purchasedListingRepository.getAllManufacturersBySalesOfBusiness(businessId);
-
-        List<SalesReportManufacturerTotalsDto> salesReportManufacturerTotalsDtos = new ArrayList<>();
-
-        for (String manufacturer: allSoldManufacturersOfBusiness) {
-            salesReportManufacturerTotalsDtos.add(getTotalsForManufacturer(manufacturer));
-        }
-        if (sortBy != null) {
-            switch (sortBy) {
-                case "value":
-                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalValue));
-                    break;
-                case "quantity":
-                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalProductPurchases));
-                    break;
-                case "likes":
-                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalLikes));
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (order != null  && order.isDescending()) {
-            Collections.reverse(salesReportManufacturerTotalsDtos);
-        }
-
-        return salesReportManufacturerTotalsDtos;
+    public List<SalesReportManufacturerTotalsDto> getManufacturersPurchasedTotals(int businessId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return purchasedListingRepository.getPurchasesGroupedByManufacturer(businessId, startDate, endDate, pageable)
+                .stream().map(SalesReportManufacturerTotalsDto::new)
+                .collect(Collectors.toList());
     }
-
-    /**
-     * For a given product, create a SalesReportManufacturerTotalsDto populate it with the correct information.
-     *
-     * @param manufacturer     The String of the manufacturer
-     * @return              SalesReportManufacturerTotalsDto populated with information about product sales
-     */
-    private SalesReportManufacturerTotalsDto getTotalsForManufacturer(String manufacturer) {
-        Integer totalPurchases = purchasedListingRepository.sumProductsSoldByManufacturer(manufacturer);
-        Double totalValue = purchasedListingRepository.sumPriceByManufacturer(manufacturer);
-        Integer totalLikes = purchasedListingRepository.sumTotalLikesByManufacturer(manufacturer);
-
-        if (totalValue == null) {
-            totalValue = 0.0;
-        }
-
-        return new SalesReportManufacturerTotalsDto(manufacturer, totalPurchases, totalValue, totalLikes);
-    }
-
 }
