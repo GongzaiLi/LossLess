@@ -7,7 +7,7 @@ Date: sprint_1
     toggleable="lg" type="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
+    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave"> <img src="icon.png" style="width: 2.5em" alt="LossLess Logo"></b-navbar-brand>
 
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
@@ -23,7 +23,7 @@ Date: sprint_1
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item to="/homepage">Home Page <NotificationDropdown/></b-nav-item>
+        <b-nav-item to="/homepage">Home Page <NotificationBadge/></b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/search">Search Accounts</b-nav-item>
         <b-nav-item to="/listingSearch">Search Listings</b-nav-item>
@@ -117,7 +117,7 @@ Date: sprint_1
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
 import EventBus from "../../util/event-bus";
 import api from "../../Api";
-import NotificationDropdown from "./NotificationDropdown";
+import NotificationBadge from "./NotificationBadge";
 
 
 /**
@@ -128,7 +128,7 @@ import NotificationDropdown from "./NotificationDropdown";
  */
 export default {
   name: "Navbar.vue",
-  components: {NotificationDropdown},
+  components: {NotificationBadge},
   data() {
     return {
       cards: [],

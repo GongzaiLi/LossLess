@@ -1,6 +1,6 @@
 import {createLocalVue, mount} from '@vue/test-utils';
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
-import NotificationDropdown from '../../components/model/NotificationDropdown'; // name of your Vue component
+import NotificationBadge from '../../components/model/NotificationBadge'; // name of your Vue component
 import Auth from '../../auth'
 import Api from '../../Api'
 import EventBus from "../../util/event-bus";
@@ -97,7 +97,14 @@ const notifications = [
     subjectId: 1,
     type: "Some type",
     read: false
-  }
+  },
+  {
+    id: 7,
+    message: "HSDFSD",
+    subjectId: 420,
+    type: "Business Currency Changed",
+    read: false
+  },
 ]
 
 const $log = {
@@ -133,7 +140,7 @@ beforeEach(() => {
   Api.getNotifications.mockResolvedValue({data: notifications});
   Api.patchNotification.mockResolvedValue({data: ""});
 
-  wrapper = mount(NotificationDropdown, {
+  wrapper = mount(NotificationBadge, {
     localVue,
     propsData: {},
     mocks: {$route, $router, $currentUser, $log, displayPeriodEnd: { split: 'asd'  }},
@@ -147,7 +154,7 @@ afterEach(() => {
   wrapper.destroy();
 });
 
-describe('NotificationDropdown', () => {
+describe('NotificationBadge', () => {
   test('is a Vue instance', () => {
     expect(wrapper.isVueInstance).toBeTruthy();
   });
@@ -175,11 +182,22 @@ describe('Get expiring cards', () => {
 
 describe('Get unread notifications', () => {
 
-  test('Unread notifications from the list of all the notifications', async () => {
+  test('Unread notifications from the list of all the notifications when acting as user', async () => {
     await wrapper.vm.updateNotifications();
     await wrapper.vm.$nextTick();
+
     expect(wrapper.vm.numberOfNotifications).toBe(4);
   })
 
-});
+  test('Unread notifications only counts business notifications when acting as business', async () => {
+    wrapper.vm.$currentUser.currentlyActingAs = {
+      id: 1,
+      name: "Big Dave's Collars"
+    };
+    await wrapper.vm.updateNotifications();
+    await wrapper.vm.$nextTick();
 
+    expect(wrapper.vm.numberOfNotifications).toBe(3);
+  })
+
+});

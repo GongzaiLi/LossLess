@@ -68,8 +68,7 @@
         </b-card>
         <div v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
           <notification :archived-selected="isArchivedSelected" :notification="notification"
-                        :in-navbar="false" @deleteNotification="createDeleteToast"
-                        v-if="showNotification(notification)">
+                        :in-navbar="false" @deleteNotification="createDeleteToast">
           </notification>
         </div>
       </b-overlay>
@@ -325,25 +324,21 @@ export default {
       else {
         this.$bvToast.hide('undoToast'+id)
       }
-    },
-
-    showNotification(notification) {
-      return this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed' ||
-          !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed';
     }
   },
 
   computed: {
     /**
-     * Filters notifications by removing notification pending deletion from the list
-     * @returns notifications with pendingDeletedNotification removed
+     * Filters notifications by removing notifications that shouldn't be displayed.
+     * This includes notifications pending deletion, and business notifications (if acting as user) or
+     * user notifications (if acting as business)
+     * @returns All notifications that should be displayed
      */
     filteredNotifications: function(){
-      let removedNotification=this.pendingDeletedNotifications
-      let filtered = this.notifications.filter(function(value){
-        return !(removedNotification.includes(value.id))
-      });
-      return filtered
+      return this.notifications.filter((notification) =>
+        !this.pendingDeletedNotifications.includes(notification.id) && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed'
+          || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')
+      );
     },
     notificationWidth() {
       return this.$currentUser.currentlyActingAs ? 12 : 6;

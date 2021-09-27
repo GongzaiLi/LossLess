@@ -1,15 +1,12 @@
 package com.seng302.wasteless.controller;
 
 import com.seng302.wasteless.dto.SalesReportDto;
-import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
-import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.PurchasedListing;
 import com.seng302.wasteless.model.SalesReportSinglePeriod;
 import com.seng302.wasteless.model.User;
-import com.seng302.wasteless.service.*;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
+import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.PurchasedListingService;
+import com.seng302.wasteless.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 

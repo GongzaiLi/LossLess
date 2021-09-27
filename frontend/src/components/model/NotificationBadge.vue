@@ -9,7 +9,7 @@ import Api from "../../Api";
 import EventBus from "../../util/event-bus";
 
 export default {
-  name: "NotificationDropdown",
+  name: "NotificationBadge",
   data() {
     return {
       notifications: [],
@@ -38,8 +38,8 @@ export default {
       let unreadNotifications = []
       for (const notification of this.notifications) {
         if (!notification.read && !this.pendingDeletedNotification.includes(notification.id)
-          && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed' ||
-              !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')) {
+          && (!this.isActingAsUser && notification.type==='Business Currency Changed' ||
+              this.isActingAsUser && notification.type!=='Business Currency Changed')) {
           unreadNotifications.push(notification)
         }
       }
