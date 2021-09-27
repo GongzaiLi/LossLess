@@ -35,6 +35,7 @@ const LISTING_ID_OF_MAX_LIKED_LISTING = 1;
 const MAX_PURCHASES_PER_USER = 3;
 const PROB_USER_PURCHASES_LISTING = 0.01;
 const NUMBER_OF_USER_IMAGES = 15;
+const NUMBER_OF_BUSINESS_IMAGES = 18;
 
 const userBios = require('./bios.json')
 const businessNames = require('./businessNames.json')
@@ -267,7 +268,12 @@ async function registerUserWithBusinesses(user, businesses, numBusinesses) {
   const [response, instance] = await registerUser(user, false);
   for (let i = 0; i < numBusinesses; i++) {
     const businessResponse = await registerBusiness(businesses[i], instance, response.data.id, user);
-    await addProduct(businessResponse.data.businessId, instance, businesses[i]);
+
+    const businessId = businessResponse.data.businessId;
+
+    await uploadBusinessImage(businessId, instance);
+
+    await addProduct(businessId, instance, businesses[i]);
 
     let adminIds = [];
     for (let j = 0; j < Math.min(Math.floor(Math.random() * (6)) + 1, response.data.id - 1); j++) {
@@ -313,7 +319,8 @@ async function registerUsers(users, businesses) {
     try {
       await Promise.all(promises);
     } catch (e) {
-      console.log(e.message, e.response.data);
+        console.log(e.response, 111111111111111111111111111)
+      console.log(e.message, e.response);
       throw e;
     }
     console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST} users.`);
@@ -582,6 +589,21 @@ async function uploadUserImage(userId, instance) {
     return instance.post(`${SERVER_URL}/users/${userId}/image`, formData,
       {headers: formData.getHeaders()});
   }
+}
+
+/**
+ * Uploads an image for a business.
+ * https://commons.wikimedia.org/w/index.php?search=food+logo&title=Special:MediaSearch&go=Go&type=image
+ * The business images come from the link.
+ */
+async function uploadBusinessImage(businessId, instance) {
+    if (Math.random() > 0.25) {
+        let formData = new FormData();
+        const imageIndex = Math.floor(Math.random() * (NUMBER_OF_BUSINESS_IMAGES - 1) + 1); // 18 is number of images in business file
+        formData.append("filename", fs.createReadStream(`./exampleImages/business/image_${imageIndex}.png`));
+        return instance.post(`${SERVER_URL}/businesses/${businessId}/image`, formData,
+            {headers: formData.getHeaders()});
+    }
 }
 
 async function main() {
