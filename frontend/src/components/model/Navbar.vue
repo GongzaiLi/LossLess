@@ -49,9 +49,10 @@ Date: sprint_1
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
+
+      <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="ml-auto" id="create-business-btn">Create Business</b-button>
     </b-collapse>
 
-    <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="float-right ml-2" id="create-business-btn">Create Business</b-button>
     <b-dropdown right variant="link" toggle-class="text-decoration-none">
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
