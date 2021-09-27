@@ -5,13 +5,20 @@ import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.ProductRepository;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Period;
@@ -239,4 +246,58 @@ public class PurchasedListingService {
                 .stream().map(SalesReportManufacturerTotalsDto::new)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Get all purchased listings for a business.
+     *
+     * @param businessId    The id of the business
+     * @return              all purchased listings of given business
+     */
+    public List<PurchasedListing> getAllPurchasedListingsForBusiness(Integer businessId) {
+        return purchasedListingRepository.findAllByBusinessId(businessId);
+    }
+
+
+    /**
+     * Get all the sales report data in a as a csv in a ByteArrayInputStream
+     *
+     * @param businessId  The id of the business
+     * @return          ByteArrayInputStream of csv file of all the data.
+     */
+    public ByteArrayInputStream getSalesReportCSVByteSteam(Integer businessId) {
+        List<PurchasedListing> allPurchasedListings = this.getAllPurchasedListingsForBusiness(businessId);
+
+        String[] csvHeader = {
+                "saleDate", "numberOfLikes", "listingDate", "closingDate", "productName", "productId", "quantity", "price", "manufacturer"
+        };
+
+        List<List<String>> csvBody = new ArrayList<>();
+        for (PurchasedListing purchasedListing: allPurchasedListings) {
+            csvBody.add(Arrays.asList(purchasedListing.getSaleDate().toString(), purchasedListing.getNumberOfLikes().toString(),
+                    purchasedListing.getListingDate().toString(), purchasedListing.getClosingDate().toString(),
+                    purchasedListing.getProduct().getName(), purchasedListing.getProduct().getId(), purchasedListing.getQuantity().toString(),
+                    purchasedListing.getPrice().toString(), purchasedListing.getManufacturer()));
+        }
+
+        try (
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                // defining the CSV printer
+                CSVPrinter csvPrinter = new CSVPrinter(
+                        new PrintWriter(out),
+                        // withHeader is optional
+                        CSVFormat.DEFAULT.withHeader(csvHeader)
+                );
+        ) {
+            // populating the CSV content
+            for (List<String> record : csvBody)
+                csvPrinter.printRecord(record);
+
+            csvPrinter.flush();
+
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
 }

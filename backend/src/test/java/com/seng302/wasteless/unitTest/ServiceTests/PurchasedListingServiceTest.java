@@ -15,6 +15,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,6 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
@@ -132,7 +136,7 @@ class PurchasedListingServiceTest {
         product3.setName("Clown Nose");
         product3.setCreated(LocalDate.now());
         product3.setDescription("For you Face");
-        product3.setManufacturer("James");
+        product3.setManufacturer("Not James");
         product3.setRecommendedRetailPrice(3.0);
         productService.createProduct(product3);
 
@@ -154,6 +158,26 @@ class PurchasedListingServiceTest {
         listingsService.purchase(listingWith1Quantity1LikesForProduct2, curUser);
         listingsService.purchase(listingWith10Quantity10LikesForProduct3, curUser);
 
+        Business business3 = new Business();
+        business3.setBusinessType(BusinessTypes.CHARITABLE_ORGANISATION);
+        business3.setAdministrators(new ArrayList<>());
+        business3.setName("Wonka Cream ;)");
+        business3.setAddress(curUser.getHomeAddress());
+        business3.setCreated(LocalDate.now());
+        businessService.createBusiness(business3);
+
+        Product product_for_csv = new Product();
+        product_for_csv.setId("Clown-Shirts");
+        product_for_csv.setBusinessId(business3.getId());
+        product_for_csv.setName("Clown Hats");
+        product_for_csv.setCreated(LocalDate.now());
+        product_for_csv.setDescription("For you torso");
+        product_for_csv.setManufacturer("James");
+        product_for_csv.setRecommendedRetailPrice(2.0);
+        productService.createProduct(product_for_csv);
+
+        Listing listingForCsv = TestUtils.createListingForSameProductAndBusinessWithLikes(this.inventoryService, this.listingsService, product_for_csv, business3, 1.0, LocalDate.of(2099, Month.JANUARY, 1), 1, 1, 1);
+        listingsService.purchase(listingForCsv, curUser);
 
         pageable = PageRequest.of(0, 100);
 
@@ -345,55 +369,85 @@ class PurchasedListingServiceTest {
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
-        assertEquals(18, purchasedTotalsData.get(0).getTotalProductPurchases());
-        assertEquals(16, purchasedTotalsData.get(1).getTotalProductPurchases());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(26, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
-        assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
-        assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
+        assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(13, purchasedTotalsData.get(1).getTotalValue());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfLikesOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
-        assertEquals(18, purchasedTotalsData.get(0).getTotalLikes());
-        assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(26, purchasedTotalsData.get(1).getTotalLikes());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalsAndSortQuantity_ASC_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "quantity")));
-        assertEquals(16, purchasedTotalsData.get(0).getTotalProductPurchases());
-        assertEquals(18, purchasedTotalsData.get(1).getTotalProductPurchases());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(26, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "value")));
-        assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
-        assertEquals(12, purchasedTotalsData.get(1).getTotalValue());
+        assertEquals(6, purchasedTotalsData.get(0).getTotalValue());
+        assertEquals(13, purchasedTotalsData.get(1).getTotalValue());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalsAndSortLikes_ASC_thenCorrectOrderOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "likes")));
-        assertEquals(16, purchasedTotalsData.get(0).getTotalLikes());
-        assertEquals(18, purchasedTotalsData.get(1).getTotalLikes());
+        assertEquals(8, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(26, purchasedTotalsData.get(1).getTotalLikes());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalsAndSortLikes_DESC_thenCorrectOrderOfPurchasesInDtos() {
         List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
                 LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "likes")));
-        assertEquals(18, purchasedTotalsData.get(0).getTotalLikes());
-        assertEquals(16, purchasedTotalsData.get(1).getTotalLikes());
+        assertEquals(26, purchasedTotalsData.get(0).getTotalLikes());
+        assertEquals(8, purchasedTotalsData.get(1).getTotalLikes());
 
+    }
+
+    @Test
+    void whenGetSalesReportCSVByteSteam_andDataExist_thenAllDataReturnedAsByteSteam() {
+        ByteArrayInputStream byteArrayInputStream = purchasedListingService.getSalesReportCSVByteSteam(3);
+
+        int n = byteArrayInputStream.available();
+        byte[] bytes = new byte[n];
+        byteArrayInputStream.read(bytes, 0, n);
+        String stringFromBytes = new String(bytes, StandardCharsets.UTF_8);
+
+        List<String> splitResult = Arrays.asList(stringFromBytes.trim().replace("\r","").split("\\s*,\\s*"));
+
+        assertEquals("saleDate", splitResult.get(0));
+        assertEquals("Clown Hats", splitResult.get(12));
+        assertEquals("Clown-Shirts", splitResult.get(13));
+        assertEquals("1", splitResult.get(14));
+        assertEquals("James", splitResult.get(16));
+    }
+
+    @Test
+    void whenGetSalesReportCSVByteSteam_andNoDataExist_thenEmptyByteSteam() {
+        ByteArrayInputStream byteArrayInputStream = purchasedListingService.getSalesReportCSVByteSteam(4);
+
+        int n = byteArrayInputStream.available();
+        byte[] bytes = new byte[n];
+        byteArrayInputStream.read(bytes, 0, n);
+        String stringFromBytes = new String(bytes, StandardCharsets.UTF_8);
+
+        assertEquals("saleDate,numberOfLikes,listingDate,closingDate,productName,productId,quantity,price,manufacturer",  stringFromBytes.trim().replace("\r",""));
     }
 
     @Test

@@ -4,10 +4,18 @@ Date: sprint_6
 -->
 <template>
   <div>
+
     <b-card v-if="canViewReport" class="shadow mw-100" no-body>
       <b-list-group>
         <b-list-group-item>
           <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
+        </b-list-group-item>
+        <b-list-group-item>
+          <b-button @click="downloadCSV('salesreport.csv')">
+            Download All Sales Report Data As CSV
+          </b-button>
+        </b-list-group-item>
+        <b-list-group-item>
           <DateRangeInput v-model="dateRange" @input="gotReport=true" :all-time-start="new Date(business.created)"/>
         </b-list-group-item>
       <b-tabs fill v-if="gotReport">
@@ -71,6 +79,23 @@ export default {
   },
 
   methods: {
+    /**
+     * Download all report data as CSV. Gets CSV from backend for this business
+     * then downloads it to users device.
+     *
+     * @param filename name to give the file
+     */
+    async downloadCSV(filename) {
+      await Api.getSalesReportCsv(this.$route.params.id)
+          .then(response => {
+            const blob = new Blob([response.data], { type: 'text/csv' })
+            const link = document.createElement('a')
+            link.href = URL.createObjectURL(blob)
+            link.download = filename
+            link.click()
+            URL.revokeObjectURL(link.href)
+          }).catch(console.error);
+    },
     /**
      * this is a get Api which can take Specific business to display on the page
      * The function id means business's id, if the serve find the business's id will response the data and call set ResponseData function
