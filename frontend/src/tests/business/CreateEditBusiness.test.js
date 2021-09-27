@@ -287,8 +287,8 @@ describe('CreateBusiness HTML testing', () => {
     expect(wrapper.findAll("select option").at(4).text()).toEqual(option4);
   });
 
-  test('Create button renders', () => {
-    const buttonLabel = "Create";
+  test('Cancel button renders', () => {
+    const buttonLabel = "Cancel";
     expect(wrapper.findAll("button").at(1).text()).toEqual(buttonLabel);
   });
 
