@@ -70,7 +70,7 @@
       </b-card>
 
       <b-collapse v-model="messageVisible" id="messageBox">
-        <messages :cardCreatorId="fullCard.creator.id" :cardId="cardId" :is-card-creator="isCardCreator"></messages>
+        <messages :cardCreatorId="fullCard.creator.id" :cardId="cardId" :is-card-creator="isCardCreator" :notification-sender-id="openedFromNotifications"></messages>
       </b-collapse>
   </div>
 </template>
@@ -115,7 +115,7 @@ import Messages from "../../components/model/Messages"
 export default {
   name: "full-card",
   components: {Messages},
-  props: ['cardId'],
+  props: ['cardId','openedFromNotifications'],
   data() {
     return {
       fullCard: {
@@ -133,6 +133,9 @@ export default {
   },
   beforeMount() {
     this.getCard()
+    if (this.openedFromNotifications){
+      this.messageVisible = true;
+    }
   },
   methods: {
 
