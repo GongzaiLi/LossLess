@@ -1,6 +1,5 @@
 package com.seng302.wasteless.service;
 
-import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
@@ -54,13 +53,6 @@ public class PurchasedListingService {
     }
 
     /**
-     * Returns the total number of purchased listings for a business.
-     * @param businessId Id of the business
-     * @return The count of purchased listings
-     */
-    public Integer countPurchasedListingForBusiness(Integer businessId) {return purchasedListingRepository.countAllByBusiness_Id(businessId);}
-
-    /**
      * Returns the total number of purchased listings for a business
      * in a specified date range
      * @param businessId Id of the business
@@ -70,14 +62,6 @@ public class PurchasedListingService {
      */
     public Integer countPurchasedListingForBusinessInDateRange(Integer businessId, LocalDate startDate, LocalDate endDate) {
         return purchasedListingRepository.countAllByBusiness_IdAndSaleDateBetween(businessId, startDate, endDate);}
-
-    /**
-     * Returns the total value of purchased listings for a business.
-     * @param businessId Id of the business
-     * @return The count of purchased listings
-     */
-    public Integer totalPurchasedListingValueForBusiness(Integer businessId) {
-        return purchasedListingRepository.sumPriceByBusiness_Id(businessId);}
 
     /**
      * Returns the total value of purchased listings for a business.
@@ -103,27 +87,24 @@ public class PurchasedListingService {
      */
     public List<SalesReportSinglePeriod> getSalesReportDataWithPeriod(Integer businessId, LocalDate startDate, LocalDate endDate, LocalDate firstPeriodStart, LocalDate lastPeriodEnd, Period periodOfData) {
         List<SalesReportSinglePeriod> salesReport = new ArrayList<>();
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetweenOrderBySaleDate(businessId, startDate, endDate);
+        int curPurchaseIndex = 0;
+        for (LocalDate curPeriodStart = firstPeriodStart; curPeriodStart.isBefore(lastPeriodEnd.plusDays(1)); curPeriodStart = curPeriodStart.plus(periodOfData)) {
+            LocalDate curPeriodEnd = curPeriodStart.plus(periodOfData).minusDays(1);
+            int totalPurchases = 0;
+            double totalValue = 0.0;
 
-        LocalDate searchStart;
-        LocalDate searchEnd;
-        for (LocalDate date = firstPeriodStart; date.isBefore(lastPeriodEnd.plusDays(1)); date = date.plus(periodOfData)) {
-            searchStart = date;
-            searchEnd = searchStart.plus(periodOfData).minusDays(1);
-            if (searchStart.isBefore(startDate)) {
-                searchStart = startDate;
-            }
-            if (searchEnd.isAfter(endDate)) {
-                searchEnd = endDate;
-            }
-            Integer totalPurchases = this.countPurchasedListingForBusinessInDateRange(businessId, searchStart, searchEnd);
-            Double totalValue = this.totalPurchasedListingValueForBusinessInDateRange(businessId, searchStart, searchEnd);
-
-            if (totalValue == null) {
-                totalValue = 0.0;
+            // Add up all purchases within current period
+            while (curPurchaseIndex < purchases.size() && !purchases.get(curPurchaseIndex).getSaleDate().isAfter(curPeriodEnd)) {
+                totalPurchases++;
+                totalValue += purchases.get(curPurchaseIndex).getPrice();
+                curPurchaseIndex++;
             }
 
-            SalesReportSinglePeriod singlePeriodData = new SalesReportSinglePeriod(searchStart, searchEnd, totalPurchases, totalValue);
-            salesReport.add(singlePeriodData);
+            salesReport.add(new SalesReportSinglePeriod(
+                    curPeriodStart.isBefore(startDate) ? startDate : curPeriodStart, // We still want to show original (filter) start date rather than the start of the period of the start date
+                    curPeriodEnd.isAfter(endDate) ? endDate : curPeriodEnd,
+                    totalPurchases, totalValue));
         }
         return salesReport;
     }
@@ -216,7 +197,7 @@ public class PurchasedListingService {
         }
 
         Map<Long, Integer> durationCounts = new HashMap<>();
-        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetween(businessId, startDate, endDate);
+        List<PurchasedListing> purchases = purchasedListingRepository.findAllByBusinessIdAndSaleDateBetweenOrderBySaleDate(businessId, startDate, endDate);
 
         for (PurchasedListing purchase : purchases) {
             long daysBetweenSaleAndClose = ChronoUnit.DAYS.between(purchase.getSaleDate(), purchase.getClosingDate());
@@ -252,44 +233,18 @@ public class PurchasedListingService {
     }
 
     /**
-     * For a given business, find all the products that have been sold any number of times (a PurchasedListing exists)
-     * and return a list of allSoldManufacturersOfBusiness. Each allSoldManufacturersOfBusiness contains information about
-     * a given manufacturer, including the number of the product sold, the total value all products sold for, and the
-     * total number of likes.
-     *
-     * @param businessId    The id of the business
-     * @param sortBy the attribute to be sorted by
-     * @param order the order to sort the list in
-     * @return              List of allSoldManufacturersOfBusiness populated with sale information for each manufacturer.
+     * For a given business, and date range, find all the manufacturers whose products have been sold at least once
+     * and return data for each. Data includes the number of sales of a manufacturer's products, the total value all
+     * @param businessId The id of the business
+     * @param startDate  The start date for the date range.
+     * @param endDate    The end date for the date range.
+     * @param pageable   An object specifying pagination and sorting data
+     * @return List of SalesReportManufacturerTotalsDto populated with sale information for each manufacturer.
      */
-    public List<SalesReportManufacturerTotalsDto> getManufacturersPurchasedTotals(int businessId, String sortBy, Sort.Direction order) {
-        List<String> allSoldManufacturersOfBusiness = purchasedListingRepository.getAllManufacturersBySalesOfBusiness(businessId);
-
-        List<SalesReportManufacturerTotalsDto> salesReportManufacturerTotalsDtos = new ArrayList<>();
-
-        for (String manufacturer: allSoldManufacturersOfBusiness) {
-            salesReportManufacturerTotalsDtos.add(getTotalsForManufacturer(manufacturer));
-        }
-        if (sortBy != null) {
-            switch (sortBy) {
-                case "value":
-                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalValue));
-                    break;
-                case "quantity":
-                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalProductPurchases));
-                    break;
-                case "likes":
-                    salesReportManufacturerTotalsDtos.sort(Comparator.comparing(SalesReportManufacturerTotalsDto::getTotalLikes));
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (order != null  && order.isDescending()) {
-            Collections.reverse(salesReportManufacturerTotalsDtos);
-        }
-
-        return salesReportManufacturerTotalsDtos;
+    public List<SalesReportManufacturerTotalsDto> getManufacturersPurchasedTotals(int businessId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return purchasedListingRepository.getPurchasesGroupedByManufacturer(businessId, startDate, endDate, pageable)
+                .stream().map(SalesReportManufacturerTotalsDto::new)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -308,16 +263,6 @@ public class PurchasedListingService {
         }
 
         return new SalesReportManufacturerTotalsDto(manufacturer, totalPurchases, totalValue, totalLikes);
-    }
-
-    /**
-     * Get all purchased listings for a business.
-     *
-     * @param businessId    The id of the business
-     * @return              all purchased listings of given business
-     */
-    public List<PurchasedListing> getAllPurchasedListingsForBusiness(Integer businessId) {
-        return purchasedListingRepository.findAllByBusinessId(businessId);
     }
 
     /**

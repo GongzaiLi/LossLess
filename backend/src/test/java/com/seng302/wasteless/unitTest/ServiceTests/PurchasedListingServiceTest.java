@@ -7,14 +7,11 @@ import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
 import com.seng302.wasteless.service.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -218,6 +215,18 @@ class PurchasedListingServiceTest {
     }
 
     @Test
+    void whenGetSalesReportData_andPeriodIsMonth_andDataSpansThreeMonths_thenReturnedDataHasEntriesInThreeMonths() {
+        List<SalesReportSinglePeriod> salesReportData = purchasedListingService.getSalesReportDataWithPeriod(business.getId(), LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2022, Month.SEPTEMBER, 14), LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2022, Month.SEPTEMBER, 30), Period.ofMonths(1));
+        assertEquals(20, salesReportData.size());
+
+        assertEquals(2, salesReportData.get(0).getTotalPurchases());
+        assertEquals(3.0, salesReportData.get(0).getTotalValue());
+
+        assertEquals(1, salesReportData.get(19).getTotalPurchases());
+        assertEquals(5.0, salesReportData.get(19).getTotalValue());
+    }
+
+    @Test
     void whenCountSalesByDuration_andAllSalesWithinDuration_thenCorrectCountsReturned() {
         Map<Long, Integer> salesReportData = purchasedListingService.countSalesByDurationBetweenSaleAndClose(1, LocalDate.now().minusYears(3), LocalDate.now().plusYears(3), 1);
         Assertions.assertEquals(1, salesReportData.get(0L));
@@ -272,7 +281,11 @@ class PurchasedListingServiceTest {
     @Test
     void whenGeneratePurchasesForProduct_andBusinessCreatedIsNow_thenAllPurchasesHaveDatesInOrder_andBusinessCreatedIsPast() {
         // Creates a new business
-        business.setId(420);
+        business = new Business();
+        business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
+        business.setAdministrators(new ArrayList<>());
+        business.setName("The Milkman");
+        business.setAddress(curUser.getHomeAddress());
         business.setCreated(LocalDate.now());
         business = businessService.createBusiness(business);
         purchasedListingService.generatePurchasesForProduct(listing1.getInventoryItem().getProduct(), curUser, business);
@@ -349,20 +362,20 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfDtosReturned() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
         assertEquals(2, purchasedTotalsData.size());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
         assertEquals(9, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(26, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotals_thenCorrectTotalValueOfPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), null, Sort.Direction.ASC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), LocalDate.now(), LocalDate.now(), pageable);
         assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(13, purchasedTotalsData.get(1).getTotalValue());
     }
@@ -376,28 +389,32 @@ class PurchasedListingServiceTest {
 
     @Test
     void whenGetManufacturersPurchasedTotalsAndSortQuantity_ASC_thenCorrectNumberOfTotalManufacturerPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "quantity", Sort.Direction.ASC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
+                LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "quantity")));
         assertEquals(9, purchasedTotalsData.get(0).getTotalProductPurchases());
         assertEquals(26, purchasedTotalsData.get(1).getTotalProductPurchases());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalAndSortValue_thenCorrectOrderOfPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "value", Sort.Direction.ASC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
+                LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "value")));
         assertEquals(7, purchasedTotalsData.get(0).getTotalValue());
         assertEquals(13, purchasedTotalsData.get(1).getTotalValue());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalsAndSortLikes_ASC_thenCorrectOrderOfPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "likes", Sort.Direction.ASC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
+                LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.ASC, "likes")));
         assertEquals(9, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(26, purchasedTotalsData.get(1).getTotalLikes());
     }
 
     @Test
     void whenGetManufacturersPurchasedTotalsAndSortLikes_DESC_thenCorrectOrderOfPurchasesInDtos() {
-        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(), "likes", Sort.Direction.DESC);
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business2.getId(),
+                LocalDate.now(), LocalDate.now(), PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "likes")));
         assertEquals(26, purchasedTotalsData.get(0).getTotalLikes());
         assertEquals(9, purchasedTotalsData.get(1).getTotalLikes());
 
@@ -433,4 +450,19 @@ class PurchasedListingServiceTest {
         assertEquals("saleDate,numberOfLikes,listingDate,closingDate,productName,productId,quantity,price,manufacturer",  stringFromBytes.trim().replace("\r",""));
     }
 
+    @Test
+    void whenGetManufacturersPurchasedTotals_AndFilterDateByAllTime_thenAllSalesSummed() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business.getId(),
+                LocalDate.of(2020, Month.FEBRUARY, 29), LocalDate.of(2022, Month.SEPTEMBER, 15), PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "likes")));
+        assertEquals(5, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(28, purchasedTotalsData.get(0).getTotalValue());
+    }
+
+    @Test
+    void whenGetManufacturersPurchasedTotals_AndFilterDateByRange_thenOnlySalesInRangeSummed() {
+        List<SalesReportManufacturerTotalsDto> purchasedTotalsData = purchasedListingService.getManufacturersPurchasedTotals(business.getId(),
+                LocalDate.of(2021, Month.FEBRUARY, 1), LocalDate.of(2021, Month.FEBRUARY, 2), PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "likes")));
+        assertEquals(2, purchasedTotalsData.get(0).getTotalProductPurchases());
+        assertEquals(3, purchasedTotalsData.get(0).getTotalValue());
+    }
 }

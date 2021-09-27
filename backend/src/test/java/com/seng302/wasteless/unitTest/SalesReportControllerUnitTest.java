@@ -553,6 +553,16 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReport_andValidReportType_then404Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/reportthatdoesntexist")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")
     void whenGetSalesReportCSV_andValidRequest_then200Response() throws Exception {
@@ -608,5 +618,4 @@ class SalesReportControllerUnitTest {
                 .andExpect(header().string("Content-Type", "text/csv"))
                 .andExpect(header().string("Content-Disposition", "attachment; filename=salesReport.csv"));
     }
-
 }
