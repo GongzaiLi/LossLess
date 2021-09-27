@@ -13,8 +13,8 @@
       </b-col>
       <b-col :lg="isCardCreator?9:12" :key="timesMessagesUpdates">
         <div class="message-box">
-          <b-card v-for="message in current_displayed_messages" :key="message.id">
-            <b-card-text :style="message.senderId === currentUserId ? 'float: right' : 'float: left'">
+          <b-card v-for="message in current_displayed_messages" :key="message.id" class="message-card">
+            <b-card-text :class="message.senderId === currentUserId ? 'speech-bubble-right': 'speech-bubble-left' ">
               {{ message.messageText }}
             </b-card-text>
           </b-card>
@@ -32,7 +32,7 @@
             >
             </b-form-textarea>
             <b-input-group-append>
-              <b-button type="submit" :disabled="targetChatHead == null && isCardCreator" variant="primary"> Send</b-button>
+              <b-button type="submit" :disabled="targetChatHead == null && isCardCreator" variant="primary"> Send </b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form>
@@ -88,6 +88,34 @@ div.chat-head:first-child {
 div.chat-head:last-child {
   border-bottom: none;
 }
+
+.speech-bubble-left {
+  float: left;
+  padding: 10px 20px;
+  background: pink;
+  border-radius: 6px;
+  text-align: left;
+  max-width: 60%;
+  margin-bottom: 0;
+}
+
+.speech-bubble-right {
+  float: right;
+  padding: 10px 20px;
+  background: #00c8e2;
+  border-radius: 6px;
+  text-align: right;
+  max-width: 60%;
+  margin-bottom: 0;
+}
+
+.message-card {
+  border: none;
+  padding: 0;
+  margin: -20px 0;
+}
+
+
 </style>
 
 <script>
