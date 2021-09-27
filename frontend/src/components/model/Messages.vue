@@ -3,7 +3,7 @@
     <b-row no-gutters>
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
-          <b-list-group-item class="chat-head" v-for="conversation in conversations" :key=conversation.id
+          <b-list-group-item class="chat-head" v-for="conversation in conversations" :key=conversation.id :active="otherUserId==conversation.otherUser.id"
                              @click="clickedChatHead($event, conversation.otherUser.id)">
             <b-img class="rounded-circle avatar" width="30" height="30" :alt="conversation.otherUser.profileImage"
                    :src="require('../../../public/profile-default.jpg')"/>
@@ -123,7 +123,7 @@ div.chat-head:last-child {
 import Api from "../../Api";
 
 export default {
-  props: ['isCardCreator', 'cardId', 'cardCreatorId'],
+  props: ['isCardCreator', 'cardId', 'cardCreatorId', 'notificationSenderId'],
   name: "Messages",
   data() {
     return {
@@ -148,15 +148,8 @@ export default {
      * @param userId
      */
     clickedChatHead(event, userId) {
-      if (this.targetChatHead) {
-        this.targetChatHead.classList.remove('active');
-      }
-      this.targetChatHead = event.currentTarget;
-      this.targetChatHead.classList.add('active');
-
       this.sendToUserId = userId;
       this.otherUserId = userId;
-
       this.setCurrentMessages()
     },
 
@@ -165,7 +158,9 @@ export default {
      */
     setCurrentMessages() {
       const correctConversation = this.conversations.find(c => this.otherUserId === c.otherUser.id);
-      this.current_displayed_messages = correctConversation.messages;
+      if(correctConversation) {
+        this.current_displayed_messages = correctConversation.messages;
+      }
     },
 
     /**
@@ -202,6 +197,13 @@ export default {
           .then(res => {
             if (this.isCardCreator) {
               this.conversations = res.data
+              if (this.notificationSenderId){
+                this.otherUserId = parseInt(this.notificationSenderId)
+              }
+              else if (this.conversations.length>0) {
+                this.otherUserId = this.conversations[0].messages[0].senderId
+              }
+              this.setCurrentMessages();
             } else {
               this.conversations = [];
               this.conversations.push(res.data);
