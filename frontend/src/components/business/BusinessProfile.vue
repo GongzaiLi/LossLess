@@ -203,7 +203,7 @@ Date: 29/03/2021
 
 .edit-business-image {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 15px;
   font-size: 0.7rem
 }
@@ -235,6 +235,7 @@ import makeAdminModal from './MakeAdminModal';
 import {formatAddress} from "../../util";
 import CreateEditBusiness from "./CreateEditBusiness";
 import ProfileImage from "../model/ProfileImage";
+import EventBus from "../../util/event-bus";
 
 export default {
   components: {
@@ -302,6 +303,7 @@ export default {
   mounted() {
     const businessId = this.$route.params.id;
     this.launchPage(businessId);
+    EventBus.$on('updatedBusiness', this.updateBusinessHandler);
   },
 
   methods: {
@@ -430,6 +432,15 @@ export default {
         return "Server error";
       }
     },
+
+    /**
+     * Handles the EventBus emit for 'updatedBusiness'.
+     * This hides the edit user modal and refreshes the business's details.
+     */
+    updateBusinessHandler(businessId) {
+      this.getBusinessInfo(businessId);
+      this.$bvModal.hide('edit-business-profile');
+    }
   },
 
   computed: {
