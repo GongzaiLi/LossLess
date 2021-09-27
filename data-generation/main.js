@@ -592,8 +592,8 @@ async function uploadUserImage(userId, instance) {
 
 /**
  * Uploads an image for a business.
- * https://commons.wikimedia.org/w/index.php?search=food+logo&title=Special:MediaSearch&go=Go&type=image
- * The business images come from the link.
+ * https://spark.adobe.com/express-apps/logo-maker/
+ * The business images are generate by the link
  */
 async function uploadBusinessImage(businessId, instance) {
     if (Math.random() > 0.25) {
