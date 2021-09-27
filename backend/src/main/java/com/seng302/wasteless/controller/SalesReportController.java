@@ -80,7 +80,7 @@ public class SalesReportController {
         Business possibleBusiness = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness,user);
 
-        if (!validateDate(startDate, endDate)) {
+        if (Boolean.FALSE.equals(validateDate(startDate, endDate))) {
             startDate = possibleBusiness.getCreated();
             endDate = LocalDate.now();
         }
@@ -156,7 +156,7 @@ public class SalesReportController {
         Business possibleBusiness = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(possibleBusiness, user);
 
-        if (!validateDate(startDate, endDate)) {
+        if (Boolean.FALSE.equals(validateDate(startDate, endDate))) {
             startDate = possibleBusiness.getCreated();
             endDate = LocalDate.now();
         }
