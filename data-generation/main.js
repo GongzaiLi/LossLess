@@ -319,8 +319,7 @@ async function registerUsers(users, businesses) {
     try {
       await Promise.all(promises);
     } catch (e) {
-        console.log(e.response, 111111111111111111111111111)
-      console.log(e.message, e.response);
+      console.log(e.message, e.response.data);
       throw e;
     }
     console.log(`Registered ${(i + 1) * MAX_USERS_PER_API_REQUEST} users.`);
@@ -600,7 +599,7 @@ async function uploadBusinessImage(businessId, instance) {
     if (Math.random() > 0.25) {
         let formData = new FormData();
         const imageIndex = Math.floor(Math.random() * (NUMBER_OF_BUSINESS_IMAGES - 1) + 1); // 18 is number of images in business file
-        formData.append("filename", fs.createReadStream(`./exampleImages/business/image_${imageIndex}.png`));
+        formData.append("filename", fs.createReadStream(`./exampleImages/business/image_${imageIndex}.jpeg`));
         return instance.post(`${SERVER_URL}/businesses/${businessId}/image`, formData,
             {headers: formData.getHeaders()});
     }
