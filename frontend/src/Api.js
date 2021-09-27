@@ -161,6 +161,8 @@ export default {
       }
     }),
   postMessage: (message) => instance.post(`/messages`, message,{withCredentials: true}),
+  getMessages: (cardId) => instance.get(`/messages/${cardId}`, {withCredentials: true}),
+
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
