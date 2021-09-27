@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Class representing a Notification that a user receives.
@@ -42,7 +43,7 @@ public class Notification {
      * marketplace card.
      */
     @Column(name = "subjectId")
-    private Integer subjectId;
+    private String subjectId;
 
     @Column(name = "created")
     private LocalDateTime created;
