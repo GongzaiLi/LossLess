@@ -12,7 +12,7 @@
       <b-col :lg="isCardCreator?9:12">
         <b-card class="message-box">
         </b-card>
-        <b-form v-if="sendToUserId && sendToUserId !== myId">
+        <b-form>
         <b-input-group>
             <b-form-textarea required no-resize maxlength="250" max-rows="2"
                              type="text" class="messageInputBox sendMessageGroup"
