@@ -201,6 +201,8 @@ export default {
      * TODO
      */
     async updateBusiness() {
+      console.log(this.businessData)
+
       //TODO
     },
 

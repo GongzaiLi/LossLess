@@ -187,7 +187,7 @@ Date: 29/03/2021
     </b-modal>
 
     <b-modal id="edit-business-image" title="Profile Image" hide-footer>
-      <ProfileImage :details="businessData.profileImage"/>
+      <ProfileImage :details="businessData.profileImage" :userLookingAtSelfOrIsAdmin = 'isAdmin || isAdminOfThisBusiness' />
     </b-modal>
   </div>
 
@@ -203,7 +203,7 @@ Date: 29/03/2021
 
 .edit-business-image {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 15px;
   font-size: 0.7rem
 }
@@ -365,6 +365,12 @@ export default {
         })
     },
 
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
 
     /**
      * Check whether the user currently logged can revoke admin from an given administrator in
