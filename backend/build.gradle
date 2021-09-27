@@ -71,6 +71,8 @@ dependencies {
     // common
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
+    compile 'org.apache.commons:commons-csv:1.9.0'
+
     // use spring boot mocking test framework
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-inline:2.7.21'

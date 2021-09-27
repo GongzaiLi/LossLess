@@ -34,7 +34,7 @@
 
       <b-col lg="4" v-if="dateType === 'day'">
         <b-form-group label="Select day">
-          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" v-model="selectedDay"/>
+          <b-form-datepicker :start-weekday="1" :date-disabled-fn="dateInFuture" value-as-date v-model="selectedDay"/>
         </b-form-group>
       </b-col>
 
@@ -64,6 +64,7 @@
 </template>
 
 <script>
+
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export default {
   name: "DateRangeInput",

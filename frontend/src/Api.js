@@ -151,10 +151,11 @@ export default {
         }
       }),
 
-  getListingDurations: (businessId, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
+  getListingDurations: (businessId, granularity, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
     {
       withCredentials: true,
       params: {
+        granularity,
         startDate: formatDate(startDate),
         endDate: formatDate(endDate),
       }
@@ -187,6 +188,8 @@ export default {
     formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
     return instance.post(`/users/${userId}/image`, formData, {withCredentials: true});
   },
+
+  getSalesReportCsv: (businessId) => instance.get(`/businesses/${businessId}/salesReport/csv`, {withCredentials: true, responseType: 'blob' }),
 
   /**
    * Given the name of the user's country, gets currency data for that country.

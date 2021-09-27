@@ -7,7 +7,7 @@ VALUES ('Willy', 'Wonka', 'Chocolate', 'Chocolate Man', 'The Lord of Chocolate',
         '2019-12-03', '(946) 570-2232', 1, '$2a$10$sE1aW/VTng8e71r.oaTzw.3hZtOpVymFcbqsnxmb22BlOsbHfbTjC', 0);
 
 INSERT INTO Business(business_type, created, description, name, address, primary_administrator)
-VALUES (2, '2015-03-22', 'We make the best chocolate in the world', 'Wonka Chocolate', 1, 1);
+VALUES (2, '2018-01-01', 'We make the best chocolate in the world', 'Wonka Chocolate', 1, 1);
 
 INSERT INTO Business_administrators(administrators_id, business_id)
 VALUES (1, 1);
