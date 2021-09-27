@@ -1,5 +1,7 @@
 package com.seng302.wasteless.repository;
 
+import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
+import com.seng302.wasteless.model.ManufacturerSummary;
 import com.seng302.wasteless.model.ProductSummary;
 import com.seng302.wasteless.model.PurchasedListing;
 import org.springframework.data.domain.Pageable;
@@ -28,9 +30,10 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * @param businessId Id of business to get purchases for
      * @param startDate  The start date for the date range.
      * @param endDate    The end date for the date range.
-     * @return All Purchased Listing records that belong to a given business, and were purchased between the start and end dates
+     * @return All Purchased Listing records that belong to a given business, and were purchased between the start and end dates.
+     * This will be sorted by the sale dates of the purchases
      */
-    List<PurchasedListing> findAllByBusinessIdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
+    List<PurchasedListing> findAllByBusinessIdAndSaleDateBetweenOrderBySaleDate(Integer businessId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Returns a Purchased Listing records that belong to a given purchaseListing Id
@@ -41,23 +44,10 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
 
     /**
      * Returns the total number of purchases for a specified business
-     * @param businessId the id of the business
-     */
-    Integer countAllByBusinessId(Integer businessId);
-
-    /**
-     * Returns the total number of purchases for a specified business
      * in a specified date range
      * @param businessId the id of the business
      */
     Integer countAllByBusinessIdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
-
-    /**
-     * Returns the total value of purchases for a specified business
-     * @param businessId the id of the business
-     */
-    @Query(value = "Select sum(PL.price from PurchasedListing PL where PL.business_id = :businessId)", nativeQuery = true)
-    Integer sumPriceByBusinessId(@Param("businessId") Integer businessId);
 
     /**
      * Returns the total value of purchases for a specified business
@@ -89,42 +79,20 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
                                                       LocalDate endDate, Pageable pageable);
 
     /**
-     * Returns total number of sales for a given manufacturer.
+     * Returns total sales, value and likes for purchases of a business, grouped by the manufacturer of the product
+     * for each purchase
      *
-     * Business id does not need to be supplied as all product database ids are unique and this method
-     * is not accessed without user being authenticated as a owner of a business of which this product
-     * was created.
-     *
-     * @param manufacturer     The Sting of the manufacturer
-     * @return              total number of sales for a given manufacturer of products sold by a business.
+     * @param businessId Id of business to get purchases for
+     * @param startDate  Start of date range to get purchases for
+     * @param endDate    End of date range to get purchases for
+     * @param pageable   Pageable object representing pagination and sorting
+     * @return total sales, value and likes for purchases of a business, grouped by product
      */
-    @Query(value = "select sum(PL.quantity) from PurchasedListing PL where PL.manufacturer = :manufacturer", nativeQuery = true)
-    Integer sumProductsSoldByManufacturer(@Param("manufacturer") String manufacturer);
-
-    /**
-     * Returns total price of all sales for a given manufacturer
-     *
-     * @param manufacturer     The String of the manufacturer
-     * @return              total price of all sales for a given manufacturer
-     */
-    @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.manufacturer = :manufacturer", nativeQuery = true)
-    Double sumPriceByManufacturer(@Param("manufacturer") String manufacturer);
-
-    /**
-     * Returns total likes of all sales for a given manufacturer
-     *
-     * @param manufacturer     The String of the manufacturer
-     * @return              total likes of all sales for a given manufacturer
-     */
-    @Query(value = "select sum(PL.numberoflikes) from PurchasedListing PL where PL.manufacturer = :manufacturer", nativeQuery = true)
-    Integer sumTotalLikesByManufacturer(@Param("manufacturer") String manufacturer);
-
-    /**
-     * Returns list of manufacturer of all products that a business has sold any amount of
-     *
-     * @param businessId    the id of the business
-     */
-    @Query(value = "select distinct(PL.manufacturer) from PurchasedListing PL where PL.business = :businessId", nativeQuery = true)
-    List<String> getAllManufacturersBySalesOfBusiness(@Param("businessId") Integer businessId);
+    @Query(value = "SELECT PL.manufacturer AS manufacturer, SUM(PL.price) AS value, SUM(PL.numberoflikes) AS likes, SUM(PL.quantity) AS quantity " +
+            "from PurchasedListing PL " +
+            "where PL.business = :businessId and PL.saleDate >= :startDate and PL.saleDate <= :endDate " +
+            "GROUP BY MANUFACTURER ", nativeQuery = true)
+    List<ManufacturerSummary> getPurchasesGroupedByManufacturer(Integer businessId, LocalDate startDate,
+                                                                LocalDate endDate, Pageable pageable);
 
 }

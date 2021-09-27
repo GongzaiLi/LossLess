@@ -3,11 +3,10 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.dto.PostMessageDto;
-import com.seng302.wasteless.model.Card;
-import com.seng302.wasteless.model.Message;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.MessageService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.MessageViews;
 import net.minidev.json.JSONObject;
@@ -32,14 +31,17 @@ public class MessageController {
     private final UserService userService;
     private final CardService cardService;
     private final MessageService messageService;
+    private final NotificationService notificationService;
 
     @Autowired
     public MessageController (UserService userService,
                               CardService cardService,
-                              MessageService messageService) {
+                              MessageService messageService,
+                              NotificationService notificationService) {
         this.userService = userService;
         this.cardService = cardService;
         this.messageService = messageService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -85,6 +87,8 @@ public class MessageController {
         JSONObject responseBody = new JSONObject();
         responseBody.put("messageId", message.getId());
 
+        Notification notification =  NotificationService.createNotification(receiver.getId(),message.getId(), NotificationType.MESSAGE_RECEIVED,String.format("You have received a new message from %s %s about the marketplace item: %s.", currentlyLoggedInUser.getFirstName(),currentlyLoggedInUser.getLastName(), cardForMessage.getTitle()));
+        notificationService.saveNotification(notification);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 

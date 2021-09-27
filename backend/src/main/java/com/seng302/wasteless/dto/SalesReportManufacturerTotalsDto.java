@@ -1,5 +1,6 @@
 package com.seng302.wasteless.dto;
 
+import com.seng302.wasteless.model.ManufacturerSummary;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -18,10 +19,10 @@ public class SalesReportManufacturerTotalsDto {
     private Double totalValue;
     private Integer totalLikes;
 
-    public SalesReportManufacturerTotalsDto(String manufacturer, Integer totalProductPurchases, Double totalValue, Integer totalLikes) {
-        setManufacturer(manufacturer);
-        setTotalProductPurchases(totalProductPurchases);
-        setTotalValue(totalValue);
-        setTotalLikes(totalLikes);
+    public SalesReportManufacturerTotalsDto(ManufacturerSummary manufacturerSummary) {
+        setManufacturer(manufacturerSummary.getManufacturer());
+        setTotalProductPurchases(manufacturerSummary.getQuantity());
+        setTotalValue(manufacturerSummary.getValue());
+        setTotalLikes(manufacturerSummary.getLikes());
     }
 }

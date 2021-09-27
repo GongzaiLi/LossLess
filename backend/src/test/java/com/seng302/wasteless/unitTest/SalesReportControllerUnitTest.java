@@ -5,6 +5,7 @@ import com.seng302.wasteless.dto.SalesReportDto;
 import com.seng302.wasteless.dto.SalesReportProductTotalsDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.*;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,6 +26,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -61,7 +66,7 @@ class SalesReportControllerUnitTest {
 
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
         business = mock(Business.class);
         business.setBusinessType(BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES);
@@ -103,6 +108,13 @@ class SalesReportControllerUnitTest {
         Mockito
                 .when(purchasedListingService.getProductsPurchasedTotals(anyInt(), any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
                 .thenReturn(salesPurchaseTotalsData);
+
+        InputStream stubInputStream =
+                IOUtils.toInputStream("This is not actually a CSV file", "UTF-8");
+
+        Mockito
+                .when(purchasedListingService.getSalesReportCSVByteSteam(anyInt()))
+                .thenReturn((ByteArrayInputStream) stubInputStream);
 
 
         doReturn(true).when(business).checkUserIsPrimaryAdministrator(user);
@@ -541,4 +553,69 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenGetSalesReport_andValidReportType_then404Response() throws Exception{
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/reportthatdoesntexist")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportCSV_andValidRequest_then200Response() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/csv")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportCSV_andUserUnauthorised_then401Response() throws Exception {
+        Mockito
+                .when(userService.getCurrentlyLoggedInUser())
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session token is invalid"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/csv")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportCSV_andUserNotAdminOfBusiness_then403Response() throws Exception {
+        Mockito
+                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/csv")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportCSV_andBusinessDoesNotExist_then406Response() throws Exception {
+        Mockito
+                .when(businessService.findBusinessById(anyInt()))
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Business with given ID does not exist"));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/csv")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
+    void whenGetSalesReportCSV_andValidRequest_thenCorrectHeadersWithResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/csv")
+                .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Content-Type"))
+                .andExpect(header().exists("Content-Disposition"))
+                .andExpect(header().string("Content-Type", "text/csv"))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=salesReport.csv"));
+    }
 }

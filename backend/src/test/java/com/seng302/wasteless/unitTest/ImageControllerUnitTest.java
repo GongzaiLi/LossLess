@@ -586,4 +586,114 @@ class ImageControllerUnitTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/users/1/image"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddBusinessImage_andValidRequest_then201Response() throws Exception {
+
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/image")
+                .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddBusinessImage_andValidRequest_AndImageAlreadyExists_then201Response() throws Exception {
+        Mockito.when(business.getProfileImage()).thenReturn(image);
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/image")
+                .file(image))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddBusinessImage_andEmptyFile_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" , (byte[]) null);
+
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Image Received"));
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/image")
+                .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
+    void whenPostRequestToAddBusinessImage_andInvalidFileType_then400Response() throws Exception {
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.txt", "text/plain" ,"image example".getBytes());
+
+        Mockito
+                .when(imageService.saveImageWithThumbnail(any(MultipartFile.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Image type"));
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/image")
+                .file(image))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void whenPostRequestToAddBusinessImage_andUserNotBusinessAdminOrGlobalAdmin_then403Response() throws Exception {
+        Mockito.when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this business"));
+
+
+        MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", "image/png" ,"image example".getBytes());
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/businesses/1/image")
+                .file(image))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void whenDeleteRequestToBusinessImage_andUserNotBusinessAdminOrGlobalAdmin_then403Response() throws Exception {
+        Mockito.when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
+                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make change for this business"));
+
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/image"))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    void whenDeleteRequestToBusinessImage_andBusinessHasNoImage_then404Response() throws Exception {
+        Mockito.when(business.getProfileImage()).thenReturn(null);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/image"))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
+    void whenDeleteRequestToBusinessImage_andUserIsBusinessAdmin_then200Response() throws Exception {
+        Mockito.when(business.checkUserIsAdministrator(any(User.class))).thenReturn(true);
+        Mockito.when(business.getProfileImage()).thenReturn(image);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/businesses/1/image"))
+                .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void whenDeleteRequestToBusinessImage_andUserIsGAA_then200Response() throws Exception {
+        Mockito.when(user.checkUserGlobalAdmin()).thenReturn(true);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.delete("/users/1/image"))
+                .andExpect(status().isOk());
+    }
 }

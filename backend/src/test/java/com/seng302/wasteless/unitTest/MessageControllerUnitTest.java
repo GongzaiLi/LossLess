@@ -5,6 +5,7 @@ import com.seng302.wasteless.dto.GetMessageDto;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.CardService;
 import com.seng302.wasteless.service.MessageService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,9 @@ class MessageControllerUnitTest {
 
     @MockBean
     private MessageService messageService;
+
+    @MockBean
+    private NotificationService notificationService;
 
     private User user;
 

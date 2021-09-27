@@ -316,5 +316,65 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /**
+     * Handle request for uploading images for businesses. If an image already exists
+     * the image will be removed an a new one will be saved to the media folder and to
+     * the database for the given business.
+     * Allows for GAA/DGAA to upload an image for a business
+     *
+     * 401                      If not currently authenticated
+     * 403 Forbidden            If attempting to make a request to change another businesses image and not DGAA, GAA or business admin
+     * 400 Bad Request          No file content, Bad file type
+     * 406 Not Acceptable       businessId not found
+     *
+     * @param businessId    The id of the business to upload the image for
+     * @param file          The image to upload
+     * @return              The image after uploading, or one of the error codes detailed above.
+     */
+    @PostMapping("/businesses/{businessId}/image")
+    public ResponseEntity<Object> postBusinessImage(@PathVariable("businessId") Integer businessId, @RequestParam("filename") MultipartFile file) {
+        logger.info("Request to upload business image for business: {}", businessId);
+
+        User currentUser = userService.getCurrentlyLoggedInUser();
+        Business businessForImage = businessService.findBusinessById(businessId);
+
+        businessService.checkUserAdminOfBusinessOrGAA(businessForImage, currentUser);
+
+        //Delete old business image if they had one
+        if (businessForImage.getProfileImage() != null) {
+            businessService.deleteBusinessImage(businessForImage);
+        }
+
+        Image newImage = imageService.saveImageWithThumbnail(file);
+
+        businessService.addImageToBusiness(businessForImage, newImage);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(newImage);
+
+    }
+
+    /**
+     * Handles requests to delete a business's image.
+     * @param businessId Id of business to delete image for
+     * @return 200 OK response if deleted successfully
+     * @throws ResponseStatusException 403 FORBIDDEN exception if the user is not allowed to modify the business with given id,
+     * 406 NOT ACCEPTABLE if given business doesn't exist
+     */
+    @DeleteMapping("/businesses/{businessId}/image")
+    public ResponseEntity<Object> deleteBusinessImage(@PathVariable("businessId") Integer businessId) {
+        User currentUser = userService.getCurrentlyLoggedInUser();
+        Business businessForImage = businessService.findBusinessById(businessId);
+
+        businessService.checkUserAdminOfBusinessOrGAA(businessForImage, currentUser);
+
+        if (businessForImage.getProfileImage() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The given business does not have a profile image");
+        }
+
+        businessService.deleteBusinessImage(businessForImage);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }
 

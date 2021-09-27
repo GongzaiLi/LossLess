@@ -1,5 +1,5 @@
 <template>
-  <b-row>
+  <b-row class="m-2">
     <b-col cols="6">
       <h3>Sales by {{ isTopProducts ? "Product" : "Manufacturer" }}</h3>
       <b-table
@@ -258,6 +258,7 @@ export default {
      */
     dateRange: async function () {
       await this.getReport(this.dateRange);
+      this.filterResults();
       this.updateChart();
     },
     /**
