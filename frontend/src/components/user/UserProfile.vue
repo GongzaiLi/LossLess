@@ -7,9 +7,7 @@ Date: 5/3/2021
 
   <div>
     <div v-show="!loading">
-      <b-card class="profile-card shadow" no-body
-              v-if="userFound"
-      >
+      <b-card class="profile-card shadow" no-body v-if="userFound">
         <template #header>
           <b-row>
             <b-col lg="2" class="p-0">
@@ -30,8 +28,9 @@ Date: 5/3/2021
                 </h4>
               </b-row>
               <b-row>
-                Member since:
-                <member-since :date="userData.created"/>
+                <p>
+                  Member since: <member-since :date="userData.created"/>
+                </p>
               </b-row>
             </b-col>
             <b-col lg="3" sm="12"
@@ -56,15 +55,13 @@ Date: 5/3/2021
             </b-icon-pencil-fill>
           </b-row>
         </template>
-
-        <b-list-group>
+        <b-list-group v-if="userData.bio">
           <b-list-group-item style="border-radius: 0">
             <b-card-text style="text-align: justify">
               {{ userData.bio }}
             </b-card-text>
           </b-list-group-item>
         </b-list-group>
-
         <b-card-body>
           <b-container>
             <h6>
@@ -134,9 +131,7 @@ Date: 5/3/2021
                   </router-link>
                 </b-col>
               </b-row>
-
             </h6>
-
           </b-container>
         </b-card-body>
       </b-card>

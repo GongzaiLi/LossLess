@@ -6,6 +6,7 @@ import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
 import net.minidev.json.JSONObject;
@@ -37,12 +38,14 @@ public class BusinessController {
     private final BusinessService businessService;
     private final UserService userService;
     private final AddressService addressService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService) {
+    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService, NotificationService notificationService) {
         this.addressService = addressService;
         this.businessService = businessService;
         this.userService = userService;
+        this.notificationService = notificationService;
 
     }
 
@@ -277,6 +280,12 @@ public class BusinessController {
         if (!businessToModify.getAddress().equals(modifiedBusiness.getAddress())) {
             logger.debug("Creating new Address Entity for business with ID {}", businessToModify.getId());
             addressService.createAddress(modifiedBusiness.getAddress());
+            if (!modifiedBusiness.getAddress().getCountry().equals(businessToModify.getAddress().getCountry())) {
+                Notification notification = NotificationService.createNotification(businessToModify.getId(), null, NotificationType.CURRENCY_CHANGE,
+                        "You have changed country and therefore your currency may have changed. " +
+                                "This will only affect the currency of products in your administered business.");
+                notificationService.saveNotification(notification);
+            }
         }
         businessToModify.setAddress(modifiedBusiness.getAddress());
 
