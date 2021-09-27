@@ -435,7 +435,7 @@ export default {
 
     /**
      * Handles the EventBus emit for 'updatedBusiness'.
-     * This hides the edit user modal and refreshes the business's details.
+     * This hides the edit business modal and refreshes the business's details.
      */
     updateBusinessHandler(businessId) {
       this.getBusinessInfo(businessId);
