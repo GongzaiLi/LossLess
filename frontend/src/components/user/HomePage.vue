@@ -1,6 +1,6 @@
 <template>
   <div>
-  <b-card class="shadow" style="max-width: 80rem">
+  <b-card class="shadow" :style="{ 'max-width': $currentUser.currentlyActingAs ? '850px' : 'initial' }">
       <h1 v-if="$currentUser.currentlyActingAs">{{$currentUser.currentlyActingAs.name + "'s Home Page"}}</h1>
       <h1 v-else>{{userData.firstName + "'s Home Page"}}</h1>
       <router-link v-if="$currentUser.currentlyActingAs" :to="{ name: 'business-profile', params: { id: $currentUser.currentlyActingAs.id }}">
@@ -11,8 +11,8 @@
     </router-link>
   </b-card>
     <b-row>
-    <b-col md="7">
-    <b-card v-if="!$currentUser.currentlyActingAs" class="expired-cards mt-3 shadow">
+    <b-col md="6" v-if="!$currentUser.currentlyActingAs">
+    <b-card class="expired-cards mt-3 shadow">
       <h3><b-icon-clock/> Your recently closed cards </h3>
       <h6>These cards will be deleted within 24 hours of their closing date. You can either extend their display period or delete cards you no longer need.</h6>
       <b-input-group v-if="hasExpiredCards">
@@ -35,8 +35,8 @@
       />
     </b-card>
     </b-col>
-    <b-col md="5">
-    <b-card v-if="!$currentUser.currentlyActingAs" class="shadow mt-3">
+    <b-col :md="notificationWidth">
+    <b-card class="shadow mt-3 w-100">
       <div>
         <b-row>
           <b-col cols="1">
@@ -61,15 +61,17 @@
           </b-col>
         </b-row>
       </div>
-      <div class="notification-holder">
+      <b-overlay class="notification-holder" v-model="loadingNotifications">
         <b-card v-if="filteredNotifications.length === 0" class="notification-cards shadow">
           <h6 v-if="!isArchivedSelected"> You have no notifications </h6>
           <h6 v-else> You have no archived notifications </h6>
         </b-card>
-        <b-card v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)" visible>
-          <notification :archived-selected="isArchivedSelected" :notification="notification" :in-navbar="false" @deleteNotification="createDeleteToast"> </notification>
-        </b-card>
-      </div>
+        <div v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
+          <notification :archived-selected="isArchivedSelected" :notification="notification"
+                        :in-navbar="false" @deleteNotification="createDeleteToast">
+          </notification>
+        </div>
+      </b-overlay>
     </b-card>
     </b-col>
     </b-row>
@@ -106,9 +108,6 @@
   margin-top: -3px;
 }
 
-.selected {
-  background-color: lightgray;
-}
 
 .notification-cards {
   margin-top: 20px;
@@ -163,6 +162,7 @@ export default {
       hasExpiredCards: false,
       notifications: [],
       isArchivedSelected: false,
+      loadingNotifications: false,
       tagColors: { //Tracks color to selected boolean
         RED: false,
         ORANGE: false,
@@ -223,17 +223,20 @@ export default {
      * cards that have expired.
      */
     async updateNotifications() {
+      this.loadingNotifications = true;
       const expiredCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
       if (expiredCards.length > 0) {
         this.hasExpiredCards = true;
       }
       this.notifications = (await Api.getNotifications(null, this.isArchivedSelected)).data;
+      this.loadingNotifications = false;
     },
     /**
      * Creates the toast notification to allow user to undo delete within 10 seconds
      * adds notification id to pendingDeletedNotifications so this notification is removed from the list of displayed notifications
      * Adds listener to prevent user from accidentally leaving the page before deletion is confirmed
      * @param id Id of the notification to delete in 10 seconds
+     * @param text the text to add to the countdown
      */
     createDeleteToast(id,text){
       addEventListener('beforeunload', beforeUnloadListener, {capture: true});
@@ -267,7 +270,8 @@ export default {
      */
     async notificationClicked(notification) {
       if (!notification.read) {
-        notification.read = true
+        notification.read = true;
+        await Api.patchNotification(notification.id, {read: true});
         EventBus.$emit('notificationClicked', notification);
       }
 
@@ -320,25 +324,25 @@ export default {
       else {
         this.$bvToast.hide('undoToast'+id)
       }
-    },
-
-
+    }
   },
 
   computed: {
     /**
-     * Filters notifications by removing notification pending deletion from the list
-     * @returns notifications with pendingDeletedNotification removed
+     * Filters notifications by removing notifications that shouldn't be displayed.
+     * This includes notifications pending deletion, and business notifications (if acting as user) or
+     * user notifications (if acting as business)
+     * @returns All notifications that should be displayed
      */
     filteredNotifications: function(){
-      let removedNotification=this.pendingDeletedNotifications
-      let filtered =[]
-      filtered = this.notifications.filter(function(value){
-        return !(removedNotification.includes(value.id))
-      });
-      return filtered
+      return this.notifications.filter((notification) =>
+        !this.pendingDeletedNotifications.includes(notification.id) && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed'
+          || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')
+      );
     },
-
+    notificationWidth() {
+      return this.$currentUser.currentlyActingAs ? 12 : 6;
+    }
   },
 
   created() {
@@ -353,7 +357,8 @@ export default {
       next()
     } else {
       next(false)
-    } }
+    }
+  }
 }
 </script>
 

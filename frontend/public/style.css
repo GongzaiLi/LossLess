@@ -35,6 +35,7 @@ body {
 
 nav {
     background-color: #001142;
+    padding: 0 1em 0 1em !important;
 }
 
 .card-header {
