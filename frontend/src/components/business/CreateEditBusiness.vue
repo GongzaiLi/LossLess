@@ -205,7 +205,7 @@ export default {
     async updateBusiness() {
       await api.modifyBusiness(this.businessData, this.businessData.id)
           .then(() => {
-            EventBus.$emit("updatedBusinessDetails", this.businessData.id) })
+            EventBus.$emit("updatedBusinessDetails") })
           .catch((error) => {
             this.errors = [];
             this.$log.debug(error);

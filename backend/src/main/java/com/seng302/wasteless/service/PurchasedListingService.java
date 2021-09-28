@@ -8,9 +8,7 @@ import com.seng302.wasteless.repository.PurchasedListingRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -289,8 +287,8 @@ public class PurchasedListingService {
                 );
         ) {
             // populating the CSV content
-            for (List<String> record : csvBody)
-                csvPrinter.printRecord(record);
+            for (List<String> line : csvBody)
+                csvPrinter.printRecord(line);
 
             csvPrinter.flush();
 

@@ -1,9 +1,6 @@
 package com.seng302.wasteless.dto;
 
-import com.seng302.wasteless.model.Address;
-import com.seng302.wasteless.model.Business;
-import com.seng302.wasteless.model.BusinessTypes;
-import com.seng302.wasteless.model.User;
+import com.seng302.wasteless.model.*;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -28,6 +25,7 @@ public class GetUserBusinessAdministeredDto {
     private Address address;
     private BusinessTypes businessType;
     private String created;
+    private Image profileImage;
 
     /**
      * Creates an instance of the BusinessAdministered data object given a business, filling all fields with public
@@ -49,6 +47,7 @@ public class GetUserBusinessAdministeredDto {
             .setDescription(business.getDescription())
             .setAddress(business.getAddress())
             .setBusinessType(business.getBusinessType())
-            .setCreated(business.getCreated().toString());
+            .setCreated(business.getCreated().toString())
+            .setProfileImage(business.getProfileImage());
     }
 }

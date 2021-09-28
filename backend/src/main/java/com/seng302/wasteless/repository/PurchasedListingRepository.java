@@ -1,6 +1,5 @@
 package com.seng302.wasteless.repository;
 
-import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.model.ManufacturerSummary;
 import com.seng302.wasteless.model.ProductSummary;
 import com.seng302.wasteless.model.PurchasedListing;
