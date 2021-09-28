@@ -80,25 +80,25 @@ Date: 29/03/2021
           </h6>
 
           <router-link v-if="isAdmin" :to="{ name: 'product-catalogue', params: { id: businessData.id }}">
-          <b-button type="submit" variant="primary">
+          <b-button class="business-manage-button" type="submit" variant="primary">
             <b-icon-newspaper/> Product Catalogue
           </b-button>
           </router-link>
           &nbsp;
           <router-link v-if="isAdmin" :to="{ name: 'inventory-page', params: { id: businessData.id }}">
-            <b-button type="submit" variant="primary">
+            <b-button class="business-manage-button" type="submit" variant="primary">
               <b-icon-box-seam/> Inventory
             </b-button>
           </router-link>
           &nbsp;
           <router-link :to="{ name: 'listings-page', params: { id: businessData.id }}">
-            <b-button type="submit" variant="primary">
+            <b-button class="business-manage-button" type="submit" variant="primary">
               <b-icon-receipt/> Sales List
             </b-button>
           </router-link>
           &nbsp;
           <router-link v-if="isAdmin" :to="{ name: 'sales-report-page', params: { id: businessData.id }}">
-            <b-button type="submit" variant="primary">
+            <b-button class="business-manage-button" type="submit" variant="primary">
               <b-icon-newspaper/> Sales Report
             </b-button>
           </router-link>
@@ -177,7 +177,7 @@ Date: 29/03/2021
       </b-card-body>
     </b-card>
 
-    <b-modal id="admin-modal" hide-header hide-footer size="xl">
+    <b-modal id="admin-modal" hide-header hide-footer size="lg">
       <make-admin-modal :make-admin-action="this.makeAdminAction"/>
       <b-alert :show="makeAdminError.length > 0 ? 120 : 0" variant="danger">{{ makeAdminError }}</b-alert>
     </b-modal>
@@ -225,6 +225,10 @@ Date: 29/03/2021
 
 h6 {
   line-height: 1.4;
+}
+
+.business-manage-button {
+  margin-bottom: 0.3rem;
 }
 </style>
 
@@ -399,6 +403,7 @@ export default {
      */
     showMakeAdminModal: function () {
       this.makeAdminAction = this.makeAdminHandler;
+      this.makeAdminError = "";
       this.$bvModal.show('admin-modal');
     },
 

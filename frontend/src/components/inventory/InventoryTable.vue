@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div style="margin-left: 15%; margin-right: 15%">
+  <div id="filter-bar">
     <div>
       <b-form @submit.prevent="searchClicked">
         <b-input-group prepend="Filter by product code:">
@@ -20,6 +20,7 @@
       no-border-collapse
       bordered
       show-empty
+      stacked="sm"
       no-local-sorting
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc"
@@ -82,6 +83,19 @@
 .thumbnail-row {
   padding: 0 !important;
 }
+
+#filter-bar {
+  margin-left: 15%;
+  margin-right: 15%;
+}
+
+@media(max-width: 992px) {
+  #filter-bar {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 </style>
 
 <script>
