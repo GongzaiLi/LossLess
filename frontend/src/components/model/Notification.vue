@@ -265,6 +265,10 @@ export default {
       }
     },
 
+    /**
+     * Shows the modal of the card related to the clicked notification.
+     * This also sends the information from the notification to open the chat up to who sent the message     *
+     */
     replyToMessage(){
         this.$bvModal.show(`full-card-${this.updatedNotification.id}`);
     },

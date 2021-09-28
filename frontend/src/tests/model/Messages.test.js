@@ -24,8 +24,8 @@ localVue.use(BootstrapVueIcons);
 
 beforeEach(() => {
 
-  Api.postMessage.mockResolvedValue({data: {}});
-
+  Api.postMessage.mockResolvedValue({data: { "messageId": 1}});
+  Api.getMessages.mockResolvedValue({data: { cardId: 1, cardOwner: {}, otherUser: {}, messages: [] }});
   wrapper = shallowMount(Messages, {
     localVue,
     propsData: {isCardCreator: false, cardId: 1},
