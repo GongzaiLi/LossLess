@@ -15,7 +15,7 @@
       </b-alert>
     </div>
 
-    <div v-if="userLookingAtSelfOrIsAdmin && !$currentUser.currentlyActingAs">
+    <div v-if="userLookingAtSelfOrIsAdmin">
       <b-button v-if="isUploadingFile" variant="info" class="w-100 mt-2" size="sm"
                 @click="$refs.userImagePicker.click()">
         <b-spinner small v-if="isUploadingFile"/>
@@ -42,14 +42,6 @@
       <h6>
         Are you sure you want to <strong>delete</strong> this image?
         <strong><br>It will be permanently deleted from your account.</strong>
-      </h6>
-    </b-modal>
-
-    <b-modal id="confirmUploadImageModal" size="sm" title="Upload Image" ok-variant="success" ok-title="Upload"
-             @ok="confirmUploadImageRequest">
-      <h6>
-        Are you sure you want to <strong>upload</strong> this image?
-        <strong><br>It will permanently change your profile image.</strong>
       </h6>
     </b-modal>
   </div>
@@ -103,6 +95,7 @@ export default {
       uploaded: false,
       isUploadingFile: false,
       imageURL: '',
+      error: null
     }
   },
 
@@ -119,38 +112,72 @@ export default {
     openImage(event) {
       if (event.target.files[0]) {
         this.imageFile = event.target.files[0];
-        this.$bvModal.show('confirmUploadImageModal')
+        this.uploadImageRequest();
       }
     },
 
     /**
-     * This sends an api request to post an image.
-     * If successful, it emits an event called updatedUser.
+     * This calls a method sends an api request to post an image, either for the user or the business.
+     * If successful, it emits an event called updatedImage.
      * Else, it pushes error messages to the errors field.
      */
-    confirmUploadImageRequest() {
+    async uploadImageRequest() {
       this.errors = [];
-      const userId = this.$route.params.id;
       this.isUploadingFile = true;
-      Api.uploadProfileImage(userId, this.imageFile).then(() => {
+      if (!this.$currentUser.currentlyActingAs) {
+       await this.uploadUserImage();
+      } else {
+        await this.uploadBusinessImage();
+      }
+
+      if (!this.error) {
         this.imageURL = window.URL.createObjectURL(this.imageFile)
         this.isUploadingFile = false;
         this.uploaded = true;
-        EventBus.$emit("updatedUserImage", this.imageURL);
+        EventBus.$emit("updatedImage", this.imageURL);
+      } else {
+        this.isUploadingFile = false;
+        if (this.error.response) {
+          if (this.error.response.status === 413) {
+            this.errors.push("The image you tried to upload is too large. Images must be less than 1MB in size.");
+          } else {
+            this.errors.push(`Uploading image failed: ${this.error.response.data.message}`);
+          }
+        } else {
+          this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+        }
+      }
+    },
+
+    /**
+     * This sends an api request to post an image for the user.
+     * If successful, it sets the error to back null.
+     * Else, it pushes error messages to the errors field and sets the current error to the error returned.
+     */
+    async uploadUserImage() {
+      const userId = this.$route.params.id;
+      await Api.uploadProfileImage(userId, this.imageFile).then(() => {
+        this.error = null;
       })
           .catch((error) => {
-            this.errors = [];
+            this.error = error
             this.$log.debug(error);
-            this.isUploadingFile = false;
-            if (error.response) {
-              if (error.response.status === 413) {
-                this.errors.push("The image you tried to upload is too large. Images must be less than 1MB in size.");
-              } else {
-                this.errors.push(`Uploading image failed: ${error.response.data.message}`);
-              }
-            } else {
-              this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
-            }
+          })
+    },
+
+    /**
+     * This sends an api request to post an image or the business.
+     * If successful, it sets the error to back null.
+     * Else, it pushes error messages to the errors field and sets the current error to the error returned.
+     */
+    async uploadBusinessImage() {
+      const businessId = this.$route.params.id;
+      await Api.uploadBusinessProfileImage(businessId, this.imageFile).then(() => {
+        this.error = null;
+      })
+          .catch((error) => {
+            this.error = error
+            this.$log.debug(error);
           })
     },
 
@@ -162,32 +189,64 @@ export default {
     },
 
     /**
-     * Deletes the image with the id stored in this.imageIdToDelete. Makes an API call if
+     * Deletes the image with the id stored in this.imageIdToDelete. Calls the method that makes an API call if
      * the image already exists. This should only be called when the user confirms they want to delete the image
      **/
-    confirmDeleteImage: function () {
+    async confirmDeleteImage() {
       this.errors = [];
-      const userId = this.$route.params.id;
-
-      if (this.profileImage || this.uploaded) {  // Only make Api request if the image exists
-        Api.deleteUserProfileImage(userId).then(() => {
-          this.imageURL = null;
-          EventBus.$emit("updatedImage", this.imageURL);
-          this.profileImage = null;
-          this.uploaded = false;
-          this.imageFile = '';
-          this.imageError = '';
-        }).catch((error) => {
-          this.errors = [];
-          this.$log.debug(error);
-          if (error.response) {
-            this.errors.push(`Deleting image failed: ${error.response.data.message}`);
-          } else {
-            this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
-          }
-        })
+      console.log(this.$currentUser.currentlyActingAs)
+      if (!this.$currentUser.currentlyActingAs && (this.profileImage || this.uploaded)) {
+        await this.deleteUserImage();
+      } else {
+        await this.deleteBusinessImage();
       }
+
+      if (this.error) {
+        if (this.error.response) {
+          this.errors.push(`Deleting image failed: ${this.error.response.data.message}`);
+        } else {
+          this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+        }
+      } else {
+        this.imageURL = null;
+        EventBus.$emit("updatedImage", this.imageURL);
+        this.profileImage = null;
+        this.uploaded = false;
+        this.imageFile = '';
+        this.imageError = '';
+      }
+
     },
+
+    /**
+     * This sends an api request to delete the for the user.
+     * If successful, it sets the error to back null.
+     * Else, it pushes error messages to the errors field and sets the current error to the error returned.
+     */
+    async deleteUserImage() {
+      const userId = this.$route.params.id;
+      await Api.deleteUserProfileImage(userId).then(() => {
+        this.error = null;
+      }).catch((error) => {
+        this.error = error
+        this.$log.debug(error);
+      })
+    },
+
+    /**
+     * This sends an api request to delete the for the business.
+     * If successful, it sets the error to back null.
+     * Else, it pushes error messages to the errors field and sets the current error to the error returned.
+     */
+    async deleteBusinessImage() {
+      const business = this.$route.params.id;
+      await Api.deleteBusinessProfileImage(business).then(() => {
+        this.error = null;
+      }).catch((error) => {
+        this.error = error
+        this.$log.debug(error);
+      })
+    }
   },
 }
 </script>
