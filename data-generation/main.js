@@ -9,7 +9,7 @@
 const fs = require('fs')
 const Axios = require('axios');
 const FormData = require('form-data');
-
+const https = require('https');
 
 const NUM_USERS = 10000;
 const MAX_GENERATED_USERS_PER_REQUEST = 5000;
@@ -489,7 +489,7 @@ async function addProduct(businessId, instance, business) {
         })
 
       product.id = productResponse.data.productId;
-      await addProductImages(businessId, instance, product.id);
+      await addProductImages(businessId, instance, product.id, productNames[i + offset]);
 
       if (Math.random() < CHANCE_OF_INVENTORY_FOR_PRODUCT) {
         const [inventoryItemId, inventory] = await addInventory(businessId, instance, product);
@@ -546,16 +546,14 @@ async function addCard(instance) {
 /**
  *  Add a random number of images to a product
  */
-async function addProductImages(businessId, instance, productId) {
-
-  const startImageId = Math.floor(Math.random() * (28) + 1);
-  const numImagesForProduct = Math.floor(Math.random() * (3) + 1);
+async function addProductImages(businessId, instance, productId, productName) {
+  const numImagesForProduct = Math.floor(Math.random() * (3)) + 1;
 
   let imagePromises = [];
 
   try {
     for (let i = 0; i < numImagesForProduct; i++) {
-      imagePromises.push(uploadProductImage(businessId, productId, instance, startImageId + i));
+      imagePromises.push(uploadProductImage(businessId, productId, instance, i, productName));
     }
     await Promise.all(imagePromises);
   } catch (err) {
@@ -566,12 +564,17 @@ async function addProductImages(businessId, instance, productId) {
 /**
  * Uploads an image for a product.
  */
-async function uploadProductImage(businessId, productId, instance, startImageId) {
+async function uploadProductImage(businessId, productId, instance, startImageId, productName) {
   // See https://github.com/axios/axios/issues/710 for how this works
   let formData = new FormData();
-  formData.append("filename", fs.createReadStream(`./exampleImages/product/${startImageId}.jpg`));
-  return instance.post(`${SERVER_URL}/businesses/${businessId}/products/${productId}/images`, formData,
-    {headers: formData.getHeaders()});
+  const path = `./productImages/${productName}-${startImageId}.jpg`;
+  if (fs.existsSync(path)) {
+    formData.append("filename", fs.createReadStream(path));
+    return instance.post(`${SERVER_URL}/businesses/${businessId}/products/${productId}/images`, formData,
+      {headers: formData.getHeaders()});
+  } else {
+    return Promise.resolve();
+  }
 }
 
 
@@ -605,9 +608,39 @@ async function uploadBusinessImage(businessId, instance) {
     }
 }
 
+async function getProductImages() {
+  if (!fs.existsSync('./productImages')) {
+    fs.mkdirSync('./productImages');
+
+    for (let i = 0; i < productNames.length; i += 10) {
+      await Promise.all(
+        productNames.slice(i, i+10).map(productName =>
+          Axios.get(`https://commons.wikimedia.org/w/api.php?action=query&format=json&uselang=en&generator=search&gsrsearch=filetype%3Abitmap%7C${productName}%20haslicense%3Aunrestricted%20${productName}&gsrlimit=3&gsroffset=0&gsrinfo=totalhits%7Csuggestion&gsrprop=size%7Cwordcount%7Ctimestamp%7Csnippet&prop=info%7Cimageinfo%7Centityterms&inprop=url&gsrnamespace=6&iiprop=url%7Csize%7Cmime&iiurlheight=180&wbetterms=label`)
+            .then(async (response) => {
+              const pages = response.data.query.pages;
+              if (pages) {
+                for (let pageNum = 0; pageNum < 3; pageNum++) {
+                  console.log(Object.values(pages)[pageNum].imageinfo[0].responsiveUrls['1.5']);
+                  const imageUrl = Object.values(pages)[pageNum].imageinfo[0].responsiveUrls['1.5'];
+                  const file = fs.createWriteStream(`productImages/${productName}-${pageNum}.jpg`);
+                  const resp = await Axios.get(imageUrl, {responseType: 'stream'});
+                  resp.data.pipe(file);
+                }
+              } else {
+                console.log("No response for", productName);
+              }
+            })
+            .catch(e => console.log(e))
+        )
+      )
+    }
+  }
+}
+
 async function main() {
   let users;
   let businesses = await getBusinesses();
+  await getProductImages();
   if (process.argv.length === 3 && process.argv[2] === 'regenerateData') {
     users = await getUsers(); // Sonarlint says that the await is redundant. Sonarlint is stupid.
   } else if (process.argv.length === 2) {
