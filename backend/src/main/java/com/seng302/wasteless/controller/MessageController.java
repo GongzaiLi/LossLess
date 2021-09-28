@@ -52,6 +52,9 @@ public class MessageController {
      *
      * Sender is taken from the currently logged in user.
      *
+     * SubjectId created for notification is a comma separated string of the related card id
+     * and the sender's id. To send this extra information to the frontend
+     *
      * Returns:
      * 201 If message successfully created
      * 401 If user is unauthorised

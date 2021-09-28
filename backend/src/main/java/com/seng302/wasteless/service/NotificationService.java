@@ -107,7 +107,7 @@ public class NotificationService {
      * Creates a notification object from the available inputs and returns the object. This object still needs to be saved
      * using saveNotification() to save the object to the database
      * @param userId Integer Id of the user this notification is for. Can not be Null
-     * @param subjectId The Integer id of the subject the notification is created for if applicable. Can be null
+     * @param subjectId The Integer id of the subject the notification is created for if applicable.
      * @param type String detailing the type of notification being created. Can not be Null
      * @param message String with the contents of the message of the notification. Can be null
      * @return Returns the created Notification object.
@@ -116,7 +116,9 @@ public class NotificationService {
 
         Notification notification = new Notification();
         notification.setType(type);
-        notification.setSubjectId(subjectId.toString());
+        if (subjectId!=null) {
+            notification.setSubjectId(subjectId.toString());
+        }
         notification.setMessage(message);
         notification.setUserId(userId);
         notification.setCreated(LocalDateTime.now());
@@ -127,7 +129,7 @@ public class NotificationService {
      * Creates a notification object from the available inputs and returns the object. This object still needs to be saved
      * using saveNotification() to save the object to the database
      * @param userId Integer Id of the user this notification is for. Can not be Null
-     * @param subjectId The Integer id of the subject the notification is created for if applicable. Can be null
+     * @param subjectId The string id of the subject the notification is created for if applicable.
      * @param type String detailing the type of notification being created. Can not be Null
      * @param message String with the contents of the message of the notification. Can be null
      * @return Returns the created Notification object.

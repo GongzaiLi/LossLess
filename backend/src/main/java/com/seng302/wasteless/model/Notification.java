@@ -8,7 +8,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Class representing a Notification that a user receives.
@@ -41,6 +40,8 @@ public class Notification {
      * For example, if this notification is for a purchase of a listing, then the ID will be the ID of the
      * corresponding sale record. If this is for a marketplace card expiry warning, then the ID is the ID of the
      * marketplace card.
+     * SubjectId created for message is a comma separated string of the related card id
+     * and the sender's id.
      */
     @Column(name = "subjectId")
     private String subjectId;

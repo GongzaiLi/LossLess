@@ -511,7 +511,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
         Assertions.assertEquals(user.getId(),notificationList.get(0).getUserId());
-        Assertions.assertEquals(listing.getId(),notificationList.get(0).getSubjectId());
+        Assertions.assertEquals(listing.getId().toString(),notificationList.get(0).getSubjectId());
         Assertions.assertEquals(NotificationType.LIKEDLISTING,notificationList.get(0).getType());
     }
 
@@ -541,7 +541,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
         Assertions.assertEquals(user.getId(),notificationList.get(0).getUserId());
-        Assertions.assertEquals(listing.getId(),notificationList.get(0).getSubjectId());
+        Assertions.assertEquals(listing.getId().toString(),notificationList.get(0).getSubjectId());
         Assertions.assertEquals(NotificationType.UNLIKEDLISTING,notificationList.get(0).getType());
     }
 
