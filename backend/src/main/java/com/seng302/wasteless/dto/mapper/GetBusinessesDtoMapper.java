@@ -82,7 +82,8 @@ public class GetBusinessesDtoMapper {
                     .setDescription(business.getDescription())
                     .setAddress(business.getAddress())
                     .setBusinessType(business.getBusinessType())
-                    .setCreated(business.getCreated().toString());
+                    .setCreated(business.getCreated().toString())
+                    .setProfileImage(business.getProfileImage());
 
         } else {
 
@@ -92,7 +93,8 @@ public class GetBusinessesDtoMapper {
                     .setDescription(business.getDescription())
                     .setAddress(business.getAddress())
                     .setBusinessType(business.getBusinessType())
-                    .setCreated(business.getCreated().toString());
+                    .setCreated(business.getCreated().toString())
+                    .setProfileImage(business.getProfileImage());
 
         }
     }

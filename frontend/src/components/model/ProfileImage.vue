@@ -134,7 +134,11 @@ export default {
         this.imageURL = window.URL.createObjectURL(this.imageFile)
         this.isUploadingFile = false;
         this.uploaded = true;
-        EventBus.$emit("updatedImage", this.imageURL);
+        if (!this.$currentUser.currentlyActingAs) {
+          EventBus.$emit("updatedUserImage");
+        } else {
+          EventBus.$emit("updatedBusinessImage");
+        }
       } else {
         this.isUploadingFile = false;
         if (this.error.response) {
@@ -194,7 +198,6 @@ export default {
      **/
     async confirmDeleteImage() {
       this.errors = [];
-      console.log(this.$currentUser.currentlyActingAs)
       if (!this.$currentUser.currentlyActingAs && (this.profileImage || this.uploaded)) {
         await this.deleteUserImage();
       } else {
@@ -209,7 +212,11 @@ export default {
         }
       } else {
         this.imageURL = null;
-        EventBus.$emit("updatedImage", this.imageURL);
+        if (!this.$currentUser.currentlyActingAs) {
+          EventBus.$emit("updatedUserImage");
+        } else {
+          EventBus.$emit("updatedBusinessImage");
+        }
         this.profileImage = null;
         this.uploaded = false;
         this.imageFile = '';

@@ -19,7 +19,6 @@ const $router = {
 const $log = {
   debug(blah) {
     return blah;
-    //console.log(blah);
   }
 };
 

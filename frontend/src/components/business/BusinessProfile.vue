@@ -230,7 +230,7 @@ h6 {
 
 <script>
 import memberSince from "../model/MemberSince";
-import api from "../../Api";
+import Api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
 import {formatAddress} from "../../util";
 import CreateEditBusiness from "./CreateEditBusiness";
@@ -303,7 +303,8 @@ export default {
   mounted() {
     const businessId = this.$route.params.id;
     this.launchPage(businessId);
-    EventBus.$on('updatedBusiness', this.updateBusinessHandler);
+    EventBus.$on('updatedBusinessDetails', this.updateBusinessHandler);
+    EventBus.$on('updatedBusinessImage', this.updateBusinessImageHandler)
   },
 
   methods: {
@@ -336,7 +337,7 @@ export default {
         userId: userId
       }
 
-      api
+      Api
           .revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
           .then((response) => {
             this.getBusinessInfo(this.$route.params.id)
@@ -352,7 +353,7 @@ export default {
      * @param id
      **/
     getBusinessInfo: function (id) {
-      api
+      Api
         .getBusiness(id)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
@@ -371,7 +372,7 @@ export default {
      * Returns the URL required to get the image given the filename
      */
     getURL(imageFileName) {
-      return api.getImage(imageFileName);
+      return Api.getImage(imageFileName);
     },
 
     /**
@@ -410,7 +411,7 @@ export default {
       const makeAdminRequestData = {
         userId: userId
       }
-      await api
+      await Api
           .makeBusinessAdmin(this.businessData.id, makeAdminRequestData)
           .then((response) => {
             this.$log.debug("Response from request to make admin: ", response);
@@ -440,13 +441,23 @@ export default {
     },
 
     /**
-     * Handles the EventBus emit for 'updatedBusiness'.
+     * Handles the EventBus emit for 'updatedBusinessDetails'.
      * This hides the edit business modal and refreshes the business's details.
      */
-    updateBusinessHandler(businessId) {
-      this.getBusinessInfo(businessId);
+    updateBusinessHandler() {
+      this.getBusinessInfo(this.businessData.id);
       this.$bvModal.hide('edit-business-profile');
+    },
+
+    /**
+     * Handles the EventBus emit for 'updatedBusinessImage'.
+     * This hides the edit business modal and refreshes the business's details.
+     */
+    updateBusinessImageHandler() {
+      this.getBusinessInfo(this.businessData.id);
     }
+
+
   },
 
   computed: {

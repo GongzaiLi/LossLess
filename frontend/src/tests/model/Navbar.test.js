@@ -54,10 +54,17 @@ let userData = {
         "postcode": "90210"
       },
       "businessType": "Accommodation and Food Services",
-      "created": "2020-07-14T14:52:00Z"
+      "created": "2020-07-14T14:52:00Z",
+      "profileImage": {
+        "id": 1,
+        "fileName": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c.jpeg",
+        "thumbnailFilename": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c_thumbnail.jpeg"
+      }
     }
   ]
 }
+
+
 
 let $currentUser = userData;
 
@@ -111,7 +118,7 @@ beforeEach(() => {
     mocks: {$route, $router, $currentUser, displayPeriodEnd: { split: 'asd'  }},
     stubs: ['router-link'],
     methods: {},
-    computed: {showProfilePicture(){return true}},
+    computed: {showUserProfilePicture(){return true}, showBusinessProfilePicture(){return true}},
   })
 });
 
@@ -192,17 +199,19 @@ describe('Got to profile', () => {
   })
 
   test('works when acting as business', async () => {
-    wrapper.vm.$currentUser.currentlyActingAs = {id: 69};
+    wrapper.vm.$currentUser.currentlyActingAs = userData.businessesAdministered[0];
     await wrapper.vm.$nextTick();
     await wrapper.find("#go-to-profile a").trigger("click");
     await wrapper.vm.$nextTick();
 
-    expect($router.push).toHaveBeenCalledWith({path: '/businesses/69'});
+    expect($router.push).toHaveBeenCalledWith({path: '/businesses/100'});
   })
 });
 
 describe('Act as business', () => {
   test('works on click with single business', async () => {
+    wrapper.vm.$currentUser.currentlyActingAs = null;
+    await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
     await wrapper.find(".business-name-drop-down a").trigger("click");
     await wrapper.vm.$nextTick();
     expect(wrapper.findAll(".business-name-drop-down").length).toBe(0);
@@ -242,11 +251,17 @@ describe('Act as business', () => {
       "primaryAdministratorId": 20,
       "name": "Another Store Name",
       "businessType": "Blah Blah Blah",
-      "created": "2020-07-14T14:52:00Z"
+      "created": "2020-07-14T14:52:00Z",
+      "profileImage": {
+        "id": 1,
+        "fileName": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c.jpeg",
+        "thumbnailFilename": "media/images/243c9607-72fa-4b1c-b1da-a5a9ef09e14c_thumbnail.jpeg"
+      }
     });
+    userData.currentlyActingAs = userData.businessesAdministered[1];
     await wrapper.vm.$forceUpdate();  // Force vm to refresh and update with the new user data
 
-    await wrapper.findAll(".business-name-drop-down a").at(1).trigger("click");
+    await wrapper.findAll(".business-name-drop-down").at(0).trigger("click");
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find("#profile-name").text()).toEqual("Another Store Name");

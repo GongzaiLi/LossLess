@@ -7,7 +7,7 @@ Date: sprint_1
     toggleable="lg" type="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave"> <img src="icon.png" style="width: 2.5em" alt="LossLess Logo"></b-navbar-brand>
+    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave"> <img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"></b-navbar-brand>
 
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
@@ -57,8 +57,10 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <b-img :src="showProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+        <b-img v-if="isActingAsUser" :src="showUserProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
+        <b-img v-else :src="showBusinessProfilePicture ? getURL($currentUser.currentlyActingAs.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+               alt="Business Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
       </template>
 
       <div v-if="!isActingAsUser">
@@ -137,8 +139,10 @@ export default {
     }
   },
   mounted() {
-    EventBus.$on('updatedUser', this.updatedUserHandler)
-    EventBus.$on('updatedImage', this.updatedUserHandler)
+    EventBus.$on('updatedUserDetails', this.updatedAccountHandler)
+    EventBus.$on('updatedUserImage', this.updatedAccountHandler)
+    EventBus.$on('updatedBusinessDetails', this.updatedAccountHandler)
+    EventBus.$on('updatedBusinessImage', this.updatedAccountHandler)
 
   },
   computed: {
@@ -149,8 +153,16 @@ export default {
     /**
      * Returns true if we should show the user's profile image. i.e. they are acting as a user and have a profile image
      */
-    showProfilePicture: function() {
+    showUserProfilePicture: function() {
       return this.$currentUser.profileImage&&this.isActingAsUser
+    },
+
+
+    /**
+     * Returns true if we should show the business's profile image. i.e. they are acting as a business and have a profile image
+     */
+    showBusinessProfilePicture: function() {
+      return this.$currentUser.currentlyActingAs.profileImage && !this.isActingAsUser
     },
 
     /**
@@ -288,11 +300,11 @@ export default {
     },
 
     /**
-     * This is the handler for the event "updatedUser".
+     * This is the handler for the events "updatedUserDetails", "updatedBusinessDetails", "updatedUserImage", "updatedBusinessImage".
      * The function calls initializeAuth from the Auth plugin
      * which refreshes Auth
      */
-    updatedUserHandler: function () {
+    updatedAccountHandler: function () {
       initializeAuth()
     },
     /**
