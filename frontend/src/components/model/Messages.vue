@@ -150,7 +150,7 @@ export default {
     clickedChatHead(event, userId) {
       this.sendToUserId = userId;
       this.otherUserId = userId;
-      this.setCurrentMessages()
+      this.setCurrentMessages();
     },
 
     /**

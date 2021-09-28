@@ -54,16 +54,110 @@ describe('Check if message can be sent to selected user', () => {
     const mockEvent = {currentTarget: targetChatHead}
     wrapper.vm.clickedChatHead(mockEvent, 3);
     expect(wrapper.vm.sendToUserId).toEqual(3)
+    expect(wrapper.vm.otherUserId).toEqual(3);
 
     wrapper.vm.clickedChatHead(mockEvent, 4);
     expect(wrapper.vm.sendToUserId).toEqual(4)
+    expect(wrapper.vm.otherUserId).toEqual(4);
   })
 
   test('Api call is made when send message called', async () => {
-    wrapper.vm.messageText = "something"
-    wrapper.vm.sendToUserId = 2
+    wrapper.vm.messageText = "something";
+    wrapper.vm.sendToUserId = 2;
     await wrapper.vm.sendMessage();
-    expect(Api.postMessage).toHaveBeenCalledWith({cardId:1, messageText:"something", receiverId: 2})
+    expect(Api.postMessage).toHaveBeenCalledWith({cardId:1, messageText:"something", receiverId: 2});
   })
 
+});
+
+describe('Check if setCurrentMessages works as intended.', () => {
+  test('Test that setCurrentMessages works with only one conversation', () => {
+    wrapper.vm.conversations = [
+      {
+        otherUser: {
+          id: 1,
+        },
+        messages: ["Test", "Data"]
+      },
+    ];
+    wrapper.vm.otherUserId = 1;
+    wrapper.vm.setCurrentMessages();
+    expect(wrapper.vm.current_displayed_messages).toEqual(["Test", "Data"])
+  });
+
+  test('Test that setCurrentMessages works with multiple conversations', () => {
+    wrapper.vm.conversations = [
+      {
+        otherUser: {
+          id: 1,
+        },
+        messages: ["Test", "Data"]
+      },
+      {
+        otherUser: {
+          id: 2,
+        },
+        messages: ["James", "Phil"]
+      },
+      {
+        otherUser: {
+          id: 3,
+        },
+        messages: ["Scott", "Nitish"]
+      },
+      {
+        otherUser: {
+          id: 10,
+        },
+        messages: ["Eric", "Caleb"]
+      },
+      {
+        otherUser: {
+          id: 12,
+        },
+        messages: ["Oliver", "Arish"]
+      },
+    ];
+    wrapper.vm.otherUserId = 2;
+    wrapper.vm.setCurrentMessages();
+    expect(wrapper.vm.current_displayed_messages).toEqual(["James", "Phil"])
+  });
+
+  test('Test that setCurrentMessages works with multiple same ids (shouldnt occur in the wild) and returns first matching messages', () => {
+    wrapper.vm.conversations = [
+      {
+        otherUser: {
+          id: 1,
+        },
+        messages: ["Test", "Data"]
+      },
+      {
+        otherUser: {
+          id: 2,
+        },
+        messages: ["James", "Phil"]
+      },
+      {
+        otherUser: {
+          id: 3,
+        },
+        messages: ["Scott", "Nitish"]
+      },
+      {
+        otherUser: {
+          id: 3,
+        },
+        messages: ["Eric", "Caleb"]
+      },
+      {
+        otherUser: {
+          id: 12,
+        },
+        messages: ["Oliver", "Arish"]
+      },
+    ];
+    wrapper.vm.otherUserId = 3;
+    wrapper.vm.setCurrentMessages();
+    expect(wrapper.vm.current_displayed_messages).toEqual(["Scott", "Nitish"])
+  })
 });
