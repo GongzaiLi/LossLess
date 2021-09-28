@@ -41,6 +41,11 @@ Page that stores table and search bar to search for businesses
           <template #empty>
             <h3 class="no-results-overlay" >No results to display</h3>
           </template>
+          <template #cell(name)="data">
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/profile-default.jpg')"
+                   alt="Business Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
+            {{formatName(data.item.name)}}
+          </template>
         </b-table>
       </b-col>
     </b-row>
@@ -185,6 +190,12 @@ export default {
       this.$router.push({path: `/businesses/${data.id}?fromSearch=true`});
     },
 
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
   },
 
   computed: {
@@ -201,7 +212,6 @@ export default {
         {
           key: 'name',
           sortable: true,
-          formatter: 'formatName'
         },
         {
           key: 'description',

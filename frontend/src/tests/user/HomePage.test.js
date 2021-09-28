@@ -143,6 +143,53 @@ describe('check-that-expired-table-only-shows-when-necessary', () => {
 
 });
 
+describe('check-filtered-notifications', () => {
+    beforeEach(() => {
+        Api.getNotifications.mockResolvedValue({data: [
+                {
+                    id: 1,
+                    message: "HSDFSD",
+                    subjectId: 420,
+                    type: "Business Currency Changed"
+                },
+                {
+                    id: 2,
+                    message: "HSDFSD",
+                    subjectId: 69,
+                    type: "User Currency Changed"
+                },
+                {
+                    id: 3,
+                    message: "HSDFSD",
+                    subjectId: 69,
+                    type: "Listing Liked"
+                }
+            ]});
+    });
+
+    test('Only shows user notifications when acting as user', async () => {
+        wrapper.vm.$currentUser.currentlyActingAs = null;
+        await wrapper.vm.updateNotifications();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.filteredNotifications.length).toBe(2);
+        expect(wrapper.vm.filteredNotifications[0].id).toBe(2);
+        expect(wrapper.vm.filteredNotifications[1].id).toBe(3);
+    });
+
+    test('Only shows business notifications when acting as business', async () => {
+        wrapper.vm.$currentUser.currentlyActingAs = {
+            id: 1,
+            name: "Big Dave's Collars"
+        };
+        await wrapper.vm.updateNotifications();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.filteredNotifications.length).toBe(1);
+        expect(wrapper.vm.filteredNotifications[0].id).toBe(1);
+    });
+});
+
 describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => {
     test('no-tags-selected-expect-call-with-empty-string', async () => {
 

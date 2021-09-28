@@ -232,7 +232,7 @@ public class ModifyUserFeature {
         responseResult.andExpect(status().isOk());
         List<Notification> notificationList = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
         Assertions.assertEquals(notificationListLength+1, notificationList.size());
-        Assertions.assertEquals(NotificationType.CURRENCY_CHANGE, notificationList.get(0).getType());
+        Assertions.assertEquals(NotificationType.USER_CURRENCY_CHANGE, notificationList.get(0).getType());
 
     }
 }

@@ -264,33 +264,35 @@ public class BusinessController {
      * Returns 401 if unauthorised, handled by spring security
      * Returns 403 if forbidden, user tried to make request to a business they are not admin of or is not a DGAA/GAA
      *
-     * @param modifiedBusiness Dto containing information needed to update a user
+     * @param modifiedBusinessDTO Dto containing information needed to update a user
      * @param businessId ID of the business to be modified
      * @return Response code with message, see above for codes
      */
     @PutMapping("/businesses/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> modifyBusiness(@Valid @RequestBody PutBusinessDto modifiedBusiness, @PathVariable("id") Integer businessId) {
+    public ResponseEntity<Object> modifyBusiness(@Valid @RequestBody PutBusinessDto modifiedBusinessDTO, @PathVariable("id") Integer businessId) {
 
         User loggedInUser = userService.getCurrentlyLoggedInUser();
 
         Business businessToModify = businessService.findBusinessById(businessId);
         businessService.checkUserAdminOfBusinessOrGAA(businessToModify, loggedInUser);
 
-        if (!businessToModify.getAddress().equals(modifiedBusiness.getAddress())) {
+        if (!businessToModify.getAddress().equals(modifiedBusinessDTO.getAddress())) {
             logger.debug("Creating new Address Entity for business with ID {}", businessToModify.getId());
-            addressService.createAddress(modifiedBusiness.getAddress());
-            if (!modifiedBusiness.getAddress().getCountry().equals(businessToModify.getAddress().getCountry())) {
-                Notification notification = NotificationService.createNotification(businessToModify.getId(), null, NotificationType.CURRENCY_CHANGE,
-                        "You have changed country and therefore your currency may have changed. " +
-                                "This will only affect the currency of products in your administered business.");
-                notificationService.saveNotification(notification);
+            addressService.createAddress(modifiedBusinessDTO.getAddress());
+            if (!modifiedBusinessDTO.getAddress().getCountry().equals(businessToModify.getAddress().getCountry())) {
+                for (User admin : businessToModify.getAdministrators()) {
+                    Notification notification = NotificationService.createNotification(admin.getId(), businessToModify.getId(), NotificationType.BUSINESS_CURRENCY_CHANGE,
+                            String.format("This business's country has changed from %s to %s so the currency of all your products may have changed.",
+                                    businessToModify.getAddress().getCountry(), modifiedBusinessDTO.getAddress().getCountry()));
+                    notificationService.saveNotification(notification);
+                }
             }
         }
-        businessToModify.setAddress(modifiedBusiness.getAddress());
+        businessToModify.setAddress(modifiedBusinessDTO.getAddress());
 
-        logger.debug("Updating business: {}", modifiedBusiness.getName());
-        businessService.updateBusinessDetails(businessToModify, modifiedBusiness);
+        logger.debug("Updating business: {}", modifiedBusinessDTO.getName());
+        businessService.updateBusinessDetails(businessToModify, modifiedBusinessDTO);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
