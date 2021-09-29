@@ -26,6 +26,7 @@ beforeEach(() => {
 
   Api.postMessage.mockResolvedValue({data: { "messageId": 1}});
   Api.getMessages.mockResolvedValue({data: { cardId: 1, cardOwner: {}, otherUser: {}, messages: [] }});
+  window.HTMLElement.prototype.scrollIntoView = jest.fn();
   wrapper = shallowMount(Messages, {
     localVue,
     propsData: {isCardCreator: false, cardId: 1},
