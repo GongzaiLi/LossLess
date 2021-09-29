@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(MessageController.class)
 @AutoConfigureMockMvc(addFilters = false) //Disable spring security for the unit tests
-public class MessageControllerUnitTest {
+class MessageControllerUnitTest {
     @Autowired
     private MockMvc mockMvc;
 

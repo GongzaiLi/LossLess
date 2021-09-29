@@ -187,7 +187,7 @@ Date: 29/03/2021
     </b-modal>
 
     <b-modal id="edit-business-image" title="Profile Image" hide-footer>
-      <ProfileImage :details="businessData.profileImage"/>
+      <ProfileImage :details="businessData.profileImage" :userLookingAtSelfOrIsAdmin = 'isAdmin || isAdminOfThisBusiness' />
     </b-modal>
   </div>
 
@@ -203,7 +203,7 @@ Date: 29/03/2021
 
 .edit-business-image {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 15px;
   font-size: 0.7rem
 }
@@ -230,11 +230,12 @@ h6 {
 
 <script>
 import memberSince from "../model/MemberSince";
-import api from "../../Api";
+import Api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
 import {formatAddress} from "../../util";
 import CreateEditBusiness from "./CreateEditBusiness";
 import ProfileImage from "../model/ProfileImage";
+import EventBus from "../../util/event-bus";
 
 export default {
   components: {
@@ -302,6 +303,8 @@ export default {
   mounted() {
     const businessId = this.$route.params.id;
     this.launchPage(businessId);
+    EventBus.$on('updatedBusinessDetails', this.updateBusinessHandler);
+    EventBus.$on('updatedBusinessImage', this.updateBusinessImageHandler)
   },
 
   methods: {
@@ -334,7 +337,7 @@ export default {
         userId: userId
       }
 
-      api
+      Api
           .revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
           .then((response) => {
             this.getBusinessInfo(this.$route.params.id)
@@ -350,7 +353,7 @@ export default {
      * @param id
      **/
     getBusinessInfo: function (id) {
-      api
+      Api
         .getBusiness(id)
         .then((response) => {
           this.$log.debug("Data loaded: ", response.data);
@@ -365,6 +368,12 @@ export default {
         })
     },
 
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return Api.getImage(imageFileName);
+    },
 
     /**
      * Check whether the user currently logged can revoke admin from an given administrator in
@@ -402,7 +411,7 @@ export default {
       const makeAdminRequestData = {
         userId: userId
       }
-      await api
+      await Api
           .makeBusinessAdmin(this.businessData.id, makeAdminRequestData)
           .then((response) => {
             this.$log.debug("Response from request to make admin: ", response);
@@ -430,6 +439,25 @@ export default {
         return "Server error";
       }
     },
+
+    /**
+     * Handles the EventBus emit for 'updatedBusinessDetails'.
+     * This hides the edit business modal and refreshes the business's details.
+     */
+    updateBusinessHandler() {
+      this.getBusinessInfo(this.businessData.id);
+      this.$bvModal.hide('edit-business-profile');
+    },
+
+    /**
+     * Handles the EventBus emit for 'updatedBusinessImage'.
+     * This hides the edit business modal and refreshes the business's details.
+     */
+    updateBusinessImageHandler() {
+      this.getBusinessInfo(this.businessData.id);
+    }
+
+
   },
 
   computed: {

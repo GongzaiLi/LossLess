@@ -18,21 +18,26 @@
               {{ message.messageText }}
             </b-card-text>
           </b-card>
-
         </div>
-        <b-form @submit.prevent="sendMessage">
-          <b-input-group>
-            <b-form-textarea
-                required
-                maxlength=250 max-rows="2"
-                no-resize
-                type="text" class="messageInputBox"
-                placeholder="Type Message..."
-                v-model="messageText"
-            >
+
+        <b-form>
+        <b-input-group>
+            <b-form-textarea required no-resize maxlength="250" max-rows="2"
+                             type="text" class="messageInputBox sendMessageGroup"
+                             placeholder="Type Message..." v-model="messageText">
             </b-form-textarea>
+
             <b-input-group-append>
-              <b-button type="submit" :disabled="targetChatHead == null && isCardCreator" variant="primary"> Send </b-button>
+              <b-button v-if="messageText"  class="clearButton" @click="messageText=''">
+                <b-icon icon="X" variant="dark"/>
+              </b-button>
+              <b-button v-else disabled class="clearButton">
+                <b-icon icon="X" variant="dark"/>
+              </b-button>
+            </b-input-group-append>
+            <b-input-group-append class="ml-2">
+              <b-button v-if="messageText" class="sendMessageGroup" variant="primary" @click="sendMessage"> Send</b-button>
+              <b-button v-else disabled class="sendMessageGroup" variant="primary"> Send</b-button>
             </b-input-group-append>
           </b-input-group>
         </b-form>
@@ -42,29 +47,46 @@
 </template>
 
 <style scoped>
+
+.clearButton {
+  background-color: lightgrey;
+  border-color: lightgrey;
+}
+
 .chat-list {
   height: 7rem;
-  max-height: 15rem;
+  max-height: 18rem;
   overflow-y: auto;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .message-box {
-  height: 11rem;
+  height: 14rem;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom: 0;
   overflow-y: auto;
 }
+
+.sendMessageGroup {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 
 .messageInputBox {
   height: 4rem;
   max-width: 100%;
   float: left;
   bottom: 0;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
 }
 
 @media (min-width: 992px) {
   .chat-list {
-    height: 15rem;
+    height: 18rem;
   }
 }
 

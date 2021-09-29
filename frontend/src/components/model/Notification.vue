@@ -1,9 +1,9 @@
 <template>
-  <div class="flex-container">
+  <b-card class="flex-container">
     <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
       <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
     </div>
-    <div class="notification">
+    <b-card class="notification">
       <div v-if="!updatedNotification.read">
         <b-row>
           <b-col>
@@ -21,7 +21,9 @@
         <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
         <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
         <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
-        <b-icon-chat-quote  v-else-if="updatedNotification.type==='Message Received'"/>
+        <b-icon-globe v-else-if="updatedNotification.type==='User Currency Changed'"/>
+        <b-icon-globe v-else-if="updatedNotification.type==='Business Currency Changed'"/>
+        <b-icon-chat-square-dots-fill v-else-if="updatedNotification.type==='Message Received'"/>
       </b-col>
       <b-col class="pl-0 pt-1" cols="5">
         <h6> {{updatedNotification.type}} </h6>
@@ -77,6 +79,7 @@
       <div v-else>
         <span >{{ updatedNotification.message }}</span>
       </div>
+
         <b-row>
           <b-col cols="11">
             <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
@@ -102,14 +105,14 @@
                @ok="archiveNotification">
         Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
       </b-modal>
-    </div>
+    </b-card>
     <b-modal :id="`full-card-${this.updatedNotification.id}`" size="lg" hide-header hide-footer>
       <MarketplaceCardFull
           :cardId = "updatedNotification.subjectId"
           :openedFromNotifications = "notification.senderId"
       >  </MarketplaceCardFull>
     </b-modal>
-  </div>
+  </b-card>
 </template>
 
 
@@ -182,10 +185,6 @@ span.unreadLabel {
   cursor: pointer;
 }
 
-/*this is being used ignore warning*/
-.dropdown-menu {
-  min-width: 6rem !important;
-}
 
 </style>
 
@@ -311,9 +310,8 @@ export default {
      * @param notification the notification that has been clicked
      */
     async markRead(notification) {
-      if (notification.id === this.updatedNotification.id && !this.updatedNotification.read &&
-      !this.updated) {
-        this.updatedNotification.read = true
+      if (notification.id === this.updatedNotification.id && !this.updatedNotification.read && !this.updated) {
+        this.updatedNotification.read = true;
         await Api.patchNotification(this.updatedNotification.id, {"read": true});
       }
       this.updated = true

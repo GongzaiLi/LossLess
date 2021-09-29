@@ -50,6 +50,7 @@ export default {
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id, count, offset, sortBy = "ID", sortDirection = "ASC", searchQuery = "") => instance.get(`/businesses/${id}/products?count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}&searchQuery=${searchQuery}`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
+  modifyBusiness: (editBusinessData, businessId) => instance.put(`/businesses/${businessId}`, editBusinessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id, productData) => instance.post(`/businesses/${id}/products`, productData, {withCredentials: true}),
@@ -190,6 +191,22 @@ export default {
     formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
     return instance.post(`/users/${userId}/image`, formData, {withCredentials: true});
   },
+
+  /**
+   * Uploads one image file to a business's Profile. Will send a POST request to the business image
+   * endpoint. Each image is sent as multipart/form-data with the param name "file".
+   * @param businessId Id of the business
+   * @param imageFile Image file object to be uploaded.
+   */
+  uploadBusinessProfileImage: (businessId, imageFile) => {
+    // See https://github.com/axios/axios/issues/710 for how this works
+    let formData = new FormData();
+    formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+    return instance.post(`/businesses/${businessId}/image`, formData, {withCredentials: true});
+  },
+
+  deleteBusinessProfileImage: (businessId) => instance.delete(`/businesses/${businessId}/image`, {withCredentials: true}),
+
 
   getSalesReportCsv: (businessId) => instance.get(`/businesses/${businessId}/salesReport/csv`, {withCredentials: true, responseType: 'blob' }),
 

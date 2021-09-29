@@ -7,7 +7,7 @@ Date: sprint_1
     toggleable="lg" type="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave">Wasteless</b-navbar-brand>
+    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave"> <img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"></b-navbar-brand>
 
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
@@ -23,7 +23,7 @@ Date: sprint_1
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item to="/homepage">Home Page</b-nav-item>
+        <b-nav-item to="/homepage">Home Page <NotificationBadge/></b-nav-item>
         <b-nav-item id="go-to-profile" v-on:click="goToProfile">My Profile</b-nav-item>
         <b-nav-item to="/search">Search Accounts</b-nav-item>
         <b-nav-item to="/listingSearch">Search Listings</b-nav-item>
@@ -48,18 +48,19 @@ Date: sprint_1
             <b-icon-graph-up/> Sales Report
           </b-dropdown-item>
         </b-nav-item-dropdown>
-
-        <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="float-right ml-2" variant="secondary">Create Business</b-button>
       </b-navbar-nav>
+
+      <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="ml-auto" id="create-business-btn">Create Business</b-button>
     </b-collapse>
 
-    <NotificationDropdown class="ml-auto"/>
     <b-dropdown right variant="link" toggle-class="text-decoration-none">
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <b-img :src="showProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+        <b-img v-if="isActingAsUser" :src="showUserProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
                alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
+        <b-img v-else :src="showBusinessProfilePicture ? getURL($currentUser.currentlyActingAs.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+               alt="Business Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
       </template>
 
       <div v-if="!isActingAsUser">
@@ -76,7 +77,7 @@ Date: sprint_1
 
       <div v-if="businessesInDropDown.length > 0" style="margin-bottom: 0.1em">
         <hr v-if="isActingAsUser" style="margin-top: 0; margin-bottom: 0;" >
-        <sub style="margin-left:2em">Business Accounts</sub>
+        <sub style="margin-left:2em;">Business Accounts</sub>
 
         <b-dropdown-item
             v-for="business in businessesInDropDown"
@@ -89,16 +90,37 @@ Date: sprint_1
         <hr style="margin-top: 0.5em; margin-bottom: 0.5em;">
       </div>
 
-      <b-dropdown-item @click="logOut">Log Out</b-dropdown-item>
+      <b-dropdown-item @click="logOut" style="min-width: 10rem">Log Out</b-dropdown-item>
     </b-dropdown>
   </b-navbar>
 </template>
 
+<style scoped>
+#create-business-btn {
+  background-color: #1c42b3;
+  border-color: #1c42b3;
+}
+#create-business-btn:hover {
+  background-color: #16348f;
+  border-color: #16348f;
+}
+#create-business-btn:focus {
+  background-color: #16348f;
+  border-color: #16348f;
+  box-shadow:0 0 0 .2rem rgba(28, 66, 179,.5);
+}
+#create-business-btn:active {
+  background-color: #16348f;
+  border-color: #16348f;
+  box-shadow:0 0 0 .2rem rgba(28, 66, 179,.5);
+}
+</style>
+
 <script>
 import {initializeAuth, setCurrentlyActingAs} from '../../auth'
-import NotificationDropdown from "./NotificationDropdown";
 import EventBus from "../../util/event-bus";
 import api from "../../Api";
+import NotificationBadge from "./NotificationBadge";
 
 
 /**
@@ -109,9 +131,7 @@ import api from "../../Api";
  */
 export default {
   name: "Navbar.vue",
-  components: {
-    NotificationDropdown
-  },
+  components: {NotificationBadge},
   data() {
     return {
       cards: [],
@@ -119,8 +139,10 @@ export default {
     }
   },
   mounted() {
-    EventBus.$on('updatedUser', this.updatedUserHandler)
-    EventBus.$on('updatedImage', this.updatedUserHandler)
+    EventBus.$on('updatedUserDetails', this.updatedAccountHandler)
+    EventBus.$on('updatedUserImage', this.updatedAccountHandler)
+    EventBus.$on('updatedBusinessDetails', this.updatedAccountHandler)
+    EventBus.$on('updatedBusinessImage', this.updatedAccountHandler)
 
   },
   computed: {
@@ -131,8 +153,16 @@ export default {
     /**
      * Returns true if we should show the user's profile image. i.e. they are acting as a user and have a profile image
      */
-    showProfilePicture: function() {
+    showUserProfilePicture: function() {
       return this.$currentUser.profileImage&&this.isActingAsUser
+    },
+
+
+    /**
+     * Returns true if we should show the business's profile image. i.e. they are acting as a business and have a profile image
+     */
+    showBusinessProfilePicture: function() {
+      return this.$currentUser.currentlyActingAs.profileImage && !this.isActingAsUser
     },
 
     /**
@@ -270,11 +300,11 @@ export default {
     },
 
     /**
-     * This is the handler for the event "updatedUser".
+     * This is the handler for the events "updatedUserDetails", "updatedBusinessDetails", "updatedUserImage", "updatedBusinessImage".
      * The function calls initializeAuth from the Auth plugin
      * which refreshes Auth
      */
-    updatedUserHandler: function () {
+    updatedAccountHandler: function () {
       initializeAuth()
     },
     /**

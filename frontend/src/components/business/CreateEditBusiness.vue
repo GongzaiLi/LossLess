@@ -48,10 +48,10 @@ Date: 26/3/2021
 
         <b-row>
           <b-col cols="auto" class="mr-auto p-3">
-            <b-button variant="primary" type="submit" id="submit-button">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
+            <b-button v-show="isEditBusiness" id="cancel-button" @click="$bvModal.hide('edit-business-profile')" >Cancel</b-button>
           </b-col>
           <b-col cols="auto" class="p-3">
-            <b-button v-show="isEditBusiness" id="cancel-button" @click="$bvModal.hide('edit-business-profile')" >Cancel</b-button>
+            <b-button variant="primary" type="submit" id="submit-button">{{(isEditBusiness)?'Confirm':'Create'}}</b-button>
           </b-col>
         </b-row>
       </b-form>
@@ -121,6 +121,7 @@ Date: 26/3/2021
 import api from "../../Api";
 import AddressInput from "../model/AddressInput";
 import {getMonthsAndYearsBetween} from '../../util';
+import EventBus from "../../util/event-bus";
 
 const MIN_AGE_TO_CREATE_BUSINESS = 16;
 
@@ -198,10 +199,22 @@ export default {
     },
 
     /**
-     * TODO
+     * Makes a put API request to update a business's details taken from the user inputs
+     * from the modal.
      */
     async updateBusiness() {
-      //TODO
+      await api.modifyBusiness(this.businessData, this.businessData.id)
+          .then(() => {
+            EventBus.$emit("updatedBusinessDetails") })
+          .catch((error) => {
+            this.errors = [];
+            this.$log.debug(error);
+            if (error.response) {
+              this.errors.push(`Updating business failed: ${error.response.data.message}`);
+            } else {
+              this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
+            }
+          });
     },
 
     /**

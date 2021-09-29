@@ -63,6 +63,7 @@ public class Business {
     @Column(name = "created")
     private LocalDate created;
 
+    @JsonView(BusinessViews.SearchBusinessesView.class)
     @JoinColumn(name = "profile_image")
     @OneToOne
     private Image profileImage;

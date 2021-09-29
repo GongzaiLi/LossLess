@@ -1,6 +1,5 @@
 package com.seng302.wasteless.repository;
 
-import com.seng302.wasteless.dto.SalesReportManufacturerTotalsDto;
 import com.seng302.wasteless.model.ManufacturerSummary;
 import com.seng302.wasteless.model.ProductSummary;
 import com.seng302.wasteless.model.PurchasedListing;
@@ -47,7 +46,7 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      * in a specified date range
      * @param businessId the id of the business
      */
-    Integer countAllByBusiness_IdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
+    Integer countAllByBusinessIdAndSaleDateBetween(Integer businessId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Returns the total value of purchases for a specified business
@@ -58,9 +57,9 @@ public interface PurchasedListingRepository extends JpaRepository<PurchasedListi
      */
     @Query(value = "select sum(PL.price) from PurchasedListing PL where PL.business = :businessId and PL.saleDate >= :startDate" +
             " and PL.saleDate <= :endDate ", nativeQuery = true)
-    Double sumPriceByBusiness_IdAndSaleDateBetween(@Param("businessId") Integer businessId,
-                                                    @Param("startDate") LocalDate startDate,
-                                                    @Param("endDate") LocalDate endDate);
+    Double sumPriceByBusinessIdAndSaleDateBetween(@Param("businessId") Integer businessId,
+                                                  @Param("startDate") LocalDate startDate,
+                                                  @Param("endDate") LocalDate endDate);
 
     /**
      * Returns total sales, value and likes for purchases of a business, grouped by product

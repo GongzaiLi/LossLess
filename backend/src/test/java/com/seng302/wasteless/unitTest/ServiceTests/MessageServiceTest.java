@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class MessageServiceTest {
+class MessageServiceTest {
 
     @Autowired
     private MessageService messageService;
