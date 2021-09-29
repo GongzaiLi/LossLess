@@ -52,6 +52,9 @@ public class MessageController {
      *
      * Sender is taken from the currently logged in user.
      *
+     * SubjectId created for notification is a comma separated string of the related card id
+     * and the sender's id. To send this extra information to the frontend
+     *
      * Returns:
      * 201 If message successfully created
      * 401 If user is unauthorised
@@ -87,7 +90,9 @@ public class MessageController {
         JSONObject responseBody = new JSONObject();
         responseBody.put("messageId", message.getId());
 
-        Notification notification =  NotificationService.createNotification(receiver.getId(),message.getId(), NotificationType.MESSAGE_RECEIVED,String.format("You have received a new message from %s %s about the marketplace item: %s.", currentlyLoggedInUser.getFirstName(),currentlyLoggedInUser.getLastName(), cardForMessage.getTitle()));
+        String subjectIdString = cardForMessage.getId().toString()+","+currentlyLoggedInUser.getId().toString();
+
+        Notification notification =  NotificationService.createNotification(receiver.getId(),subjectIdString, NotificationType.MESSAGE_RECEIVED,String.format("You have received a new message from %s %s about the marketplace item: %s.", currentlyLoggedInUser.getFirstName(),currentlyLoggedInUser.getLastName(), cardForMessage.getTitle()));
         notificationService.saveNotification(notification);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }

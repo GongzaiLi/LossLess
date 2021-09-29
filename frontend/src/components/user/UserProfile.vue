@@ -161,6 +161,8 @@ Date: 5/3/2021
     <b-modal id="edit-profile-image" title="Profile Image" hide-footer>
       <ProfileImage :details="userData.profileImage" :userLookingAtSelfOrIsAdmin=userLookingAtSelfOrIsAdmin />
     </b-modal>
+
+    <currency-notification toast-id="user-currency-changed" :oldCurrency="oldCurrency" :new-currency="newCurrency" :is-user="true"/>
   </div>
 </template>
 
@@ -207,9 +209,11 @@ import UserDetailsModal from "./UserDetailsModal";
 import ProfileImage from "../model/ProfileImage";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util/index";
+import CurrencyNotification from "../model/CurrencyNotification";
 
 export default {
   components: {
+    CurrencyNotification,
     UserDetailsModal,
     memberSince,
     ProfileImage,
@@ -242,7 +246,9 @@ export default {
       },
       loggedInUserAdmin: false,
       userFound: true,
-      loading: true
+      loading: true,
+      oldCurrency: '',
+      newCurrency : ''
     }
   },
 
@@ -250,12 +256,20 @@ export default {
     const userId = this.$route.params.id;
     this.launchPage(userId);
 
-    EventBus.$on('updatedUserDetails', this.updatedUserHandler)
-    EventBus.$on('updatedUserImage', this.updatedImageHandler)
+    EventBus.$on('updatedUserDetails', this.updatedUserHandler);
+    EventBus.$on('updatedUserImage', this.updatedImageHandler);
+    EventBus.$on("currencyChanged", this.showNotification);
 
   },
 
   methods: {
+    /**
+     * When the user's currency has changed, then it will show a notification
+     */
+    showNotification(oldCurrency, newCurrency) {
+      [this.oldCurrency, this.newCurrency] = [oldCurrency, newCurrency];
+      this.$bvToast.show('user-currency-changed');
+    },
     /**
      * set up the page
      * add debounced delay 400 ms to launch the page
@@ -437,8 +451,6 @@ export default {
       return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.id === this.userData.id
           || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     },
-
-
   },
   watch: {
     /**
