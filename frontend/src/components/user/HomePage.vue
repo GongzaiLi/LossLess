@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 
 .expired-cards {
   overflow-y: auto;
@@ -128,9 +128,9 @@
 
 <script>
 import Api from "../../Api";
-import MarketplaceSection from "../marketplace/MarketplaceSection";
 import NotificationTag from "../model/NotificationTag";
 import Notification from "../model/Notification";
+import MarketplaceSection from "../marketplace/MarketplaceSection";
 import EventBus from "../../util/event-bus";
 import Vue from 'vue';
 

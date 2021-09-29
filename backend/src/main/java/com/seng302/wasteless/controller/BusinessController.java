@@ -1,7 +1,10 @@
 package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.seng302.wasteless.dto.*;
+import com.seng302.wasteless.dto.GetBusinessesDto;
+import com.seng302.wasteless.dto.GetSearchBusinessDto;
+import com.seng302.wasteless.dto.PutBusinessDto;
+import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
@@ -16,17 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * BusinessController is used for mapping all Restful API requests related directly to businesses
@@ -296,28 +295,4 @@ public class BusinessController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException exception) {
-        Map<String, String> errors;
-        errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-//            logger.error(errorMessage); it doesnt work I am not sure why
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
-
-
 }
