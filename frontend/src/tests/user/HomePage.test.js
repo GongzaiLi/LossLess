@@ -100,8 +100,6 @@ beforeEach(() => {
         methods: {},
     });
 
-    global.console = {warn: jest.fn()}
-
 });
 
 afterEach(() => {
@@ -149,13 +147,13 @@ describe('check-filtered-notifications', () => {
                 {
                     id: 1,
                     message: "HSDFSD",
-                    subjectId: 420,
+                    subjectId: 2,
                     type: "Business Currency Changed"
                 },
                 {
                     id: 2,
                     message: "HSDFSD",
-                    subjectId: 69,
+                    subjectId: 1,
                     type: "User Currency Changed"
                 },
                 {
@@ -163,6 +161,12 @@ describe('check-filtered-notifications', () => {
                     message: "HSDFSD",
                     subjectId: 69,
                     type: "Listing Liked"
+                },
+                {
+                    id: 4,
+                    message: "HSDFSD",
+                    subjectId: 420,
+                    type: "Business Currency Changed"
                 }
             ]});
     });
@@ -177,9 +181,9 @@ describe('check-filtered-notifications', () => {
         expect(wrapper.vm.filteredNotifications[1].id).toBe(3);
     });
 
-    test('Only shows business notifications when acting as business', async () => {
+    test('Only shows business notifications of business acting as', async () => {
         wrapper.vm.$currentUser.currentlyActingAs = {
-            id: 1,
+            id: 2,
             name: "Big Dave's Collars"
         };
         await wrapper.vm.updateNotifications();
@@ -187,6 +191,19 @@ describe('check-filtered-notifications', () => {
 
         expect(wrapper.vm.filteredNotifications.length).toBe(1);
         expect(wrapper.vm.filteredNotifications[0].id).toBe(1);
+    });
+
+    test('Shows different business notifications when change business acting as', async () => {
+        wrapper.vm.$currentUser.currentlyActingAs = {
+            id: 420,
+            name: "Big Bob's Collars"
+        };
+
+        await wrapper.vm.updateNotifications();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.filteredNotifications.length).toBe(1);
+        expect(wrapper.vm.filteredNotifications[0].id).toBe(4);
     });
 });
 

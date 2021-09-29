@@ -336,7 +336,8 @@ export default {
      */
     filteredNotifications: function(){
       return this.notifications.filter((notification) =>
-        !this.pendingDeletedNotifications.includes(notification.id) && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed'
+        !this.pendingDeletedNotifications.includes(notification.id)
+          && (this.$currentUser.currentlyActingAs && notification.type === 'Business Currency Changed' && notification.subjectId === this.$currentUser.currentlyActingAs.id
           || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')
       );
     },

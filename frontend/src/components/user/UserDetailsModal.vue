@@ -313,6 +313,7 @@ export default {
         .modifyUser(editData, this.$route.params.id)
           .then(() => {
             EventBus.$emit("updatedUserDetails");
+            EventBus.$emit("notificationUpdate");
         })
         .catch((error) => {
           this.errors = [];
