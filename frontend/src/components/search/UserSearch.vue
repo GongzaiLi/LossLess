@@ -35,7 +35,7 @@ Date: sprint_1
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
           <template #cell(name)="data">
-            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/profile-default.jpg')"
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/user-profile-default.png')"
                    alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
             {{createUsername(data.item)}}
           </template>

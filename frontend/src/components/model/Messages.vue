@@ -4,7 +4,7 @@
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
           <b-list-group-item class="chat-head" v-for="item in conversations" :key=item.userId @click="clickedChatHead($event, item.userId)">
-            <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/profile-default.jpg')" />
+            <b-img class="rounded-circle avatar" width="30" height="30" :alt="item.userName" :src="require('../../../public/user-profile-default.png')" />
             {{item.userName}}
           </b-list-group-item>
         </b-list-group>
