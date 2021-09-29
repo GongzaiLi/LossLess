@@ -1,6 +1,5 @@
 <!--
 Individual Business profile Page. Currently displays all business data
-Author: Gongzai Li
 Date: 29/03/2021
 -->
 <template>
@@ -189,6 +188,8 @@ Date: 29/03/2021
     <b-modal id="edit-business-image" title="Profile Image" hide-footer>
       <ProfileImage :details="businessData.profileImage" :userLookingAtSelfOrIsAdmin = 'isAdmin || isAdminOfThisBusiness' />
     </b-modal>
+
+    <currency-notification toast-id="business-currency-changed" :oldCurrency="oldCurrency" :new-currency="newCurrency" :is-user="false"/>
   </div>
 
 
@@ -236,9 +237,11 @@ import {formatAddress} from "../../util";
 import CreateEditBusiness from "./CreateEditBusiness";
 import ProfileImage from "../model/ProfileImage";
 import EventBus from "../../util/event-bus";
+import CurrencyNotification from "../model/currencyNotification";
 
 export default {
   components: {
+    CurrencyNotification,
     CreateEditBusiness,
     memberSince,
     makeAdminModal,
@@ -297,6 +300,8 @@ export default {
       loading: true,
       makeAdminAction: null,
       makeAdminError: "",
+      oldCurrency: '',
+      newCurrency : ''
     }
   },
 
@@ -304,10 +309,18 @@ export default {
     const businessId = this.$route.params.id;
     this.launchPage(businessId);
     EventBus.$on('updatedBusinessDetails', this.updateBusinessHandler);
-    EventBus.$on('updatedBusinessImage', this.updateBusinessImageHandler)
+    EventBus.$on('updatedBusinessImage', this.updateBusinessImageHandler);
+    EventBus.$on("currencyChanged", this.showNotification);
   },
 
   methods: {
+    /**
+     * When the business's currency has changed, then it will show a notification
+     */
+    showNotification(oldCurrency, newCurrency) {
+      [this.oldCurrency, this.newCurrency] = [oldCurrency, newCurrency];
+      this.$bvToast.show('business-currency-changed');
+    },
 
     /**
      * set up the page
@@ -456,8 +469,6 @@ export default {
     updateBusinessImageHandler() {
       this.getBusinessInfo(this.businessData.id);
     }
-
-
   },
 
   computed: {
@@ -489,7 +500,6 @@ export default {
     getAddress: function () {
       return formatAddress(this.businessData.address, 1);
     },
-
 
     /**
      * set table parameter
