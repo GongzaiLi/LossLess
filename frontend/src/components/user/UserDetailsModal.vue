@@ -290,6 +290,8 @@ export default {
             )) {
               await this.updateUser();
             }
+          } else {
+            await this.updateUser();
           }
         } else {
           await this.updateUser();
