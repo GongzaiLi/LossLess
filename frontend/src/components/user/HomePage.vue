@@ -46,7 +46,7 @@
             <h3>Notifications</h3>
           </b-col>
           <b-col cols="4">
-            <b-dropdown v-if="!isArchivedSelected" text="Filter By Tag">
+            <b-dropdown :variant="numberOfSelectedTags === 0 ? 'secondary' : 'primary'" v-if="!isArchivedSelected" :text="numberOfSelectedTags === 0 ? 'Filter By Tag' : `${numberOfSelectedTags} Tags Selected`">
               <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
@@ -66,8 +66,9 @@
       </div>
       <b-overlay class="notification-holder" v-model="loadingNotifications">
         <b-card v-if="filteredNotifications.length === 0" class="notification-cards shadow">
-          <h6 v-if="!isArchivedSelected"> You have no notifications </h6>
-          <h6 v-else> You have no archived notifications </h6>
+          <h6 v-if="isArchivedSelected"> You have no archived notifications </h6>
+          <h6 v-if="!isArchivedSelected && numberOfSelectedTags === 0"> You have no notifications </h6>
+          <h6 v-if="!isArchivedSelected && numberOfSelectedTags !== 0"> You have no notifications that match the selected tag filters </h6>
         </b-card>
         <div v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
           <notification @tagColorChanged="filterNotificationsByTag" :archived-selected="isArchivedSelected" :notification="notification"
@@ -344,6 +345,12 @@ export default {
   },
 
   computed: {
+    /**
+     * Count the number of currently selected tags
+     */
+    numberOfSelectedTags: function () {
+      return Object.entries(this.tagColors).filter(([, value]) => value).length;
+    },
     /**
      * Filters notifications by removing notifications that shouldn't be displayed.
      * This includes notifications pending deletion, and business notifications (if acting as user) or
