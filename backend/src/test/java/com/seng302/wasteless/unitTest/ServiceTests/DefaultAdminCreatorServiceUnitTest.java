@@ -1,4 +1,4 @@
-package com.seng302.wasteless.unitTest;
+package com.seng302.wasteless.unitTest.ServiceTests;
 
 
 import com.seng302.wasteless.service.AddressService;

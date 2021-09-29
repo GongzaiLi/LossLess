@@ -8,7 +8,8 @@ Date: 3/3/2021
     <b-row class="justify-content-md-center">
       <b-col md="8" xl="6">
         <b-card class="shadow">
-        <h2>Login to Wasteless</h2>
+        <h2><img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"> Login to LossLess</h2>
+          <hr>
           <b-form @submit="login">
             <b-form-group>
               <strong>Email</strong>

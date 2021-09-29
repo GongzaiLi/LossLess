@@ -11,8 +11,9 @@ Date: 3/3/2021
         @submit="submit"
         @input="setCustomValidities"
       >
-      <h1 v-if="!isEditUser">Sign Up to Wasteless</h1>
+      <h1 v-if="!isEditUser"><img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"> Sign Up to LossLess</h1>
       <h5 v-else>User Details</h5>
+      <hr>
       <b-form-group>
           <strong>First Name *</strong>
           <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
