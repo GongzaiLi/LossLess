@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 
 .expired-cards {
   overflow-y: auto;
@@ -128,9 +128,9 @@
 
 <script>
 import Api from "../../Api";
-import MarketplaceSection from "../marketplace/MarketplaceSection";
 import NotificationTag from "../model/NotificationTag";
 import Notification from "../model/Notification";
+import MarketplaceSection from "../marketplace/MarketplaceSection";
 import EventBus from "../../util/event-bus";
 import Vue from 'vue';
 
@@ -334,10 +334,10 @@ export default {
      * user notifications (if acting as business)
      * @returns All notifications that should be displayed
      */
-    filteredNotifications: function(){
+    filteredNotifications: function() {
       return this.notifications.filter((notification) =>
         !this.pendingDeletedNotifications.includes(notification.id)
-          && (this.$currentUser.currentlyActingAs && notification.type === 'Business Currency Changed' && notification.subjectId === this.$currentUser.currentlyActingAs.id
+          && (this.$currentUser.currentlyActingAs && notification.type === 'Business Currency Changed' && parseInt(notification.subjectId) === this.$currentUser.currentlyActingAs.id
           || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')
       );
     },

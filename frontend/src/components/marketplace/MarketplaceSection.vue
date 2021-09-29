@@ -70,8 +70,8 @@
       <MarketplaceCardFull
           :cardId = "cardId"
           v-on:cardChanged="refreshData"
-          v-on:closeModal="closeFullCardModal">
-        >  </MarketplaceCardFull>
+          v-on:closeModal="closeFullCardModal"
+      />
     </b-modal>
   </div>
 </template>

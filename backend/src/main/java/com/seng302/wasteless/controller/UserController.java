@@ -406,7 +406,7 @@ public class UserController {
         userService.updateUserDetails(userToModify, modifiedUser);
 
         if (userCountryChanged) {
-            Notification notification = NotificationService.createNotification(userToModify.getId(), null, NotificationType.USER_CURRENCY_CHANGE,
+            Notification notification = NotificationService.createNotification(userToModify.getId(),  userToModify.getId(), NotificationType.USER_CURRENCY_CHANGE,
                     "You have changed country and therefore your currency may have changed. " +
                             "This will not affect the currency of products in your administered business unless you " +
                             "also modify the address of the business.");

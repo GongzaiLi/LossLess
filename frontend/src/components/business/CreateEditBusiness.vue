@@ -157,6 +157,7 @@ export default {
         businessType: "",
       },
       errors: [],
+      oldCountry: "",
     }
   },
 
@@ -164,6 +165,7 @@ export default {
     this.$log.debug(this.businessDetails)
     if (this.isEditBusiness) {
       this.businessData = JSON.parse(JSON.stringify(this.businessDetails));
+      this.oldCountry = this.businessData.address.country;
     }
   },
 
@@ -203,9 +205,11 @@ export default {
      * from the modal.
      */
     async updateBusiness() {
+
       await api.modifyBusiness(this.businessData, this.businessData.id)
-          .then(() => {
-            EventBus.$emit("updatedBusinessDetails") })
+          .then(async () => {
+            EventBus.$emit("updatedBusinessDetails");
+            await this.notificationCurrencyChange();})
           .catch((error) => {
             this.errors = [];
             this.$log.debug(error);
@@ -215,6 +219,20 @@ export default {
               this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
             }
           });
+    },
+    /**
+     * Compares the currency of the user's old country to their new country and gives a notification if it
+     * has changed.
+     * */
+    notificationCurrencyChange: async function () {
+      if (this.oldCountry !== this.businessData.address.country) {
+        EventBus.$emit("notificationUpdate");
+        const oldCurrency = await api.getUserCurrency(this.oldCountry);
+        const newCurrency = await api.getUserCurrency(this.businessData.address.country);
+        if (oldCurrency.code !== newCurrency.code) {
+          EventBus.$emit("currencyChanged", oldCurrency.code, newCurrency.code);
+        }
+      }
     },
 
     /**

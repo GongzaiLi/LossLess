@@ -200,7 +200,6 @@ export default {
   },
 
   methods: {
-
     /**
      * If new password does not match old pass word return a string
      * that can be used as the value for a custom validity on the confirm password field else return empty string
@@ -279,23 +278,8 @@ export default {
      * */
     async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-      if(this.isEditUser) {
-        if (this.country !== this.userData.homeAddress.country) {
-          let oldCurrency = await Api.getUserCurrency(this.country);
-          let newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
-          if (oldCurrency.code !== newCurrency.code) {
-            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
-                " This will not affect the currency of products in your administered business unless you " +
-                "also modify the address of the business."
-            )) {
-              await this.updateUser();
-            }
-          } else {
-            await this.updateUser();
-          }
-        } else {
-          await this.updateUser();
-        }
+      if (this.isEditUser) {
+        await this.updateUser();
       } else {
         await this.register()
       }
@@ -311,9 +295,9 @@ export default {
       let editData = this.getEditData();
       await Api
         .modifyUser(editData, this.$route.params.id)
-          .then(() => {
+          .then(async () => {
             EventBus.$emit("updatedUserDetails");
-            EventBus.$emit("notificationUpdate");
+            await this.notificationCurrencyChange();
         })
         .catch((error) => {
           this.errors = [];
@@ -324,6 +308,21 @@ export default {
             this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
           }
         });
+    },
+
+    /**
+     * Compares the currency of the business's old country to their new country and gives a notification if it
+     * has changed.
+     * */
+    notificationCurrencyChange: async function () {
+      if (this.country !== this.userData.homeAddress.country) {
+        EventBus.$emit("notificationUpdate");
+        const oldCurrency = await Api.getUserCurrency(this.country);
+        const newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
+        if (oldCurrency.code !== newCurrency.code) {
+          EventBus.$emit("currencyChanged", oldCurrency.code, newCurrency.code);
+        }
+      }
     },
 
     /**
