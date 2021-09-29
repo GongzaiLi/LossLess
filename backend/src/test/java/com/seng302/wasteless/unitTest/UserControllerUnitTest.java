@@ -105,7 +105,7 @@ class UserControllerUnitTest {
 
         Notification notification = new Notification();
         notification.setType(NotificationType.EXPIRED);
-        notification.setSubjectId(1);
+        notification.setSubjectId("1");
         notification.setMessage("Your card has expired");
         notification.setUserId(1);
         List<Notification> notifs = new ArrayList<>();
