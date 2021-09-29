@@ -46,10 +46,13 @@
             <h3>Notifications</h3>
           </b-col>
           <b-col cols="4">
-            <b-dropdown v-if="!isArchivedSelected" text="Filter By Tag" class="tag-filter-dropdown">
+            <b-dropdown v-if="!isArchivedSelected" text="Filter By Tag">
               <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
+              <b-dropdown-item v-if="anyTagSelected" @click="removeAllTagsFromFilter()">
+                <P><b-icon-x-circle-fill/> Remove Filters </p>
+              </b-dropdown-item>
             </b-dropdown>
             <h3 v-else>(Archived)</h3>
           </b-col>
@@ -67,7 +70,7 @@
           <h6 v-else> You have no archived notifications </h6>
         </b-card>
         <div v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
-          <notification :archived-selected="isArchivedSelected" :notification="notification"
+          <notification @tagColorChanged="filterNotificationsByTag" :archived-selected="isArchivedSelected" :notification="notification"
                         :in-navbar="false" @deleteNotification="createDeleteToast">
           </notification>
         </div>
@@ -108,6 +111,9 @@
   margin-top: -3px;
 }
 
+.selected {
+  background-color: lightgray;
+}
 
 .notification-cards {
   margin-top: 20px;
@@ -180,7 +186,7 @@ export default {
   mounted() {
     const userId = this.$currentUser.id;
     this.getUserInfo(userId);
-    EventBus.$on('notificationUpdate', this.updateNotifications)
+    EventBus.$on('notificationUpdate', this.updateNotifications);
   },
 
   methods: {
@@ -189,6 +195,13 @@ export default {
      */
     toggleTagColorSelected: function (tagColor) {
       this.tagColors[tagColor] = !this.tagColors[tagColor];
+      this.filterNotificationsByTag();
+    },
+    /**
+     * Toggle all tags to be un-selected
+     */
+    removeAllTagsFromFilter: function () {
+      Object.entries(this.tagColors).forEach(([tag,]) => this.tagColors[tag] = false);
       this.filterNotificationsByTag();
     },
     /**
@@ -285,6 +298,9 @@ export default {
     async toggleArchived() {
       this.isArchivedSelected = !this.isArchivedSelected;
       await this.updateNotifications();
+      if (!this.isArchivedSelected) {
+        await this.filterNotificationsByTag();
+      }
     },
     /**
      * Hides the toast notification
@@ -342,6 +358,12 @@ export default {
     },
     notificationWidth() {
       return this.$currentUser.currentlyActingAs ? 12 : 6;
+    },
+    /**
+     * return true if any tag selected
+     */
+    anyTagSelected() {
+      return Object.entries(this.tagColors).some(([, value]) => value);
     }
   },
 

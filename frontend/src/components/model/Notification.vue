@@ -1,113 +1,127 @@
 <template>
-  <b-card class="flex-container">
-    <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
-      <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
-    </div>
-    <div class="notification">
-      <div v-if="!updatedNotification.read">
+  <b-card class="notification-card">
+    <b-card-body class="notification-body">
+      <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
+        <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
+      </div>
+      <div class="notification">
+        <div v-if="!updatedNotification.read">
+          <b-row>
+            <b-col>
+             <span class="unreadLabel">
+             <b-icon-envelope-fill> </b-icon-envelope-fill> New Notification</span>
+            </b-col>
+          </b-row>
+          <hr class="unreadHr">
+        </div>
         <b-row>
-          <b-col>
-           <span class="unreadLabel">
-           <b-icon-envelope-fill> </b-icon-envelope-fill> New Notification</span>
+          <b-col cols="2" class="pt-1 pr-0">
+            <b-icon-star-fill class="mr-2 star-icon "  v-if="updatedNotification.starred"/>
+            <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
+            <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
+            <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
+            <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
+            <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
+            <b-icon-globe v-else-if="updatedNotification.type==='User Currency Changed'"/>
+            <b-icon-globe v-else-if="updatedNotification.type==='Business Currency Changed'"/>
+            <b-icon-chat-square-dots-fill v-else-if="updatedNotification.type==='Message Received'"/>
+          </b-col>
+          <b-col class="pl-0 pt-1" cols="5">
+            <h6> {{updatedNotification.type}} </h6>
+          </b-col>
+          <b-col cols="3" class="pt-1">
+            <h6> {{updatedNotification.price}} </h6>
+          </b-col>
+          <b-col cols="1">
+            <b-dropdown variant="none" right no-caret class="float-right" v-if="!this.inNavbar && !this.archivedSelected">
+              <template #button-content>
+                <b-icon-tag-fill title="Add tag to notification"
+                                 @mouseover="isHoveringTagButton = true"
+                                 @mouseout="isHoveringTagButton = false"
+                                 :class="{hoveringTagButton: isHoveringTagButton}"
+                                 class="tag-button float-right" />
+              </template>
+              <b-dropdown-header>
+                <h6>Tag Notification</h6>
+              </b-dropdown-header>
+              <b-dropdown-item v-for="tagColor in tagColors" :key="tagColor" @click="setNotificationTagColor(tagColor)">
+                <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
+              </b-dropdown-item>
+              <b-dropdown-item v-if="updatedNotification.tag" @click="setNotificationTagColor('remove')">
+                <P><b-icon-x-circle-fill class="remove-tag"/> Remove Tag</p>
+              </b-dropdown-item>
+            </b-dropdown>
+          </b-col>
+          <b-col cols="1">
+              <b-dropdown right no-caret variant="link" class="float-right" v-if="!this.inNavbar">
+                <template #button-content>
+                  <div>
+                    <b-icon-three-dots-vertical class="three-dot float-right " ></b-icon-three-dots-vertical>
+                  </div>
+                </template>
+                <b-dropdown-item v-if="!archivedSelected" @click="starNotification">
+                  <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
+                  <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
+                </b-dropdown-item>
+                <b-dropdown-item @click="confirmArchive">
+                  <p v-if="!archivedSelected">
+                    <b-icon-archive  class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive </p>
+                  <p v-else>
+                    <b-icon-archive  class="archive-button" variant="outline-success" title="Un-Archive this notification"></b-icon-archive>  Un-Archive </p>
+                </b-dropdown-item>
+                <b-dropdown-item @click="confirmDelete">
+                  <p><b-icon-trash class="delete-button" title="Delete this notification"></b-icon-trash>  Delete</p>
+                </b-dropdown-item>
+              </b-dropdown>
           </b-col>
         </b-row>
-        <hr class="unreadHr">
-      </div>
-      <b-row>
-      <b-col cols="2" class="pt-1 pr-0">
-        <b-icon-star-fill class="mr-2 star-icon "  v-if="updatedNotification.starred"/>
-        <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
-        <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
-        <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
-        <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
-        <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
-        <b-icon-globe v-else-if="updatedNotification.type==='User Currency Changed'"/>
-        <b-icon-globe v-else-if="updatedNotification.type==='Business Currency Changed'"/>
-        <b-icon-chat-square-dots-fill v-else-if="updatedNotification.type==='Message Received'"/>
-      </b-col>
-      <b-col class="pl-0 pt-1" cols="5">
-        <h6> {{updatedNotification.type}} </h6>
-      </b-col>
-      <b-col cols="3" class="pt-1">
-        <h6> {{updatedNotification.price}} </h6>
-      </b-col>
-      <b-col cols="1">
-        <b-dropdown variant="none" right no-caret class="float-right" v-if="!this.inNavbar && !this.archivedSelected">
-          <template #button-content>
-            <b-icon-tag-fill class="tag-button float-right"/>
-          </template>
-          <b-dropdown-item v-for="tagColor in tagColors" :key="tagColor" @click="setNotificationTagColor(tagColor)">
-            <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
-          </b-dropdown-item>
-          <b-dropdown-item v-if="updatedNotification.tag" @click="setNotificationTagColor('remove')">
-            <P><b-icon-x-circle-fill class="remove-tag"/> Remove Tag</p>
-          </b-dropdown-item>
-        </b-dropdown>
-      </b-col>
-      <b-col cols="1">
-          <b-dropdown right no-caret variant="link" class="float-right" v-if="!this.inNavbar">
-            <template #button-content>
-              <div>
-                <b-icon-three-dots-vertical class="three-dot float-right " ></b-icon-three-dots-vertical>
-              </div>
-            </template>
-            <b-dropdown-item v-if="!archivedSelected" @click="starNotification">
-              <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
-              <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
-            </b-dropdown-item>
-            <b-dropdown-item @click="confirmArchive">
-              <p v-if="!archivedSelected">
-                <b-icon-archive  class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive </p>
-              <p v-else>
-                <b-icon-archive  class="archive-button" variant="outline-success" title="Un-Archive this notification"></b-icon-archive>  Un-Archive </p>
-            </b-dropdown-item>
-            <b-dropdown-item @click="confirmDelete">
-              <p><b-icon-trash class="delete-button" title="Delete this notification"></b-icon-trash>  Delete</p>
-            </b-dropdown-item>
-          </b-dropdown>
-      </b-col>
-    </b-row>
-    <hr class="mt-1 mb-2">
-      <div v-if="updatedNotification.type === 'Liked Listing' || updatedNotification.type === 'Unliked Listing'">
-        <span @click="goToListing" class="listing-link">{{ updatedNotification.message }}</span>
-      </div>
-      <div v-else>
-        <span >{{ updatedNotification.message }}</span>
-      </div>
+        <hr class="mt-1 mb-2">
+        <div v-if="updatedNotification.type === 'Liked Listing' || updatedNotification.type === 'Unliked Listing'">
+          <span @click="goToListing" class="listing-link">{{ updatedNotification.message }}</span>
+        </div>
+        <div v-else>
+          <span >{{ updatedNotification.message }}</span>
+        </div>
 
-        <b-row>
-          <b-col cols="11">
-            <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
-          </b-col>
-          <b-col v-if="updatedNotification.read"  cols="1">
-            <span class="readLabel">
-             <b-icon-check2-all> </b-icon-check2-all> </span>
-          </b-col>
-        </b-row>
+          <b-row>
+            <b-col cols="11">
+              <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
+            </b-col>
+            <b-col v-if="updatedNotification.read"  cols="1">
+              <span class="readLabel">
+               <b-icon-check2-all> </b-icon-check2-all> </span>
+            </b-col>
+          </b-row>
 
-      <b-modal ref="confirmDeleteModal" size="sm"
-               title="Delete Notification"
-               ok-variant="danger"
-               ok-title="Delete"
-               @ok="notificationDeleted">
-        Are you sure you want to <strong>delete</strong> this notification?
-      </b-modal>
+        <b-modal ref="confirmDeleteModal" size="sm"
+                 title="Delete Notification"
+                 ok-variant="danger"
+                 ok-title="Delete"
+                 @ok="notificationDeleted">
+          Are you sure you want to <strong>delete</strong> this notification?
+        </b-modal>
 
-      <b-modal ref="confirmArchiveModal" size="sm"
-               :title="this.archivedSelected ? 'Un-Archive Notification' :'Archive Notification'"
-               ok-variant="success"
-               :ok-title="this.archivedSelected ? 'Un-Archive' :'Archive'"
-               @ok="archiveNotification">
-        Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
-      </b-modal>
-    </div>
+        <b-modal ref="confirmArchiveModal" size="sm"
+                 :title="this.archivedSelected ? 'Un-Archive Notification' :'Archive Notification'"
+                 ok-variant="success"
+                 :ok-title="this.archivedSelected ? 'Un-Archive' :'Archive'"
+                 @ok="archiveNotification">
+          Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
+        </b-modal>
+      </div>
+    </b-card-body>
   </b-card>
 </template>
 
 
 <style>
 
-.flex-container {
+.notification-card {
+  padding: 0 !important;
+}
+
+.notification-body {
+  padding: 0 !important;
   display: flex;
 }
 
@@ -174,6 +188,10 @@ span.unreadLabel {
   cursor: pointer;
 }
 
+.hoveringTagButton{
+  color: red;
+}
+
 
 </style>
 
@@ -191,7 +209,8 @@ export default {
     return {
       updatedNotification: {message:"", type:"", read: this.notification.read},
       tagColors: ["RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "BLACK"],
-      updated: false
+      updated: false,
+      isHoveringTagButton: false,
     }
   },
 
@@ -208,6 +227,7 @@ export default {
         this.updatedNotification.tag = tagColor;
         await Api.patchNotification(this.updatedNotification.id, {"tag": tagColor})
       }
+      this.$emit('tagColorChanged');
     },
 
     /**
