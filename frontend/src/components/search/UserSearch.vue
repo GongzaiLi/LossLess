@@ -24,7 +24,6 @@ Date: sprint_1
          no-local-sorting
          :sort-by.sync="sortBy"
          :sort-desc.sync="sortDesc"
-         stacked="sm"
          show-empty
          @row-clicked="rowClickHandler"
          :fields="fields"

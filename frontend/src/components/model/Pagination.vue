@@ -6,10 +6,6 @@
           :total-rows="totalItems"
           :per-page="perPage"
           @page-click="pageChange"
-          first-text="First"
-          prev-text="Prev"
-          next-text="Next"
-          last-text="Last"
       />
     </b-col>
     <b-col lg="4">
@@ -27,6 +23,10 @@
     </b-col>
   </b-row>
 </template>
+
+<style>
+
+</style>
 
 <script>
 export default {

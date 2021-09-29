@@ -20,7 +20,6 @@
       no-border-collapse
       bordered
       show-empty
-      stacked="sm"
       no-local-sorting
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc"

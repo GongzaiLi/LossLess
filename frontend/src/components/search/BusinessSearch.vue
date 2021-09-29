@@ -31,7 +31,6 @@ Page that stores table and search bar to search for businesses
                  no-local-sorting
                  :sort-by.sync="sortBy"
                  :sort-desc.sync="sortDesc"
-                 stacked="sm"
                  show-empty
                  :fields="fields"
                  :per-page="perPage"
