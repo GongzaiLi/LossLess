@@ -209,7 +209,7 @@ import UserDetailsModal from "./UserDetailsModal";
 import ProfileImage from "../model/ProfileImage";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util/index";
-import CurrencyNotification from "../model/currencyNotification";
+import CurrencyNotification from "../model/CurrencyNotification";
 
 export default {
   components: {

@@ -14,7 +14,7 @@ Date: sprint_6
       By updating your country your currency has changed from <strong>{{ oldCurrency }} to {{ newCurrency }}</strong>.
       <br>
       <br>
-      This will be updated for all future listing you create.
+      All of your listings are now in this currency, and any future listings you create will be in this currency.
       <br>
       <br>
       {{ notificationText }}

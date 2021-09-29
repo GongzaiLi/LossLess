@@ -205,6 +205,7 @@ export default {
      * from the modal.
      */
     async updateBusiness() {
+
       await api.modifyBusiness(this.businessData, this.businessData.id)
           .then(async () => {
             EventBus.$emit("updatedBusinessDetails");
@@ -225,7 +226,7 @@ export default {
      * */
     notificationCurrencyChange: async function () {
       if (this.oldCountry !== this.businessData.address.country) {
-        const oldCurrency = await api.getUserCurrency(this.country);
+        const oldCurrency = await api.getUserCurrency(this.oldCountry);
         const newCurrency = await api.getUserCurrency(this.businessData.address.country);
         if (oldCurrency.code !== newCurrency.code) {
           EventBus.$emit("currencyChanged", oldCurrency.code, newCurrency.code);
