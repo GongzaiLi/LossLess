@@ -71,8 +71,6 @@ Date: 3/3/2021
           <strong>Date of Birth *</strong>
           <div v-if="isEditUser">Note: you must be at least 13 years old to use this site</div>
           <div v-else> Note: you must be at least 13 years old to register </div>
-
-
           <b-form-input type="date" v-model="userData.dateOfBirth" required
                         id="dateOfBirthInput"
                         placeholder="Date of Birth"
@@ -314,8 +312,9 @@ export default {
       let editData = this.getEditData();
       await Api
         .modifyUser(editData, this.$route.params.id)
-          .then(() => {
+          .then(async () => {
             EventBus.$emit("updatedUserDetails");
+            await this.notificationCurrencyChange();
         })
         .catch((error) => {
           this.errors = [];
@@ -329,6 +328,20 @@ export default {
     },
 
     /**
+     * Compares the currency of the business's old country to their new country and gives a notification if it
+     * has changed.
+     * */
+    notificationCurrencyChange: async function () {
+      if (this.country !== this.userData.homeAddress.country) {
+        const oldCurrency = await Api.getUserCurrency(this.country);
+        const newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
+        if (oldCurrency.code !== newCurrency.code) {
+          EventBus.$emit("currencyChanged", oldCurrency.code, newCurrency.code);
+        }
+      }
+    },
+
+    /**
      * Makes a request to the API to register a user with the form input.
      * Then, will redirect to the login page if successful.
      * Performs no input validation. Validation is performed by the HTML form.
@@ -336,7 +349,6 @@ export default {
      * The parameter event is passed
      */
     async register() {
-      console.log(this.getRegisterData().password.length)
       let registerData = this.getRegisterData();
       this.errors = [];
 
