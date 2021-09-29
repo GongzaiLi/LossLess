@@ -14,10 +14,11 @@
       <b-col :lg="isCardCreator?9:12" :key="timesMessagesUpdates">
         <div class="message-box">
           <b-card v-for="message in current_displayed_messages" :key="message.id" class="message-card">
-            <b-card-text :class="message.senderId === currentUserId ? 'speech-bubble-right': 'speech-bubble-left' ">
+            <b-card-text :class="message.senderId === currentUserId ? 'speech-bubble-right': 'speech-bubble-left'">
               {{ message.messageText }}
             </b-card-text>
           </b-card>
+          <div ref="below-messages" />
         </div>
 
         <b-form>
@@ -156,7 +157,8 @@ export default {
       currentUserId: null,
       conversations: [],
       timesMessagesUpdates: 0,
-      current_displayed_messages: []
+      current_displayed_messages: [],
+      InitialLoad:true
     }
   },
   methods: {
@@ -173,6 +175,9 @@ export default {
       this.sendToUserId = userId;
       this.otherUserId = userId;
       this.setCurrentMessages();
+      setTimeout(() => {
+        this.scrollToBottomOfMessages();
+      }, 1);
     },
 
     /**
@@ -219,29 +224,45 @@ export default {
           .then(res => {
             if (this.isCardCreator) {
               this.conversations = res.data
-              if (this.notificationSenderId){
+              if (this.notificationSenderId&&this.InitialLoad){
                 this.otherUserId = parseInt(this.notificationSenderId)
+                this.sendToUserId = parseInt(this.notificationSenderId)
+                this.InitialLoad=false
               }
-              else if (this.conversations.length>0) {
+              else if (this.conversations.length>0&&this.InitialLoad) {
                 this.otherUserId = this.conversations[0].messages[0].senderId
+                this.sendToUserId = this.conversations[0].messages[0].senderId
+                this.InitialLoad=false
               }
               this.setCurrentMessages();
             } else {
               this.conversations = [];
               this.conversations.push(res.data);
               this.otherUserId = this.conversations[0].otherUser.id;
+              this.sendToUserId =  this.cardCreatorId
               this.setCurrentMessages();
             }
           }).catch(err => {
             console.error(err);
           });
+      this.scrollToBottomOfMessages();
     },
+
+    /**
+     * Scrolls the view to the bottom of the scroll bar
+     * Used in messages so the last message is always shown
+     */
+    scrollToBottomOfMessages(){
+      const container = this.$refs['below-messages'];
+      if (container) {
+        container.scrollIntoView({behavior: "smooth"});
+      }
+    }
   },
 
-
-  mounted() {
+  async mounted() {
     this.currentUserId = this.$currentUser.id;
-    this.getMessages()
+    await this.getMessages();
   }
 }
 </script>

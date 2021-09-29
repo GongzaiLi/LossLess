@@ -68,7 +68,7 @@
         </div>
       </b-card>
 
-      <b-collapse v-model="messageVisible" id="messageBox">
+      <b-collapse v-if="messageVisible" v-model="messageVisible" id="messageBox">
         <messages :cardCreatorId="fullCard.creator.id" :cardId="cardId" :is-card-creator="isCardCreator" :notification-sender-id="openedFromNotifications"></messages>
       </b-collapse>
   </div>
@@ -130,7 +130,6 @@ export default {
 
         }
       },
-      messageText: '',
       messageVisible: false,
     }
   },
