@@ -130,6 +130,7 @@
 import Api from "../../Api";
 import NotificationTag from "../model/NotificationTag";
 import Notification from "../model/Notification";
+import MarketplaceSection from "../marketplace/MarketplaceSection";
 import EventBus from "../../util/event-bus";
 import Vue from 'vue';
 
@@ -140,7 +141,7 @@ const beforeUnloadListener = (event) => {
 
 
 export default {
-  components: {Notification, NotificationTag},
+  components: {MarketplaceSection, Notification, NotificationTag},
   data: function () {
     return {
       userData: {
