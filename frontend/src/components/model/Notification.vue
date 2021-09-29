@@ -3,7 +3,7 @@
     <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
       <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
     </div>
-    <div class="notification">
+    <b-card class="notification">
       <div v-if="!updatedNotification.read">
         <b-row>
           <b-col>
@@ -28,7 +28,12 @@
       <b-col class="pl-0 pt-1" lg="5" cols="4">
         <h6> {{updatedNotification.type}} </h6>
       </b-col>
-      <b-col cols="3" class="pt-1">
+        <b-col v-if="updatedNotification.type==='Message Received'" cols="3" class="pt-1">
+          <b-button v-if="updatedNotification.type==='Message Received'" size="sm" variant="primary" @click="replyToMessage">
+            <b-icon-chat-quote-fill/> Reply
+          </b-button>
+        </b-col>
+      <b-col v-else cols="3" class="pt-1">
         <h6> {{updatedNotification.price}} </h6>
       </b-col>
       <b-col cols="1">
@@ -100,12 +105,19 @@
                @ok="archiveNotification">
         Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
       </b-modal>
-    </div>
+    </b-card>
+    <b-modal :id="`full-card-${this.updatedNotification.id}`" size="lg" hide-header hide-footer>
+      <MarketplaceCardFull
+          :cardId = "updatedNotification.subjectId"
+          :openedFromNotifications = "notification.senderId"
+          v-on:closeModal="closeFullCardModal"
+      />
+    </b-modal>
   </b-card>
 </template>
 
 
-<style>
+<style scoped>
 
 .flex-container {
   display: flex;
@@ -181,10 +193,11 @@ import Api from "../../Api";
 import EventBus from "../../util/event-bus";
 import {formatAddress} from "../../util";
 import NotificationTag from "../../components/model/NotificationTag";
+import MarketplaceCardFull from "../marketplace/MarketplaceCardFull";
 
 export default {
   name: "Notification",
-  components: {NotificationTag},
+  components: {NotificationTag, MarketplaceCardFull},
   props: ['notification', 'inNavbar', 'archivedSelected','deleted'],
   data() {
     return {
@@ -207,6 +220,13 @@ export default {
         this.updatedNotification.tag = tagColor;
         await Api.patchNotification(this.updatedNotification.id, {"tag": tagColor})
       }
+    },
+
+    /**
+     * Closes the full card modal when cancel button pressed.
+     */
+    closeFullCardModal() {
+      this.$bvModal.hide(`full-card-${this.updatedNotification.id}`);
     },
 
     /**
@@ -249,6 +269,14 @@ export default {
           this.$router.push('/listings/' + this.updatedNotification.subjectId);
         }
       }
+    },
+
+    /**
+     * Shows the modal of the card related to the clicked notification.
+     * This also sends the information from the notification to open the chat up to who sent the message     *
+     */
+    replyToMessage(){
+        this.$bvModal.show(`full-card-${this.updatedNotification.id}`);
     },
 
     /**
@@ -302,6 +330,12 @@ export default {
       this.updatedNotification = await this.updatePurchasedNotifications(this.notification)
     } else {
       this.updatedNotification = this.notification
+    }
+
+    if (this.updatedNotification.type==="Message Received"){
+      let subjectArray = this.updatedNotification.subjectId.split(",");
+      this.updatedNotification.subjectId=subjectArray[0];
+      this.updatedNotification.senderId=subjectArray[1];
     }
 
     /**
