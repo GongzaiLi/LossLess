@@ -112,7 +112,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
      void whenSearchingForUsers_andOneMatchingUsers_thenCorrectResult() throws Exception {
-        createOneUser("James", "Harris", "jeh1281@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh1281@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
         createOneUser("Oliver", "Cranshaw", "ojc315@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
        mockMvc.perform(
@@ -126,7 +126,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
      void whenSearchingForUsers_andNoMatchingUsers_thenCorrectResult() throws Exception {
-        createOneUser("James", "Harris", "jeh1282@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh1282@uclive.ac.nz", "2000-10-27", homeAddress, "1sadsdsa337");
         createOneUser("Oliver", "Cranshaw", "ojc316@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         MvcResult mvcResult = mockMvc.perform(
@@ -144,11 +144,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
      void whenSearchingForUsers_andMultipleMatchingUsers_byFullMatch_andPartialMatch_thenCorrectOrder() throws Exception {
-        createOneUser("James", "Harris", "jeh1283@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh1283@uclive.ac.nz", "2000-10-27", homeAddress, "13sadsad37");
+        createOneUser("Nothing", "James", "jeh@uclive.ac.nz", "2000-10-27", homeAddress, "133sadsad7");
 
-        createOneUser("James123", "Harris", "jeh12814@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James123", "jeh1@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James123", "Harris", "jeh12814@uclive.ac.nz", "2000-10-27", homeAddress, "13sadsdsa37");
+        createOneUser("Nothing", "James123", "jeh1@uclive.ac.nz", "2000-10-27", homeAddress, "13sadsad37");
 
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"1238@FSF\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
@@ -159,7 +159,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -174,7 +174,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
@@ -190,7 +190,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James1234\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James1234\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user3)
@@ -205,7 +205,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James1234\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James1234\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user4)
@@ -229,7 +229,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
      void whenGetUserWithIdTwo_andOnlyOneCreatedUser_BesidedDefault_ThenGetCorrectUser() throws Exception {
-        createOneUser("James", "Harris", "jeh12811@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh12811@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/2")
@@ -244,7 +244,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void whenGetUserWithIdThree_andTwoCreatedUser_andUserHimSelfLoggedIn_BesidedDefault_ThenGetCorrectUserRoleAndAddress() throws Exception {
-        createOneUser("James", "Harris", "jeh12812@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh12812@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
         createOneUser("Oliver", "Cranshaw", "ojc3122@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         mockMvc.perform(
@@ -261,7 +261,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void whenGetUserWithIdTwo_andTwoCreatedUser_andUserHimselfNotLoggedIn_BesidedDefault_ThenGetNoUserRoleAndAddress() throws Exception {
-        createOneUser("James", "Harris", "jeh12813@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh12813@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
         createOneUser("Oliver", "Cranshaw", "ojc3113@uclive.ac.nz", "2000-11-11", homeAddress, "Password123");
 
         mockMvc.perform(
@@ -299,8 +299,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
      void whenSearchingForUsers_andMultipleMatchingUsers_byPartial_thenCorrectOrder() throws Exception {
-        createOneUser("James", "Harris", "jeh12814@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "je14h@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh12814@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
+        createOneUser("Nothing", "James", "je14h@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -310,7 +310,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -325,7 +325,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
@@ -346,8 +346,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void whenSearchingForUsers_WithOneCountAndZeroOffset_ReturnsTotalResults() throws Exception {
-        createOneUser("James", "Harris", "jeh128@1uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "jeh@1uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh128@1uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
+        createOneUser("Nothing", "James", "jeh@1uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"11113@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -357,7 +357,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -372,7 +372,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
@@ -391,8 +391,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void whenSearchingForUsers_WithCountLessThanTotal_OnlyReturnsCount() throws Exception {
-        createOneUser("James", "Harris", "jeh128123@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "jeh142@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh128123@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
+        createOneUser("Nothing", "James", "jeh142@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -402,7 +402,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -417,7 +417,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
@@ -432,8 +432,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     }
     @Test
     void whenSearchingForUsers_Withoffset_ReturnsWithOffsetApplies() throws Exception {
-        createOneUser("James", "Harris", "jeh12124148@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "jeh14214@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh12124148@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
+        createOneUser("Nothing", "James", "jeh14214@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -443,7 +443,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -458,7 +458,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
@@ -480,8 +480,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void whenSearchingForUsers_WithNegativeOffset_returns400BadRequest() throws Exception {
-        createOneUser("James", "Harris", "jeh1444428@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "jeh@414414uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh1444428@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
+        createOneUser("Nothing", "James", "jeh@414414uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -491,7 +491,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -506,7 +506,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
@@ -521,8 +521,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
     @Test
     void whenSearchingForUsers_WithNegativeCount_returns400BadRequest() throws Exception {
-        createOneUser("James", "Harris", "jeh14214214128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
-        createOneUser("Nothing", "James", "je12412412421h@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh14214214128@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
+        createOneUser("Nothing", "James", "je12412412421h@uclive.ac.nz", "2000-10-27", homeAddress, "asdasdasdasd");
 
         String user1 = "{\"firstName\": \"Nothing\", \"lastName\" : \"Nothing\", \"email\": \"123@123\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
                 "    \"streetNumber\": \"3/24\",\n" +
@@ -532,7 +532,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"middleName\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"middleName\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user1)
@@ -547,7 +547,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\", \"nickname\": \"James\"}";
+                "  }, \"password\": \"asdasdasdasd\", \"nickname\": \"James\"}";
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
                         .content(user2)
