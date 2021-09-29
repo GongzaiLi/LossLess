@@ -4,7 +4,7 @@
       <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
         <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
       </div>
-      <b-card class="notification">
+      <div class="notification">
         <div v-if="!updatedNotification.read">
           <b-row>
             <b-col>
@@ -120,7 +120,7 @@
               v-on:closeModal="closeFullCardModal"
           />
       </b-modal>
-      </b-card>
+      </div>
     </b-card-body>
   </b-card>
 </template>
