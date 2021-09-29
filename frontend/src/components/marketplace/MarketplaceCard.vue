@@ -59,7 +59,7 @@ p.sub-title {
 </style>
 
 <script>
-import {formatAddress} from "../../util";
+import {formatAddress, getMonthName} from "../../util";
 
 export default {
   name: "MarketplaceCard",
@@ -91,10 +91,11 @@ export default {
     },
 
     /**
-     * format Expiry date
+     * Format User's date of birth date
      */
     formatExpiry: function () {
-      return new Date(this.cardInfo.displayPeriodEnd).toString().split(" ").slice(0, 4).join(" ");
+      const expiryDate =  new Date(this.cardInfo.displayPeriodEnd)
+      return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear();
     },
   }
 }

@@ -112,7 +112,7 @@ label{
 
 <script>
 import Api from "../../Api";
-import {formatAddress} from "../../util";
+import {formatAddress, getMonthName} from "../../util";
 import Messages from "../../components/model/Messages"
 
 export default {
@@ -205,6 +205,7 @@ export default {
   },
 
   computed: {
+
     /**
      * Formats the address using util function and appropriate privacy level.
      *
@@ -217,14 +218,18 @@ export default {
      * format Expiry date
      */
     formatExpiry: function () {
-      return new Date(this.fullCard.displayPeriodEnd).toString().split(" ").slice(0, 5).join(" ");
+      const expiryDate =  new Date(this.fullCard.displayPeriodEnd)
+      return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear()
+          + ', ' + expiryDate.toString().split(" ").slice(4,5).join(' ');
     },
 
     /**
      * format Created date
      */
     formatCreated: function () {
-      return new Date(this.fullCard.created).toString().split(" ").slice(0, 5).join(" ").toString();
+      const expiryDate =  new Date(this.fullCard.created)
+      return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear()
+          + ', ' + expiryDate.toString().split(" ").slice(4,5).join(' ');
     },
 
     /**

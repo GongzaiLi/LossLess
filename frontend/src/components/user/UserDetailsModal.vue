@@ -55,7 +55,7 @@ Date: 3/3/2021
 
         <b-form-group v-if="changePassword || !isEditUser">
           <strong>{{isEditUser ? 'New Password' : 'Password *'}}</strong>
-          <password-input autocomplete="new-password" v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
+          <password-input autocomplete="new-password" v-model="userData.newPassword" id="newPassword" :is-required="changePassword ? changePassword : !isEditUser" place-holder="New Password"/>
 
           <strong>Confirm {{isEditUser ? 'New Password' : 'Password *'}}</strong>
           <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
@@ -69,7 +69,10 @@ Date: 3/3/2021
 
         <b-form-group>
           <strong>Date of Birth *</strong>
-          <div>Note: you must be at least 13 years old to register</div>
+          <div v-if="isEditUser">Note: you must be at least 13 years old to use this site</div>
+          <div v-else> Note: you must be at least 13 years old to register </div>
+
+
           <b-form-input type="date" v-model="userData.dateOfBirth" required
                         id="dateOfBirthInput"
                         placeholder="Date of Birth"
@@ -333,6 +336,7 @@ export default {
      * The parameter event is passed
      */
     async register() {
+      console.log(this.getRegisterData().password.length)
       let registerData = this.getRegisterData();
       this.errors = [];
 

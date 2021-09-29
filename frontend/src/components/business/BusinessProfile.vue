@@ -121,7 +121,7 @@ Date: 29/03/2021
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
           </b-card-text>
-          <b-row>
+          <b-row class="adminRow">
             <b-col cols="12">
               <b-table hover
                        striped
@@ -195,6 +195,11 @@ Date: 29/03/2021
 </template>
 
 <style scoped>
+
+.adminRow {
+  cursor: pointer;
+}
+
 .profile-card {
   max-width: 50rem;
   margin-left: auto;

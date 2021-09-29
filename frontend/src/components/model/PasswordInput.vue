@@ -4,7 +4,8 @@
                   v-model="inputPassword"
                   :value="value"
                   @input="$emit('input', inputPassword)"
-                  maxLength=50
+                  maxLength=100
+                  minLength=8
                   class="form-control"
                   :id="id"
                   :placeholder="placeHolder"
