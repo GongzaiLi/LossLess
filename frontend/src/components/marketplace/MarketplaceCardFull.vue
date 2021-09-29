@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div v-if="cardWasDeleted">
+    <b-card>
+      <h1><strong> Sorry, this card has been deleted. </strong></h1>
+    </b-card>
+  </div>
+  <div v-else>
       <b-card>
         <div>
           <h1><strong> {{ fullCard.title }} </strong>
@@ -34,7 +39,7 @@
           </b-container>
           <br>
           <div>
-            <b-button v-if="canDeleteOrExtend" class="button-left" variant="danger"
+            <b-button v-if="canDeleteOrExtend && openedFromNotifications == null" class="button-left" variant="danger"
                       @click="openDeleteConfirmDialog" title="Delete Card">
               <b-icon-trash-fill/>
             </b-button>
@@ -68,8 +73,17 @@
         </div>
       </b-card>
 
-      <b-collapse v-if="messageVisible" v-model="messageVisible" id="messageBox">
-        <messages :cardCreatorId="fullCard.creator.id" :cardId="cardId" :is-card-creator="isCardCreator" :notification-sender-id="openedFromNotifications"></messages>
+      <b-collapse
+          v-model="messageVisible"
+          id="messageBox"
+      >
+        <messages
+            :cardCreatorId="fullCard.creator.id"
+            :cardId="cardId"
+            v-if="mounted"
+            :is-card-creator="isCardCreator"
+            :notification-sender-id="openedFromNotifications"
+        />
       </b-collapse>
   </div>
 </template>
@@ -121,6 +135,7 @@ export default {
   props: ['cardId','openedFromNotifications'],
   data() {
     return {
+      mounted: false,
       fullCard: {
         creator: {
           firstName: '',
@@ -130,14 +145,16 @@ export default {
 
         }
       },
-      messageVisible: false,
+      messageVisible: true,
+      cardWasDeleted: false
     }
   },
-  beforeMount() {
-    this.getCard()
+  async beforeMount() {
+    await this.getCard();
     if (this.openedFromNotifications){
       this.messageVisible = true;
     }
+    this.mounted = true;
   },
   methods: {
 
@@ -145,12 +162,15 @@ export default {
      * Calls the API request to get the full details of a card
      * determined by the given cardId.
      */
-    getCard() {
-      Api.getFullCard(this.cardId)
-          .then((resp) => {
-            this.fullCard = resp.data;
-          }).catch((error) => {
-        this.$log.debug(error);
+    async getCard() {
+      await Api.getFullCard(this.cardId)
+        .then((resp) => {
+          this.fullCard = resp.data;
+        }).catch((err) => {
+          this.$log.debug(err);
+          if (err.toString() === "Error: Request failed with status code 406") {
+            this.cardWasDeleted = true;
+          }
       })
     },
 

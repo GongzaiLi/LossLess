@@ -1,9 +1,17 @@
 <template>
   <div>
     <b-row no-gutters>
+      <b-button v-if="!refreshingMessages" variant="primary" @click="refreshMessages" title="Refresh Messages" style="margin-bottom: 5px">
+        <b-icon-arrow-counterclockwise/> Refresh Messages
+      </b-button>
+      <b-button v-else variant="primary"  title="Refreshing Messages" style="margin-bottom: 5px">
+        <b-icon-arrow-counterclockwise animation="spin-reverse"/> Refreshing...
+      </b-button>
+    </b-row>
+    <b-row no-gutters>
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
-          <b-list-group-item class="chat-head" v-for="conversation in conversations" :key=conversation.id :active="otherUserId==conversation.otherUser.id"
+          <b-list-group-item class="chat-head" v-for="conversation in conversations" :key=conversation.id :active="otherUserId===conversation.otherUser.id"
                              @click="clickedChatHead($event, conversation.otherUser.id)">
             <b-img class="rounded-circle avatar" width="30" height="30" :alt="conversation.otherUser.profileImage"
                    :src="require('../../../public/profile-default.jpg')"/>
@@ -12,7 +20,7 @@
         </b-list-group>
       </b-col>
       <b-col :lg="isCardCreator?9:12" :key="timesMessagesUpdates">
-        <div class="message-box">
+        <div class="message-box" ref="container">
           <b-card v-for="message in current_displayed_messages" :key="message.id" class="message-card">
             <b-card-text :class="message.senderId === currentUserId ? 'speech-bubble-right': 'speech-bubble-left'">
               {{ message.messageText }}
@@ -20,7 +28,6 @@
           </b-card>
           <div ref="below-messages" />
         </div>
-
         <b-form>
         <b-input-group>
             <b-form-textarea required no-resize maxlength="250" max-rows="2"
@@ -108,9 +115,6 @@ div.chat-head:first-child {
   border-top: none;
 }
 
-div.chat-head:last-child {
-  border-bottom: none;
-}
 
 .speech-bubble-left {
   float: left;
@@ -138,6 +142,11 @@ div.chat-head:last-child {
   margin: -20px 0;
 }
 
+.refresh-div {
+  background-color: #00c8e2;
+  border-radius: 20px;
+}
+
 
 </style>
 
@@ -158,7 +167,9 @@ export default {
       conversations: [],
       timesMessagesUpdates: 0,
       current_displayed_messages: [],
-      InitialLoad:true
+      InitialLoad:true,
+      snapToBottom: true,
+      refreshingMessages: false
     }
   },
   methods: {
@@ -175,9 +186,10 @@ export default {
       this.sendToUserId = userId;
       this.otherUserId = userId;
       this.setCurrentMessages();
-      setTimeout(() => {
+      this.$nextTick(() => {
+        this.snapToBottom = true;
         this.scrollToBottomOfMessages();
-      }, 1);
+      });
     },
 
     /**
@@ -204,8 +216,7 @@ export default {
         messageText: this.messageText
       }
       await Api.postMessage(message)
-          .then(async (res) => {
-            this.$log.debug(res.data);
+          .then(async () => {
             this.messageText = '';
             await this.getMessages();
             this.setCurrentMessages();
@@ -249,13 +260,35 @@ export default {
     },
 
     /**
+     * Used for when refreshing messages button is clicked.
+     * Get messages and set refreshing messages so the animation can play.
+     */
+    async refreshMessages() {
+      this.refreshingMessages = true;
+      setTimeout(() => {
+        this.refreshingMessages = false;
+      }, 2000);
+      await this.getMessages();
+    },
+
+    /**
      * Scrolls the view to the bottom of the scroll bar
      * Used in messages so the last message is always shown
+     *
+     * If snapToBottom is true, snaps instantly. (Initial load and when changing chat heads)
      */
-    scrollToBottomOfMessages(){
-      const container = this.$refs['below-messages'];
-      if (container) {
-        container.scrollIntoView({behavior: "smooth"});
+    scrollToBottomOfMessages() {
+      if (this.snapToBottom) {
+        const container = this.$refs.container;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+        this.snapToBottom = false
+      } else {
+        const container = this.$refs['below-messages'];
+        if (container) {
+          container.scrollIntoView({behavior: "smooth"});
+        }
       }
     }
   },

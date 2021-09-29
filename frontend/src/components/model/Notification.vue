@@ -110,13 +110,14 @@
       <MarketplaceCardFull
           :cardId = "updatedNotification.subjectId"
           :openedFromNotifications = "notification.senderId"
-      >  </MarketplaceCardFull>
+          v-on:closeModal="closeFullCardModal"
+      />
     </b-modal>
   </b-card>
 </template>
 
 
-<style>
+<style scoped>
 
 .flex-container {
   display: flex;
@@ -220,6 +221,13 @@ export default {
         this.updatedNotification.tag = tagColor;
         await Api.patchNotification(this.updatedNotification.id, {"tag": tagColor})
       }
+    },
+
+    /**
+     * Closes the full card modal when cancel button pressed.
+     */
+    closeFullCardModal() {
+      this.$bvModal.hide(`full-card-${this.updatedNotification.id}`);
     },
 
     /**
