@@ -20,8 +20,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -108,6 +107,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Request", e);
         }
+    }
+
+    @Test
+    void whenPostRequestToUsersAndUserInvalidDueToAddressTooLong_then400Response() throws Exception {
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": {\n" +
+                "    \"streetNumber\": \"3/24\",\n" +
+                "    \"streetName\": \"Ilam Road\",\n" +
+                "    \"suburb\": \"Riccarton\",\n" +
+                "    \"city\": \"Christchurch\",\n" +
+                "    \"region\": \"Canterbury\",\n" +
+                "    \"country\": \"" + "A".repeat(100) + "\",\n" +
+                "    \"postcode\": \"90210\"\n" +
+                "  },\"password\": \"12345678910\"}";
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content(user)
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("{\"country\":\"size must be between 0 and 50\"}"));
     }
 
     @Test
