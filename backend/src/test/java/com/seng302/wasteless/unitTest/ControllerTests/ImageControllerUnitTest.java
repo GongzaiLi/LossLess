@@ -230,10 +230,18 @@ class ImageControllerUnitTest {
 
     }
 
+    /**
+     * Test 1: png
+     * Test 2: jpeg
+     * Test 3: jpg
+     * Test 4: gif
+     * @param fileType to try upload
+     * @throws Exception
+     */
     @ParameterizedTest
     @ValueSource(strings = {"image/png", "image/jpeg", "image/jpg", "image/gif" })
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPostRequestToAddProductImage_andValidRequest_withTypeIsPNG_then201Response(String fileType) throws Exception {
+    void whenPostRequestToAddProductImage_andValidRequest_then201Response(String fileType) throws Exception {
         MockMultipartFile image = new MockMultipartFile("filename", "testImage.png", fileType ,"image example".getBytes());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -243,6 +251,14 @@ class ImageControllerUnitTest {
     }
 
 
+    /**
+     * Upload bad image type to endpoints
+     * Test 1: business products
+     * Test 2: user image
+     * Test 3: business image
+     * @param request endpoint url
+     * @throws Exception
+     */
     @ParameterizedTest
     @ValueSource(strings={"/businesses/1/products/1-test-product/images", "/users/1/image", "/businesses/1/image"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -259,6 +275,14 @@ class ImageControllerUnitTest {
                 .andExpect(status().isBadRequest());
     }
 
+    /**
+     * Upload no image to endpoints
+     * Test 1: business products
+     * Test 2: user image
+     * Test 3: business image
+     * @param request endpoint url
+     * @throws Exception
+     */
     @ParameterizedTest
     @ValueSource(strings={"/businesses/1/products/1-test-product/images", "/users/1/image", "/businesses/1/image"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null

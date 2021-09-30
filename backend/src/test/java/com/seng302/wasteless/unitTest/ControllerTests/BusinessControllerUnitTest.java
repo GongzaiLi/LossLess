@@ -261,10 +261,17 @@ class BusinessControllerUnitTest {
     }
 
 
+    /**
+     * Test 1: Make user an admin
+     * Test 2: Make GAA an admin
+     * Test 3: Make DGAA an admin
+     * @param request the id of the user to make admin
+     * @throws Exception
+     */
     @ParameterizedTest
     @ValueSource(strings = {"{\"userId\": \"1\"}", "{\"userId\": \"2\"}", "{\"userId\": \"3\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPutRequestToBusinessMakeAdmin_andInvalidRequest_then200Response(String request) throws Exception {
+    void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response(String request) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
                         .with(csrf())
                         .content(request)

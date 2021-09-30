@@ -337,11 +337,17 @@ class SalesReportControllerUnitTest {
 
 
 
-
+    /**
+     * Test 1: products purchased
+     * Test 2: manufacturers purchased
+     * Test 3: csv
+     * @param request
+     * @throws Exception
+     */
     @ParameterizedTest
     @ValueSource(strings = {"/businesses/1/salesReport/productsPurchasedTotals", "/businesses/1/salesReport/manufacturersPurchasedTotals", "/businesses/1/salesReport/csv"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSalesReportProductPurchasedTotals_andUserNotAllowedToAccessInformationOfBusiness_then403Response(String request) throws Exception{
+    void whenGetSalesReportEndpointsandUserNotAllowedToAccessInformationOfBusiness_then403Response(String request) throws Exception{
 
         Mockito
                 .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))

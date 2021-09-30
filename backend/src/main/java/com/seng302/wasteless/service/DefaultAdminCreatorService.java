@@ -76,7 +76,6 @@ public class DefaultAdminCreatorService {
      * @throws IOException If reading the config file failed due to an external error, eg. the file was corrupted
      */
     private void readConfigFile(InputStream configFileStream) throws InvalidParameterException, IOException {
-
         Properties defaultProps = new Properties();
         defaultProps.load(configFileStream);
 
