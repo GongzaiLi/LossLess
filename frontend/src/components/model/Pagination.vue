@@ -24,6 +24,7 @@
   </b-row>
 </template>
 
+
 <script>
 export default {
   name: "pagination",
