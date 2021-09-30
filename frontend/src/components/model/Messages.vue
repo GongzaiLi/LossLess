@@ -181,6 +181,7 @@ div.chat-head:first-child {
 <script>
 
 import Api from "../../Api";
+import EventBus from "../../util/event-bus";
 
 export default {
   props: ['isCardCreator', 'cardId', 'cardCreatorId', 'notificationSenderId'],
@@ -283,6 +284,7 @@ export default {
               this.sendToUserId =  this.cardCreatorId
               this.setCurrentMessages();
             }
+            EventBus.$emit("notificationUpdate");
           }).catch(err => {
             console.error(err);
           });
