@@ -62,12 +62,15 @@ public class CardExpiryService {
                 notificationService.saveNotification(notification);
 
                 cardService.deleteCard(card);
-            } else {
+            } else if (Boolean.FALSE.equals(card.getExpiryWarningAlreadySent())) {
                 // Just give them a warning - they have 24h to delete/extend it
                 logger.warn("Expiry warning for card id={}, display end={}, title={}, creator={}", card.getId(), card.getDisplayPeriodEnd(), card.getTitle(), card.getCreator().getId());
 
                 Notification notification = NotificationService.createNotification(card.getCreator().getId(),card.getId(), NotificationType.EXPIRY_WARNING, String.format("Your card: %s will be deleted within 24 hours of its closing date. You can either extend its display period or delete it.", card.getTitle()));
                 notificationService.saveNotification(notification);
+
+                card.setExpiryWarningAlreadySent(true);  // This makes sure we don't re-send warnings every time this service runs
+                cardRepository.save(card);
             }
         }
     }

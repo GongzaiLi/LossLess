@@ -58,4 +58,6 @@ public class Card {
     @Column(name = "displayPeriodEnd")
     private LocalDateTime displayPeriodEnd;
 
+    @Column(name = "expiryWarningAlreadySent", columnDefinition = "boolean default false")
+    private Boolean expiryWarningAlreadySent;
 }
