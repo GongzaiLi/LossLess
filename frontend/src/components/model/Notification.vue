@@ -1,5 +1,5 @@
 <template>
-  <b-card class="notification-card">
+  <b-card class="notification-card" @click="markRead">
     <b-card-body class="notification-body">
       <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
         <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
@@ -15,29 +15,30 @@
           <hr class="unreadHr">
         </div>
         <b-row>
-        <b-col cols="2" class="pt-1 pr-0">
+        <b-col class="pt-1" cols="auto">
+          <h6>
           <b-icon-star-fill class="mr-2 star-icon "  v-if="updatedNotification.starred"/>
           <b-icon-exclamation-triangle v-if="updatedNotification.type==='Liked Listing Purchased'"/>
           <b-icon-heart v-else-if="updatedNotification.type==='Liked Listing'"/>
           <b-icon-x-circle v-else-if="updatedNotification.type==='Unliked Listing'" />
+          <b-icon-clock-fill v-else-if="updatedNotification.type==='Marketplace Card About To Expire'"/>
           <b-icon-clock-history v-else-if="updatedNotification.type==='Expired Marketplace Card'"/>
           <b-icon-cart  v-else-if="updatedNotification.type==='Purchased listing'"/>
           <b-icon-globe v-else-if="updatedNotification.type==='User Currency Changed'"/>
           <b-icon-globe v-else-if="updatedNotification.type==='Business Currency Changed'"/>
           <b-icon-chat-square-dots-fill v-else-if="updatedNotification.type==='Message Received'"/>
-        </b-col>
-        <b-col class="pl-0 pt-1" cols="5">
-          <h6> {{updatedNotification.type}} </h6>
+            {{updatedNotification.type}}
+          </h6>
         </b-col>
           <b-col v-if="updatedNotification.type==='Message Received'" cols="3" class="pt-1">
             <b-button v-if="updatedNotification.type==='Message Received'" size="sm" variant="primary" @click="replyToMessage">
               <b-icon-chat-quote-fill/> Reply
             </b-button>
           </b-col>
-        <b-col v-else cols="3" class="pt-1">
+        <b-col v-else-if="updatedNotification.price" cols="4" class="pt-1">
           <h6> {{updatedNotification.price}} </h6>
         </b-col>
-        <b-col cols="1">
+        <b-col cols="1" class="ml-auto">
           <b-dropdown variant="none" right no-caret class="float-right" v-if="!this.inNavbar && !this.archivedSelected">
             <template #button-content>
               <b-icon-tag-fill title="Add tag to notification"
@@ -82,7 +83,7 @@
       </b-row>
       <hr class="mt-1 mb-2">
         <div v-if="updatedNotification.type === 'Liked Listing' || updatedNotification.type === 'Unliked Listing'">
-          <span @click="goToListing" class="listing-link">{{ updatedNotification.message }}</span>
+          <a @click="goToListing" class="listing-link">{{ updatedNotification.message }}</a>
         </div>
         <div v-else>
           <span >{{ updatedNotification.message }}</span>
@@ -91,6 +92,10 @@
             <b-row>
               <b-col cols="11">
                 <h6 v-if="updatedNotification.location"> Location: {{updatedNotification.location}} </h6>
+
+                <div class="mt-2" v-else-if="updatedNotification.type==='Marketplace Card About To Expire'">
+                  <b-button variant="primary" @click="replyToMessage">Open Marketplace Card</b-button>
+                </div>
               </b-col>
               <b-col v-if="updatedNotification.read"  cols="1">
                 <span class="readLabel">
@@ -203,6 +208,12 @@ span.unreadLabel {
   color: red;
 }
 
+@media (max-width: 500px) {
+  .notification-card>div {
+    padding: 0.5rem;
+  }
+}
+
 
 </style>
 
@@ -221,7 +232,6 @@ export default {
     return {
       updatedNotification: {message:"", type:"", read: this.notification.read},
       tagColors: ["RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "BLACK"],
-      updated: false,
       isHoveringTagButton: false,
     }
   },
@@ -284,6 +294,7 @@ export default {
      * When a liked or unliked listing is clicked it routes you to that listing
      */
     goToListing() {
+      this.markRead();  // For some reason, when we click the link and redirect to a different page, it's not always marked as read so this gaurantees it.
       if (this.updatedNotification.type === 'Liked Listing' || this.updatedNotification.type === 'Unliked Listing') {
         if (this.$route.fullPath !== '/listings/' + this.updatedNotification.subjectId) {
           this.$router.push('/listings/' + this.updatedNotification.subjectId);
@@ -336,14 +347,14 @@ export default {
      * Marks a notification as read and makes th api call.
      * @param notification the notification that has been clicked
      */
-    async markRead(notification) {
-      if (notification.id === this.updatedNotification.id && !this.updatedNotification.read && !this.updated) {
+    async markRead() {
+      if (!this.updatedNotification.read) {
         this.updatedNotification.read = true;
         await Api.patchNotification(this.updatedNotification.id, {"read": true});
-      }
-      this.updated = true
-    },
 
+        EventBus.$emit('notificationClicked', this.updatedNotification);
+      }
+    },
   },
   async mounted() {
     if (this.notification.type === "Purchased listing") {
@@ -357,11 +368,6 @@ export default {
       this.updatedNotification.subjectId=subjectArray[0];
       this.updatedNotification.senderId=subjectArray[1];
     }
-
-    /**
-     * This mount listens to the markRead event when a notification click is on home feed.
-     */
-    EventBus.$on('notificationClicked', this.markRead);
   },
 }
 </script>
