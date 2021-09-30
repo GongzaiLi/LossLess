@@ -334,9 +334,10 @@ export default {
      * user notifications (if acting as business)
      * @returns All notifications that should be displayed
      */
-    filteredNotifications: function(){
+    filteredNotifications: function() {
       return this.notifications.filter((notification) =>
-        !this.pendingDeletedNotifications.includes(notification.id) && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed'
+        !this.pendingDeletedNotifications.includes(notification.id)
+          && (this.$currentUser.currentlyActingAs && notification.type === 'Business Currency Changed' && parseInt(notification.subjectId) === this.$currentUser.currentlyActingAs.id
           || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')
       );
     },

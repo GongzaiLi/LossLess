@@ -105,6 +105,13 @@ const notifications = [
     type: "Business Currency Changed",
     read: false
   },
+  {
+    id: 8,
+    message: "HSDFSD",
+    subjectId: 69,
+    type: "Business Currency Changed",
+    read: false
+  },
 ]
 
 const $log = {
@@ -191,7 +198,7 @@ describe('Get unread notifications', () => {
 
   test('Unread notifications only counts business notifications when acting as business', async () => {
     wrapper.vm.$currentUser.currentlyActingAs = {
-      id: 1,
+      id: 420,
       name: "Big Dave's Collars"
     };
     await wrapper.vm.updateNotifications();

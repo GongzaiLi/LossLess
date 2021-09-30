@@ -316,6 +316,7 @@ export default {
      * */
     notificationCurrencyChange: async function () {
       if (this.country !== this.userData.homeAddress.country) {
+        EventBus.$emit("notificationUpdate");
         const oldCurrency = await Api.getUserCurrency(this.country);
         const newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
         if (oldCurrency.code !== newCurrency.code) {
