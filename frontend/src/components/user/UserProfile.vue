@@ -457,7 +457,7 @@ export default {
      * format User's date of birth date
      */
     formatDateOfBirth: function () {
-      const dateOfBirth =  new Date(this.userData.dateOfBirth)
+      const dateOfBirth = new Date(this.userData.dateOfBirth)
       return dateOfBirth.getDate() + " " + getMonthName(dateOfBirth.getMonth()) + " " + dateOfBirth.getFullYear();
     },
 

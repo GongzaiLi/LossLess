@@ -122,12 +122,10 @@ export default {
       this.confirmed = false;
       this.imageFile = null;
       this.canSave = false;
-      if (this.$currentUser.currentlyActingAs) {
-        if (!this.profileImage) {
-          this.imageURL = require('../../../public/profile-default.jpg');
-        } else {
-          this.imageURL = this.getURL(this.profileImage.fileName);
-        }
+      if (!this.profileImage) {
+        this.imageURL = require('../../../public/profile-default.jpg');
+      } else {
+        this.imageURL = this.getURL(this.profileImage.fileName);
       }
     },
 
