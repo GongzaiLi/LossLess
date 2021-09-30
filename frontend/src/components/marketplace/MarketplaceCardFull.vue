@@ -18,7 +18,9 @@
 
           <b-card no-body>
             <template #header>
-              <b-card-text>{{ fullCard.description !== "" ? fullCard.description : "No Description" }}</b-card-text>
+              <b-card-text class="marketplace-full-card-description">
+                {{ fullCard.description !== "" ? fullCard.description : "No Description" }}
+              </b-card-text>
             </template>
           </b-card>
           <br>
@@ -117,6 +119,10 @@
 
 label{
   word-wrap: break-word;
+}
+
+.marketplace-full-card-description {
+  white-space: pre-line;
 }
 
 
@@ -243,6 +249,8 @@ export default {
       const expiryDate =  new Date(this.fullCard.displayPeriodEnd)
       return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear()
           + ', ' + expiryDate.toString().split(" ").slice(4,5).join(' ');
+      // let endDate = new Date(this.fullCard.displayPeriodEnd);
+      // return endDate.toTimeString().split(":").slice(0, 2).join(":") + " " + endDate.toDateString();
     },
 
     /**
@@ -252,6 +260,8 @@ export default {
       const expiryDate =  new Date(this.fullCard.created)
       return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear()
           + ', ' + expiryDate.toString().split(" ").slice(4,5).join(' ');
+      // let createdDate = new Date(this.fullCard.created);
+      // return createdDate.toTimeString().split(":").slice(0, 2).join(":") + " " + createdDate.toDateString();
     },
 
     /**

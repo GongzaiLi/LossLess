@@ -7,8 +7,8 @@
       <h5 class="card-title single-line-clamped">{{cardInfo.title}}</h5>
       <p class="sub-title">Ends: {{ formatExpiry }}</p>
       <hr>
-      <b-card-text>
-        <p  v-if="cardInfo.description" class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
+      <b-card-text class="marketplace-full-card-description">
+        <p v-if="cardInfo.description" class="dual-line-clamped" style="line-height: 1.2em;">{{cardInfo.description}}</p>
         <p v-else class="sub-title" style="line-height: 1.2em;">No Description</p>
       </b-card-text>
 
@@ -56,6 +56,11 @@ p.sub-title {
   color: grey;
   font-size: 13px;
 }
+
+.marketplace-full-card-description {
+  white-space: pre-line;
+}
+
 </style>
 
 <script>

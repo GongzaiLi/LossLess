@@ -18,7 +18,7 @@
     </b-input-group-text>
     <br>
 
-    <b-form @submit.prevent="createAction">
+    <b-form @submit.prevent="createAction" @input="setCustomValidities">
       <b-input-group>
         <h6><strong>Section*:</strong></h6>
       </b-input-group>
@@ -44,10 +44,10 @@
         <h6><strong>Description:</strong></h6>
       </b-input-group>
       <b-input-group class="mb-1">
-        <b-form-textarea type="text" maxlength="250" v-model="createCardForm.description"/>
+        <b-form-textarea id="market-description" type="text" maxLength=250 trim v-model="createCardForm.description"
+                         :required="descriptionRequired"/>
       </b-input-group>
       <br>
-
       <b-input-group>
         <h6><strong>Keywords:</strong></h6>
       </b-input-group>
@@ -79,6 +79,7 @@ export default {
   props: ['cancelAction', 'showError', 'defaultSection'],
   data() {
     return {
+      descriptionRequired: false,
       tagRequired: false,
       cardInfo: {
         fullName: '',
@@ -99,6 +100,16 @@ export default {
     this.createCardForm.section = this.defaultSection || '';
   },
   methods: {
+
+    /**
+     * Uses HTML constraint validation to set custom validity rules checks:
+     * check the createCard description can not be more than 10 lines
+     **/
+    setCustomValidities() {
+      this.descriptionRequired = this.createCardForm.description.split('\n').length > 10;
+      const descriptionInput = document.getElementById('market-description');
+      descriptionInput.setCustomValidity(this.descriptionRequired ? "Description can be at most 10 lines and 250 characters" : "");
+    },
 
     /**
      *  Validates the maximum length of each tag to be at most 10 characters and the maximum number of tags to be
@@ -153,11 +164,10 @@ export default {
      * @param number The number to potentially have a 0 put in front of
      * @returns {string} A string of the input number with an added 0 if below 10
      */
-    addLeadingZero(number){
-      if (number<10){
-        return '0'+number.toString()
-      }
-      else{
+    addLeadingZero(number) {
+      if (number < 10) {
+        return '0' + number.toString()
+      } else {
         return number.toString()
       }
     }

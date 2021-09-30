@@ -128,7 +128,7 @@ export default {
       this.imageFile = null;
       this.canSave = false;
       if (!this.profileImage) {
-        this.imageURL = require('../../../public/profile-default.jpg');
+        this.imageURL = this.defaultImage;
       } else {
         this.imageURL = this.getURL(this.profileImage.fileName);
       }
@@ -186,7 +186,7 @@ export default {
 
       } else {
         if (!this.profileImage) {
-          this.imageURL = require('../../../public/profile-default.jpg');
+          this.imageURL = this.defaultImage;
         }
         this.confirmed = false
         this.isUploadingFile = false;
