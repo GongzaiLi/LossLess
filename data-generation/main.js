@@ -121,7 +121,7 @@ async function getUsers() {
       email: user.email.replace('\'', '').replace('..', '.'),  // some data comes back malformed with ' (single quote) characters or .. (double dots), so we remove them here
       dateOfBirth: user.dob.date,
       phoneNumber: user.phone,
-      password: user.login.password,
+      password: user.login.password + user.phone,
       homeAddress: getAddressFromApiUser(user)
     })
   }
