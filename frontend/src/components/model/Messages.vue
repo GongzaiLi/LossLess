@@ -330,7 +330,7 @@ export default {
       if (user.profileImage) {
         return Api.getImage(user.profileImage.thumbnailFilename);
       } else {
-        return 'user-profile-default.jpg';
+        return 'user-profile-default.png';
       }
     },
 
