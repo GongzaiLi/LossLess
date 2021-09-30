@@ -26,6 +26,9 @@ beforeEach(() => {
 
   Api.postMessage.mockResolvedValue({data: { "messageId": 1}});
   Api.getMessages.mockResolvedValue({data: { cardId: 1, cardOwner: {}, otherUser: {}, messages: [] }});
+  Api.getImage = (imageName) => {
+    return `localhost:9499/images?filename=${imageName}`
+  }
   window.HTMLElement.prototype.scrollIntoView = jest.fn();
   wrapper = shallowMount(Messages, {
     localVue,
@@ -83,7 +86,7 @@ describe('Check if setCurrentMessages works as intended.', () => {
     ];
     wrapper.vm.otherUserId = 1;
     wrapper.vm.setCurrentMessages();
-    expect(wrapper.vm.current_displayed_messages).toEqual(["Test", "Data"])
+    expect(wrapper.vm.currentConversation.messages).toEqual(["Test", "Data"])
   });
 
   test('Test that setCurrentMessages works with multiple conversations', () => {
@@ -121,7 +124,7 @@ describe('Check if setCurrentMessages works as intended.', () => {
     ];
     wrapper.vm.otherUserId = 2;
     wrapper.vm.setCurrentMessages();
-    expect(wrapper.vm.current_displayed_messages).toEqual(["James", "Phil"])
+    expect(wrapper.vm.currentConversation.messages).toEqual(["James", "Phil"])
   });
 
   test('Test that setCurrentMessages works with multiple same ids (shouldnt occur in the wild) and returns first matching messages', () => {
@@ -159,6 +162,55 @@ describe('Check if setCurrentMessages works as intended.', () => {
     ];
     wrapper.vm.otherUserId = 3;
     wrapper.vm.setCurrentMessages();
-    expect(wrapper.vm.current_displayed_messages).toEqual(["Scott", "Nitish"])
+    expect(wrapper.vm.currentConversation.messages).toEqual(["Scott", "Nitish"])
   })
+});
+
+
+describe('Check user thumbnails.', () => {
+  test('Gets real image url if image exists', () => {
+    expect(wrapper.vm.getUserThumbnailUrl({
+      profileImage: {
+        thumbnailFilename: "thumb.png",
+        fileName: "file.png",
+      }
+    })).toEqual("localhost:9499/images?filename=thumb.png")
+  });
+
+  test('Gets default image url if no image exists', () => {
+    expect(wrapper.vm.getUserThumbnailUrl({
+      profileImage: null
+    })).toEqual("profile-default.jpg")
+  });
+});
+
+
+describe('Check user objects.', () => {
+  beforeEach(() => {
+    wrapper.vm.currentConversation = {
+        otherUser: {
+          id: 1,
+          name: "Caleb"
+        },
+        cardOwner: {
+          id: 4,
+          name: "Nitish"
+        },
+        messages: ["Test", "Data"]
+      };
+  })
+
+  test('Gets card owner if sender is owner', () => {
+    expect(wrapper.vm.getUserObject(1)).toEqual({
+      id: 1,
+      name: "Caleb"
+    });
+  });
+
+  test('Gets other user if sender is not card owner', () => {
+    expect(wrapper.vm.getUserObject(4)).toEqual({
+      id: 4,
+      name: "Nitish"
+    });
+  });
 });

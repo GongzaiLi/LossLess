@@ -277,7 +277,7 @@ export default {
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
-      this.$router.push(`/businesses/${business.id}`);
+      this.goToProfile();
     },
 
     /**
@@ -286,7 +286,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
-      this.$router.push(`/users/${this.$currentUser.id}`);
+      this.goToProfile();
     },
 
     hoverLogo() {
