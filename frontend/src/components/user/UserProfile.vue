@@ -33,7 +33,7 @@ Date: 5/3/2021
                 </p>
               </b-row>
             </b-col>
-            <b-col lg="3" sm="12"
+            <b-col lg="3" sm="10"
                    v-if="currentUserAdmin"
                    class="p-0">
               <b-icon-pencil-fill class="close edit-details"
@@ -88,7 +88,7 @@ Date: 5/3/2021
                   <b-icon-calendar-event-fill></b-icon-calendar-event-fill>
                 </b-col>
                 <b-col cols="4"><strong>Date Of Birth:</strong></b-col>
-                <b-col>{{ userData.dateOfBirth }}</b-col>
+                <b-col>{{formatDateOfBirth}}</b-col>
               </b-row>
             </h6>
             <h6 v-show="viewable">
@@ -177,7 +177,7 @@ Date: 5/3/2021
 
 .edit-business-image {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 3px;
   font-size: 0.7rem
 }
@@ -210,7 +210,7 @@ import memberSince from "../model/MemberSince";
 import UserDetailsModal from "./UserDetailsModal";
 import ProfileImage from "../model/ProfileImage";
 import EventBus from "../../util/event-bus";
-import {formatAddress} from "../../util/index";
+import {formatAddress, getMonthName} from "../../util/index";
 import CurrencyNotification from "../model/CurrencyNotification";
 
 export default {
@@ -272,6 +272,7 @@ export default {
       [this.oldCurrency, this.newCurrency] = [oldCurrency, newCurrency];
       this.$bvToast.show('user-currency-changed');
     },
+
     /**
      * set up the page
      * add debounced delay 400 ms to launch the page
@@ -453,6 +454,16 @@ export default {
       return this.$currentUser.role === 'defaultGlobalApplicationAdmin' || this.$currentUser.id === this.userData.id
           || (this.$currentUser.role === 'globalApplicationAdmin' && this.userData.role !== 'defaultGlobalApplicationAdmin');
     },
+
+    /**
+     * format User's date of birth date
+     */
+    formatDateOfBirth: function () {
+      const dateOfBirth = new Date(this.userData.dateOfBirth)
+      return dateOfBirth.getDate() + " " + getMonthName(dateOfBirth.getMonth()) + " " + dateOfBirth.getFullYear();
+    },
+
+
   },
   watch: {
     /**

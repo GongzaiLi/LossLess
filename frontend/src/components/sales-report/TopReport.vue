@@ -1,6 +1,6 @@
 <template>
   <b-row class="m-2">
-    <b-col cols="6">
+    <b-col lg="6">
       <h3>Sales by {{ isTopProducts ? "Product" : "Manufacturer" }}</h3>
       <b-table
           ref="productsReportTable"
@@ -27,7 +27,7 @@
           aria-controls="my-table"/>
 
     </b-col>
-    <b-col cols="6">
+    <b-col lg="6">
       <b-row>
         <b-col cols="auto">
           <h3>Top {{ isTopProducts ? "Products" : "Manufacturers" }}</h3>

@@ -24,14 +24,13 @@ Page that stores table and search bar to search for businesses
       <b-col cols="12">
         <b-table striped hover
                  ref="searchTable"
-                 table-class="text-nowrap"
+                 class="text-nowrap"
                  :responsive="true"
                  no-border-collapse
                  bordered
                  no-local-sorting
                  :sort-by.sync="sortBy"
                  :sort-desc.sync="sortDesc"
-                 stacked="sm"
                  show-empty
                  :fields="fields"
                  :per-page="perPage"
@@ -58,6 +57,12 @@ Page that stores table and search bar to search for businesses
   margin-top:7em;
   margin-bottom:7em;
   text-align: center;
+}
+
+@media (max-width: 992px) {
+  .text-nowrap {
+    white-space: normal !important;
+  }
 }
 </style>
 

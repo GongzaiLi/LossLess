@@ -72,7 +72,7 @@
 
 <script>
 import api from "../../Api";
-import {formatAddress} from "../../util";
+import {formatAddress, getMonthName} from "../../util";
 
 export default {
   name: "CreateCard",
@@ -121,9 +121,9 @@ export default {
     setAutofillData(id) {
       this.createCardForm.creatorId = id;
       const currentDate = new Date();
-      this.cardInfo.dateCreated = currentDate.getDate() + "/"
-          + (currentDate.getMonth() + 1) + "/"
-          + currentDate.getFullYear() + " @ "
+
+      this.cardInfo.dateCreated = currentDate.getDate() + " " + getMonthName(currentDate.getMonth()) + " " +
+          currentDate.getFullYear() + " @ "
           + currentDate.getHours() + ":"
           + this.addLeadingZero(currentDate.getMinutes()) + ":"
           + this.addLeadingZero(currentDate.getSeconds());

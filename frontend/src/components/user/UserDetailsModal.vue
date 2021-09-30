@@ -50,15 +50,15 @@ Date: 3/3/2021
 
         <b-form-group v-if="isEditUser && !currentUserAdminAndEditingAnotherUser && changePassword" class="input-group-addon">
           <strong>Enter Current Password</strong>
-          <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser || changePassword" place-holder="Current Password"/>
+          <password-input v-model="userData.oldPassword" id="oldPassword" :min-password-length="0" :is-required="!isEditUser || changePassword" place-holder="Current Password"/>
         </b-form-group>
 
         <b-form-group v-if="changePassword || !isEditUser">
           <strong>{{isEditUser ? 'New Password' : 'Password *'}}</strong>
-          <password-input autocomplete="new-password" v-model="userData.newPassword" id="newPassword" :is-required="!isEditUser" place-holder="New Password"/>
+          <password-input autocomplete="new-password" v-model="userData.newPassword" :min-password-length="8" id="newPassword" :is-required="changePassword ? changePassword : !isEditUser" place-holder="New Password"/>
 
           <strong>Confirm {{isEditUser ? 'New Password' : 'Password *'}}</strong>
-          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
+          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :min-password-length="8" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
         <hr v-if="isEditUser">
 
@@ -69,7 +69,8 @@ Date: 3/3/2021
 
         <b-form-group>
           <strong>Date of Birth *</strong>
-          <div>Note: you must be at least 13 years old to register</div>
+          <div v-if="isEditUser">Note: you must be at least 13 years old to use this site</div>
+          <div v-else> Note: you must be at least 13 years old to register </div>
           <b-form-input type="date" v-model="userData.dateOfBirth" required
                         id="dateOfBirthInput"
                         placeholder="Date of Birth"
@@ -200,6 +201,7 @@ export default {
   },
 
   methods: {
+
     /**
      * If new password does not match old pass word return a string
      * that can be used as the value for a custom validity on the confirm password field else return empty string
@@ -278,8 +280,23 @@ export default {
      * */
     async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-      if (this.isEditUser) {
-        await this.updateUser();
+      if(this.isEditUser) {
+        if (this.country !== this.userData.homeAddress.country) {
+          let oldCurrency = await Api.getUserCurrency(this.country);
+          let newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
+          if (oldCurrency.code !== newCurrency.code) {
+            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
+                " This will not affect the currency of products in your administered business unless you " +
+                "also modify the address of the business."
+            )) {
+              await this.updateUser();
+            }
+          } else {
+            await this.updateUser();
+          }
+        } else {
+          await this.updateUser();
+        }
       } else {
         await this.register()
       }
@@ -316,6 +333,7 @@ export default {
      * */
     notificationCurrencyChange: async function () {
       if (this.country !== this.userData.homeAddress.country) {
+        EventBus.$emit("notificationUpdate");
         const oldCurrency = await Api.getUserCurrency(this.country);
         const newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
         if (oldCurrency.code !== newCurrency.code) {

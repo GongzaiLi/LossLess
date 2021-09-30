@@ -17,14 +17,13 @@ Date: sprint_1
       <b-col cols="12">
         <b-table striped hover
                  ref="searchTable"
-         table-class="text-nowrap"
+         class="text-nowrap"
          responsive
          no-border-collapse
          bordered
          no-local-sorting
          :sort-by.sync="sortBy"
          :sort-desc.sync="sortDesc"
-         stacked="sm"
          show-empty
          @row-clicked="rowClickHandler"
          :fields="fields"
@@ -52,6 +51,13 @@ Date: sprint_1
   margin-bottom:7em;
   text-align: center;
 }
+
+@media (max-width: 992px) {
+  .text-nowrap {
+    white-space: normal !important;
+  }
+}
+
 </style>
 
 <script>

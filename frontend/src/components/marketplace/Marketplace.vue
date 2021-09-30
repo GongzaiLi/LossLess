@@ -5,7 +5,7 @@ Date: 21/5/21
 
 <template>
   <div>
-    <b-card class="shadow" style="max-width: 85%">
+    <b-card class="shadow" style="max-width: 100%">
       <div class="row">
         <h1 class="col-10"><b-icon-shop/> Marketplace </h1>
         <div class="col-2">
