@@ -57,9 +57,9 @@ Date: sprint_1
       <template #button-content>
         <b-badge v-if="isActingAsUser">{{ userBadgeRole }}</b-badge>
         <em class="ml-2" id="profile-name" style="color:white;">{{profileName}}</em>
-        <b-img v-if="isActingAsUser" :src="showUserProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+        <b-img v-if="isActingAsUser" :src="showUserProfilePicture ? getURL($currentUser.profileImage.fileName) : require('../../../public/user-profile-default.png')"
                alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
-        <b-img v-else :src="showBusinessProfilePicture ? getURL($currentUser.currentlyActingAs.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+        <b-img v-else :src="showBusinessProfilePicture ? getURL($currentUser.currentlyActingAs.profileImage.fileName) : require('../../../public/business-profile-default.jpeg')"
                alt="Business Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 2rem; width:2rem"></b-img>
       </template>
 

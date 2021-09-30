@@ -5,7 +5,7 @@ import VueRouter from 'vue-router';
 import Api from "../../Api";
 
 jest.mock('../../Api');
-jest.mock("../../../public/profile-default.jpg", () => {
+jest.mock("../../../public/business-profile-default.jpeg", () => {
 }) // mock image
 
 let $currentUser = {

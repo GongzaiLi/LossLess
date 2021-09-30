@@ -17,7 +17,7 @@ Date: 29/03/2021
         <b-row>
           <div class="profile-image-container">
             <b-img
-                :src="businessData.profileImage ? getURL(businessData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+                :src="businessData.profileImage ? getURL(businessData.profileImage.fileName) : require('../../../public/business-profile-default.jpeg')"
                 alt="User Profile Image" width="75" height="75" class="rounded-circle"
                 id="profile-image"
                 title="View profile image"
@@ -202,7 +202,8 @@ Date: 29/03/2021
 
     <b-modal id="edit-business-image" title="Profile Image" hide-footer>
       <ProfileImage :details="businessData.profileImage"
-                    :userLookingAtSelfOrIsAdmin='isAdmin || isAdminOfThisBusiness'/>
+                    :userLookingAtSelfOrIsAdmin='isAdmin || isAdminOfThisBusiness'
+                    :default-image="require('../../../public/business-profile-default.jpeg')"/>
     </b-modal>
 
     <currency-notification toast-id="business-currency-changed" :oldCurrency="oldCurrency" :new-currency="newCurrency"

@@ -5,7 +5,10 @@ import Api from "../../Api";
 import VueRouter from 'vue-router';
 import makeAdminModal from "../../components/business/MakeAdminModal";
 
-
+jest.mock("../../../public/business-profile-default.jpeg", () => {
+}) // mock image
+jest.mock("../../../public/user-profile-default.png", () => {
+}) // mock image
 let userData = {
     id: 1,
     currentlyActingAs: null,

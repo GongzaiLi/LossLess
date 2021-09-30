@@ -10,7 +10,7 @@ const $log = {
 
 
 jest.mock('../../Api');
-jest.mock("../../../public/profile-default.jpg", () => {
+jest.mock("../../../public/user-profile-default.png", () => {
 }) // mock image
 
 const localVue = createLocalVue();
@@ -29,7 +29,7 @@ beforeEach(() => {
     .mockImplementationOnce(() =>
       new Date('04/12/2021').valueOf()
     );
-  jest.mock('../../../public/profile-default.jpg');
+  jest.mock('../../../public/user-profile-default.png');
   wrapper = shallowMount(UserDetailsModal, {
     localVue,
     router,
