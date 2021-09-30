@@ -38,7 +38,7 @@ public class MockUserServiceConfig {
 
 
         public MockUserService () {
-            super(null);
+            super(null, null, null, null);
             User defaultAdmin = new User();
             defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
             defaultAdmin.setEmail("defaultadmin@700");
@@ -125,10 +125,7 @@ public class MockUserServiceConfig {
 
         @Override
         public boolean checkUserAdminsBusiness(Integer businessId, Integer userId) {
-            if (userId.equals(1)) {
-                return true;
-            }
-            return false;
+            return userId.equals(1);
         }
     }
 

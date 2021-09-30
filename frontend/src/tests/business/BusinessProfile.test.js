@@ -5,7 +5,10 @@ import Api from "../../Api";
 import VueRouter from 'vue-router';
 import makeAdminModal from "../../components/business/MakeAdminModal";
 
-
+jest.mock("../../../public/business-profile-default.jpeg", () => {
+}) // mock image
+jest.mock("../../../public/user-profile-default.png", () => {
+}) // mock image
 let userData = {
     id: 1,
     currentlyActingAs: null,
@@ -100,23 +103,6 @@ test('get-normal-data', async () => {
   expect(wrapper.vm.businessData).toEqual(response.data);
 });
 
-
-test('get-address', async () => {
-  const address = {
-    streetNumber: "3/24",
-    streetName: "Ilam Road",
-    suburb: "a suburb",
-    city: "Christchurch",
-    region: "Canterbury",
-    country: "New Zealand",
-    postcode: "90210"
-  };
-
-  wrapper.vm.businessData.address = address;
-  await wrapper.vm.$nextTick();
-  expect(wrapper.vm.getAddress).toEqual("3/24 Ilam Road, a suburb, Christchurch Canterbury New Zealand 90210");
-});
-
 test('check-can-revoke-admin-invalid-returns-false', async () => {
 
   const data = {
@@ -132,7 +118,7 @@ test('check-can-revoke-admin-invalid-returns-false', async () => {
         firstName: 'James',
         lastName: 'Harris',
         middleName: 'Edward',
-        nickName: 'Jimmy',
+        nickname: 'Jimmy',
         bio: 'My name is James',
         email: 'jeh128@uclive.ac.nz',
         dateOfBirth: '2000-10-10',
@@ -157,7 +143,7 @@ test('check-can-revoke-admin-invalid-returns-false', async () => {
         firstName: 'Michael',
         lastName: 'Hartley',
         middleName: 'Steven',
-        nickName: 'Jimmy',
+        nickname: 'Jimmy',
         bio: 'My name is Michael',
         email: 'micky@gmail.com',
         dateOfBirth: '2000-11-10',
@@ -222,7 +208,7 @@ test('check-can-revoke-admin-invalid-as-user-is-user-returns-false', async () =>
         firstName: 'James',
         lastName: 'Harris',
         middleName: 'Edward',
-        nickName: 'Jimmy',
+        nickname: 'Jimmy',
         bio: 'My name is James',
         email: 'jeh128@uclive.ac.nz',
         dateOfBirth: '2000-10-10',
@@ -247,7 +233,7 @@ test('check-can-revoke-admin-invalid-as-user-is-user-returns-false', async () =>
         firstName: 'Michael',
         lastName: 'Hartley',
         middleName: 'Steven',
-        nickName: 'Jimmy',
+        nickname: 'Jimmy',
         bio: 'My name is Michael',
         email: 'micky@gmail.com',
         dateOfBirth: '2000-11-10',
@@ -312,7 +298,7 @@ test('check-can-revoke-admin-valid-returns-true', async () => {
         firstName: 'James',
         lastName: 'Harris',
         middleName: 'Edward',
-        nickName: 'Jimmy',
+        nickname: 'Jimmy',
         bio: 'My name is James',
         email: 'jeh128@uclive.ac.nz',
         dateOfBirth: '2000-10-10',
@@ -337,7 +323,7 @@ test('check-can-revoke-admin-valid-returns-true', async () => {
         firstName: 'Michael',
         lastName: 'Hartley',
         middleName: 'Steven',
-        nickName: 'Jimmy',
+        nickname: 'Jimmy',
         bio: 'My name is Michael',
         email: 'micky@gmail.com',
         dateOfBirth: '2000-11-10',
@@ -459,7 +445,7 @@ test('business-found-in-html', async () => {
           firstName: 'James',
           lastName: 'Harris',
           middleName: 'Edward',
-          nickName: 'Jimmy',
+          nickname: 'Jimmy',
           bio: 'My name is James',
           email: 'jeh128@uclive.ac.nz',
           dateOfBirth: '2000-10-10',
@@ -484,7 +470,7 @@ test('business-found-in-html', async () => {
           firstName: 'Michael',
           lastName: 'Hartley',
           middleName: 'Steven',
-          nickName: 'Jimmy',
+          nickname: 'Jimmy',
           bio: 'My name is Michael',
           email: 'micky@gmail.com',
           dateOfBirth: '2000-11-10',
@@ -545,7 +531,7 @@ test('business-administrators-table-correct-data', async () => {
           firstName: 'James',
           lastName: 'Harris',
           middleName: 'Edward',
-          nickName: 'Jimmy',
+          nickname: 'Jimmy',
           bio: 'My name is James',
           email: 'jeh128@uclive.ac.nz',
           dateOfBirth: '2000-10-10',
@@ -570,7 +556,7 @@ test('business-administrators-table-correct-data', async () => {
           firstName: 'Michael',
           lastName: 'Hartley',
           middleName: 'Steven',
-          nickName: 'Jimmy',
+          nickname: 'Jimmy',
           bio: 'My name is Michael',
           email: 'micky@gmail.com',
           dateOfBirth: '2000-11-10',

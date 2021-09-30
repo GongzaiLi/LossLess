@@ -17,7 +17,7 @@ public class Administrator {
     private String firstName;
     private String lastName;
     private String middleName;
-    private String nickName;
+    private String nickname;
     private String bio;
     private String email;
     private String dateOfBirth;

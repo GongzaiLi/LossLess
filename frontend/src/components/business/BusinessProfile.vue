@@ -1,22 +1,43 @@
 <!--
 Individual Business profile Page. Currently displays all business data
-Author: Gongzai Li
 Date: 29/03/2021
 -->
 <template>
   <div v-show="!loading">
-    <h4 class="profile-card"><b-link v-if="$route.query.fromSearch" variant="info" to="/search">
-      <b-icon-arrow-left/> Back to results
-    </b-link></h4>
+    <h4 class="profile-card">
+      <b-link v-if="$route.query.fromSearch" variant="info" to="/search">
+        <b-icon-arrow-left/>
+        Back to results
+      </b-link>
+    </h4>
     <b-card class="profile-card shadow" no-body
             v-if="businessFound"
     >
       <template #header>
         <b-row>
-          <b-col>
+          <div class="profile-image-container">
+            <b-img
+                :src="businessData.profileImage ? getURL(businessData.profileImage.fileName) : require('../../../public/business-profile-default.jpeg')"
+                alt="User Profile Image" width="75" height="75" class="rounded-circle"
+                id="profile-image"
+                title="View profile image"
+            />
+            <b-button v-if="isAdminOfThisBusiness && isAdmin || $currentUser.role !== 'user'"
+                      class="edit-business-image" size="sm"
+                      @click="$bvModal.show('edit-business-image')"
+            >
+              <b-icon-image/>
+              Edit
+            </b-button>
+          </div>
+          <b-col class="mt-2">
             <h4 class="mb-1">{{ businessData.name }}</h4>
-            Registered on: <member-since :date="businessData.created"/>
+            Registered on:
+            <member-since :date="businessData.created"/>
           </b-col>
+          <b-icon-pencil-fill v-if="isAdminOfThisBusiness && isAdmin || $currentUser.role !== 'user'"
+                              class="close edit-details" @click="$bvModal.show('edit-business-profile')"
+                              title="Update Business Details"></b-icon-pencil-fill>
         </b-row>
       </template>
 
@@ -68,20 +89,30 @@ Date: 29/03/2021
           </h6>
 
           <router-link v-if="isAdmin" :to="{ name: 'product-catalogue', params: { id: businessData.id }}">
-          <b-button type="submit" variant="primary">
-            <b-icon-newspaper/> Product Catalogue
-          </b-button>
+            <b-button class="business-manage-button" type="submit" variant="primary">
+              <b-icon-newspaper/>
+              Product Catalogue
+            </b-button>
           </router-link>
           &nbsp;
           <router-link v-if="isAdmin" :to="{ name: 'inventory-page', params: { id: businessData.id }}">
-            <b-button type="submit" variant="primary">
-              <b-icon-box-seam/> Inventory
+            <b-button class="business-manage-button" type="submit" variant="primary">
+              <b-icon-box-seam/>
+              Inventory
             </b-button>
           </router-link>
           &nbsp;
           <router-link :to="{ name: 'listings-page', params: { id: businessData.id }}">
-            <b-button type="submit" variant="primary">
-              <b-icon-receipt/> Sales List
+            <b-button class="business-manage-button" type="submit" variant="primary">
+              <b-icon-receipt/>
+              Sales List
+            </b-button>
+          </router-link>
+          &nbsp;
+          <router-link v-if="isAdmin" :to="{ name: 'sales-report-page', params: { id: businessData.id }}">
+            <b-button class="business-manage-button" type="submit" variant="primary">
+              <b-icon-newspaper/>
+              Sales Report
             </b-button>
           </router-link>
 
@@ -93,7 +124,8 @@ Date: 29/03/2021
         <b-list-group-item>
           <h6><strong>You're an administrator of this business. To view the business inventory
             and catalogue, you must first be acting as this business.</strong>
-            <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this business
+            <br><br>To do so, click your profile picture on top-right of the screen. Then, select the name of this
+            business
             ('{{ businessData.name }}') from the drop-down menu.</h6>
         </b-list-group-item>
       </b-list-group>
@@ -103,7 +135,7 @@ Date: 29/03/2021
           <b-card-text style="text-align: justify">
             <h4 class="mb-1">Administrators</h4>
           </b-card-text>
-          <b-row>
+          <b-row class="adminRow">
             <b-col cols="12">
               <b-table hover
                        striped
@@ -120,9 +152,9 @@ Date: 29/03/2021
                 <template #empty>
                   <h3 class="no-results-overlay">No results to display</h3>
                 </template>
-                <template #cell(actions)="row" >
+                <template #cell(actions)="row">
                   <div v-if="checkCanRevokeAdmin(row.item.id)">
-                    <b-button size="sm" @click="removeAdminClickHandler(row.item.id)"  class="mr-1">
+                    <b-button size="sm" @click="removeAdminClickHandler(row.item.id)" class="mr-1">
                       Revoke Admin
                     </b-button>
                   </div>
@@ -153,42 +185,94 @@ Date: 29/03/2021
             invalid URL into the address bar.
           </b-col>
           <b-col> Try again
-          <router-link to="/businesses">Create a new business here.</router-link>
+            <router-link to="/businesses">Create a new business here.</router-link>
           </b-col>
         </h6>
       </b-card-body>
     </b-card>
 
-    <b-modal id="admin-modal" hide-header hide-footer size="xl">
+    <b-modal id="admin-modal" hide-header hide-footer size="lg">
       <make-admin-modal :make-admin-action="this.makeAdminAction"/>
       <b-alert :show="makeAdminError.length > 0 ? 120 : 0" variant="danger">{{ makeAdminError }}</b-alert>
     </b-modal>
+
+    <b-modal id="edit-business-profile" title="Update Business Profile" hide-footer scrollable>
+      <CreateEditBusiness :is-edit-business="true" :business-details="businessData"/>
+    </b-modal>
+
+    <b-modal id="edit-business-image" title="Profile Image" hide-footer>
+      <ProfileImage :details="businessData.profileImage"
+                    :userLookingAtSelfOrIsAdmin='isAdmin || isAdminOfThisBusiness'
+                    :default-image="require('../../../public/business-profile-default.jpeg')"/>
+    </b-modal>
+
+    <currency-notification toast-id="business-currency-changed" :oldCurrency="oldCurrency" :new-currency="newCurrency"
+                           :is-user="false"/>
   </div>
 
 
 </template>
 
 <style scoped>
+
+.adminRow {
+  cursor: pointer;
+}
+
 .profile-card {
   max-width: 50rem;
   margin-left: auto;
   margin-right: auto;
 }
 
+.edit-business-image {
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  font-size: 0.7rem
+}
+
+.edit-details {
+  cursor: pointer;
+}
+
+.profile-image-container {
+  position: relative;
+  text-align: center;
+}
+
+#profile-image {
+  margin-left: 1rem;
+  position: relative;
+  object-fit: cover;
+}
+
 h6 {
   line-height: 1.4;
+}
+
+.business-manage-button {
+  margin-bottom: 0.3rem;
 }
 </style>
 
 <script>
 import memberSince from "../model/MemberSince";
-import api from "../../Api";
+import Api from "../../Api";
 import makeAdminModal from './MakeAdminModal';
+import {formatAddress} from "../../util";
+import CreateEditBusiness from "./CreateEditBusiness";
+import ProfileImage from "../model/ProfileImage";
+import EventBus from "../../util/event-bus";
+import CurrencyNotification from "../model/CurrencyNotification";
 
 export default {
   components: {
+    CurrencyNotification,
+    CreateEditBusiness,
     memberSince,
-    makeAdminModal
+    makeAdminModal,
+    ProfileImage
   },
   data: function () {
     return {
@@ -215,7 +299,7 @@ export default {
             firstName: '',
             lastName: '',
             middleName: '',
-            nickName: '',
+            nickname: '',
             bio: '',
             email: '',
             dateOfBirth: '',
@@ -243,15 +327,28 @@ export default {
       loading: true,
       makeAdminAction: null,
       makeAdminError: "",
+      oldCurrency: '',
+      newCurrency: ''
     }
   },
 
   mounted() {
     const businessId = this.$route.params.id;
     this.launchPage(businessId);
+    EventBus.$on('updatedBusinessDetails', this.updateBusinessHandler);
+    EventBus.$on('updatedBusinessImage', this.updateBusinessImageHandler);
+    EventBus.$on("currencyChanged", this.showNotification);
   },
 
   methods: {
+    /**
+     * When the business's currency has changed, then it will show a notification
+     */
+    showNotification(oldCurrency, newCurrency) {
+      this.oldCurrency = oldCurrency;
+      this.newCurrency = newCurrency;
+      this.$bvToast.show('business-currency-changed');
+    },
 
     /**
      * set up the page
@@ -281,7 +378,7 @@ export default {
         userId: userId
       }
 
-      api
+      Api
           .revokeBusinessAdmin(this.businessData.id, revokeAdminRequestData)
           .then((response) => {
             this.getBusinessInfo(this.$route.params.id)
@@ -297,28 +394,28 @@ export default {
      * @param id
      **/
     getBusinessInfo: function (id) {
-      api
-        .getBusiness(id)
-        .then((response) => {
-          this.$log.debug("Data loaded: ", response.data);
-          this.setResponseData(response.data);
-          this.businessFound = true;
-          this.loading = false;
-        })
-        .catch((error) => {
-          this.$log.debug(error);
-          this.businessFound = false;
-          this.loading = false;
-        })
+      Api
+          .getBusiness(id)
+          .then((response) => {
+            this.$log.debug("Data loaded: ", response.data);
+            this.businessData = response.data;
+            this.businessFound = true;
+            this.loading = false;
+          })
+          .catch((error) => {
+            this.$log.debug(error);
+            this.businessFound = false;
+            this.loading = false;
+          })
     },
 
     /**
-     * set the response data to businessData
-     * @param data
+     * Returns the URL required to get the image given the filename
      */
-    setResponseData: function (data) {
-      this.businessData = data;
+    getURL(imageFileName) {
+      return Api.getImage(imageFileName);
     },
+
     /**
      * Check whether the user currently logged can revoke admin from an given administrator in
      * the administrators table or not, for the purposes
@@ -343,6 +440,7 @@ export default {
      */
     showMakeAdminModal: function () {
       this.makeAdminAction = this.makeAdminHandler;
+      this.makeAdminError = "";
       this.$bvModal.show('admin-modal');
     },
 
@@ -355,7 +453,7 @@ export default {
       const makeAdminRequestData = {
         userId: userId
       }
-      await api
+      await Api
           .makeBusinessAdmin(this.businessData.id, makeAdminRequestData)
           .then((response) => {
             this.$log.debug("Response from request to make admin: ", response);
@@ -383,13 +481,30 @@ export default {
         return "Server error";
       }
     },
+
+    /**
+     * Handles the EventBus emit for 'updatedBusinessDetails'.
+     * This hides the edit business modal and refreshes the business's details.
+     */
+    updateBusinessHandler() {
+      this.getBusinessInfo(this.businessData.id);
+      this.$bvModal.hide('edit-business-profile');
+    },
+
+    /**
+     * Handles the EventBus emit for 'updatedBusinessImage'.
+     * This hides the edit business modal and refreshes the business's details.
+     */
+    updateBusinessImageHandler() {
+      this.getBusinessInfo(this.businessData.id);
+    }
   },
 
   computed: {
     /**
      * True if the user can should be able to see all business information (ie they are an admin or acting as this business)
      */
-    isAdmin: function() {
+    isAdmin: function () {
       return this.$currentUser.role !== 'user' ||
           (this.$currentUser.currentlyActingAs && this.$currentUser.currentlyActingAs.id === parseInt(this.$route.params.id))
     },
@@ -407,16 +522,13 @@ export default {
     },
 
     /**
-     * the street number, street name, city, region,
-     * country and postcode join with space between the echo to a string
-     * @return {string}
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
      */
     getAddress: function () {
-      const address = this.businessData.address;
-      return `${address.streetNumber} ${address.streetName}, ${address.suburb}, ` +
-        `${address.city} ${address.region} ${address.country} ${address.postcode}`;
+      return formatAddress(this.businessData.address, 1);
     },
-
 
     /**
      * set table parameter

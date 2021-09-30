@@ -95,9 +95,12 @@
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input placeholder="Any" type="date" v-model="search.closesEndDate"></b-input>
+                  <b-input placeholder="Any" :min=search.closesStartDate type="date" v-model="search.closesEndDate"></b-input>
                 </div>
                 <label class="any_label">(Any if blank)</label>
+                <label v-if="invalidDateRange" class="rangeWarning mb-2 ml-2">
+                  <b-icon icon="exclamation-circle-fill"></b-icon> The dates may be the wrong way around
+                </label>
               </div>
             </b-col>
             <b-col cols="12" md="4">
@@ -107,12 +110,15 @@
                   <div class="input-group-text">Price:</div>
                 </div>
                 <div>
-                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="Any" v-model="search.priceMin"></b-input>
+                  <b-input class="price_min" step="0.01" min="0.00" max="1000000.00" type="number" placeholder="0" v-model="search.priceMin"></b-input>
                 </div>
                 <label class="to_label"> to </label>
                 <div>
-                  <b-input class="price_max" step="0.01" min="0.01" max="1000000.00" type="number" placeholder="Any" v-model="search.priceMax"></b-input>
+                  <b-input class="price_max" step="0.01" :min=search.priceMin max="1000000.00" type="number" placeholder="Any" v-model="search.priceMax"></b-input>
                 </div>
+                <label v-if="invalidPriceRange" class="rangeWarning mb-2 ml-2">
+                  <b-icon icon="exclamation-circle-fill"></b-icon> Lowest price must come before highest price
+                </label>
               </div>
 
             </b-col>
@@ -139,6 +145,10 @@
 </template>
 
 <style>
+
+.rangeWarning {
+  color: orangered
+}
 
 .search_button {
   text-align: right;
@@ -230,6 +240,15 @@ export default {
         this.currentPage = 1;
         this.$refs.listingsSearchPag.currentPage = 1; // We have to do this because the v-model doesn't update when we only set data.currentPage
       }
+      let closesStartDate = this.search.closesStartDate
+      if (this.search.closesStartDate) {
+        closesStartDate = this.search.closesStartDate.toString() + " 00:00:00";
+      }
+      let closesEndDate = this.search.closesEndDate
+      if (this.search.closesEndDate) {
+        closesEndDate = this.search.closesEndDate + " 23:59:59"
+      }
+
       const resp = (await Api.searchListings(
           this.search.productName,
           this.search.priceMin,
@@ -237,8 +256,8 @@ export default {
           this.search.businessName,
           this.search.businessTypes,
           this.search.businessLocation,
-          this.search.closesStartDate,
-          this.search.closesEndDate,
+          closesStartDate,
+          closesEndDate,
           this.sortOrdersForAPI,
           this.perPage,
           this.currentPage - 1)).data;   // Use new listings variable as setting currencies onto this.listings doesn't update Vue
@@ -293,6 +312,28 @@ export default {
 
 
   computed: {
+
+    /**
+     *  Compares the listing closes start and end date for filtering listings.
+     *  This is used to show a warning if the date range is the wrong way around.
+     *
+     * @return True if closes start date is after closes end date. False otherwise.
+     */
+    invalidDateRange() {
+        return new Date(this.search.closesStartDate) > new Date(this.search.closesEndDate);
+    },
+
+    /**
+     *  Compares the listing price and end date for filtering listings.
+     *  This is used to show a warning if the price range is the wrong way around.
+     *
+     * @return True if closes start date is after closes end date. False otherwise.
+     */
+    invalidPriceRange() {
+      return (this.search.priceMin > this.search.priceMax) && this.search.priceMax;
+    },
+
+
     /**
      * Returns a list of sort orders that should be passed to the API call to search listings.
      * This exists mainly because we need special sort orders for sorting by location (as we

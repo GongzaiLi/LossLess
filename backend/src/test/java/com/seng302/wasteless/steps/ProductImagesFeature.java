@@ -25,14 +25,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.IMAGE_PNG;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -204,7 +201,7 @@ public class ProductImagesFeature {
                 MockMvcRequestBuilders.multipart(String.format("/businesses/%d/products/%s/images", business.getId(), productId))
                         .file(image)
                         .with(user(currentUserDetails))
-                        .with(csrf()));;
+                        .with(csrf()));
 
         product = productService.findProductById(productId);
     }
@@ -221,12 +218,6 @@ public class ProductImagesFeature {
     }
 
     // AC1,2,3 - Upload an image and a thumbnail for the product with a correct type
-
-    @Then("The user will be able to see having {int} image with the id {int} from the product.")
-    public void the_user_will_be_able_to_see_having_image_with_the_id_from_the_product(Integer imageSize, Integer imageId) {
-        Assertions.assertEquals(imageSize, product.getImages().size());
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId)));
-    }
 
     @And("The current primary image is this product's image id: {int}")
     public void the_current_primary_image_is_this_product_s_image_id(Integer primaryImageId) {
@@ -258,20 +249,10 @@ public class ProductImagesFeature {
                     MockMvcRequestBuilders.multipart(String.format("/businesses/%d/products/%s/images", business.getId(), productId))
                             .file(image)
                             .with(user(currentUserDetails))
-                            .with(csrf())).andExpect(status().isCreated());;
+                            .with(csrf())).andExpect(status().isCreated());
         }
 
         product = productService.findProductById(productId);
-    }
-
-
-    @Then("The user will be able to see having {int} images with the id {int}, {int}, {int}, {int} from the product.")
-    public void the_user_will_be_able_to_see_having_images_with_the_id_from_the_product(Integer imageSize, Integer imageId1, Integer imageId2, Integer imageId3, Integer imageId4) {
-        Assertions.assertEquals(imageSize, product.getImages().size());
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId1)));
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId2)));
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId3)));
-        Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(imageId4)));
     }
 
     // AC2 - Change the primary image in the product
@@ -347,10 +328,10 @@ public class ProductImagesFeature {
     public void delete_all_images_in_the_product_with_id(String productId) throws Exception {
         Assertions.assertEquals(productId, product.getId());
 
-        Set<ProductImage> productImages = product.getImages();
+        Set<Image> images = product.getImages();
 
-        while (productImages.size() > 0) {
-            Integer id = productImages.stream().findFirst().get().getId();
+        while (images.size() > 0) {
+            Integer id = images.stream().findFirst().get().getId();
             Assertions.assertTrue(product.getImages().stream().anyMatch(image -> image.getId().equals(id)));
             mockMvc.perform(MockMvcRequestBuilders.delete(String.format("/businesses/%d/products/%s/images/%d", business.getId(), productId, id))
                     .contentType(APPLICATION_JSON)
@@ -359,7 +340,7 @@ public class ProductImagesFeature {
                     .andExpect(status().isOk());
             product = productService.findProductById(productId);
             Assertions.assertTrue(product.getImages().stream().noneMatch(image -> image.getId().equals(id)));
-            productImages = product.getImages();
+            images = product.getImages();
         }
 
 

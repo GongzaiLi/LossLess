@@ -13,9 +13,8 @@
     <br>
     <b-table
         striped hovers
-        responsive="true"
+        responsive
         no-border-collapse
-        stacked="sm"
         bordered
         show-empty
         no-local-sorting
@@ -33,7 +32,7 @@
         <div v-if="!products.item.images.length">
           <b-img  class="product-image-thumbnail" center :src="require(`/public/product_default_thumbnail.png`)" alt="Product has no image"/>
         </div>
-        <div v-if="products.item.images.length">
+        <div v-if="products.item.images.length && products.item.primaryImage">
           <img class="product-image-thumbnail" center :src="getThumbnail(products.item)" alt="Failed to load image"/>
         </div>
       </template>

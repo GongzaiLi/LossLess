@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="listings-page">
     <b-container>
       <b-row class="mb-5">
         <b-link v-if="$route.query.fromBusiness" variant="info" class="back-to-search-link"
@@ -29,6 +29,8 @@
                   id="carousel-1"
                   :controls="listingItem.inventoryItem.product.images.length > 1"
                   indicators
+                  :no-animation="true"
+                  aria-busy="false"
                   :interval="0"
                   ref="image_carousel"
                   v-model="slideNumber"
@@ -131,7 +133,7 @@
                     </router-link>
                   </label>
                   <br>
-                  <label class="details-text"> <strong> Business Location: </strong> {{ address }} </label>
+                  <label class="details-text"> <strong> Business Location: </strong> {{ getAddress }} </label>
                 </b-container>
               </b-input-group-text>
             </b-col>
@@ -195,7 +197,7 @@
   margin-right: auto;
 }
 
-.modal-header .close {
+.listings-page .modal-header .close {
   display: none;
 }
 
@@ -236,6 +238,7 @@
   margin-left: 5px;
   width: 25px;
   height: 25px;
+  cursor: pointer;
 }
 
 .details-text {
@@ -250,6 +253,7 @@
 <script>
 import Api from "../../Api";
 import EventBus from "../../util/event-bus"
+import {formatAddress, formatDateTime} from "../../util";
 
 
 export default {
@@ -258,7 +262,6 @@ export default {
     return {
       slideNumber: 0,
       listingItem: {},
-      address: {},
       currency: {},
       listingLoading: true,
       listingNotExists: false,
@@ -271,6 +274,7 @@ export default {
   async mounted() {
     this.queryHistory = this.$route.query.queryHistory
     await this.setListingData();
+    this.listingItem.closes = await formatDateTime(this.listingItem.closes);
   },
 
   methods: {
@@ -297,7 +301,6 @@ export default {
             }
 
             const address = this.listingItem.business.address;
-            this.address = (address.suburb ? address.suburb + ", " : "") + `${address.city}, ${address.region}, ${address.country}`;
             this.currency = await Api.getUserCurrency(address.country);
             this.listingLoading = false;
           })
@@ -393,11 +396,20 @@ export default {
      */
     openErrorModal() {
       this.$refs.purchaseErrorModal.show();
-    }
+    },
+
 
   },
 
   computed: {
+    /**
+     * Formats the address using util function and appropriate privacy level.
+     *
+     * @return address formatted
+     */
+    getAddress: function () {
+      return formatAddress(this.listingItem.business.address, 2);
+    },
     /**
      * Returns the listing like string based on number of likes
      * @returns {string} The string to be returned

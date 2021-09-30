@@ -51,9 +51,12 @@ class ListingsServiceTest {
 
     private User curUser;
 
+    private Listing savedListing;
+
+
     @BeforeAll
     void setUp() {
-        TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);
+        savedListing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);
         TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Back Water", 1.5, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES,LocalDate.of(2099, Month.FEBRUARY, 1), 69, 69);
         TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Willy Wonka", 2.0, "NZ", "Christchurch", "Riccarton", "Peaches and Wonka", BusinessTypes.RETAIL_TRADE, LocalDate.of(2099, Month.MARCH, 1), 69, 69);
         TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Wonka Willy", 100.0, "NZ", "Christchurch", "Riccarton", "Fraud", BusinessTypes.CHARITABLE_ORGANISATION, LocalDate.of(2099, Month.MARCH, 10), 69, 69);
@@ -206,7 +209,7 @@ class ListingsServiceTest {
 
     @Test
     void whenFilterByClosingDateRange_andUpperAndLowerInclusive_thenExcludedListingsNotReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2099, Month.FEBRUARY, 1)),Optional.of(LocalDate.of(2099, Month.MARCH, 1)),Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2099, Month.FEBRUARY, 1).atTime(23,59)),Optional.of(LocalDate.of(2099, Month.MARCH, 1).atTime(23,59)),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
 
         assertTrue(names.containsAll(Arrays.asList("Willy Wonka", "Back Water"))
@@ -215,7 +218,7 @@ class ListingsServiceTest {
 
     @Test
     void whenFilterByClosingDateRange_andUpperAndLowerExclusive_thenAllListingsReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2000, Month.FEBRUARY, 1)),Optional.of(LocalDate.of(2100, Month.MARCH, 1)),Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(),Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2000, Month.FEBRUARY, 1).atTime(23,59)),Optional.of(LocalDate.of(2100, Month.MARCH, 1).atTime(23,59)),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertTrue(names.containsAll(Arrays.asList("Willy Wonka", "Black Water No Sugar", "Back Water", "Wonka Willy"))
                 && Arrays.asList("Willy Wonka", "Black Water No Sugar", "Back Water", "Wonka Willy").containsAll(names));
@@ -223,14 +226,14 @@ class ListingsServiceTest {
 
     @Test
     void whenFilterByClosingDateRange_andRangeTooLow_thenNoListingsReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2000, Month.FEBRUARY, 1)),Optional.of(LocalDate.of(2001, Month.MARCH, 1)),Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2000, Month.FEBRUARY, 1).atTime(23,59)),Optional.of(LocalDate.of(2001, Month.MARCH, 1).atTime(23,59)),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
 
     @Test
     void whenFilterByClosingDateRange_andRangeTooHigh_thenNoListingsReturned() {
-        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2100, Month.FEBRUARY, 1)),Optional.of(LocalDate.of(2101, Month.MARCH, 1)),Pageable.unpaged());
+        Page<Listing> listings = listingsService.searchListings(Optional.empty(), Optional.empty(), Optional.empty(),Optional.empty(), Optional.empty(),Optional.empty(), Optional.of(LocalDate.of(2100, Month.FEBRUARY, 1).atTime(23,59)),Optional.of(LocalDate.of(2101, Month.MARCH, 1).atTime(23,59)),Pageable.unpaged());
         List<String> names = listings.map(listing -> listing.getInventoryItem().getProduct().getName()).getContent();
         assertEquals(0, names.size());
     }
@@ -241,7 +244,7 @@ class ListingsServiceTest {
 
     @Test
     void whenGetListingById_andListingExists_thenListingReturned() {
-        Assertions.assertNotNull(listingsService.findFirstById(1));
+        Assertions.assertNotNull(listingsService.findFirstById(savedListing.getId()));
     }
 
     @Test

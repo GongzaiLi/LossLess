@@ -2,6 +2,7 @@ package com.seng302.wasteless.dto;
 
 import com.seng302.wasteless.model.Address;
 import com.seng302.wasteless.model.BusinessTypes;
+import com.seng302.wasteless.model.Image;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -23,4 +24,5 @@ public class GetBusinessesDto {
     private Address address;
     private BusinessTypes businessType;
     private String created;
+    private Image profileImage;
 }

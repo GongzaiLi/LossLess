@@ -63,6 +63,11 @@ public class Business {
     @Column(name = "created")
     private LocalDate created;
 
+    @JsonView(BusinessViews.SearchBusinessesView.class)
+    @JoinColumn(name = "profile_image")
+    @OneToOne
+    private Image profileImage;
+
     /**
      * Add an administrator to a business
      * Never call this directly, only call it from business service.

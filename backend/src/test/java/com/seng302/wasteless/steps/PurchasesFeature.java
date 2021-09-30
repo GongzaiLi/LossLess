@@ -4,11 +4,9 @@ import com.jayway.jsonpath.JsonPath;
 import com.seng302.wasteless.controller.ListingController;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.repository.PurchasedListingRepository;
-import com.seng302.wasteless.repository.UserRepository;
 import com.seng302.wasteless.security.CustomUserDetails;
 import com.seng302.wasteless.service.*;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -21,11 +19,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.seng302.wasteless.TestUtils.newUserWithEmail;
 import static com.seng302.wasteless.TestUtils.createListingWithNameAndPrice;
@@ -65,7 +63,6 @@ public class PurchasesFeature {
     @Autowired
     private BusinessService businessService;
 
-
     @Autowired
     private NotificationService notificationService;
 
@@ -79,6 +76,8 @@ public class PurchasesFeature {
     private List<User> userList;
 
     private ResultActions responseResult;
+
+    private static Integer numPurchases = 0;
 
     /**
      * Sets up the mockMVC object by building with with webAppContextSetup.
@@ -114,6 +113,7 @@ public class PurchasesFeature {
 
     @When("I purchase that listing")
     public void iPurchaseThatListing() throws Exception {
+        numPurchases++;
         mockMvc.perform(MockMvcRequestBuilders.post(String.format("/listings/%d/purchase", curListing.getId()))
                 .with(user(currentUserDetails))
                 .with(csrf()))
@@ -178,14 +178,14 @@ public class PurchasesFeature {
     public void notifications_are_created_for_the_users_who_have_liked_the_listing_that_was_purchased(Integer numNotification) {
         Assertions.assertEquals(userList.size(), numNotification);
         for (User user : userList) {
-            List<Notification> notificationList = notificationService.findAllNotificationsByUserId(user.getId());
+            List<Notification> notificationList = notificationService.filterNotifications(user.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
             Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.LIKEDLISTING_PURCHASED)));
         }
     }
 
     @Then("A notifications is created telling me I have purchased the listing")
     public void a_notifications_is_created_telling_me_i_have_purchased_the_listing() {
-        List<Notification> notificationList = notificationService.findAllNotificationsByUserId(currentUserDetails.getId());
+        List<Notification> notificationList = notificationService.filterNotifications(currentUserDetails.getId(), Optional.ofNullable(null), Optional.ofNullable(null));
         Assertions.assertTrue(notificationList.stream().anyMatch(notify -> notify.getType().equals(NotificationType.PURCHASED_LISTING)));
     }
 
@@ -203,7 +203,7 @@ public class PurchasesFeature {
 
     @When("I try and get information about the sale")
     public void i_try_and_get_information_about_the_sale() throws Exception {
-        responseResult = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/purchase/%d", 1))
+        responseResult = mockMvc.perform(MockMvcRequestBuilders.get(String.format("/purchase/%d", numPurchases))
                 .with(user(currentUserDetails))
                 .with(csrf()))
                 .andExpect(status().isOk());

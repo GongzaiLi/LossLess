@@ -1,18 +1,19 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '../components/user/Login.vue'
-import Register from '../components/user/Register.vue'
+import UserDetailsModal from '../components/user/UserDetailsModal.vue'
 import UserProfile from '../components/user/UserProfile'
 import SearchPage from "../components/search/SearchPage";
 import BusinessProfile from "@/components/business/BusinessProfile";
 import ProductCatalogue from "@/components/product/ProductCatalogue";
-import CreateBusiness from "../components/business/CreateBusiness";
+import CreateBusiness from "../components/business/CreateEditBusiness";
 import ListingsPage from "../components/listing/BusinessListingsPage";
 import HomePage from "@/components/user/HomePage";
 import InventoryPage from "@/components/inventory/InventoryPage";
 import Marketplace from "@/components/marketplace/Marketplace";
 import ListingSearchPage from "../components/listing/ListingSearchPage";
 import ListingFullPage from "@/components/listing/ListingFullPage";
+import SalesReportPage from "../components/sales-report/SalesReportPage";
 
 
 
@@ -28,7 +29,7 @@ const router = new Router({
     routes: [
         { path: '/', redirect: '/login' },
         { path: '/login', name: 'login', component: Login },
-        { path: '/register', name: 'register', component: Register },
+        { path: '/register', name: 'register', component: UserDetailsModal },
         { path: '/search', name: 'search', component: SearchPage},
         { path: '/users/:id', name: 'user-profile', component: UserProfile},
         { path: '/homePage', name: 'home-page', component: HomePage},
@@ -39,7 +40,8 @@ const router = new Router({
         { path: '/businesses/:id/inventory', name:'inventory-page', component: InventoryPage},
         { path: '/marketPlace', name: 'market-place', component: Marketplace},
         { path : '/listingSearch', name: 'listings-search', component: ListingSearchPage},
-        { path : '/listings/:id', name: 'listings-full', component: ListingFullPage}
+        { path : '/listings/:id', name: 'listings-full', component: ListingFullPage},
+        { path : '/businesses/:id/salesReport', name: 'sales-report-page', component: SalesReportPage},
 
     ]
 });

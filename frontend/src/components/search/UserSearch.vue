@@ -1,7 +1,6 @@
 <!--
 Page that stores table and search bar to search for other users
-Author: Caleb Sim, Gongzai Li
-Date: 7/3/2021
+Date: sprint_1
 -->
 <template>
   <b-card style="max-width: 1200px">
@@ -18,14 +17,13 @@ Date: 7/3/2021
       <b-col cols="12">
         <b-table striped hover
                  ref="searchTable"
-         table-class="text-nowrap"
+         class="text-nowrap"
          responsive
          no-border-collapse
          bordered
          no-local-sorting
          :sort-by.sync="sortBy"
          :sort-desc.sync="sortDesc"
-         stacked="sm"
          show-empty
          @row-clicked="rowClickHandler"
          :fields="fields"
@@ -35,6 +33,11 @@ Date: 7/3/2021
          <template #empty>
           <h3 class="no-results-overlay" >No results to display</h3>
         </template>
+          <template #cell(name)="data">
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/user-profile-default.png')"
+                   alt="User Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
+            {{createUsername(data.item)}}
+          </template>
         </b-table>
       </b-col>
     </b-row>
@@ -48,11 +51,19 @@ Date: 7/3/2021
   margin-bottom:7em;
   text-align: center;
 }
+
+@media (max-width: 992px) {
+  .text-nowrap {
+    white-space: normal !important;
+  }
+}
+
 </style>
 
 <script>
 import api from "../../Api";
 import pagination from "../model/Pagination";
+import {formatAddress} from "../../util";
 
 export default {
   components: {
@@ -129,7 +140,7 @@ export default {
             case "name":
               sortByParam = "NAME";
               break;
-            case "nickName":
+            case "nickname":
               sortByParam = "NICKNAME";
               break;
 
@@ -159,7 +170,7 @@ export default {
 
     /**
      * The getUserInfoIntoTable function to read the data from the APi response.Date then put a array (item)
-     * The Array hold the an object {name: 'name', nickname: 'nickName', email: 'Email', homeAddress: 'address'}.
+     * The Array hold the an object {name: 'name', nickname: 'nickname', email: 'Email', homeAddress: 'address'}.
      * @returns [{name: 'name', nickname: 'nickName', email: 'Email', homeAddress: 'address'}, .......]
      */
     getUserInfoIntoTable: function (data) {
@@ -167,11 +178,10 @@ export default {
       let tableHeader = {};
       for (const user of data) {
         tableHeader = user;
-        tableHeader.name = `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
         if (this.$currentUser.role !== "user") {
           tableHeader.userType = `${this.getUserRoleString(user)}`;
         }
-        tableHeader.location = `${user.homeAddress.city}, ${user.homeAddress.region}, ${user.homeAddress.country}`
+        tableHeader.location = formatAddress(user.homeAddress, 3);
         items.push(tableHeader);
       }
       return items;
@@ -190,7 +200,21 @@ export default {
         roleLabel = "USER";
       }
       return roleLabel;
-    }
+    },
+
+    /**
+     * @user user information returned from backend
+     * @returns String compiled from the user's first name, middle name - if exists and lastname
+     */
+    createUsername(user){
+      return `${user.firstName} ${user.middleName || ''} ${user.lastName}`;
+    },
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
   },
 
   computed: {
@@ -206,17 +230,13 @@ export default {
       let fields = [
         {
           key: 'name',
-          //label: 'F name',
           sortable: true
         },
         {
-          key: 'nickName',
+          key: 'nickname',
           sortable: true
         },
         {
-          key: 'email',
-          sortable: true
-        },{
           key: 'location',
           sortable: false
         },
@@ -228,7 +248,7 @@ export default {
         });
       }
       return fields;
-    }
+    },
   }
 }
 </script>

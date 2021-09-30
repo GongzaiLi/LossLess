@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +32,9 @@ public class ListingsService {
     private final PurchasedListingRepository purchasedListingRepository;
 
     private final UserService userService;
+
+    private static final String BUSINESSFIELD = "business";
+    private static final String ADDRESSFIELD = "address";
 
     @Autowired
     public ListingsService(ListingRepository listingRepository, InventoryService inventoryService, PurchasedListingRepository purchasedListingRepository, UserService userService) {
@@ -57,7 +60,7 @@ public class ListingsService {
      * @param date Upper inclusive bound for close date
      * @return Returns a Specification that matches all listings with close dates before or equal to the given close date
      */
-    public static Specification<Listing> closesLessThanOrEqualTo(LocalDate date) {
+    public static Specification<Listing> closesLessThanOrEqualTo(LocalDateTime date) {
         return (root, query, builder) -> builder.lessThanOrEqualTo(root.get("closes"), date);
     }
 
@@ -67,7 +70,7 @@ public class ListingsService {
      * @param date Lower inclusive bound for close date
      * @return Returns a Specification that matches all listings with close dates after or equal to the given close date
      */
-    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDate date) {
+    public static Specification<Listing> closesGreaterThanOrEqualTo(LocalDateTime date) {
         return (root, query, builder) -> builder.greaterThanOrEqualTo(root.get("closes"), date);
     }
 
@@ -103,7 +106,7 @@ public class ListingsService {
      */
     public static Specification<Listing> sellerAddressCountryMatches(String country) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("address").get("country")),
+                builder.lower(root.get(BUSINESSFIELD).get(ADDRESSFIELD).get("country")),
                 "%" + country.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -116,7 +119,7 @@ public class ListingsService {
      */
     public static Specification<Listing> sellerAddressCityMatches(String city) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("address").get("city")),
+                builder.lower(root.get(BUSINESSFIELD).get(ADDRESSFIELD).get("city")),
                 "%" + city.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -129,7 +132,7 @@ public class ListingsService {
      */
     public static Specification<Listing> sellerAddressSuburbMatches(String suburb) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("address").get("suburb")),
+                builder.lower(root.get(BUSINESSFIELD).get(ADDRESSFIELD).get("suburb")),
                 "%" + suburb.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -142,7 +145,7 @@ public class ListingsService {
      */
     private Specification<Listing> sellerBusinessNameMatches(String businessName) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("name")),
+                builder.lower(root.get(BUSINESSFIELD).get("name")),
                 "%" + businessName.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -162,7 +165,7 @@ public class ListingsService {
             }
         }
 
-        return (root, query, builder) -> root.get("business").get("businessType").in(businessTypes);
+        return (root, query, builder) -> root.get(BUSINESSFIELD).get("businessType").in(businessTypes);
     }
 
 
@@ -235,8 +238,8 @@ public class ListingsService {
             Optional<String> businessName,
             Optional<List<String>> businessTypes,
             Optional<String> address,
-            Optional<LocalDate> closingDateStart,
-            Optional<LocalDate> closingDateEnd,
+            Optional<LocalDateTime> closingDateStart,
+            Optional<LocalDateTime> closingDateEnd,
             Pageable pageable) {
         Specification<Listing> querySpec = productNameMatches(searchQuery.orElse(""));
 

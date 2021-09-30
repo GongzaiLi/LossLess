@@ -3,11 +3,13 @@ package com.seng302.wasteless.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetBusinessesDto;
 import com.seng302.wasteless.dto.GetSearchBusinessDto;
+import com.seng302.wasteless.dto.PutBusinessDto;
 import com.seng302.wasteless.dto.PutBusinessesAdminDto;
 import com.seng302.wasteless.dto.mapper.GetBusinessesDtoMapper;
 import com.seng302.wasteless.model.*;
 import com.seng302.wasteless.service.AddressService;
 import com.seng302.wasteless.service.BusinessService;
+import com.seng302.wasteless.service.NotificationService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.BusinessViews;
 import net.minidev.json.JSONObject;
@@ -17,17 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * BusinessController is used for mapping all Restful API requests related directly to businesses
@@ -39,12 +37,14 @@ public class BusinessController {
     private final BusinessService businessService;
     private final UserService userService;
     private final AddressService addressService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService) {
+    public BusinessController(BusinessService businessService, AddressService addressService, UserService userService, NotificationService notificationService) {
         this.addressService = addressService;
         this.businessService = businessService;
         this.userService = userService;
+        this.notificationService = notificationService;
 
     }
 
@@ -254,27 +254,45 @@ public class BusinessController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
     /**
-     * Returns a json object of bad field found in the request
+     * Handle put request modify business
+     * Validates inputted data using same validation as creating a business.
      *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
+     * Returns 200 on success
+     * Returns 400 if invalid modifications
+     * Returns 401 if unauthorised, handled by spring security
+     * Returns 403 if forbidden, user tried to make request to a business they are not admin of or is not a DGAA/GAA
+     *
+     * @param modifiedBusinessDTO Dto containing information needed to update a user
+     * @param businessId ID of the business to be modified
+     * @return Response code with message, see above for codes
      */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException exception) {
-        Map<String, String> errors;
-        errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-//            logger.error(errorMessage); it doesnt work I am not sure why
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
+    @PutMapping("/businesses/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> modifyBusiness(@Valid @RequestBody PutBusinessDto modifiedBusinessDTO, @PathVariable("id") Integer businessId) {
+
+        User loggedInUser = userService.getCurrentlyLoggedInUser();
+
+        Business businessToModify = businessService.findBusinessById(businessId);
+        businessService.checkUserAdminOfBusinessOrGAA(businessToModify, loggedInUser);
+
+        if (!businessToModify.getAddress().equals(modifiedBusinessDTO.getAddress())) {
+            logger.debug("Creating new Address Entity for business with ID {}", businessToModify.getId());
+            addressService.createAddress(modifiedBusinessDTO.getAddress());
+            if (!modifiedBusinessDTO.getAddress().getCountry().equals(businessToModify.getAddress().getCountry())) {
+                for (User admin : businessToModify.getAdministrators()) {
+                    Notification notification = NotificationService.createNotification(admin.getId(), businessToModify.getId(), NotificationType.BUSINESS_CURRENCY_CHANGE,
+                            String.format("This business's country has changed from %s to %s so the currency of all your products may have changed.",
+                                    businessToModify.getAddress().getCountry(), modifiedBusinessDTO.getAddress().getCountry()));
+                    notificationService.saveNotification(notification);
+                }
+            }
+        }
+        businessToModify.setAddress(modifiedBusinessDTO.getAddress());
+
+        logger.debug("Updating business: {}", modifiedBusinessDTO.getName());
+        businessService.updateBusinessDetails(businessToModify, modifiedBusinessDTO);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
 }

@@ -65,7 +65,7 @@ public class GetUserDtoMapper {
                     .setFirstName(user.getFirstName())
                     .setLastName(user.getLastName())
                     .setMiddleName(user.getMiddleName())
-                    .setNickName(user.getNickname())
+                    .setNickname(user.getNickname())
                     .setBio(user.getBio())
                     .setEmail(user.getEmail())
                     .setDateOfBirth(user.getDateOfBirth().toString())
@@ -73,19 +73,21 @@ public class GetUserDtoMapper {
                     .setHomeAddress(address)
                     .setCreated(user.getCreated().toString())
                     .setRole(user.getRole())
-                    .setBusinessesAdministered(businessesAdministered);
+                    .setBusinessesAdministered(businessesAdministered)
+                    .setProfileImage(user.getProfileImage());
         } else {
             return new GetUserDto()
                     .setId(user.getId())
                     .setFirstName(user.getFirstName())
                     .setLastName(user.getLastName())
                     .setMiddleName(user.getMiddleName())
-                    .setNickName(user.getNickname())
+                    .setNickname(user.getNickname())
                     .setBio(user.getBio())
                     .setEmail(user.getEmail())
                     .setHomeAddress(address)
                     .setCreated(user.getCreated().toString())
-                    .setBusinessesAdministered(businessesAdministered);
+                    .setBusinessesAdministered(businessesAdministered)
+                    .setProfileImage(user.getProfileImage());
         }
     }
 }

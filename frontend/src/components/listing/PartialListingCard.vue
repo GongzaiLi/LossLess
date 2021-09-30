@@ -14,8 +14,8 @@
     </div>
     <hr>
     <h5><strong>Seller: {{ listing.business.name }}</strong></h5>
-    <span>Location: {{ listing.business.address.city }}, {{ listing.business.address.country }}</span><br>
-    <span>Closes: {{ listing.closes }}</span>
+    <span>Location: {{getAddress}}</span><br>
+    <span>Closes: {{ getCloses }}</span>
     <template #footer>
       <h5 class="listing_price" v-if="currency">
         {{ currency.symbol }}{{ listing.price }} {{ currency.code }}
@@ -43,6 +43,7 @@
 
 <script>
 import Api from "../../Api";
+import {formatAddress, formatDateTime} from "../../util";
 
 export default {
   name: "PartialListingCard",
@@ -73,6 +74,22 @@ export default {
      */
     async setCurrency() {
       this.currency = await Api.getUserCurrency(this.listing.business.address.country);
+    }
+  },
+
+  computed: {
+    /**
+     * Formats the address using util function and appropriate privacy level.
+     *
+     *
+     * @return address formatted
+     */
+    getAddress: function () {
+      return formatAddress(this.listing.business.address, 4);
+    },
+
+    getCloses: function () {
+      return formatDateTime(this.listing.closes)
     }
   },
 

@@ -9,6 +9,10 @@ import VueRouter from 'vue-router';
 //     id: 0
 //   }
 // };
+
+jest.mock("../../../public/user-profile-default.png", () => {
+}) // mock image
+
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 const $log = {
   debug: jest.fn(),
@@ -80,17 +84,17 @@ describe('fullname-computed', () => {
     wrapper.vm.userData.firstName = "First";
     wrapper.vm.userData.lastName = "Last";
     wrapper.vm.userData.middleName = "Middle";
-    wrapper.vm.userData.nickName = "Nick";
+
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Middle Last (Nick)");
+    expect(wrapper.vm.fullName).toEqual("First Middle Last");
   });
 
   test('first-and-last-and-nick-name', async () => {
     wrapper.vm.userData.firstName = "First";
     wrapper.vm.userData.lastName = "Last";
-    wrapper.vm.userData.nickName = "Nick";
+
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.fullName).toEqual("First Last (Nick)");
+    expect(wrapper.vm.fullName).toEqual("First Last");
   });
 })
 
@@ -155,21 +159,21 @@ describe('User Role', () => {
     wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.showUserRole).toBe(true);
+    expect(wrapper.vm.currentUserAdmin).toBe(true);
   });
 
   test('displays-if-current-user-is-dgaa', async () => {
     wrapper.vm.$currentUser.role = 'globalApplicationAdmin';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.showUserRole).toBe(true);
+    expect(wrapper.vm.currentUserAdmin).toBe(true);
   });
 
   test('doesnt-display-if-current-user-is-user', async () => {
     wrapper.vm.$currentUser.role = 'user';
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.showUserRole).toBe(false);
+    expect(wrapper.vm.currentUserAdmin).toBe(false);
   });
 })
 

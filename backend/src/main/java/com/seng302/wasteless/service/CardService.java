@@ -2,6 +2,7 @@ package com.seng302.wasteless.service;
 
 import com.seng302.wasteless.model.Card;
 import com.seng302.wasteless.model.CardSections;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.repository.CardRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -125,6 +127,28 @@ public class CardService {
         }
         logger.warn("Section '{}' is not a valid section", section);
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The section specified is not one of 'ForSale', 'Wanted', or 'Exchange'");
+    }
+
+    /**
+     * Checks whether a card is allowed to be extended.
+     * Card must with 48 hours of expiring or after expiry.
+     *
+     * @param card  The card to check
+     * @return      True if card allowed to be extended, false otherwise
+     */
+    public boolean checkCardWithinExtendDateRange(Card card) {
+        return LocalDateTime.now().plusHours(48).isAfter(card.getDisplayPeriodEnd());
+    }
+
+    /**
+     * Checks user is either cards creator or is global admin
+     *
+     * @param card  The card to check permission for
+     * @param user  the user to check permission for
+     * @return  True if allowed, false otherwise
+     */
+    public boolean checkUserHasPermissionForCard(Card card, User user) {
+        return card.getCreator().getId().equals(user.getId()) || user.checkUserGlobalAdmin();
     }
 }
 

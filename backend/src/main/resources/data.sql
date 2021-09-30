@@ -7,7 +7,7 @@ VALUES ('Willy', 'Wonka', 'Chocolate', 'Chocolate Man', 'The Lord of Chocolate',
         '2019-12-03', '(946) 570-2232', 1, '$2a$10$sE1aW/VTng8e71r.oaTzw.3hZtOpVymFcbqsnxmb22BlOsbHfbTjC', 0);
 
 INSERT INTO Business(business_type, created, description, name, address, primary_administrator)
-VALUES (2, '2015-03-22', 'We make the best chocolate in the world', 'Wonka Chocolate', 1, 1);
+VALUES (2, '2018-01-01', 'We make the best chocolate in the world', 'Wonka Chocolate', 1, 1);
 
 INSERT INTO Business_administrators(administrators_id, business_id)
 VALUES (1, 1);
@@ -29,6 +29,12 @@ VALUES (1, '2017-08-08', 'An exploding candy', 'The Chocolate Factory', 'Explodi
 INSERT INTO Product(business_id, created, description, manufacturer, name, recommended_retail_price, code)
 VALUES (1, '2017-08-08', 'A treat that never ends', 'The Chocolate Factory', 'Ever-Lasting Gobstopper', 8.99,
         '1-WONKA-ELG');
+INSERT INTO Product(business_id, created, description, manufacturer, name, recommended_retail_price, code)
+VALUES (1, '2017-08-08', 'NO SUGAR?!?!?!', 'The Chocolate Factory', 'Black Water No Sugar', 8.99,
+        '1-WONKA-BLACK-WATER');
+INSERT INTO Product(business_id, created, description, manufacturer, name, recommended_retail_price, code)
+VALUES (1, '2017-08-08', 'Easter Egg', 'The Chocolate Factory', 'Easter Egg', 8.99,
+        '1-WONKA-EGG');
 
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)

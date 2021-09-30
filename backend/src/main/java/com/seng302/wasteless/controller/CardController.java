@@ -18,16 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -166,7 +162,7 @@ public class CardController {
      */
     @GetMapping("/cards/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> createUser(@PathVariable("id") Integer cardId) {
+    public ResponseEntity<Object> getCard(@PathVariable("id") Integer cardId) {
         logger.info("Request to get card with id: {}", cardId);
 
         userService.getCurrentlyLoggedInUser();
@@ -181,25 +177,6 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.OK).body(cardDTO);
     }
 
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException exception) {
-        Map<String, String> errors;
-        errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
     /**
      * Handle delete request to /cards endpoint for deletion of card.
      * Request are validated for create fields by Spring, if bad then returns 400 with map of errors
@@ -222,7 +199,7 @@ public class CardController {
 
         Card card = cardService.findCardById(id);
 
-        if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
+        if (!cardService.checkUserHasPermissionForCard(card, user)) {
             logger.warn("Cannot delete card. User: {} does not own this card and is not global admin", user);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
         }
@@ -240,7 +217,7 @@ public class CardController {
      * 400 BAD_REQUEST If invalid id, id is not an integer
      * 401 UNAUTHORIZED If no user is logged on.
      * 403 FORBIDDEN If user does not own the card and is not a GAA
-     * 406 NOT_ACCEPTABLE If the card doesn't exist
+     * 406 NOT_ACCEPTABLE If the card doesn't exist, or too far from closing date
      * 200 If successfully extended card.
      *
      * @param id The unique id of the card to be extended.
@@ -254,14 +231,20 @@ public class CardController {
 
         Card card = cardService.findCardById(id);
 
-        if (!card.getCreator().getId().equals(user.getId()) && !user.checkUserGlobalAdmin()) {
+        if (!cardService.checkUserHasPermissionForCard(card, user)) {
             logger.warn("Cannot extend card. User: {} does not own this card and is not global admin", user);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You do not own this card");
         }
-        logger.info("User: {} validated as owner of card or global admin.", user);
+        logger.info("User: {} validated as owner of card or global admin.", user.getId());
+
+        if (!cardService.checkCardWithinExtendDateRange(card)) {
+            logger.warn("Cannot extend card {} as it is not close enough to closing", card.getId());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("This card is too far from closing date");
+        }
 
         card.setDisplayPeriodEnd(LocalDateTime.now().plusSeconds(maxDisplayPeriodSeconds));
-        logger.info("User: {} Extended card: {} by two weeks.", user, card);
+        card.setCreated(LocalDateTime.now());
+        logger.info("User: {} Extended card: {} by two weeks.", user.getId(), card);
 
         cardService.createCard(card);
         return ResponseEntity.status(HttpStatus.OK).body("End of display period successfully extended by two weeks");

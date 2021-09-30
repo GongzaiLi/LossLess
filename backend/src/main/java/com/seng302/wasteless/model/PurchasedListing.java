@@ -9,15 +9,16 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data // generate setters and getters for all fields (lombok pre-processor)
 @NoArgsConstructor // generate a no-args constructor needed by JPA (lombok pre-processor)
-@Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
 @Accessors(chain = true) //Allows chaining of getters and setters
+@Entity // declare this class as a JPA entity (that can be mapped to a SQL table)
+@Table(indexes = @Index(name="purchasedListingBusinessAndSaleDate", columnList = "business, saleDate"))
 public class PurchasedListing {
 
     @Id // this field (attribute) is the table primary key
@@ -38,26 +39,25 @@ public class PurchasedListing {
 
 
     @NotNull
-    @JoinColumn(name = "sale_date")
+    @Column(name = "saleDate")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private LocalDate saleDate;
 
     @PositiveOrZero
-    @JoinColumn(name = "number_of_likes", columnDefinition = "integer default 0")
+    @Column(name = "numberOfLikes", columnDefinition = "integer default 0")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Integer numberOfLikes;
 
 
     @NotNull
-    @JoinColumn(name = "listing_date")
+    @Column(name = "listingDate")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private LocalDate listingDate;
 
     @NotNull
-    @FutureOrPresent
-    @JoinColumn(name = "closing_date")
+    @Column(name = "closingDate")
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
-    private LocalDate closingDate;
+    private LocalDateTime closingDate;
 
 
     @NotNull
@@ -79,6 +79,11 @@ public class PurchasedListing {
     @JsonView(PurchasedListingView.GetPurchasedListingView.class)
     private Double price;
 
+    @NotNull
+    @Column(name = "manufacturer")
+    @JsonView(PurchasedListingView.GetPurchasedListingView.class)
+    private String manufacturer;
+
     /**
      * Creates a new Purchased Listing record from a Listing that was purchased
      * and the User that purchased it.
@@ -96,6 +101,7 @@ public class PurchasedListing {
         setQuantity(listing.getQuantity());
         setPrice(listing.getPrice());
         setNumberOfLikes(listing.getUsersLiked());
+        setManufacturer(listing.getInventoryItem().getProduct().getManufacturer());
     }
 }
 

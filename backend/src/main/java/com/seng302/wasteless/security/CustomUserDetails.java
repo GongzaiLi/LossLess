@@ -14,24 +14,38 @@ import java.util.Collections;
  */
 public class CustomUserDetails implements UserDetails {
 
-    private User user;
+    private String email;
+    private String password;
+    private String role;
+    private Integer id;
 
     public CustomUserDetails(User user) {
-        this.user = user;
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.role = user.getRole().toString();
+        this.id = user.getId();
     }
 
     @Override
-    public String getUsername() {
-        return user.getEmail();
-    }
+    public String getUsername() { return this.email; }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return this.password;
+    }
+
+    /**
+     * Sets the 'username' of the currently logged in CustomUserDetails object.
+     * In this case the username of a user is just their email.
+     * This method comes in handy when the user changes their email and wants to stay logged in.
+     * @param email The email that the username/email shall be set to
+     */
+    public void setUsername(String email) {
+        this.email = email;
     }
 
     public Integer getId() {
-        return user.getId();
+        return this.id;
     }
 
     @Override
@@ -56,7 +70,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority userAuthority = new SimpleGrantedAuthority(user.getRole().toString());
+        SimpleGrantedAuthority userAuthority = new SimpleGrantedAuthority(this.role);
         return Collections.singletonList(userAuthority);
     }
 

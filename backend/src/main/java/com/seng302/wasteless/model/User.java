@@ -1,6 +1,7 @@
 package com.seng302.wasteless.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.seng302.wasteless.view.MessageViews;
 import com.seng302.wasteless.view.PurchasedListingView;
 import com.seng302.wasteless.view.UserViews;
 import lombok.Data;
@@ -32,23 +33,23 @@ public class User {
 
     @Id // this field (attribute) is the table primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement the ID
-    @JsonView({PurchasedListingView.GetPurchasedListingView.class})
+    @JsonView({PurchasedListingView.GetPurchasedListingView.class, MessageViews.GetMessageView.class})
     private Integer id;
 
     @Column(name = "first_name") // map camelcase name (java) to snake case (SQL)
     @NotBlank(message = "firstName is mandatory")
-    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class, MessageViews.GetMessageView.class})
     @Size(min = 0, max = 50)
     private String firstName;
 
     @NotBlank(message = "lastName is mandatory")
     @Column(name = "last_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class, MessageViews.GetMessageView.class})
     @Size(min = 0, max = 50)
     private String lastName;
 
     @Column(name = "middle_name") // map camelcase name (java) to snake case (SQL)
-    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class})
+    @JsonView({UserViews.PostUserRequestView.class, PurchasedListingView.GetPurchasedListingView.class, MessageViews.GetMessageView.class})
     @Size(min = 0, max = 50)
     private String middleName;
 
@@ -90,7 +91,7 @@ public class User {
     @NotBlank(message = "password is mandatory")
     @JsonView({UserViews.PostUserRequestView.class})
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
-    @Size(min = 0, max = 100)
+    @Size(min = 8, max = 100)
     private String password;
 
     @Column(name = "businesses_primarily_administered")
@@ -110,6 +111,12 @@ public class User {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Listing> listingsLiked;
+
+    @JoinColumn(name = "profile_image")
+    @OneToOne
+    @JsonView({MessageViews.GetMessageView.class})
+    private Image profileImage;
+
 
     /**
      * Check this objects date is within the expected maximum and minimum date ranges

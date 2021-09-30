@@ -1,5 +1,5 @@
 <template>
-  <b-card class="shadow" style="max-width: 85%">
+  <b-card class="shadow">
     <h1><b-icon-search/> Search </h1>
     <b-tabs v-model=activeTabIndex align="center" fill style="padding-top: 16px">
     <b-tab title="User" :title-item-class="'tab-title-class'">

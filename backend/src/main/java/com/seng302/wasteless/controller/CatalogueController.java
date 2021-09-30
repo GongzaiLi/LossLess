@@ -3,9 +3,13 @@ package com.seng302.wasteless.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.seng302.wasteless.dto.GetProductDTO;
-import com.seng302.wasteless.model.*;
+import com.seng302.wasteless.model.Business;
+import com.seng302.wasteless.model.GetProductSortTypes;
+import com.seng302.wasteless.model.Product;
+import com.seng302.wasteless.model.User;
 import com.seng302.wasteless.service.BusinessService;
 import com.seng302.wasteless.service.ProductService;
+import com.seng302.wasteless.service.PurchasedListingService;
 import com.seng302.wasteless.service.UserService;
 import com.seng302.wasteless.view.ProductViews;
 import net.minidev.json.JSONObject;
@@ -14,17 +18,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * ProductController is used for mapping all Restful API requests starting with the address
@@ -38,12 +38,14 @@ public class CatalogueController {
     private final BusinessService businessService;
     private final UserService userService;
     private final ProductService productService;
+    private final PurchasedListingService purchasedListingService;
 
     @Autowired
-    public CatalogueController(BusinessService businessService, UserService userService, ProductService productService) {
+    public CatalogueController(BusinessService businessService, UserService userService, ProductService productService, PurchasedListingService purchasedListingService) {
         this.businessService = businessService;
         this.userService = userService;
         this.productService = productService;
+        this.purchasedListingService = purchasedListingService;
 
     }
     /**
@@ -51,11 +53,12 @@ public class CatalogueController {
      *
      * @param businessId      the id of the business that is creating the product
      * @param possibleProduct the product that is trying to be added to the catalogue
+     * @param generateSalesData optional boolean, if true will create and save fake purchase history (used by data gen)
      * @return Http Response:  200 if created, 400 for a bad request, 401 if unauthorised or 403 if forbidden
      */
     @PostMapping("/businesses/{id}/products")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct) {
+    public ResponseEntity<Object> createBusinessProduct(@PathVariable("id") Integer businessId, @Valid @RequestBody @JsonView(ProductViews.PostProductRequestView.class) Product possibleProduct, @RequestParam Optional<Boolean> generateSalesData) {
 
         logger.debug("Request to Create product: {} for business ID: {}", possibleProduct, businessId);
 
@@ -94,6 +97,11 @@ public class CatalogueController {
         responseBody.put("productId", possibleProduct.getId());
 
         logger.info("Successfully created Product Entity");
+
+        if (generateSalesData.isPresent() && Boolean.TRUE.equals(generateSalesData.get())) {
+            purchasedListingService.generatePurchasesForProduct(possibleProduct, user, possibleBusiness);
+            businessService.saveBusinessChanges(possibleBusiness);
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
     }
 
@@ -216,46 +224,5 @@ public class CatalogueController {
 
         logger.info("Successfully updated old product with data: {}", oldProduct);
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException exception) {
-        Map<String, String> errors;
-        errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            logger.warn("Validation exceptions: field name '{}', error message '{}'", errorMessage, fieldName);
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public Map<String, String> handleValidationExceptions(
-            ConstraintViolationException exception) {
-
-        Map<String, String> errors = new HashMap<>();
-
-        String constraintName = exception.getConstraintViolations().toString();
-        String errorMsg = exception.getMessage();
-
-        logger.warn("Validation exceptions: field name '{}', constraint name '{}'", errorMsg, constraintName);
-        errors.put(constraintName, errorMsg);
-        return errors;
     }
 }

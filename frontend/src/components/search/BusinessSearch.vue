@@ -24,14 +24,13 @@ Page that stores table and search bar to search for businesses
       <b-col cols="12">
         <b-table striped hover
                  ref="searchTable"
-                 table-class="text-nowrap"
+                 class="text-nowrap"
                  :responsive="true"
                  no-border-collapse
                  bordered
                  no-local-sorting
                  :sort-by.sync="sortBy"
                  :sort-desc.sync="sortDesc"
-                 stacked="sm"
                  show-empty
                  :fields="fields"
                  :per-page="perPage"
@@ -40,6 +39,11 @@ Page that stores table and search bar to search for businesses
                  :current-page="currentPage">
           <template #empty>
             <h3 class="no-results-overlay" >No results to display</h3>
+          </template>
+          <template #cell(name)="data">
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/business-profile-default.jpeg')"
+                   alt="Business Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
+            {{formatName(data.item.name)}}
           </template>
         </b-table>
       </b-col>
@@ -54,11 +58,18 @@ Page that stores table and search bar to search for businesses
   margin-bottom:7em;
   text-align: center;
 }
+
+@media (max-width: 992px) {
+  .text-nowrap {
+    white-space: normal !important;
+  }
+}
 </style>
 
 <script>
 import pagination from "../model/Pagination";
 import api from "../../Api";
+import {formatAddress} from "../../util";
 
 export default {
   components: {
@@ -118,14 +129,13 @@ export default {
     },
 
     /**
-     * Formats the address to show the suburb if one exists, followed by the city and the country
-     * which will always exist. These are combined into a string separeted by commas.
+     * Formats the address using util function and appropriate privacy level.
      *
-     * @param address
-     * @return formattedAddress
+     * @param address The address object.
+     * @return address formatted
      */
-    formatAddress: function (address) {
-      return `${address.suburb ? address.suburb + ', ' : ''}${address.city}, ${address.country}`;
+    getAddress: function (address) {
+      return formatAddress(address, 3);
     },
 
     /**
@@ -185,6 +195,12 @@ export default {
       this.$router.push({path: `/businesses/${data.id}?fromSearch=true`});
     },
 
+    /**
+     * Returns the URL required to get the image given the filename
+     */
+    getURL(imageFileName) {
+      return api.getImage(imageFileName);
+    },
   },
 
   computed: {
@@ -201,7 +217,6 @@ export default {
         {
           key: 'name',
           sortable: true,
-          formatter: 'formatName'
         },
         {
           key: 'description',
@@ -215,7 +230,7 @@ export default {
           key: 'address',
           label: 'Location',
           sortable: false,
-          formatter: "formatAddress"
+          formatter: "getAddress"
         }]
     }
   }

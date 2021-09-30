@@ -63,29 +63,10 @@ afterEach(() => {
     wrapper.destroy();
 });
 
-describe ("format-address", () => {
-    it('normal address, no nulls',  async() => {
-
-        expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch (Upper Riccarton)");
-    })
-    it('null suburb',  async() => {
-        cardInfo.creator.homeAddress = {
-            streetNumber: "3/24",
-            streetName: "Ilam Road",
-            suburb: null,
-            city: "Christchurch",
-            region: "Canterbury",
-            country: "New Zealand",
-            postcode: "90210"
-        }
-        expect(wrapper.vm.formatAddress).toStrictEqual("Christchurch");
-    })
-})
-
 describe ("format-expiry-date", () => {
     it('check-format-expiry-date',  async() => {
         cardInfo.displayPeriodEnd = "2021-07-21";
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.formatExpiry).toStrictEqual("Wed Jul 21 2021")
+        expect(wrapper.vm.formatExpiry).toStrictEqual("21 July 2021")
     })
 })

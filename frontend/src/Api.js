@@ -29,6 +29,7 @@
  * Declare all available services here
  */
 import axios from 'axios'
+import {formatDate} from "./util";
 
 const SERVER_URL = process.env.VUE_APP_SERVER_ADD;
 
@@ -49,6 +50,7 @@ export default {
   getBusiness: (id) => instance.get(`/businesses/${id}`, {withCredentials: true}),
   getProducts: (id, count, offset, sortBy = "ID", sortDirection = "ASC", searchQuery = "") => instance.get(`/businesses/${id}/products?count=${count}&offset=${offset}&sortBy=${sortBy}&sortDirection=${sortDirection}&searchQuery=${searchQuery}`, {withCredentials: true}),
   postBusiness: (businessData) => instance.post('/businesses', businessData, {withCredentials: true}),
+  modifyBusiness: (editBusinessData, businessId) => instance.put(`/businesses/${businessId}`, editBusinessData, {withCredentials: true}),
   makeBusinessAdmin: (id, makeAdminData) => instance.put(`/businesses/${id}/makeAdministrator`, makeAdminData, {withCredentials: true}),
   revokeBusinessAdmin: (id, revokeAdminData) => instance.put(`/businesses/${id}/removeAdministrator`, revokeAdminData, {withCredentials: true}),
   createProduct: (id, productData) => instance.post(`/businesses/${id}/products`, productData, {withCredentials: true}),
@@ -80,7 +82,9 @@ export default {
   getFullCard: (cardId) => instance.get(`/cards/${cardId}`, {withCredentials: true}),
   deleteCard: (cardId) => instance.delete(`/cards/${cardId}`, {withCredentials: true}),
   getExpiredCards: (id) => instance.get(`/cards/${id}/expiring`, {withCredentials: true}),
-  getNotifications: () => instance.get(`/users/notifications`, {withCredentials: true}),
+  getNotifications: (tags, archived=false) => instance.get(`/users/notifications?archived=${archived}${tags != null ? `&tags=${tags}`: ''}`, {withCredentials: true}),
+  patchNotification: (id, data) => instance.patch(`/notifications/${id}`, data, {withCredentials: true}),
+  deleteNotification: (id) => instance.delete(`/notifications/${id}`, {withCredentials: true}),
   clearHasCardsExpired: (userId) => instance.put(`/users/${userId}/clearHasCardsExpired`, null, {withCredentials: true}),
   extendCardExpiry: (id) => instance.put(`/cards/${id}/extenddisplayperiod`, {}, {withCredentials: true}),
   searchBusiness: (searchParameter, type = "", size = 10, page = 0, sortBy = "name", sortDirection = "ASC") => instance.get(`businesses/search?searchQuery=${searchParameter}&size=${size}&page=${page}&sort=${sortBy},${sortDirection}&type=${type}`, {withCredentials: true}),
@@ -112,6 +116,54 @@ export default {
       })
   },
   likeListing: (listingId) => instance.put(`/listings/${listingId}/like`, {}, {withCredentials: true}),
+  modifyUser: (editUserData, userId) => instance.put(`/users/${userId}`, editUserData, {withCredentials: true}),
+  deleteUserProfileImage: (userId) => instance.delete(`/users/${userId}/image`, {withCredentials: true}),
+  getSalesReport: (businessId, startDate, endDate, period) => instance.get(`/businesses/${businessId}/salesReport/totalPurchases`,
+    {
+      withCredentials: true,
+      params: {
+        startDate: startDate,
+        endDate: endDate,
+        period: period
+      }
+    }),
+
+  getProductsReport: (businessId, startDate, endDate, sortBy, order) => instance.get(`/businesses/${businessId}/salesReport/productsPurchasedTotals`,
+      {
+        withCredentials: true,
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          sortBy: sortBy,
+          order: order,
+          size: 100000 // For some reason pagination defaults to a size of 20, but we want all results
+        }
+      }),
+
+  getManufacturersReport: (businessId, startDate, endDate, sortBy, order) => instance.get(`/businesses/${businessId}/salesReport/manufacturersPurchasedTotals`,
+      {
+        withCredentials: true,
+        params: {
+          startDate: startDate,
+          endDate: endDate,
+          sortBy: sortBy,
+          order: order,
+          size: 100000
+        }
+      }),
+
+  getListingDurations: (businessId, granularity, startDate, endDate) => instance.get(`/businesses/${businessId}/salesReport/listingDurations`,
+    {
+      withCredentials: true,
+      params: {
+        granularity,
+        startDate: formatDate(startDate),
+        endDate: formatDate(endDate),
+      }
+    }),
+  postMessage: (message) => instance.post(`/messages`, message,{withCredentials: true}),
+  getMessages: (cardId) => instance.get(`/messages/${cardId}`, {withCredentials: true}),
+
 
   /**
    * Uploads one image file to a product. Will send a POST request to the product images
@@ -126,6 +178,37 @@ export default {
     formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
     return instance.post(`/businesses/${businessId}/products/${productId}/images`, formData, {withCredentials: true});
   },
+
+  /**
+   * Uploads one image file to a user's Profile. Will send a POST request to the user image
+   * endpoint. Each image is sent as multipart/form-data with the param name "file".
+   * @param userId Id of the user
+   * @param imageFile Image file object to be uploaded.
+   */
+  uploadProfileImage: (userId, imageFile) => {
+    // See https://github.com/axios/axios/issues/710 for how this works
+    let formData = new FormData();
+    formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+    return instance.post(`/users/${userId}/image`, formData, {withCredentials: true});
+  },
+
+  /**
+   * Uploads one image file to a business's Profile. Will send a POST request to the business image
+   * endpoint. Each image is sent as multipart/form-data with the param name "file".
+   * @param businessId Id of the business
+   * @param imageFile Image file object to be uploaded.
+   */
+  uploadBusinessProfileImage: (businessId, imageFile) => {
+    // See https://github.com/axios/axios/issues/710 for how this works
+    let formData = new FormData();
+    formData.append("filename", new Blob([imageFile], {type: `${imageFile.type}`}));
+    return instance.post(`/businesses/${businessId}/image`, formData, {withCredentials: true});
+  },
+
+  deleteBusinessProfileImage: (businessId) => instance.delete(`/businesses/${businessId}/image`, {withCredentials: true}),
+
+
+  getSalesReportCsv: (businessId) => instance.get(`/businesses/${businessId}/salesReport/csv`, {withCredentials: true, responseType: 'blob' }),
 
   /**
    * Given the name of the user's country, gets currency data for that country.
@@ -146,7 +229,7 @@ export default {
       name: 'United States Dollar'
     };
 
-    return fetch(`https://restcountries.eu/rest/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
+    return fetch(`https://restcountries.com/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 404 || !data[0].currencies || data[0].currencies.length === 0) {

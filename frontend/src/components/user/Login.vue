@@ -8,7 +8,8 @@ Date: 3/3/2021
     <b-row class="justify-content-md-center">
       <b-col md="8" xl="6">
         <b-card class="shadow">
-        <h2>Login to Wasteless</h2>
+        <h2><img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"> Login to LossLess</h2>
+          <hr>
           <b-form @submit="login">
             <b-form-group>
               <strong>Email</strong>
@@ -20,19 +21,7 @@ Date: 3/3/2021
 
             <b-form-group>
               <strong>Password</strong>
-              <div class="input-group mb-2 mr-sm-2">
-                <b-form-input v-bind:type="passwordType" required
-                              v-model=password
-                              class="form-control"
-                              autocomplete="off"/>
-                <div class="input-group-prepend">
-                  <div class="input-group-text" @click="showPassword">
-                    <b-icon-eye-fill v-if="!visiblePassword"/>
-                    <b-icon-eye-slash-fill v-if="visiblePassword"/>
-                  </div>
-                </div>
-              </div>
-
+              <password-input v-model=password :min-password-length="0" id="loginPassword" :is-required="true" place-holder=""/>
             </b-form-group>
             <b-form-group
             >
@@ -56,9 +45,11 @@ Date: 3/3/2021
 
 <script>
 import api from "../../Api";
+import PasswordInput from "../model/PasswordInput";
 
 
 export default {
+  components: {PasswordInput},
   data: function () {
     return {
       errors: [],
