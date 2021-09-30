@@ -132,7 +132,7 @@ label{
 
 <script>
 import Api from "../../Api";
-import {formatAddress, getMonthName} from "../../util";
+import {formatAddress} from "../../util";
 import Messages from "../../components/model/Messages"
 
 export default {
@@ -246,22 +246,16 @@ export default {
      * format Expiry date
      */
     formatExpiry: function () {
-      const expiryDate =  new Date(this.fullCard.displayPeriodEnd)
-      return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear()
-          + ', ' + expiryDate.toString().split(" ").slice(4,5).join(' ');
-      // let endDate = new Date(this.fullCard.displayPeriodEnd);
-      // return endDate.toTimeString().split(":").slice(0, 2).join(":") + " " + endDate.toDateString();
+      let endDate = new Date(this.fullCard.displayPeriodEnd);
+      return endDate.toTimeString().split(":").slice(0, 2).join(":") + " " + endDate.toDateString();
     },
 
     /**
      * format Created date
      */
     formatCreated: function () {
-      const expiryDate =  new Date(this.fullCard.created)
-      return expiryDate.getDate() + " " + getMonthName(expiryDate.getMonth()) + " " + expiryDate.getFullYear()
-          + ', ' + expiryDate.toString().split(" ").slice(4,5).join(' ');
-      // let createdDate = new Date(this.fullCard.created);
-      // return createdDate.toTimeString().split(":").slice(0, 2).join(":") + " " + createdDate.toDateString();
+      let createdDate = new Date(this.fullCard.created);
+      return createdDate.toTimeString().split(":").slice(0, 2).join(":") + " " + createdDate.toDateString();
     },
 
     /**
