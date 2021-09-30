@@ -1,27 +1,36 @@
 <template>
   <div>
+    <hr>
     <b-row no-gutters>
       <b-button v-if="!refreshingMessages" variant="primary" @click="refreshMessages" title="Refresh Messages" style="margin-bottom: 5px">
-        <b-icon-arrow-counterclockwise/> Refresh Messages
+        <b-icon-arrow-counterclockwise/> Refresh
       </b-button>
       <b-button v-else variant="primary"  title="Refreshing Messages" style="margin-bottom: 5px">
         <b-icon-arrow-counterclockwise animation="spin-reverse"/> Refreshing...
       </b-button>
+      <h3 class="ml-lg-3">Card Messages</h3>
     </b-row>
-    <b-row no-gutters>
+    <b-row no-gutters v-if="!displayNoMessagesDiv">
       <b-col lg="3" sm="12" v-if="isCardCreator">
         <b-list-group class="chat-list">
           <b-list-group-item class="chat-head" v-for="conversation in conversations" :key=conversation.id :active="otherUserId===conversation.otherUser.id"
                              @click="clickedChatHead($event, conversation.otherUser.id)">
-            <b-img class="rounded-circle avatar" width="30" height="30" :alt="conversation.otherUser.profileImage"
-                   :src="require('../../../public/profile-default.jpg')"/>
+            <b-img class="rounded-circle avatar" width="30" height="30" :alt="`${conversation.otherUser.firstName}'s profile picture`"
+                   :src="getUserThumbnailUrl(conversation.otherUser)"/>
             {{ conversation.otherUser.firstName }}
           </b-list-group-item>
         </b-list-group>
       </b-col>
       <b-col :lg="isCardCreator?9:12" :key="timesMessagesUpdates">
         <div class="message-box" ref="container">
-          <b-card v-for="message in current_displayed_messages" :key="message.id" class="message-card">
+          <div v-if="displaySendMessageHelp" class="h-100 d-flex align-items-center justify-content-center">
+            <h5 class="my-auto font-weight-light">Send a message to the card creator to let them know you're interested!</h5>
+          </div>
+          <b-card v-for="message in currentConversation.messages" :key="message.id" class="message-card">
+            <b-img class="rounded-circle avatar" :class="message.senderId === currentUserId ? 'profile-bubble-right': 'profile-bubble-left'" width="30" height="30" 
+                  :alt="`${getUserObject(message.senderId).firstName}'s profile picture`"
+                  :src="getUserThumbnailUrl(getUserObject(message.senderId))"
+              />
             <b-card-text :class="message.senderId === currentUserId ? 'speech-bubble-right': 'speech-bubble-left'">
               {{ message.messageText }}
             </b-card-text>
@@ -51,6 +60,11 @@
         </b-form>
       </b-col>
     </b-row>
+    <b-row v-if="displayNoMessagesDiv">
+      <b-col cols="12" class="d-flex justify-content-center">
+        <h5 class="font-weight-light"><em>You haven't yet recieved any messages for this card</em></h5>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -75,6 +89,7 @@
   border-bottom-right-radius: 0 !important;
   border-bottom: 0;
   overflow-y: auto;
+  background-color: #fafafa;
 }
 
 .sendMessageGroup {
@@ -136,10 +151,23 @@ div.chat-head:first-child {
   margin-bottom: 0;
 }
 
+.profile-bubble-left {
+  float: left;
+  margin-top: 0.4rem;
+  margin-right: 0.5rem;
+}
+
+.profile-bubble-right {
+  float: right;
+  margin-top: 0.4rem;
+  margin-left: 0.5rem;
+}
+
 .message-card {
   border: none;
   padding: 0;
   margin: -20px 0;
+  background-color: #fafafa;
 }
 
 .refresh-div {
@@ -166,7 +194,9 @@ export default {
       currentUserId: null,
       conversations: [],
       timesMessagesUpdates: 0,
-      current_displayed_messages: [],
+      currentConversation: {
+        messages: []
+      },
       InitialLoad:true,
       snapToBottom: true,
       refreshingMessages: false
@@ -197,8 +227,8 @@ export default {
      */
     setCurrentMessages() {
       const correctConversation = this.conversations.find(c => this.otherUserId === c.otherUser.id);
-      if(correctConversation) {
-        this.current_displayed_messages = correctConversation.messages;
+      if (correctConversation) {
+        this.currentConversation = correctConversation;
       }
     },
 
@@ -289,6 +319,56 @@ export default {
         if (container) {
           container.scrollIntoView({behavior: "smooth"});
         }
+      }
+    },
+
+    /**
+     * Given a user object, returns the URL of the user's profile thumbnail (if it exists), 
+     * otherwise returns the default image URL
+     */
+    getUserThumbnailUrl(user) {
+      if (user.profileImage) {
+        return Api.getImage(user.profileImage.thumbnailFilename);
+      } else {
+        return 'profile-default.jpg';
+      }
+    },
+
+    /**
+     * Given the id of a sender in the current conversation, returns the user object 
+     * of the sender. Note that the sender MUST be in the current conversation - it cannot 
+     * be form a different conversation
+     */
+    getUserObject(senderId) {
+      if (senderId == this.currentConversation.cardOwner.id) {
+        return this.currentConversation.cardOwner;
+      } else {
+        return this.currentConversation.otherUser;
+      }
+    }
+  },
+  computed: {
+    /**
+     * Returns true if the message that the user has recieved no messages should be displayed. 
+     * This will be true if the user owns the current card, and no messages have been recieved 
+     * in the current conversation.
+     */
+    displayNoMessagesDiv() {
+      if (!this.currentConversation.cardOwner) {
+        return true;
+      } else {
+        return this.currentConversation.cardOwner.id === this.currentUserId && this.currentConversation.messages.length === 0;
+      }
+    },
+    /**
+     * Returns true if we should display a help prompt telling the user to send a message to the card owner. 
+     * This will be true if the user does not own the current card, and has not sent a message
+     */
+    displaySendMessageHelp() {
+      if (!this.currentConversation.cardOwner) {
+        return false;
+      } else {
+        return this.currentConversation.cardOwner.id !== this.currentUserId && this.currentConversation.messages.length === 0;
       }
     }
   },
