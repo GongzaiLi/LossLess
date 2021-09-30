@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 public class CardExpiryService {
     private final CardService cardService;
     private final CardRepository cardRepository;
-    private final UserService userService;
     private final NotificationService notificationService;
 
     private final Logger logger = LoggerFactory.getLogger(CardExpiryService.class.getName());
@@ -35,10 +34,9 @@ public class CardExpiryService {
     private Integer notificationWaitPeriodSeconds;
 
     @Autowired
-    public CardExpiryService(CardService cardService, CardRepository cardRepository, UserService userService, NotificationService notificationService) {
+    public CardExpiryService(CardService cardService, CardRepository cardRepository, NotificationService notificationService) {
         this.cardService = cardService;
         this.cardRepository = cardRepository;
-        this.userService = userService;
         this.notificationService = notificationService;
     }
 

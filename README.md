@@ -1,15 +1,15 @@
-<table align="center"><tr><td align="center" width="999">
+<table style="alignment: center"><tr><td style="text-align: center">
 
-## Welcome to Wasteless! 
-WASTELESS is a web app where stores can advertise any products that they are about to throw out at 
+## Welcome to LossLess! 
+LossLess is a web app where stores can advertise any products that they are about to throw out at 
 a reduced cost to the public. The primary purpose of this application is to reduce the amount of wastage.  
 Users can sign up with an account and search for listings of food to like and purchase. Users can also search 
 for businesses and view the food that the business is currently offering for sale.   
 Users can also create a business account. A business account can 
-create products and inventory to manage - Wasteless allows you to keep track of the quantites and expiry dates 
+create products and inventory to manage - LossLess allows you to keep track of the quantites and expiry dates 
 of your inventory. Additionally, businesses can publically list existing inventory for sale, where it can be purchased
 by other users.  
-WASTELESS also provides a community marketplace, where users can create cards publically advertising items they would 
+LossLess also provides a community marketplace, where users can create cards publically advertising items they would 
 like to buy, sell or exchange.
 
 ### To access the deployed production application, visit:

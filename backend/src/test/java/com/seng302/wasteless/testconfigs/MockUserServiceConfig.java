@@ -38,7 +38,7 @@ public class MockUserServiceConfig {
 
 
         public MockUserService () {
-            super(null, null, null, null, null);
+            super(null, null, null, null);
             User defaultAdmin = new User();
             defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
             defaultAdmin.setEmail("defaultadmin@700");

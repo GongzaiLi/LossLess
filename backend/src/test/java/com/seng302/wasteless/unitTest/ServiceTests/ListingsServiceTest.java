@@ -53,6 +53,7 @@ class ListingsServiceTest {
 
     private Listing savedListing;
 
+
     @BeforeAll
     void setUp() {
         savedListing = TestUtils.createListingWithNameAndPrice(this.productService, this.inventoryService, this.listingsService, this.businessService, this.addressService, "Black Water No Sugar", 1.0, "NZ", "Christchurch", "Riccarton", "Wonka Water", BusinessTypes.ACCOMMODATION_AND_FOOD_SERVICES, LocalDate.of(2099, Month.JANUARY, 1), 69, 69);

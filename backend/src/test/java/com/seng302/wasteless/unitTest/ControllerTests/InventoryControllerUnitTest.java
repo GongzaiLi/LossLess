@@ -1,4 +1,4 @@
-package com.seng302.wasteless.unitTest;
+package com.seng302.wasteless.unitTest.ControllerTests;
 
 import com.seng302.wasteless.controller.InventoryController;
 import com.seng302.wasteless.dto.PostInventoryDto;

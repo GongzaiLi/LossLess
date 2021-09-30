@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,19 +34,16 @@ public class UserService {
     private final AddressService addressService;
 
     private final BCryptPasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        ImageService imageService,
                        AddressService addressService,
-                       BCryptPasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager) {
+                       BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.addressService = addressService;
         this.imageService = imageService;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
     }
 
     /**

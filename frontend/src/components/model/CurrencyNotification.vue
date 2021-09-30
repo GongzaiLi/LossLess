@@ -23,9 +23,6 @@ Date: sprint_6
   </div>
 </template>
 
-<style scoped>
-
-</style>
 <script>
 export default {
   name: "currencyNotification",
