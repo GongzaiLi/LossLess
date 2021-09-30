@@ -33,7 +33,7 @@ Date: 5/3/2021
                 </p>
               </b-row>
             </b-col>
-            <b-col lg="3" sm="12"
+            <b-col lg="3" sm="10"
                    v-if="currentUserAdmin"
                    class="p-0">
               <b-icon-pencil-fill class="close edit-details"
@@ -175,7 +175,7 @@ Date: 5/3/2021
 
 .edit-business-image {
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 3px;
   font-size: 0.7rem
 }

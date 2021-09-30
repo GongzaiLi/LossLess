@@ -25,7 +25,7 @@
         <b-icon-globe v-else-if="updatedNotification.type==='Business Currency Changed'"/>
         <b-icon-chat-square-dots-fill v-else-if="updatedNotification.type==='Message Received'"/>
       </b-col>
-      <b-col class="pl-0 pt-1" cols="5">
+      <b-col class="pl-0 pt-1" lg="5" cols="4">
         <h6> {{updatedNotification.type}} </h6>
       </b-col>
         <b-col v-if="updatedNotification.type==='Message Received'" cols="3" class="pt-1">
@@ -176,7 +176,6 @@ span.unreadLabel {
 .three-dot {
   margin-right: -10px;
   padding-right: 0;
-
   color: black;
 }
 
