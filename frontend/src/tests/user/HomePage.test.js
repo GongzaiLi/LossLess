@@ -5,6 +5,7 @@ import homePage from '../../components/user/HomePage';
 import Api from "../../Api";
 import Router from 'vue-router'
 import MarketplaceSection from "../../components/marketplace/MarketplaceSection";
+import VueRouter from "vue-router";
 
 
 config.showDeprecationWarnings = false  //to disable deprecation warnings
@@ -79,7 +80,7 @@ let response = {
     }]
 };
 
-beforeEach(() => {
+beforeEach(async () => {
     const localVue = createLocalVue()
     localVue.use(BootstrapVue);
     localVue.use(BootstrapVueIcons);
@@ -92,12 +93,15 @@ beforeEach(() => {
     Api.getExpiredCards.mockResolvedValue({data: []});
     Api.deleteNotification = jest.fn();
 
+    const router = new VueRouter();
+
     wrapper = shallowMount(homePage, {
         localVue,
         propsData: {},
         mocks: {$log},
         stubs: {},
         methods: {},
+        router
     });
 
 });
@@ -260,19 +264,40 @@ describe('check-that-filterNotificationsByTag-sends-correct-api-request', () => 
 
 describe('check-deleted-functionality', () => {
     test('if-no-pendingDeletedNotification-then-pendingDeletedNotification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotification = []
+        console.log(wrapper.vm.$route)
+        wrapper.vm.pendingDeletedNotificationId = null;
         await wrapper.vm.createDeleteToast(1);
         expect(Api.deleteNotification).toBeCalledTimes(0);
     });
 });
 
-describe('check-router-guard-functionality', () => {
-    test('if-route-is-changed-while-no-pending-notifications-notification-is-not-deleted', async () => {
-        wrapper.vm.pendingDeletedNotifications = []
-        await wrapper.vm.$options.beforeRouteLeave[0].call(wrapper.vm, "toObj", "fromObj", jest.fn());
+describe('Notification Deletion', () => {
+
+    test('if set notification to pend deletion, and no existing notification pending, then it is marked as pending deletion but is not deleted', async () => {
+        wrapper.vm.pendingDeletedNotificationId = null;
+        await wrapper.vm.createDeleteToast(1);
+
+        expect(wrapper.vm.pendingDeletedNotificationId).toBe(1);
         expect(Api.deleteNotification).toBeCalledTimes(0);
     });
+
+    test('if delete notification and it is marked as pending then it is deleted', async () => {
+        wrapper.vm.pendingDeletedNotificationId = 1;
+        await wrapper.vm.createDeleteToast(2);
+
+        expect(Api.deleteNotification).toHaveBeenCalledTimes(1);
+        expect(Api.deleteNotification).toHaveBeenCalledWith(1);
+    });
+
+    test('if notification marked as pending and undo notification delete then it is restored and not deleted', async () => {
+        await wrapper.vm.createDeleteToast(2);
+        await wrapper.vm.undoDelete(2);
+
+        expect(Api.deleteNotification).toBeCalledTimes(0);
+        expect(wrapper.vm.pendingDeletedNotificationId).toBeNull();
+    });
 });
+
 
 
 describe('test-toggleTagColorSelected-works-correctly', () => {

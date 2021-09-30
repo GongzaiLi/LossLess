@@ -2,7 +2,7 @@
   <div id="app">
     <Navbar v-if="!['login', 'register'].includes($route.name)"/>
     <!-- The keep-alive prevents the SearchPage component from being re-rendered each time, so you can got back to your search results -->
-    <keep-alive v-if="$currentUser" include="SearchPage,ListingsSearchPage"> <!-- The v-if means that when the currentUser is null (ie logged out) the keep-alive gets destroyed, so the cached components are cleared -->
+    <keep-alive v-if="$currentUser" include="SearchPage,ListingsSearchPage,HomePage"> <!-- The v-if means that when the currentUser is null (ie logged out) the keep-alive gets destroyed, so the cached components are cleared -->
       <router-view/>
     </keep-alive>
     <router-view v-else/>
