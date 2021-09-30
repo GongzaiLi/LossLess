@@ -340,7 +340,7 @@ export default {
      * be form a different conversation
      */
     getUserObject(senderId) {
-      if (senderId == this.currentConversation.cardOwner.id) {
+      if (senderId === this.currentConversation.cardOwner.id) {
         return this.currentConversation.cardOwner;
       } else {
         return this.currentConversation.otherUser;

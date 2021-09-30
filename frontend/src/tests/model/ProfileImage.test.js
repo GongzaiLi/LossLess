@@ -255,16 +255,8 @@ describe('Testing-api-post-upload-image-for-business', () => {
 });
 
 describe('Testing-cancel-and-save-methods', () => {
-    it('cancel-resets-data-values', async () => {
-        $currentUser.currentlyActingAs = 1;
 
-        await wrapper.vm.cancel();
-        expect(wrapper.vm.confirmed).toBeFalsy();
-        expect(wrapper.vm.imageFile).toBe(null);
-        expect(wrapper.vm.canSave).toBeFalsy();
-    });
-
-    it('save-sets-variables-and-makes-an-api-request-data-values', async () => {
+    it('save-sets-variables-and-makes-an-api-request', async () => {
         wrapper.vm.uploadImageRequest = jest.fn();
         await wrapper.vm.save();
         expect(wrapper.vm.confirmed).toBeTruthy();

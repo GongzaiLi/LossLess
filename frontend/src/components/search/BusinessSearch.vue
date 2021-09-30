@@ -20,7 +20,7 @@ Page that stores table and search bar to search for businesses
         <b-button variant="primary" @click="searchBusinessApiRequest(searchQuery, businessType)"> Search </b-button>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="businessRow">
       <b-col cols="12">
         <b-table striped hover
                  ref="searchTable"
@@ -53,6 +53,11 @@ Page that stores table and search bar to search for businesses
 </template>
 
 <style scoped>
+
+.businessRow {
+  cursor: pointer;
+}
+
 .no-results-overlay {
   margin-top:7em;
   margin-bottom:7em;

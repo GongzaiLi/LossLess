@@ -27,9 +27,6 @@
       </b-button>
 
       <div v-if="canSave">
-        <b-button id="cancelButton" class="mt-2" variant="danger" size="sm" @click="cancel">
-          <b-icon-trash-fill/> Cancel </b-button>
-
         <b-button id="confirmButton" variant="info" class="mt-2" size="sm" @click="save">
           <b-icon-pencil-fill/> Save </b-button>
       </div>
@@ -115,19 +112,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Cancels image upload and resets image to previous image.
-     */
-    cancel() {
-      this.confirmed = false;
-      this.imageFile = null;
-      this.canSave = false;
-      if (!this.profileImage) {
-        this.imageURL = require('../../../public/profile-default.jpg');
-      } else {
-        this.imageURL = this.getURL(this.profileImage.fileName);
-      }
-    },
 
     /**
      * Confirms image upload and calls method that makes the api request.

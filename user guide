@@ -1,0 +1,23 @@
+searching for user: navbar image
+modify user: edit icon
+assign global admin: search users
+creating a business: nav bar
+assign business admin: search user
+create new product: nav bar
+create inventory: nav bar
+edit product inventory: table image
+create listing: nav bar
+marketplace: nav bar
+delete marketplace card : delete button changed to icon
+searching for business: nav bar
+search business: type is changed to all from none
+search for listing: nav bar
+search for listings: page changed
+full listing: page slightly different
+
+
+Issues:
+no pointer on list of users when searching
+no pointer on list of inventory when creating listing
+changing image - remove the cancel button
+marketplace hovering on table view doesnt work - remove from user guide
