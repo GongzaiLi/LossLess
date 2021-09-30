@@ -59,7 +59,7 @@ class UserServiceTest {
         Mockito.when(userRepository.findFirstById(1)).thenReturn(null);
         boolean success = true;
         try {
-            UserService userService = new UserService(userRepository, imageService, addressService, passwordEncoder, authenticationManager);
+            UserService userService = new UserService(userRepository, imageService, addressService, passwordEncoder);
             userService.findUserById(1);
         } catch (ResponseStatusException e) {
             success = false;
@@ -74,7 +74,7 @@ class UserServiceTest {
         Mockito.when(userToFind.getId()).thenReturn(1);
         Mockito.when(userRepository.findFirstById(1)).thenReturn(userToFind);
 
-        UserService userService = new UserService(userRepository, imageService, addressService, passwordEncoder, authenticationManager);
+        UserService userService = new UserService(userRepository, imageService, addressService, passwordEncoder);
         Assertions.assertEquals(1, userService.findUserById(1).getId());
     }
 
@@ -83,7 +83,7 @@ class UserServiceTest {
         User user = new User();
         user.setProfileImage(new Image());
 
-        UserService userService = new UserService(userRepository, imageService, addressService, passwordEncoder, authenticationManager);
+        UserService userService = new UserService(userRepository, imageService, addressService, passwordEncoder);
         userService.deleteUserImage(user);
 
         Assertions.assertNull(user.getProfileImage());

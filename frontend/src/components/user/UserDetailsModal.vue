@@ -11,8 +11,9 @@ Date: 3/3/2021
         @submit="submit"
         @input="setCustomValidities"
       >
-      <h1 v-if="!isEditUser">Sign Up to Wasteless</h1>
+      <h1 v-if="!isEditUser"><img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"> Sign Up to LossLess</h1>
       <h5 v-else>User Details</h5>
+      <hr>
       <b-form-group>
           <strong>First Name *</strong>
           <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
@@ -280,23 +281,8 @@ export default {
      * */
     async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-      if(this.isEditUser) {
-        if (this.country !== this.userData.homeAddress.country) {
-          let oldCurrency = await Api.getUserCurrency(this.country);
-          let newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
-          if (oldCurrency.code !== newCurrency.code) {
-            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
-                " This will not affect the currency of products in your administered business unless you " +
-                "also modify the address of the business."
-            )) {
-              await this.updateUser();
-            }
-          } else {
-            await this.updateUser();
-          }
-        } else {
-          await this.updateUser();
-        }
+      if (this.isEditUser) {
+        await this.updateUser();
       } else {
         await this.register()
       }

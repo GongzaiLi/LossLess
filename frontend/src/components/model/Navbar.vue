@@ -7,7 +7,7 @@ Date: sprint_1
     toggleable="lg" type="dark" fixed="top"
     class="shadow"
   >
-    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave"> <img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"></b-navbar-brand>
+    <b-navbar-brand to="/homePage" @mouseenter="hoverLogo" @mouseleave="hoverLogoLeave"> <img src="../../../public/logo.png" style="width: 2.5em" alt="LossLess Logo"> LossLess</b-navbar-brand>
 
     <b-toast id="my-toast" variant="warning" solid toaster="b-toaster-top-left">
       <template #toast-title>
@@ -277,7 +277,7 @@ export default {
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
-      this.$router.push(`/businesses/${business.id}`);
+      this.goToProfile();
     },
 
     /**
@@ -286,7 +286,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
-      this.$router.push(`/users/${this.$currentUser.id}`);
+      this.goToProfile();
     },
 
     hoverLogo() {

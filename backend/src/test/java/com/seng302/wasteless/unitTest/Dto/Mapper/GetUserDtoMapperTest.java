@@ -1,4 +1,4 @@
-package com.seng302.wasteless.unitTest;
+package com.seng302.wasteless.unitTest.Dto.Mapper;
 
 import com.seng302.wasteless.dto.GetUserBusinessAdministeredDto;
 import com.seng302.wasteless.dto.mapper.GetUserDtoMapper;
@@ -58,6 +58,7 @@ class GetUserDtoMapperTest {
         business.setId(1);
         business.setAdministrators(Collections.singletonList(user));
         business.setName("Jimmy's clown store");
+        business.setProfileImage(null);
 
         Mockito
                 .when(businessService.findBusinessesByUserId(anyInt()))

@@ -49,12 +49,6 @@
                       variant="success" @click="openExtendConfirmDialog"> Extend
               <b-icon-alarm/>
             </b-button>
-            <b-button v-if="!messageVisible" class="button-right" variant="primary" @click="messageVisible = true" title="Open Messages">
-              <b-icon-chat-quote-fill/> Open Messages
-            </b-button>
-            <b-button v-else class="button-right" variant="primary"  @click="messageVisible = false" title="Close Messages">
-              <b-icon-chat-quote-fill/> Close Messages
-            </b-button>
           </div>
 
 

@@ -361,9 +361,10 @@ public class UserController {
 
         if (userCountryChanged) {
             Notification notification = NotificationService.createNotification(userToModify.getId(),  userToModify.getId(), NotificationType.USER_CURRENCY_CHANGE,
-                    "You have changed country and therefore your currency may have changed. " +
+            String.format("You have changed country from %s to %s therefore your currency may have changed. " +
                             "This will not affect the currency of products in your administered business unless you " +
-                            "also modify the address of the business.");
+                            "also modify the address of the business.",
+                    userToModify.getHomeAddress().getCountry(), modifiedUser.getHomeAddress().getCountry()));
             notificationService.saveNotification(notification);
         }
 

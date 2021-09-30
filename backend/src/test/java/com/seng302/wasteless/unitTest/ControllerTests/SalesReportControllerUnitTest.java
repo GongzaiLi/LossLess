@@ -1,4 +1,4 @@
-package com.seng302.wasteless.unitTest;
+package com.seng302.wasteless.unitTest.ControllerTests;
 
 import com.seng302.wasteless.controller.SalesReportController;
 import com.seng302.wasteless.dto.SalesReportDto;
@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -334,15 +335,25 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isNotAcceptable());
     }
 
-    @Test
+
+
+    /**
+     * Test 1: products purchased
+     * Test 2: manufacturers purchased
+     * Test 3: csv
+     * @param request
+     * @throws Exception
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"/businesses/1/salesReport/productsPurchasedTotals", "/businesses/1/salesReport/manufacturersPurchasedTotals", "/businesses/1/salesReport/csv"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSalesReportProductPurchasedTotals_andUserNotAllowedToAccessInformationOfBusiness_then403Response() throws Exception{
+    void whenGetSalesReportEndpointsandUserNotAllowedToAccessInformationOfBusiness_then403Response(String request) throws Exception{
 
         Mockito
                 .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
                 .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/productsPurchasedTotals")
+        mockMvc.perform(MockMvcRequestBuilders.get(request)
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -402,18 +413,7 @@ class SalesReportControllerUnitTest {
     }
 
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenGetSalesReportManufacturerPurchasedTotals_andUserNotAllowedToAccessInformationOfBusiness_then403Response() throws Exception{
 
-        Mockito
-                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request"));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/manufacturersPurchasedTotals")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
@@ -583,17 +583,7 @@ class SalesReportControllerUnitTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER")
-    void whenGetSalesReportCSV_andUserNotAdminOfBusiness_then403Response() throws Exception {
-        Mockito
-                .when(businessService.checkUserAdminOfBusinessOrGAA(any(Business.class), any(User.class)))
-                .thenThrow(new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to make this request"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/businesses/1/salesReport/csv")
-                .contentType(APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER")

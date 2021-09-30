@@ -1,4 +1,4 @@
-package com.seng302.wasteless.unitTest;
+package com.seng302.wasteless.unitTest.ControllerTests;
 
 
 import com.seng302.wasteless.controller.BusinessController;
@@ -9,6 +9,8 @@ import com.seng302.wasteless.testconfigs.MockBusinessServiceConfig;
 import com.seng302.wasteless.testconfigs.MockUserServiceConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -259,11 +261,17 @@ class BusinessControllerUnitTest {
     }
 
 
-    @Test
+    /**
+     * Test 1: Make user an admin
+     * Test 2: Make GAA an admin
+     * Test 3: Make DGAA an admin
+     * @param request the id of the user to make admin
+     * @throws Exception
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"{\"userId\": \"1\"}", "{\"userId\": \"2\"}", "{\"userId\": \"3\"}"})
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response() throws Exception {
-        String request = "{\"userId\": \"2\"}";
-
+    void whenPutRequestToBusinessMakeAdmin_andValidRequest_then200Response(String request) throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
                         .with(csrf())
                         .content(request)
@@ -271,29 +279,6 @@ class BusinessControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseGlobalApplicationAdmin_then200Response() throws Exception {
-        String request = "{\"userId\": \"2\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
-                        .with(csrf())
-                        .content(request)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null
-    void whenPutRequestToBusinessMakeAdmin_andUserAllowedToMakeRequest_BecauseDefaultGlobalApplicationAdmin_then200Response() throws Exception {
-        String request = "{\"userId\": \"2\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/businesses/0/makeAdministrator")
-                        .with(csrf())
-                        .content(request)
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = "USER") //Get past authentication being null

@@ -1,4 +1,4 @@
-package com.seng302.wasteless.unitTest;
+package com.seng302.wasteless.unitTest.ControllerTests;
 
 import com.seng302.wasteless.controller.UserController;
 import com.seng302.wasteless.model.*;
@@ -117,7 +117,6 @@ class UserControllerUnitTest {
         Authentication authentication = Mockito.mock(Authentication.class);
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        Mockito.when(authentication.getPrincipal()).thenReturn(new CustomUserDetails(user));
         SecurityContextHolder.setContext(securityContext);
 
         Mockito
@@ -173,6 +172,8 @@ class UserControllerUnitTest {
         doReturn(1).when(user).getId();
         doReturn(2).when(admin).getId();
         doReturn(3).when(defaultAdmin).getId();
+        CustomUserDetails customUser = new CustomUserDetails(user);
+        Mockito.when(authentication.getPrincipal()).thenReturn(customUser);
     }
 
     @Test
