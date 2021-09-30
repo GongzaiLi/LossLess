@@ -150,7 +150,7 @@ class BusinessControllerIntegrationTest {
     void whenGetRequestToBusinessAndMultipleBusinessExists_andNonAdminAccountLoggedIn_thenCorrectBusiness() throws Exception {
         createOneBusiness("Business", address1, "Accommodation and Food Services", "I am a business");
         createOneBusiness("Business2", address1, "Non-profit organisation", "I am a business 2");
-        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "1337");
+        createOneUser("James", "Harris", "jeh128@uclive.ac.nz", "2000-10-27", homeAddress, "13371337");
 
         mockMvc.perform(get("/businesses/2")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -222,8 +222,8 @@ class BusinessControllerIntegrationTest {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
-        user.setPassword("Steve");
-        user.setLastName("Steve");
+        user.setPassword("SteveSteve");
+        user.setLastName("SteveSteve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
                 .setSuburb("Riccarton")
@@ -263,8 +263,8 @@ class BusinessControllerIntegrationTest {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
-        user.setPassword("Steve");
-        user.setLastName("Steve");
+        user.setPassword("SteveSteve");
+        user.setLastName("SteveSteve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
                 .setSuburb("Riccarton")
@@ -311,8 +311,8 @@ class BusinessControllerIntegrationTest {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
-        user.setPassword("Steve");
-        user.setLastName("Steve");
+        user.setPassword("SteveSteve");
+        user.setLastName("SteveSteve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
                 .setSuburb("Riccarton")
@@ -351,8 +351,8 @@ class BusinessControllerIntegrationTest {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
-        user.setPassword("Steve");
-        user.setLastName("Steve");
+        user.setPassword("SteveSteve");
+        user.setLastName("SteveSteve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
                 .setSuburb("Riccarton")
@@ -395,8 +395,8 @@ class BusinessControllerIntegrationTest {
         User user = new User();
         user.setEmail("jabob@gmail.com");
         user.setFirstName("Jacob");
-        user.setPassword("Steve");
-        user.setLastName("Steve");
+        user.setPassword("SteveSteve");
+        user.setLastName("SteveSteve");
         user.setDateOfBirth(LocalDate.now().minusYears(20));
         user.setHomeAddress(new Address()
                 .setSuburb("Riccarton")

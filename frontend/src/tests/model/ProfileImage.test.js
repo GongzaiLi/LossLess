@@ -38,8 +38,9 @@ beforeEach(() => {
         localVue,
         router,
         props: {details},
-        mocks: {$log, $currentUser}
+        mocks: {$log, $currentUser, }
     });
+    wrapper.setData({confirmed:true, canSave: false, imageURL: null})
 });
 
 afterEach(() => {
@@ -252,3 +253,24 @@ describe('Testing-api-post-upload-image-for-business', () => {
         expect(wrapper.vm.errors).toStrictEqual(["Sorry, we couldn't reach the server. Check your internet connection"]);
     });
 });
+
+describe('Testing-cancel-and-save-methods', () => {
+    it('cancel-resets-data-values', async () => {
+        $currentUser.currentlyActingAs = 1;
+
+        await wrapper.vm.cancel();
+        expect(wrapper.vm.confirmed).toBeFalsy();
+        expect(wrapper.vm.imageFile).toBe(null);
+        expect(wrapper.vm.canSave).toBeFalsy();
+    });
+
+    it('save-sets-variables-and-makes-an-api-request-data-values', async () => {
+        wrapper.vm.uploadImageRequest = jest.fn();
+        await wrapper.vm.save();
+        expect(wrapper.vm.confirmed).toBeTruthy();
+        expect(wrapper.vm.uploadImageRequest).toHaveBeenCalled();
+        expect(wrapper.vm.canSave).toBeFalsy();
+    });
+
+});
+
