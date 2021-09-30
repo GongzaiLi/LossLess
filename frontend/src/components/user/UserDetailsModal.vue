@@ -281,23 +281,8 @@ export default {
      * */
     async submit(event) {
       event.preventDefault(); // HTML forms will by default reload the page, so prevent that from happening
-      if(this.isEditUser) {
-        if (this.country !== this.userData.homeAddress.country) {
-          let oldCurrency = await Api.getUserCurrency(this.country);
-          let newCurrency = await Api.getUserCurrency(this.userData.homeAddress.country);
-          if (oldCurrency.code !== newCurrency.code) {
-            if (await this.$bvModal.msgBoxConfirm("By updating your country your currency will change from " + oldCurrency.code + " to " + newCurrency.code + ". This will be updated for all future listing you create." +
-                " This will not affect the currency of products in your administered business unless you " +
-                "also modify the address of the business."
-            )) {
-              await this.updateUser();
-            }
-          } else {
-            await this.updateUser();
-          }
-        } else {
-          await this.updateUser();
-        }
+      if (this.isEditUser) {
+        await this.updateUser();
       } else {
         await this.register()
       }
