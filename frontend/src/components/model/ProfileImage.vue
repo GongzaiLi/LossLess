@@ -26,20 +26,17 @@
         Add profile photo
       </b-button>
 
-      <div v-if="canSave">
-        <b-button id="confirmButton" variant="info" class="mt-2" size="sm" @click="save">
-          <b-icon-pencil-fill/> Save </b-button>
-      </div>
 
-        <b-button id="deleteButton" v-if="(profileImage || uploaded) && !isUploadingFile" class="mt-2" variant="danger" size="sm"
-                  @click="$bvModal.show('confirmDeleteImageModal')">
-          <b-icon-trash-fill/>
-          Delete
+
+        <b-button id="deleteButton" v-if="((profileImage || uploaded) && !isUploadingFile)" class="mt-2" variant="danger" size="sm"
+                  @click="(canSave)?cancel():$bvModal.show('confirmDeleteImageModal')">
+          <b-icon :icon="(canSave)?'x':'trash-fill'" />
+          {{(canSave)?'Cancel':'Delete'}}
         </b-button>
-        <b-button id="changeButton" v-if="(profileImage || uploaded) && !isUploadingFile" variant="info" class="mt-2" size="sm"
-                  @click="$refs.userImagePicker.click()">
-          <b-icon-pencil-fill/>
-          Change
+        <b-button id="changeButton" v-if="((profileImage || uploaded) && !isUploadingFile)" variant="info" class="mt-2" size="sm"
+                  @click="(canSave)?save():$refs.userImagePicker.click()">
+          <b-icon :icon="(canSave)?'check2':'pencil-fill'" />
+          {{(canSave)?'Save':'Change'}}
         </b-button>
     </div>
 
@@ -60,7 +57,17 @@
   margin-left: 1%;
 }
 
+#confirmButton {
+  width: 49%;
+  margin-left: 1%;
+}
+
 #deleteButton {
+  width: 49%;
+  margin-right: 1%;
+}
+
+#cancelButton {
   width: 49%;
   margin-right: 1%;
 }
@@ -117,6 +124,22 @@ export default {
   },
 
   methods: {
+    /**
+     * Cancels image upload and resets image to previous image.
+     */
+    cancel() {
+      this.confirmed = false;
+      this.imageFile = null;
+      this.canSave = false;
+      if (!this.profileImage) {
+        this.isUploadingFile = false
+        this.imageURL = this.defaultImage;
+        this.uploaded = false
+      } else {
+        this.imageURL = this.getURL(this.profileImage.fileName);
+      }
+    },
+
 
     /**
      * Confirms image upload and calls method that makes the api request.
@@ -124,6 +147,8 @@ export default {
     save() {
       this.confirmed = true;
       this.uploadImageRequest();
+      this.$bvModal.hide('edit-business-image')
+      this.$bvModal.hide('edit-profile-image')
       this.canSave = false;
     },
 
