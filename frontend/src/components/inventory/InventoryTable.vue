@@ -4,7 +4,7 @@
     <div>
       <b-form @submit.prevent="searchClicked">
         <b-input-group prepend="Filter by product code:">
-          <b-form-input v-model="searchQuery"></b-form-input>
+          <b-form-input v-model="searchQuery" trim></b-form-input>
           <b-input-group-append>
             <b-button type="submit"> Filter </b-button>
           </b-input-group-append>
