@@ -89,7 +89,7 @@
   border-bottom-right-radius: 0 !important;
   border-bottom: 0;
   overflow-y: auto;
-  background-color: #fafafa;
+  background-color: #f5f5f5f3;
 }
 
 .sendMessageGroup {
@@ -167,7 +167,7 @@ div.chat-head:first-child {
   border: none;
   padding: 0;
   margin: -20px 0;
-  background-color: #fafafa;
+  background-color: #f5f5f5f3;
 }
 
 .refresh-div {
