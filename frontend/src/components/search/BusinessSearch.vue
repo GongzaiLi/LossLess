@@ -41,7 +41,7 @@ Page that stores table and search bar to search for businesses
             <h3 class="no-results-overlay" >No results to display</h3>
           </template>
           <template #cell(name)="data">
-            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/profile-default.jpg')"
+            <b-img :src="data.item.profileImage ? getURL(data.item.profileImage.thumbnailFilename) : require('../../../public/business-profile-default.jpeg')"
                    alt="Business Profile Image" class="rounded-circle" style="margin-left: 5px; position: relative; height: 1.5rem; width:1.5rem"></b-img>
             {{formatName(data.item.name)}}
           </template>

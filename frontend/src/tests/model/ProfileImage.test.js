@@ -9,7 +9,7 @@ const $log = {
 };
 
 jest.mock('../../Api');
-jest.mock("../../../public/profile-default.jpg", ()=>{}) // mock image
+jest.mock("../../../public/user-profile-default.png", ()=>{}) // mock image
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
@@ -33,7 +33,7 @@ let $currentUser = {
 }
 
 beforeEach(() => {
-    jest.mock('../../../public/profile-default.jpg');
+    jest.mock('../../../public/user-profile-default.png');
     wrapper = mount(ProfileImage, {
         localVue,
         router,

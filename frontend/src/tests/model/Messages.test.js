@@ -180,7 +180,7 @@ describe('Check user thumbnails.', () => {
   test('Gets default image url if no image exists', () => {
     expect(wrapper.vm.getUserThumbnailUrl({
       profileImage: null
-    })).toEqual("profile-default.jpg")
+    })).toEqual("user-profile-default.png")
   });
 });
 

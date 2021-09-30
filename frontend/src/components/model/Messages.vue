@@ -27,7 +27,7 @@
             <h5 class="my-auto font-weight-light">Send a message to the card creator to let them know you're interested!</h5>
           </div>
           <b-card v-for="message in currentConversation.messages" :key="message.id" class="message-card">
-            <b-img class="rounded-circle avatar" :class="message.senderId === currentUserId ? 'profile-bubble-right': 'profile-bubble-left'" width="30" height="30" 
+            <b-img class="rounded-circle avatar" :class="message.senderId === currentUserId ? 'profile-bubble-right': 'profile-bubble-left'" width="30" height="30"
                   :alt="`${getUserObject(message.senderId).firstName}'s profile picture`"
                   :src="getUserThumbnailUrl(getUserObject(message.senderId))"
               />
@@ -323,20 +323,20 @@ export default {
     },
 
     /**
-     * Given a user object, returns the URL of the user's profile thumbnail (if it exists), 
+     * Given a user object, returns the URL of the user's profile thumbnail (if it exists),
      * otherwise returns the default image URL
      */
     getUserThumbnailUrl(user) {
       if (user.profileImage) {
         return Api.getImage(user.profileImage.thumbnailFilename);
       } else {
-        return 'profile-default.jpg';
+        return 'user-profile-default.png';
       }
     },
 
     /**
-     * Given the id of a sender in the current conversation, returns the user object 
-     * of the sender. Note that the sender MUST be in the current conversation - it cannot 
+     * Given the id of a sender in the current conversation, returns the user object
+     * of the sender. Note that the sender MUST be in the current conversation - it cannot
      * be form a different conversation
      */
     getUserObject(senderId) {
@@ -349,8 +349,8 @@ export default {
   },
   computed: {
     /**
-     * Returns true if the message that the user has recieved no messages should be displayed. 
-     * This will be true if the user owns the current card, and no messages have been recieved 
+     * Returns true if the message that the user has recieved no messages should be displayed.
+     * This will be true if the user owns the current card, and no messages have been recieved
      * in the current conversation.
      */
     displayNoMessagesDiv() {
@@ -361,7 +361,7 @@ export default {
       }
     },
     /**
-     * Returns true if we should display a help prompt telling the user to send a message to the card owner. 
+     * Returns true if we should display a help prompt telling the user to send a message to the card owner.
      * This will be true if the user does not own the current card, and has not sent a message
      */
     displaySendMessageHelp() {

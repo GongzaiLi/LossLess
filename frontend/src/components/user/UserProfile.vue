@@ -12,7 +12,7 @@ Date: 5/3/2021
           <b-row>
             <b-col lg="2" class="p-0">
             <div class="profile-image-container">
-            <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/profile-default.jpg')"
+            <b-img :src="userData.profileImage ? getURL(userData.profileImage.fileName) : require('../../../public/user-profile-default.png')"
                      alt="User Profile Image" width="75" height="75" class="rounded-circle"
                      id="profile-image"
                      title="View profile image"
@@ -159,7 +159,9 @@ Date: 5/3/2021
     </b-modal>
 
     <b-modal id="edit-profile-image" title="Profile Image" hide-footer>
-      <ProfileImage :details="userData.profileImage" :userLookingAtSelfOrIsAdmin=userLookingAtSelfOrIsAdmin />
+      <ProfileImage :details="userData.profileImage"
+                    :userLookingAtSelfOrIsAdmin=userLookingAtSelfOrIsAdmin
+                    :default-image="require('../../../public/user-profile-default.png')"/>
     </b-modal>
 
     <currency-notification toast-id="user-currency-changed" :oldCurrency="oldCurrency" :new-currency="newCurrency" :is-user="true"/>

@@ -4,7 +4,7 @@
            class="profile-image mx-auto"
            block rounded="circle" thumbnail
            alt="userImage"/>
-    <b-img v-else :src="profileImage ? getURL(profileImage.fileName) : require('../../../public/profile-default.jpg')"
+    <b-img v-else :src="profileImage ? getURL(profileImage.fileName) : defaultImage"
            class="profile-image mx-auto"
            fluid block rounded="circle" thumbnail
            alt="default image"/>
@@ -95,6 +95,11 @@ export default {
       type: Boolean,
       default: false
     },
+    defaultImage: {
+      type: String,
+      default: require('../../../public/user-profile-default.png')
+    }
+
   },
   data: function () {
     return {
@@ -123,7 +128,7 @@ export default {
       this.imageFile = null;
       this.canSave = false;
       if (!this.profileImage) {
-        this.imageURL = require('../../../public/profile-default.jpg');
+        this.imageURL = this.defaultImage;
       } else {
         this.imageURL = this.getURL(this.profileImage.fileName);
       }
@@ -181,7 +186,7 @@ export default {
 
       } else {
         if (!this.profileImage) {
-          this.imageURL = require('../../../public/profile-default.jpg');
+          this.imageURL = this.defaultImage;
         }
         this.confirmed = false
         this.isUploadingFile = false;

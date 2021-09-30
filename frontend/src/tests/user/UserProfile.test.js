@@ -9,6 +9,10 @@ import VueRouter from 'vue-router';
 //     id: 0
 //   }
 // };
+
+jest.mock("../../../public/user-profile-default.png", () => {
+}) // mock image
+
 config.showDeprecationWarnings = false  //to disable deprecation warnings
 const $log = {
   debug: jest.fn(),
