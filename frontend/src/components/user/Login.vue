@@ -21,7 +21,7 @@ Date: 3/3/2021
 
             <b-form-group>
               <strong>Password</strong>
-              <password-input v-model=password id="loginPassword" :is-required="true" place-holder=""/>
+              <password-input v-model=password :min-password-length="0" id="loginPassword" :is-required="true" place-holder=""/>
             </b-form-group>
             <b-form-group
             >

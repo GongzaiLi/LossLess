@@ -25,18 +25,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -177,47 +172,6 @@ public class UserController {
         UserSearchDto userSearchDto = UserSearchDtoMapper.toGetUserSearchDto(searchQuery, count, offset, sortType, sortDirection);
 
         return ResponseEntity.status(HttpStatus.OK).body(userSearchDto);
-    }
-
-
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(
-            MethodArgumentNotValidException exception) {
-        Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-//            logger.error(errorMessage); doesnt work. I am not sure why.
-            errors.put(fieldName, errorMessage);
-        });
-        return errors;
-    }
-
-    /**
-     * Returns a json object of bad field found in the request
-     *
-     * @param exception The exception thrown by Spring when it detects invalid data
-     * @return Map of field name that had the error and a message describing the error.
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public Map<String, String> handleValidationExceptions(
-            ConstraintViolationException exception) {
-
-        Map<String, String> errors = new HashMap<>();
-
-        String constraintName = exception.getConstraintViolations().toString();
-        String errorMsg = exception.getMessage();
-
-        errors.put(constraintName, errorMsg);
-        return errors;
     }
 
     /**

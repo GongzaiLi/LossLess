@@ -27,13 +27,11 @@
 
     <div v-else>
       <b-table striped hover
-               table-class="text-nowrap"
-               responsive="lg"
+               class="text-nowrap"
+               responsive
                no-border-collapse
                bordered
-               stacked="sm"
                show-empty
-               class="overflow-auto"
                @row-clicked="cardClickHandler"
                @sort-changed="sortingChanged"
                :fields="fields"

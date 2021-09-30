@@ -16,7 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +31,6 @@ import static org.mockito.ArgumentMatchers.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.*;
@@ -79,21 +77,21 @@ class UserControllerUnitTest {
         admin.setEmail("GAA@gmail.com");
         admin.setRole(UserRoles.GLOBAL_APPLICATION_ADMIN);
         admin.setDateOfBirth(LocalDate.now().minusYears(20));
-        admin.setPassword("1337");
+        admin.setPassword("13371777");
 
         defaultAdmin = mock(User.class);
         defaultAdmin.setId(3);
         defaultAdmin.setEmail("DGAA@gmail.com");
         defaultAdmin.setRole(UserRoles.DEFAULT_GLOBAL_APPLICATION_ADMIN);
         defaultAdmin.setDateOfBirth(LocalDate.now().minusYears(20));
-        defaultAdmin.setPassword("1337");
+        defaultAdmin.setPassword("13371777");
 
         user = mock(User.class);
         user.setId(1);
         user.setEmail("james@gmail.com");
         user.setRole(UserRoles.USER);
         user.setDateOfBirth(LocalDate.now().minusYears(20));
-        user.setPassword("1337");
+        user.setPassword("13371777");
 
         address = mock(Address.class);
         address.setId(1);
@@ -130,7 +128,7 @@ class UserControllerUnitTest {
         doReturn(LocalDate.now().minusYears(20)).when(user).getDateOfBirth();
         doReturn(true).when(user).checkDateOfBirthValid();
         doReturn(address).when(user).getHomeAddress();
-        doReturn("1337").when(user).getPassword();
+        doReturn("13371777").when(user).getPassword();
 
         Mockito
                 .when(passwordEncoder.matches(anyString(), anyString()))
@@ -194,7 +192,7 @@ class UserControllerUnitTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
                 "  }, " +
-                "\"password\": \"1337\"}";
+                "\"password\": \"13371777\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put("/users/1")
                 .content(modifiedUser)
@@ -218,7 +216,7 @@ class UserControllerUnitTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
-                "\"password\": \"1337\",\n" +
+                "\"password\": \"13371777\",\n" +
                 "\"newPassword\": \"1338\"\n" +
                 "}";
 
@@ -248,7 +246,7 @@ class UserControllerUnitTest {
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
                 "  },\n" +
-                "\"password\": \"1337\",\n" +
+                "\"password\": \"13371777\",\n" +
                 "\"newPassword\": \"1338\"\n" +
                 "}";
 
@@ -536,7 +534,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13312312317\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -553,7 +551,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13312312317\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -570,7 +568,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -587,7 +585,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -604,7 +602,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -622,7 +620,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -639,7 +637,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }, \"password\": \"1337\"}";
+                "  }, \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -656,7 +654,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }: \"236a Blenheim Road\", \"password\": \"1337\"}";
+                "  }: \"236a Blenheim Road\", \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -665,7 +663,7 @@ class UserControllerUnitTest {
 
     @Test
     void whenPostRequestToUsersAndUserInvalidDueToMissingHomeAddress_thenCorrectResponse() throws Exception {
-        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"password\": \"1337\"}";
+        String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"password\": \"13371777\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -702,7 +700,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  }", "1337");
+                "  }", "13312312317");
 
         String user = "{\"firstName\": \"James\", \"lastName\" : \"Harris\", \"email\": \"jeh128@uclive.ac.nz\", \"dateOfBirth\": \"2000-10-27\", \"homeAddress\": \"236a Blenheim Road\"}";
 
@@ -722,7 +720,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  },\"password\": \"1337\"}";
+                "  },\"password\": \"13312312317\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -741,7 +739,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  },\"password\": \"1337\"}";
+                "  },\"password\": \"13312312317\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -759,7 +757,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  },\"password\": \"1337\"}";
+                "  },\"password\": \"13312312317\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))
@@ -776,7 +774,7 @@ class UserControllerUnitTest {
                 "    \"region\": \"Canterbury\",\n" +
                 "    \"country\": \"New Zealand\",\n" +
                 "    \"postcode\": \"90210\"\n" +
-                "  },\"password\":\"a\"}";
+                "  },\"password\":\"13312312317\"}";
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .content(user)
                 .contentType(APPLICATION_JSON))

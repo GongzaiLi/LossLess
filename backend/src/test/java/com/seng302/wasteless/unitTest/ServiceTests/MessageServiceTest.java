@@ -98,7 +98,7 @@ class MessageServiceTest {
         user.setFirstName("a");
         user.setLastName("b");
         user.setDateOfBirth(LocalDate.parse("1998-05-09"));
-        user.setPassword("a");
+        user.setPassword("asadsadsadsa");
 
         if (userRepository.findFirstById(userId) == null) {
             userService.createUser(user);

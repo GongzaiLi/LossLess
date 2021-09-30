@@ -91,7 +91,7 @@ public class User {
     @NotBlank(message = "password is mandatory")
     @JsonView({UserViews.PostUserRequestView.class})
     @Column(name = "password") // map camelcase name (java) to snake case (SQL)
-    @Size(min = 0, max = 100)
+    @Size(min = 8, max = 100)
     private String password;
 
     @Column(name = "businesses_primarily_administered")
