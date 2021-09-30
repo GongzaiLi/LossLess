@@ -62,14 +62,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
             "check-default-admin-period-ms=0\ndefault-admin-username=admin@sengmail.com\ndefault-admin-password=supersecurepassword",
             "check-default-admin-period-ms=-5\ndefault-admin-username=admin@sengmail.com\ndefault-admin-password=supersecurepassword"})
      void throwsInvalidParameterExceptionWhenPeriodInvalid(String config) {
-        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
+        ByteArrayInputStream bytes = new ByteArrayInputStream(config.getBytes());
+        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", bytes));
     }
 
 
     @Test
      void throwsInvalidParameterExceptionWhenConfigEmpty() {
         String config = "";
-
-        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", new ByteArrayInputStream(config.getBytes())));
+        ByteArrayInputStream bytes = new ByteArrayInputStream(config.getBytes());
+        assertThrows(InvalidParameterException.class, () -> ReflectionTestUtils.invokeMethod(creatorService, "readConfigFile", bytes));
     }
 }
