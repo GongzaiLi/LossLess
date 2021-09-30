@@ -33,6 +33,9 @@ public class ListingsService {
 
     private final UserService userService;
 
+    private final String BUSINESS_FIELD = "business";
+    private final String ADDRESS_FIELD = "address";
+
     @Autowired
     public ListingsService(ListingRepository listingRepository, InventoryService inventoryService, PurchasedListingRepository purchasedListingRepository, UserService userService) {
         this.listingRepository = listingRepository;
@@ -103,7 +106,7 @@ public class ListingsService {
      */
     public static Specification<Listing> sellerAddressCountryMatches(String country) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("address").get("country")),
+                builder.lower(root.get(BUSINESS_FIELD).get(ADDRESS_FIELD).get("country")),
                 "%" + country.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -116,7 +119,7 @@ public class ListingsService {
      */
     public static Specification<Listing> sellerAddressCityMatches(String city) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("address").get("city")),
+                builder.lower(root.get(BUSINESS_FIELD).get(ADDRESS_FIELD).get("city")),
                 "%" + city.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -129,7 +132,7 @@ public class ListingsService {
      */
     public static Specification<Listing> sellerAddressSuburbMatches(String suburb) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("address").get("suburb")),
+                builder.lower(root.get(BUSINESS_FIELD).get(ADDRESS_FIELD).get("suburb")),
                 "%" + suburb.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -142,7 +145,7 @@ public class ListingsService {
      */
     private Specification<Listing> sellerBusinessNameMatches(String businessName) {
         return (root, query, builder) -> builder.like(
-                builder.lower(root.get("business").get("name")),
+                builder.lower(root.get(BUSINESS_FIELD).get("name")),
                 "%" + businessName.toLowerCase(Locale.ROOT) + "%");
     }
 
@@ -162,7 +165,7 @@ public class ListingsService {
             }
         }
 
-        return (root, query, builder) -> root.get("business").get("businessType").in(businessTypes);
+        return (root, query, builder) -> root.get(BUSINESS_FIELD).get("businessType").in(businessTypes);
     }
 
 
