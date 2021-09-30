@@ -612,16 +612,21 @@ async function getProductImages() {
   if (!fs.existsSync('./productImages')) {
     fs.mkdirSync('./productImages');
 
-    for (let i = 0; i < productNames.length; i += 10) {
+    for (let i = 0; i < productNames.length; i += 20) {
       await Promise.all(
-        productNames.slice(i, i+10).map(productName =>
-          Axios.get(`https://commons.wikimedia.org/w/api.php?action=query&format=json&uselang=en&generator=search&gsrsearch=filetype%3Abitmap%7C${productName}%20haslicense%3Aunrestricted%20${productName}&gsrlimit=3&gsroffset=0&gsrinfo=totalhits%7Csuggestion&gsrprop=size%7Cwordcount%7Ctimestamp%7Csnippet&prop=info%7Cimageinfo%7Centityterms&inprop=url&gsrnamespace=6&iiprop=url%7Csize%7Cmime&iiurlheight=180&wbetterms=label`)
+        productNames.slice(i, i+20).map(productName =>
+          Axios.get(`https://commons.wikimedia.org/w/api.php?action=query&format=json&uselang=en&generator=search&gsrsearch=filetype%3Abitmap%7Cdrawing%20haslicense%3Aattribution%20${productName}&gsrlimit=3&gsroffset=0&gsrinfo=totalhits%7Csuggestion&gsrprop=size%7Cwordcount%7Ctimestamp%7Csnippet&prop=info%7Cimageinfo%7Centityterms&inprop=url&gsrnamespace=6&iiprop=url%7Csize%7Cmime&iiurlheight=180&wbetterms=label`)
             .then(async (response) => {
               const pages = response.data.query.pages;
               if (pages) {
-                for (let pageNum = 0; pageNum < 3; pageNum++) {
-                  console.log(Object.values(pages)[pageNum].imageinfo[0].responsiveUrls['1.5']);
-                  const imageUrl = Object.values(pages)[pageNum].imageinfo[0].responsiveUrls['1.5'];
+                for (let pageNum = 0; pageNum < Object.values(pages).length; pageNum++) {
+                  let imageUrl;
+                  if (Object.values(pages)[pageNum].imageinfo[0].responsiveUrls) {
+                    imageUrl = Object.values(pages)[pageNum].imageinfo[0].responsiveUrls['1.5'];
+                  } else {
+                    imageUrl = Object.values(pages)[pageNum].imageinfo[0].url;
+                  }
+                  console.log(imageUrl);
                   const file = fs.createWriteStream(`productImages/${productName}-${pageNum}.jpg`);
                   const resp = await Axios.get(imageUrl, {responseType: 'stream'});
                   resp.data.pipe(file);
