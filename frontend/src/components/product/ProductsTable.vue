@@ -13,9 +13,8 @@
     <br>
     <b-table
         striped hovers
-        responsive="true"
+        responsive
         no-border-collapse
-        stacked="sm"
         bordered
         show-empty
         no-local-sorting

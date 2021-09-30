@@ -190,7 +190,6 @@ span.unreadLabel {
 .three-dot {
   margin-right: -10px;
   padding-right: 0;
-
   color: black;
 }
 

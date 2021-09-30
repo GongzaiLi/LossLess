@@ -37,16 +37,16 @@
     </b-col>
     <b-col :md="notificationWidth">
     <b-card class="shadow mt-3 w-100">
-      <div>
+      <div class="mb-2">
         <b-row>
-          <b-col cols="1">
+          <b-col lg="1" cols="1">
             <h3><b-icon-bell/></h3>
           </b-col>
-          <b-col cols="5">
+          <b-col lg="5" cols="11">
             <h3>Notifications</h3>
           </b-col>
-          <b-col cols="4">
-            <b-dropdown :variant="numberOfSelectedTags === 0 ? 'secondary' : 'primary'" v-if="!isArchivedSelected" :text="numberOfSelectedTags === 0 ? 'Filter By Tag' : `${numberOfSelectedTags} Tags Selected`">
+          <b-col lg="4" cols="6">
+            <b-dropdown :variant="numberOfSelectedTags === 0 ? 'secondary' : 'primary'" v-if="!isArchivedSelected" :text="numberOfSelectedTags === 0 ? 'Filter By Tag' : `${numberOfSelectedTags} Tags Selected`" class="tag-filter-dropdown">
               <b-dropdown-form v-for="[tagColor, selected] in Object.entries(tagColors)" :key="tagColor" @click="toggleTagColorSelected(tagColor)" :class="[selected ? 'selected' : '']">
                 <NotificationTag :tag-color=tagColor class="tag" :tag-style-prop="{height: '1.5rem', width: '100%'}"></NotificationTag>
               </b-dropdown-form>
@@ -56,7 +56,7 @@
             </b-dropdown>
             <h3 v-else>(Archived)</h3>
           </b-col>
-          <b-col cols="2">
+          <b-col lg="2" cols="6">
             <b-icon-archive v-if="!isArchivedSelected" font-scale="2"  title="View Archived Notifications"
                             class="view-archived-button pt-2"  @click="toggleArchived" v-b-tooltip.hover></b-icon-archive>
             <b-icon-archive-fill v-else font-scale="2" variant="success"  title="View Notifications"
@@ -357,9 +357,10 @@ export default {
      * user notifications (if acting as business)
      * @returns All notifications that should be displayed
      */
-    filteredNotifications: function(){
+    filteredNotifications: function() {
       return this.notifications.filter((notification) =>
-        !this.pendingDeletedNotifications.includes(notification.id) && (this.$currentUser.currentlyActingAs && notification.type==='Business Currency Changed'
+        !this.pendingDeletedNotifications.includes(notification.id)
+          && (this.$currentUser.currentlyActingAs && notification.type === 'Business Currency Changed' && parseInt(notification.subjectId) === this.$currentUser.currentlyActingAs.id
           || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')
       );
     },

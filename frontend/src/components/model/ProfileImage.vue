@@ -25,16 +25,25 @@
         <b-icon-image/>
         Add profile photo
       </b-button>
-      <b-button id="deleteButton" v-if="(profileImage || uploaded) && !isUploadingFile" class="mt-2" variant="danger" size="sm"
-                @click="$bvModal.show('confirmDeleteImageModal')">
-        <b-icon-trash-fill/>
-        Delete
-      </b-button>
-      <b-button id="changeButton" v-if="(profileImage || uploaded) && !isUploadingFile" variant="info" class="mt-2" size="sm"
-                @click="$refs.userImagePicker.click()">
-        <b-icon-pencil-fill/>
-        Change
-      </b-button>
+
+      <div v-if="canSave">
+        <b-button id="cancelButton" class="mt-2" variant="danger" size="sm" @click="cancel">
+          <b-icon-trash-fill/> Cancel </b-button>
+
+        <b-button id="confirmButton" variant="info" class="mt-2" size="sm" @click="save">
+          <b-icon-pencil-fill/> Save </b-button>
+      </div>
+
+        <b-button id="deleteButton" v-if="(profileImage || uploaded) && !isUploadingFile" class="mt-2" variant="danger" size="sm"
+                  @click="$bvModal.show('confirmDeleteImageModal')">
+          <b-icon-trash-fill/>
+          Delete
+        </b-button>
+        <b-button id="changeButton" v-if="(profileImage || uploaded) && !isUploadingFile" variant="info" class="mt-2" size="sm"
+                  @click="$refs.userImagePicker.click()">
+          <b-icon-pencil-fill/>
+          Change
+        </b-button>
     </div>
 
     <b-modal id="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete"
@@ -95,7 +104,9 @@ export default {
       uploaded: false,
       isUploadingFile: false,
       imageURL: '',
-      error: null
+      error: null,
+      confirmed: false,
+      canSave: false
     }
   },
 
@@ -104,6 +115,28 @@ export default {
   },
 
   methods: {
+    /**
+     * Cancels image upload and resets image to previous image.
+     */
+    cancel() {
+      this.confirmed = false;
+      this.imageFile = null;
+      this.canSave = false;
+      if (!this.profileImage) {
+        this.imageURL = require('../../../public/profile-default.jpg');
+      } else {
+        this.imageURL = this.getURL(this.profileImage.fileName);
+      }
+    },
+
+    /**
+     * Confirms image upload and calls method that makes the api request.
+     */
+    save() {
+      this.confirmed = true;
+      this.uploadImageRequest();
+      this.canSave = false;
+    },
 
     /**
      * when user uploads image display the image as a preview
@@ -113,6 +146,7 @@ export default {
       if (event.target.files[0]) {
         this.imageFile = event.target.files[0];
         this.uploadImageRequest();
+        this.canSave = true;
       }
     },
 
@@ -124,22 +158,32 @@ export default {
     async uploadImageRequest() {
       this.errors = [];
       this.isUploadingFile = true;
-      if (!this.$currentUser.currentlyActingAs) {
-       await this.uploadUserImage();
-      } else {
-        await this.uploadBusinessImage();
+      if (this.confirmed) {
+        if (!this.$currentUser.currentlyActingAs) {
+          await this.uploadUserImage();
+        } else {
+          await this.uploadBusinessImage();
+        }
       }
 
       if (!this.error) {
         this.imageURL = window.URL.createObjectURL(this.imageFile)
         this.isUploadingFile = false;
         this.uploaded = true;
-        if (!this.$currentUser.currentlyActingAs) {
-          EventBus.$emit("updatedUserImage");
-        } else {
-          EventBus.$emit("updatedBusinessImage");
+        if (this.confirmed) {
+          if (!this.$currentUser.currentlyActingAs) {
+            EventBus.$emit("updatedUserImage");
+          } else {
+            EventBus.$emit("updatedBusinessImage");
+          }
         }
+        this.confirmed = false;
+
       } else {
+        if (!this.profileImage) {
+          this.imageURL = require('../../../public/profile-default.jpg');
+        }
+        this.confirmed = false
         this.isUploadingFile = false;
         if (this.error.response) {
           if (this.error.response.status === 413) {
@@ -150,6 +194,7 @@ export default {
         } else {
           this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
         }
+        this.error = null;
       }
     },
 
@@ -197,6 +242,7 @@ export default {
      * the image already exists. This should only be called when the user confirms they want to delete the image
      **/
     async confirmDeleteImage() {
+
       this.errors = [];
       if (!this.$currentUser.currentlyActingAs && (this.profileImage || this.uploaded)) {
         await this.deleteUserImage();
@@ -211,6 +257,7 @@ export default {
           this.errors.push("Sorry, we couldn't reach the server. Check your internet connection");
         }
       } else {
+        this.canSave = false;
         this.imageURL = null;
         if (!this.$currentUser.currentlyActingAs) {
           EventBus.$emit("updatedUserImage");
