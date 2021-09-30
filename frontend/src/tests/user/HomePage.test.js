@@ -123,28 +123,6 @@ describe('check-getUserInfo-API-function', () => {
     });
 });
 
-
-describe('check-that-expired-table-only-shows-when-necessary', () => {
-    test('check-table-not-shown-with-zero-expired-cards', async () => {
-
-
-        wrapper.vm.hasExpiredCards = false;
-        await wrapper.vm.$forceUpdate();
-
-        expect(wrapper.find(MarketplaceSection).exists()).toBeFalsy();
-    })
-
-    test('check-table-shown-with-many-expired-cards', async () => {
-
-
-        wrapper.vm.hasExpiredCards = true;
-        await wrapper.vm.$forceUpdate();
-
-        expect(wrapper.find(MarketplaceSection).exists()).toBeTruthy();
-    })
-
-});
-
 describe('check-filtered-notifications', () => {
     beforeEach(() => {
         Api.getNotifications.mockResolvedValue({data: [

@@ -1,6 +1,7 @@
 <template>
   <div v-if="cardWasDeleted">
     <b-card>
+      <b-icon-x class="float-right close" @click="closeFullViewCardModal"/>
       <h1><strong> Sorry, this card has been deleted. </strong></h1>
     </b-card>
   </div>
@@ -41,7 +42,7 @@
           </b-container>
           <br>
           <div>
-            <b-button v-if="canDeleteOrExtend && openedFromNotifications == null" class="button-left" variant="danger"
+            <b-button v-if="canDeleteOrExtend" class="button-left" variant="danger"
                       @click="openDeleteConfirmDialog" title="Delete Card">
               <b-icon-trash-fill/>
             </b-button>

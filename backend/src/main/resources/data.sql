@@ -38,19 +38,19 @@ VALUES (1, '2017-08-08', 'Easter Egg', 'The Chocolate Factory', 'Easter Egg', 8.
 
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
-VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 5, '2021-12-26', 12.5, 1, 3);
+VALUES ('2022-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 5, '2021-12-26', 12.5, 1, 3);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
-VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 2, '2021-12-26', 5, 2, 0);
+VALUES ('2022-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 2, '2021-12-26', 5, 2, 0);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
-VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 10, '2021-12-26', 20, 3, 2);
+VALUES ('2022-09-27', 1, '2022-05-27', '2021-03-01', 2.5, 10, '2021-12-26', 20, 3, 2);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
-VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 3.5, 10, '2021-12-26', 35, 4, 10);
+VALUES ('2022-09-27', 1, '2022-05-27', '2021-03-01', 3.5, 10, '2021-12-26', 35, 4, 10);
 INSERT INTO Inventory(best_before, businessid, expires, manufactured, price_per_item, quantity, sell_by, total_price,
                       product_id, quantity_unlisted)
-VALUES ('2021-09-27', 1, '2022-05-27', '2021-03-01', 9.5, 3, '2021-12-26', 28.5, 5, 1);
+VALUES ('2022-09-27', 1, '2022-05-27', '2021-03-01', 9.5, 3, '2021-12-26', 28.5, 5, 1);
 
 INSERT INTO Listing(business_id, closes, created, moreInfo, price, quantity, inventory_id)
 VALUES (1, '2022-03-27', '2021-03-20', 'Willing to see offers.', 2.5, 2, 1);

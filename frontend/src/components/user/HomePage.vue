@@ -1,6 +1,6 @@
 <template>
   <div>
-  <b-card class="shadow" :style="{ 'max-width': $currentUser.currentlyActingAs ? '850px' : 'initial' }">
+  <b-card class="shadow">
       <h1 v-if="$currentUser.currentlyActingAs">{{$currentUser.currentlyActingAs.name + "'s Home Page"}}</h1>
       <h1 v-else>{{userData.firstName + "'s Home Page"}}</h1>
       <router-link v-if="$currentUser.currentlyActingAs" :to="{ name: 'business-profile', params: { id: $currentUser.currentlyActingAs.id }}">
@@ -11,31 +11,6 @@
     </router-link>
   </b-card>
     <b-row>
-    <b-col md="6" v-if="!$currentUser.currentlyActingAs">
-    <b-card class="expired-cards mt-3 shadow">
-      <h3><b-icon-clock/> Your recently closed cards </h3>
-      <h6>These cards will be deleted within 24 hours of their closing date. You can either extend their display period or delete cards you no longer need.</h6>
-      <b-input-group v-if="hasExpiredCards">
-        <b-form-text style="margin-right: 7px">
-          Table View
-        </b-form-text>
-        <b-form-checkbox v-model="isCardFormat" switch/>
-        <b-form-text>
-          Card View
-        </b-form-text>
-      </b-input-group>
-      <h2 style="text-align: center; margin-top: 2rem" v-if="!hasExpiredCards"> You have no cards that recently expired </h2>
-      <marketplace-section
-          v-else
-          :is-card-format="isCardFormat"
-          :cardsPerRow="2"
-          :perPage="2"
-          section="homepage"
-          v-on:cardCountChanged="checkExpiredCardsExist"
-      />
-    </b-card>
-    </b-col>
-    <b-col :md="notificationWidth">
     <b-card class="shadow mt-3 w-100">
       <div class="mb-2">
         <b-row>
@@ -77,7 +52,6 @@
         </div>
       </b-overlay>
     </b-card>
-    </b-col>
     </b-row>
     <div class="undoToastClass" >
     <b-toast v-if="pendingDeletedNotificationId && this.$route.name==='home-page'"
@@ -142,7 +116,6 @@
 import Api from "../../Api";
 import NotificationTag from "../model/NotificationTag";
 import Notification from "../model/Notification";
-import MarketplaceSection from "../marketplace/MarketplaceSection";
 import EventBus from "../../util/event-bus";
 
 const beforeUnloadListener = (event) => {
@@ -152,7 +125,7 @@ const beforeUnloadListener = (event) => {
 
 
 export default {
-  components: {MarketplaceSection, Notification, NotificationTag},
+  components: {Notification, NotificationTag},
   name: "HomePage",
   data: function () {
     return {
@@ -170,8 +143,6 @@ export default {
       },
       errors: [],
       activeTabIndex: 0,
-      isCardFormat: true,
-      hasExpiredCards: false,
       notifications: [],
       isArchivedSelected: false,
       loadingNotifications: false,
@@ -238,19 +209,11 @@ export default {
             this.$log.debug(error);
           })
     },
-    checkExpiredCardsExist(cards) {
-      this.hasExpiredCards = cards.length !== 0;
-    },
     /**
-     * Updates the notifications using the notification api requests and updates whether the user has
-     * cards that have expired.
+     * Updates the notifications using the notification api requests
      */
     async updateNotifications() {
       this.loadingNotifications = true;
-      const expiredCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
-      if (expiredCards.length > 0) {
-        this.hasExpiredCards = true;
-      }
       this.notifications = (await Api.getNotifications(null, this.isArchivedSelected)).data;
       this.loadingNotifications = false;
     },
@@ -364,6 +327,7 @@ export default {
 
   created() {
     this.updateNotifications();
+    window.addEventListener("unload", () => this.deleteNotification());  // Delete pending notifications when leaving the page
   },
 }
 </script>

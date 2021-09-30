@@ -168,32 +168,13 @@ describe('NotificationBadge', () => {
 });
 
 
-describe('Get expiring cards', () => {
-  test('cards expiring within 24 hours get added to notifications', async () => {
-    await wrapper.vm.updateNotifications();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.numberOfNotifications).toBe(4);
-  })
-
-
-  describe('Get expiring cards', () => {
-    test('cards expiring within 24 hours get added to notifications', async () => {
-      await wrapper.vm.updateNotifications();
-      await wrapper.vm.$nextTick();
-      expect(wrapper.vm.numberOfNotifications).toBe(4);
-    })
-  });
-
-});
-
-
 describe('Get unread notifications', () => {
 
   test('Unread notifications from the list of all the notifications when acting as user', async () => {
     await wrapper.vm.updateNotifications();
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.numberOfNotifications).toBe(4);
+    expect(wrapper.vm.numberOfNotifications).toBe(2);
   })
 
   test('Unread notifications only counts business notifications when acting as business', async () => {
@@ -204,7 +185,7 @@ describe('Get unread notifications', () => {
     await wrapper.vm.updateNotifications();
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.vm.numberOfNotifications).toBe(3);
+    expect(wrapper.vm.numberOfNotifications).toBe(1);
   })
 
 });
