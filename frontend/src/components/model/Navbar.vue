@@ -256,6 +256,7 @@ export default {
      * Currently does nothing with managing cookies, this needs to be implemented later.
      */
     logOut() {
+      EventBus.$emit('changedCurrentUser');
       this.$currentUser = null;
       this.$router.push('/login');
     },
@@ -277,6 +278,7 @@ export default {
      */
     actAsBusiness(business) {
       setCurrentlyActingAs(business);
+      EventBus.$emit('changedCurrentUser');
       this.goToProfile();
     },
 
@@ -286,6 +288,7 @@ export default {
      */
     actAsUser() {
       setCurrentlyActingAs(null);
+      EventBus.$emit('changedCurrentUser');
       this.goToProfile();
     },
 
