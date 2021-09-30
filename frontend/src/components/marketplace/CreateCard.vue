@@ -136,8 +136,7 @@ export default {
       this.cardInfo.dateCreated = currentDate.getDate() + " " + getMonthName(currentDate.getMonth()) + " " +
           currentDate.getFullYear() + " @ "
           + currentDate.getHours() + ":"
-          + this.addLeadingZero(currentDate.getMinutes()) + ":"
-          + this.addLeadingZero(currentDate.getSeconds());
+          + this.addLeadingZero(currentDate.getMinutes());
       api
           .getUser(id)
           .then((response) => {
