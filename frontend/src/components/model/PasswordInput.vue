@@ -5,7 +5,7 @@
                   :value="value"
                   @input="$emit('input', inputPassword)"
                   maxLength=100
-                  minLength=8
+                  :minLength="minPasswordLength ? minPasswordLength : 0"
                   class="form-control"
                   :id="id"
                   :placeholder="placeHolder"
@@ -22,7 +22,7 @@
 <script>
 export default {
   name: "password-input",
-  props:['value', 'id', 'placeHolder', 'isRequired', 'autocomplete'],
+  props:['value', 'id', 'placeHolder', 'isRequired', 'autocomplete', 'minPasswordLength'],
   data() {
     return {
       visiblePassword: false,

@@ -50,15 +50,15 @@ Date: 3/3/2021
 
         <b-form-group v-if="isEditUser && !currentUserAdminAndEditingAnotherUser && changePassword" class="input-group-addon">
           <strong>Enter Current Password</strong>
-          <password-input v-model="userData.oldPassword" id="oldPassword" :is-required="!isEditUser || changePassword" place-holder="Current Password"/>
+          <password-input v-model="userData.oldPassword" id="oldPassword" :min-password-length="0" :is-required="!isEditUser || changePassword" place-holder="Current Password"/>
         </b-form-group>
 
         <b-form-group v-if="changePassword || !isEditUser">
           <strong>{{isEditUser ? 'New Password' : 'Password *'}}</strong>
-          <password-input autocomplete="new-password" v-model="userData.newPassword" id="newPassword" :is-required="changePassword ? changePassword : !isEditUser" place-holder="New Password"/>
+          <password-input autocomplete="new-password" v-model="userData.newPassword" :min-password-length="8" id="newPassword" :is-required="changePassword ? changePassword : !isEditUser" place-holder="New Password"/>
 
           <strong>Confirm {{isEditUser ? 'New Password' : 'Password *'}}</strong>
-          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :is-required="!isEditUser" place-holder="Confirm Password"/>
+          <password-input v-model="userData.confirmPassword" id="confirmPasswordInput" :min-password-length="8" :is-required="!isEditUser" place-holder="Confirm Password"/>
         </b-form-group>
         <hr v-if="isEditUser">
 
