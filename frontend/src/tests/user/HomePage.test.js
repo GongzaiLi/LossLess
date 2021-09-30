@@ -379,3 +379,22 @@ describe('Test notification clicked', () => {
 
 });
 
+describe("Removing all tags", () => {
+    test("Removes single tag", () => {
+        wrapper.vm.tagColors.RED = true;
+
+        wrapper.vm.removeAllTagsFromFilter();
+
+        expect(wrapper.vm.tagColors.RED).toBeFalsy();
+    })
+
+    test("Removes multiple tags", () => {
+        wrapper.vm.tagColors.BLACK = true;
+        wrapper.vm.tagColors.ORANGE = true;
+
+        wrapper.vm.removeAllTagsFromFilter();
+
+        expect(wrapper.vm.tagColors.BLACK).toBeFalsy();
+        expect(wrapper.vm.tagColors.ORANGE).toBeFalsy();
+    })
+})
