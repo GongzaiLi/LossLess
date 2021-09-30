@@ -45,7 +45,7 @@
           <h6 v-if="!isArchivedSelected && numberOfSelectedTags === 0"> You have no notifications </h6>
           <h6 v-if="!isArchivedSelected && numberOfSelectedTags !== 0"> You have no notifications that match the selected tag filters </h6>
         </b-card>
-        <div v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow" @click="notificationClicked(notification)">
+        <div v-for="notification in filteredNotifications" v-bind:key="notification.id" class="notification-cards shadow">
           <notification @tagColorChanged="filterNotificationsByTag" :archived-selected="isArchivedSelected" :notification="notification"
                         :in-navbar="false" @deleteNotification="createDeleteToast">
           </notification>
@@ -254,19 +254,6 @@ export default {
         clearInterval(this.countdown.interval);
         clearTimeout(this.countdown.timeout);
       }
-    },
-
-    /**
-     * Performs an action based on the notification that has been clicked.
-     * @param notification the notification that has been clicked
-     */
-    async notificationClicked(notification) {
-      if (!notification.read) {
-        notification.read = true;
-        await Api.patchNotification(notification.id, {read: true});
-        EventBus.$emit('notificationClicked', notification);
-      }
-
     },
 
     /**

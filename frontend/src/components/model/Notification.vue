@@ -1,5 +1,5 @@
 <template>
-  <b-card class="notification-card">
+  <b-card class="notification-card" @click="markRead">
     <b-card-body class="notification-body">
       <div v-if="updatedNotification.tag" :key="updatedNotification.tag" class="tag-bar"> <!-- Key makes div refresh on tag color change -->
         <NotificationTag :tag-color=updatedNotification.tag style="height: 100%"/>
@@ -232,7 +232,6 @@ export default {
     return {
       updatedNotification: {message:"", type:"", read: this.notification.read},
       tagColors: ["RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "BLACK"],
-      updated: false,
       isHoveringTagButton: false,
     }
   },
@@ -295,7 +294,7 @@ export default {
      * When a liked or unliked listing is clicked it routes you to that listing
      */
     goToListing() {
-      this.updatedNotification.read = true;  // For some reason, when we click the link and redirect to a different page, it's not always marked as read so this gaurantees it.
+      this.markRead();  // For some reason, when we click the link and redirect to a different page, it's not always marked as read so this gaurantees it.
       if (this.updatedNotification.type === 'Liked Listing' || this.updatedNotification.type === 'Unliked Listing') {
         if (this.$route.fullPath !== '/listings/' + this.updatedNotification.subjectId) {
           this.$router.push('/listings/' + this.updatedNotification.subjectId);
@@ -348,14 +347,14 @@ export default {
      * Marks a notification as read and makes th api call.
      * @param notification the notification that has been clicked
      */
-    async markRead(notification) {
-      if (notification.id === this.updatedNotification.id && !this.updatedNotification.read && !this.updated) {
+    async markRead() {
+      if (!this.updatedNotification.read) {
         this.updatedNotification.read = true;
         await Api.patchNotification(this.updatedNotification.id, {"read": true});
-      }
-      this.updated = true
-    },
 
+        EventBus.$emit('notificationClicked', this.updatedNotification);
+      }
+    },
   },
   async mounted() {
     if (this.notification.type === "Purchased listing") {
@@ -369,11 +368,6 @@ export default {
       this.updatedNotification.subjectId=subjectArray[0];
       this.updatedNotification.senderId=subjectArray[1];
     }
-
-    /**
-     * This mount listens to the markRead event when a notification click is on home feed.
-     */
-    EventBus.$on('notificationClicked', this.markRead);
   },
 }
 </script>
