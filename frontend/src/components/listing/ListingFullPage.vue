@@ -300,9 +300,11 @@ export default {
               product.images.unshift(product.primaryImage);
             }
 
+            this.listingLoading = false;
+          })
+          .then(async () => {
             const address = this.listingItem.business.address;
             this.currency = await Api.getUserCurrency(address.country);
-            this.listingLoading = false;
           })
           .catch(() => {
             this.listingNotExists = true;

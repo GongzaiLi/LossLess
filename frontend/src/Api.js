@@ -229,7 +229,10 @@ export default {
       name: 'United States Dollar'
     };
 
-    return fetch(`https://restcountries.com/v2/name/${encodeURIComponent(countryName)}?fields=currencies`)
+    const controller = new AbortController();  // see https://stackoverflow.com/questions/46946380/fetch-api-request-timeout
+    setTimeout(() => controller.abort(), 2000);
+    
+    return fetch(`https://restcountries.com/v2/name/${encodeURIComponent(countryName)}?fields=currencies`, { signal: controller.signal })
       .then(resp => resp.json())
       .then(data => {
         if (data.status === 404 || !data[0].currencies || data[0].currencies.length === 0) {
@@ -241,6 +244,13 @@ export default {
         } else {
           currencyCache[countryName] = currency;
           return currency;
+        }
+      })
+      .catch(() => {
+        return {
+          symbol: '$',
+          code: 'NZD',
+          name: 'New Zealand Dollar'
         }
       })
   }
