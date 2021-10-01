@@ -10,10 +10,6 @@
            alt="default image"/>
     <input @change="openImage($event)" type="file" ref="userImagePicker"
            accept="image/png, image/jpeg, image/gif, image/jpg" class="upload-image py-2 mb-2">
-    <div v-if="errors.length">
-      <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}
-      </b-alert>
-    </div>
 
     <div v-if="userLookingAtSelfOrIsAdmin">
       <b-button v-if="isUploadingFile" variant="info" class="w-100 mt-2" size="sm"
@@ -33,11 +29,16 @@
           <b-icon :icon="(canSave)?'x':'trash-fill'" />
           {{(canSave)?'Cancel':'Delete'}}
         </b-button>
-        <b-button id="changeButton" v-if="((profileImage || uploaded) && !isUploadingFile)" variant="info" class="mt-2" size="sm"
+        <b-button id="changeButton" v-if="((profileImage || uploaded) && !isUploadingFile)" :variant="(canSave)?'success':'info'" class="mt-2" size="sm"
                   @click="(canSave)?save():$refs.userImagePicker.click()">
           <b-icon :icon="(canSave)?'check2':'pencil-fill'" />
           {{(canSave)?'Save':'Change'}}
         </b-button>
+
+      <div v-if="errors.length" class="mt-2">
+        <b-alert variant="danger" v-for="error in errors" v-bind:key="error" dismissible :show="true">{{ error }}
+        </b-alert>
+      </div>
     </div>
 
     <b-modal id="confirmDeleteImageModal" size="sm" title="Delete Image" ok-variant="danger" ok-title="Delete"
@@ -131,6 +132,8 @@ export default {
       this.confirmed = false;
       this.imageFile = null;
       this.canSave = false;
+      this.error = null;
+      this.errors = [];
       if (!this.profileImage) {
         this.isUploadingFile = false
         this.imageURL = this.defaultImage;
@@ -144,11 +147,15 @@ export default {
     /**
      * Confirms image upload and calls method that makes the api request.
      */
-    save() {
+    async save() {
       this.confirmed = true;
-      this.uploadImageRequest();
-      this.$bvModal.hide('edit-business-image')
-      this.$bvModal.hide('edit-profile-image')
+      await this.uploadImageRequest();
+      if (this.errors.length === 0) {
+        this.$bvModal.hide('edit-business-image')
+        this.$bvModal.hide('edit-profile-image')
+      } else {
+        this.uploaded = false;
+      }
       this.canSave = false;
     },
 
