@@ -116,7 +116,7 @@ public class ImageService {
             }
             int height = TARGET_HEIGHT;
             int width = originalImage.getWidth() * TARGET_HEIGHT / originalImage.getHeight();
-            BufferedImage resizedImage = new BufferedImage( width, height, originalImage.getType());
+            BufferedImage resizedImage = new BufferedImage( width, height, originalImage.getType() == 0 ? 5 : originalImage.getType()); // This is a hack to fix a known bug in Java. See https://github.com/usnistgov/pyramidio/issues/7
             Graphics2D graphics2D = resizedImage.createGraphics();
             graphics2D.drawImage(originalImage, 0, 0, width, height, null);
             graphics2D.dispose();

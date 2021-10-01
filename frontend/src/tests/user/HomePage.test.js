@@ -123,28 +123,6 @@ describe('check-getUserInfo-API-function', () => {
     });
 });
 
-
-describe('check-that-expired-table-only-shows-when-necessary', () => {
-    test('check-table-not-shown-with-zero-expired-cards', async () => {
-
-
-        wrapper.vm.hasExpiredCards = false;
-        await wrapper.vm.$forceUpdate();
-
-        expect(wrapper.find(MarketplaceSection).exists()).toBeFalsy();
-    })
-
-    test('check-table-shown-with-many-expired-cards', async () => {
-
-
-        wrapper.vm.hasExpiredCards = true;
-        await wrapper.vm.$forceUpdate();
-
-        expect(wrapper.find(MarketplaceSection).exists()).toBeTruthy();
-    })
-
-});
-
 describe('check-filtered-notifications', () => {
     beforeEach(() => {
         Api.getNotifications.mockResolvedValue({data: [
@@ -385,24 +363,6 @@ describe('test-toggle-archived-notifications', () => {
         expect(Api.getNotifications).toHaveBeenCalledWith(null, false);
     });
 })
-
-describe('Test notification clicked', () => {
-
-    const collarNotification = {
-        id: 6,
-        message: "A notification about Pink collars maybe - 69g can",
-        subjectId: 1,
-        type: "Some type",
-        read: false
-    }
-
-    test('Notification set to read on click', async () => {
-        await wrapper.vm.notificationClicked(collarNotification);
-        expect(collarNotification.read).toBeTruthy();
-
-    })
-
-});
 
 describe("Removing all tags", () => {
     test("Removes single tag", () => {

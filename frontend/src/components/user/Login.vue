@@ -15,7 +15,7 @@ Date: 3/3/2021
               <strong>Email</strong>
               <b-form-input type="email" v-model="email" required
                      autofocus
-                     autocomplete="off"
+                     autocomplete="off" trim
               ></b-form-input>
             </b-form-group>
 

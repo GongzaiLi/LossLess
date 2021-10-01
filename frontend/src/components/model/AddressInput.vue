@@ -22,6 +22,7 @@ Date: sprint_1
                 maxLength=50
                 v-bind:value="value"
                 required
+                trim
               />
               <b-form-input
                 v-model="homeAddress.streetName"
@@ -30,6 +31,7 @@ Date: sprint_1
                 maxLength=50
                 v-bind:value="value"
                 required
+                trim
               />
             </b-input-group>
           </b-col>
@@ -71,6 +73,7 @@ Date: sprint_1
               maxLength=50
               placeholder="Suburb"
               v-bind:value="value"
+              trim
             />
           </b-col>
           <b-col>
@@ -80,6 +83,7 @@ Date: sprint_1
               placeholder="City"
               v-bind:value="value"
               required
+              trim
             />
           </b-col>
           <b-col>
@@ -88,6 +92,7 @@ Date: sprint_1
               maxLength=50
               placeholder="Region"
               v-bind:value="value"
+              trim
             />
           </b-col>
         </b-row>
@@ -106,6 +111,7 @@ Date: sprint_1
               placeholder="Country"
               v-bind:value="value"
               required
+              trim
             />
           </b-col>
           <b-col md="4">
@@ -115,6 +121,7 @@ Date: sprint_1
               placeholder="Postcode"
               v-bind:value="value"
               required
+              trim
             />
           </b-col>
           <b-col md="2">
@@ -185,6 +192,11 @@ export default {
   // This is needed to close the dropdown when you click outside it
   mounted: function () {
     if (this.address) this.homeAddress = this.address;
+    for (const [key, val] of Object.entries(this.homeAddress)) {  // Need to convert all to strings if null
+      if (val === null) {
+        this.homeAddress[key] = "";
+      }
+    }
     document.addEventListener('click', () => {
       this.showAutocompleteDropdown = false;
     });

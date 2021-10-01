@@ -13,7 +13,6 @@ export default {
   data() {
     return {
       notifications: [],
-      expiringCards: [],
       notificationChange: true,
       pendingDeletedNotification:[]
     }
@@ -23,11 +22,10 @@ export default {
       return this.$currentUser.currentlyActingAs == null;
     },
     /**
-     * Checks if there are notifications about expiring or expired cards.
      * @return The number of total notifications
      */
     numberOfNotifications: function () {
-      return this.expiringCards.length + this.unreadNotifications.length;
+      return this.unreadNotifications.length;
     },
 
     /**
@@ -37,8 +35,8 @@ export default {
     unreadNotifications: function () {
       let unreadNotifications = []
       for (const notification of this.notifications) {
-        if (!notification.read && (this.$currentUser.currentlyActingAs && notification.type === 'Business Currency Changed' && parseInt(notification.subjectId) === this.$currentUser.currentlyActingAs.id
-                || !this.$currentUser.currentlyActingAs && notification.type!=='Business Currency Changed')) {
+        if (!notification.read && (!this.isActingAsUser && notification.type === 'Business Currency Changed' && parseInt(notification.subjectId) === this.$currentUser.currentlyActingAs.id
+                || this.isActingAsUser && notification.type!=='Business Currency Changed')) {
           unreadNotifications.push(notification)
         }
       }
@@ -56,11 +54,9 @@ export default {
       }
     },
     /**
-     *  Adds a notification about a card that expires within next 24 hours.
-     *  This is done by adding the expiring card to the list of notifications.
+     *  Gets all notifications for the current user
      */
     async updateNotifications() {
-      this.expiringCards = (await Api.getExpiredCards(this.$currentUser.id)).data;
       this.notifications = (await Api.getNotifications()).data;
       // This is needed to re-render a notification when a star icon is needed.
       this.notificationChange = !this.notificationChange;

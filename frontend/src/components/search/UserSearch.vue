@@ -7,7 +7,7 @@ Date: sprint_1
     <b-row style="height: 50px">
       <b-col cols="7">
         <b-form-input v-model="searchQuery" @keyup.enter="displayResults(searchQuery)" type="search"
-                      placeholder="Search users"></b-form-input>
+                      placeholder="Search users" trim></b-form-input>
       </b-col>
       <b-col cols="0">
         <b-button variant="primary" @click="displayResults(searchQuery)"> Search</b-button>

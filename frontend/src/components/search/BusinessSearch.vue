@@ -7,7 +7,7 @@ Page that stores table and search bar to search for businesses
       <b-col md="6" class="mb-3">
         <b-input-group prepend="Name:">
           <b-form-input v-model="searchQuery" @keyup.enter="searchBusinessApiRequest(searchQuery)" type="search"
-                        placeholder="Search businesses"></b-form-input>
+                        placeholder="Search businesses" trim></b-form-input>
         </b-input-group>
 
       </b-col>

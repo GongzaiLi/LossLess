@@ -42,7 +42,7 @@ Date: 13/5/2021
               :disabled="disabled"
               placeholder="PRODUCT-ID"
               v-model="inventoryInfo.displayedProductId"
-              autofocus required/>
+              autofocus required trim/>
             <b-input-group-append v-if="!disabled">
               <b-button variant="outline-primary" @click="openSelectProductModal">Select Product</b-button>
             </b-input-group-append>
