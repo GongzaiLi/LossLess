@@ -13,7 +13,7 @@ Date: sprint_1
         <b-button variant="primary" @click="displayResults(searchQuery)"> Search</b-button>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="userRow">
       <b-col cols="12">
         <b-table striped hover
                  ref="searchTable"
@@ -46,6 +46,11 @@ Date: sprint_1
 </template>
 
 <style scoped>
+
+.userRow {
+  cursor: pointer;
+}
+
 .no-results-overlay {
   margin-top:7em;
   margin-bottom:7em;
@@ -59,6 +64,7 @@ Date: sprint_1
 }
 
 </style>
+
 
 <script>
 import api from "../../Api";
