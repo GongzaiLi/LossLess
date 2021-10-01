@@ -41,7 +41,7 @@
         <b-input-group>
             <b-form-textarea required no-resize maxlength="250" max-rows="2"
                              type="text" class="messageInputBox sendMessageGroup"
-                             placeholder="Type Message..." v-model="messageText">
+                             placeholder="Type Message..." v-model="messageText" trim>
             </b-form-textarea>
 
             <b-input-group-append>
@@ -132,6 +132,7 @@ div.chat-head:first-child {
 
 
 .speech-bubble-left {
+  white-space: pre-line;
   float: left;
   padding: 10px 20px;
   background: pink;
@@ -142,11 +143,12 @@ div.chat-head:first-child {
 }
 
 .speech-bubble-right {
+  white-space: pre-line;
   float: right;
   padding: 10px 20px;
   background: #00c8e2;
   border-radius: 6px;
-  text-align: right;
+  text-align: left;
   max-width: 60%;
   margin-bottom: 0;
 }

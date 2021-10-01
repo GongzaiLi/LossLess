@@ -44,10 +44,9 @@ Date: sprint_1
           <b-dropdown-item :to="businessListingsRouteLink">
             <b-icon-receipt/> Sales List
           </b-dropdown-item>
-          <b-dropdown-item :to="businessSalesReportRouteLink">
-            <b-icon-graph-up/> Sales Report
-          </b-dropdown-item>
         </b-nav-item-dropdown>
+
+        <b-nav-item v-if="$currentUser.currentlyActingAs" :to="businessSalesReportRouteLink"> Sales Report </b-nav-item>
       </b-navbar-nav>
 
       <b-button v-if="!$currentUser.currentlyActingAs" to="/businesses/" class="ml-auto" id="create-business-btn">Create Business</b-button>
