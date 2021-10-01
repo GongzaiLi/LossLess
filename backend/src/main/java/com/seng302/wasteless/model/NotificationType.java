@@ -8,6 +8,7 @@ public enum NotificationType {
     LIKEDLISTING("Liked Listing"),
     UNLIKEDLISTING("Unliked Listing"),
     EXPIRED("Expired Marketplace Card"),
+    EXPIRY_WARNING("Marketplace Card About To Expire"),
     PURCHASED_LISTING("Purchased listing"),
     LIKEDLISTING_PURCHASED("Liked Listing Purchased"),
     USER_CURRENCY_CHANGE("User Currency Changed"),

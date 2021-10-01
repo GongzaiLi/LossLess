@@ -133,7 +133,6 @@ export default {
   components: {NotificationBadge},
   data() {
     return {
-      cards: [],
       timer: null,
     }
   },
