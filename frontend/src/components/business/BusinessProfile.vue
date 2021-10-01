@@ -111,7 +111,7 @@ Date: 29/03/2021
           &nbsp;
           <router-link v-if="isAdmin" :to="{ name: 'sales-report-page', params: { id: businessData.id }}">
             <b-button class="business-manage-button" type="submit" variant="primary">
-              <b-icon-newspaper/>
+              <b-icon-graph-up/>
               Sales Report
             </b-button>
           </router-link>
