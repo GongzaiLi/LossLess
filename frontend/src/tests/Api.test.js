@@ -24,7 +24,7 @@ describe("Get user's country", () => {
     returnedData = [{"currencies":[{"code":"EUR","name":"Euro","symbol":"€"}]}];
 
     const currency = await Api.getUserCurrency('New Zealand');
-    expect(window.fetch).toHaveBeenCalledWith('https://restcountries.com/v2/name/New%20Zealand?fields=currencies');
+    expect(window.fetch).toHaveBeenCalledWith('https://restcountries.com/v2/name/New%20Zealand?fields=currencies', expect.anything());
     expect(currency).toEqual({"code":"EUR","name":"Euro","symbol":"€"});
   });
 
