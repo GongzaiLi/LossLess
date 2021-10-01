@@ -36,7 +36,7 @@
         <h6><strong>Title*:</strong></h6>
       </b-input-group>
       <b-input-group class="mb-1">
-        <b-form-input type="text" maxlength="25" v-model="createCardForm.title" required/>
+        <b-form-input type="text" maxlength="25" v-model="createCardForm.title" required trim/>
       </b-input-group>
       <br>
 

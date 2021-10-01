@@ -60,7 +60,8 @@ Date: 23/5/2021
                           maxLength=250
                           :disabled="disabled"
                           autocomplete="off"
-                          v-model="listingData.moreInfo"/>
+                          v-model="listingData.moreInfo"
+                          trim/>
           </b-input-group>
 
           <b-input-group>

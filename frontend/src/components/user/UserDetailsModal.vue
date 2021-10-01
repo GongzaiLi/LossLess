@@ -16,22 +16,22 @@ Date: 3/3/2021
       <hr>
       <b-form-group>
           <strong>First Name *</strong>
-          <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus></b-form-input>
+          <b-form-input v-model="userData.firstName" maxLength=50 required placeholder="First Name" autofocus trim></b-form-input>
         </b-form-group>
 
         <b-form-group>
           <strong>Last Name *</strong>
-          <b-form-input v-model="userData.lastName" maxLength=50 required placeholder="Last Name"></b-form-input>
+          <b-form-input v-model="userData.lastName" maxLength=50 required placeholder="Last Name" trim></b-form-input>
         </b-form-group>
 
         <b-form-group>
           <strong>Middle Name</strong>
-          <b-form-input v-model="userData.middleName" maxLength=50 placeholder="Middle Name"></b-form-input>
+          <b-form-input v-model="userData.middleName" maxLength=50 placeholder="Middle Name" trim></b-form-input>
         </b-form-group>
 
         <b-form-group>
           <strong>Nickname</strong>
-          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nickname"></b-form-input>
+          <b-form-input v-model="userData.nickname" maxLength=50 placeholder="Nickname" trim></b-form-input>
         </b-form-group>
 
         <b-form-group>
@@ -41,7 +41,7 @@ Date: 3/3/2021
 
         <b-form-group>
           <strong>Email *</strong>
-          <b-form-input required type="email" maxLength=50 v-model="userData.email" placeholder="Email"></b-form-input>
+          <b-form-input required type="email" maxLength=50 v-model="userData.email" placeholder="Email" trim></b-form-input>
         </b-form-group>
 
         <hr v-if="isEditUser">

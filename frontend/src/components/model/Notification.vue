@@ -69,7 +69,7 @@
                 <p ><b-icon-star-fill v-if="updatedNotification.starred" title="Mark this notification as Important" class="star-icon"></b-icon-star-fill>
                 <b-icon-star title="Remove this notification as Important" class="star-icon"  v-else></b-icon-star>   Important</p>
               </b-dropdown-item>
-              <b-dropdown-item @click="confirmArchive">
+              <b-dropdown-item @click="archiveNotification">
                 <p v-if="!archivedSelected">
                   <b-icon-archive  class="archive-button" variant="outline-success" title="Archive this notification"></b-icon-archive>  Archive </p>
                 <p v-else>
@@ -111,13 +111,6 @@
             Are you sure you want to <strong>delete</strong> this notification?
           </b-modal>
 
-        <b-modal ref="confirmArchiveModal" size="sm"
-                 :title="this.archivedSelected ? 'Un-Archive Notification' :'Archive Notification'"
-                 ok-variant="success"
-                 :ok-title="this.archivedSelected ? 'Un-Archive' :'Archive'"
-                 @ok="archiveNotification">
-          Are you sure you want to <strong>{{this.archivedSelected ? 'un-archive' :'archive'}}</strong> this notification?
-        </b-modal>
         <b-modal :id="`full-card-${this.updatedNotification.id}`" size="lg" hide-header hide-footer>
           <MarketplaceCardFull
               :cardId = "updatedNotification.subjectId"
@@ -318,21 +311,14 @@ export default {
     },
 
     /**
-     * Shows a dialog to confirm archiving the notification.
-     * USES REFS NOT ID TO PREVENT DUPLICATION!
-     */
-    async confirmArchive() {
-      this.$refs.confirmArchiveModal.show();
-    },
-
-    /**
      * Calls API archiveNotification patch request
      * and using an EventBus that emits notificationUpdate so that
      * other components are refreshed.
      */
     async archiveNotification() {
-      await Api.patchNotification(this.updatedNotification.id, {"archived": !this.archivedSelected})
-      EventBus.$emit("notificationUpdate")
+      await Api.patchNotification(this.updatedNotification.id, {"archived": !this.archivedSelected});
+      await this.markRead();
+      EventBus.$emit('notificationUpdate', this.updatedNotification);
     },
 
     /**

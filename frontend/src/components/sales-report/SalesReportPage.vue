@@ -8,12 +8,16 @@ Date: sprint_6
     <b-card v-if="canViewReport" class="shadow mw-100" no-body>
       <b-list-group>
         <b-list-group-item>
-          <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
-        </b-list-group-item>
-        <b-list-group-item>
-          <b-button @click="downloadCSV('salesreport.csv')">
-            Download All Sales Report Data As CSV
-          </b-button>
+          <b-row>
+            <b-col lg="9">
+              <h3 class="mb-1">{{ business.name }}'s Sale Report</h3>
+            </b-col>
+            <b-col lg="3">
+              <b-button @click="downloadCSV('salesreport.csv')" variant="info">
+                Download All Sales Records As CSV
+              </b-button>
+            </b-col>
+          </b-row>
         </b-list-group-item>
         <b-list-group-item>
           <DateRangeInput v-model="dateRange" @input="gotReport=true" :all-time-start="new Date(business.created)"/>

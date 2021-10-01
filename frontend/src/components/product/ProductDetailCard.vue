@@ -71,21 +71,21 @@
           <br>This will be automatically changed into the correct format.</p>
         <b-input-group class="mb-1">
           <b-form-input type="text" maxlength="50" pattern="[a-zA-Z0-9\d\-_\s]{0,100}" v-bind:disabled=disabled
-                        placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required/>
+                        placeholder="PRODUCT-ID" v-model="productCard.id" autofocus required trim/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Name*:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" maxlength="38" v-bind:disabled=disabled v-model="productCard.name" required/>
+          <b-form-input type="text" maxlength="38" v-bind:disabled=disabled v-model="productCard.name" required trim/>
         </b-input-group>
 
         <b-input-group>
           <h6><strong>Manufacturer:</strong></h6>
         </b-input-group>
         <b-input-group class="mb-1">
-          <b-form-input type="text" maxlength="50" v-bind:disabled=disabled v-model="productCard.manufacturer"/>
+          <b-form-input type="text" maxlength="50" v-bind:disabled=disabled v-model="productCard.manufacturer" trim/>
         </b-input-group>
 
         <b-input-group>
@@ -118,7 +118,7 @@
         </b-input-group>
         <b-input-group class="mb-1">
           <b-form-textarea rows="5" type="text" maxlength="250" v-bind:disabled=disabled
-                           v-model="productCard.description "/>
+                           v-model="productCard.description" trim/>
         </b-input-group>
       </b-card-body>
       <div>

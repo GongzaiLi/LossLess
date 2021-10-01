@@ -45,3 +45,7 @@ nav {
 .card-footer {
     background-color: rgba(0, 0, 255,0.06);
 }
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.75);
+}
