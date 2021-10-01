@@ -264,7 +264,7 @@ describe('Testing-cancel-and-save-methods', () => {
         expect(wrapper.vm.canSave).toBeFalsy();
     });
 
-    it('save-sets-variables-and-makes-an-api-request-data-values', async () => {
+    it('save-sets-variables-and-makes-an-api-request', async () => {
         wrapper.vm.uploadImageRequest = jest.fn();
         await wrapper.vm.save();
         expect(wrapper.vm.confirmed).toBeTruthy();
